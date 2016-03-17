@@ -1,0 +1,19 @@
+{% extends '_page.html' %}
+
+{% set pageCategory = "error" %}
+
+{% block custom_style%}
+    {{ stylesheet_tag('homecss') | safe }}
+{% endblock %}
+
+{% block header %}
+    {{ super() }}
+{% endblock %}
+
+{% block main %}
+    400
+{% endblock %}
+
+{% block custom_script %}
+    {{ javascript_tag('home') | safe }}
+{% endblock %}

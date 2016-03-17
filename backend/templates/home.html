@@ -1,0 +1,13 @@
+{% set pageCategory = "home" %}
+{% extends '_page.html' %}
+
+{% block custom_style%}
+    {{ stylesheet_tag('home_css') | safe }}
+{% endblock %}
+
+{% block main %}
+{% endblock %}
+
+{% block custom_script %}
+    {{ javascript_tag('home') | safe }}
+{% endblock %}
