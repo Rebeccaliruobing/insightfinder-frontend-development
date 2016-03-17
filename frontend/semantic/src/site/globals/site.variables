@@ -1,3 +1,19 @@
 /*******************************
      User Global Variables
 *******************************/
+
+/*-------------------
+       Fonts
+--------------------*/
+
+@importGoogleFonts   : false;
+
+@fontChinese         : "Lantinghei SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑";
+@headerFont          : "Helvetica Neue",Helvetica,@fontChinese,Arial,sans-serif;
+@pageFont            : "Helvetica Neue",Helvetica,@fontChinese,Arial,sans-serif;
+
+/*-------------------
+    Border Radius
+--------------------*/
+@absoluteBorderRadius: @3px;
+

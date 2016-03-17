@@ -42,5 +42,6 @@ def init_app(app):
     main_view = MainView.as_view(b'main_view')
     bp.add_url_rule("/", view_func=main_view)
     bp.add_url_rule("/<string:action>", view_func=main_view)
+    bp.add_url_rule("/monitoring/<string:action>", view_func=main_view)
 
     app.register_blueprint(bp)

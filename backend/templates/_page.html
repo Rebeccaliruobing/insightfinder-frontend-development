@@ -13,7 +13,7 @@
 
 <body class="{{ pageCategory }}">
 
-<div id="page-body" class="page-body"></div>
+{% block page_body %}{% endblock %}
 
 {{ javascript_tag('commons') | safe }}
 {% block custom_script %}{% endblock %}
