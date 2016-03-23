@@ -1,0 +1,37 @@
+{% set pageCategory = "signin" %}
+{% extends '_page.html' %}
+
+{% block custom_style%}
+    {{ stylesheet_tag('signin_css') | safe }}
+{% endblock %}
+
+{% block page_body %}
+<div class="ui middle aligned center aligned grid">
+    <div class="column">
+        <form class="ui form" accept-charset="UTF-8" method="post">
+            <h2 class="ui image header">
+                <img src="{{ asset_url_for('images/logo.png') }}" class="image">
+            </h2>
+            <div class="ui segment">
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="user icon"></i>
+                        <input type="text" name="username" placeholder="User Name">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="ui left icon input">
+                        <i class="lock icon"></i>
+                        <input type="password" name="password" placeholder="Password">
+                    </div>
+                </div>
+                <div class="ui fluid orange submit button">Sign In</div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_script %}
+    {{ javascript_tag('signin') | safe }}
+{% endblock %}

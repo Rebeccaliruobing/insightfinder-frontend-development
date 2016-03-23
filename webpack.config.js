@@ -26,6 +26,9 @@ module.exports = {
 
     home: './home',
     home_css: './home.scss',
+
+    signin: './signin',
+    signin_css: './signin.scss',
   },
   output: {
     path: outputDir,
