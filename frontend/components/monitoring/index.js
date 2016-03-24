@@ -5,7 +5,7 @@
 import React from 'react';
 import {Link} from 'react-router';
 
-export RegisterProject from './register_project';
+export Projects from './projects';
 
 export class Monitoring extends React.Component {
   render() {
@@ -16,8 +16,7 @@ export class Monitoring extends React.Component {
               <div className="item">
                 <div className="header">Projects</div>
                 <div className="menu">
-                  <Link to="/monitoring/register-project" className="item">Register Project</Link>
-                  <div className="item">Remove Project</div>
+                  <Link to="/monitoring/projects" className="item">Projects</Link>
                 </div>
               </div>
               <div className="item">

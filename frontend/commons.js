@@ -6,4 +6,5 @@ import 'jquery';
 import 'react';
 import 'react-dom';
 import 'react-router';
+import 'lodash';
 import "./semantic/dist/semantic.js";

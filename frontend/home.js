@@ -7,7 +7,7 @@ import ReactDOM from 'react-dom';
 import {Router, Route, browserHistory, IndexRoute, IndexRedirect} from 'react-router';
 
 import Header from './components/header';
-import {Monitoring, RegisterProject} from './components/monitoring';
+import {Monitoring, Projects} from './components/monitoring';
 import Analysis from './components/analysis';
 import Settings from './components/settings';
 
@@ -29,7 +29,8 @@ if (pageBody) {
       <Route component={App} path="/">
         <IndexRedirect to="/monitoring" />
         <Route component={Monitoring} path="monitoring">
-          <Route component={RegisterProject} path="register-project" />
+          <IndexRedirect to="/monitoring/projects" />
+          <Route component={Projects} path="projects" />
         </Route>
         <Route component={Analysis} path="analysis" />
         <Route component={Settings} path="settings" />

@@ -12,17 +12,19 @@
             <h2 class="ui image header">
                 <img src="{{ asset_url_for('images/logo.png') }}" class="image">
             </h2>
-            <div class="ui segment">
-                <div class="field">
-                    <div class="ui left icon input">
+            <div class="ui segment left aligned">
+                <div class="field required">
+                    <label>User Name</label>
+                    <div class="ui icon input">
                         <i class="user icon"></i>
-                        <input type="text" name="username" placeholder="User Name">
+                        <input type="text" name="username">
                     </div>
                 </div>
-                <div class="field">
-                    <div class="ui left icon input">
+                <div class="field required">
+                    <label>Password</label>
+                    <div class="ui icon input">
                         <i class="lock icon"></i>
-                        <input type="password" name="password" placeholder="Password">
+                        <input type="password" name="password">
                     </div>
                 </div>
                 <div class="ui fluid orange submit button">Sign In</div>

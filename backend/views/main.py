@@ -16,7 +16,7 @@ class MainView(ActionView):
     def monitoring(self):
         return render_template('home.html')
 
-    def register_project(self):
+    def projects(self):
         return render_template('home.html')
 
     def analysis(self):
