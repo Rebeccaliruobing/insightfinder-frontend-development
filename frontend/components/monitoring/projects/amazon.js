@@ -1,5 +1,5 @@
 import React from 'react';
-import AmazonProjectModal from './amazon_form';
+import AmazonProjectModal from './amazon_modal';
 
 class AmazonProjects extends React.Component {
 
@@ -7,8 +7,7 @@ class AmazonProjects extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false,
-      modalSize: 'small',
+      showModal: false
     };
   }
 
@@ -25,8 +24,7 @@ class AmazonProjects extends React.Component {
                    onClick={(e) => this.setState({showModal: true})}>
                 <i className="plus icon" />Register
               </div>
-              <div className="ui left floated small labeled icon button"
-                   onClick={() => this.setState({modalSize: 'fullscreen'})}>
+              <div className="ui left floated small labeled icon button">
                 <i className="remove icon" />Remove
               </div>
             </th>
@@ -70,7 +68,7 @@ class AmazonProjects extends React.Component {
         </table>
         {
           this.state.showModal &&
-          <AmazonProjectModal size={this.state['modalSize']} onClose={this.handleModalClose}/>
+          <AmazonProjectModal onClose={this.handleModalClose}/>
         }
       </div>
     )

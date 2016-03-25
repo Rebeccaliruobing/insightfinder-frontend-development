@@ -29,9 +29,7 @@ let Modal = class Modal extends React.Component {
           closable: this.props['closable'],
           allowMultiple: false,
           onHidden: () => { this.props.onClose && this.props.onClose(); },
-          onDeny: () => {
-            alert('fsdfd');
-            this.props.onDeny && this.props.onDeny(); },
+          onDeny: () => { this.props.onDeny && this.props.onDeny(); },
           onApprove: () => { this.props.onApprove && this.props.onApprove(); }
         })
         .modal('show');
