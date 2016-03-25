@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import {Link, IndexLink} from 'react-router';
-import ProjectsAmazon from './amazon';
+import AmazonProjects from './amazon';
 import ProjectsGoogle from './google';
 
 
@@ -46,7 +46,7 @@ class Projects extends React.Component {
             onClick={(e) => this.selectTab(e, 'google')}>Google Cloud</a>
         </div>
         <div className={tabStates['amazon'] + ' ui tab segment'}>
-          {tabStates['amazon'] === 'active' ? <ProjectsAmazon/> : null} 
+          {tabStates['amazon'] === 'active' ? <AmazonProjects/> : null} 
         </div>
         <div className={tabStates['google'] + ' ui tab segment'}>
           {tabStates['google'] === 'active' ? <ProjectsGoogle/> : null} 

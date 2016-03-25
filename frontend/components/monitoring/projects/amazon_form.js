@@ -1,36 +1,29 @@
 import React from 'react';
-import _ from 'lodash';
+import {Modal} from '../../../artui';
 
-class ProjectAmazonForm extends React.Component {
+
+class AmazonProjectModal extends React.Component {
   render(){
-    var styles = {
-      display: 'block !important',
-      top: 0,
-    };
-
     return (
-      <div className="ui dimmer modals page transition visible active">
-      <div className="ui standard modal transition active scrolling visible" style={styles}>
-        <i className="close icon"></i>
-        <div className="header">
+      <Modal {...this.props}>
+        <Modal.Header>
           Modal Title
-        </div>
-        <div className="image content">
-        <div className="image">
-          An image can appear on left or an icon
-        </div>
-        <div className="description">
-      A description can appear on the right
-      </div>
-      </div>
-      <div className="actions">
-      <div className="ui button">Cancel</div>
-      <div className="ui button">OK</div>
-      </div>
-      </div>
-      </div>
-      )
+        </Modal.Header>
+        <Modal.ImageContent className="image content" style={{height: 500}}>
+          <div className="image">
+            An image can appear on left or an icon
+          </div>
+          <div className="description">
+            A description can appear on the right
+          </div>
+        </Modal.ImageContent>
+        <Modal.Actions>
+          <Modal.ActionButton deny={true}>Cancel</Modal.ActionButton>
+          <Modal.ActionButton approve={true}>OK</Modal.ActionButton>
+        </Modal.Actions>
+      </Modal>
+    )
   }
 }
 
-export default ProjectAmazonForm;
+export default AmazonProjectModal;
