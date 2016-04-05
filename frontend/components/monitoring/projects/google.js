@@ -15,20 +15,16 @@ class GoogleProjects extends React.Component {
 
   render() {
     return (
-      <div>
-        <table className="ui striped table unstackable">
-          <thead className="full-width">
-          <tr>
-            <th colSpan="6">
-              <div className="ui left floated small primary labeled icon button"
-                   onClick={(e) => this.setState({showModal: true})}>
-                <i className="plus icon" />Register
-              </div>
-              <div className="ui left floated small labeled icon button">
-                <i className="remove icon" />Remove
-              </div>
-            </th>
-          </tr>
+      <div className="ui segment attached">
+        <button className="ui small positive action button"
+                onClick={(e) => this.setState({showModal: true})}>
+          <i className="icon plus"></i>Register
+        </button>
+        <button className="ui small negative disabled button">
+          <i className="icon remove"></i>Remove
+        </button>
+        <table className="ui small table">
+          <thead>
           <tr>
             <th className="collapsing">
               <div className="ui fitted checkbox">
