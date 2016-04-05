@@ -22,6 +22,9 @@ class MainView(ActionView):
     def summary(self, path):
         return render_template('home.html')
 
+    def live(self, path):
+        return render_template('home.html')
+
     def analysis(self, path):
         return render_template('home.html')
 

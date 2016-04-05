@@ -4,10 +4,11 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, IndexRoute, IndexRedirect, Link} from 'react-router';
+import {Router, Route, browserHistory, 
+  IndexRoute, IndexRedirect, Link} from 'react-router';
 import {Console} from './artui/react';
 
-import {Monitoring, Projects, Summary} from './components/monitoring';
+import {Monitoring, Projects, Summary, LiveMonitoring} from './components/monitoring';
 import Analysis from './components/analysis';
 import Settings from './components/settings';
 
@@ -16,7 +17,9 @@ const logo = require('./images/logo.png');
 
 const EmptyContent = function(props) {
   return (
-    <div style={{height: 1000}}>Hello World!</div>
+    <Console.Content>
+      <div style={{height: 1000}}>Hi Insightfinder!</div>
+    </Console.Content>
     )
 };
 
@@ -29,12 +32,12 @@ const App = function(props) {
         <Link to="/settings" className="item">Alert Settings</Link>
         <div className="right menu">
           <div className="ui right simple dropdown item">
-            <i className="user icon circular teal inverted"></i>
+            <i className="user icon circular teal inverted" />
             Guest
-            <i className="dropdown icon"></i>
+            <i className="dropdown icon"/>
             <div className="menu">
               <div className="item">
-                <i className="icon power"></i>Logout
+                <i className="icon power"/>Logout
               </div>
             </div>
           </div>
@@ -55,9 +58,14 @@ if (pageBody) {
           <IndexRedirect to="/monitoring/projects" />
           <Route component={Projects} path="projects" />
           <Route component={Summary} path="summary" />
+          <Route component={LiveMonitoring} path="live" />
         </Route>
-        <Route component={Analysis} path="analysis" />
-        <Route component={Settings} path="settings" />
+        <Route component={Analysis} path="analysis">
+          <IndexRoute component={EmptyContent} />
+        </Route>
+        <Route component={Settings} path="settings" >
+          <IndexRoute component={EmptyContent} />
+        </Route>
       </Route>
     </Router>
   ), pageBody);

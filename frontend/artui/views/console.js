@@ -30,7 +30,6 @@ class Topbar extends React.Component {
       <div className={classes} {...others}>
         <a className="logo" href="/"><img src={logo} /></a>
         <div className="inner">
-          <div className="toggle"><i className="outdent icon"></i></div>
           <div className="ui menu">
             {this.props.children}
           </div>
@@ -67,6 +66,16 @@ Console.Content = function(props) {
   var classes = classNames('content', className);
   return (
     <div className={classes} {...others}>{props.children}</div>
+  )
+};
+
+Console.Breadcrumb = function(props) {
+  let {className, ...others} = props;
+  var classes = classNames('ui breadcrumb', className);
+  return (
+    <div className="ui outdent basic attached segment">
+      <div className={classes} {...others}>{props.children}</div>
+    </div>
   )
 };
 

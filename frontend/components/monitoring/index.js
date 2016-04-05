@@ -8,6 +8,7 @@ import {Console} from '../../artui/react';
 
 export Projects from './projects';
 export Summary from './summary';
+export LiveMonitoring from './live';
 
 export class Monitoring extends React.Component {
   render() {
@@ -24,10 +25,8 @@ export class Monitoring extends React.Component {
             <div className="item">
               <div className="header">Monitoring</div>
               <div className="menu">
-                <div className="item">
-                  <Link to="/monitoring/summary" className="item">Daily Summary</Link>
-                </div>
-                <div className="item">Live Monitoring</div>
+                <Link to="/monitoring/summary" className="item">Daily Summary</Link>
+                <Link to="/monitoring/live" className="item">Live Monitoring</Link>
                 <div className="item">Incident Analysis</div>
                 <div className="item">Cluster Outlier Detection</div>
                 <div className="item">Software Rollout Check</div>

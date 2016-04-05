@@ -25,6 +25,7 @@ class Analysis extends React.Component {
             </div>
           </div>
         </Console.Navbar>
+        {this.props.children}
       </Console.Wrapper>
     )
   }

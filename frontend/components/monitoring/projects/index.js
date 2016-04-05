@@ -35,15 +35,13 @@ class Projects extends React.Component {
     return (
       <Console.Content>
         <div className="ui segments" ref={c => this._el = c}>
-          <div className="ui outdent basic attached segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"></i>
-              <Link to="/monitoring" className="section">Cloud Monitoring</Link>
-              <i className="right angle icon divider"></i>
-              <div className="active section">Projects</div>
-            </div>
-          </div>
+          <Console.Breadcrumb>
+            <IndexLink to="/" className="section">Home</IndexLink>
+            <i className="right angle icon divider"/>
+            <Link to="/monitoring" className="section">Cloud Monitoring</Link>
+            <i className="right angle icon divider"/>
+            <div className="active section">Projects</div>
+          </Console.Breadcrumb>
           {tabStates['amazon'] === 'active' &&
           <div className="ui message attached">
             <ul>
