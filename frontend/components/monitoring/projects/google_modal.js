@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import React from 'react';
-import {Modal} from '../../../artui';
+import {Modal} from '../../../artui/react';
 
 
 class GoogleProjectModal extends React.Component {

@@ -10,17 +10,20 @@ class MainView(ActionView):
     def index(self):
         return redirect('/monitoring')
 
-    def signin(self):
+    def signin(self, path):
         return render_template('signin.html')
 
-    def monitoring(self):
+    def monitoring(self, path):
         return render_template('home.html')
 
-    def projects(self):
+    def projects(self, path):
         return render_template('home.html')
 
-    def analysis(self):
+    def summary(self, path):
         return render_template('home.html')
 
-    def settings(self):
+    def analysis(self, path):
+        return render_template('home.html')
+
+    def settings(self, path):
         return render_template('home.html')

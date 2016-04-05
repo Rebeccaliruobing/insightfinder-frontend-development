@@ -4,37 +4,39 @@
 
 import React from 'react';
 import {Link} from 'react-router';
+import {Console} from '../../artui/react';
 
 export Projects from './projects';
+export Summary from './summary';
 
 export class Monitoring extends React.Component {
   render() {
     return (
-        <div className="ui grid">
-          <div className="three wide column">
-            <div className="ui large fluid vertical menu">
-              <div className="item">
-                <div className="header">Projects</div>
-                <div className="menu">
-                  <Link to="/monitoring/projects" className="item">Projects</Link>
-                </div>
+      <Console.Wrapper>
+        <Console.Navbar>
+          <div className="ui vertical menu inverted">
+            <div className="item">
+              <div className="header">Projects</div>
+              <div className="menu">
+                <Link to="/monitoring/projects" className="item">Projects</Link>
               </div>
-              <div className="item">
-                <div className="header">Monitoring</div>
-                <div className="menu">
-                  <div className="item">Daily Summary</div>
-                  <div className="item">Live Monitoring</div>
-                  <div className="item">Incident Analysis</div>
-                  <div className="item">Cluster Outlier Detection</div>
-                  <div className="item">Software Rollout Check</div>
+            </div>
+            <div className="item">
+              <div className="header">Monitoring</div>
+              <div className="menu">
+                <div className="item">
+                  <Link to="/monitoring/summary" className="item">Daily Summary</Link>
                 </div>
+                <div className="item">Live Monitoring</div>
+                <div className="item">Incident Analysis</div>
+                <div className="item">Cluster Outlier Detection</div>
+                <div className="item">Software Rollout Check</div>
               </div>
             </div>
           </div>
-          <div className="thirteen wide column">
-            {this.props.children}
-          </div>
-        </div>
+        </Console.Navbar>
+        {this.props.children}
+      </Console.Wrapper>
     )
   }
 }

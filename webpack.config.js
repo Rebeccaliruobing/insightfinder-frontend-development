@@ -22,13 +22,13 @@ module.exports = {
   entry: {
     commons: './commons',
     assets: './assets',
-    commons_css: './commons.scss',
+    commons_css: './commons.less',
 
     home: './home',
-    home_css: './home.scss',
+    home_css: './home.less',
 
     signin: './signin',
-    signin_css: './signin.scss',
+    signin_css: './signin.less',
   },
   output: {
     path: outputDir,
