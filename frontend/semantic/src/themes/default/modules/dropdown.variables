@@ -44,6 +44,7 @@
 /* Text */
 @textLineHeight: 1em;
 @textLineHeightOffset: (@textLineHeight - 1em);
+@textCursorSpacing: 1px;
 
 /* Menu Item */
 @itemFontSize: @medium;
@@ -251,12 +252,14 @@
 @multipleSelectionChildVerticalMargin: (@searchSelectionVerticalPadding * (2/3));
 @multipleSelectionChildLeftMargin: (@inputHorizontalPadding - @multipleSelectionLeftPadding);
 @multipleSelectionChildMargin: @multipleSelectionChildVerticalMargin 0em @multipleSelectionChildVerticalMargin @multipleSelectionChildLeftMargin;
-@multipleSelectionChildLineHeight: @searchSelectionLineHeight;
+@multipleSelectionChildLineHeight: @relative17px;
 @multipleSelectionSearchStartWidth: (@glyphWidth * 2);
 
 /* Dropdown Icon */
-@multipleSelectionDropdownIconMargin: 0em -@labelHorizontalPadding 0em 0em;
-@multipleSelectionDropdownIconPadding: 0.5em;
+@multipleSelectionDropdownIconMargin: -@searchSelectionVerticalPadding -@labelHorizontalPadding 0em 0em;
+@multipleSelectionDropdownIconPadding: '';
+
+@multipleSelectionSearchAfterLabelDistance: @relative2px;
 
 /* Selection Label */
 @labelSize: @relativeMedium;

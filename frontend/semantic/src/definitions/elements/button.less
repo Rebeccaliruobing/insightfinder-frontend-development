@@ -207,7 +207,7 @@
   opacity: @disabledOpacity !important;
   background-image: none !important;
   box-shadow: none !important;
-  pointer-events: none;
+  pointer-events: none !important;
 }
 
 /* Basic Group With Disabled */
@@ -591,7 +591,11 @@
   vertical-align: @iconVerticalAlign;
   color: @iconColor;
 }
-.ui.button > .right.icon:not(.button) {
+
+.ui.button:not(.icon) > .icon:not(.button) {
+  margin: @iconMargin;
+}
+.ui.button:not(.icon) > .right.icon:not(.button) {
   margin: @rightIconMargin;
 }
 
@@ -1878,7 +1882,7 @@
 .ui.inverted.green.button.active,
 .ui.inverted.green.buttons .button:active,
 .ui.inverted.green.button:active {
-  box-shadlightOw: none !important;
+  box-shadow: none !important;
   color: @greenTextColor;
 }
 .ui.inverted.green.buttons .button:hover,
