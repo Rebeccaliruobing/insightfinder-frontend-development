@@ -17,8 +17,8 @@ class AmazonProjectModal extends React.Component {
 
   render(){
     return (
-      <Modal {...this.props} size="small" closable={false}>
-        <Modal.Content>
+      <Modal {...this.props} size="small" closable={true}>
+        <div className="content">
           <form className="ui form">
             <div className="field">
               <label>Project Name</label>
@@ -52,16 +52,15 @@ class AmazonProjectModal extends React.Component {
               </div>
             </div>
           </form>
-        </Modal.Content>
-        <Modal.Actions>
-          <Modal.ActionButton deny={true}>Cancel</Modal.ActionButton>
-          <Modal.ActionButton
-            approve={true} className="labeled">
+        </div>
+        <div className="actions">
+          <div className="ui button deny">Cancel</div>
+          <div className="ui button approve labeled">
             <div className="ui button orange">
-              <i className="save icon"></i>Register
+              <i className="save icon"/>Register
             </div>
-          </Modal.ActionButton>
-        </Modal.Actions>
+          </div>
+        </div>
       </Modal>
     )
   }
