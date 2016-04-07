@@ -71,14 +71,15 @@ const Modal = class Modal extends React.Component {
 Modal.propTypes = {
   closable: React.PropTypes.bool,
   type: React.PropTypes.oneOf(['basic']),
-  size: React.PropTypes.oneOf(['fullscreen', 'small', 'large']),
+  size: React.PropTypes.oneOf(['mini', 'tiny', 'small', '', 'large', 'big', 'huge', 'massive']),
   onClose: React.PropTypes.func.isRequired,
   onApprove: React.PropTypes.func,
   onDeny: React.PropTypes.func
 };
 
 Modal.defaultProps = {
-  closable: true
+  closable: true,
+  size: ''
 };
 
 export default Modal;

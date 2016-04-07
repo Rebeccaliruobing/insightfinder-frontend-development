@@ -1,3 +1,70 @@
 /*******************************
          Site Overrides
 *******************************/
+
+/* Responsive Widths */
+@mobileWidth: 95%;
+@tabletWidth: 88%;
+@computerWidth: 740px;
+@largeMonitorWidth: 800px;
+@widescreenMonitorWidth: 860px;
+
+/* Size Widths */
+@miniRatio: 0.4;
+@tinyRatio: 0.6;
+@smallRatio: 0.8;
+@largeRatio: 1.2;
+@bigRatio: 1.3;
+@hugeRatio: 1.4;
+
+@miniHeaderSize: 1.3em;
+@miniMobileWidth: @mobileWidth;
+@miniTabletWidth: (@tabletWidth * @miniRatio);
+@miniComputerWidth: (@computerWidth * @miniRatio);
+@miniLargeMonitorWidth: (@largeMonitorWidth * @miniRatio);
+@miniWidescreenMonitorWidth: (@widescreenMonitorWidth * @miniRatio);
+
+@miniMobileMargin: 0em 0em 0em -(@miniMobileWidth / 2);
+@miniTabletMargin: 0em 0em 0em -(@miniTabletWidth / 2);
+@miniComputerMargin: 0em 0em 0em -(@miniComputerWidth / 2);
+@miniLargeMonitorMargin: 0em 0em 0em -(@miniLargeMonitorWidth / 2);
+@miniWidescreenMonitorMargin: 0em 0em 0em -(@miniWidescreenMonitorWidth / 2);
+
+@tinyHeaderSize: 1.3em;
+@tinyMobileWidth: @mobileWidth;
+@tinyTabletWidth: (@tabletWidth * @tinyRatio);
+@tinyComputerWidth: (@computerWidth * @tinyRatio);
+@tinyLargeMonitorWidth: (@largeMonitorWidth * @tinyRatio);
+@tinyWidescreenMonitorWidth: (@widescreenMonitorWidth * @tinyRatio);
+
+@tinyMobileMargin: 0em 0em 0em -(@tinyMobileWidth / 2);
+@tinyTabletMargin: 0em 0em 0em -(@tinyTabletWidth / 2);
+@tinyComputerMargin: 0em 0em 0em -(@tinyComputerWidth / 2);
+@tinyLargeMonitorMargin: 0em 0em 0em -(@tinyLargeMonitorWidth / 2);
+@tinyWidescreenMonitorMargin: 0em 0em 0em -(@tinyWidescreenMonitorWidth / 2);
+
+@bigHeaderSize: 1.6em;
+@bigMobileWidth: @mobileWidth;
+@bigTabletWidth: @tabletWidth;
+@bigComputerWidth: (@computerWidth * @bigRatio);
+@bigLargeMonitorWidth: (@largeMonitorWidth * @bigRatio);
+@bigWidescreenMonitorWidth: (@widescreenMonitorWidth * @bigRatio);
+
+@bigMobileMargin: 0em 0em 0em -(@bigMobileWidth / 2);
+@bigTabletMargin: 0em 0em 0em -(@bigTabletWidth / 2);
+@bigComputerMargin: 0em 0em 0em -(@bigComputerWidth / 2);
+@bigLargeMonitorMargin: 0em 0em 0em -(@bigLargeMonitorWidth / 2);
+@bigWidescreenMonitorMargin: 0em 0em 0em -(@bigWidescreenMonitorWidth / 2);
+
+@hugeHeaderSize: 1.6em;
+@hugeMobileWidth: @mobileWidth;
+@hugeTabletWidth: @tabletWidth;
+@hugeComputerWidth: (@computerWidth * @hugeRatio);
+@hugeLargeMonitorWidth: (@largeMonitorWidth * @hugeRatio);
+@hugeWidescreenMonitorWidth: (@widescreenMonitorWidth * @hugeRatio);
+
+@hugeMobileMargin: 0em 0em 0em -(@hugeMobileWidth / 2);
+@hugeTabletMargin: 0em 0em 0em -(@hugeTabletWidth / 2);
+@hugeComputerMargin: 0em 0em 0em -(@hugeComputerWidth / 2);
+@hugeLargeMonitorMargin: 0em 0em 0em -(@hugeLargeMonitorWidth / 2);
+@hugeWidescreenMonitorMargin: 0em 0em 0em -(@hugeWidescreenMonitorWidth / 2);
