@@ -24,13 +24,16 @@ const Modal = class Modal extends React.Component {
   componentDidMount() {
 
     if (this._el) {
-      $(this._el)
+      $(this._el).find('.ui.modal')
         .modal({
           closable: this.props['closable'],
           allowMultiple: false,
-          onHidden: () => { this.props.onClose && this.props.onClose(); },
-          onDeny: () => { this.props.onDeny && this.props.onDeny(); },
-          onApprove: () => { this.props.onApprove && this.props.onApprove(); }
+          inverted: this.props['dimmer'] === 'inverted',
+          blurring: this.props['dimmer'] === 'blurring',
+          transition: this.props['transition'],
+          onHidden: () => { this.props.onClose(); },
+          onCancel: () => { this.props.onCancel(); },
+          onOK: () => { this.props.onOK(); }
         })
         .modal('show');
     }
@@ -38,25 +41,25 @@ const Modal = class Modal extends React.Component {
 
   componentWillUnmount() {
     if (this._el) {
-      $(this._el).remove();
+      $(this._el).find('.ui.modal').remove();
     }
   }
 
   componentDidUpdate() {
     if (this._el) {
-      $(this._el).modal('refresh');
+      $(this._el).find('.ui.modal').modal('refresh');
     }
   }
 
   render() {
 
-    let {type, size, className, onClose, onDeny, onApprove, closable, ...other} = this.props;
+    let {type, size, className, transition, onClose, onCancel, onOK, closable, ...other} = this.props;
     let classes = classNames('ui modal', size, type, className);
 
     // 在Modal外添加一个div元素, 用于避免React Unmount时异常.
     return(
-      <div>
-        <div className={classes} {...other} ref={c => this._el = c}>
+      <div ref={c => this._el = c}>
+        <div className={classes} {...other}>
           {
             closable &&
             <i className="close icon"/>
@@ -71,15 +74,20 @@ const Modal = class Modal extends React.Component {
 Modal.propTypes = {
   closable: React.PropTypes.bool,
   type: React.PropTypes.oneOf(['basic']),
-  size: React.PropTypes.oneOf(['mini', 'tiny', 'small', '', 'large', 'big', 'huge', 'massive']),
+  size: React.PropTypes.oneOf(['mini', 'tiny', 'small', 'large', 'big', 'huge', 'massive']),
+  transition: React.PropTypes.string,
+  dimmer: React.PropTypes.string,
+  
+  // 在onClose回调函数中, 需删除本react组件以删除创建的dom对象.
   onClose: React.PropTypes.func.isRequired,
-  onApprove: React.PropTypes.func,
-  onDeny: React.PropTypes.func
+  onOK: React.PropTypes.func,
+  onCancel: React.PropTypes.func
 };
 
 Modal.defaultProps = {
   closable: true,
-  size: ''
+  onOK: () => {},
+  onCancel: () => {}
 };
 
 export default Modal;

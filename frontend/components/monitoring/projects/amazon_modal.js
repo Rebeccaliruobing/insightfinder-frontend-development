@@ -18,9 +18,6 @@ class AmazonProjectModal extends React.Component {
   render(){
     return (
       <Modal {...this.props} size="mini" closable={false}>
-        <div className="header">
-          fsdfdsf
-        </div>
         <div className="content">
           <form className="ui form">
             <div className="field">
