@@ -1,0 +1,116 @@
+@TopbarHeight:      48px;
+@TopbarLogoHeight:  40px;
+@NavbarWidth:       200px;
+
+.ui.console {
+  height:             100%;
+  width:              100%;
+  overflow:           hidden;
+  position:           relative;;
+  background-color:   #545454;
+
+  > .topbar {
+    width:          100%;
+    height:         @TopbarHeight;
+    width:          100%;
+    background:     #fff;
+    position:       fixed;
+    z-index:        10;
+    > .logo {
+      width:        @NavbarWidth;
+      height:       @TopbarHeight;
+      display:      block;
+      float:        left;
+      text-align: center;
+      background-color: #353644;
+
+      > img {
+        height:     @TopbarLogoHeight; 
+        margin:     (@TopbarHeight - @TopbarLogoHeight)/2 auto;
+      }
+    }
+
+    > .inner {
+      box-shadow: 0 -1px 8px 1px #bbb;
+      height:     @TopbarHeight; 
+      margin-left: 200px;
+
+      > .toggle {
+        float: left;
+        height: @TopbarHeight;
+        .icon {
+          font-size: 16px;
+          color: #555;
+          padding: 16px;
+          margin: 0;
+          border-right: 1px solid #eee;
+          height: @TopbarHeight;
+          width: @TopbarHeight;
+          cursor: pointer;
+
+          &:hover {
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.03);
+            color: rgba(0, 0, 0, 0.95);
+          }
+        }
+      }
+
+      .ui.menu {
+        margin: 0px;
+        border: 0px;
+        box-shadow: none;
+        border-radius: 0px;
+        height: @TopbarHeight;
+      }
+    }
+  }
+
+  > .wrapper {
+    height: 100%;
+    width: 100%;
+  }
+
+  > .wrapper > .navbar,
+  > .navbar {
+    height:         100%;
+    width:          @NavbarWidth;
+    height:         100%;
+    padding-top:    @TopbarHeight;
+    border-radius:  0;
+    margin:         0;
+    background:     #1B1C1D;
+    float:          left;
+    position:       fixed;
+    z-index:        9;
+    overflow-y:     auto;
+  }
+
+  > .wrapper > .content,
+  > .content {
+    width:        100%;
+    height:       100%;
+    padding-top:  @TopbarHeight;
+    padding-left: @NavbarWidth;
+    background:   white;
+    position:     relative;
+    overflow-y:     auto;
+    margin: 0;
+
+    > .xui.segments {
+      padding: 0px 1.5rem;
+    }
+
+    .xui.segments {
+      border: 0px;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .xui.breadcrumb {
+      .active.section {
+        font-weight: normal;
+      }
+    }
+  }
+}

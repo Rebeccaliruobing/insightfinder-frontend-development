@@ -1,0 +1,25 @@
+/*
+ *
+**/
+
+@container-mixins: {
+
+  @import "../../semantic/src/themes/default/elements/container.variables";
+  @import (optional) "../../semantic/src/site/elements/container.variables";
+
+  /**
+   * 创建一个有最大宽度限制的container
+  **/
+  .makeContainer(@maxWidth; @offset: 0;
+                 @fluidAt: @maxWidth + @offset + 2 * @mobileGutter) {
+
+    width: auto;
+    max-width: @maxWidth !important;
+
+    @media only screen and (max-width: @fluidAt) {
+      margin-left: @mobileGutter !important;
+      margin-right: @mobileGutter !important;
+      width: auto !important;
+    }
+  }
+};

@@ -1,0 +1,10 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@headerWeight: @boldFontWeight;
+@verticalHeaderFontWeight: @boldFontWeight;
+@subMenuActiveFontWeight: @boldFontWeight;
+@secondaryPointingActiveFontWeight: @boldFontWeight;
+@tabularActiveWeight: @boldFontWeight;
+@textMenuHeaderFontWeight: @boldFontWeight;

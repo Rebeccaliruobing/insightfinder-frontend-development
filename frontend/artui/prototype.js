@@ -1,0 +1,82 @@
+/*
+ * 包括进行原型开发时, 需要使用的图片资源. 原型开发结束后, 应不使用该文件.
+**/
+
+export const Wireframes = { 
+  'centered_paragraph': require('./images/wireframe/centered-paragraph.png'),
+  'image_square': require('./images/wireframe/image-square.png'), 
+  'image_text': require('./images/wireframe/image-text.png'),
+  'image': require('./images/wireframe/image.png'),
+  'media_paragraph_alt.': require('./images/wireframe/media-paragraph-alt.png'),
+  'media_paragraph': require('./images/wireframe/media-paragraph.png'),
+  'paragraph': require('./images/wireframe/paragraph.png'),
+  'short_paragraph': require('./images/wireframe/short-paragraph.png'),
+  'square_image': require('./images/wireframe/square-image.png'), 
+  'text_image': require('./images/wireframe/text-image.png'),
+  'white_image': require('./images/wireframe/white-image.png')
+};
+
+export const Avatars = {
+  large: {
+    ade: require('./images/avatar/large/ade.png'),
+    chris: require('./images/avatar/large/chris.png'),
+    christian: require('./images/avatar/large/christian.png'),
+    daniel: require('./images/avatar/large/daniel.png'),
+    elliot: require('./images/avatar/large/elliot.png'),
+    helen: require('./images/avatar/large/helen.png'),
+    jenny: require('./images/avatar/large/jenny.png'),
+    joe: require('./images/avatar/large/joe.png'),
+    justen: require('./images/avatar/large/justen.png'),
+    laura: require('./images/avatar/large/laura.png'),
+    matt: require('./images/avatar/large/matt.png'),
+    nan: require('./images/avatar/large/nan.png'),
+    nom: require('./images/avatar/large/nom.png'),
+    steve: require('./images/avatar/large/steve.png'),
+    stevie: require('./images/avatar/large/stevie.png'),
+    tom: require('./images/avatar/large/tom.png'),
+    veronika: require('./images/avatar/large/veronika.png'),
+    zoe: require('./images/avatar/large/zoe.png'),
+    cassie: require('./images/avatar/large/cassie.png'),
+    elyse: require('./images/avatar/large/elyse.png'),
+    eve: require('./images/avatar/large/eve.png'),
+    kristy: require('./images/avatar/large/kristy.png'),
+    lena: require('./images/avatar/large/lena.png'),
+    lindsay: require('./images/avatar/large/lindsay.png'),
+    mark: require('./images/avatar/large/mark.png'),
+    matthew: require('./images/avatar/large/matthew.png'),
+    molly: require('./images/avatar/large/molly.png'),
+    patrick: require('./images/avatar/large/patrick.png'),
+    rachel: require('./images/avatar/large/rachel.png')
+  },
+  small: {
+    ade: require('./images/avatar/small/ade.png'),
+    chris: require('./images/avatar/small/chris.png'),
+    christian: require('./images/avatar/small/christian.png'),
+    daniel: require('./images/avatar/small/daniel.png'),
+    elliot: require('./images/avatar/small/elliot.png'),
+    helen: require('./images/avatar/small/helen.png'),
+    jenny: require('./images/avatar/small/jenny.png'),
+    joe: require('./images/avatar/small/joe.png'),
+    justen: require('./images/avatar/small/justen.png'),
+    laura: require('./images/avatar/small/laura.png'),
+    matt: require('./images/avatar/small/matt.png'),
+    nan: require('./images/avatar/small/nan.png'),
+    nom: require('./images/avatar/small/nom.png'),
+    steve: require('./images/avatar/small/steve.png'),
+    stevie: require('./images/avatar/small/stevie.png'),
+    tom: require('./images/avatar/small/tom.png'),
+    veronika: require('./images/avatar/small/veronika.png'),
+    zoe: require('./images/avatar/small/zoe.png'),
+    cassie: require('./images/avatar/small/cassie.png'),
+    elyse: require('./images/avatar/small/elyse.png'),
+    eve: require('./images/avatar/small/eve.png'),
+    kristy: require('./images/avatar/small/kristy.png'),
+    lena: require('./images/avatar/small/lena.png'),
+    lindsay: require('./images/avatar/small/lindsay.png'),
+    mark: require('./images/avatar/small/mark.png'),
+    matthew: require('./images/avatar/small/matthew.png'),
+    molly: require('./images/avatar/small/molly.png'),
+    patrick: require('./images/avatar/small/patrick.png'),
+    rachel: require('./images/avatar/small/rachel.png')
+  }
+};

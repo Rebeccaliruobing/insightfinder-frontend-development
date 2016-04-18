@@ -1,0 +1,12 @@
+/*******************************
+         Site Overrides
+*******************************/
+
+.ui.tiny.input {
+  font-size: @relativeTiny;
+}
+
+// Compact
+.ui.compact.input input {
+  padding: @compactPadding !important;
+}

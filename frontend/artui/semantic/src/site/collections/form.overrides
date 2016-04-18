@@ -1,0 +1,47 @@
+/*******************************
+         Site Overrides
+*******************************/
+
+// Label
+.ui.form .field > label {
+
+  // Text aligned
+  &[class*="left aligned"] {
+    text-align: left;
+  }
+  &[class*="center aligned"] {
+    text-align: center;
+  }
+  &[class*="right aligned"] {
+    text-align: right;
+  }
+  &.justified {
+    text-align: justify;
+    hyphens: auto;
+  }
+
+  // Wide
+  .loopWide({
+    &.@{wideName}.wide {
+      width: @@wideWide;
+    }
+  });
+}
+
+// 多字段的field
+.ui.form .parts.field {
+  & > .ui.input, & > .ui.checkbox,
+  & > .ui.dropdown, & > .ui.button,
+  & > input, & > select, & > span {
+    margin-right: @partsFieldDistance;
+    vertical-align: middle;
+  }
+
+  & > :last-child {
+    margin-right: 0em !important;
+  }
+}
+
+.ui.form .field > span {
+  display: inline-block;
+}

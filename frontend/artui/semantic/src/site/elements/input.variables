@@ -1,0 +1,5 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@compactPadding: (@verticalPadding * 0.75 - @lineHeightOffset) @horizontalPadding * 0.75;

@@ -1,0 +1,12 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@titleFontSize: @relativeLarge;
+@contentMargin: auto;
+@contentPadding: 1em 0em 0em;
+
+/* Divided */
+@dividedBorderWidth: 1px;
+@dividedBorder: @dividedBorderWidth solid @borderColor;
+@dividedColoredBorderWidth: 2px;

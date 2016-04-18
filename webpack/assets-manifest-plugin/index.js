@@ -1,111 +1,133 @@
-var fs = require('fs');
-var path = require('path');
-
-var webpack = require('webpack');
-var Format = require('./format');
-
 /**
  * 创建一个包括Webpack编译生成文件的信息的manifest文件。
  * 该文件中包括生成文件与对应包含hash值文件名的映射信息。
+ * 
  * https://github.com/nickjj/manifest-revision-webpack-plugin
- *
- * @param {string} output - 保存manifest的文件路径
- * @param {object} options - 配置参数
- */
-var AssetsManifestPlugin = function (output, options) {
-    this.output = output;
-    this.options = options || {}
+ * https://github.com/webdeveric/webpack-assets-manifest
+**/
 
-    this.options.rootAssetPath = this.options.rootAssetPath || './frontend';
-    this.options.format = this.options.format || 'general';
+'use strict';
+
+var fs = require('fs');
+var path = require('path');
+var _ = require('lodash');
+
+/*
+ * @param {object} output - 配置信息
+ * @constructor
+ */
+var AssetsManifestPlugin = function (options) {
+  var defaults = {
+    output: '../backend/manifest.json',
+    replacer: null,
+    space: '\t',
+    baseURL: '/static/'
+  };
+  
+  options = _.pick(
+    _.merge({}, defaults, options || {}),
+    _.keys(defaults)
+  );
+  
+  _.merge(this, options);
+  
+  this.moduleAssets = {};
+};
+
+AssetsManifestPlugin.prototype.getStatsData = function(stats) {
+  return stats.toJson({
+    assets: true,
+    modulesSort: true,
+    chunksSort: true,
+    assetsSort: true,
+
+    hash: false,
+    version: false,
+    timings: false,
+    chunks: false,
+    chunkModules: false,
+    modules: false,
+    children: false,
+    cached: false,
+    reasons: false,
+    source: false,
+    errorDetails: false,
+    chunkOrigins: false 
+  });
+};
+
+AssetsManifestPlugin.prototype.getExtension = function(filename, num)
+{
+  if (! filename) {
+    return '';
+  }
+
+  num = (num || 1) | 0;
+
+  var parts = path.basename(filename).split(/\./);
+  parts.shift(); // Remove the filename
+
+  return parts.length ? '.' + parts.slice(-num).join('.') : '';
+};
+
+AssetsManifestPlugin.prototype.processAssets = function(assets)
+{
+  for (var name in assets) {
+    var filenames = assets[name];
+
+    if (! Array.isArray(filenames)) {
+      filenames = [ filenames ];
+    }
+
+    for (var i = 0, l = filenames.length; i < l ; ++i ) {
+      var filename = name + this.getExtension(filenames[ i ], 2);
+      this.moduleAssets[filename] = filenames[ i ];
+    }
+  }
+  return this.moduleAssets;
+};
+
+AssetsManifestPlugin.prototype.toString = function()
+{
+  var self = this;
+  _.each(_.keys(this.moduleAssets), function(key){
+    self.moduleAssets[key] = self.baseURL + self.moduleAssets[key]
+  });
+  return JSON.stringify(this.moduleAssets, this.replacer, this.space);
 };
 
 /**
- * When given a logical asset path, produce an array that contains the logical
- * path of the asset without the cache hash included as the first element.
- * The second element contains the cached version of the asset name.
-
- * @param {string} logicalAssetPath - The path of the asset without the root.
- * @param {string} cachedAsset - The file name of the asset with the cache hash.
- * @returns {Array}
+ * 处理webpack Done事件
+ * @param output
+ * @param stats
  */
-AssetsManifestPlugin.prototype.mapAsset = function (logicalAssetPath, cachedAsset) {
-    if (logicalAssetPath.charAt(0) === '/') {
-        logicalAssetPath = logicalAssetPath.substr(1);
-    }
+AssetsManifestPlugin.prototype.handleDone = function(output, stats) {
 
-    return [logicalAssetPath, cachedAsset];
+  var fs   = require('fs-extra');
+  this.processAssets(this.getStatsData(stats).assetsByChunkName);
+  var json = this.toString();
+  fs.mkdirsSync( path.dirname(output) );
+  fs.writeFileSync(output, json);
 };
 
 /**
- * Take in the modules array from the webpack stats and produce an object that
- * only includes assets that matter to us. The key is the asset logical path
- * and the value is the logical path but with the cached asset name.
- *
- * You would use this as a lookup table in your web server.
-
- * @param {string} data - Array of webpack modules.
- * @returns {Object}
+ * Webpack 编译插件入口.
+ * @param (object) compiler - Webpack 编译器对象
  */
-AssetsManifestPlugin.prototype.parsedAssets = function (data) {
-    var assets = {};
-
-    for (var i = 0, length = data.length; i < length; i++) {
-        var item = data[i];
-
-        // 只处理本地的assets.
-        if (item.name.indexOf('./') === 0 &&
-            item.name.indexOf('~/') === -1 &&
-            fs.lstatSync(item.name).isFile() &&
-            item.hasOwnProperty('assets') &&
-            item.assets.length > 0) {
-
-            var nameWithoutRoot = item.name.replace(
-                this.options.rootAssetPath + '/', '');
-            var mappedAsset = this.mapAsset(nameWithoutRoot,
-                item.assets.slice(-1)[0]);
-            assets[mappedAsset[0]] = mappedAsset[1];
-        }
-    }
-
-    return assets;
-};
-
 AssetsManifestPlugin.prototype.apply = function (compiler) {
 
-    var self = this;
-    var output = this.output;
+  var self = this;
+  var basedir = compiler.context;
+  var output = path.resolve(basedir, this.output);
+  
+  compiler.plugin('compilation', function(compilation){
+    compilation.plugin('module-asset', function(module, hashedFile) {
+      var logicalPath = path.relative(basedir, module.userRequest);
+      self.moduleAssets[logicalPath] = hashedFile;
+    })
+  });
 
-    // 从webpack的stats中获得所需的信息，通过options过滤不需要的信息。
-    var options = {};
-    options.assets = true;
-    options.version = false;
-    options.timings = false;
-    options.chunks = true;
-    options.chunkModules = false;
-    options.cached = true;
-    options.source = false;
-    options.reasons = false;
-    options.errorDetails = false;
-    options.chunkOrigins = false;
-
-    compiler.plugin('done', function (stats) {
-        var data = stats.toJson(options);
-        var parsedAssets = self.parsedAssets(data.modules);
-        var outputData = null;
-
-        if (typeof self.options.format === 'string' ||
-            self.options.format instanceof String) {
-
-            var format = new Format(data, parsedAssets);
-            outputData = format[self.options.format]();
-        }
-        else {
-            outputData = self.options.format(data, parsedAssets);
-        }
-
-        fs.writeFileSync(output, JSON.stringify(outputData, null, '\t'));
-    });
+  compiler.plugin('done', this.handleDone.bind(this, output));
 };
 
 module.exports = AssetsManifestPlugin;

@@ -1,0 +1,14 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@mobileWidth        : auto;
+@tabletWidth        : 720px;
+@computerWidth      : 960px;
+@largeMonitorWidth  : 1264px;
+@mobileGutter       : @2spacer;
+
+/* Coupling (Add Negative Margin to container size) */
+@gridGutterWidth              : @2spacer;
+@relaxedGridGutterWidth       : @3spacer;
+@veryRelaxedGridGutterWidth   : @4spacer;

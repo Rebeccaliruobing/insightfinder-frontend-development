@@ -49,8 +49,7 @@ class Assets(object):
         """
         try:
             with self.app.open_resource(self.manifest, 'r') as stats_json:
-                stats = json.load(stats_json)
-                self.assets = stats['assets']
+                self.assets = json.load(stats_json)
         except IOError:
             raise RuntimeError(
                 u"需要设置配置参数'WEBPACK_MANIFEST_PATH'，"
@@ -99,15 +98,16 @@ class Assets(object):
             return asset
 
         # 如果是debug环境，使用request中的host来替换localhost
-        assets_url = self.assets_url
-
-        if self.app.debug and self.assets_debug_url:
-            host = request.host.split(':')[0]
-            assets_url = self.assets_debug_url.format(host)
+        # assets_url = self.assets_url
+        #
+        # if self.app.debug and self.assets_debug_url:
+        #     host = request.host.split(':')[0]
+        #     assets_url = self.assets_debug_url.format(host)
 
         for key in self.assets:
             if key == asset:
-                return '{0}{1}'.format(assets_url, self.assets[key])
+                # return '{0}{1}'.format(assets_url, self.assets[key])
+                return self.assets[key]
 
         # 如没有对应的资源文件，则返回传入值以方便查找错误的文件
         return asset

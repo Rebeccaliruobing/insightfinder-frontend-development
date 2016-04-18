@@ -1,0 +1,43 @@
+/*******************************
+         Site Overrides
+*******************************/
+
+.ui.table {
+
+  // 调整head中字体的粗体深度
+  thead th {
+    font-weight: 500;
+  }
+
+  // 去掉table中的由于line-height导致的checkbox多余的下padding
+  th, td {
+    .ui.checkbox {
+      display: block;
+    }
+  }
+}
+
+/*--------------
+     Compact
+---------------*/
+
+.ui.compact.table th {
+  padding-top: @compactHeaderVerticalPadding;
+  padding-bottom: @compactHeaderVerticalPadding;
+}
+
+/* Very */
+.ui[class*="very compact"].table th {
+  padding-top: @veryCompactHeaderVerticalPadding;
+  padding-bottom: @veryCompactHeaderVerticalPadding;
+}
+
+/*--------------
+   Selectable
+---------------*/
+.ui.compact.table tbody tr td.selectable > a:not(.ui) {
+  padding: @compactVerticalPadding @compactHorizontalPadding;
+}
+.ui[class*="very compact"].table tbody tr td.selectable > a:not(.ui) {
+  padding: @veryCompactVerticalPadding @veryCompactHorizontalPadding;
+}

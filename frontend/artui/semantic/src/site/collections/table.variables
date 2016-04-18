@@ -1,0 +1,13 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+// compact, very compact thead垂直padding的调整
+
+@compactHeaderVerticalPadding: @relativeTiny;
+@veryCompactHeaderVerticalPadding: @relativeMini;
+
+// sortable表格的不可排序th(disabled)的样式与一般th相同
+@sortableDisabledColor: @textColor;
+@sortableHoverBackground: '';
+@sortableHoverColor: '';

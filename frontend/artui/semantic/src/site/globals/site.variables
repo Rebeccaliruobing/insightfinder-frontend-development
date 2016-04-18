@@ -1,0 +1,77 @@
+/*******************************
+     User Global Variables
+*******************************/
+
+// Fonts
+@importGoogleFonts   : false;
+
+@fontChinese         : "Lantinghei SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑";
+@headerFont          : "Helvetica Neue",Helvetica,@fontChinese,Arial,sans-serif;
+@pageFont            : "Helvetica Neue",Helvetica,@fontChinese,Arial,sans-serif;
+
+@fontMonospace       : Menlo,Monaco,Consolas,"Courier New",monospace,@fontChinese;
+
+// Border Radius
+@relativeBorderRadius: @relative2px;
+@absoluteBorderRadius: @2px;
+
+// Breakpoints
+@mobileBreakpoint            : 320px;
+@tabletBreakpoint            : 768px;
+@computerBreakpoint          : 992px;
+@largeMonitorBreakpoint      : 1300px;
+@widescreenMonitorBreakpoint : 1920px;
+
+// Input
+@inputVerticalPadding        : 10/14em;
+@inputLineHeight             : 16/14em;
+
+/*
+ * 新增变量
+**/
+@boldFontWeight       : 500;
+
+// Spacing 块左右的间隔单位，以8/14rem为单位
+@1spacer              : @8px;
+@2spacer              : @16px;
+@3spacer              : @24px;
+@4spacer              : @32px;
+@5spacer              : @40px;
+@6spacer              : @48px;
+@7spacer              : @56px;
+@8spacer              : @64px;
+
+// Color names
+@colorNames:          red, orange, yellow, olive, green,
+                      teal, blue, violet, purple, pink, brown;
+@colorUpperNames:     Red, Orange, Yellow, Olive, Green,
+                      Teal, Blue, Violet, Purple, Pink, Brown;
+
+// 用于生成与颜色名相关样式的Mixin
+.loopColors(@rules;
+            @names:@colorNames;
+            @n:length(@names)) when(@n > 0){
+  @colorName: extract(@names, @n);
+  @rules();
+  .loopColors(@rules; @names; @n - 1);
+}
+
+// wide
+@wideNames:           one, two, three, four, five, six, seven, eight,
+                      nine, ten, eleven, twelve, thirteen, fourteen, fifteen, sixteen;
+
+
+// 用于生成与宽度相关的样式
+.loopWide(@rules;
+          @names: @wideNames;
+          @n:length(@names)) when(@n > 0) {
+  @wideName: extract(@names, @n);
+  @wideWide: %("%sWide", @wideName);
+  @rules();
+  .loopWide(@rules; @names; @n - 1);
+}
+
+/*-------------------
+  包括自定义的颜色
+--------------------*/
+@import (optional) "../../../../../artui_variables";

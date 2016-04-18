@@ -1,0 +1,6 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@horizontalPadding:   @2spacer;
+@headerFontWeight:    400;

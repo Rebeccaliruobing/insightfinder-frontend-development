@@ -3,10 +3,7 @@
     本模块提供了以类方式实现的页面视图的基类。
 """
 
-# TODO: [IMP] Add security view?
-
 from __future__ import absolute_import
-
 from flask import abort
 from flask.views import MethodView
 

@@ -1,0 +1,21 @@
+/*******************************
+        User Overrides
+*******************************/
+
+.ui.accordion.dividing {
+  .title.active {
+    border-bottom: @dividedBorder;
+  }
+
+  .loopColors({
+    &.@{colorName}{
+      .title.active {
+        border-bottom: @dividedColoredBorderWidth solid @@colorName;
+      }
+    }
+  });
+}
+
+.ui.accordion .title:not(.ui) {
+  font-weight: @boldFontWeight;
+}

@@ -1,0 +1,11 @@
+/*******************************
+         Site Overrides
+*******************************/
+
+i.icon.hoverrotate {
+  &:hover {
+    height: 1em;
+    line-height: 1;
+    animation: icon-loading @hoverRotateDuration linear 1;
+  }
+}

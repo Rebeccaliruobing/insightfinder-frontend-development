@@ -1,0 +1,14 @@
+/*******************************
+         Site Overrides
+*******************************/
+
+/* outdent */
+
+/* TODO: 使用变量 */
+/* TODO: outdent改成compact, 还是在site中添加多种padding? */
+.ui.outdent.segment {
+  padding: 1rem 0;
+  &.attached {
+    border-color: transparent;
+  }
+}
