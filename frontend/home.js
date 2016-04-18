@@ -16,13 +16,10 @@ import Settings from './components/settings';
 
 const logo = require('./images/logo.png');
 
-
 const EmptyContent = function(props) {
   return (
-    <Console.Content>
-      <div style={{height: 1000}}>Hi Insightfinder!</div>
-    </Console.Content>
-    )
+    <Console.Content style={{height: 1000}}>Hello Insightfinder!</Console.Content>
+  )
 };
 
 const App = function(props) {

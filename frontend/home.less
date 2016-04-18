@@ -1,1 +1,27 @@
-@import './artui/index.less';
+@import "./artui/mixins";
+
+#app {
+  height: 100%;
+}
+
+.main.ui.container {
+  width: auto !important;
+  margin-left: @2spacer !important;
+  margin-right: @2spacer !important;
+}
+
+.ui.console {
+  > .topbar > .logo {
+    background: #CAE5FF;
+  }
+}
+
+.ui.console > .wrapper > .navbar {
+  background: #6699CC;
+}
+
+.ui.console .navbar {
+  .ui.menu {
+    border-color: transparent;
+  }
+}

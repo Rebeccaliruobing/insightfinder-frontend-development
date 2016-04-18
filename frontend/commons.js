@@ -10,7 +10,6 @@ import 'lodash';
 import 'classnames';
 
 import './artui';
-import './artui/i18n/zh-CN';
 
 import 'react';
 import 'react-dom';

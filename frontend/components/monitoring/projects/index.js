@@ -34,7 +34,7 @@ class Projects extends React.Component {
 
     return (
       <Console.Content>
-        <div className="ui segments" ref={c => this._el = c}>
+        <div className="main ui container" ref={c => this._el = c}>
           <Console.Breadcrumb>
             <IndexLink to="/" className="section">Home</IndexLink>
             <i className="right angle icon divider"/>
