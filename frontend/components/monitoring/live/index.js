@@ -2,7 +2,10 @@ import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
 import {Link, IndexLink} from 'react-router';
-import {Console} from '../../../artui/react';
+import {Console, Accordion, Message} from '../../../artui/react';
+
+import Project from './project';
+import {ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 
 class LiveMonitoring extends React.Component {
 
@@ -11,8 +14,10 @@ class LiveMonitoring extends React.Component {
 
     this._el = null;
     this.state = {
-      selectProjects: []
+      selectProjects: [],
+      showInfo: true 
     };
+    this.handleAddMonitoring.bind(this);
   }
 
   componentDidMount() {
@@ -27,12 +32,36 @@ class LiveMonitoring extends React.Component {
       $(this._el).find('.ui.dropdown').dropdown('destroy');
     }
   }
+  
+  handleAddMonitoring() {
+    let projects = this.state['selectProjects'];
+    projects.push('app1AWS');
+    this.setState({
+      'selectProjects': projects
+    });
+  }
 
+  renderProjects() {
+    let projects = this.state.selectProjects;
+    let elems = [];
+    projects.map((project) => {
+      elems.push(
+        (
+          <Accordion className="ui tiny orange dividing accordion">
+            <div className="active title"><i className="dropdown icon"/>{project}</div>
+            <Project/>
+          </Accordion>
+        )
+      )
+    });
+    
+    return elems;
+  }
+  
   render() {
-
     return (
       <Console.Content>
-        <div className="ui segments" ref={c => this._el = c}>
+        <div className="main ui container" ref={c => this._el = c}>
           <Console.Breadcrumb>
               <IndexLink to="/" className="section">Home</IndexLink>
               <i className="right angle icon divider"/>
@@ -40,19 +69,24 @@ class LiveMonitoring extends React.Component {
               <i className="right angle icon divider"/>
               <div className="active section">Live Monitoring</div>
           </Console.Breadcrumb>
-          <div className="ui message attached">
-            <ul>
-              <li><b>Model Name</b>: 
-                choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric. </li>
-              <li><b>Anomaly Threshold</b>: 
-                choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies.
-              </li>
-              <li><b>Duration Threshold</b>: 
-                number of continuous anomalies to trigger an alert.
-              </li>
-            </ul>
-          </div>
-          <div className="ui segment attached">
+          {
+            this.state.showInfo &&
+            <Message className="ui tiny message" 
+                     closable={true} onClose={() => this.setState({showInfo: false})}>
+              <i className="close icon" />
+              <ul>
+                <li><b>Model Name</b>:
+                  choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric. </li>
+                <li><b>Anomaly Threshold</b>:
+                  choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies.
+                </li>
+                <li><b>Duration Threshold</b>:
+                  number of continuous anomalies to trigger an alert.
+                </li>
+              </ul>
+            </Message>
+          }
+          <div className="ui segment">
             <div className="ui small form equal width">
               <div className="fields">
                 <div className="inline field">
@@ -65,46 +99,15 @@ class LiveMonitoring extends React.Component {
                     <option value="app2AWStest">app2AWStest</option>
                   </select>
                 </div>
-                <div className="inline field">
-                  <label>Model Type</label>
-                  <select className="ui fluid dropdown">
-                    <option value="cpu(holistic)">cpu(holistic)</option>
-                    <option value="casandra(holistic)">casandra(holistic)</option>
-                    <option value="casandra(split)">casandra(split)</option>
-                    <option value="cpu-nofilter(holistic)">cpu-nofilter(holistic)</option>
-                    <option value="cpu-nofilter(split)">cpu-nofilter(split)</option>
-                    <option value="cpu-filter(holistic)">cpu-filter(holistic)</option>
-                    <option value="cpu-filter(split)">cpu-filter(split)</option>
-                  </select>
-                </div>
-                <div className="inline field">
-                  <label>Anomaly Threshold</label>
-                  <select className="ui fluid dropdown">
-                    <option value="0.99">0.99</option>
-                    <option value="0.97">0.97</option>
-                    <option value="0.95">0.95</option>
-                    <option value="0.9">0.9</option>
-                    <option value="0.5">0.5</option>
-                    <option value="0.25">0.25</option>
-                  </select>
-                </div>
-                <div className="inline field">
-                  <label>Duration Threshold</label>
-                  <select className="ui fluid dropdown">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                  </select>
-                </div>
-              </div>
-              <div className="field">
-                <button className="ui orange button orange" type="submit">Submit</button>
+                <ModelType className="inline field"/>
+                <AnomalyThreshold className="inline field"/>
+                <DurationThreshold className="inline field" />
+                <button className="ui orange button orange" 
+                        onClick={this.handleAddMonitoring.bind(this)}>Add</button>
               </div>
             </div>
           </div>
+          {this.renderProjects()}
         </div>
       </Console.Content>
     )
