@@ -2,9 +2,11 @@
          Site Overrides
 *******************************/
 
-/*--------------
-     Sizes
----------------*/
+.ui.basic.container {
+  width: 100% !important;
+}
+
+// Sizes
 .ui.mini.container {
   font-size: @relativeMini;
 }

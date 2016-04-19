@@ -5,7 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Console, Accordion, Message} from '../../../artui/react';
 
 import Project from './project';
-import {ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
+import Selections from '../../selections';
 
 class LiveMonitoring extends React.Component {
 
@@ -15,7 +15,7 @@ class LiveMonitoring extends React.Component {
     this._el = null;
     this.state = {
       selectProjects: [],
-      showInfo: true 
+      showInfo: false 
     };
     this.handleAddMonitoring.bind(this);
   }
@@ -62,13 +62,15 @@ class LiveMonitoring extends React.Component {
     return (
       <Console.Content>
         <div className="main ui container" ref={c => this._el = c}>
-          <Console.Breadcrumb>
+          <div className="ui vertical segment">
+            <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
               <i className="right angle icon divider"/>
               <Link to="/monitoring" className="section">Cloud Monitoring</Link>
               <i className="right angle icon divider"/>
               <div className="active section">Live Monitoring</div>
-          </Console.Breadcrumb>
+            </div>
+          </div>
           {
             this.state.showInfo &&
             <Message className="ui tiny message" 
@@ -86,12 +88,12 @@ class LiveMonitoring extends React.Component {
               </ul>
             </Message>
           }
-          <div className="ui segment">
-            <div className="ui small form equal width">
-              <div className="fields">
-                <div className="inline field">
+          <div className="ui vertical segment">
+            <div className="ui tiny form">
+              <div className="inline fields">
+                <div className="field">
                   <label>Project Name</label>
-                  <select className="ui fluid dropdown">
+                  <select className="ui dropdown">
                     <option value="app1AWS">app1AWS</option>
                     <option value="app2AWS">app2AWS</option>
                     <option value="appWestAWS">appWestAWS</option>
@@ -99,11 +101,19 @@ class LiveMonitoring extends React.Component {
                     <option value="app2AWStest">app2AWStest</option>
                   </select>
                 </div>
-                <ModelType className="inline field"/>
-                <AnomalyThreshold className="inline field"/>
-                <DurationThreshold className="inline field" />
-                <button className="ui orange button orange" 
-                        onClick={this.handleAddMonitoring.bind(this)}>Add</button>
+                <div className="field">
+                  {Selections.ModelType()}
+                </div>
+                <div className="field">
+                  {Selections.AnomalyThreshold()}
+                </div>
+                <div className="field">
+                  {Selections.DurationThreshold()}
+                </div>
+                <div className="field">
+                  <button className="ui orange button orange"
+                          onClick={this.handleAddMonitoring.bind(this)}>Add</button>
+                </div>
               </div>
             </div>
           </div>

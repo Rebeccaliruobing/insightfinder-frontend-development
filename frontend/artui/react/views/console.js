@@ -72,7 +72,7 @@ Console.Breadcrumb = function(props) {
   let {className, ...others} = props;
   var classes = classNames('ui breadcrumb', className);
   return (
-    <div className="ui outdent basic attached segment">
+    <div className="ui basic attached segment">
       <div className={classes} {...others}>{props.children}</div>
     </div>
   )

@@ -25,6 +25,13 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 - 增加大小的类, 支持mini ~ massive大小
 - 用于生成固定宽度的弹性container的Mixin *makeContainer*
 - 调整container小屏幕下的左右间隔为16px固定大小, 与字体无关
+- 添加*basic*类，代表在任何屏幕下都是100%的宽度
+
+### Segment
+- 添加*flat*类，去掉凸起效果
+- segment左右边距采用16px固定大小，与字体无关
+- segment上下才用1em，与字体相关
+- vertical时，不同颜色用于改变分割线的颜色
 
 ### Form
 - 调整Label粗体为*@boldFontWeight*
@@ -57,7 +64,6 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 
 ### Todo:
 - globals/site.variables 添加常用的padding, margin大小的class? 参照bootstrap
-- segment中的outline => fitted, horizontally vertically
 
 [1]:https://github.com/necolas/normalize.css
 [2]:https://github.com/Semantic-Org/Semantic-UI/blob/next/RELEASE-NOTES.md

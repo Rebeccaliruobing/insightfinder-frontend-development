@@ -5103,9 +5103,9 @@ input::selection {
          Site Overrides
 *******************************/
 
-/*--------------
-     Sizes
----------------*/
+.ui.basic.container {
+  width: 100% !important;
+}
 
 .ui.mini.container {
   font-size: 0.78571429em;
