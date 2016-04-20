@@ -39,6 +39,7 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 
 ### Input
 - 添加*compact*类，减小边距
+- 添加React组件，并且支持错误信息提示框
 
 ### Button
 - 调整字体大小为相对大小。

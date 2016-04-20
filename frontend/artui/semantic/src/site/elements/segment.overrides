@@ -7,4 +7,11 @@
   box-shadow: none;
 }
 
-
+.ui.segment:not(.inverted) {
+  .loopColors({
+    &.@{colorName}{
+      border-top: 0px;
+      border-bottom: @coloredBorderSize solid @@colorName;
+    }
+  });
+}

@@ -3,4 +3,4 @@
 *******************************/
 
 @verticalMargin: 1em;
-@horizontalPadding: 2spacer;
+@horizontalPadding: @2spacer;

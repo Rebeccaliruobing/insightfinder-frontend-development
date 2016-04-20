@@ -18,8 +18,8 @@
   position: relative;
   background: #FFFFFF;
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
-  margin: 1rem 0em;
-  padding: 1em 1em;
+  margin: 1em 0em;
+  padding: 1em 1.14285714rem;
   border-radius: 0.14285714rem;
   border: 1px solid rgba(34, 36, 38, 0.15);
 }
@@ -81,7 +81,7 @@
   padding-bottom: 2em;
 }
 .ui.grid.segment {
-  margin: 1rem 0em;
+  margin: 1em 0em;
   border-radius: 0.14285714rem;
 }
 
@@ -92,7 +92,7 @@
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
 }
 .ui[class*="very basic"].table.segment {
-  padding: 1em 1em;
+  padding: 1em 1.14285714rem;
 }
 
 
@@ -275,7 +275,7 @@
       -ms-flex-direction: column;
           flex-direction: column;
   position: relative;
-  margin: 1rem 0em;
+  margin: 1em 0em;
   border: 1px solid rgba(34, 36, 38, 0.15);
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
   border-radius: 0.14285714rem;
@@ -325,7 +325,7 @@
 /* Nested Group */
 .ui.segments > .ui.segments {
   border-top: 1px solid rgba(34, 36, 38, 0.15);
-  margin: 1rem 1rem;
+  margin: 1em 1em;
 }
 .ui.segments > .segments:first-child {
   border-top: none;
@@ -350,7 +350,7 @@
   padding: 0em;
   background-color: #FFFFFF;
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
-  margin: 1rem 0em;
+  margin: 1em 0em;
   border-radius: 0.14285714rem;
   border: 1px solid rgba(34, 36, 38, 0.15);
 }
@@ -728,7 +728,7 @@
   bottom: 0px;
   margin-bottom: 0em;
   top: 0px;
-  margin-top: 1rem;
+  margin-top: 1em;
   border-radius: 0.14285714rem 0.14285714rem 0em 0em;
 }
 .ui.segment[class*="top attached"]:first-child {
@@ -740,7 +740,7 @@
   bottom: 0px;
   margin-top: 0em;
   top: 0px;
-  margin-bottom: 1rem;
+  margin-bottom: 1em;
   box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15), none;
   border-radius: 0em 0em 0.14285714rem 0.14285714rem;
 }
@@ -796,15 +796,51 @@
          Site Overrides
 *******************************/
 
-
-/* outdent */
-
-/* TODO: 使用变量 */
-
-/* TODO: outdent改成compact, 还是在site中添加多种padding? */
-.ui.outdent.segment {
-  padding: 1rem 0;
+.ui.flat.segment,
+.ui.flat.segments {
+  box-shadow: none;
 }
-.ui.outdent.segment.attached {
-  border-color: transparent;
+.ui.segment:not(.inverted).brown {
+  border-top: 0px;
+  border-bottom: 2px solid #A5673F;
+}
+.ui.segment:not(.inverted).pink {
+  border-top: 0px;
+  border-bottom: 2px solid #E03997;
+}
+.ui.segment:not(.inverted).purple {
+  border-top: 0px;
+  border-bottom: 2px solid #A333C8;
+}
+.ui.segment:not(.inverted).violet {
+  border-top: 0px;
+  border-bottom: 2px solid #6435C9;
+}
+.ui.segment:not(.inverted).blue {
+  border-top: 0px;
+  border-bottom: 2px solid #2185D0;
+}
+.ui.segment:not(.inverted).teal {
+  border-top: 0px;
+  border-bottom: 2px solid #00B5AD;
+}
+.ui.segment:not(.inverted).green {
+  border-top: 0px;
+  border-bottom: 2px solid #21BA45;
+}
+.ui.segment:not(.inverted).olive {
+  border-top: 0px;
+  border-bottom: 2px solid #B5CC18;
+}
+.ui.segment:not(.inverted).yellow {
+  border-top: 0px;
+  border-bottom: 2px solid #FBBD08;
+}
+.ui.segment:not(.inverted).orange {
+  border-top: 0px;
+  border-bottom: 2px solid #F2711C;
+}
+.ui.segment:not(.inverted).red {
+  border-top: 0px;
+  border-bottom: 2px solid #DB2828;
 }
