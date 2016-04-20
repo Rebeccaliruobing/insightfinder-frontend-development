@@ -20,8 +20,7 @@ var AssetsManifestPlugin = function (options) {
   var defaults = {
     output: '../backend/manifest.json',
     replacer: null,
-    space: '\t',
-    baseURL: '/static/'
+    space: '\t'
   };
   
   options = _.pick(
@@ -89,10 +88,6 @@ AssetsManifestPlugin.prototype.processAssets = function(assets)
 
 AssetsManifestPlugin.prototype.toString = function()
 {
-  var self = this;
-  _.each(_.keys(this.moduleAssets), function(key){
-    self.moduleAssets[key] = self.baseURL + self.moduleAssets[key]
-  });
   return JSON.stringify(this.moduleAssets, this.replacer, this.space);
 };
 
@@ -106,6 +101,7 @@ AssetsManifestPlugin.prototype.handleDone = function(output, stats) {
   var fs   = require('fs-extra');
   this.processAssets(this.getStatsData(stats).assetsByChunkName);
   var json = this.toString();
+
   fs.mkdirsSync( path.dirname(output) );
   fs.writeFileSync(output, json);
 };

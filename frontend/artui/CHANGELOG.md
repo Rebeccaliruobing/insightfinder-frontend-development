@@ -20,6 +20,7 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 ### React
 - **Link**, **IndexLink**组件, 对react-router中Link, IndexLink添加缺省的activeClassName 
 - **Hoverable**组件, 用于hover时不同显示内容的react组件
+- 添加**react-timeout**包，提供安全的timeout方法
 
 ### Container
 - 增加大小的类, 支持mini ~ massive大小
@@ -45,6 +46,10 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 - 调整字体大小为相对大小。
 - 字体*font-weight*调整为normal
 
+### Label
+- 调整字体的深度为 *@boldFontWeight*
+- 实现React Label组件，提供自动消失功能
+
 ### Menu
 - 调整粗体的深度为 *@boldFontWeight*
 
@@ -55,8 +60,9 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 - input.overrides 添加tiny大小的input
 
 ### Message
-- React的Message组件, 用于处理Message的关闭。
-- 调整message的样式, 间隔采用8/16px标准
+- React的Message组件, 用于处理Message的关闭
+- 调整message左右间隔大小, 间隔固定16px/rem
+- React Message组件添加自动延时关闭功能
 
 ### Accordion
 - 添加React **Accordion**组件

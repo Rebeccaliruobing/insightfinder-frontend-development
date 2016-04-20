@@ -5,6 +5,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
+import Label from './label';
 
 const Input = class extends React.Component {
   
@@ -14,7 +15,7 @@ const Input = class extends React.Component {
 
   render() {
     let {type, name, value, className, onChange, placeholder,
-      message, messageClass, ...others} = this.props;
+      message, messageClass, messageAutoDismiss, ...others} = this.props;
     return (
       <div className={classNames('ui', className, 'input')} {...others}>
         <input name={name} type={type} value={value} 
@@ -22,9 +23,9 @@ const Input = class extends React.Component {
                onChange={(e) => onChange(e)} />
         {
           message !== '' && (
-            <div className={classNames('ui', messageClass, 'label')}>
+            <Label className={messageClass}>
               {message}
-            </div>
+            </Label>
           )
         }
       </div>

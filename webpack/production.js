@@ -11,12 +11,10 @@ const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const config = require('./development');
 
 config.output.publicPath = '/static/';
-config.plugins[config.plugins.length - 1] = new AssetsManifestPlugin({
-    baseURL: '/static/'
-});
+config.plugins[config.plugins.length - 1] = new AssetsManifestPlugin();
 config.plugins.push(
-  new webpack.DefinePlugin({
-    'process.env': {'NODE_ENV': JSON.stringify('production')}
+  new webpack.DefinePlugin({ 
+    'process.env': {'NODE_ENV': JSON.stringify('production')} 
   })
 );
 config.plugins.push(new webpack.optimize.DedupePlugin());

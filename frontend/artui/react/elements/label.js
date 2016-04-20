@@ -8,7 +8,7 @@ import React from 'react';
 import classNames from 'classnames';
 import ReactTimeout from 'react-timeout';
 
-class Message extends React.Component {
+class Label extends React.Component {
   
   constructor(props) {
     super(props);
@@ -26,13 +26,6 @@ class Message extends React.Component {
   
   componentDidMount() {
     if (this._$el) {
-      if (this.props.closable) {
-        this._$el.find('.close')
-          .on('click', () => {
-            this._close();
-          });
-      }
-      
       if (this.props.autoDismiss) {
         this.props.setTimeout(() => {
           this._close();
@@ -41,39 +34,30 @@ class Message extends React.Component {
     }
   }
   
-  componentWillUnmount() {
-    if (this._$el && this.props.closable) {
-      this._$el.find('.close').off('click');
-    }
-  }
-    
   render() {
     let {tag, className, 
-      closable, onClose, 
-      autoDismiss, dismissTimeout,
+      onClose, autoDismiss, dismissTimeout,
       children, ...others} = this.props;
     return React.createElement(tag, {
       ref: c => this._$el = $(c),
-      className: classNames('ui', className, 'message'),
+      className: classNames('ui', className, 'label'),
       ...others
     }, children);
   }
 };
 
-Message.propTypes = {
+Label.propTypes = {
   tag: React.PropTypes.string,
-  closable: React.PropTypes.bool,
   onClose: React.PropTypes.func,
   autoDismiss: React.PropTypes.bool,
   dismissTimeout: React.PropTypes.number  // seconds
 };
 
-Message.defaultProps = {
+Label.defaultProps = {
   tag: 'div',
-  closable: false,
   onClose: () => {},
-  autoDismiss: false,
-  dismissTimeout: 10
+  autoDismiss: true,
+  dismissTimeout: 5 
 };
 
-export default ReactTimeout(Message);
+export default ReactTimeout(Label);
