@@ -34,6 +34,7 @@ module.exports = {
       loader: 'babel',
       query: {
         presets: ['es2015', 'stage-1', 'react'],
+        compact: true,
         cacheDirectory: true
       },
       include: [sourceDir],
@@ -89,8 +90,7 @@ module.exports = {
 
     // 生产assets的文件名映射表
     new AssetsManifestPlugin({
-      output: '../backend/manifest-dev.json',
-      baseURL: 'http://0.0.0.0:10086/static/'
+      output: '../backend/manifest-dev.json'
     })
   ],
   devServer: {

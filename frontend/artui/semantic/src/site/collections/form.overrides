@@ -28,6 +28,11 @@
   });
 }
 
+.ui.form .inline.fields .field > label,
+.ui.form .inline.field > label {
+  margin: 0em @inlineLabelDistance 0em 0em;
+}
+
 // 多字段的field
 .ui.form .parts.field {
   & > .ui.input, & > .ui.checkbox,
