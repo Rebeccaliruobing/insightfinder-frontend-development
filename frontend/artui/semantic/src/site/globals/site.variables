@@ -23,12 +23,12 @@
 @widescreenMonitorBreakpoint : 1920px;
 
 // Input
-@inputVerticalPadding        : 10/14em;
-@inputLineHeight             : 16/14em;
+@inputVerticalPadding           : 10/14em;
+@inputCompactVerticalPadding    : (@inputVerticalPadding * 0.75);
+@inputHorizontalPadding         : 1.5em;
+@inputCompactHorizontalPadding  : (@inputHorizontalPadding * 0.75);
+@inputLineHeight                : 16/14em;
 
-/*
- * 新增变量
-**/
 @boldFontWeight       : 500;
 
 // Spacing 块左右的间隔单位，以8/14rem为单位

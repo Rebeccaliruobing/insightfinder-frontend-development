@@ -2,48 +2,19 @@
          Site Overrides
 *******************************/
 
+/* 与input, selection保持相同的高度 */
 .ui.button {
   border: 1px solid transparent;
 }
 
-// Sizes: relative
-.ui.mini.buttons .button,
-.ui.mini.buttons .or,
-.ui.mini.button {
-  font-size: @relativeMini;
-}
-.ui.tiny.buttons .button,
-.ui.tiny.buttons .or,
-.ui.tiny.button {
-  font-size: @relativeTiny;
-}
-.ui.small.buttons .button,
-.ui.small.buttons .or,
-.ui.small.button {
-  font-size: @relativeSmall;
-}
+/* 缺省为1em */
 .ui.buttons .button,
 .ui.buttons .or,
 .ui.button {
-  font-size: @relativeMedium;
+  font-size: 1em;
 }
-.ui.large.buttons .button,
-.ui.large.buttons .or,
-.ui.large.button {
-  font-size: @relativeLarge;
-}
-.ui.big.buttons .button,
-.ui.big.buttons .or,
-.ui.big.button {
-  font-size: @relativeBig;
-}
-.ui.huge.buttons .button,
-.ui.huge.buttons .or,
-.ui.huge.button {
-  font-size: @relativeHuge;
-}
-.ui.massive.buttons .button,
-.ui.massive.buttons .or,
-.ui.massive.button {
-  font-size: @relativeMassive;
+.ui.medium.buttons .button,
+.ui.medium.buttons .or,
+.ui.medium.button {
+  font-size: @medium;
 }

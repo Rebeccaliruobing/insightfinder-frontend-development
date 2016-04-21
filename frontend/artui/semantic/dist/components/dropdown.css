@@ -114,8 +114,8 @@
   border-top: none;
   line-height: 1em;
   color: rgba(0, 0, 0, 0.87);
-  padding: 0.78571429rem 1.14285714rem !important;
-  font-size: 1rem;
+  padding: 0.78571429em 1.14285714em !important;
+  font-size: 1em;
   text-transform: none;
   font-weight: normal;
   box-shadow: none;
@@ -154,10 +154,10 @@
 
 .ui.dropdown .menu > .header {
   margin: 1rem 0rem 0.75rem;
-  padding: 0em 1.14285714rem;
+  padding: 0em 1.14285714em;
   color: rgba(0, 0, 0, 0.85);
   font-size: 0.78571429em;
-  font-weight: bold;
+  font-weight: 500;
   text-transform: uppercase;
 }
 .ui.dropdown .menu > .divider {
@@ -178,7 +178,7 @@
   margin-top: 0em;
 }
 .ui.dropdown .menu > .input:not(.transparent) input {
-  padding: 0.5em 1em;
+  padding: 0.5em 1.5em;
 }
 .ui.dropdown .menu > .input:not(.transparent) .button,
 .ui.dropdown .menu > .input:not(.transparent) .icon,
@@ -203,7 +203,7 @@
 -------------------*/
 
 .ui.dropdown .menu > .message {
-  padding: 0.78571429rem 1.14285714rem;
+  padding: 0.78571429em 1.14285714em;
   font-weight: normal;
 }
 .ui.dropdown .menu > .message:not(.ui) {
@@ -354,7 +354,7 @@
   min-height: 2.5em;
   background: #FFFFFF;
   display: inline-block;
-  padding: 0.71428571em 2.6em 0.71428571em 1em;
+  padding: 0.71428571em 3.1em 0.71428571em 1.5em;
   color: rgba(0, 0, 0, 0.87);
   box-shadow: none;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -381,7 +381,7 @@ select.ui.dropdown {
   height: auto;
   line-height: 1.14285714em;
   top: 0.71428571em;
-  right: 1em;
+  right: 1.5em;
   z-index: 3;
   margin: -0.71428571em;
   padding: 0.71428571em;
@@ -423,33 +423,33 @@ select.ui.dropdown {
 ---------------*/
 
 .ui.selection.dropdown .menu > .message {
-  padding: 0.78571429rem 1.14285714rem;
+  padding: 0.78571429em 1.14285714em;
 }
 @media only screen and (max-width: 767px) {
   .ui.selection.dropdown .menu {
-    max-height: 8.01428571rem;
+    max-height: 8.01428571em;
   }
 }
 @media only screen and (min-width: 768px) {
   .ui.selection.dropdown .menu {
-    max-height: 10.68571429rem;
+    max-height: 10.68571429em;
   }
 }
 @media only screen and (min-width: 992px) {
   .ui.selection.dropdown .menu {
-    max-height: 16.02857143rem;
+    max-height: 16.02857143em;
   }
 }
 @media only screen and (min-width: 1920px) {
   .ui.selection.dropdown .menu {
-    max-height: 21.37142857rem;
+    max-height: 21.37142857em;
   }
 }
 
 /* Menu Item */
 .ui.selection.dropdown .menu > .item {
   border-top: 1px solid #FAFAFA;
-  padding: 0.78571429rem 1.14285714rem !important;
+  padding: 0.78571429em 1.14285714em !important;
   white-space: normal;
   word-wrap: normal;
 }
@@ -563,7 +563,7 @@ select.ui.dropdown {
 /* Search Selection */
 .ui.search.selection.dropdown > input.search {
   line-height: 1.14285714em;
-  padding: 0.64285714em 2.6em 0.64285714em 1em;
+  padding: 0.64285714em 3.1em 0.64285714em 1.5em;
 }
 
 /* Active/Visible Search */
@@ -595,22 +595,22 @@ select.ui.dropdown {
 }
 @media only screen and (max-width: 767px) {
   .ui.search.dropdown .menu {
-    max-height: 8.01428571rem;
+    max-height: 8.01428571em;
   }
 }
 @media only screen and (min-width: 768px) {
   .ui.search.dropdown .menu {
-    max-height: 10.68571429rem;
+    max-height: 10.68571429em;
   }
 }
 @media only screen and (min-width: 992px) {
   .ui.search.dropdown .menu {
-    max-height: 16.02857143rem;
+    max-height: 16.02857143em;
   }
 }
 @media only screen and (min-width: 1920px) {
   .ui.search.dropdown .menu {
-    max-height: 21.37142857rem;
+    max-height: 21.37142857em;
   }
 }
 
@@ -621,7 +621,7 @@ select.ui.dropdown {
 
 /* Multiple Selection */
 .ui.multiple.dropdown {
-  padding: 0.21428571em 2.6em 0.21428571em 0.21428571em;
+  padding: 0.21428571em 3.1em 0.21428571em 0.71428571em;
 }
 .ui.multiple.dropdown .menu {
   cursor: auto;
@@ -712,7 +712,7 @@ select.ui.dropdown {
   vertical-align: baseline;
 }
 .ui.inline.dropdown > .text {
-  font-weight: bold;
+  font-weight: 500;
 }
 .ui.inline.dropdown .menu {
   cursor: auto;
@@ -734,7 +734,7 @@ select.ui.dropdown {
 /* Menu Item Active */
 .ui.dropdown .menu .active.item {
   background: transparent;
-  font-weight: bold;
+  font-weight: 500;
   color: rgba(0, 0, 0, 0.95);
   box-shadow: none;
   z-index: 12;
@@ -1069,7 +1069,7 @@ select.ui.dropdown {
 .ui.scrolling.dropdown .menu .item.item.item,
 .ui.dropdown .scrolling.menu > .item.item.item {
   border-top: none;
-  padding-right: calc( 1.14285714rem  +  17px ) !important;
+  padding-right: calc( 1.14285714em  +  17px ) !important;
 }
 .ui.scrolling.dropdown .menu .item:first-child,
 .ui.dropdown .scrolling.menu .item:first-child {
@@ -1090,25 +1090,25 @@ select.ui.dropdown {
 @media only screen and (max-width: 767px) {
   .ui.scrolling.dropdown .menu,
   .ui.dropdown .scrolling.menu {
-    max-height: 10.28571429rem;
+    max-height: 10.28571429em;
   }
 }
 @media only screen and (min-width: 768px) {
   .ui.scrolling.dropdown .menu,
   .ui.dropdown .scrolling.menu {
-    max-height: 15.42857143rem;
+    max-height: 15.42857143em;
   }
 }
 @media only screen and (min-width: 992px) {
   .ui.scrolling.dropdown .menu,
   .ui.dropdown .scrolling.menu {
-    max-height: 20.57142857rem;
+    max-height: 20.57142857em;
   }
 }
 @media only screen and (min-width: 1920px) {
   .ui.scrolling.dropdown .menu,
   .ui.dropdown .scrolling.menu {
-    max-height: 20.57142857rem;
+    max-height: 20.57142857em;
   }
 }
 
@@ -1214,7 +1214,7 @@ select.ui.dropdown {
           transform: rotate(45deg);
   width: 0.5em;
   height: 0.5em;
-  box-shadow: -1px -1px 0px 1px rgba(34, 36, 38, 0.15);
+  box-shadow: -1px -1px 0px 0px rgba(34, 36, 38, 0.15);
   background: #FFFFFF;
   z-index: 2;
 }
@@ -1351,7 +1351,7 @@ select.ui.dropdown {
 .ui.upward.top.pointing.dropdown > .menu:after {
   top: 100%;
   bottom: auto;
-  box-shadow: 1px 1px 0px 1px rgba(34, 36, 38, 0.15);
+  box-shadow: 1px 1px 0px 0px rgba(34, 36, 38, 0.15);
   margin: -0.25em 0em 0em;
 }
 
@@ -1399,6 +1399,7 @@ select.ui.dropdown {
 .ui.vertical.menu .dropdown.item > .dropdown.icon:before {
   content: "\f0da" /*rtl:"\f0d9"*/;
 }
+
 /* Icons for Reference
 .dropdown.down.icon {
   content: "\f0d7";
@@ -1419,3 +1420,48 @@ select.ui.dropdown {
         User Overrides
 *******************************/
 
+/* Selection */
+.ui.selection.dropdown {
+  vertical-align: bottom;
+  min-height: 1em;
+}
+
+/* Compact */
+.ui.compact.selection.dropdown {
+  padding: 0.53571429em 2.725em 0.53571429em 1.125em;
+}
+.ui.compact.selection.dropdown > .dropdown.icon {
+  top: 0.53571429em;
+  right: 1.125em;
+  margin: -0.53571429em;
+  padding: 0.53571429em;
+}
+
+/* Font size */
+.ui.dropdown {
+  font-size: 1em;
+}
+.ui.dropdown.mini {
+  font-size: 0.78571429rem;
+}
+.ui.dropdown.tiny {
+  font-size: 0.85714286rem;
+}
+.ui.dropdown.small {
+  font-size: 0.92857143rem;
+}
+.ui.dropdown.medium {
+  font-size: 1rem;
+}
+.ui.dropdown.large {
+  font-size: 1.14285714rem;
+}
+.ui.dropdown.big {
+  font-size: 1.28571429rem;
+}
+.ui.dropdown.huge {
+  font-size: 1.42857143rem;
+}
+.ui.dropdown.massive {
+  font-size: 1.71428571rem;
+}

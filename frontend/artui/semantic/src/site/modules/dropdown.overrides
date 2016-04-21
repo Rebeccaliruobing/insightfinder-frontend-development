@@ -1,3 +1,50 @@
 /*******************************
         User Overrides
 *******************************/
+
+/* Selection */
+.ui.selection.dropdown {
+  vertical-align: bottom;
+  min-height: 1em;
+}
+
+/* Compact */
+.ui.compact.selection.dropdown {
+  padding: @compactSelectionPadding;
+
+  & > .dropdown.icon {
+    top: @compactSelectionVerticalPadding;
+    right: @compactSelectionHorizontalPadding;
+    margin: @compactSelectionIconMargin;
+    padding: @compactSelectionIconPadding;
+  }
+}
+
+/* Font size */
+.ui.dropdown {
+  font-size: 1em;
+  &.mini {
+    font-size: @mini;
+  }
+  &.tiny {
+    font-size: @tiny;
+  }
+  &.small {
+    font-size: @small;
+  }
+  &.medium {
+    font-size: @medium;
+  }
+  &.large {
+    font-size: @large;
+  }
+  &.big {
+    font-size: @big;
+  }
+  &.huge {
+    font-size: @huge;
+  }
+  &.massive {
+    font-size: @massive;
+  }
+}

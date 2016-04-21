@@ -1,11 +1,10 @@
 import React from 'react';
-import $ from 'jquery';
 import _ from 'lodash';
 import {Link, IndexLink} from 'react-router';
-import {Console, Accordion, Message} from '../../../artui/react';
+import {Console, Dropdown, Accordion, Message} from '../../../artui/react';
 
 import Project from './project';
-import Selections from '../../selections';
+import {ProjectSelection, ModelType} from '../../selections';
 
 class LiveMonitoring extends React.Component {
 
@@ -14,25 +13,13 @@ class LiveMonitoring extends React.Component {
 
     this._el = null;
     this.state = {
+      projects: ['app2AWS', 'appWestAWS', 'AppGAE'],
       selectProjects: [],
       showInfo: false 
     };
     this.handleAddMonitoring.bind(this);
   }
 
-  componentDidMount() {
-    if (this._el) {
-      $(this._el).find('.ui.dropdown').dropdown({
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    if (this._el) {
-      $(this._el).find('.ui.dropdown').dropdown('destroy');
-    }
-  }
-  
   handleAddMonitoring() {
     let projects = this.state['selectProjects'];
     projects.push('app1AWS');
@@ -59,9 +46,11 @@ class LiveMonitoring extends React.Component {
   }
   
   render() {
+    const projects = this.state['projects'] || [];
+    
     return (
       <Console.Content>
-        <div className="main ui container" ref={c => this._el = c}>
+        <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui vertical segment">
             <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
@@ -88,31 +77,14 @@ class LiveMonitoring extends React.Component {
               </ul>
             </Message>
           }
+          <ProjectSelection className="selection compact"/>
+          <button className="ui orange compact button"
+                  onClick={this.handleAddMonitoring.bind(this)}>Add</button>
           <div className="ui vertical segment">
             <div className="ui tiny form">
               <div className="inline fields">
                 <div className="field">
                   <label>Project Name</label>
-                  <select className="ui dropdown">
-                    <option value="app1AWS">app1AWS</option>
-                    <option value="app2AWS">app2AWS</option>
-                    <option value="appWestAWS">appWestAWS</option>
-                    <option value="insightfinderGAE">insightfinderGAE</option>
-                    <option value="app2AWStest">app2AWStest</option>
-                  </select>
-                </div>
-                <div className="field">
-                  {Selections.ModelType()}
-                </div>
-                <div className="field">
-                  {Selections.AnomalyThreshold()}
-                </div>
-                <div className="field">
-                  {Selections.DurationThreshold()}
-                </div>
-                <div className="field">
-                  <button className="ui orange button orange"
-                          onClick={this.handleAddMonitoring.bind(this)}>Add</button>
                 </div>
               </div>
             </div>

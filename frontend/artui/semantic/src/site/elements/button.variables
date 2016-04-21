@@ -3,3 +3,9 @@
 *******************************/
 
 @fontWeight: normal;
+@verticalAlign: bottom;
+
+@verticalPadding: @inputVerticalPadding;
+@horizontalPadding: @inputHorizontalPadding;
+@compactVerticalPadding: @inputCompactVerticalPadding;
+@compactHorizontalPadding: @inputCompactHorizontalPadding;

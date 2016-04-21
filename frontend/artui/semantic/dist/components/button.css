@@ -20,7 +20,7 @@
   min-height: 1em;
   outline: none;
   border: none;
-  vertical-align: baseline;
+  vertical-align: bottom;
   background: #E0E1E2 none;
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
@@ -3320,46 +3320,20 @@
          Site Overrides
 *******************************/
 
+
+/* 与input, selection保持相同的高度 */
 .ui.button {
   border: 1px solid transparent;
 }
-.ui.mini.buttons .button,
-.ui.mini.buttons .or,
-.ui.mini.button {
-  font-size: 0.78571429em;
-}
-.ui.tiny.buttons .button,
-.ui.tiny.buttons .or,
-.ui.tiny.button {
-  font-size: 0.85714286em;
-}
-.ui.small.buttons .button,
-.ui.small.buttons .or,
-.ui.small.button {
-  font-size: 0.92857143em;
-}
+
+/* 缺省为1em */
 .ui.buttons .button,
 .ui.buttons .or,
 .ui.button {
   font-size: 1em;
 }
-.ui.large.buttons .button,
-.ui.large.buttons .or,
-.ui.large.button {
-  font-size: 1.14285714em;
-}
-.ui.big.buttons .button,
-.ui.big.buttons .or,
-.ui.big.button {
-  font-size: 1.28571429em;
-}
-.ui.huge.buttons .button,
-.ui.huge.buttons .or,
-.ui.huge.button {
-  font-size: 1.42857143em;
-}
-.ui.massive.buttons .button,
-.ui.massive.buttons .or,
-.ui.massive.button {
-  font-size: 1.71428571em;
+.ui.medium.buttons .button,
+.ui.medium.buttons .or,
+.ui.medium.button {
+  font-size: 1rem;
 }

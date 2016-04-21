@@ -1,3 +1,29 @@
 /*******************************
     User Variable Overrides
 *******************************/
+
+/* bold */
+@menuHeaderFontWeight: @boldFontWeight;
+@inlineTextFontWeight: @boldFontWeight;
+@activeItemFontWeight: @boldFontWeight;
+
+/* Pointing arrow */
+@pointingArrowBoxShadow: -@menuBorderWidth -@menuBorderWidth 0px 0px @menuBorderColor;
+@pointingUpwardArrowBoxShadow: @menuBorderWidth @menuBorderWidth 0px 0px @menuBorderColor;
+
+/* Compact */
+@compactSelectionVerticalPadding: @inputCompactVerticalPadding;
+@compactSelectionHorizontalPadding: @inputCompactHorizontalPadding;
+@compactSelectionIconDistance: @inputCompactHorizontalPadding + @glyphWidth + 0.5em;
+@compactSelectionPadding: @compactSelectionVerticalPadding @compactSelectionIconDistance
+                          @compactSelectionVerticalPadding @compactSelectionHorizontalPadding;
+
+@compactSelectionIconHitbox: @compactSelectionVerticalPadding;
+@compactSelectionIconMargin: -@compactSelectionIconHitbox;
+@compactSelectionIconPadding: @compactSelectionIconHitbox;
+
+
+/* Font size */
+@itemFontSize: 1em;
+@itemVerticalPadding: @relativeMini;
+@itemHorizontalPadding: @relativeLarge;

@@ -1,24 +1,48 @@
 import React from 'react';
+import {Dropdown, Link} from '../artui/react';
+
+class ProjectSelection extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      projects: ['app2AWS', 'appWestAWS', 'AppGAE']
+    }
+  }
+  
+  render() {
+    let projects = this.state['projects'];
+    
+    return (
+      <Dropdown className="selection" {...this.props}>
+        <span className="text"></span>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          {
+            projects.map((p) => {
+              return <div key={p} className="item">{p}</div>
+            })
+          }
+        </div>
+      </Dropdown>
+    );
+  }
+}
+
+export {ProjectSelection};
+
+export const ModelType = (props) => {
+  return (
+    <Dropdown className="selection" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">Holistic</div>
+        <div className="item">Split</div>
+      </div>
+    </Dropdown>
+  );
+};
 
 export default {
-  ModelType: function() {
-    return [
-      (
-        <label key="label">Model Type</label>
-      ), (
-        <select key="values" className="ui dropdown">
-          <option value="cpu(holistic)">cpu(holistic)</option>
-          <option value="casandra(holistic)">casandra(holistic)</option>
-          <option value="casandra(split)">casandra(split)</option>
-          <option value="cpu-nofilter(holistic)">cpu-nofilter(holistic)</option>
-          <option value="cpu-nofilter(split)">cpu-nofilter(split)</option>
-          <option value="cpu-filter(holistic)">cpu-filter(holistic)</option>
-          <option value="cpu-filter(split)">cpu-filter(split)</option>
-        </select>
-      )
-    ];
-  },
-  
   AnomalyThreshold: function() {
     return [
       (

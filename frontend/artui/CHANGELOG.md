@@ -43,8 +43,9 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 - 添加React组件，并且支持错误信息提示框
 
 ### Button
-- 调整字体大小为相对大小。
+- 缺省字体大小为1em, 以支持全局设置字体大小
 - 字体*font-weight*调整为normal
+- 调整 *vertical-align* 为buttom，以和input等对齐
 
 ### Label
 - 调整字体的深度为 *@boldFontWeight*
