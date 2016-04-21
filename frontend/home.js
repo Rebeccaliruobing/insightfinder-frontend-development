@@ -47,8 +47,8 @@ const App = function(props) {
   );
 };
 
-const pageBody = document.querySelector('#app');
-if (pageBody) {
+const appBody = document.querySelector('#app');
+if (appBody) {
   ReactDOM.render((
     <Router history={browserHistory}>
       <Route component={App} path="/">
@@ -67,5 +67,5 @@ if (pageBody) {
         </Route>
       </Route>
     </Router>
-  ), pageBody);
+  ), appBody);
 }
