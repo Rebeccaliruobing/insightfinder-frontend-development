@@ -4,4 +4,6 @@
 
 @labelFontSize: @relativeMedium;
 @labelFontWeight: @boldFontWeight;
-@partsFieldDistance: 0.25em;
+
+// Inline
+@inlineFieldInputDistance: 0.25em;

@@ -20,12 +20,12 @@
   min-height: 1em;
   outline: none;
   border: none;
-  vertical-align: bottom;
+  vertical-align: baseline;
   background: #E0E1E2 none;
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   margin: 0em 0.25em 0em 0em;
-  padding: 0.71428571em 1.5em 0.71428571em;
+  padding: 0.71428571em 1.42857143em 0.71428571em;
   text-transform: none;
   text-shadow: none;
   font-weight: normal;
@@ -230,7 +230,7 @@
 }
 .ui.animated.button .visible.content {
   position: relative;
-  margin-right: 1.5em;
+  margin-right: 1.42857143em;
 }
 .ui.animated.button .hidden.content {
   position: absolute;
@@ -646,15 +646,15 @@
 
 .ui.compact.buttons .button,
 .ui.compact.button {
-  padding: 0.53571429em 1.125em 0.53571429em;
+  padding: 0.5em 0.85714286em 0.5em;
 }
 .ui.compact.icon.buttons .button,
 .ui.compact.icon.button {
-  padding: 0.53571429em 0.53571429em 0.53571429em;
+  padding: 0.5em 0.5em 0.5em;
 }
 .ui.compact.labeled.icon.buttons .button,
 .ui.compact.labeled.icon.button {
-  padding: 0.53571429em 3.55357143em 0.53571429em;
+  padding: 0.5em 3.28571429em 0.5em;
 }
 
 /*-------------------
@@ -839,8 +839,8 @@
 .ui.labeled.icon.buttons .button,
 .ui.labeled.icon.button {
   position: relative;
-  padding-left: 3.92857143em !important;
-  padding-right: 1.5em !important;
+  padding-left: 3.85714286em !important;
+  padding-right: 1.42857143em !important;
 }
 
 /* Left Labeled */
@@ -869,8 +869,8 @@
 
 /* Right Labeled */
 .ui[class*="right labeled"].icon.button {
-  padding-right: 3.92857143em !important;
-  padding-left: 1.5em !important;
+  padding-right: 3.85714286em !important;
+  padding-left: 1.42857143em !important;
 }
 .ui[class*="right labeled"].icon.button > .icon {
   left: auto;
@@ -915,8 +915,8 @@
 /* Fluid Labeled */
 .ui.fluid[class*="left labeled"].icon.button,
 .ui.fluid[class*="right labeled"].icon.button {
-  padding-left: 1.5em !important;
-  padding-right: 1.5em !important;
+  padding-left: 1.42857143em !important;
+  padding-right: 1.42857143em !important;
 }
 
 /*--------------

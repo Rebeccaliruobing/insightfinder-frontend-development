@@ -3,7 +3,6 @@
 *******************************/
 
 @fontWeight: normal;
-@verticalAlign: bottom;
 
 @verticalPadding: @inputVerticalPadding;
 @horizontalPadding: @inputHorizontalPadding;

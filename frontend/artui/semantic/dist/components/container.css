@@ -146,30 +146,35 @@
          Site Overrides
 *******************************/
 
-.ui.basic.container {
-  width: 100% !important;
-}
+
+/* Font size */
 .ui.mini.container {
-  font-size: 0.78571429em;
+  font-size: 0.78571429rem;
 }
 .ui.tiny.container {
-  font-size: 0.85714286em;
+  font-size: 0.85714286rem;
 }
 .ui.small.container {
-  font-size: 0.92857143em;
+  font-size: 0.92857143rem;
 }
-.ui.container {
-  font-size: 1em;
+.ui.container,
+.ui.medium.container {
+  font-size: 1rem;
 }
 .ui.large.container {
-  font-size: 1.14285714em;
+  font-size: 1.14285714rem;
 }
 .ui.big.container {
-  font-size: 1.28571429em;
+  font-size: 1.28571429rem;
 }
 .ui.huge.container {
-  font-size: 1.42857143em;
+  font-size: 1.42857143rem;
 }
 .ui.massive.container {
-  font-size: 1.71428571em;
+  font-size: 1.71428571rem;
+}
+
+/* Basic */
+.ui.basic.container {
+  width: 100% !important;
 }

@@ -948,7 +948,7 @@ body {
   background: #FFFFFF;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
   color: rgba(0, 0, 0, 0.87);
   font-smoothing: antialiased;
 }
@@ -1012,7 +1012,7 @@ h5:last-child {
 
 p {
   margin: 0em 0em 1em;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
 }
 
 p:first-child {
@@ -1110,12 +1110,12 @@ input::selection {
   min-height: 1em;
   outline: none;
   border: none;
-  vertical-align: bottom;
+  vertical-align: baseline;
   background: #E0E1E2 none;
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   margin: 0em 0.25em 0em 0em;
-  padding: 0.71428571em 1.5em 0.71428571em;
+  padding: 0.71428571em 1.42857143em 0.71428571em;
   text-transform: none;
   text-shadow: none;
   font-weight: normal;
@@ -1332,7 +1332,7 @@ input::selection {
 
 .ui.animated.button .visible.content {
   position: relative;
-  margin-right: 1.5em;
+  margin-right: 1.42857143em;
 }
 
 .ui.animated.button .hidden.content {
@@ -1802,17 +1802,17 @@ input::selection {
 
 .ui.compact.buttons .button,
 .ui.compact.button {
-  padding: 0.53571429em 1.125em 0.53571429em;
+  padding: 0.5em 0.85714286em 0.5em;
 }
 
 .ui.compact.icon.buttons .button,
 .ui.compact.icon.button {
-  padding: 0.53571429em 0.53571429em 0.53571429em;
+  padding: 0.5em 0.5em 0.5em;
 }
 
 .ui.compact.labeled.icon.buttons .button,
 .ui.compact.labeled.icon.button {
-  padding: 0.53571429em 3.55357143em 0.53571429em;
+  padding: 0.5em 3.28571429em 0.5em;
 }
 
 /*-------------------
@@ -2025,8 +2025,8 @@ input::selection {
 .ui.labeled.icon.buttons .button,
 .ui.labeled.icon.button {
   position: relative;
-  padding-left: 3.92857143em !important;
-  padding-right: 1.5em !important;
+  padding-left: 3.85714286em !important;
+  padding-right: 1.42857143em !important;
 }
 
 /* Left Labeled */
@@ -2058,8 +2058,8 @@ input::selection {
 /* Right Labeled */
 
 .ui[class*="right labeled"].icon.button {
-  padding-right: 3.92857143em !important;
-  padding-left: 1.5em !important;
+  padding-right: 3.85714286em !important;
+  padding-left: 1.42857143em !important;
 }
 
 .ui[class*="right labeled"].icon.button > .icon {
@@ -2112,8 +2112,8 @@ input::selection {
 
 .ui.fluid[class*="left labeled"].icon.button,
 .ui.fluid[class*="right labeled"].icon.button {
-  padding-left: 1.5em !important;
-  padding-right: 1.5em !important;
+  padding-left: 1.42857143em !important;
+  padding-right: 1.42857143em !important;
 }
 
 /*--------------
@@ -5071,40 +5071,45 @@ input::selection {
          Site Overrides
 *******************************/
 
-.ui.basic.container {
-  width: 100% !important;
-}
+/* Font size */
 
 .ui.mini.container {
-  font-size: 0.78571429em;
+  font-size: 0.78571429rem;
 }
 
 .ui.tiny.container {
-  font-size: 0.85714286em;
+  font-size: 0.85714286rem;
 }
 
 .ui.small.container {
-  font-size: 0.92857143em;
+  font-size: 0.92857143rem;
 }
 
-.ui.container {
-  font-size: 1em;
+.ui.container,
+.ui.medium.container {
+  font-size: 1rem;
 }
 
 .ui.large.container {
-  font-size: 1.14285714em;
+  font-size: 1.14285714rem;
 }
 
 .ui.big.container {
-  font-size: 1.28571429em;
+  font-size: 1.28571429rem;
 }
 
 .ui.huge.container {
-  font-size: 1.42857143em;
+  font-size: 1.42857143rem;
 }
 
 .ui.massive.container {
-  font-size: 1.71428571em;
+  font-size: 1.71428571rem;
+}
+
+/* Basic */
+
+.ui.basic.container {
+  width: 100% !important;
 }
 /*!
  * # Semantic UI 2.2.0 - Divider
@@ -11691,7 +11696,7 @@ img.ui.bordered.image {
   text-align: left;
   line-height: 1.14285714em;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  padding: 0.64285714em 1.5em;
+  padding: 0.64285714em 1.42857143em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   color: rgba(0, 0, 0, 0.87);
@@ -11964,7 +11969,7 @@ img.ui.bordered.image {
 
 .ui[class*="left icon"].input > input {
   padding-left: 2.52857143em !important;
-  padding-right: 1.5em !important;
+  padding-right: 1.42857143em !important;
 }
 
 /* Focus */
@@ -12225,7 +12230,7 @@ img.ui.bordered.image {
 }
 
 .ui.compact.input input {
-  padding: 0.46428571em 1.125em !important;
+  padding: 0.46428571em 1.07142857em !important;
 }
 /*!
  * # Semantic UI 2.2.0 - Label
@@ -16459,6 +16464,18 @@ ol.ui.horizontal.list li:before,
          Site Overrides
 *******************************/
 
+/* Font size */
+
+.ui.segments .segment,
+.ui.segment {
+  font-size: 1em;
+}
+
+.ui.segments .segment.medium,
+.ui.segment.medium {
+  font-size: 1rem;
+}
+
 .ui.flat.segment,
 .ui.flat.segments {
   box-shadow: none;
@@ -17468,7 +17485,7 @@ ol.ui.horizontal.list li:before,
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
   line-height: 1.14285714em;
-  padding: 0.64285714em 1.5em;
+  padding: 0.64285714em 1.42857143em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -17485,7 +17502,7 @@ ol.ui.horizontal.list li:before,
   margin: 0em;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  padding: 0.71428571em 1.5em;
+  padding: 0.71428571em 1.42857143em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   outline: none;
@@ -17530,7 +17547,7 @@ ol.ui.horizontal.list li:before,
   border: 1px solid rgba(34, 36, 38, 0.15);
   border-radius: 0.14285714rem;
   box-shadow: 0em 0em 0em 0em transparent inset;
-  padding: 0.62em 1.5em;
+  padding: 0.62em 1.42857143em;
   color: rgba(0, 0, 0, 0.87);
   -webkit-transition: color 0.1s ease, border-color 0.1s ease;
   transition: color 0.1s ease, border-color 0.1s ease;
@@ -18530,6 +18547,18 @@ ol.ui.horizontal.list li:before,
          Site Overrides
 *******************************/
 
+/* Font size */
+
+.ui.form {
+  font-size: 1em;
+}
+
+.ui.form.medium {
+  font-size: 1rem;
+}
+
+/* Label */
+
 .ui.form .field > label[class*="left aligned"] {
   text-align: left;
 }
@@ -18613,29 +18642,30 @@ ol.ui.horizontal.list li:before,
   width: 6.25%;
 }
 
-.ui.form .inline.fields .field > label,
-.ui.form .inline.field > label {
-  margin: 0em 0.85714286em 0em 0em;
-}
-
-.ui.form .parts.field > .ui.input,
-.ui.form .parts.field > .ui.checkbox,
-.ui.form .parts.field > .ui.dropdown,
-.ui.form .parts.field > .ui.button,
-.ui.form .parts.field > input,
-.ui.form .parts.field > select,
-.ui.form .parts.field > span {
-  margin-right: 0.25em;
-  vertical-align: middle;
-}
-
-.ui.form .parts.field > :last-child {
-  margin-right: 0em !important;
-}
-
+/*
+// field content
 .ui.form .field > span {
   display: inline-block;
 }
+
+.ui.form .inline.fields .field,
+.ui.form .inline.field {
+  & > label {
+    margin: 0em @inlineLabelDistance 0em 0em;
+  }
+
+  & > input, & > .ui.input, & > .ui.checkbox,
+  & > .ui.dropdown, & > select,
+  & > span {
+    margin-right: @inlineFieldInputDistance;
+    vertical-align: baseline;
+  }
+
+  & > :last-child {
+    margin-right: 0em !important;
+  }
+}
+*/
 /*!
  * # Semantic UI 2.2.0 - Grid
  * http://github.com/semantic-org/semantic-ui/
@@ -23216,7 +23246,7 @@ Floated Menu / Item
   margin: 1em 0em;
   background: #F8F8F9;
   padding: 1em 1.14285714rem;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
   color: rgba(0, 0, 0, 0.87);
   -webkit-transition: opacity 0.1s ease, color 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
   transition: opacity 0.1s ease, color 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
@@ -23319,7 +23349,7 @@ Floated Menu / Item
   cursor: pointer;
   position: absolute;
   margin: 0em;
-  top: 0.78575em;
+  top: 0.78571429em;
   right: 0.5em;
   opacity: 0.7;
   -webkit-transition: opacity 0.1s ease;
@@ -25531,7 +25561,7 @@ Floated Menu / Item
 .ui.card > .content > .header:not(.ui) {
   font-weight: bold;
   font-size: 1.28571429em;
-  margin-top: -0.21425em;
+  margin-top: -0.21428571em;
   line-height: 1.2857em;
 }
 
@@ -26887,7 +26917,7 @@ a.ui.card:hover,
   border-left: none;
   font-size: 1em;
   max-width: 500px;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
 }
 
 /*--------------
@@ -27136,7 +27166,7 @@ a.ui.card:hover,
 
 .ui.items > .item > .content > .header {
   display: inline-block;
-  margin: -0.21425em 0em 0em;
+  margin: -0.21428571em 0em 0em;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-weight: bold;
   color: rgba(0, 0, 0, 0.85);
@@ -27186,7 +27216,7 @@ a.ui.card:hover,
   margin-top: 0.6em;
   max-width: auto;
   font-size: 1em;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
   color: rgba(0, 0, 0, 0.87);
 }
 
@@ -28248,7 +28278,7 @@ a.ui.card:hover,
 
 .ui.accordion.menu .item .title > .dropdown.icon {
   float: right;
-  margin: 0.21425em 0em 0em 1em;
+  margin: 0.21428571em 0em 0em 1em;
   -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
 }
@@ -29421,7 +29451,7 @@ body.dimmable > .dimmer {
   position: relative;
   width: auto;
   font-size: 0.85714286em;
-  margin: 0em 0em 0em 1em;
+  margin: 0em 0.5em 0em 0.5em;
 }
 
 .ui.dropdown .menu > .item .dropdown.icon {
@@ -29529,7 +29559,7 @@ body.dimmable > .dimmer {
 }
 
 .ui.dropdown .menu > .input:not(.transparent) input {
-  padding: 0.5em 1.5em;
+  padding: 0.5em 1.42857143em;
 }
 
 .ui.dropdown .menu > .input:not(.transparent) .button,
@@ -29709,7 +29739,7 @@ body.dimmable > .dimmer {
   min-height: 2.5em;
   background: #FFFFFF;
   display: inline-block;
-  padding: 0.71428571em 3.1em 0.71428571em 1.5em;
+  padding: 0.71428571em 3.02857143em 0.71428571em 1.42857143em;
   color: rgba(0, 0, 0, 0.87);
   box-shadow: none;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -29739,7 +29769,7 @@ select.ui.dropdown {
   height: auto;
   line-height: 1.14285714em;
   top: 0.71428571em;
-  right: 1.5em;
+  right: 1.42857143em;
   z-index: 3;
   margin: -0.71428571em;
   padding: 0.71428571em;
@@ -29910,7 +29940,7 @@ select.ui.dropdown {
 /* Search Selection */
 
 .ui.search.dropdown {
-  min-width: '';
+  min-width: initial;
 }
 
 /* Search Dropdown */
@@ -29946,7 +29976,7 @@ select.ui.dropdown {
 
 .ui.search.selection.dropdown > input.search {
   line-height: 1.14285714em;
-  padding: 0.64285714em 3.1em 0.64285714em 1.5em;
+  padding: 0.64285714em 3.02857143em 0.64285714em 1.42857143em;
 }
 
 /* Active/Visible Search */
@@ -30013,7 +30043,7 @@ select.ui.dropdown {
 /* Multiple Selection */
 
 .ui.multiple.dropdown {
-  padding: 0.21428571em 3.1em 0.21428571em 0.71428571em;
+  padding: 0.21428571em 3.02857143em 0.21428571em 0.64285714em;
 }
 
 .ui.multiple.dropdown .menu {
@@ -30895,31 +30925,7 @@ select.ui.dropdown {
         User Overrides
 *******************************/
 
-/* Selection */
-
-.ui.selection.dropdown {
-  vertical-align: bottom;
-  min-height: 1em;
-}
-
-/* Compact */
-
-.ui.compact.selection.dropdown {
-  padding: 0.53571429em 2.725em 0.53571429em 1.125em;
-}
-
-.ui.compact.selection.dropdown > .dropdown.icon {
-  top: 0.53571429em;
-  right: 1.125em;
-  margin: -0.53571429em;
-  padding: 0.53571429em;
-}
-
 /* Font size */
-
-.ui.dropdown {
-  font-size: 1em;
-}
 
 .ui.dropdown.mini {
   font-size: 0.78571429rem;
@@ -30951,6 +30957,33 @@ select.ui.dropdown {
 
 .ui.dropdown.massive {
   font-size: 1.71428571rem;
+}
+
+/* Selection */
+
+.ui.selection.dropdown {
+  min-height: 1em;
+}
+
+.ui.search.dropdown:not(.selection) > input.search {
+  top: 0.14285714em;
+}
+
+/* Compact */
+
+.ui.compact.selection.dropdown {
+  padding: 0.5em 2.45714286em 0.5em 0.85714286em;
+}
+
+.ui.compact.selection.dropdown > .dropdown.icon {
+  top: 0.5em;
+  right: 0.85714286em;
+  margin: -0.5em;
+  padding: 0.5em;
+}
+
+.ui.compact.selection.dropdown.search > input.search {
+  padding: 0.42857143em 2.45714286em 0.42857143em 0.85714286em;
 }
 /*!
  * # Semantic UI 2.2.0 - Video
@@ -31367,7 +31400,7 @@ select.ui.dropdown {
   }
 
   .ui.modal > .close {
-    top: 1.0535rem;
+    top: 1.05357143rem;
     right: 1rem;
     color: rgba(0, 0, 0, 0.87);
   }
@@ -31572,7 +31605,7 @@ select.ui.dropdown {
 }
 
 .ui.fullscreen.modal > .close {
-  top: 1.0535rem;
+  top: 1.05357143rem;
   right: 1rem;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -31864,7 +31897,7 @@ select.ui.dropdown {
 }
 
 .ui.massive.modal > .close {
-  top: 1.0535rem;
+  top: 1.05357143rem;
   right: 1rem;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -32040,7 +32073,7 @@ a.ui.nag {
   min-width: min-content;
   z-index: 1900;
   border: 1px solid #D4D4D5;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
   max-width: 250px;
   background: #FFFFFF;
   padding: 0.833em 1em;
@@ -33311,7 +33344,7 @@ a.ui.nag {
   font-style: normal;
   font-weight: normal;
   line-height: 1.14285714em;
-  padding: 0.64285714em 1.5em;
+  padding: 0.64285714em 1.42857143em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);

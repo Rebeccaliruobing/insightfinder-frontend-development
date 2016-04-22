@@ -2,6 +2,15 @@
          Site Overrides
 *******************************/
 
+/* Font size */
+.ui.segments .segment,
+.ui.segment {
+  font-size: 1em;
+  &.medium {
+    font-size: @medium;
+  }
+}
+
 // Flat
 .ui.flat.segment, .ui.flat.segments {
   box-shadow: none;
@@ -15,3 +24,4 @@
     }
   });
 }
+

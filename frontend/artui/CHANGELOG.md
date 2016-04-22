@@ -36,7 +36,7 @@ Semantic UI的安装及升级可参考[Semantic UI Getting Started][2].
 
 ### Form
 - 调整Label粗体为*@boldFontWeight*
-- 添加*parts*类，用于描述多个输入项的field
+- 添加*parts*类，用于描述多个输入项的field (TODO: 用)
 
 ### Input
 - 添加*compact*类，减小边距

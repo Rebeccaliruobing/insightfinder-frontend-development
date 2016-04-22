@@ -50,7 +50,7 @@ class LiveMonitoring extends React.Component {
     
     return (
       <Console.Content>
-        <div className="ui main tiny container" ref={c => this._el = c}>
+        <div className="ui main container" ref={c => this._el = c}>
           <div className="ui vertical segment">
             <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
@@ -77,11 +77,12 @@ class LiveMonitoring extends React.Component {
               </ul>
             </Message>
           }
-          <ProjectSelection className="selection compact"/>
-          <button className="ui orange compact button"
-                  onClick={this.handleAddMonitoring.bind(this)}>Add</button>
           <div className="ui vertical segment">
-            <div className="ui tiny form">
+            <ProjectSelection className="" />
+            <button className="ui orange compact button"
+                    onClick={this.handleAddMonitoring.bind(this)}>Add</button>
+            <div className="ui orange compact button">Test</div>
+            <div className="ui form">
               <div className="inline fields">
                 <div className="field">
                   <label>Project Name</label>

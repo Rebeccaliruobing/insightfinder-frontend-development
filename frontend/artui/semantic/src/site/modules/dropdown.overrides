@@ -2,27 +2,8 @@
         User Overrides
 *******************************/
 
-/* Selection */
-.ui.selection.dropdown {
-  vertical-align: bottom;
-  min-height: 1em;
-}
-
-/* Compact */
-.ui.compact.selection.dropdown {
-  padding: @compactSelectionPadding;
-
-  & > .dropdown.icon {
-    top: @compactSelectionVerticalPadding;
-    right: @compactSelectionHorizontalPadding;
-    margin: @compactSelectionIconMargin;
-    padding: @compactSelectionIconPadding;
-  }
-}
-
 /* Font size */
 .ui.dropdown {
-  font-size: 1em;
   &.mini {
     font-size: @mini;
   }
@@ -48,3 +29,37 @@
     font-size: @massive;
   }
 }
+
+/* Selection */
+.ui.selection.dropdown {
+  min-height: 1em;
+}
+
+// Search
+.ui.search.dropdown:not(.selection) {
+  & > input.search {
+    top: @searchInputOffset;
+  }
+}
+
+/* Compact */
+.ui.compact.selection.dropdown {
+  padding: @compactSelectionPadding;
+  & > .dropdown.icon {
+    top: @compactSelectionVerticalPadding;
+    right: @compactSelectionHorizontalPadding;
+    margin: @compactSelectionIconMargin;
+    padding: @compactSelectionIconPadding;
+  }
+
+  &.search {
+    & > input.search {
+      padding: @compactSearchSelectionInputPadding;
+    }
+  }
+}
+
+.ui.compact.multiple.dropdown {
+
+}
+

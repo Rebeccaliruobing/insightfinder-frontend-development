@@ -796,6 +796,16 @@
          Site Overrides
 *******************************/
 
+
+/* Font size */
+.ui.segments .segment,
+.ui.segment {
+  font-size: 1em;
+}
+.ui.segments .segment.medium,
+.ui.segment.medium {
+  font-size: 1rem;
+}
 .ui.flat.segment,
 .ui.flat.segments {
   box-shadow: none;

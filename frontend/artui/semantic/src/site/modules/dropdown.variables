@@ -11,6 +11,13 @@
 @pointingArrowBoxShadow: -@menuBorderWidth -@menuBorderWidth 0px 0px @menuBorderColor;
 @pointingUpwardArrowBoxShadow: @menuBorderWidth @menuBorderWidth 0px 0px @menuBorderColor;
 
+/* Icon */
+@dropdownIconMargin: 0em 0.5em 0em 0.5em;
+
+/* Search */
+@searchMinWidth: initial;
+@searchInputOffset: (@lineHeight - @inputLineHeight) * 0.5;
+
 /* Compact */
 @compactSelectionVerticalPadding: @inputCompactVerticalPadding;
 @compactSelectionHorizontalPadding: @inputCompactHorizontalPadding;
@@ -22,6 +29,12 @@
 @compactSelectionIconMargin: -@compactSelectionIconHitbox;
 @compactSelectionIconPadding: @compactSelectionIconHitbox;
 
+@compactSearchSelectionVerticalPadding: (@compactSelectionVerticalPadding - @searchSelectionLineHeightOffset);
+@compactSearchSelectionHorizontalPadding: @compactSelectionHorizontalPadding;
+@compactSearchSelectionInputPadding: @compactSearchSelectionVerticalPadding @compactSelectionIconDistance
+                                     @compactSearchSelectionVerticalPadding @compactSearchSelectionHorizontalPadding;
+
+@compactMultipleSelectionPadding: 0px @multipleSelectionRightPadding 0px @multipleSelectionLeftPadding;
 
 /* Font size */
 @itemFontSize: 1em;

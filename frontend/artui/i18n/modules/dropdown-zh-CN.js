@@ -14,4 +14,4 @@
 $.fn.dropdown.settings.message['addResult'] = '新建 <b>{term}</b>';
 $.fn.dropdown.settings.message['count'] = '已选中{count}项';
 $.fn.dropdown.settings.message['maxSelections'] = '最多可选{maxCount}项';
-
+$.fn.dropdown.settings.message['noResults'] = '无匹配项';

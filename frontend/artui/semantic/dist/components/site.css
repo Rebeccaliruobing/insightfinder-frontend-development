@@ -29,7 +29,7 @@ body {
   background: #FFFFFF;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   font-size: 14px;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
   color: rgba(0, 0, 0, 0.87);
   font-smoothing: antialiased;
 }
@@ -88,7 +88,7 @@ h5:last-child {
 
 p {
   margin: 0em 0em 1em;
-  line-height: 1.4285em;
+  line-height: 1.42857143;
 }
 p:first-child {
   margin-top: 0em;

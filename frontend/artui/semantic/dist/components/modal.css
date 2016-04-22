@@ -230,7 +230,7 @@
     padding-right: 2.25rem;
   }
   .ui.modal > .close {
-    top: 1.0535rem;
+    top: 1.05357143rem;
     right: 1rem;
     color: rgba(0, 0, 0, 0.87);
   }
@@ -411,7 +411,7 @@
   padding-right: 2.25rem;
 }
 .ui.fullscreen.modal > .close {
-  top: 1.0535rem;
+  top: 1.05357143rem;
   right: 1rem;
   color: rgba(0, 0, 0, 0.87);
 }
@@ -668,7 +668,7 @@
   padding-right: 2.25rem;
 }
 .ui.massive.modal > .close {
-  top: 1.0535rem;
+  top: 1.05357143rem;
   right: 1rem;
   color: rgba(0, 0, 0, 0.87);
 }

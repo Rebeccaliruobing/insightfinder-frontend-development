@@ -5,7 +5,7 @@ class ProjectSelection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      projects: ['app2AWS', 'appWestAWS', 'AppGAE']
+      projects: ['app2AWS', 'appWestAWS', 'AppGAE', '中文', '中', '我真的很长很长很长很长']
     }
   }
   
@@ -13,8 +13,8 @@ class ProjectSelection extends React.Component {
     let projects = this.state['projects'];
     
     return (
-      <Dropdown className="selection" {...this.props}>
-        <span className="text"></span>
+      <Dropdown {...this.props}>
+        <span className="text" />
         <i className="dropdown icon"/>
         <div className="menu">
           {

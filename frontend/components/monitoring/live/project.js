@@ -18,15 +18,6 @@ const Project = class extends React.Component {
     };
   }
 
-  componentDidMount() {
-  }
-
-  componentDidUpdate() {
-  }
-
-  componentWillUnmount() {
-  }
-
   render() {
     return (
       <div className="active content">

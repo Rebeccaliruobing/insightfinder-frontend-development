@@ -2,32 +2,34 @@
          Site Overrides
 *******************************/
 
-.ui.basic.container {
-  width: 100% !important;
-}
-
-// Sizes
+/* Font size */
 .ui.mini.container {
-  font-size: @relativeMini;
+  font-size: @mini;
 }
 .ui.tiny.container {
-  font-size: @relativeTiny;
+  font-size: @tiny;
 }
 .ui.small.container {
-  font-size: @relativeSmall;
+  font-size: @small;
 }
-.ui.container {
-  font-size: @relativeMedium;
+.ui.container,
+.ui.medium.container {
+  font-size: @medium;
 }
 .ui.large.container {
-  font-size: @relativeLarge;
+  font-size: @large;
 }
 .ui.big.container {
-  font-size: @relativeBig;
+  font-size: @big;
 }
 .ui.huge.container {
-  font-size: @relativeHuge;
+  font-size: @huge;
 }
 .ui.massive.container {
-  font-size: @relativeMassive;
+  font-size: @massive;
+}
+
+/* Basic */
+.ui.basic.container {
+  width: 100% !important;
 }

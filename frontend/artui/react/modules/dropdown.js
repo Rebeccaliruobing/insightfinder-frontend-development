@@ -40,6 +40,7 @@ class Dropdown extends React.Component {
     let {tag, className, 
       on, action, transition, direction, useLabels, 
       children, ...others} = this.props;
+
     return React.createElement(tag, {
       ref: c => this._$el = $(c),
       className: classNames('ui', className, 'dropdown'),
@@ -51,9 +52,8 @@ class Dropdown extends React.Component {
 Dropdown.propTypes = {
   tag: React.PropTypes.string,
   on: React.PropTypes.oneOf(['click', 'hover']),
-  direction: React.PropTypes.oneOf(['auto', 'upward', 'downward']),
-  
   action: React.PropTypes.oneOf(['activate', 'select', 'combo', 'hide', 'nothing']),
+  direction: React.PropTypes.oneOf(['auto', 'upward', 'downward']),
   useLabels: React.PropTypes.bool,
   transition: React.PropTypes.string
 };
@@ -61,10 +61,10 @@ Dropdown.propTypes = {
 Dropdown.defaultProps = {
   tag: 'div',
   on: 'click',
+  action: 'activate',
   direction: 'auto',
   useLabels: true,
-  transition: 'auto',
-  action: 'activate'
+  transition: 'auto'
 };
 
 export default Dropdown;
