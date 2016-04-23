@@ -6,8 +6,24 @@
 import React from 'react';
 import classNames from 'classnames';
 import Label from './label';
+import {BaseComponent, PropTypes} from '../base';
 
-const Input = class extends React.Component {
+class Input extends BaseComponent {
+  static propTypes = {
+    type: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    placeholder: PropTypes.string,
+    onChange: PropTypes.func,
+    message: PropTypes.string,
+    messageClass: PropTypes.string
+  };
+
+  static defaultProps = {
+    onChange: () => {},
+    name: '',
+    message: '',
+    messageClass: ''
+  };
   
   constructor(props) {
     super(props);
@@ -31,22 +47,6 @@ const Input = class extends React.Component {
       </div>
     )
   }
-};
-
-Input.propTypes = {
-  type: React.PropTypes.string.isRequired,
-  name: React.PropTypes.string,
-  placeholder: React.PropTypes.string,
-  onChange: React.PropTypes.func,
-  message: React.PropTypes.string,
-  messageClass: React.PropTypes.string
-};
-
-Input.defaultProps = {
-  onChange: () => {},
-  name: '',
-  message: '',
-  messageClass: ''
-};
+}
 
 export default Input;

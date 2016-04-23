@@ -1115,7 +1115,7 @@ input::selection {
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
   margin: 0em 0.25em 0em 0em;
-  padding: 0.71428571em 1.42857143em 0.71428571em;
+  padding: 0.57142857em 1.14285714em 0.57142857em;
   text-transform: none;
   text-shadow: none;
   font-weight: normal;
@@ -1332,7 +1332,7 @@ input::selection {
 
 .ui.animated.button .visible.content {
   position: relative;
-  margin-right: 1.42857143em;
+  margin-right: 1.14285714em;
 }
 
 .ui.animated.button .hidden.content {
@@ -1802,17 +1802,17 @@ input::selection {
 
 .ui.compact.buttons .button,
 .ui.compact.button {
-  padding: 0.5em 0.85714286em 0.5em;
+  padding: 0.42857143em 0.71428571em 0.42857143em;
 }
 
 .ui.compact.icon.buttons .button,
 .ui.compact.icon.button {
-  padding: 0.5em 0.5em 0.5em;
+  padding: 0.42857143em 0.42857143em 0.42857143em;
 }
 
 .ui.compact.labeled.icon.buttons .button,
 .ui.compact.labeled.icon.button {
-  padding: 0.5em 3.28571429em 0.5em;
+  padding: 0.42857143em 2.85714286em 0.42857143em;
 }
 
 /*-------------------
@@ -1873,7 +1873,7 @@ input::selection {
 
 .ui.icon.buttons .button,
 .ui.icon.button {
-  padding: 0.71428571em 0.71428571em 0.71428571em;
+  padding: 0.57142857em 0.57142857em 0.57142857em;
 }
 
 .ui.icon.buttons .button > .icon,
@@ -2025,8 +2025,8 @@ input::selection {
 .ui.labeled.icon.buttons .button,
 .ui.labeled.icon.button {
   position: relative;
-  padding-left: 3.85714286em !important;
-  padding-right: 1.42857143em !important;
+  padding-left: 3.28571429em !important;
+  padding-right: 1.14285714em !important;
 }
 
 /* Left Labeled */
@@ -2041,7 +2041,7 @@ input::selection {
   border-bottom-left-radius: inherit;
   text-align: center;
   margin: 0em;
-  width: 2.42857143em;
+  width: 2.14285714em;
   background-color: rgba(0, 0, 0, 0.05);
   color: '';
   box-shadow: -1px 0px 0px 0px transparent inset;
@@ -2058,8 +2058,8 @@ input::selection {
 /* Right Labeled */
 
 .ui[class*="right labeled"].icon.button {
-  padding-right: 3.85714286em !important;
-  padding-left: 1.42857143em !important;
+  padding-right: 3.28571429em !important;
+  padding-left: 1.14285714em !important;
 }
 
 .ui[class*="right labeled"].icon.button > .icon {
@@ -2112,8 +2112,8 @@ input::selection {
 
 .ui.fluid[class*="left labeled"].icon.button,
 .ui.fluid[class*="right labeled"].icon.button {
-  padding-left: 1.42857143em !important;
-  padding-right: 1.42857143em !important;
+  padding-left: 1.14285714em !important;
+  padding-right: 1.14285714em !important;
 }
 
 /*--------------
@@ -2157,7 +2157,7 @@ input::selection {
 .ui.buttons .or {
   position: relative;
   width: 0.3em;
-  height: 2.42857143em;
+  height: 2.14285714em;
   z-index: 3;
 }
 
@@ -2170,11 +2170,11 @@ input::selection {
   left: 50%;
   background-color: #FFFFFF;
   text-shadow: none;
-  margin-top: -0.85714286em;
-  margin-left: -0.85714286em;
-  width: 1.71428571em;
-  height: 1.71428571em;
-  line-height: 1.71428571em;
+  margin-top: -0.78571429em;
+  margin-left: -0.78571429em;
+  width: 1.57142857em;
+  height: 1.57142857em;
+  line-height: 1.57142857em;
   color: rgba(0, 0, 0, 0.4);
   font-style: normal;
   font-weight: bold;
@@ -4889,10 +4889,14 @@ input::selection {
          Site Overrides
 *******************************/
 
-/* 与input, selection保持相同的高度 */
+/* 与input, dropdown采用相同的结构 */
 
 .ui.button {
   border: 1px solid transparent;
+}
+
+.ui.button:last-child {
+  margin-right: 0em;
 }
 
 /* 缺省为1em */
@@ -11696,7 +11700,7 @@ img.ui.bordered.image {
   text-align: left;
   line-height: 1.14285714em;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  padding: 0.64285714em 1.42857143em;
+  padding: 0.42857143em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   color: rgba(0, 0, 0, 0.87);
@@ -11920,7 +11924,7 @@ img.ui.bordered.image {
   right: 0px;
   margin: 0em;
   height: 100%;
-  width: 2.52857143em;
+  width: 2.1em;
   opacity: 0.5;
   border-radius: 0em 0.14285714rem 0.14285714rem 0em;
   -webkit-transition: opacity 0.3s ease;
@@ -11932,7 +11936,7 @@ img.ui.bordered.image {
 }
 
 .ui.icon.input input {
-  padding-right: 2.52857143em !important;
+  padding-right: 2.1em !important;
 }
 
 .ui.icon.input > i.icon:before,
@@ -11968,8 +11972,8 @@ img.ui.bordered.image {
 }
 
 .ui[class*="left icon"].input > input {
-  padding-left: 2.52857143em !important;
-  padding-right: 1.42857143em !important;
+  padding-left: 2.1em !important;
+  padding-right: 1.14285714em !important;
 }
 
 /* Focus */
@@ -11994,8 +11998,8 @@ img.ui.bordered.image {
 }
 
 .ui.labeled.input > .label:not(.corner) {
-  padding-top: 0.71428571em;
-  padding-bottom: 0.71428571em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
 }
 
 /* Regular Label on Left */
@@ -12103,8 +12107,8 @@ img.ui.bordered.image {
 
 .ui.action.input > .button,
 .ui.action.input > .buttons > .button {
-  padding-top: 0.71428571em;
-  padding-bottom: 0.71428571em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
   margin: 0;
 }
 
@@ -12230,7 +12234,7 @@ img.ui.bordered.image {
 }
 
 .ui.compact.input input {
-  padding: 0.46428571em 1.07142857em !important;
+  padding: 0.30357143em 0.85714286em !important;
 }
 /*!
  * # Semantic UI 2.2.0 - Label
@@ -17485,7 +17489,7 @@ ol.ui.horizontal.list li:before,
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
   line-height: 1.14285714em;
-  padding: 0.64285714em 1.42857143em;
+  padding: 0.42857143em 1.14285714em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -17502,7 +17506,7 @@ ol.ui.horizontal.list li:before,
   margin: 0em;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  padding: 0.71428571em 1.42857143em;
+  padding: 0.5em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   outline: none;
@@ -17547,7 +17551,7 @@ ol.ui.horizontal.list li:before,
   border: 1px solid rgba(34, 36, 38, 0.15);
   border-radius: 0.14285714rem;
   box-shadow: 0em 0em 0em 0em transparent inset;
-  padding: 0.62em 1.42857143em;
+  padding: 0.62em 1.14285714em;
   color: rgba(0, 0, 0, 0.87);
   -webkit-transition: color 0.1s ease, border-color 0.1s ease;
   transition: color 0.1s ease, border-color 0.1s ease;
@@ -29559,7 +29563,7 @@ body.dimmable > .dimmer {
 }
 
 .ui.dropdown .menu > .input:not(.transparent) input {
-  padding: 0.5em 1.42857143em;
+  padding: 0.5em 1.14285714em;
 }
 
 .ui.dropdown .menu > .input:not(.transparent) .button,
@@ -29735,11 +29739,11 @@ body.dimmable > .dimmer {
   outline: 0;
   -webkit-transform: rotateZ(0deg);
   transform: rotateZ(0deg);
-  min-width: 14em;
-  min-height: 2.5em;
+  min-width: 8em;
+  min-height: initial;
   background: #FFFFFF;
   display: inline-block;
-  padding: 0.71428571em 3.02857143em 0.71428571em 1.42857143em;
+  padding: 0.57142857em 2.24285714em 0.57142857em 1.14285714em;
   color: rgba(0, 0, 0, 0.87);
   box-shadow: none;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -29768,11 +29772,11 @@ select.ui.dropdown {
   width: auto;
   height: auto;
   line-height: 1.14285714em;
-  top: 0.71428571em;
-  right: 1.42857143em;
+  top: 0.57142857em;
+  right: 1.14285714em;
   z-index: 3;
-  margin: -0.71428571em;
-  padding: 0.71428571em;
+  margin: '';
+  padding: initial;
   opacity: 0.8;
   -webkit-transition: opacity 0.1s ease;
   transition: opacity 0.1s ease;
@@ -29940,7 +29944,7 @@ select.ui.dropdown {
 /* Search Selection */
 
 .ui.search.dropdown {
-  min-width: initial;
+  min-width: '';
 }
 
 /* Search Dropdown */
@@ -29976,7 +29980,7 @@ select.ui.dropdown {
 
 .ui.search.selection.dropdown > input.search {
   line-height: 1.14285714em;
-  padding: 0.64285714em 3.02857143em 0.64285714em 1.42857143em;
+  padding: 0.5em 2.24285714em 0.5em 1.14285714em;
 }
 
 /* Active/Visible Search */
@@ -30043,7 +30047,7 @@ select.ui.dropdown {
 /* Multiple Selection */
 
 .ui.multiple.dropdown {
-  padding: 0.21428571em 3.02857143em 0.21428571em 0.64285714em;
+  padding: 0.16666667em 2.24285714em 0.16666667em 0.35714286em;
 }
 
 .ui.multiple.dropdown .menu {
@@ -30076,7 +30080,7 @@ select.ui.dropdown {
 /* Dropdown Icon */
 
 .ui.multiple.dropdown .dropdown.icon {
-  margin: -0.64285714em -0.78571429em 0em 0em;
+  margin: -0.5em -0.78571429em 0em 0em;
   padding: '';
 }
 
@@ -30086,7 +30090,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.42857143em 0em 0.42857143em 0.78571429em;
+  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
   line-height: 1.21428571em;
 }
 
@@ -30110,7 +30114,7 @@ select.ui.dropdown {
   top: 0;
   left: 0;
   padding: inherit;
-  margin: 0.42857143em 0em 0.42857143em 0.78571429em;
+  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
   line-height: 1.21428571em;
 }
 
@@ -30124,7 +30128,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.42857143em 0em 0.42857143em 0.78571429em;
+  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
   width: 2.2em;
   line-height: 1.21428571em;
 }
@@ -30927,63 +30931,56 @@ select.ui.dropdown {
 
 /* Font size */
 
-.ui.dropdown.mini {
+.ui.mini.dropdown {
   font-size: 0.78571429rem;
 }
 
-.ui.dropdown.tiny {
+.ui.tiny.dropdown {
   font-size: 0.85714286rem;
 }
 
-.ui.dropdown.small {
+.ui.small.dropdown {
   font-size: 0.92857143rem;
 }
 
-.ui.dropdown.medium {
+.ui.medium.dropdown {
   font-size: 1rem;
 }
 
-.ui.dropdown.large {
+.ui.large.dropdown {
   font-size: 1.14285714rem;
 }
 
-.ui.dropdown.big {
+.ui.big.dropdown {
   font-size: 1.28571429rem;
 }
 
-.ui.dropdown.huge {
+.ui.huge.dropdown {
   font-size: 1.42857143rem;
 }
 
-.ui.dropdown.massive {
+.ui.massive.dropdown {
   font-size: 1.71428571rem;
 }
 
 /* Selection */
 
 .ui.selection.dropdown {
-  min-height: 1em;
+  margin: 0em 0.25em 0em 0em;
 }
 
-.ui.search.dropdown:not(.selection) > input.search {
-  top: 0.14285714em;
+.ui.selection.dropdown:last-child {
+  margin-right: 0em;
 }
 
-/* Compact */
-
-.ui.compact.selection.dropdown {
-  padding: 0.5em 2.45714286em 0.5em 0.85714286em;
+.ui.selection.compact.dropdown {
+  padding: 0.42857143em 1.81428571em 0.42857143em 0.71428571em;
 }
 
-.ui.compact.selection.dropdown > .dropdown.icon {
-  top: 0.5em;
-  right: 0.85714286em;
-  margin: -0.5em;
-  padding: 0.5em;
-}
-
-.ui.compact.selection.dropdown.search > input.search {
-  padding: 0.42857143em 2.45714286em 0.42857143em 0.85714286em;
+.ui.selection.dropdown > .dropdown.icon {
+  line-height: inherit;
+  top: initial;
+  right: 0;
 }
 /*!
  * # Semantic UI 2.2.0 - Video
@@ -33344,7 +33341,7 @@ a.ui.nag {
   font-style: normal;
   font-weight: normal;
   line-height: 1.14285714em;
-  padding: 0.64285714em 1.42857143em;
+  padding: 0.42857143em 1.14285714em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);

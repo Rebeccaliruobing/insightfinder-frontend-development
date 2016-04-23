@@ -13,30 +13,70 @@
 
 /* Icon */
 @dropdownIconMargin: 0em 0.5em 0em 0.5em;
+@selectionIconMargin: '';
+@selectionIconPadding: initial;
 
-/* Search */
-@searchMinWidth: initial;
-@searchInputOffset: (@lineHeight - @inputLineHeight) * 0.5;
-
-/* Compact */
-@compactSelectionVerticalPadding: @inputCompactVerticalPadding;
-@compactSelectionHorizontalPadding: @inputCompactHorizontalPadding;
-@compactSelectionIconDistance: @inputCompactHorizontalPadding + @glyphWidth + 0.5em;
-@compactSelectionPadding: @compactSelectionVerticalPadding @compactSelectionIconDistance
-                          @compactSelectionVerticalPadding @compactSelectionHorizontalPadding;
-
-@compactSelectionIconHitbox: @compactSelectionVerticalPadding;
-@compactSelectionIconMargin: -@compactSelectionIconHitbox;
-@compactSelectionIconPadding: @compactSelectionIconHitbox;
-
-@compactSearchSelectionVerticalPadding: (@compactSelectionVerticalPadding - @searchSelectionLineHeightOffset);
-@compactSearchSelectionHorizontalPadding: @compactSelectionHorizontalPadding;
-@compactSearchSelectionInputPadding: @compactSearchSelectionVerticalPadding @compactSelectionIconDistance
-                                     @compactSearchSelectionVerticalPadding @compactSearchSelectionHorizontalPadding;
-
-@compactMultipleSelectionPadding: 0px @multipleSelectionRightPadding 0px @multipleSelectionLeftPadding;
-
-/* Font size */
+/* Item */
 @itemFontSize: 1em;
 @itemVerticalPadding: @relativeMini;
 @itemHorizontalPadding: @relativeLarge;
+
+/*
+ * Selection
+*/
+@selectionLineHeight: @inputEmLineHeight;
+@selectionMinHeight: initial;
+@selectionMinWidth: 8em;
+
+@selectionVerticalPadding: @inputEmVerticalPadding;
+@selectionHorizontalPadding: @inputHorizontalPadding;
+@selectionIconDistance: @selectionHorizontalPadding + @glyphWidth;
+@selectionPadding: @selectionVerticalPadding @selectionIconDistance @selectionVerticalPadding @selectionHorizontalPadding;
+
+@selectionCompactVerticalPadding: @inputEmCompactVerticalPadding;
+@selectionCompactHorizontalPadding: @inputCompactHorizontalPadding;
+@selectionCompactIconDistance: @selectionCompactHorizontalPadding + @glyphWidth;
+@selectionCompactPadding: @selectionCompactVerticalPadding @selectionCompactIconDistance
+                          @selectionCompactVerticalPadding @selectionCompactHorizontalPadding;
+
+@selectionVerticalMargin: @inputVerticalMargin;
+@selectionHorizontalMargin: @inputHorizontalMargin;
+@selectionMargin: @selectionVerticalMargin @selectionHorizontalMargin @selectionVerticalMargin 0em;
+
+///* Search */
+//@searchMinWidth: initial;
+//
+///*
+// Multiple
+//*/
+//@multipleSelectionDropdownIconMargin: @dropdownIconMargin;
+//@labelVerticalMargin: @relative3px;
+//@labelVerticalPadding: @relative5px;
+//
+///* Inline multiple */
+//@multipleSelectionPadding: 0;
+//@multipleSelectionChildLineHeight: @inputLineHeight;
+//@multipleSelectionChildVerticalMargin: 0;
+//
+//@multipleSelectionVerticalPadding: (@inputVerticalPadding - @labelVerticalPadding - @labelVerticalMargin);
+//
+///* Compact */
+//@compactSelectionVerticalPadding: @inputCompactVerticalPadding;
+//@compactSelectionHorizontalPadding: @inputCompactHorizontalPadding;
+//@compactSelectionIconDistance: @inputCompactHorizontalPadding + @glyphWidth + 0.5em;
+//@compactSelectionPadding: @compactSelectionVerticalPadding @compactSelectionIconDistance
+//                          @compactSelectionVerticalPadding @compactSelectionHorizontalPadding;
+//
+//@compactSelectionIconHitbox: @compactSelectionVerticalPadding;
+//@compactSelectionIconMargin: -@compactSelectionIconHitbox;
+//@compactSelectionIconPadding: @compactSelectionIconHitbox;
+//
+//@compactSearchSelectionVerticalPadding: (@compactSelectionVerticalPadding - @searchSelectionLineHeightOffset);
+//@compactSearchSelectionHorizontalPadding: @compactSelectionHorizontalPadding;
+//@compactSearchSelectionInputPadding: @compactSearchSelectionVerticalPadding @compactSelectionIconDistance
+//                                     @compactSearchSelectionVerticalPadding @compactSearchSelectionHorizontalPadding;
+//
+//@compactMultipleSelectionPadding: 0px @multipleSelectionRightPadding 0px @multipleSelectionLeftPadding;
+//
+
+

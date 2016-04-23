@@ -24,12 +24,25 @@
 @largeMonitorBreakpoint      : 1300px;
 @widescreenMonitorBreakpoint : 1920px;
 
-// Input
+// Input, line-height有2种情况: 20/14或1, 对应不同的vertical padding
 @inputLineHeight                : @relative16px;
-@inputVerticalPadding           : @relative10px;
-@inputHorizontalPadding         : @relative20px;
-@inputCompactVerticalPadding    : @relative7px;
-@inputCompactHorizontalPadding  : @relative12px;
+@inputEmLineHeight              : @relative14px; // 1em line-height
+
+@inputVerticalPadding           : @relative7px;
+@inputEmVerticalPadding         : @relative8px;
+
+@inputCompactVerticalPadding    : @relative5px;
+@inputEmCompactVerticalPadding  : @relative6px;
+
+@inputHorizontalPadding         : @relative16px;
+@inputCompactHorizontalPadding  : @relative10px;
+
+@inputVerticalMargin            : 0em;
+@inputHorizontalMargin          : 0.25em;
+@inputHorizontalWideMargin      : 0.5em;
+
+@inputNoBorderHeight            : @inputLineHeight + @inputVerticalPadding * 2;   // 30/14 rem + 2px border = 32px
+@inputNoBorderCompactHeight     : @inputLineHeight + @inputCompactVerticalPadding * 2; // 26/14 rem + 2px border = 28px
 
 /* Spacing 块左右的间隔单位，以@8px为基本单位 */
 @1spacer              : @8px;
@@ -40,7 +53,6 @@
 @6spacer              : @48px;
 @7spacer              : @56px;
 @8spacer              : @64px;
-
 
 /**
  * Mixins

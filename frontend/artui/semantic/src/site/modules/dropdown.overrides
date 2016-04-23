@@ -3,63 +3,70 @@
 *******************************/
 
 /* Font size */
-.ui.dropdown {
-  &.mini {
-    font-size: @mini;
-  }
-  &.tiny {
-    font-size: @tiny;
-  }
-  &.small {
-    font-size: @small;
-  }
-  &.medium {
-    font-size: @medium;
-  }
-  &.large {
-    font-size: @large;
-  }
-  &.big {
-    font-size: @big;
-  }
-  &.huge {
-    font-size: @huge;
-  }
-  &.massive {
-    font-size: @massive;
-  }
+.ui.mini.dropdown {
+  font-size: @mini;
+}
+.ui.tiny.dropdown {
+  font-size: @tiny;
+}
+.ui.small.dropdown {
+  font-size: @small;
+}
+.ui.medium.dropdown {
+  font-size: @medium;
+}
+.ui.large.dropdown {
+  font-size: @large;
+}
+.ui.big.dropdown {
+  font-size: @big;
+}
+.ui.huge.dropdown {
+  font-size: @huge;
+}
+.ui.massive.dropdown {
+  font-size: @massive;
 }
 
 /* Selection */
 .ui.selection.dropdown {
-  min-height: 1em;
+  margin: @selectionMargin;
+}
+.ui.selection.dropdown:last-child {
+  margin-right: 0em;
+}
+.ui.selection.compact.dropdown {
+  padding: @selectionCompactPadding;
 }
 
-// Search
-.ui.search.dropdown:not(.selection) {
-  & > input.search {
-    top: @searchInputOffset;
-  }
+// icon 与 search的输入框一样的lineHeight
+.ui.selection.dropdown > .dropdown.icon {
+  line-height: inherit;
+  top: initial;
+  right: 0;
 }
 
-/* Compact */
-.ui.compact.selection.dropdown {
-  padding: @compactSelectionPadding;
-  & > .dropdown.icon {
-    top: @compactSelectionVerticalPadding;
-    right: @compactSelectionHorizontalPadding;
-    margin: @compactSelectionIconMargin;
-    padding: @compactSelectionIconPadding;
-  }
-
-  &.search {
-    & > input.search {
-      padding: @compactSearchSelectionInputPadding;
-    }
-  }
-}
-
-.ui.compact.multiple.dropdown {
-
-}
-
+// TODO: [REV] Review belows
+///* Inline multiple */
+//.ui.multiple.dropdown:not(.selection) > .label {
+//  vertical-align: baseline;
+//}
+//
+//// Search
+//
+///* Compact */
+//.ui.compact.selection.dropdown {
+//  padding: @compactSelectionPadding;
+//  & > .dropdown.icon {
+//    top: @compactSelectionVerticalPadding;
+//    right: @compactSelectionHorizontalPadding;
+//    margin: @compactSelectionIconMargin;
+//    padding: @compactSelectionIconPadding;
+//  }
+//
+//  &.search {
+//    & > input.search {
+//      padding: @compactSearchSelectionInputPadding;
+//    }
+//  }
+//}

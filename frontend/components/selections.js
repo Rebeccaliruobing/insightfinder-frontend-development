@@ -1,5 +1,6 @@
 import React from 'react';
 import {Dropdown, Link} from '../artui/react';
+import classNames from 'classnames';
 
 class ProjectSelection extends React.Component {
   constructor(props) {
@@ -10,12 +11,12 @@ class ProjectSelection extends React.Component {
   }
   
   render() {
+    
     let projects = this.state['projects'];
+    let {value, ...others} = this.props;
     
     return (
-      <Dropdown {...this.props}>
-        <span className="text" />
-        <i className="dropdown icon"/>
+      <Dropdown mode="select" value={value} {...others}>
         <div className="menu">
           {
             projects.map((p) => {
@@ -27,6 +28,10 @@ class ProjectSelection extends React.Component {
     );
   }
 }
+
+ProjectSelection.defaultProps = {
+  multiple: false
+};
 
 export {ProjectSelection};
 

@@ -2,9 +2,12 @@
          Site Overrides
 *******************************/
 
-/* 与input, selection保持相同的高度 */
+/* 与input, dropdown采用相同的结构 */
 .ui.button {
   border: 1px solid transparent;
+}
+.ui.button:last-child {
+  margin-right: 0em;
 }
 
 /* 缺省为1em */

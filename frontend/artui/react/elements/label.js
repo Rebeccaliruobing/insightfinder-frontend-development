@@ -7,8 +7,22 @@ import $ from 'jquery';
 import React from 'react';
 import classNames from 'classnames';
 import ReactTimeout from 'react-timeout';
+import {BaseComponent, PropTypes} from '../base';
 
-class Label extends React.Component {
+class Label extends BaseComponent {
+  static propTypes = {
+    tag: PropTypes.string,
+    onClose: PropTypes.func,
+    autoDismiss: PropTypes.bool,
+    dismissTimeout: PropTypes.number  // seconds
+  };
+
+  static defaultProps = {
+    tag: 'div',
+    onClose: () => {},
+    autoDismiss: true,
+    dismissTimeout: 5
+  };
   
   constructor(props) {
     super(props);
@@ -44,20 +58,6 @@ class Label extends React.Component {
       ...others
     }, children);
   }
-};
-
-Label.propTypes = {
-  tag: React.PropTypes.string,
-  onClose: React.PropTypes.func,
-  autoDismiss: React.PropTypes.bool,
-  dismissTimeout: React.PropTypes.number  // seconds
-};
-
-Label.defaultProps = {
-  tag: 'div',
-  onClose: () => {},
-  autoDismiss: true,
-  dismissTimeout: 5 
-};
+}
 
 export default ReactTimeout(Label);

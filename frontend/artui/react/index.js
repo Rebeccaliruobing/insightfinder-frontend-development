@@ -4,11 +4,14 @@
 
 import 'react-timeout';
 
+export {BaseComponent, PropTypes} from './base';
+
 export Hoverable from './behaviors/hoverable';
 
 export Message from './collections/message';
 
 export {Link, IndexLink} from './elements/link';
+export {Button, Buttons} from './elements/button';
 export Input from './elements/input';
 export Label from './elements/label';
 

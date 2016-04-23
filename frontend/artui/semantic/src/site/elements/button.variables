@@ -4,7 +4,8 @@
 
 @fontWeight: normal;
 
-@verticalPadding: @inputVerticalPadding;
+// Button采用1em的line-height
+@verticalPadding: @inputEmVerticalPadding;
 @horizontalPadding: @inputHorizontalPadding;
-@compactVerticalPadding: @inputCompactVerticalPadding;
+@compactVerticalPadding: @inputEmCompactVerticalPadding;
 @compactHorizontalPadding: @inputCompactHorizontalPadding;
