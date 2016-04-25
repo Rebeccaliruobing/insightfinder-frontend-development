@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import {Link, IndexLink} from 'react-router';
 import {Console, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-
 import Project from './project';
 import {ProjectSelection, ModelType} from '../../selections';
 
@@ -83,12 +82,6 @@ class LiveMonitoring extends React.Component {
             <Button className="orange"
                     onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
             <Button className="orange ">中文</Button>
-            <div className="ui form">
-              <div className="inline fields">
-                <div className="field">
-                </div>
-              </div>
-            </div>
           </div>
           {this.renderProjects()}
         </div>

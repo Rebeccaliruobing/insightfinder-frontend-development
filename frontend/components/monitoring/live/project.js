@@ -5,6 +5,7 @@
 import $ from 'jquery';
 import React from 'react';
 import classNames from 'classnames';
+import {Dygraph} from 'react-dygraphs';
 import {Wireframes} from '../../../artui/prototype';
 import {Popup} from '../../../artui/react';
 import Details from './details';
@@ -58,23 +59,23 @@ const Project = class extends React.Component {
               </Popup>
               <div className="header">Summary</div>
             </div>
-            <img className="ui image" src={Wireframes.image} />
+            <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
           </a>
           <a className="card" onClick={()=> this.setState({showDetails:false})}>
             <div className="content">Group 1</div>
-            <img className="ui image" src={Wireframes.image} />
+            <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
           </a>
           <a className="card">
             <div className="content">Group 2</div>
-            <img className="ui image" src={Wireframes.image} />
+            <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
           </a>
           <a className="card">
             <div className="content">Group 3</div>
-            <img className="ui image" src={Wireframes.image} />
+            <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
           </a>
           <a className="card">
             <div className="content">Group 4</div>
-            <img className="ui image" src={Wireframes.image} />
+            <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
           </a>
         </div>
         { this.state['showDetails'] && <Details/> }

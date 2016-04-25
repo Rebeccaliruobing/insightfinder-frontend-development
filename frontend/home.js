@@ -9,6 +9,7 @@ import ReactDOM from 'react-dom';
 import {Router, Route, browserHistory, 
   IndexRoute, IndexRedirect, Link} from 'react-router';
 import {Console} from './artui/react';
+import './artui/dataviz';
 
 import {Monitoring, Projects, Summary, LiveMonitoring} from './components/monitoring';
 import Analysis from './components/analysis';
