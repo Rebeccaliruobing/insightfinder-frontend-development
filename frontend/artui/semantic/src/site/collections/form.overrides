@@ -36,27 +36,48 @@
   });
 }
 
-/*
-// field content
-.ui.form .field > span {
-  display: inline-block;
+/* Vertical Align */
+/* Input */
+.ui.form textarea,
+.ui.form input:not([type]),
+.ui.form input[type="date"],
+.ui.form input[type="datetime-local"],
+.ui.form input[type="email"],
+.ui.form input[type="number"],
+.ui.form input[type="password"],
+.ui.form input[type="search"],
+.ui.form input[type="tel"],
+.ui.form input[type="time"],
+.ui.form input[type="text"],
+.ui.form input[type="url"] {
+  vertical-align: middle;
 }
 
-.ui.form .inline.fields .field,
-.ui.form .inline.field {
-  & > label {
-    margin: 0em @inlineLabelDistance 0em 0em;
-  }
-
-  & > input, & > .ui.input, & > .ui.checkbox,
-  & > .ui.dropdown, & > select,
-  & > span {
-    margin-right: @inlineFieldInputDistance;
-    vertical-align: baseline;
-  }
-
-  & > :last-child {
-    margin-right: 0em !important;
-  }
+/* Inline Label */
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > label,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  vertical-align: middle;
 }
-*/
+
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.field > label {
+  margin: 0 @inlineLabelDistance 0 0;
+}
+
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  margin: 0 @inlineFieldPartDistance 0 0;
+}
+
+.ui.form .inline.fields .field > :last-child,
+.ui.form .inline.field > :last-child {
+  margin: 0;
+}

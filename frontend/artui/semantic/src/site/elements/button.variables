@@ -9,3 +9,5 @@
 @horizontalPadding: @inputHorizontalPadding;
 @compactVerticalPadding: @inputEmCompactVerticalPadding;
 @compactHorizontalPadding: @inputCompactHorizontalPadding;
+
+@verticalAlign: middle;

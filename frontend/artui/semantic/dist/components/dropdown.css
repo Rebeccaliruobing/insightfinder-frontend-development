@@ -379,7 +379,7 @@ select.ui.dropdown {
   position: absolute;
   width: auto;
   height: auto;
-  line-height: 1.14285714em;
+  line-height: 1.28571429em;
   top: 0.57142857em;
   right: 1.14285714em;
   z-index: 3;
@@ -562,8 +562,8 @@ select.ui.dropdown {
 
 /* Search Selection */
 .ui.search.selection.dropdown > input.search {
-  line-height: 1.14285714em;
-  padding: 0.5em 2.24285714em 0.5em 1.14285714em;
+  line-height: 1.28571429em;
+  padding: 0.42857143em 2.24285714em 0.42857143em 1.14285714em;
 }
 
 /* Active/Visible Search */
@@ -621,7 +621,7 @@ select.ui.dropdown {
 
 /* Multiple Selection */
 .ui.multiple.dropdown {
-  padding: 0.16666667em 2.24285714em 0.16666667em 0.35714286em;
+  padding: 0.14285714em 2.24285714em 0.14285714em 0.35714286em;
 }
 .ui.multiple.dropdown .menu {
   cursor: auto;
@@ -650,7 +650,7 @@ select.ui.dropdown {
 
 /* Dropdown Icon */
 .ui.multiple.dropdown .dropdown.icon {
-  margin: -0.5em -0.78571429em 0em 0em;
+  margin: -0.42857143em -0.78571429em 0em 0em;
   padding: '';
 }
 
@@ -659,7 +659,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   line-height: 1.21428571em;
 }
 .ui.multiple.dropdown > .label ~ input.search {
@@ -681,7 +681,7 @@ select.ui.dropdown {
   top: 0;
   left: 0;
   padding: inherit;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   line-height: 1.21428571em;
 }
 .ui.multiple.search.dropdown > .label ~ .text {
@@ -693,7 +693,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   width: 2.2em;
   line-height: 1.21428571em;
 }
@@ -1449,12 +1449,15 @@ select.ui.dropdown {
 /* Selection */
 .ui.selection.dropdown {
   margin: 0em 0.25em 0em 0em;
+  height: 2.28571429em;
+  vertical-align: middle;
 }
 .ui.selection.dropdown:last-child {
   margin-right: 0em;
 }
 .ui.selection.compact.dropdown {
   padding: 0.42857143em 1.81428571em 0.42857143em 0.71428571em;
+  height: 2em;
 }
 .ui.selection.dropdown > .dropdown.icon {
   line-height: inherit;

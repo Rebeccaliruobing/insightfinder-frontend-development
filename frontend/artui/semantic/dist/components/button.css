@@ -20,7 +20,7 @@
   min-height: 1em;
   outline: none;
   border: none;
-  vertical-align: baseline;
+  vertical-align: middle;
   background: #E0E1E2 none;
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
@@ -3321,15 +3321,7 @@
 *******************************/
 
 
-/* 与input, dropdown采用相同的结构 */
-.ui.button {
-  border: 1px solid transparent;
-}
-.ui.button:last-child {
-  margin-right: 0em;
-}
-
-/* 缺省为1em */
+/* font size */
 .ui.buttons .button,
 .ui.buttons .or,
 .ui.button {
@@ -3339,4 +3331,20 @@
 .ui.medium.buttons .or,
 .ui.medium.button {
   font-size: 1rem;
+}
+
+/* 与input, dropdown采用相同的结构 */
+.ui.button {
+  border: 1px solid transparent;
+}
+.ui.button:last-child {
+  margin-right: 0em;
+}
+
+/* Size */
+.ui.button {
+  height: 2.28571429em;
+}
+.ui.compact.button {
+  height: 2em;
 }

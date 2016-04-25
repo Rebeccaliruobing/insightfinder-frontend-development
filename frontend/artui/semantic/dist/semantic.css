@@ -1110,7 +1110,7 @@ input::selection {
   min-height: 1em;
   outline: none;
   border: none;
-  vertical-align: baseline;
+  vertical-align: middle;
   background: #E0E1E2 none;
   color: rgba(0, 0, 0, 0.6);
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
@@ -4889,17 +4889,7 @@ input::selection {
          Site Overrides
 *******************************/
 
-/* 与input, dropdown采用相同的结构 */
-
-.ui.button {
-  border: 1px solid transparent;
-}
-
-.ui.button:last-child {
-  margin-right: 0em;
-}
-
-/* 缺省为1em */
+/* font size */
 
 .ui.buttons .button,
 .ui.buttons .or,
@@ -4911,6 +4901,26 @@ input::selection {
 .ui.medium.buttons .or,
 .ui.medium.button {
   font-size: 1rem;
+}
+
+/* 与input, dropdown采用相同的结构 */
+
+.ui.button {
+  border: 1px solid transparent;
+}
+
+.ui.button:last-child {
+  margin-right: 0em;
+}
+
+/* Size */
+
+.ui.button {
+  height: 2.28571429em;
+}
+
+.ui.compact.button {
+  height: 2em;
 }
 /*!
  * # Semantic UI 2.2.0 - Container
@@ -11698,9 +11708,9 @@ img.ui.bordered.image {
   outline: none;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   text-align: left;
-  line-height: 1.14285714em;
+  line-height: 1.28571429em;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  padding: 0.42857143em 1.14285714em;
+  padding: 0.28571429em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   color: rgba(0, 0, 0, 0.87);
@@ -11924,7 +11934,7 @@ img.ui.bordered.image {
   right: 0px;
   margin: 0em;
   height: 100%;
-  width: 2.1em;
+  width: 1.95714286em;
   opacity: 0.5;
   border-radius: 0em 0.14285714rem 0.14285714rem 0em;
   -webkit-transition: opacity 0.3s ease;
@@ -11936,7 +11946,7 @@ img.ui.bordered.image {
 }
 
 .ui.icon.input input {
-  padding-right: 2.1em !important;
+  padding-right: 1.95714286em !important;
 }
 
 .ui.icon.input > i.icon:before,
@@ -11972,7 +11982,7 @@ img.ui.bordered.image {
 }
 
 .ui[class*="left icon"].input > input {
-  padding-left: 2.1em !important;
+  padding-left: 1.95714286em !important;
   padding-right: 1.14285714em !important;
 }
 
@@ -11998,8 +12008,8 @@ img.ui.bordered.image {
 }
 
 .ui.labeled.input > .label:not(.corner) {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: 0.42857143em;
+  padding-bottom: 0.42857143em;
 }
 
 /* Regular Label on Left */
@@ -12107,8 +12117,8 @@ img.ui.bordered.image {
 
 .ui.action.input > .button,
 .ui.action.input > .buttons > .button {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: 0.42857143em;
+  padding-bottom: 0.42857143em;
   margin: 0;
 }
 
@@ -12229,12 +12239,61 @@ img.ui.bordered.image {
          Site Overrides
 *******************************/
 
+/* Font Size */
+
+.ui.mini.input {
+  font-size: 0.78571429rem;
+}
+
 .ui.tiny.input {
-  font-size: 0.85714286em;
+  font-size: 0.85714286rem;
+}
+
+.ui.small.input {
+  font-size: 0.92857143rem;
+}
+
+.ui.medium.input {
+  font-size: 1rem;
+}
+
+.ui.large.input {
+  font-size: 1.14285714rem;
+}
+
+.ui.big.input {
+  font-size: 1.28571429rem;
+}
+
+.ui.huge.input {
+  font-size: 1.42857143rem;
+}
+
+.ui.massive.input {
+  font-size: 1.71428571rem;
+}
+
+/* Size */
+
+.ui.input input {
+  vertical-align: middle;
+  height: 2.28571429em;
 }
 
 .ui.compact.input input {
-  padding: 0.30357143em 0.85714286em !important;
+  height: 2em;
+  padding: 0.28571429em 0.71428571em !important;
+}
+
+/* Margin & Align */
+
+.ui.input {
+  vertical-align: middle;
+  margin: 0em 0.25em 0 0;
+}
+
+.ui.input:last-child {
+  margin-right: 0;
 }
 /*!
  * # Semantic UI 2.2.0 - Label
@@ -17469,7 +17528,7 @@ ol.ui.horizontal.list li:before,
 
 .ui.form ::-webkit-datetime-edit,
 .ui.form ::-webkit-inner-spin-button {
-  height: 1.14285714em;
+  height: 1.28571429em;
 }
 
 .ui.form input:not([type]),
@@ -17488,8 +17547,8 @@ ol.ui.horizontal.list li:before,
   outline: none;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  line-height: 1.14285714em;
-  padding: 0.42857143em 1.14285714em;
+  line-height: 1.28571429em;
+  padding: 0.28571429em 1.14285714em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -17506,7 +17565,7 @@ ol.ui.horizontal.list li:before,
   margin: 0em;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  padding: 0.5em 1.14285714em;
+  padding: 0.42857143em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   outline: none;
@@ -18481,7 +18540,7 @@ ol.ui.horizontal.list li:before,
 
 .ui.form .inline.fields .field > :first-child,
 .ui.form .inline.field > :first-child {
-  margin: 0em 0.85714286em 0em 0em;
+  margin: 0em 0.5em 0em 0em;
 }
 
 .ui.form .inline.fields .field > :only-child,
@@ -18646,30 +18705,54 @@ ol.ui.horizontal.list li:before,
   width: 6.25%;
 }
 
-/*
-// field content
-.ui.form .field > span {
-  display: inline-block;
+/* Vertical Align */
+
+/* Input */
+
+.ui.form textarea,
+.ui.form input:not([type]),
+.ui.form input[type="date"],
+.ui.form input[type="datetime-local"],
+.ui.form input[type="email"],
+.ui.form input[type="number"],
+.ui.form input[type="password"],
+.ui.form input[type="search"],
+.ui.form input[type="tel"],
+.ui.form input[type="time"],
+.ui.form input[type="text"],
+.ui.form input[type="url"] {
+  vertical-align: middle;
 }
 
-.ui.form .inline.fields .field,
-.ui.form .inline.field {
-  & > label {
-    margin: 0em @inlineLabelDistance 0em 0em;
-  }
+/* Inline Label */
 
-  & > input, & > .ui.input, & > .ui.checkbox,
-  & > .ui.dropdown, & > select,
-  & > span {
-    margin-right: @inlineFieldInputDistance;
-    vertical-align: baseline;
-  }
-
-  & > :last-child {
-    margin-right: 0em !important;
-  }
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > label,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  vertical-align: middle;
 }
-*/
+
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.field > label {
+  margin: 0 0.5em 0 0;
+}
+
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  margin: 0 0.25em 0 0;
+}
+
+.ui.form .inline.fields .field > :last-child,
+.ui.form .inline.field > :last-child {
+  margin: 0;
+}
 /*!
  * # Semantic UI 2.2.0 - Grid
  * http://github.com/semantic-org/semantic-ui/
@@ -29771,7 +29854,7 @@ select.ui.dropdown {
   position: absolute;
   width: auto;
   height: auto;
-  line-height: 1.14285714em;
+  line-height: 1.28571429em;
   top: 0.57142857em;
   right: 1.14285714em;
   z-index: 3;
@@ -29979,8 +30062,8 @@ select.ui.dropdown {
 /* Search Selection */
 
 .ui.search.selection.dropdown > input.search {
-  line-height: 1.14285714em;
-  padding: 0.5em 2.24285714em 0.5em 1.14285714em;
+  line-height: 1.28571429em;
+  padding: 0.42857143em 2.24285714em 0.42857143em 1.14285714em;
 }
 
 /* Active/Visible Search */
@@ -30047,7 +30130,7 @@ select.ui.dropdown {
 /* Multiple Selection */
 
 .ui.multiple.dropdown {
-  padding: 0.16666667em 2.24285714em 0.16666667em 0.35714286em;
+  padding: 0.14285714em 2.24285714em 0.14285714em 0.35714286em;
 }
 
 .ui.multiple.dropdown .menu {
@@ -30080,7 +30163,7 @@ select.ui.dropdown {
 /* Dropdown Icon */
 
 .ui.multiple.dropdown .dropdown.icon {
-  margin: -0.5em -0.78571429em 0em 0em;
+  margin: -0.42857143em -0.78571429em 0em 0em;
   padding: '';
 }
 
@@ -30090,7 +30173,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   line-height: 1.21428571em;
 }
 
@@ -30114,7 +30197,7 @@ select.ui.dropdown {
   top: 0;
   left: 0;
   padding: inherit;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   line-height: 1.21428571em;
 }
 
@@ -30128,7 +30211,7 @@ select.ui.dropdown {
   position: static;
   padding: 0;
   max-width: 100%;
-  margin: 0.33333333em 0em 0.33333333em 0.78571429em;
+  margin: 0.28571429em 0em 0.28571429em 0.78571429em;
   width: 2.2em;
   line-height: 1.21428571em;
 }
@@ -30967,6 +31050,8 @@ select.ui.dropdown {
 
 .ui.selection.dropdown {
   margin: 0em 0.25em 0em 0em;
+  height: 2.28571429em;
+  vertical-align: middle;
 }
 
 .ui.selection.dropdown:last-child {
@@ -30975,6 +31060,7 @@ select.ui.dropdown {
 
 .ui.selection.compact.dropdown {
   padding: 0.42857143em 1.81428571em 0.42857143em 0.71428571em;
+  height: 2em;
 }
 
 .ui.selection.dropdown > .dropdown.icon {
@@ -33340,8 +33426,8 @@ a.ui.nag {
   text-shadow: none;
   font-style: normal;
   font-weight: normal;
-  line-height: 1.14285714em;
-  padding: 0.42857143em 1.14285714em;
+  line-height: 1.28571429em;
+  padding: 0.28571429em 1.14285714em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);

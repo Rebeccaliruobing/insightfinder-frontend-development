@@ -39,9 +39,9 @@
   outline: none;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   text-align: left;
-  line-height: 1.14285714em;
+  line-height: 1.28571429em;
   font-family: "Helvetica Neue", Helvetica, "Lantinghei SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
-  padding: 0.42857143em 1.14285714em;
+  padding: 0.28571429em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   color: rgba(0, 0, 0, 0.87);
@@ -248,7 +248,7 @@
   right: 0px;
   margin: 0em;
   height: 100%;
-  width: 2.1em;
+  width: 1.95714286em;
   opacity: 0.5;
   border-radius: 0em 0.14285714rem 0.14285714rem 0em;
   -webkit-transition: opacity 0.3s ease;
@@ -258,7 +258,7 @@
   pointer-events: none;
 }
 .ui.icon.input input {
-  padding-right: 2.1em !important;
+  padding-right: 1.95714286em !important;
 }
 .ui.icon.input > i.icon:before,
 .ui.icon.input > i.icon:after {
@@ -288,7 +288,7 @@
   left: 0.5em;
 }
 .ui[class*="left icon"].input > input {
-  padding-left: 2.1em !important;
+  padding-left: 1.95714286em !important;
   padding-right: 1.14285714em !important;
 }
 
@@ -312,8 +312,8 @@
   font-size: 1em;
 }
 .ui.labeled.input > .label:not(.corner) {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: 0.42857143em;
+  padding-bottom: 0.42857143em;
 }
 
 /* Regular Label on Left */
@@ -405,8 +405,8 @@
 }
 .ui.action.input > .button,
 .ui.action.input > .buttons > .button {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
+  padding-top: 0.42857143em;
+  padding-bottom: 0.42857143em;
   margin: 0;
 }
 
@@ -515,9 +515,48 @@
          Site Overrides
 *******************************/
 
+
+/* Font Size */
+.ui.mini.input {
+  font-size: 0.78571429rem;
+}
 .ui.tiny.input {
-  font-size: 0.85714286em;
+  font-size: 0.85714286rem;
+}
+.ui.small.input {
+  font-size: 0.92857143rem;
+}
+.ui.medium.input {
+  font-size: 1rem;
+}
+.ui.large.input {
+  font-size: 1.14285714rem;
+}
+.ui.big.input {
+  font-size: 1.28571429rem;
+}
+.ui.huge.input {
+  font-size: 1.42857143rem;
+}
+.ui.massive.input {
+  font-size: 1.71428571rem;
+}
+
+/* Size */
+.ui.input input {
+  vertical-align: middle;
+  height: 2.28571429em;
 }
 .ui.compact.input input {
-  padding: 0.30357143em 0.85714286em !important;
+  height: 2em;
+  padding: 0.28571429em 0.71428571em !important;
+}
+
+/* Margin & Align */
+.ui.input {
+  vertical-align: middle;
+  margin: 0em 0.25em 0 0;
+}
+.ui.input:last-child {
+  margin-right: 0;
 }

@@ -85,7 +85,7 @@
 /* Set max height on unusual input */
 .ui.form ::-webkit-datetime-edit,
 .ui.form ::-webkit-inner-spin-button {
-  height: 1.14285714em;
+  height: 1.28571429em;
 }
 .ui.form input:not([type]),
 .ui.form input[type="date"],
@@ -103,8 +103,8 @@
   outline: none;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  line-height: 1.14285714em;
-  padding: 0.42857143em 1.14285714em;
+  line-height: 1.28571429em;
+  padding: 0.28571429em 1.14285714em;
   font-size: 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -120,7 +120,7 @@
   margin: 0em;
   -webkit-appearance: none;
   tap-highlight-color: rgba(255, 255, 255, 0);
-  padding: 0.5em 1.14285714em;
+  padding: 0.42857143em 1.14285714em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
   outline: none;
@@ -1005,7 +1005,7 @@
 /* Label */
 .ui.form .inline.fields .field > :first-child,
 .ui.form .inline.field > :first-child {
-  margin: 0em 0.85714286em 0em 0em;
+  margin: 0em 0.5em 0em 0em;
 }
 .ui.form .inline.fields .field > :only-child,
 .ui.form .inline.field > :only-child {
@@ -1141,27 +1141,47 @@
 .ui.form .field > label.one.wide {
   width: 6.25%;
 }
-/*
-// field content
-.ui.form .field > span {
-  display: inline-block;
+
+/* Vertical Align */
+
+/* Input */
+.ui.form textarea,
+.ui.form input:not([type]),
+.ui.form input[type="date"],
+.ui.form input[type="datetime-local"],
+.ui.form input[type="email"],
+.ui.form input[type="number"],
+.ui.form input[type="password"],
+.ui.form input[type="search"],
+.ui.form input[type="tel"],
+.ui.form input[type="time"],
+.ui.form input[type="text"],
+.ui.form input[type="url"] {
+  vertical-align: middle;
 }
 
-.ui.form .inline.fields .field,
-.ui.form .inline.field {
-  & > label {
-    margin: 0em @inlineLabelDistance 0em 0em;
-  }
-
-  & > input, & > .ui.input, & > .ui.checkbox,
-  & > .ui.dropdown, & > select,
-  & > span {
-    margin-right: @inlineFieldInputDistance;
-    vertical-align: baseline;
-  }
-
-  & > :last-child {
-    margin-right: 0em !important;
-  }
+/* Inline Label */
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > label,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  vertical-align: middle;
 }
-*/
+.ui.form .inline.fields > label,
+.ui.form .inline.fields .field > label,
+.ui.form .inline.field > label {
+  margin: 0 0.5em 0 0;
+}
+.ui.form .inline.fields .field > p,
+.ui.form .inline.fields .field > span,
+.ui.form .inline.field > p,
+.ui.form .inline.field > span {
+  margin: 0 0.25em 0 0;
+}
+.ui.form .inline.fields .field > :last-child,
+.ui.form .inline.field > :last-child {
+  margin: 0;
+}

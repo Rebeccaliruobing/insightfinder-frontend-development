@@ -25,13 +25,14 @@
 @widescreenMonitorBreakpoint : 1920px;
 
 // Input, line-height有2种情况: 20/14或1, 对应不同的vertical padding
-@inputLineHeight                : @relative16px;
-@inputEmLineHeight              : @relative14px; // 1em line-height
+// 由于input的line-height没法精确控制, Input, dropdown, button等采用高度控制, 以确保对齐.
+@inputLineHeight                : @relative18px;
+@inputVerticalPadding           : @relative6px;
 
-@inputVerticalPadding           : @relative7px;
+@inputEmLineHeight              : @relative14px; // 1em
 @inputEmVerticalPadding         : @relative8px;
 
-@inputCompactVerticalPadding    : @relative5px;
+@inputCompactVerticalPadding    : @relative4px;
 @inputEmCompactVerticalPadding  : @relative6px;
 
 @inputHorizontalPadding         : @relative16px;
@@ -41,6 +42,8 @@
 @inputHorizontalMargin          : 0.25em;
 @inputHorizontalWideMargin      : 0.5em;
 
+@inputHeight                    : @relative32px;
+@inputCompactHeight             : @relative28px;
 @inputNoBorderHeight            : @inputLineHeight + @inputVerticalPadding * 2;   // 30/14 rem + 2px border = 32px
 @inputNoBorderCompactHeight     : @inputLineHeight + @inputCompactVerticalPadding * 2; // 26/14 rem + 2px border = 28px
 

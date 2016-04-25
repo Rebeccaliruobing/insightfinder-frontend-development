@@ -2,15 +2,7 @@
          Site Overrides
 *******************************/
 
-/* 与input, dropdown采用相同的结构 */
-.ui.button {
-  border: 1px solid transparent;
-}
-.ui.button:last-child {
-  margin-right: 0em;
-}
-
-/* 缺省为1em */
+/* font size */
 .ui.buttons .button,
 .ui.buttons .or,
 .ui.button {
@@ -20,4 +12,20 @@
 .ui.medium.buttons .or,
 .ui.medium.button {
   font-size: @medium;
+}
+
+/* 与input, dropdown采用相同的结构 */
+.ui.button {
+  border: 1px solid transparent;
+}
+.ui.button:last-child {
+  margin-right: 0em;
+}
+
+/* Size */
+.ui.button {
+  height: @inputHeight;
+}
+.ui.compact.button {
+  height: @inputCompactHeight;
 }

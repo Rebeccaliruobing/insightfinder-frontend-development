@@ -24,6 +24,7 @@
 /*
  * Selection
 */
+@selectionHeight: @inputHeight;
 @selectionLineHeight: @inputEmLineHeight;
 @selectionMinHeight: initial;
 @selectionMinWidth: 8em;
@@ -33,6 +34,7 @@
 @selectionIconDistance: @selectionHorizontalPadding + @glyphWidth;
 @selectionPadding: @selectionVerticalPadding @selectionIconDistance @selectionVerticalPadding @selectionHorizontalPadding;
 
+@selectionCompactHeight: @inputCompactHeight;
 @selectionCompactVerticalPadding: @inputEmCompactVerticalPadding;
 @selectionCompactHorizontalPadding: @inputCompactHorizontalPadding;
 @selectionCompactIconDistance: @selectionCompactHorizontalPadding + @glyphWidth;

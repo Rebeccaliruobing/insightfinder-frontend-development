@@ -31,12 +31,15 @@
 /* Selection */
 .ui.selection.dropdown {
   margin: @selectionMargin;
+  height: @selectionHeight;
+  vertical-align: middle;
 }
 .ui.selection.dropdown:last-child {
   margin-right: 0em;
 }
 .ui.selection.compact.dropdown {
   padding: @selectionCompactPadding;
+  height: @selectionCompactHeight;
 }
 
 // icon 与 search的输入框一样的lineHeight

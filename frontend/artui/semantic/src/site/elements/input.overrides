@@ -2,11 +2,50 @@
          Site Overrides
 *******************************/
 
+/* Font Size */
+//.ui.input {
+//  //font-size: 1em;
+//}
+.ui.mini.input {
+  font-size: @mini;
+}
 .ui.tiny.input {
-  font-size: @relativeTiny;
+  font-size: @tiny;
+}
+.ui.small.input {
+  font-size: @small;
+}
+.ui.medium.input {
+  font-size: @medium;
+}
+.ui.large.input {
+  font-size: @large;
+}
+.ui.big.input {
+  font-size: @big;
+}
+.ui.huge.input {
+  font-size: @huge;
+}
+.ui.massive.input {
+  font-size: @massive;
 }
 
-// Compact
+/* Size */
+.ui.input input {
+  vertical-align: middle;
+  height: @inputHeight;
+}
 .ui.compact.input input {
-  padding: @compactPadding !important;
+  height: @inputCompactHeight;
+  padding: @inputCompactVerticalPadding @inputCompactHorizontalPadding !important;
+}
+
+/* Margin & Align */
+.ui.input {
+  vertical-align: middle;
+  margin: @inputVerticalMargin @inputHorizontalMargin 0 0;
+}
+.ui.input:last-child {
+  margin-right: 0;
 }

@@ -6,4 +6,5 @@
 @labelFontWeight: @boldFontWeight;
 
 // Inline
-@inlineFieldInputDistance: 0.25em;
+@inlineFieldPartDistance: @inputHorizontalMargin;
+@inlineLabelDistance: @inputHorizontalWideMargin;

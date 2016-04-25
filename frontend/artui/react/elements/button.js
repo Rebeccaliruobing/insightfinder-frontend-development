@@ -22,7 +22,7 @@ export const Button = class extends BaseComponent {
     
     return React.createElement(tag, {
       className: classNames('ui', className, 'button'),
-      tabindex: '0',
+      tabIndex: '0',
       ...others
     }, children);
   }
