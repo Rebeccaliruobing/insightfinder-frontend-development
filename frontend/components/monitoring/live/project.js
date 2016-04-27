@@ -5,9 +5,10 @@
 import $ from 'jquery';
 import React from 'react';
 import classNames from 'classnames';
-import {Dygraph} from 'react-dygraphs';
-import {Wireframes} from '../../../artui/prototype';
+
 import {Popup} from '../../../artui/react';
+import {Dygraph} from '../../../artui/react/dataviz';
+
 import Details from './details';
 
 const Project = class extends React.Component {

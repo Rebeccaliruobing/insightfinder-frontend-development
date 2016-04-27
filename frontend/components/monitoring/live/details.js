@@ -5,7 +5,7 @@
 import $ from 'jquery';
 import React from 'react';
 import classNames from 'classnames';
-import {Wireframes} from '../../../artui/prototype';
+import {Dygraph} from '../../../artui/react/dataviz';
 
 const Details = class extends React.Component {
   
@@ -24,9 +24,7 @@ const Details = class extends React.Component {
     
   render() {
     return (
-      <div>
-        <img src={Wireframes.media_paragraph} />
-      </div>
+      <Dygraph data={[[1,10,100], [2,20,80], [3,50,60], [4,70,80]]}/>
     )
   }
 };
