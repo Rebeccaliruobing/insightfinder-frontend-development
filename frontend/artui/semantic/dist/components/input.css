@@ -63,7 +63,7 @@
 .ui.input input::-moz-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
-.ui.input input::-ms-input-placeholder {
+.ui.input input:-ms-input-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
 
@@ -81,7 +81,8 @@
 .ui.input input[disabled] {
   opacity: 0.45;
 }
-.ui.disabled.input input {
+.ui.disabled.input input,
+.ui.input input[disabled] {
   pointer-events: none;
 }
 
@@ -150,8 +151,8 @@
 .ui.input input:focus::-moz-placeholder {
   color: rgba(0, 0, 0, 0.87);
 }
-.ui.input.focus input::-ms-input-placeholder,
-.ui.input input:focus::-ms-input-placeholder {
+.ui.input.focus input:-ms-input-placeholder,
+.ui.input input:focus:-ms-input-placeholder {
   color: rgba(0, 0, 0, 0.87);
 }
 
@@ -173,8 +174,8 @@
 .ui.input.error input::-moz-placeholder {
   color: #e7bdbc;
 }
-.ui.input.error input::-ms-input-placeholder {
-  color: #e7bdbc;
+.ui.input.error input:-ms-input-placeholder {
+  color: #e7bdbc !important;
 }
 
 /* Focused Error Placeholder */
@@ -184,8 +185,8 @@
 .ui.input.error input:focus::-moz-placeholder {
   color: #da9796;
 }
-.ui.input.error input:focus::-ms-input-placeholder {
-  color: #da9796;
+.ui.input.error input:focus:-ms-input-placeholder {
+  color: #da9796 !important;
 }
 
 
@@ -231,7 +232,7 @@
 .ui.transparent.inverted.input input::-moz-placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
-.ui.transparent.inverted.input input::-ms-input-placeholder {
+.ui.transparent.inverted.input input:-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 

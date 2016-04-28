@@ -6956,6 +6956,7 @@ h5.ui.header .sub.header {
 
 .ui.icon.header .content {
   display: block;
+  padding: 0em;
 }
 
 .ui.icon.header .circular.icon {
@@ -7515,7 +7516,7 @@ a.ui.inverted.grey.header:hover {
 i.icon {
   display: inline-block;
   opacity: 1;
-  margin: 0em 0.25rem 0em 0em;
+  margin: 0em 0.25em 0em 0em;
   width: 1.18em;
   height: 1em;
   font-family: 'Icons';
@@ -8000,7 +8001,7 @@ i.icons .icon:first-child {
   vertical-align: top;
   -webkit-transform: none;
   transform: none;
-  margin-right: 0.25rem;
+  margin-right: 0.25em;
 }
 
 /* Corner Icon */
@@ -11350,6 +11351,14 @@ i.icon.ms.edge:before {
          Site Overrides
 *******************************/
 
+i.icon {
+  line-height: 1 !important;
+}
+
+i.icon:last-child {
+  margin-right: 0;
+}
+
 i.icon.hoverrotate:hover {
   height: 1em;
   line-height: 1;
@@ -11734,7 +11743,7 @@ img.ui.bordered.image {
   color: rgba(0, 0, 0, 0.4);
 }
 
-.ui.input input::-ms-input-placeholder {
+.ui.input input:-ms-input-placeholder {
   color: rgba(0, 0, 0, 0.4);
 }
 
@@ -11751,7 +11760,8 @@ img.ui.bordered.image {
   opacity: 0.45;
 }
 
-.ui.disabled.input input {
+.ui.disabled.input input,
+.ui.input input[disabled] {
   pointer-events: none;
 }
 
@@ -11824,8 +11834,8 @@ img.ui.bordered.image {
   color: rgba(0, 0, 0, 0.87);
 }
 
-.ui.input.focus input::-ms-input-placeholder,
-.ui.input input:focus::-ms-input-placeholder {
+.ui.input.focus input:-ms-input-placeholder,
+.ui.input input:focus:-ms-input-placeholder {
   color: rgba(0, 0, 0, 0.87);
 }
 
@@ -11850,8 +11860,8 @@ img.ui.bordered.image {
   color: #e7bdbc;
 }
 
-.ui.input.error input::-ms-input-placeholder {
-  color: #e7bdbc;
+.ui.input.error input:-ms-input-placeholder {
+  color: #e7bdbc !important;
 }
 
 /* Focused Error Placeholder */
@@ -11864,8 +11874,8 @@ img.ui.bordered.image {
   color: #da9796;
 }
 
-.ui.input.error input:focus::-ms-input-placeholder {
-  color: #da9796;
+.ui.input.error input:focus:-ms-input-placeholder {
+  color: #da9796 !important;
 }
 
 /*******************************
@@ -11917,7 +11927,7 @@ img.ui.bordered.image {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.ui.transparent.inverted.input input::-ms-input-placeholder {
+.ui.transparent.inverted.input input:-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
@@ -17767,7 +17777,7 @@ ol.ui.horizontal.list li:before,
   color: rgba(140, 140, 140, 0.87);
 }
 
-.ui.form ::-ms-input-placeholder {
+.ui.form :-ms-input-placeholder {
   color: rgba(140, 140, 140, 0.87);
 }
 
@@ -17779,7 +17789,7 @@ ol.ui.horizontal.list li:before,
   color: rgba(89, 89, 89, 0.87);
 }
 
-.ui.form :focus::-ms-input-placeholder {
+.ui.form :focus:-ms-input-placeholder {
   color: rgba(89, 89, 89, 0.87);
 }
 
@@ -17793,8 +17803,8 @@ ol.ui.horizontal.list li:before,
   color: #e7bdbc;
 }
 
-.ui.form .error ::-ms-input-placeholder {
-  color: #e7bdbc;
+.ui.form .error :-ms-input-placeholder {
+  color: #e7bdbc !important;
 }
 
 .ui.form .error ::-moz-placeholder {
@@ -17805,8 +17815,8 @@ ol.ui.horizontal.list li:before,
   color: #da9796;
 }
 
-.ui.form .error :focus::-ms-input-placeholder {
-  color: #da9796;
+.ui.form .error :focus:-ms-input-placeholder {
+  color: #da9796 !important;
 }
 
 .ui.form .error :focus::-moz-placeholder {

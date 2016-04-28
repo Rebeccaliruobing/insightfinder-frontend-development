@@ -3,3 +3,4 @@
 *******************************/
 
 @hoverRotateDuration: 1s;
+@distanceFromText: @inputHorizontalMargin;

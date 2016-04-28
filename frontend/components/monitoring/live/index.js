@@ -1,7 +1,6 @@
 import React from 'react';
-import _ from 'lodash';
 import {Link, IndexLink} from 'react-router';
-import {Console, Button, Dropdown, Accordion, Message} from '../../../artui/react';
+import {Console, Button, Buttons, Dropdown, Accordion, Message} from '../../../artui/react';
 import Project from './project';
 import {ProjectSelection, ModelType} from '../../selections';
 
@@ -58,6 +57,11 @@ class LiveMonitoring extends React.Component {
               <i className="right angle icon divider"/>
               <div className="active section">Live Monitoring</div>
             </div>
+            <Buttons className="icon right aligned">
+              <Button><i className="line chart icon"/></Button>
+              <Button><i className="table icon"/></Button>
+              <Button><i className="setting icon"/></Button>
+            </Buttons>
           </div>
           {
             this.state.showInfo &&
@@ -81,7 +85,6 @@ class LiveMonitoring extends React.Component {
             <ProjectSelection onChange={(value, text) => {console.log(value)}} />
             <Button className="orange"
                     onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
-            <Button className="orange ">中文</Button>
           </div>
           {this.renderProjects()}
         </div>

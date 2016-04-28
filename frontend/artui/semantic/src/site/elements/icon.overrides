@@ -2,6 +2,14 @@
          Site Overrides
 *******************************/
 
+i.icon {
+  line-height: 1 !important;
+}
+
+i.icon:last-child {
+  margin-right: 0;
+}
+
 i.icon.hoverrotate {
   &:hover {
     height: 1em;
