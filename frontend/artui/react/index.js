@@ -15,9 +15,10 @@ export {Button, Buttons} from './elements/button';
 export Input from './elements/input';
 export Label from './elements/label';
 
+export Accordion from './modules/accordion';
+export {Checkbox, CheckboxGroup, RadioGroup} from './modules/checkbox';
+export Dropdown from './modules/dropdown';
 export Popup from './modules/popup';
 export Tab from './modules/tab';
-export Accordion from './modules/accordion';
-export Dropdown from './modules/dropdown';
 
 export Console from './views/console';

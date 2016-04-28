@@ -1,3 +1,9 @@
 /*******************************
     User Variable Overrides
 *******************************/
+
+@checkboxSize: @relative16px;
+@radioSize: @relative16px;
+@checkboxCheckFontSize: 1em;
+@radioTop: 0;
+@bulletTop: 0;

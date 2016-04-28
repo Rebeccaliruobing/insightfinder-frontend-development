@@ -10,6 +10,7 @@ import './semantic/dist/components/api';
 import './semantic/dist/components/form';
 import './semantic/dist/components/transition';
 import './semantic/dist/components/dropdown';
+import './semantic/dist/components/checkbox';
 import './semantic/dist/components/popup';
 import './semantic/dist/components/accordion';
 

@@ -1,3 +1,57 @@
 /*******************************
          Site Overrides
 *******************************/
+
+.ui.checkboxes {
+  display: inline-block;
+  font-size: 1em;
+}
+
+.ui.checkbox {
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+/* font size */
+.ui.mini.checkboxes,
+.ui.mini.checkbox {
+  font-size: @mini;
+}
+.ui.tiny.checkboxes,
+.ui.tiny.checkbox {
+  font-size: @tiny;
+}
+.ui.small.checkboxes,
+.ui.small.checkbox {
+  font-size: @small;
+}
+.ui.medium.checkboxes,
+.ui.medium.checkbox {
+  font-size: @medium;
+}
+.ui.large.checkboxes,
+.ui.large.checkbox {
+  font-size: @large;
+}
+.ui.big.checkboxes,
+.ui.big.checkbox {
+  font-size: @big;
+}
+.ui.huge.checkboxes,
+.ui.huge.checkbox {
+  font-size: @huge;
+}
+.ui.massive.checkboxes,
+.ui.massive.checkbox {
+  font-size: @massive;
+}
+
+.ui.checkboxes + .ui.checkbox,
+.ui.checkbox + .ui.checkboxes,
+.ui.checkbox + .ui.checkbox {
+  margin-left: @inputHorizontalVeryWideMargin !important;
+}
+
+.ui.checkbox:last-child {
+  margin-right: 0;
+}

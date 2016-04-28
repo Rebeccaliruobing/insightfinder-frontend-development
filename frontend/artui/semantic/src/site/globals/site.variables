@@ -41,6 +41,7 @@
 @inputVerticalMargin            : 0em;
 @inputHorizontalMargin          : 0.25em;
 @inputHorizontalWideMargin      : 0.5em;
+@inputHorizontalVeryWideMargin  : 1em;
 
 @inputHeight                    : @relative32px;
 @inputCompactHeight             : @relative28px;

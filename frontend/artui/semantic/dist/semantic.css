@@ -28613,10 +28613,10 @@ a.ui.card:hover,
   outline: none;
   vertical-align: baseline;
   font-style: normal;
-  min-height: 17px;
+  min-height: 1.14285714em;
   font-size: 1rem;
-  line-height: 17px;
-  min-width: 17px;
+  line-height: 1.14285714em;
+  min-width: 1.14285714em;
 }
 
 /* HTML Checkbox */
@@ -28630,8 +28630,8 @@ a.ui.card:hover,
   opacity: 0 !important;
   outline: none;
   z-index: 3;
-  width: 17px;
-  height: 17px;
+  width: 1.14285714em;
+  height: 1.14285714em;
 }
 
 /*--------------
@@ -28653,8 +28653,8 @@ a.ui.card:hover,
   position: absolute;
   top: 0px;
   left: 0px;
-  width: 17px;
-  height: 17px;
+  width: 1.14285714em;
+  height: 1.14285714em;
   content: '';
   background: #FFFFFF;
   border-radius: 0.21428571rem;
@@ -28672,11 +28672,11 @@ a.ui.card:hover,
 .ui.checkbox .box:after,
 .ui.checkbox label:after {
   position: absolute;
-  font-size: 14px;
+  font-size: 1em;
   top: 0px;
   left: 0px;
-  width: 17px;
-  height: 17px;
+  width: 1.14285714em;
+  height: 1.14285714em;
   text-align: center;
   opacity: 0;
   color: rgba(0, 0, 0, 0.87);
@@ -28865,7 +28865,7 @@ a.ui.card:hover,
 ---------------*/
 
 .ui.radio.checkbox {
-  min-height: 15px;
+  min-height: 1.14285714em;
 }
 
 .ui.radio.checkbox .box,
@@ -28880,10 +28880,10 @@ a.ui.card:hover,
   content: '';
   -webkit-transform: none;
   transform: none;
-  width: 15px;
-  height: 15px;
+  width: 1.14285714em;
+  height: 1.14285714em;
   border-radius: 500rem;
-  top: 1px;
+  top: 0;
   left: 0px;
 }
 
@@ -28893,19 +28893,19 @@ a.ui.card:hover,
 .ui.radio.checkbox label:after {
   border: none;
   content: '' !important;
-  width: 15px;
-  height: 15px;
-  line-height: 15px;
+  width: 1.14285714em;
+  height: 1.14285714em;
+  line-height: 1.14285714em;
 }
 
 /* Radio Checkbox */
 
 .ui.radio.checkbox .box:after,
 .ui.radio.checkbox label:after {
-  top: 1px;
+  top: 0;
   left: 0px;
-  width: 15px;
-  height: 15px;
+  width: 1.14285714em;
+  height: 1.14285714em;
   border-radius: 500rem;
   -webkit-transform: scale(0.46666667);
   transform: scale(0.46666667);
@@ -29252,6 +29252,68 @@ a.ui.card:hover,
 /*******************************
          Site Overrides
 *******************************/
+
+.ui.checkboxes {
+  display: inline-block;
+  font-size: 1em;
+}
+
+.ui.checkbox {
+  font-size: 1em;
+  vertical-align: middle;
+}
+
+/* font size */
+
+.ui.mini.checkboxes,
+.ui.mini.checkbox {
+  font-size: 0.78571429rem;
+}
+
+.ui.tiny.checkboxes,
+.ui.tiny.checkbox {
+  font-size: 0.85714286rem;
+}
+
+.ui.small.checkboxes,
+.ui.small.checkbox {
+  font-size: 0.92857143rem;
+}
+
+.ui.medium.checkboxes,
+.ui.medium.checkbox {
+  font-size: 1rem;
+}
+
+.ui.large.checkboxes,
+.ui.large.checkbox {
+  font-size: 1.14285714rem;
+}
+
+.ui.big.checkboxes,
+.ui.big.checkbox {
+  font-size: 1.28571429rem;
+}
+
+.ui.huge.checkboxes,
+.ui.huge.checkbox {
+  font-size: 1.42857143rem;
+}
+
+.ui.massive.checkboxes,
+.ui.massive.checkbox {
+  font-size: 1.71428571rem;
+}
+
+.ui.checkboxes + .ui.checkbox,
+.ui.checkbox + .ui.checkboxes,
+.ui.checkbox + .ui.checkbox {
+  margin-left: 1em !important;
+}
+
+.ui.checkbox:last-child {
+  margin-right: 0;
+}
 /*!
  * # Semantic UI 2.2.0 - Dimmer
  * http://github.com/semantic-org/semantic-ui/

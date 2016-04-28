@@ -5,9 +5,7 @@
 import React from 'react';
 
 export const PropTypes = Object.assign({
-  
 }, React.PropTypes);
 
 export const BaseComponent = class extends React.Component {
-  
 };
