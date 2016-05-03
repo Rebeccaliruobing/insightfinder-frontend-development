@@ -1,6 +1,6 @@
 /*
- * Message提供了对SemanticUI message的简单封装.
- * http://semantic-ui.com/collections/message.html
+ * Message提供了对SemanticUI Label的简单封装.
+ * http://semantic-ui.com/elements/label.html
 **/
 
 import $ from 'jquery';
@@ -10,8 +10,10 @@ import ReactTimeout from 'react-timeout';
 import {BaseComponent, PropTypes} from '../base';
 
 class Label extends BaseComponent {
+  
   static propTypes = {
     tag: PropTypes.string,
+    closable: PropTypes.bool,
     onClose: PropTypes.func,
     autoDismiss: PropTypes.bool,
     dismissTimeout: PropTypes.number  // seconds
@@ -19,6 +21,7 @@ class Label extends BaseComponent {
 
   static defaultProps = {
     tag: 'div',
+    closable: false,
     onClose: () => {},
     autoDismiss: true,
     dismissTimeout: 5
@@ -50,8 +53,9 @@ class Label extends BaseComponent {
   
   render() {
     let {tag, className, 
-      onClose, autoDismiss, dismissTimeout,
+      autoDismiss, dismissTimeout, onClose, 
       children, ...others} = this.props;
+    
     return React.createElement(tag, {
       ref: c => this._$el = $(c),
       className: classNames('ui', className, 'label'),
@@ -60,4 +64,15 @@ class Label extends BaseComponent {
   }
 }
 
-export default ReactTimeout(Label);
+function LabelGroup(props) {
+  let {tag, className, children, ...others} = props;
+
+  return React.createElement(tag, {
+    className: classNames('ui', className, 'labels'),
+    ...others
+  }, children)
+}
+
+Label = ReactTimeout(Label);
+
+export { LabelGroup, Label}

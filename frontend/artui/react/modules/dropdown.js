@@ -62,7 +62,7 @@ class Dropdown extends BaseComponent {
         direction: this.props['direction'],
         transition: this.props['transition'],
         onChange: (value, text, $selectItem) => {
-          this.props.onChange(this, value, text);
+          this.props.onChange(value, text);
         }
       });
     }

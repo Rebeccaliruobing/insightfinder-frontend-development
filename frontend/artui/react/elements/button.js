@@ -10,18 +10,23 @@ import {BaseComponent, PropTypes} from '../base';
 
 export const Button = class extends BaseComponent {
   static propTypes = {
-    tag: PropTypes.string
+    tag: PropTypes.string,
+    disabled: PropTypes.bool
   };
 
   static defaultProps = {
-    tag: 'div'
+    tag: 'div',
+    disabled: false
   };
   
   render() {
-    let {tag, className, children, ...others} = this.props;
+    let {tag, className, disabled, children, ...others} = this.props;
+    let classes = classNames('ui', {
+      disabled: disabled
+    }, className, 'button');
     
     return React.createElement(tag, {
-      className: classNames('ui', className, 'button'),
+      className: classes,
       tabIndex: '0',
       ...others
     }, children);

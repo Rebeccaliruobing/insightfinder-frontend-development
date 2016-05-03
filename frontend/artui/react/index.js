@@ -13,7 +13,7 @@ export Message from './collections/message';
 export {Link, IndexLink} from './elements/link';
 export {Button, Buttons} from './elements/button';
 export Input from './elements/input';
-export Label from './elements/label';
+export {Label, LabelGroup} from './elements/label';
 
 export Accordion from './modules/accordion';
 export {Checkbox, CheckboxGroup, RadioGroup} from './modules/checkbox';
