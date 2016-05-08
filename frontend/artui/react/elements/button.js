@@ -8,21 +8,24 @@ import React from 'react';
 import classNames from 'classnames';
 import {BaseComponent, PropTypes} from '../base';
 
-export const Button = class extends BaseComponent {
+class Button extends BaseComponent {
   static propTypes = {
     tag: PropTypes.string,
+    active: PropTypes.bool,
     disabled: PropTypes.bool
   };
 
   static defaultProps = {
     tag: 'div',
+    active: false,
     disabled: false
   };
   
   render() {
-    let {tag, className, disabled, children, ...others} = this.props;
+    let {tag, className, active, disabled, children, ...others} = this.props;
     let classes = classNames('ui', {
-      disabled: disabled
+      disabled: disabled,
+      active: active,
     }, className, 'button');
     
     return React.createElement(tag, {
@@ -31,11 +34,13 @@ export const Button = class extends BaseComponent {
       ...others
     }, children);
   }
-};
+}
 
-export const Buttons = function({tag, className, children, ...others}) {
+function ButtonGroup({tag, className, children, ...others}) {
   return React.createElement(tag || 'div', {
     className: classNames('ui', className, 'buttons'),
     ...others
   }, children)
-};
+}
+
+export { ButtonGroup, Button };

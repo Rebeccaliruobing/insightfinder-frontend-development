@@ -11,9 +11,9 @@ export Hoverable from './behaviors/hoverable';
 export Message from './collections/message';
 
 export {Link, IndexLink} from './elements/link';
-export {Button, Buttons} from './elements/button';
+export {ButtonGroup, Button} from './elements/button';
+export {LabelGroup, Label} from './elements/label';
 export Input from './elements/input';
-export {Label, LabelGroup} from './elements/label';
 
 export Accordion from './modules/accordion';
 export {Checkbox, CheckboxGroup, RadioGroup} from './modules/checkbox';

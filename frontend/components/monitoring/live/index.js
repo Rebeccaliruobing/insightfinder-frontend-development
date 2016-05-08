@@ -1,8 +1,9 @@
 import React from 'react';
 import {Link, IndexLink} from 'react-router';
-import {Console, Button, Buttons, Dropdown, Accordion, Message} from '../../../artui/react';
+import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import Project from './project';
 import {ProjectSelection, ModelType} from '../../selections';
+import MetricTable from './metric_table';
 
 class LiveMonitoring extends React.Component {
 
@@ -11,6 +12,7 @@ class LiveMonitoring extends React.Component {
 
     this._el = null;
     this.state = {
+      view: 'chart',
       projects: ['app2AWS', 'appWestAWS', 'AppGAE'],
       selectProjects: [],
       showInfo: false 
@@ -45,11 +47,12 @@ class LiveMonitoring extends React.Component {
   
   render() {
     const projects = this.state['projects'] || [];
+    const {view} = this.state;
     
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
-          <div className="ui vertical segment">
+          <div className="ui clearing vertical segment">
             <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
               <i className="right angle icon divider"/>
@@ -57,11 +60,18 @@ class LiveMonitoring extends React.Component {
               <i className="right angle icon divider"/>
               <div className="active section">Live Monitoring</div>
             </div>
-            <Buttons className="icon right aligned">
-              <Button><i className="line chart icon"/></Button>
-              <Button><i className="table icon"/></Button>
+            <ButtonGroup className="right floated basic icon">
+              <Button><i className="add icon"/></Button>
               <Button><i className="setting icon"/></Button>
-            </Buttons>
+            </ButtonGroup>
+            <ButtonGroup className="right floated basic icon">
+              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
+                <i className="line chart icon"/>
+              </Button>
+              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
+                <i className="table icon"/>
+              </Button>
+            </ButtonGroup>
           </div>
           {
             this.state.showInfo &&
@@ -87,6 +97,7 @@ class LiveMonitoring extends React.Component {
                     onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
           </div>
           {this.renderProjects()}
+          { view == 'table' && <MetricTable />}
         </div>
       </Console.Content>
     )
