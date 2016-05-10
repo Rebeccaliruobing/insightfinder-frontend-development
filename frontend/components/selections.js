@@ -6,7 +6,7 @@ class ProjectSelection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      projects: ['app2AWS', 'appWestAWS', 'AppGAE', '中文', '中', '我真的很长很长很长很长']
+      projects: ['app3GAE', 'VCL5', 'hadoopAWS']
     }
   }
   
@@ -33,11 +33,9 @@ ProjectSelection.defaultProps = {
   multiple: false
 };
 
-export {ProjectSelection};
-
-export const ModelType = (props) => {
+const ModelType = (props) => {
   return (
-    <Dropdown className="selection" {...props}>
+    <Dropdown mode="select" {...props}>
       <i className="dropdown icon"/>
       <div className="menu">
         <div className="item">Holistic</div>
@@ -47,38 +45,38 @@ export const ModelType = (props) => {
   );
 };
 
-export default {
-  AnomalyThreshold: function() {
-    return [
-      (
-        <label key="label">Anomaly Threshold</label>
-      ), (
-        <select key="values" className="ui dropdown">
-          <option value="0.99">0.99</option>
-          <option value="0.97">0.97</option>
-          <option value="0.95">0.95</option>
-          <option value="0.9">0.9</option>
-          <option value="0.5">0.5</option>
-          <option value="0.25">0.25</option>
-        </select>
-      )
-    ];
-  },
+const  AnomalyThreshold = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">0.99</div>
+        <div className="item">0.97</div>
+        <div className="item">0.95</div>
+        <div className="item">0.9</div>
+        <div className="item">0.5</div>
+        <div className="item">0.25</div>
+      </div>
+    </Dropdown>
+  );
+};
 
-  DurationThreshold: function() {
-    return [
-      (
-        <label key="label">Duration Threshold</label>
-      ), (
-        <select key="values" className="ui dropdown">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="10">10</option>
-        </select>
-      )
-    ];
-  }
+const DurationThreshold =  (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">5</div>
+        <div className="item">10</div>
+        <div className="item">15</div>
+        <div className="item">20</div>
+        <div className="item">25</div>
+        <div className="item">30</div>
+      </div>
+    </Dropdown>
+  );
+};
+
+export {ProjectSelection, ModelType,
+  AnomalyThreshold, DurationThreshold
 };

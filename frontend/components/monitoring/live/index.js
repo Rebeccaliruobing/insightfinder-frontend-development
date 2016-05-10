@@ -1,9 +1,11 @@
 import React from 'react';
 import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import Project from './project';
-import {ProjectSelection, ModelType} from '../../selections';
-import MetricTable from './metric_table';
+import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
+import ProjectsSummary from './summary';
+import ProjectMetric from './metric';
+import ProjectDetails from './details';
+
 
 class LiveMonitoring extends React.Component {
 
@@ -11,43 +13,27 @@ class LiveMonitoring extends React.Component {
     super(props);
 
     this._el = null;
+    
     this.state = {
       view: 'chart',
-      projects: ['app2AWS', 'appWestAWS', 'AppGAE'],
-      selectProjects: [],
-      showInfo: false 
+      showAddPanel: false,
+      addedName: '',
+      addedProjects: ['app2AWS', 'appWestAWS'],
+      detailedProject: ''
     };
     this.handleAddMonitoring.bind(this);
   }
 
   handleAddMonitoring() {
-    let projects = this.state['selectProjects'];
-    projects.push('app1AWS');
+    let {addedProjects, addedName} = this.state;
+    addedProjects.push(addedName);
     this.setState({
-      'selectProjects': projects
+      'addedProjects': addedProjects
     });
   }
 
-  renderProjects() {
-    let projects = this.state.selectProjects;
-    let elems = [];
-    projects.map((project) => {
-      elems.push(
-        (
-          <Accordion className="ui tiny orange dividing accordion">
-            <div className="active title"><i className="dropdown icon"/>{project}</div>
-            <Project/>
-          </Accordion>
-        )
-      )
-    });
-    
-    return elems;
-  }
-  
   render() {
-    const projects = this.state['projects'] || [];
-    const {view} = this.state;
+    const {view, showAddPanel, addedProjects, detailedProject} = this.state;
     
     return (
       <Console.Content>
@@ -61,7 +47,7 @@ class LiveMonitoring extends React.Component {
               <div className="active section">Live Monitoring</div>
             </div>
             <ButtonGroup className="right floated basic icon">
-              <Button><i className="add icon"/></Button>
+              <Button><i className="add icon" onClick={() => this.setState({showAddPanel: true})} /></Button>
               <Button><i className="setting icon"/></Button>
             </ButtonGroup>
             <ButtonGroup className="right floated basic icon">
@@ -74,30 +60,32 @@ class LiveMonitoring extends React.Component {
             </ButtonGroup>
           </div>
           {
-            this.state.showInfo &&
-            <Message className="ui tiny message" 
-                     closable={true} onClose={() => this.setState({showInfo: false})}>
-              <i className="close icon" />
-              <ul>
-                <li><b>Model Name</b>:
-                  choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric. </li>
-                <li><b>Anomaly Threshold</b>:
-                  choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies.
-                </li>
-                <li><b>Duration Threshold</b>:
-                  number of continuous anomalies to trigger an alert.
-                </li>
-              </ul>
-            </Message>
+            showAddPanel &&
+            <div className="ui vertical segment">
+              <label>Projects </label>
+              <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}} />
+              <span>Model Type </span>
+              <ModelType />
+              <span>Anomaly Threshold </span>
+              <AnomalyThreshold />
+              <span>Duration Threshold (minute) </span>
+              <DurationThreshold />
+              <Button className="orange"
+                      onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
+              <Button className="orange">Add & Save</Button>
+              <i className="close link icon" style={{float:'right'}} 
+                 onClick={() => this.setState({showAddPanel: false})}/>
+            </div>
           }
-          <div className="ui vertical segment">
-            <span>Projects: </span>
-            <ProjectSelection onChange={(value, text) => {console.log(value)}} />
-            <Button className="orange"
-                    onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
-          </div>
-          {this.renderProjects()}
-          { view == 'table' && <MetricTable />}
+          { (view == 'chart') && 
+          <ProjectsSummary projects={addedProjects} 
+                           onProjectSelected={(project) => this.setState({detailedProject: project})} />
+          }
+          { (view == 'table') &&
+          <ProjectMetric projects={addedProjects} 
+                         onProjectSelected={(project) => this.setState({detailedProject: project})}/>
+          }
+          { !!detailedProject && <ProjectDetails project={detailedProject} />}
         </div>
       </Console.Content>
     )

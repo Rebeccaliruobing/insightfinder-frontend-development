@@ -8,7 +8,7 @@ class Table extends BaseComponent {
   };
 
   static defaultProps = {
-    tag: 'div'
+    tag: 'table'
   };
 
   constructor(props) {

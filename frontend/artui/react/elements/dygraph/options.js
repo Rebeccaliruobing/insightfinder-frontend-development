@@ -1,11 +1,12 @@
 /*
- * dygraphs参数对应的React属性类型或名称, default用于设置需调整的缺省值.
- * hideOnInit 用于控制时候在初始化时, 使用该参数. 
+ * Dygraphs参数与React属性的映射。
+ * - default用于设置需调整的缺省值。
+ * - hideOnInit 初始化时不使用该参数，
  * 
  * https://github.com/motiz88/react-dygraphs
 **/
 
-import {PropTypes} from '../base';
+import {PropTypes} from '../../base';
 
 const options = {
 
