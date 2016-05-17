@@ -24,6 +24,28 @@ class LiveMonitoring extends React.Component {
     this.handleAddMonitoring.bind(this);
   }
 
+  componentDidMount() {
+    $.api({
+      action: 'liveAnalysis',
+      method: 'POST',
+      on: 'now',
+      beforeSend: (settings) => {
+        settings.data = {
+          'pvalue': '',
+          'cvalue': '',
+          'modelType': ''
+        };
+        return settings;
+      },
+      onSuccess: (resp) => {
+        alert(resp);
+      },
+      onError: (error) => {
+        alert(error);
+      }
+    });
+  }
+  
   handleAddMonitoring() {
     let {addedProjects, addedName} = this.state;
     addedProjects.push(addedName);

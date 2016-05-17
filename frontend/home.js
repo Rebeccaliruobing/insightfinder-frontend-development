@@ -1,18 +1,14 @@
-/*
- * home.js
- */
-
 import './home.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, 
-  IndexRoute, IndexRedirect, Link} from 'react-router';
-import {Console} from './artui/react';
+import {Router, Route, browserHistory, IndexRoute, IndexRedirect} from 'react-router';
 
-import {Monitoring, Projects, Summary, LiveMonitoring} from './components/monitoring';
-import Analysis from './components/analysis';
-import Settings from './components/settings';
+import {Console, Link} from './artui/react';
+
+import './apis';
+import {Cloud, LiveMonitoring} from './components/cloud';
+import {Settings} from './components/settings';
 
 const logo = require('./images/logo.png');
 
@@ -26,9 +22,9 @@ const App = function(props) {
   return (
     <Console>
       <Console.Topbar logo={logo}>
-        <Link to="/monitoring" className="item">Cloud Monitoring</Link>
-        <Link to="/analysis" className="item">File Analysis</Link>
-        <Link to="/settings" className="item">Alert Settings</Link>
+        <Link to="/cloud" className="item">Cloud Monitoring</Link>
+        <Link to="/settings" className="item">Project Settings</Link>
+        <Link to="/file" className="item">File Analysis</Link>
         <div className="right menu">
           <div className="ui right simple dropdown item">
             <i className="user icon circular teal inverted" />
@@ -52,15 +48,10 @@ if (appBody) {
   ReactDOM.render((
     <Router history={browserHistory}>
       <Route component={App} path="/">
-        <IndexRedirect to="/monitoring" />
-        <Route component={Monitoring} path="monitoring">
-          <IndexRedirect to="/monitoring/projects" />
-          <Route component={Projects} path="projects" />
-          <Route component={Summary} path="summary" />
-          <Route component={LiveMonitoring} path="live" />
-        </Route>
-        <Route component={Analysis} path="analysis">
-          <IndexRoute component={EmptyContent} />
+        <IndexRedirect to="/cloud" />
+        <Route component={Cloud} path="cloud">
+          <IndexRedirect to="/cloud/monitoring" />
+          <Route component={LiveMonitoring} path="monitoring" />
         </Route>
         <Route component={Settings} path="settings" >
           <IndexRoute component={EmptyContent} />
