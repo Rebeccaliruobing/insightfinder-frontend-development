@@ -1,5 +1,5 @@
 /*!
- * # Semantic UI - Video
+ * # Semantic UI - Embed
  * http://github.com/semantic-org/semantic-ui/
  *
  *
@@ -147,6 +147,12 @@ $.fn.embed = function(parameters) {
           module.debug('Creating embed object', $embed);
         },
 
+        changeEmbed: function(url) {
+          $embed
+            .html( module.generate.embed(url) )
+          ;
+        },
+
         createAndShow: function() {
           module.createEmbed();
           module.show();
@@ -158,9 +164,19 @@ $.fn.embed = function(parameters) {
           $module
             .data(metadata.source, source)
             .data(metadata.id, id)
-            .data(metadata.url, url)
           ;
-          module.create();
+          if(url) {
+            $module.data(metadata.url, url);
+          }
+          else {
+            $module.removeData(metadata.url);
+          }
+          if(module.has.embed()) {
+            module.changeEmbed();
+          }
+          else {
+            module.create();
+          }
         },
 
         // clears embed
@@ -340,6 +356,9 @@ $.fn.embed = function(parameters) {
         },
 
         has: {
+          embed: function() {
+            return ($embed.length > 0);
+          },
           placeholder: function() {
             return settings.placeholder || $module.data(metadata.placeholder);
           }
@@ -613,7 +632,7 @@ $.fn.embed.settings = {
         return {
           autohide       : !settings.brandedUI,
           autoplay       : settings.autoplay,
-          color          : settings.colors || undefined,
+          color          : settings.color || undefined,
           hq             : settings.hd,
           jsapi          : settings.api,
           modestbranding : !settings.brandedUI
@@ -631,7 +650,7 @@ $.fn.embed.settings = {
           api      : settings.api,
           autoplay : settings.autoplay,
           byline   : settings.brandedUI,
-          color    : settings.colors || undefined,
+          color    : settings.color || undefined,
           portrait : settings.brandedUI,
           title    : settings.brandedUI
         };
@@ -666,7 +685,7 @@ $.fn.embed.settings = {
   },
 
   // NOT YET IMPLEMENTED
-  api     : true,
+  api     : false,
   onPause : function() {},
   onPlay  : function() {},
   onStop  : function() {}

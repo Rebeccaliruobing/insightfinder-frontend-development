@@ -81,6 +81,9 @@ $.fn.form = function(parameters) {
             module.invoke(query);
           }
           else {
+            if(instance !== undefined) {
+              instance.invoke('destroy');
+            }
             module.verbose('Initializing form validation', $module, settings);
             module.bindEvents();
             module.set.defaults();
@@ -234,6 +237,20 @@ $.fn.form = function(parameters) {
         is: {
           bracketedRule: function(rule) {
             return (rule.type && rule.type.match(settings.regExp.bracket));
+          },
+          empty: function($field) {
+            if(!$field || $field.length === 0) {
+              return true;
+            }
+            else if($field.is('input[type="checkbox"]')) {
+              return !$field.is(':checked');
+            }
+            else {
+              return module.is.blank($field);
+            }
+          },
+          blank: function($field) {
+            return $.trim($field.val()) === '';
           },
           valid: function() {
             var
@@ -801,8 +818,11 @@ $.fn.form = function(parameters) {
           // takes a validation object and returns whether field passes validation
           field: function(field, fieldName) {
             var
-              identifier  = field.identifier || fieldName,
-              $field      = module.get.field(identifier),
+              identifier    = field.identifier || fieldName,
+              $field        = module.get.field(identifier),
+              $dependsField = (field.depends)
+                ? module.get.field(field.depends)
+                : false,
               fieldValid  = true,
               fieldErrors = []
             ;
@@ -814,8 +834,12 @@ $.fn.form = function(parameters) {
               module.debug('Field is disabled. Skipping', identifier);
               fieldValid = true;
             }
-            else if(field.optional && $.trim($field.val()) === ''){
-              module.debug('Field is optional and empty. Skipping', identifier);
+            else if(field.optional && module.is.blank($field)){
+              module.debug('Field is optional and blank. Skipping', identifier);
+              fieldValid = true;
+            }
+            else if(field.depends && module.is.empty($dependsField)) {
+              module.debug('Field depends on another value that is not present or empty. Skipping', $dependsField);
               fieldValid = true;
             }
             else if(field.rules !== undefined) {
@@ -1066,7 +1090,7 @@ $.fn.form.settings = {
   regExp: {
     bracket : /\[(.*)\]/i,
     decimal : /^\d*(\.)\d+/,
-    email   : /.+@.+\..+/i,
+    email   : /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i,
     escape  : /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,
     flags   : /^\/(.*)\/(.*)?/,
     integer : /^\-?\d+$/,
@@ -1174,10 +1198,7 @@ $.fn.form.settings = {
 
     // is most likely an email
     email: function(value){
-      var
-        emailRegExp = new RegExp($.fn.form.settings.regExp.email, 'i')
-      ;
-      return emailRegExp.test(value);
+      return $.fn.form.settings.regExp.email.test(value);
     },
 
     // value is most likely url

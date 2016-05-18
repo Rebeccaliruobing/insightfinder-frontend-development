@@ -57,6 +57,8 @@ $.fn.popup = function(parameters) {
 
         $module            = $(this),
         $context           = $(settings.context),
+        $scrollContext     = $(settings.scrollContext),
+        $boundary          = $(settings.boundary),
         $target            = (settings.target)
           ? $(settings.target)
           : $module,
@@ -71,6 +73,7 @@ $.fn.popup = function(parameters) {
         element            = this,
         instance           = $module.data(moduleNamespace),
 
+        contextObserver,
         elementNamespace,
         id,
         module
@@ -86,6 +89,7 @@ $.fn.popup = function(parameters) {
           if(!module.exists() && settings.preserve) {
             module.create();
           }
+          module.observeChanges();
           module.instantiate();
         },
 
@@ -95,6 +99,17 @@ $.fn.popup = function(parameters) {
           $module
             .data(moduleNamespace, instance)
           ;
+        },
+
+        observeChanges: function() {
+          if('MutationObserver' in window) {
+            contextObserver = new MutationObserver(module.event.contextChanged);
+            contextObserver.observe($context[0], {
+              childList : true,
+              subtree   : true
+            });
+            module.debug('Setting up mutation observer', contextObserver);
+          }
         },
 
         refresh: function() {
@@ -143,6 +158,9 @@ $.fn.popup = function(parameters) {
 
         destroy: function() {
           module.debug('Destroying previous module');
+          if(contextObserver) {
+            contextObserver.disconnect();
+          }
           // remove element only if was created dynamically
           if($popup && !settings.preserve) {
             module.removePopup();
@@ -151,9 +169,9 @@ $.fn.popup = function(parameters) {
           clearTimeout(module.hideTimer);
           clearTimeout(module.showTimer);
           // remove events
-          $window.off(elementNamespace);
+          module.unbind.close();
+          module.unbind.events();
           $module
-            .off(eventNamespace)
             .removeData(moduleNamespace)
           ;
         },
@@ -188,6 +206,18 @@ $.fn.popup = function(parameters) {
               module.set.position();
             }
           },
+          contextChanged: function(mutations) {
+            [].forEach.call(mutations, function(mutation) {
+              if(mutation.removedNodes) {
+                [].forEach.call(mutation.removedNodes, function(node) {
+                  if(node == element || $(node).find(element).length > 0) {
+                    module.debug('Element removed from DOM, tearing down events');
+                    module.destroy();
+                  }
+                });
+              }
+            });
+          },
           hideGracefully: function(event) {
             var
               $target = $(event.target),
@@ -195,12 +225,12 @@ $.fn.popup = function(parameters) {
               inPopup = ($target.closest(selector.popup).length > 0)
             ;
             // don't close on clicks inside popup
-            if(event && (!isInDOM || inPopup)) {
-              module.debug('Click was inside popup, keeping popup open');
-            }
-            else {
+            if(event && !inPopup && isInDOM) {
               module.debug('Click occurred outside popup hiding popup');
               module.hide();
+            }
+            else {
+              module.debug('Click was inside popup, keeping popup open');
             }
           }
         },
@@ -249,7 +279,7 @@ $.fn.popup = function(parameters) {
           else if($target.next(selector.popup).length !== 0) {
             module.verbose('Pre-existing popup found');
             settings.inline = true;
-            settings.popups  = $target.next(selector.popup).data(metadata.activator, $module);
+            settings.popup  = $target.next(selector.popup).data(metadata.activator, $module);
             module.refresh();
             if(settings.hoverable) {
               module.bind.popup();
@@ -269,7 +299,7 @@ $.fn.popup = function(parameters) {
         },
 
         createID: function() {
-          id = (Math.random().toString(16) + '000000000').substr(2,8);
+          id = (Math.random().toString(16) + '000000000').substr(2, 8);
           elementNamespace = '.' + id;
           module.verbose('Creating unique id for element', id);
         },
@@ -333,7 +363,7 @@ $.fn.popup = function(parameters) {
             .each(function() {
               $(this)
                 .data(metadata.activator)
-                .popup('hide')
+                  .popup('hide')
               ;
             })
           ;
@@ -392,9 +422,6 @@ $.fn.popup = function(parameters) {
             callback = $.isFunction(callback) ? callback : function(){};
             if(settings.transition && $.fn.transition !== undefined && $module.transition('is supported')) {
               module.set.visible();
-              if(settings.autoRemove) {
-                module.bind.autoRemoval();
-              }
               $popup
                 .transition({
                   animation  : settings.transition + ' in',
@@ -433,9 +460,6 @@ $.fn.popup = function(parameters) {
                     module.reset();
                     callback.call($popup, element);
                     settings.onHidden.call($popup, element);
-                    if(settings.autoRemove) {
-                      module.unbind.autoRemoval();
-                    }
                   }
                 })
               ;
@@ -477,11 +501,16 @@ $.fn.popup = function(parameters) {
           },
           calculations: function() {
             var
-              targetElement  = $target[0],
-              targetPosition = (settings.inline || (settings.popup && settings.movePopup))
+              targetElement    = $target[0],
+              isWindow         = ($boundary[0] == window),
+              targetPosition   = (settings.inline || (settings.popup && settings.movePopup))
                 ? $target.position()
                 : $target.offset(),
-              calculations = {},
+              screenPosition = $boundary.offset() || { top: 0, left: 0 },
+              calculations   = {},
+              scroll = (isWindow)
+                ? { top: $window.scrollTop(), left: $window.scrollLeft() }
+                : { top: 0, left: 0},
               screen
             ;
             calculations = {
@@ -506,12 +535,14 @@ $.fn.popup = function(parameters) {
               },
               // screen boundaries
               screen : {
+                top  : screenPosition.top,
+                left : screenPosition.left,
                 scroll: {
-                  top  : $window.scrollTop(),
-                  left : $window.scrollLeft()
+                  top  : scroll.top,
+                  left : scroll.left
                 },
-                width  : $window.width(),
-                height : $window.height()
+                width  : $boundary.width(),
+                height : $boundary.height()
               }
             };
 
@@ -531,16 +562,16 @@ $.fn.popup = function(parameters) {
             calculations.target.margin.left = (settings.inline)
               ? module.is.rtl()
                 ? parseInt( window.getComputedStyle(targetElement).getPropertyValue('margin-right'), 10)
-                : parseInt( window.getComputedStyle(targetElement).getPropertyValue('margin-left') , 10)
+                : parseInt( window.getComputedStyle(targetElement).getPropertyValue('margin-left'), 10)
               : 0
             ;
             // calculate screen boundaries
             screen = calculations.screen;
             calculations.boundary = {
-              top    : screen.scroll.top,
-              bottom : screen.scroll.top + screen.height,
-              left   : screen.scroll.left,
-              right  : screen.scroll.left + screen.width
+              top    : screen.top + screen.scroll.top,
+              bottom : screen.top + screen.scroll.top + screen.height,
+              left   : screen.left + screen.scroll.left,
+              right  : screen.left + screen.scroll.left + screen.width
             };
             return calculations;
           },
@@ -574,7 +605,6 @@ $.fn.popup = function(parameters) {
               popup,
               boundary
             ;
-            offset       = offset       || module.get.offset();
             calculations = calculations || module.get.calculations();
 
             // shorthand
@@ -951,21 +981,9 @@ $.fn.popup = function(parameters) {
               ;
             }
           },
-          autoRemoval: function() {
-            $module
-              .one('remove' + eventNamespace, function() {
-                module.hide(function() {
-                  module.removePopup();
-                });
-              })
-            ;
-          },
           close: function() {
-            if(settings.hideOnScroll === true || (settings.hideOnScroll == 'auto' && settings.on != 'click'))   {
-              $document
-                .one(module.get.scrollEvent() + elementNamespace, module.event.hideGracefully)
-              ;
-              $context
+            if(settings.hideOnScroll === true || (settings.hideOnScroll == 'auto' && settings.on != 'click')) {
+              $scrollContext
                 .one(module.get.scrollEvent() + elementNamespace, module.event.hideGracefully)
               ;
             }
@@ -991,31 +1009,22 @@ $.fn.popup = function(parameters) {
         },
 
         unbind: {
-          close: function() {
-            if(settings.hideOnScroll === true || (settings.hideOnScroll == 'auto' && settings.on != 'click')) {
-              $document
-                .off('scroll' + elementNamespace, module.hide)
-              ;
-              $context
-                .off('scroll' + elementNamespace, module.hide)
-              ;
-            }
-            if(settings.on == 'hover' && openedWithTouch) {
-              $document
-                .off('touchstart' + elementNamespace)
-              ;
-              openedWithTouch = false;
-            }
-            if(settings.on == 'click' && settings.closable) {
-              module.verbose('Removing close event from document');
-              $document
-                .off('click' + elementNamespace)
-              ;
-            }
+          events: function() {
+            $window
+              .off(elementNamespace)
+            ;
+            $module
+              .off(eventNamespace)
+            ;
           },
-          autoRemoval: function() {
-            $module.off('remove' + elementNamespace);
-          }
+          close: function() {
+            $document
+              .off(elementNamespace)
+            ;
+            $scrollContext
+              .off(elementNamespace)
+            ;
+          },
         },
 
         has: {
@@ -1262,50 +1271,53 @@ $.fn.popup = function(parameters) {
 
 $.fn.popup.settings = {
 
-  name         : 'Popup',
+  name           : 'Popup',
 
   // module settings
-  silent       : false,
-  debug        : false,
-  verbose      : false,
-  performance  : true,
-  namespace    : 'popup',
+  silent         : false,
+  debug          : false,
+  verbose        : false,
+  performance    : true,
+  namespace      : 'popup',
+
+  // whether it should use dom mutation observers
+  observeChanges : true,
 
   // callback only when element added to dom
-  onCreate     : function(){},
+  onCreate       : function(){},
 
   // callback before element removed from dom
-  onRemove     : function(){},
+  onRemove       : function(){},
 
   // callback before show animation
-  onShow       : function(){},
+  onShow         : function(){},
 
   // callback after show animation
-  onVisible    : function(){},
+  onVisible      : function(){},
 
   // callback before hide animation
-  onHide       : function(){},
+  onHide         : function(){},
 
   // callback when popup cannot be positioned in visible screen
-  onUnplaceable: function(){},
+  onUnplaceable  : function(){},
 
   // callback after hide animation
-  onHidden     : function(){},
-
-  // hides popup when triggering element is destroyed
-  autoRemove   : true,
+  onHidden       : function(){},
 
   // when to show popup
-  on           : 'hover',
+  on             : 'hover',
+
+  // element to use to determine if popup is out of boundary
+  boundary       : window,
 
   // whether to add touchstart events when using hover
   addTouchEvents : true,
 
   // default position relative to element
-  position     : 'top left',
+  position       : 'top left',
 
   // name of variation to use
-  variation    : '',
+  variation      : '',
 
   // whether popup should be moved to context
   movePopup      : true,
@@ -1326,31 +1338,34 @@ $.fn.popup.settings = {
   hoverable      : false,
 
   // explicitly set content
-  content      : false,
+  content        : false,
 
   // explicitly set html
-  html         : false,
+  html           : false,
 
   // explicitly set title
-  title        : false,
+  title          : false,
 
   // whether automatically close on clickaway when on click
-  closable     : true,
+  closable       : true,
 
   // automatically hide on scroll
-  hideOnScroll : 'auto',
+  hideOnScroll   : 'auto',
 
   // hide other popups on show
-  exclusive    : false,
+  exclusive      : false,
 
   // context to attach popups
-  context      : 'body',
+  context        : 'body',
+
+  // context for binding scroll events
+  scrollContext  : window,
 
   // position to prefer when calculating new position
-  prefer       : 'opposite',
+  prefer         : 'opposite',
 
   // specify position to appear even if it doesn't fit
-  lastResort   : false,
+  lastResort     : false,
 
   // delay used to prevent accidental refiring of animations due to user error
   delay        : {

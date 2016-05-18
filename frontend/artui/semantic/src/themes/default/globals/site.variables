@@ -76,6 +76,11 @@
 @inputHorizontalPadding : @relative14px;
 @inputPadding           : @inputVerticalPadding @inputHorizontalPadding;
 
+/* Input Text Color */
+@inputColor: @textColor;
+@inputPlaceholderColor: lighten(@inputColor, 75);
+@inputPlaceholderFocusColor: lighten(@inputColor, 45);
+
 /* Line Height Default For Inputs in Browser */
 @inputLineHeight: 1.2142em;
 
@@ -300,7 +305,7 @@
 ;
 @floatingShadow:
   0px 2px 4px 0px rgba(34, 36, 38, 0.12),
-  0px 2px 10px 0px rgba(34, 36, 38, 0.08)
+  0px 2px 10px 0px rgba(34, 36, 38, 0.15)
 ;
 
 /*******************************
@@ -693,6 +698,12 @@
 /*-------------------
         Hover
 --------------------*/
+
+/*---  Shadows  ---*/
+@floatingShadowHover:
+  0px 2px 4px 0px rgba(34, 36, 38, 0.15),
+  0px 2px 10px 0px rgba(34, 36, 38, 0.25)
+;
 
 /*---  Colors  ---*/
 @primaryColorHover    : saturate(darken(@primaryColor, 5), 10, relative);

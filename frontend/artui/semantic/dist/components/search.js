@@ -61,6 +61,8 @@ $.fn.search = function(parameters) {
         element         = this,
         instance        = $module.data(moduleNamespace),
 
+        disabledBubbled = false,
+
         module
       ;
 
@@ -87,6 +89,20 @@ $.fn.search = function(parameters) {
             .off(eventNamespace)
             .removeData(moduleNamespace)
           ;
+        },
+
+        refresh: function() {
+          module.debug('Refreshing selector cache');
+          $prompt         = $module.find(selector.prompt);
+          $searchButton   = $module.find(selector.searchButton);
+          $category       = $module.find(selector.category);
+          $results        = $module.find(selector.results);
+          $result         = $module.find(selector.result);
+        },
+
+        refreshResults: function() {
+          $results = $module.find(selector.results);
+          $result  = $module.find(selector.result);
         },
 
         bind: {
@@ -154,8 +170,13 @@ $.fn.search = function(parameters) {
             if(module.resultsClicked) {
               module.debug('Determining if user action caused search to close');
               $module
-                .one('click', selector.results, function(event) {
-                  if( !module.is.animating() && !module.is.hidden() ) {
+                .one('click.close' + eventNamespace, selector.results, function(event) {
+                  if(module.is.inMessage(event) || disabledBubbled) {
+                    $prompt.focus();
+                    return;
+                  }
+                  disabledBubbled = false;
+                  if( !module.is.animating() && !module.is.hidden()) {
                     callback();
                   }
                 })
@@ -178,7 +199,9 @@ $.fn.search = function(parameters) {
               var
                 $result = $(this),
                 $title  = $result.find(selector.title).eq(0),
-                $link   = $result.find('a[href]').eq(0),
+                $link   = $result.is('a[href]')
+                  ? $result
+                  : $result.find('a[href]').eq(0),
                 href    = $link.attr('href')   || false,
                 target  = $link.attr('target') || false,
                 title   = $title.html(),
@@ -193,6 +216,7 @@ $.fn.search = function(parameters) {
               if( $.isFunction(settings.onSelect) ) {
                 if(settings.onSelect.call(element, result, results) === false) {
                   module.debug('Custom onSelect callback cancelled default select action');
+                  disabledBubbled = true;
                   return;
                 }
               }
@@ -340,6 +364,9 @@ $.fn.search = function(parameters) {
           hidden: function() {
             return $results.hasClass(className.hidden);
           },
+          inMessage: function(event) {
+            return (event.target && $(event.target).closest(selector.message).length > 0);
+          },
           empty: function() {
             return ($results.html() === '');
           },
@@ -417,6 +444,13 @@ $.fn.search = function(parameters) {
             }
             return result || false;
           },
+        },
+
+        select: {
+          firstResult: function() {
+            module.verbose('Selecting first result');
+            $result.first().addClass(className.active);
+          }
         },
 
         set: {
@@ -797,6 +831,10 @@ $.fn.search = function(parameters) {
             $results
               .html(html)
             ;
+            module.refreshResults();
+            if(settings.selectFirstResult) {
+              module.select.firstResult();
+            }
             module.showResults();
           }
           else {
@@ -1075,25 +1113,28 @@ $.fn.search = function(parameters) {
 
 $.fn.search.settings = {
 
-  name           : 'Search',
-  namespace      : 'search',
+  name              : 'Search',
+  namespace         : 'search',
 
-  silent         : false,
-  debug          : false,
-  verbose        : false,
-  performance    : true,
+  silent            : false,
+  debug             : false,
+  verbose           : false,
+  performance       : true,
 
   // template to use (specified in settings.templates)
-  type           : 'standard',
+  type              : 'standard',
 
   // minimum characters required to search
-  minCharacters  : 1,
+  minCharacters     : 1,
+
+  // whether to select first result after searching automatically
+  selectFirstResult : false,
 
   // API config
-  apiSettings    : false,
+  apiSettings       : false,
 
   // object to search
-  source         : false,
+  source            : false,
 
   // fields to search
   searchFields   : [
@@ -1193,6 +1234,7 @@ $.fn.search.settings = {
     prompt       : '.prompt',
     searchButton : '.search.button',
     results      : '.results',
+    message      : '.results > .message',
     category     : '.category',
     result       : '.result',
     title        : '.title, .name'
