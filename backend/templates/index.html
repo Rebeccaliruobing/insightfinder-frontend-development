@@ -1,0 +1,6 @@
+{% set pageCategory = "home" %}
+{% extends '_page.html' %}
+
+{% block custom_style%}{{ stylesheet_tag('app') | safe }}{% endblock %}
+{% block page_body %}<div id="app"></div>{% endblock %}
+{% block custom_script %}{{ javascript_tag('app') | safe }}{% endblock %}

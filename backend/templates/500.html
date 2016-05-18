@@ -2,19 +2,6 @@
 
 {% set pageCategory = "error" %}
 
-{% block custom_style%}
-    {{ stylesheet_tag('homecss') | safe }}
-{% endblock %}
-
-{% block header %}
-    {{ super() }}
-{% endblock %}
-
-{% block main %}
-    500
-    {{ error }}
-{% endblock %}
-
-{% block custom_script %}
-    {{ javascript_tag('home') | safe }}
-{% endblock %}
+{% block custom_style%}{% endblock %}
+{% block page_body %}404{% endblock %}
+{% block custom_script %}{% endblock %}

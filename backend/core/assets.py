@@ -7,6 +7,7 @@
 """
 
 import json
+from pathlib2 import PurePath
 from flask import request
 
 
@@ -48,8 +49,11 @@ class Assets(object):
         从manifest.json文件中读取资源文件路径的映射表。
         """
         try:
-            with self.app.open_resource(self.manifest, 'r') as stats_json:
-                self.assets = json.load(stats_json)
+            base_dir = PurePath(self.app.config['BASE_DIR'])
+            with open(str(base_dir/'frontend'/self.manifest), 'r') as stats_json:
+                stats = json.load(stats_json)
+                self.assets = stats['assets']
+                self.cdn = stats['cdn']
         except IOError:
             raise RuntimeError(
                 u"需要设置配置参数'WEBPACK_MANIFEST_PATH'，"

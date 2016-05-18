@@ -2,7 +2,6 @@
  * 创建一个包括Webpack编译生成文件的信息的manifest文件。
  * 该文件中包括生成文件与对应包含hash值文件名的映射信息。
  * 
- * https://github.com/nickjj/manifest-revision-webpack-plugin
  * https://github.com/webdeveric/webpack-assets-manifest
 **/
 
@@ -18,9 +17,10 @@ var _ = require('lodash');
  */
 var AssetsManifestPlugin = function (options) {
   var defaults = {
-    output: '../backend/manifest.json',
+    output: '../frontend/manifest.json',
     replacer: null,
-    space: '\t'
+    space: '\t',
+    cdn: {}
   };
   
   options = _.pick(
@@ -88,7 +88,10 @@ AssetsManifestPlugin.prototype.processAssets = function(assets)
 
 AssetsManifestPlugin.prototype.toString = function()
 {
-  return JSON.stringify(this.moduleAssets, this.replacer, this.space);
+  return JSON.stringify({
+    assets: this.moduleAssets,
+    cdn: this.cdn
+  }, this.replacer, this.space);
 };
 
 /**

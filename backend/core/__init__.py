@@ -55,35 +55,6 @@ def init_app(app):
     asset = Assets()
     asset.init_app(app)
 
-    # MongoDB
-    if app.config.get('MONGO_ENABLED', False):
-        from pymongo import MongoClient
-        dbname = app.config['MONGO_DBNAME']
-        client = MongoClient(
-            host=app.config.get('MONGO_HOST', None),
-            port=app.config.get('MONGO_PORT', None)
-        )
-        db = client[dbname]
-
-    # 应用文件的存储
-    # TODO: [IMP] 添加QINIU_ENABLED及回退方案.
-    if app.config.get('QINIU_ENABLED', False):
-        from .storage import qiniu_storage
-        app.storage = qiniu_storage
-
-    # 管理控制台路由的注册
-    if app.config.get('ADMIN_ENABLED', False):
-        from .admin import admin_view, logoff_view
-
-        admin_base = app.config.get('ADMIN_URL_BASE', '/admin')
-
-        app.add_url_rule(admin_base + '/logoff',
-                         view_func=logoff_view, methods=['GET', 'POST'])
-        app.add_url_rule(admin_base + '/', defaults={'path': ''},
-                         view_func=admin_view, methods=['GET', 'POST'])
-        app.add_url_rule(admin_base + '/<path:path>',
-                         view_func=admin_view, methods=['GET', 'POST'])
-
     # 开发时用于原型设计的组件
     if app.config.get('PROTOTYPE_ENABLED', False):
         from .prototype import clorem, avatars, wireframes

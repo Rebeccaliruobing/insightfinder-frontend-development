@@ -1,3 +1,4 @@
 $.fn.api.settings.api = {
-  'liveAnalysis': 'https://app.insightfinder.com/liveAnalysis'
+  'login': 'https://insightfindertesting.appspot.com/login-check',
+  'liveAnalysis': 'https://insightfindertesting.appspot.com/liveanalysis'
 };

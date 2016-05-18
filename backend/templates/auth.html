@@ -1,9 +1,7 @@
-{% set pageCategory = "signin" %}
+{% set pageCategory = "auth" %}
 {% extends '_page.html' %}
 
-{% block custom_style%}
-    {{ stylesheet_tag('signin_css') | safe }}
-{% endblock %}
+{% block custom_style%}{{ stylesheet_tag('auth') | safe }}{% endblock %}
 
 {% block page_body %}
 <div class="ui middle aligned center aligned grid">
@@ -34,6 +32,4 @@
 </div>
 {% endblock %}
 
-{% block custom_script %}
-    {{ javascript_tag('signin') | safe }}
-{% endblock %}
+{% block custom_script %}{{ javascript_tag('auth') | safe }}{% endblock %}

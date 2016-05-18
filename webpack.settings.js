@@ -6,13 +6,19 @@ module.exports = {
   entry: {
     commons: './commons',
     assets: './assets',
-    home: './home'
+    app: './app',
+    auth: './auth'
   },
-  commonsChunk: ['commons'],
+  
   providePlugin: {
     _: 'lodash',
     $: 'jquery',
     'jQuery': 'jquery',
     'window.jQuery': 'jquery'
-  }
+  },
+  
+  /*
+   所有js共用模块所在的chunk名称
+   */
+  _commonsChunk: ['commons']
 };

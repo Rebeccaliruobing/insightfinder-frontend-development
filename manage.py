@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 import os
-
-
 from flask.ext.script import Manager, Server
 from backend import create_app
 

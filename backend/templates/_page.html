@@ -11,11 +11,8 @@
 </head>
 
 <body class="{{ pageCategory }}">
-
 {% block page_body %}{% endblock %}
-
 {{ javascript_tag('commons') | safe }}
 {% block custom_script %}{% endblock %}
-
 </body>
 </html>

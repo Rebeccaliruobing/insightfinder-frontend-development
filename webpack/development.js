@@ -5,80 +5,36 @@
 **/
 
 const path = require('path');
+const merge = require('lodash/merge');
 const webpack = require('webpack');
+
+const currentDir = process.cwd();
 
 // Plugins
 const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
 
-const settings = require('../webpack.settings');
+const settings = require('./common');
 
-const currentDir = process.cwd();
-const sourceDir = path.join(currentDir, 'frontend');
-const outputDir = path.join(currentDir, 'static');
-
-module.exports = {
-  context: sourceDir,
-  entry: settings.entry,
+module.exports = merge({}, {
   output: {
-    path: outputDir,
-    filename: '[name]-[chunkhash].js',
-    chunkFilename: '[name].[id]-[chunkhash].js',
+    pathinfo: true,
+    
+    // TODO: 应使用js变量来替换
     publicPath: 'http://0.0.0.0:10086/static/'
   },
-  module: {
-    loaders: [{
-      // 将ES6/7语法，及React JSX转换成js。
-      test: /\.(js|jsx)?$/,
-      loader: 'babel',
-      query: {
-        presets: ['es2015', 'stage-1', 'react'],
-        compact: true,
-        cacheDirectory: true
-      },
-      include: [sourceDir],
-      exclude: [path.join(currentDir, 'node_modules')]
-    }, {
-      // 将初始chunk中的css以css文件的方式，其他chunk采取css嵌入在js中的方式。
-      test: /\.css$/,
-      loader: ExtractTextPlugin.extract(
-        'style', 'css?' + JSON.stringify({discardComments: {removeAll: true}}))
-    }, {
-      test: /\.less$/,
-      loader: ExtractTextPlugin.extract('style', 'css!less?sourceMap')
-    }, {
-      test: /\.scss$/,
-      loader: ExtractTextPlugin.extract('style', 'css!resolve-url!sass?sourceMap')
-    }, {
-      test: /\.(png|jpe?g|gif|svg|ico)(\?\S*)?$/,
-      loader: 'file?name=imgs/[name]-[hash:20].[ext]'
-    }, {
-      test: /\.(woff|woff2|ttf|eot)(\?\S*)?$/,
-      loader: 'file?name=fonts/[name]-[hash:20].[ext]'
-    }, {
-      test: /\.(mp4|mpeg|webm|ogv|swf)(\?\S*)?$/,
-      loader: 'file?name=video/[name]-[hash:20].[ext]'
-    }]
-  },
-  resolve: {
-    // 如第三方库的package.json的main为minified版本的文件，则需要添加alias
-    // 来指定未minified的源代码，以便webpack正确编译。
-    alias: {
-    },
-    // require('file')时自动添加的扩展名，仅添加js相关的扩展名。
-    // 其他类型如img，css等需显示指定，以避免同名的冲突，如index.js, index.css。
-    extensions: ['', '.js', '.jsx']
-  },
   plugins: [
-    // 有错误时停止生成文件
+    
+    // 有错误时不刷新页面
     new webpack.NoErrorsPlugin(),
 
     // 用文件的md5替换chunkhash，以避免共用js内容未变化时hash变化。
     new WebpackMd5Hash(),
 
     new webpack.optimize.CommonsChunkPlugin({
-      names: settings.commonsChunk,
+      names: settings._commonsChunk,
       minChunks: Infinity
     }),
 
@@ -88,14 +44,19 @@ module.exports = {
     // 使用变量时,自动装载对应模块.
     new webpack.ProvidePlugin(settings.providePlugin),
 
-    // 生产assets的文件名映射表
+    // 生成后端使用assets文件的映射表
     new AssetsManifestPlugin({
-      output: '../backend/manifest-dev.json'
+      output: '../frontend/manifest-dev.json'
     })
   ],
+  devtool: '#inline-source-map',
   devServer: {
     port: 10086,
     host: '0.0.0.0',
-    inline: true
+    inline: true,
+    headers: {
+      // "Access-Control-Allow-Origin": "http://localhost:5000",
+      // "Access-Control-Allow-Credentials": true
+    }
   }
-};
+}, settings);
