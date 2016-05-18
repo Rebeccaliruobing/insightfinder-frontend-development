@@ -1,13 +1,11 @@
-body.signin> .page-body {
-  height: 100% !important;
-  > .ui.grid { 
-    height: 100%; 
-    > .column { 
-      max-width: 300px; 
-    }
-  }
+@import "./artui/mixins";
+
+.auth.ui.container{
+  @container-mixins();
+  .makeContainer(320px);
 }
 
-.ui.header > .image {
+.auth .ui.header > .image {
   width:  160px !important;
+  height: 58px;
 }

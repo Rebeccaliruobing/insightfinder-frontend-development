@@ -53,10 +53,10 @@ module.exports = merge({}, {
   devServer: {
     port: 10086,
     host: '0.0.0.0',
-    inline: true,
+    inline: false,
     headers: {
-      // "Access-Control-Allow-Origin": "http://localhost:5000",
-      // "Access-Control-Allow-Credentials": true
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": false 
     }
   }
 }, settings);

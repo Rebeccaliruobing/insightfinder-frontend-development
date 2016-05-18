@@ -8,12 +8,13 @@
   @import (optional) "../../semantic/src/site/elements/container.variables";
 
   /**
-   * 创建一个有最大宽度限制的container
+   * 创建一个有最大宽度限制的container, Mobile时固定左右边距
   **/
   .makeContainer(@maxWidth; @offset: 0;
                  @fluidAt: @maxWidth + @offset + 2 * @mobileGutter) {
 
-    width: auto;
+    margin-left: auto !important;
+    margin-right: auto !important;
     max-width: @maxWidth !important;
 
     @media only screen and (max-width: @fluidAt) {

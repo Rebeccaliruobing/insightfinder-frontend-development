@@ -174,7 +174,38 @@
   font-size: 1.71428571rem;
 }
 
-/* Basic */
-.ui.basic.container {
+/* middle aligned */
+.ui.top.aligned.container,
+.ui.middle.aligned.container,
+.ui.bottom.aligned.container {
+  height: 100%;
+}
+.ui.top.aligned.container > div {
+  position: relative;
+  top: 0%;
+  -webkit-transform: translate(0px, 0%);
+          transform: translate(0px, 0%);
+}
+.ui.middle.aligned.container > div {
+  position: relative;
+  top: 50%;
+  -webkit-transform: translate(0px, -50%);
+          transform: translate(0px, -50%);
+}
+.ui.bottom.aligned.container > div {
+  position: relative;
+  top: 100%;
+  -webkit-transform: translate(0px, -100%);
+          transform: translate(0px, -100%);
+}
+
+/* Background container */
+.ui.bg.container {
+  position: absolute;
   width: 100% !important;
+  height: 100% !important;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  margin: 0 !important;
 }

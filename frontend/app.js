@@ -4,8 +4,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Router, Route, browserHistory, IndexRoute, IndexRedirect} from 'react-router';
 
-import './apis';
 import {Console, Link} from './artui/react';
+
+import './apis';
 import {Cloud, LiveMonitoring} from './components/cloud';
 import {Settings} from './components/settings';
 

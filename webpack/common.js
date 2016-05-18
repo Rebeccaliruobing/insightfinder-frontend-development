@@ -29,7 +29,7 @@ module.exports = merge({}, {
       include: [sourceDir],
       query: {
         presets: ['es2015', 'stage-1', 'react'],
-        plugins: ['transform-runtime'],
+        // plugins: ['transform-runtime'],
         compact: true,
         comments: false,
         cacheDirectory: true

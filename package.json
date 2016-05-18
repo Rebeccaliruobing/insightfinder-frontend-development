@@ -4,7 +4,7 @@
   "description": "insightfinder web ui",
   "main": "index.js",
   "scripts": {
-    "dev": "./node_modules/.bin/webpack-dev-server --config webpack/development.js -d --progress --colors --display-error-details",
+    "dev": "./node_modules/.bin/webpack-dev-server --colors --debug --progress --display-error-details --config webpack/development.js",
     "devserver": "export FLASK_CONFIG=development && export WEBPACK_DEV_SERVER=1 && python manage.py runserver",
     "stage": "rm -rf ./static && webpack --config webpack/stage.js -d --progress --colors --display-error-details",
     "stageserver": "export FLASK_CONFIG=development && python manage.py runserver",

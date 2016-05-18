@@ -4,31 +4,9 @@
 {% block custom_style%}{{ stylesheet_tag('auth') | safe }}{% endblock %}
 
 {% block page_body %}
-<div class="ui middle aligned center aligned grid">
-    <div class="column">
-        <form class="ui form" accept-charset="UTF-8" method="post">
-            <h2 class="ui image header">
-                <img src="{{ asset_url_for('images/logo.png') }}" class="image">
-            </h2>
-            <div class="ui segment left aligned">
-                <div class="field required">
-                    <label>User Name</label>
-                    <div class="ui icon input">
-                        <i class="user icon"></i>
-                        <input type="text" name="username">
-                    </div>
-                </div>
-                <div class="field required">
-                    <label>Password</label>
-                    <div class="ui icon input">
-                        <i class="lock icon"></i>
-                        <input type="password" name="password">
-                    </div>
-                </div>
-                <div class="ui fluid orange submit button">Sign In</div>
-            </div>
-        </form>
-    </div>
+<div class="ui bg container"></div>
+<div class="auth ui middle center aligned container">
+    <div id="auth"></div>
 </div>
 {% endblock %}
 
