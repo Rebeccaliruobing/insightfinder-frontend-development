@@ -64,7 +64,7 @@ class LiveMonitoring extends React.Component {
             <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
               <i className="right angle icon divider"/>
-              <Link to="/monitoring" className="section">Cloud Monitoring</Link>
+              <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
               <i className="right angle icon divider"/>
               <div className="active section">Live Monitoring</div>
             </div>

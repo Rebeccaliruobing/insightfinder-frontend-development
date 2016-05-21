@@ -28,22 +28,24 @@ module.exports = merge({}, {
       loader: 'babel',
       include: [sourceDir],
       query: {
-        presets: ['es2015', 'stage-1', 'react'],
+        presets: ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3', 'react'],
         // plugins: ['transform-runtime'],
         compact: true,
         comments: false,
         cacheDirectory: true
       }
     }, {
+      test: /\.json$/, loader: 'json'
+    } , {
       test: /\.css$/,
       loader: ExtractTextPlugin.extract(
         'style', 'css?' + JSON.stringify({discardComments: {removeAll: true}}))
     }, {
       test: /\.less$/,
-      loader: ExtractTextPlugin.extract('style', 'css!less?sourceMap')
+      loader: ExtractTextPlugin.extract('style', 'css?sourceMap!less?sourceMap')
     }, {
       test: /\.scss$/,
-      loader: ExtractTextPlugin.extract('style', 'css!resolve-url!sass?sourceMap')
+      loader: ExtractTextPlugin.extract('style', 'css?sourceMap!resolve-url!sass?sourceMap')
     }, {
       test: /\.(png|jpe?g|gif|svg|ico)(\?\S*)?$/,
       loader: 'file?name=imgs/[name]-[hash:20].[ext]'

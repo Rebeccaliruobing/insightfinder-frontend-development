@@ -2,15 +2,13 @@ import './app.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, IndexRoute, IndexRedirect} from 'react-router';
-
+import {Router, Route, browserHistory, hashHistory, IndexRoute, IndexRedirect} from 'react-router';
 import {Console, Link} from './artui/react';
-
-import './apis';
-import {Cloud, LiveMonitoring} from './components/cloud';
+import {routes as cloutRoutes} from './components/cloud';
 import {Settings} from './components/settings';
+import './apis';
 
-const logo = require('./images/logo.png');
+const APPID = `app`;
 
 const EmptyContent = function(props) {
   return (
@@ -21,7 +19,7 @@ const EmptyContent = function(props) {
 const App = function(props) {
   return (
     <Console>
-      <Console.Topbar logo={logo}>
+      <Console.Topbar logo={require('./images/logo.png')}>
         <Link to="/cloud" className="item">Cloud Monitoring</Link>
         <Link to="/settings" className="item">Project Settings</Link>
         <Link to="/file" className="item">File Analysis</Link>
@@ -43,16 +41,14 @@ const App = function(props) {
   );
 };
 
-const appBody = document.querySelector('#app');
+$('body').prepend($(`<div id='${APPID}'></div>`))
+const appBody = document.querySelector(`#${APPID}`);
 if (appBody) {
   ReactDOM.render((
-    <Router history={browserHistory}>
+    <Router history={hashHistory}>
       <Route component={App} path="/">
         <IndexRedirect to="/cloud" />
-        <Route component={Cloud} path="cloud">
-          <IndexRedirect to="/cloud/monitoring" />
-          <Route component={LiveMonitoring} path="monitoring" />
-        </Route>
+        {cloutRoutes}
         <Route component={Settings} path="settings" >
           <IndexRoute component={EmptyContent} />
         </Route>

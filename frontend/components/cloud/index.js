@@ -1,9 +1,11 @@
 import React from 'react';
 import {Console, Link} from '../../artui/react';
+import {Route, IndexRedirect} from 'react-router';
 
 import Navbar from './navbar';
 
-export LiveMonitoring from './monitoring';
+import LiveMonitoring from './monitoring';
+import OutlierDetection from './outlier-detection';
 
 export class Cloud extends React.Component {
   render() {
@@ -15,3 +17,11 @@ export class Cloud extends React.Component {
     )
   }
 }
+
+export const routes = (
+    <Route component={Cloud} path="cloud">
+      <IndexRedirect to="monitoring" />
+      <Route component={LiveMonitoring} path="monitoring" />
+      <Route component={OutlierDetection} path="outlier" />
+    </Route>
+)
