@@ -1,4 +1,6 @@
+const baseUrl = 'https://insightfinderui.appspot.com/';
+
 $.fn.api.settings.api = {
-  'login': 'https://insightfindertesting.appspot.com/login-check',
-  'liveAnalysis': 'https://insightfindertesting.appspot.com/liveanalysis'
+  'login': baseUrl + 'login-check',
+  'liveAnalysis': baseUrl + 'liveanalysis'
 };

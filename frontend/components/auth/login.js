@@ -1,13 +1,12 @@
 import $ from 'jquery';
 import React from 'react';
 import classNames from 'classnames';
-import {BaseComponent, PropTypes} from '../../artui/react';
+import {BaseComponent, PropTypes, Input} from '../../artui/react';
 
 const logo = require('../../images/logo.png');
 
 class Login extends BaseComponent {
   static propTypes = {};
-
   static defaultProps = {};
   
   constructor(props) {
@@ -23,13 +22,17 @@ class Login extends BaseComponent {
         beforeSend: (settings) => {
           settings.data = {
             'userName': 'guest',
-            'password': 'password'
+            'password': 'Have1insight!'
           };
           return settings;
         },
         onSuccess: (resp) => {
+          console.log(resp);
           alert('设置成功!');
           window.location.reload();
+        },
+        onFailure: (resp) => {
+          console.log(resp);
         }
       })
     }
@@ -37,8 +40,7 @@ class Login extends BaseComponent {
   
   render() {
     return (
-      <form className="ui form" accept-charset="UTF-8" method="post" 
-            ref={c=>this._$el = $(c)} >
+      <form className="ui form" ref={c=>this._$el = $(c)} >
         <h2 className="ui image header">
           <img src={logo} className="image"/>
         </h2>
