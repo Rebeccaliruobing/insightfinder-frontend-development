@@ -11,10 +11,12 @@ const webpack = require('webpack');
 const currentDir = process.cwd();
 
 // Plugins
-const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackHarddiskPlugin = require('./html-webpack-harddisk-plugin');
+const AssetsManifestPlugin = require('./assets-manifest-plugin');
 
 const settings = require('./common');
 
@@ -47,7 +49,20 @@ module.exports = merge({}, {
     // 生成后端使用assets文件的映射表
     new AssetsManifestPlugin({
       output: '../frontend/manifest-dev.json'
+    }),
+
+    new HtmlWebpackPlugin({
+        title: 'InsightFinder',
+        filename: 'html/dev/index.html',
+        template: './templates/index.ejs',
+        inject: false,
+        alwaysWriteToDisk: true,
+    }),
+
+    new HtmlWebpackHarddiskPlugin({
+        outputDir: settings.output.path
     })
+
   ],
   devtool: '#inline-source-map',
   devServer: {

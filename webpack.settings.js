@@ -14,7 +14,11 @@ module.exports = {
     _: 'lodash',
     $: 'jquery',
     'jQuery': 'jquery',
-    'window.jQuery': 'jquery'
+    'window.jQuery': 'jquery',
+    'moment': 'moment',
+    'React': 'react',
+    'ReactDOM': 'react-dom',
+    'cx': 'classnames'
   },
   
   /*

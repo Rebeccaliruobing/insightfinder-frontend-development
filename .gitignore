@@ -87,3 +87,9 @@ build/Release
 node_modules/
 frontend/manifest-dev.json
 !frontend/artui/semantic/dist
+
+
+# Jetbrains
+.idea
+static/html/dev
+backend/config/default.py

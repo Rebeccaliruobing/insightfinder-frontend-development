@@ -8,6 +8,7 @@ import 'react-dom';
 import 'react-router';
 import 'lodash';
 import 'classnames';
+import 'moment';
 
 import './artui';
 import './artui/i18n/zh-CN';

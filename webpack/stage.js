@@ -60,7 +60,16 @@ module.exports = merge({}, {
       'process.env': {
         'USE_CDN': true
       }
-    })
+    }),
+
+    // 生成HTML页面
+    new HtmlWebpackPlugin({
+        title: 'InsightFinder',
+        filename: 'html/index.html',
+        template: './templates/index.ejs',
+        inject: false,
+        alwaysWriteToDisk: true,
+    }),
   ],
   devtool: '#inline-source-map'
 },settings);

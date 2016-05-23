@@ -77,6 +77,23 @@ const DurationThreshold =  (props) => {
   );
 };
 
-export {ProjectSelection, ModelType,
-  AnomalyThreshold, DurationThreshold
+const WindowWithWeek = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">1</div>
+        <div className="item">2</div>
+        <div className="item">4</div>
+      </div>
+    </Dropdown>
+  )
+}
+
+export {
+  ProjectSelection, 
+  ModelType,
+  AnomalyThreshold, 
+  DurationThreshold,
+  WindowWithWeek
 };

@@ -61,6 +61,16 @@ module.exports = merge({}, {
     }),
 
     // TODO: 优化?
-    new webpack.optimize.DedupePlugin()
+    new webpack.optimize.DedupePlugin(),
+
+    // 生成HTML页面
+    // index.html
+    new HtmlWebpackPlugin({
+        title: 'InsightFinder',
+        filename: 'html/index.html',
+        template: './templates/index.ejs',
+        inject: false,
+        alwaysWriteToDisk: true,
+    }),
   ]
 },settings);
