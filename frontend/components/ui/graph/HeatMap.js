@@ -49,13 +49,6 @@ class HeatMap extends React.Component {
         this.shouldComponentUpdate = PureRenderMixin.shouldComponentUpdate.bind(this);
     }
 
-    getStyle() {
-        return {
-            width: this.props.width,
-            height: this.props.height
-        }
-    }
-
     render() {
         return (
             <div className={cx('heatmap inlin-block')}>
@@ -91,7 +84,7 @@ class HeatMap extends React.Component {
             rect
                 .filter((item) =>(item.value >= 0))
                 .transition()
-                .delay((d) =>(d.colIndex - dayOffset) * 20)
+                .delay((d) =>d.colIndex * d.rowIndex * 0.1)
                 .transition()
                 .duration(1000)
                 .attrTween('fill', function (d, i, a) {

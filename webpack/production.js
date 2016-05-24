@@ -15,9 +15,12 @@ const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const settings = require('./common');
-const {GetExternals, GetCdnManifest} = require('./utils');
+const utils = require('./utils');
+const GetExternals = utils.GetExternals;
+const GetCdnManifest = utils.GetCdnManifest;
 
 module.exports = merge({}, {
   output: {

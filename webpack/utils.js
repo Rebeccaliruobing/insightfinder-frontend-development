@@ -12,7 +12,7 @@ function GetExternals(settings) {
 }
 
 function GetCdnManifest(settings) {
-  let ret = {};
+  var ret = {};
   
   if (settings && settings['js']) {
     ret['js'] = reduce(settings['js'], (result, val, key) => {

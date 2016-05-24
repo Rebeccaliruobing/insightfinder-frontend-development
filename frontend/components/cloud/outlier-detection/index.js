@@ -40,7 +40,7 @@ export default class OutlierDetection extends Component {
             dataArray.push({
                 colIndex: colIndex % 32,
                 rowIndex: parseInt(index / 32),
-                value: lineArray[timeIndex]
+                value: lineArray[lineArray.length - 2]
             });
         });
 
@@ -48,7 +48,7 @@ export default class OutlierDetection extends Component {
             heatMap: (
                 <div className="ui card">
                     <div className="image">
-                        <HeatMap duration={120} itemSize={6} data={dataArray}/>
+                        <HeatMap duration={300} itemSize={6} data={dataArray}/>
                     </div>
                     <div className="content">
                         <div className="meta">
