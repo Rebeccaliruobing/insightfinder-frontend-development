@@ -91,5 +91,5 @@ frontend/manifest-dev.json
 
 # Jetbrains
 .idea
-static/html/dev
+static/dev
 backend/config/default.py

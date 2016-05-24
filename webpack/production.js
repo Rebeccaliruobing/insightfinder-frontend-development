@@ -70,7 +70,7 @@ module.exports = merge({}, {
     // index.html
     new HtmlWebpackPlugin({
         title: 'InsightFinder',
-        filename: 'html/index.html',
+        filename: 'index.html',
         template: './templates/index.ejs',
         inject: false,
         alwaysWriteToDisk: true,

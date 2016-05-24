@@ -2,7 +2,8 @@ import './app.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, hashHistory, IndexRoute, IndexRedirect} from 'react-router';
+import {Router, Route, browserHistory, useRouterHistory, IndexRoute, IndexRedirect} from 'react-router';
+import { createHashHistory } from 'history'
 import {Console, Link} from './artui/react';
 import {routes as cloutRoutes} from './components/cloud';
 import {Settings} from './components/settings';
@@ -41,11 +42,13 @@ const App = function(props) {
   );
 };
 
+const appHistory = useRouterHistory(createHashHistory)({ queryKey: false })
+
 $('body').prepend($(`<div id='${APPID}'></div>`))
 const appBody = document.querySelector(`#${APPID}`);
 if (appBody) {
   ReactDOM.render((
-    <Router history={hashHistory}>
+    <Router history={appHistory}>
       <Route component={App} path="/">
         <IndexRedirect to="/cloud" />
         {cloutRoutes}

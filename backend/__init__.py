@@ -27,6 +27,7 @@ def create_app(config_name):
     # - app.root_dir为backend目录, 以方便template文件的查找
     # - 静态文件路径通过配置参数设置, 缺省为根路径下的static
     app.static_folder = app.config['STATIC_FOLDER']
+    app.template_folder = app.config['TEMPLATE_FOLDER']
 
     # 在加载其它模块前加载core模块
     from .core import init_app as core_init_app

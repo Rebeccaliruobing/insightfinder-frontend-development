@@ -14,6 +14,7 @@ root_dir = PurePath(os.path.dirname(__file__)).parent.parent
 # 根据当前文件路径获得应用的路径及静态文件目录
 BASE_DIR = str(root_dir)
 STATIC_FOLDER = str(root_dir/'static')
+TEMPLATE_FOLDER = str(root_dir/'static')
 
 # Flask用于对Session中的数据进行加密的密钥, 与密码加密无关.
 # 生成环境从FLASK_SECRET_KEY环境变量中获得

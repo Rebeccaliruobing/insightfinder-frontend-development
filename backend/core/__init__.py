@@ -50,11 +50,6 @@ def init_app(app):
 
     hashids = Hashids(salt='OnlyParanoidCanSurvive')
 
-    # 初始化资源文件处理组件
-    from .assets import Assets
-    asset = Assets()
-    asset.init_app(app)
-
     # 开发时用于原型设计的组件
     if app.config.get('PROTOTYPE_ENABLED', False):
         from .prototype import clorem, avatars, wireframes
