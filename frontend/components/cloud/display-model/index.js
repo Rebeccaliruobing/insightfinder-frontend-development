@@ -1,15 +1,14 @@
-import React, { Component } from 'react';
-
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
+import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
-import DateTimePicker from "../../ui/datetimepicker";
-import RcSlider from '../../ui/rc-slider';
-import HeatMap from '../../ui/graph/HeatMap';
+
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {ProjectSelection, ModelType, AnomalyThreshold, WindowWithWeek} from '../../selections';
 
-import mockData from '../../../mock/cloud/OutlierDetection.json';
+import DateTimePicker from "../../ui/datetimepicker";
 
-export default class OutlierDetection extends Component {
+export default class DisplayModel extends Component {
 
     constructor(props) {
         super(props);
@@ -113,7 +112,7 @@ export default class OutlierDetection extends Component {
                             <i className="right angle icon divider"/>
                             <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
                             <i className="right angle icon divider"/>
-                            <div className="active section">Outlier Detection</div>
+                            <div className="active section">Display Model</div>
                         </div>
                         <ButtonGroup className="right floated basic icon">
                             <Button onClick={this.handleToggleFilterPanel.bind(this)}>
@@ -159,30 +158,41 @@ export default class OutlierDetection extends Component {
 
                         <div className="ui success message">
                             <ol>
-                                <li><span className="bold">Project Name:</span>nickname of your cloud project.
+                                <li>Anomaly detection results will be returned immediately if a model is already
+                                    available for the specified incident duration. The incident duration should be
+                                    within the model duration and the length of the incident should be no more than half
+                                    of the model duration. Otherwise, a new model will be created to cover the specified
+                                    incident duration. All the available models are shown in the right side list.
                                 </li>
                                 <li>
-                                    <span className="bold">Start time/end time/window:</span>
-                                    models falling into user specified window are loaded.
+                                    <span className="bold">Model Type: </span>
+                                    choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric.
                                 </li>
-                                <li>Review heat maps modeling the behavior of each instance.</li>
+                                <li>
+                                    <span className="bold">Anomaly Threshold: </span>
+                                    choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies.
+                                </li>
+                                <li>
+                                    <span className="bold">Duration Threshold:</span>
+                                    number of minutes of continuous anomalies to trigger an alert.
+                                </li>
+                                <li>
+                                    <span className="bold">Start time/end time/duration: </span>
+                                    user specified analysis period.
+                                </li>
+                                <li>
+                                    Previously analyzed incidents: click to populate period for rerun of a previously analyzed incident.
+                                </li>
+                                <li>
+                                    Available model duration includes a list of models for the current project.
+                                </li>
                             </ol>
                         </div>
                     </div>
 
                     <div className="ui vertical segment">
                         <div className="ui info message">
-                            Each heat map models the behavior of one instance. Red areas represent frequent behaviors
-                            (i.e. normal states) and the size of the red areas indicates the ranges of different metric
-                            values.
-                        </div>
-                        <div className="padding40">
-                            <RcSlider max={6} value={this.state.dateIndex}
-                                      marks={_.zipObject(_.range(0, 6), _.range(0, 6).map((index)=> moment(mockData.data[index].startTime).format('YYYY-MM-DD HH:mm')))}
-                                      onChange={this.handleDateIndexChange.bind(this)}/>
-                        </div>
-                        <div className="ui four cards">
-                            {this.state.heatMap}
+                            
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,7 @@
  * Common js libraries used in all pages.
  */
 
+import 'babel-polyfill';
 import 'jquery';
 import 'react';
 import 'react-dom';

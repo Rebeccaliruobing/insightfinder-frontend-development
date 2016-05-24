@@ -25,6 +25,10 @@ const ProjectDetails = class extends React.Component {
   
   componentWillUnmount() {
   }
+
+  handleHighlight(v){
+    return Math.max.apply(Math, v) > 850 ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
+  }
     
   render() {
     let {project} = this.props;
@@ -40,9 +44,15 @@ const ProjectDetails = class extends React.Component {
                 Summary
               </div>
               <div className="content active">
-                <Dygraph data={[[1,10], [2,20], [3,50], [4,70]]} 
-                         labels={['x', 'y']}
-                         style={{height: 150}}/>
+                <Dygraph data={_.range(0, 20).map((item, index)=>[index, Math.random() * 1000, Math.random() * 1000])}
+                         labels={['x', 'disk1', 'disk2']}
+                         highlightCircleSize={2}
+                         highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                         highlightCallback={this.handleHighlight}/>
               </div>
             </Accordion>
             <Accordion>
@@ -51,9 +61,16 @@ const ProjectDetails = class extends React.Component {
                  Network Group1
               </div>
               <div className="content active">
-                <Dygraph data={[[1,10], [2,20], [3,50], [4,70]]} 
+                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                          labels={['x', 'y']}
-                         style={{height: 150}}/>
+                         style={{height: 150}}
+                         highlightCircleSize={2}
+                         highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                         highlightCallback={this.handleHighlight}/>
               </div>
             </Accordion>
             <Accordion>
@@ -62,9 +79,16 @@ const ProjectDetails = class extends React.Component {
                 Network Group2
               </div>
               <div className="content active">
-                <Dygraph data={[[1,10], [2,20], [3,50], [4,70]]} 
+                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                          labels={['x', 'y']}
-                         style={{height: 150}}/>
+                         style={{height: 150}}
+                         highlightCircleSize={2}
+                         highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                         highlightCallback={this.handleHighlight}/>
               </div>
             </Accordion>
             <Accordion>
@@ -73,9 +97,16 @@ const ProjectDetails = class extends React.Component {
                 Network Group3
               </div>
               <div className="content active">
-                <Dygraph data={[[1,10], [2,20], [3,50], [4,70]]} 
+                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                          labels={['x', 'y']}
-                         style={{height: 150}}/>
+                         style={{height: 150}}
+                         highlightCircleSize={2}
+                         highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                         highlightCallback={this.handleHighlight}/>
               </div>
             </Accordion>
           </div>

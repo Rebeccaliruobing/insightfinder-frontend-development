@@ -5,7 +5,11 @@ import {Route, IndexRedirect} from 'react-router';
 import Navbar from './navbar';
 
 import LiveMonitoring from './monitoring';
+import IncidentAnalysis from './incident-analysis';
 import OutlierDetection from './outlier-detection';
+import SoftwareRolloutCheck from './software-rollout-check';
+import SummaryReport from './summary-report';
+import DisplayModel from './display-model';
 
 export class Cloud extends React.Component {
   render() {
@@ -22,6 +26,10 @@ export const routes = (
     <Route component={Cloud} path="cloud">
       <IndexRedirect to="monitoring" />
       <Route component={LiveMonitoring} path="monitoring" />
-      <Route component={OutlierDetection} path="outlier" />
+      <Route component={IncidentAnalysis} path="incident-analysis" />
+      <Route component={OutlierDetection} path="outlier-detection" />
+      <Route component={SoftwareRolloutCheck} path="software-rollout-check" />
+      <Route component={SummaryReport} path="summary-report" />
+      <Route component={DisplayModel} path="display-model" />
     </Route>
 )

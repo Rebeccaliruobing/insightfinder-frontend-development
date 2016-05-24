@@ -9,11 +9,11 @@ export default function(props) {
           <a className="active title"><i className="dropdown icon"/>Monitoring</a>
           <div className="active content menu">
             <Link to="/cloud/monitoring" className="item">Live Monitoring</Link>
-            <Link to="/cloud/incident" className="item">Incident Analysis</Link>
-            <Link to="/cloud/outlier" className="item">Cluster Outlier Detection</Link>
-            <Link to="/cloud/rollout" className="item">Software Rollout Check</Link>
-            <Link to="/cloud/summary" className="item">Summary Report</Link>
-            <Link to="/cloud/display" className="item">Display Model</Link>
+            <Link to="/cloud/incident-analysis" className="item">Incident Analysis</Link>
+            <Link to="/cloud/outlier-detection" className="item">Cluster Outlier Detection</Link>
+            <Link to="/cloud/software-rollout-check" className="item">Software Rollout Check</Link>
+            <Link to="/cloud/summary-report" className="item">Summary Report</Link>
+            <Link to="/cloud/display-model" className="item">Display Model</Link>
           </div>
         </div>
         <div className="item">

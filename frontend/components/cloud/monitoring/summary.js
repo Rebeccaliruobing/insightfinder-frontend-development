@@ -11,17 +11,7 @@ class ProjectsSummary extends BaseComponent {
   constructor(props) {
     super(props);
 
-    this.projectData = [
-      [1,0.1],
-      [2,0.2],
-      [3,0.43],
-      [4,0.33],
-      [5,0.13],
-      [6,0.03],
-      [7,0.03],
-      [8,0.03],
-      [9,0.13],
-    ];
+    this.projectData = _.range(0, 20).map((item, index)=>[index, Math.random() * 1000]);
     
     this.annotations = [{
       series: 'y',
