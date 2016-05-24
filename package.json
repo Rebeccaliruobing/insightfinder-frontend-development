@@ -58,9 +58,9 @@
     "jquery": "^2.2.3",
     "moment": "^2.13.0",
     "rc-slider": "^3.6.2",
-    "react": "^15.0.2",
+    "react": "^15.1.0",
     "react-addons-pure-render-mixin": "^15.1.0",
-    "react-dom": "^15.0.2",
+    "react-dom": "^15.1.0",
     "react-router": "^2.4.0",
     "react-timeout": "^1.0.0"
   }
