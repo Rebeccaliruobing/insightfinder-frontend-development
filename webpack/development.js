@@ -65,6 +65,13 @@ module.exports = merge({}, {
       inject: false,
       alwaysWriteToDisk: true
     }),
+    new HtmlWebpackPlugin({
+      title: 'InsightFinder',
+      filename: 'dev/liveMonitoring.html',
+      template: './templates/liveMonitoring.ejs',
+      inject: false,
+      alwaysWriteToDisk: true
+    }),
 
     new HtmlWebpackHarddiskPlugin({
         outputDir: settings.output.path

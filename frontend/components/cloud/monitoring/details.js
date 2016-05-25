@@ -4,8 +4,10 @@
 
 import $ from 'jquery';
 import React from 'react';
+import {withRouter} from 'react-router';
 import classNames from 'classnames';
-import {Accordion} from '../../../artui/react';
+
+import {Console, ButtonGroup, Button, Link, Accordion} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 
 const ProjectDetails = class extends React.Component {
@@ -13,7 +15,8 @@ const ProjectDetails = class extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      summary: [[]]
+      view: 'grid',
+      selectedGroup: ''
     }
   }
 
@@ -29,158 +32,244 @@ const ProjectDetails = class extends React.Component {
   handleHighlight(v){
     return Math.max.apply(Math, v) > 850 ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
   }
+  
+  handleClick(group) {
+    return () => {
+      this.setState({selectedGroup: group})
+    }
+  }
     
-  render() {
-    let {project} = this.props;
-    
+  renderNavs() {
     return (
-      <div className="ui vertical segment">
-        <h4 className="ui header">{project}</h4>
-        <div className="ui grid">
-          <div className="twelve wide column">
-            <Accordion>
-              <div className="title active">
-                <i className="dropdown icon"/>
-                Summary
-              </div>
-              <div className="content active">
-                <Dygraph data={_.range(0, 20).map((item, index)=>[index, Math.random() * 1000, Math.random() * 1000])}
-                         labels={['x', 'disk1', 'disk2']}
-                         highlightCircleSize={2}
-                         highlightSeriesOpts={{
-                          strokeWidth: 3,
-                          strokeBorderWidth: 1,
-                          highlightCircleSize: 5
-                        }}
-                         highlightCallback={this.handleHighlight}/>
-              </div>
-            </Accordion>
-            <Accordion>
-              <div className="title active">
-                <i className="dropdown icon"/>
-                 Network Group1
-              </div>
-              <div className="content active">
-                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
-                         labels={['x', 'y']}
-                         style={{height: 150}}
-                         highlightCircleSize={2}
-                         highlightSeriesOpts={{
-                          strokeWidth: 3,
-                          strokeBorderWidth: 1,
-                          highlightCircleSize: 5
-                        }}
-                         highlightCallback={this.handleHighlight}/>
-              </div>
-            </Accordion>
-            <Accordion>
-              <div className="title active">
-                <i className="dropdown icon"/>
-                Network Group2
-              </div>
-              <div className="content active">
-                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
-                         labels={['x', 'y']}
-                         style={{height: 150}}
-                         highlightCircleSize={2}
-                         highlightSeriesOpts={{
-                          strokeWidth: 3,
-                          strokeBorderWidth: 1,
-                          highlightCircleSize: 5
-                        }}
-                         highlightCallback={this.handleHighlight}/>
-              </div>
-            </Accordion>
-            <Accordion>
-              <div className="title active">
-                <i className="dropdown icon"/>
-                Network Group3
-              </div>
-              <div className="content active">
-                <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
-                         labels={['x', 'y']}
-                         style={{height: 150}}
-                         highlightCircleSize={2}
-                         highlightSeriesOpts={{
-                          strokeWidth: 3,
-                          strokeBorderWidth: 1,
-                          highlightCircleSize: 5
-                        }}
-                         highlightCallback={this.handleHighlight}/>
-              </div>
-            </Accordion>
+      <Console.Navbar>
+        <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
+          <div className="item">
+            <a className="active title"><i className="dropdown icon"/>List of Charts</a>
+            <div className="active content menu">
+              <Link to="" className="item">Summary</Link>
+              <Link to="" className="item">Normalization Group 1</Link>
+              <Link to="" className="item">Normalization Group 2</Link>
+            </div>
           </div>
-          <div className="four wide column">
-            <Accordion className="ui styled fluid accordion" exclusive={true}>
-              <div className="title">
-                <i className="dropdown icon"/>
-                A: CPU usuage
-              </div>
+          <div className="item">
+          </div>
+        </Accordion>
+      </Console.Navbar>
+    )
+  }
+
+  renderAnnotation() {
+    return (
+      <Accordion className="ui styled fluid accordion" exclusive={true}>
+        <div className="title">
+          <i className="dropdown icon"/>
+          A: CPU usuage
+        </div>
+        <div className="content">
+          <div className="ui threaded comments">
+            <div className="comment">
               <div className="content">
-                <div className="ui threaded comments">
-                  <div className="comment">
-                    <div className="content">
-                      <a className="author">Matt</a>
-                      <div className="metadata">
-                        <span className="date">Today at 5:42PM</span>
-                      </div>
-                      <div className="text">
-                        Do something!
-                      </div>
-                    </div>
-                  </div>
-                  <div className="comment">
-                    <div className="content">
-                      <a className="author">Jacob</a>
-                      <div className="metadata">
-                        <span className="date">Today at 6:02PM</span>
-                      </div>
-                      <div className="text">
-                        Fixed!
-                      </div>
-                    </div>
-                  </div>
-                  <form className="ui reply form">
-                    <div className="field">
-                      <textarea rows="3"></textarea>
-                    </div>
-                    <div className="ui blue labeled submit icon button">
-                      <i className="icon edit"></i> Add Reply
-                    </div>
-                  </form>
+                <a className="author">Matt</a>
+                <div className="metadata">
+                  <span className="date">Today at 5:42PM</span>
+                </div>
+                <div className="text">
+                  Do something!
                 </div>
               </div>
-              <div className="title">
-                <i className="dropdown icon"/>
-                B: Network
-              </div>
+            </div>
+            <div className="comment">
               <div className="content">
-                <div className="ui threaded comments">
-                  <div className="comment">
-                    <div className="content">
-                      <a className="author">Matt</a>
-                      <div className="metadata">
-                        <span className="date">Today at 5:42PM</span>
-                      </div>
-                      <div className="text">
-                        Do something!
-                      </div>
-                    </div>
-                  </div>
-                  <form className="ui reply form">
-                    <div className="field">
-                      <textarea rows="3"></textarea>
-                    </div>
-                    <div className="ui blue labeled submit icon button">
-                      <i className="icon edit"></i> Add Reply
-                    </div>
-                  </form>
+                <a className="author">Jacob</a>
+                <div className="metadata">
+                  <span className="date">Today at 6:02PM</span>
+                </div>
+                <div className="text">
+                  Fixed!
                 </div>
               </div>
-            </Accordion>
+            </div>
+            <form className="ui reply form">
+              <div className="field">
+                <textarea rows="3"></textarea>
+              </div>
+              <div className="ui blue labeled submit icon button">
+                <i className="icon edit"></i> Add Reply
+              </div>
+            </form>
           </div>
         </div>
+        <div className="title">
+          <i className="dropdown icon"/>
+          B: Network
+        </div>
+        <div className="content">
+          <div className="ui threaded comments">
+            <div className="comment">
+              <div className="content">
+                <a className="author">Matt</a>
+                <div className="metadata">
+                  <span className="date">Today at 5:42PM</span>
+                </div>
+                <div className="text">
+                  Do something!
+                </div>
+              </div>
+            </div>
+            <form className="ui reply form">
+              <div className="field">
+                <textarea rows="3"></textarea>
+              </div>
+              <div className="ui blue labeled submit icon button">
+                <i className="icon edit"></i> Add Reply
+              </div>
+            </form>
+          </div>
+        </div>
+      </Accordion>
+    )
+  }
+  
+  renderSelectedGroup() {
+    return (
+      <div className="ui grid">
+        <div className="twelve wide column">
+          <Dygraph data={_.range(0, 20).map((item, index)=>[index, Math.random() * 1000, Math.random() * 1000])}
+                   labels={['x', 'disk1', 'disk2']}
+                   style={{width: '100%'}}
+                   highlightCircleSize={2}
+                   highlightSeriesOpts={{
+                          strokeWidth: 1,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 3
+                        }}
+                   highlightCallback={this.handleHighlight}/>
+        </div>
+        <div className="four wide column">
+          {this.renderAnnotation()}
+        </div>
       </div>
+    );
+  }
+
+  renderGroups() {
+    let groups = [
+      'Summary',
+      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
+      'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+    ];
+    let elems = [];
+
+    groups.map((group, index) => {
+      elems.push((
+        <div key={group} className="ui card" onClick={this.handleClick(group)}>
+          <div className="content">
+            <div className="header">{group}</div>
+            <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
+                     labels={['x', 'y']}
+                     style={{height: 150}}
+                     highlightCircleSize={2}
+                     highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                     highlightCallback={this.handleHighlight}/>
+          </div>
+        </div>
+      ));
+    });
+    return elems;
+
+  }
+  
+  renderList() {
+    let groups = [
+      'Summary',
+      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
+      'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+    ];
+    let elems = [];
+    groups.map((group, index) => {
+      elems.push((
+        <Accordion>
+          <div className="content">
+            <div className="header">{group}</div>
+            <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
+                     labels={['x', 'y']}
+                     style={{height: 150}}
+                     highlightCircleSize={2}
+                     highlightSeriesOpts={{
+                          strokeWidth: 3,
+                          strokeBorderWidth: 1,
+                          highlightCircleSize: 5
+                        }}
+                     highlightCallback={this.handleHighlight}/>
+          </div>
+        </Accordion>
+      ));
+    });
+   
+    return (
+      <div className="ui grid">
+        <div className="twelve wide column">
+          {elems}
+        </div>
+        <div className="four wide column">
+          {this.renderAnnotation()}
+        </div>
+      </div>
+    )
+  }
+
+  render() {
+    let {query} = this.props.location;
+    let project = query['project'];
+    let {view, selectedGroup} = this.state;
+
+    return (
+      <Console.Wrapper>
+        {this.renderNavs()}
+        <Console.Content>
+          <div className="ui main tiny container" ref={c => this._el = c}>
+            <div className="ui clearing vertical segment">
+              <div className="ui vertical segment">
+                {project}
+                <ButtonGroup className="right floated basic icon">
+                  <Button active={view == 'block'} onClick={()=>this.setState({view:'block'})}>
+                    <i className="block layout icon"/>
+                  </Button>
+                  <Button active={view == 'grid'} onClick={()=>this.setState({view:'grid'})}>
+                    <i className="grid layout icon"/>
+                  </Button>
+                  <Button active={view == 'list'} onClick={()=>this.setState({view:'list', selectedGroup: ''})}>
+                    <i className="list layout icon"/>
+                  </Button>
+                </ButtonGroup>
+              </div>
+              <div className="ui vertical segment">
+                {view == 'block' &&
+                <div className='ui three cards'>
+                  {this.renderGroups()}
+                </div>
+                }
+                {view == 'grid' &&
+                <div className='ui five cards'>
+                  {this.renderGroups()}
+                </div>
+                }
+                {view == 'list' && this.renderList()}
+              </div>
+              {!!selectedGroup &&
+              <div className="ui vertical segment">
+                <h4 className="ui header">{selectedGroup}</h4>
+                {this.renderSelectedGroup()}
+              </div>
+              }
+            </div>
+          </div>
+        </Console.Content>
+      </Console.Wrapper>
     )
   }
 };

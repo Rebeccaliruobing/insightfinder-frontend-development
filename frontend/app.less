@@ -5,6 +5,16 @@
   width: 100%;
 }
 
+.auth.ui.container{
+  @container-mixins();
+  .makeContainer(320px);
+}
+
+.auth .ui.header > .image {
+  width:  160px !important;
+  height: 58px;
+}
+
 .main.ui.container {
   width: auto !important;
   margin-left: @2spacer !important;
@@ -22,6 +32,10 @@
 
 .ui.console > .wrapper > .navbar {
   background: #6699CC;
+}
+
+.ui.console > .topbar {
+  z-index: 1000;
 }
 
 .ui.console > .topbar > .inner > .ui.menu {

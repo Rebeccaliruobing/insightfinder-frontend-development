@@ -84,7 +84,6 @@ class Dygraph extends BaseComponent {
 
       if (annotations) {
         this._dygraph.ready(() => {
-          console.log(this._dygraph);
           this._dygraph.setAnnotations(annotations);
         });
       }
