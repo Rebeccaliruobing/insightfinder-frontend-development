@@ -8,6 +8,7 @@ def init_app(app):
 
     from .main import MainView
     from .auth import AuthView
+    from . import apis
     main_view = MainView.as_view(b'main_view')
     auth_view = AuthView.as_view(b'auth_view')
 

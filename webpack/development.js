@@ -23,7 +23,7 @@ const settings = require('./common');
 module.exports = merge({}, {
   output: {
     pathinfo: true,
-    
+
     // TODO: 应使用js变量来替换
     publicPath: 'http://0.0.0.0:10086/static/'
   },
@@ -73,6 +73,7 @@ module.exports = merge({}, {
   ],
   devtool: '#inline-source-map',
   devServer: {
+    hot: true,
     port: 10086,
     host: '0.0.0.0',
     inline: false,

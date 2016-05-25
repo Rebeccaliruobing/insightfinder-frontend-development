@@ -10,6 +10,9 @@ import {ProjectSelection, ModelType, AnomalyThreshold, WindowWithWeek} from '../
 import mockData from '../../../mock/cloud/OutlierDetection.json';
 
 export default class OutlierDetection extends Component {
+    static contextTypes = {
+        userInstructions: React.PropTypes.object
+    };
 
     constructor(props) {
         super(props);
@@ -103,6 +106,7 @@ export default class OutlierDetection extends Component {
 
     render() {
         const {view, showAddPanel, params} = this.state;
+        const {userInstructions} = this.context;
 
         return (
             <Console.Content>
@@ -157,17 +161,7 @@ export default class OutlierDetection extends Component {
                         <i className="close link icon" style={{float:'right'}}
                            onClick={this.handleToggleFilterPanel.bind(this)}/>
 
-                        <div className="ui success message">
-                            <ol>
-                                <li><span className="bold">Project Name:</span>nickname of your cloud project.
-                                </li>
-                                <li>
-                                    <span className="bold">Start time/end time/window:</span>
-                                    models falling into user specified window are loaded.
-                                </li>
-                                <li>Review heat maps modeling the behavior of each instance.</li>
-                            </ol>
-                        </div>
+                        <div className="ui success message" dangerouslySetInnerHTML={{__html: userInstructions.cloudoutlier}}></div>
                     </div>
 
                     <div className="ui vertical segment">
