@@ -10,8 +10,6 @@ import {cloudRoute} from './components/cloud';
 import {Settings} from './components/settings';
 import './apis';
 
-const APPID = `app`;
-
 const EmptyContent = function(props) {
   return (
     <Console.Content style={{height: 1000}}>Hello Insightfinder!</Console.Content>
@@ -45,18 +43,15 @@ const App = function(props) {
 
 const appHistory = useRouterHistory(createHashHistory)({ queryKey: false })
 
-$('body').prepend($('<div id="${APPID}"></div>'));
-const appBody = document.querySelector(`#${APPID}`);
-if (appBody) {
-  ReactDOM.render((
-    <Router history={appHistory}>
-      <Route component={App} path="/">
-        <IndexRedirect to="/cloud" />
-        {cloudRoute}
-        <Route component={Settings} path="settings" >
-          <IndexRoute component={EmptyContent} />
-        </Route>
+$('body').prepend($('<div id="app"></div>'));
+ReactDOM.render((
+  <Router history={appHistory}>
+    <Route component={App} path="/">
+      <IndexRedirect to="/cloud" />
+      {cloudRoute}
+      <Route component={Settings} path="settings" >
+        <IndexRoute component={EmptyContent} />
       </Route>
-    </Router>
-  ), appBody);
-}
+    </Route>
+  </Router>
+), document.querySelector('#app'));
