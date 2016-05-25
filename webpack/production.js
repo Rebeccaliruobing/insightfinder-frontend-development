@@ -81,6 +81,13 @@ module.exports = merge({}, {
       template: './templates/auth.ejs',
       inject: false,
       alwaysWriteToDisk: true
+    }),
+    new HtmlWebpackPlugin({
+      title: 'InsightFinder',
+      filename: 'liveMonitoring.html',
+      template: './templates/liveMonitoring.ejs',
+      inject: false,
+      alwaysWriteToDisk: true
     })
   ]
 },settings);

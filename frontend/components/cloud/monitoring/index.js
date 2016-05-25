@@ -4,7 +4,6 @@ import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../
 import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 import ProjectsSummary from './summary';
 import ProjectMetric from './metric';
-import ProjectDetails from './details';
 
 
 class LiveMonitoring extends React.Component {
@@ -18,8 +17,7 @@ class LiveMonitoring extends React.Component {
       view: 'chart',
       showAddPanel: false,
       addedName: '',
-      addedProjects: ['app2AWS', 'appWestAWS'],
-      detailedProject: ''
+      addedProjects: ['app2AWS', 'appWestAWS']
     };
     this.handleAddMonitoring.bind(this);
   }
@@ -38,10 +36,8 @@ class LiveMonitoring extends React.Component {
         return settings;
       },
       onSuccess: (resp) => {
-        alert(resp);
       },
       onError: (error) => {
-        alert(error);
       }
     });
   }
@@ -54,8 +50,12 @@ class LiveMonitoring extends React.Component {
     });
   }
 
+  handleProjectSelected(project) {
+    window.open('/liveMonitoring?project=' + project);
+  }
+
   render() {
-    const {view, showAddPanel, addedProjects, detailedProject} = this.state;
+    const {view, showAddPanel, addedProjects} = this.state;
     
     return (
       <Console.Content>
@@ -100,14 +100,13 @@ class LiveMonitoring extends React.Component {
             </div>
           }
           { (view == 'chart') && 
-          <ProjectsSummary projects={addedProjects} 
-                           onProjectSelected={(project) => this.setState({detailedProject: project})} />
+          <ProjectsSummary projects={addedProjects}
+                           onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
           { (view == 'table') &&
           <ProjectMetric projects={addedProjects} 
-                         onProjectSelected={(project) => this.setState({detailedProject: project})}/>
+                         onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
-          { !!detailedProject && <ProjectDetails project={detailedProject} />}
         </div>
       </Console.Content>
     )
