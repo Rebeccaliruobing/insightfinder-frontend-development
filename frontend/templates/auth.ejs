@@ -8,12 +8,12 @@
     <% for (var css in htmlWebpackPlugin.files.chunks.commons.css){ %>
     <link href="<%= htmlWebpackPlugin.files.chunks.commons.css[css] %>" rel="stylesheet">
     <% } %>
-    <% for (var css in htmlWebpackPlugin.files.chunks.app.css) { %>
-    <link href="<%= htmlWebpackPlugin.files.chunks.app.css[css] %>" rel="stylesheet">
+    <% for (var css in htmlWebpackPlugin.files.chunks.auth.css) { %>
+    <link href="<%= htmlWebpackPlugin.files.chunks.auth.css[css] %>" rel="stylesheet">
     <% } %>
 </head>
 <body>
 <script src="<%= htmlWebpackPlugin.files.chunks.commons.entry %>"></script>
-<script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>"></script>
+<script src="<%= htmlWebpackPlugin.files.chunks.auth.entry %>"></script>
 </body>
 </html>

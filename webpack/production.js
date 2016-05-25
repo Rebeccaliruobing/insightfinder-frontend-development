@@ -73,7 +73,14 @@ module.exports = merge({}, {
         filename: 'index.html',
         template: './templates/index.ejs',
         inject: false,
-        alwaysWriteToDisk: true,
+        alwaysWriteToDisk: true
     }),
+    new HtmlWebpackPlugin({
+      title: 'InsightFinder',
+      filename: 'auth.html',
+      template: './templates/auth.ejs',
+      inject: false,
+      alwaysWriteToDisk: true
+    })
   ]
 },settings);

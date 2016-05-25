@@ -22,7 +22,7 @@ export class Cloud extends React.Component {
   }
 }
 
-export const routes = (
+export const cloudRoute = (
     <Route component={Cloud} path="cloud">
       <IndexRedirect to="monitoring" />
       <Route component={LiveMonitoring} path="monitoring" />

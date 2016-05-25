@@ -1,25 +1,15 @@
 import './auth.less';
 
+import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, IndexRoute, IndexRedirect} from 'react-router';
+import {Router, browserHistory} from 'react-router';
 
-import {Login} from './components/auth';
+import {AuthRoute} from './components/auth';
 
-const App = function(props) {
-  return (
-    props.children
-  );
-};
-
-const appBody = document.querySelector('#auth');
-if (appBody) {
-  ReactDOM.render((
-    <Router history={browserHistory}>
-      <Route component={App} path="auth">
-        <IndexRedirect to="/auth/login" />
-        <Route component={Login} path="login" />
-      </Route>
-    </Router>
-  ), appBody);
-}
+$('body').prepend($('<div id="app"></div>'));
+ReactDOM.render((
+  <Router history={browserHistory}>
+    {AuthRoute}
+  </Router>
+), document.querySelector('#app'));

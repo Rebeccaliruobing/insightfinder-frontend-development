@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import React from 'react';
-import classNames from 'classnames';
+import cx from 'classnames';
 import {BaseComponent, PropTypes, Input} from '../../artui/react';
 
 const logo = require('../../images/logo.png');
@@ -12,6 +12,10 @@ class Login extends BaseComponent {
   constructor(props) {
     super(props);
     this._$el = null;
+    this.state = {
+      userName: '',
+      password: ''
+    }
   }
   
   componentDidMount() {
@@ -21,15 +25,13 @@ class Login extends BaseComponent {
         method: 'POST',
         beforeSend: (settings) => {
           settings.data = {
-            'userName': 'guest',
-            'password': 'Have1insight!'
+            'userName': this.state['userName'],
+            'password': this.state['password']
           };
           return settings;
         },
         onSuccess: (resp) => {
-          console.log(resp);
-          alert('设置成功!');
-          window.location.reload();
+          window.location.href = '/';
         },
         onFailure: (resp) => {
           console.log(resp);
@@ -39,6 +41,9 @@ class Login extends BaseComponent {
   }
   
   render() {
+    const {userName, password} = this.state;
+    let disabled = !userName || !password;
+    
     return (
       <form className="ui form" ref={c=>this._$el = $(c)} >
         <h2 className="ui image header">
@@ -49,17 +54,20 @@ class Login extends BaseComponent {
             <label>User Name</label>
             <div className="ui icon input">
               <i className="user icon"/>
-              <input type="text" name="userName"/>
+              <input type="text" name="userName" value={userName}
+                     onChange={(e) => this.setState({userName: e.target.value})} />
             </div>
           </div>
           <div className="field required">
             <label>Password</label>
             <div className="ui icon input">
               <i className="lock icon"/>
-              <input type="password" name="password"/>
+              <input type="password" name="password" 
+                     value={password}
+                     onChange={(e) => this.setState({password: e.target.value})}/>
             </div>
           </div>
-          <div className="ui fluid orange submit button">Sign In</div>
+          <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Sign In</div>
         </div>
       </form>
     )
