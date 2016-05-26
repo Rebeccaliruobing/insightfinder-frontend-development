@@ -88,7 +88,7 @@ class HeatMapCard extends Component {
                                 Group 1
                             </div>
                             <div className="image content">
-                                <div>
+                                <div style={{width: '100%'}}>
 
                                     <Dygraph
                                         data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
@@ -101,7 +101,7 @@ class HeatMapCard extends Component {
                                           highlightCircleSize: 5}}
                                         highlightCallback={this.handleHighlight}/>
                                 </div>
-                                <div>
+                                <div style={{width: '100%'}}>
                                     <Dygraph
                                         data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                                         labels={['x', 'y']}
@@ -113,7 +113,7 @@ class HeatMapCard extends Component {
                                           highlightCircleSize: 5}}
                                         highlightCallback={this.handleHighlight}/>
                                 </div>
-                                <div>
+                                <div style={{width: '100%'}}>
                                     <Dygraph
                                         data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                                         labels={['x', 'y']}
