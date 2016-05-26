@@ -87,7 +87,7 @@ class HeatMapCard extends Component {
                             <div className="header">
                                 Group 1
                             </div>
-                            <div className="image content">
+                            <div className="content">
                                 <div style={{width: '100%'}}>
 
                                     <Dygraph
