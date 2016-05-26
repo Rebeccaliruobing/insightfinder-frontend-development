@@ -4,9 +4,155 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, WindowWithWeek} from '../../selections';
+import {
+    ProjectSelection,
+    ModelType,
+    AnomalyThreshold,
+    WindowWithWeek,
+    DurationThreshold,
+    DurationHour
+} from '../../selections';
 
-import DateTimePicker from "../../ui/datetimepicker";
+import DateTimePicker from "../../ui/datetimepicker/index";
+
+
+class FilterBar extends Component {
+    static contextTypes = {
+        userInstructions: React.PropTypes.object,
+        dashboardUservalues: React.PropTypes.object
+    };
+
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
+    handleAddMonitoring() {
+
+    }
+
+    handleEndTimeChange(endTime) {
+        let startTime, params = this.state.params;
+        startTime = moment(endTime).add(-7 * params.weeks, 'days').toDate();
+        params = Object.assign({}, params, {
+            startTime: startTime,
+            endTime: endTime
+        });
+        this.setState({params: params});
+
+    }
+
+    handleWeeksChange(v) {
+        this.setState({
+            params: Object.assign({}, this.state.params, {weeks: v})
+        }, ()=> {
+            this.handleEndTimeChange(this.state.params.endTime);
+        })
+    }
+
+    handleClickIncident(incident) {
+        return (e) => {
+
+            //    2016-05-24T17:10:20.895Z_2016-05-24T23:39:00.136Z_a3291001893c3d27047dbc2cbf114b64e2d33256_0.99_3
+            let [startTime, endTime, incidentId, anomalyThreshold, ] = incident.split("_");
+            this.setState({
+                startTime: moment(startTime).toDate(),
+                endTime: moment(endTime).toDate(),
+            })
+        }
+
+    }
+
+    _incidentsRef(c) {
+
+    }
+
+    render() {
+        const {startTime, endTime, } = this.state;
+        const {params} = this.props;
+        const {userInstructions, dashboardUservalues} = this.context;
+        const labelStyle = {
+            width: '130px'
+        };
+
+        const incidentInfo = (dashboardUservalues.incidentAllInfo || []).find((item)=>item.projectName == this.state.addedName);
+        const incidentList = (incidentInfo && incidentInfo.incidentList) || [];
+
+        console.log(dashboardUservalues);
+        return (
+            <div className="ui form">
+                <div className="inline fields">
+                    <div className="four wide field">
+                        <label style={labelStyle}>Projects</label>
+                        <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}}/>
+                    </div>
+                    <div className="four wide field">
+                        <label style={labelStyle}>Model Type</label>
+                        <ModelType/>
+                    </div>
+                    <div className="four wide field">
+                        <label style={labelStyle}>Anomaly Threshold</label>
+                        <AnomalyThreshold/>
+                    </div>
+                    <div className="four wide field">
+                        <label style={labelStyle}>Duration Threshold (Minute)</label>
+                        <DurationThreshold/>
+                    </div>
+                </div>
+                <div className="inline fields">
+                    <div className="four wide field">
+                        <label style={labelStyle}>Duration (Hour)</label>
+                        <DurationHour />
+                    </div>
+                    <div className="four wide field">
+                        <label style={labelStyle}>Start Time</label>
+                        <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm'
+                                        value={startTime} disabled/>
+
+                    </div>
+
+
+                    <div className="four wide field">
+                        <label style={labelStyle}>End Time</label>
+                        <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm'
+                                        value={endTime}
+                                        onChange={this.handleEndTimeChange.bind(this)}/>
+
+                    </div>
+                    <div className="four wide field"></div>
+
+                </div>
+
+                <div className="ui field">
+                    <Button className="orange"
+                            onClick={this.handleAddMonitoring.bind(this)}>Add
+                    </Button>
+                    <Button className="orange">Add & Save</Button>
+                </div>
+
+                <div ref={this._incidentsRef}>
+                    <div className="ui middle aligned divided list">
+                        {incidentList.map((incident)=> {
+                            let [startTime, endTime, incidentId, anomalyThreshold, ] = incident.split("_");
+
+                            return (
+                                <div className="item" key={incident}>
+                                    <div className="content" onClick={this.handleClickIncident(incident)}>
+                                        <a className="header">
+                                            Start Time: {moment(startTime).toString()},
+                                            End Time: {moment(endTime).toString()}
+                                        </a>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+
+            </div>
+        )
+    }
+}
 
 export default class IncidentDetection extends Component {
 
@@ -32,71 +178,8 @@ export default class IncidentDetection extends Component {
     }
 
     componentDidMount() {
-        // this.setHeatMap(0, 0);
-    }
-
-    // setHeatMap(dateIndex = 0, timeIndex = 0) {
-    //     let dataArray = [];
-    //     mockData.data[dateIndex].mapData.NASValues.forEach((line, index) => {
-    //         var lineArray = line.split(",");
-    //         var colIndex = lineArray.splice(0, 1);
-    //         dataArray.push({
-    //             colIndex: colIndex % 32,
-    //             rowIndex: parseInt(index / 32),
-    //             value: lineArray[lineArray.length - 2]
-    //         });
-    //     });
-    //
-    //     this.setState({
-    //         heatMap: (
-    //             <div className="ui card">
-    //                 <div className="image">
-    //                     <a href="#/cloud/monitoring" target="_blank">
-    //                         <HeatMap duration={300} itemSize={6} data={dataArray}/>
-    //                     </a>
-    //                 </div>
-    //                 <div className="content">
-    //                     <div className="meta">
-    //                         <span className="date">
-    //                             {moment(mockData.data[dateIndex].startTime).format('YYYY-MM-DD HH:mm')}
-    //                         </span>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         )
-    //     });
-    // }
-
-    handleAddMonitoring() {
 
     }
-
-    handleEndTimeChange(endTime) {
-        let startTime, params = this.state.params;
-        startTime = moment(endTime).add(-7 * params.weeks, 'days').toDate();
-        params = Object.assign({}, params, {
-            startTime: startTime,
-            endTime: endTime
-        });
-        this.setState({params: params});
-
-    }
-
-    handleWeeksChange(v) {
-        this.setState({
-            params: Object.assign({}, this.state.params, {weeks: v})
-        }, ()=> {
-            this.handleEndTimeChange(this.state.params.endTime);
-        })
-    }
-
-    // handleDateIndexChange(value) {
-    //     this.setState({
-    //         dateIndex: parseInt(value),
-    //     }, ()=> {
-    //         this.setHeatMap(this.state.dateIndex, this.state.timeIndex);
-    //     })
-    // }
 
     handleToggleFilterPanel() {
         this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
@@ -138,29 +221,13 @@ export default class IncidentDetection extends Component {
 
                     <div className="ui vertical segment filterPanel" style={{display: 'none'}}
                          ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-                        <label>Projects</label>
-                        <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}}/>
-                        <label>Start Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.startTime} disabled/>
-                        </div>
-                        <label>End Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.endTime}
-                                            onChange={this.handleEndTimeChange.bind(this)}/>
-                        </div>
-                        <label>Window (Week)</label>
-                        <WindowWithWeek value={params.weeks} onChange={this.handleWeeksChange.bind(this)}/>
-                        <Button className="orange"
-                                onClick={this.handleAddMonitoring.bind(this)}>Add
-                        </Button>
-                        <Button className="orange">Add & Save</Button>
+
                         <i className="close link icon" style={{float:'right'}}
                            onClick={this.handleToggleFilterPanel.bind(this)}/>
+                        <FilterBar {...this.props}/>
 
-                        <div className="ui success message" dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}></div>
+                        <div className="ui success message"
+                             dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}></div>
                     </div>
 
                     <div className="ui vertical segment">

@@ -3,24 +3,32 @@ import {Dropdown, Link} from '../artui/react';
 import classNames from 'classnames';
 
 class ProjectSelection extends React.Component {
+
+    static contextTypes = {
+        dashboardUservalues: React.PropTypes.object
+    };
+
   constructor(props) {
     super(props);
     this.state = {
       projects: ['app3GAE', 'VCL5', 'hadoopAWS']
     }
   }
-  
+
   render() {
-    
-    let projects = this.state['projects'];
+
+
     let {value, ...others} = this.props;
-    
+
+    let projects= (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+
+    console.log(projects);
     return (
       <Dropdown mode="select" value={value} {...others}>
         <div className="menu">
           {
             projects.map((p) => {
-              return <div key={p} className="item">{p}</div>
+              return <div key={p.projectName} className="item">{p.projectName}</div>
             })
           }
         </div>
@@ -88,12 +96,27 @@ const WindowWithWeek = (props) => {
       </div>
     </Dropdown>
   )
-}
+};
+
+const DurationHour = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">6</div>
+        <div className="item">12</div>
+        <div className="item">18</div>
+        <div className="item">24</div>
+      </div>
+    </Dropdown>
+  )
+};
 
 export {
-  ProjectSelection, 
+  ProjectSelection,
   ModelType,
-  AnomalyThreshold, 
+  AnomalyThreshold,
   DurationThreshold,
-  WindowWithWeek
+  WindowWithWeek,
+  DurationHour
 };

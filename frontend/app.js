@@ -33,6 +33,24 @@ class App extends React.Component {
           this.setState({userInstructions: resp});
       });
       apis.postDashboardUserValues().then((resp)=>{
+          resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
+          resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
+          resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
+          resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
+          resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
+          resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
+
+          resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=>{
+              return Object.assign({}, info, {
+                  metricSettings: JSON.parse(info.metricSettings)
+              });
+          });
+
+          resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=>{
+              return Object.assign({}, info, {
+                  metaData: JSON.parse(info.metaData)
+              });
+          });
           this.setState({dashboardUservalues: resp});
       });
       apis.postDashboardDailySummaryReport().then((resp)=>{
