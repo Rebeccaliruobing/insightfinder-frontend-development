@@ -4,10 +4,7 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, WindowWithWeek} from '../../selections';
-
-import DateTimePicker from "../../ui/datetimepicker";
-
+import FilterBar from './filter-bar';
 export default class SoftwareRolloutCheck extends Component {
 
     static contextTypes = {
@@ -138,28 +135,9 @@ export default class SoftwareRolloutCheck extends Component {
 
                     <div className="ui vertical segment filterPanel" style={{display: 'none'}}
                          ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-                        <label>Projects</label>
-                        <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}}/>
-                        <label>Start Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.startTime} disabled/>
-                        </div>
-                        <label>End Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.endTime}
-                                            onChange={this.handleEndTimeChange.bind(this)}/>
-                        </div>
-                        <label>Window (Week)</label>
-                        <WindowWithWeek value={params.weeks} onChange={this.handleWeeksChange.bind(this)}/>
-                        <Button className="orange"
-                                onClick={this.handleAddMonitoring.bind(this)}>Add
-                        </Button>
-                        <Button className="orange">Add & Save</Button>
-                        <i className="close link icon" style={{float:'right'}}
+                        <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                            onClick={this.handleToggleFilterPanel.bind(this)}/>
-
+                        <FilterBar/>
                         <div className="ui success message" dangerouslySetInnerHTML={{__html: userInstructions.cloudrollout}}></div>
                     </div>
 

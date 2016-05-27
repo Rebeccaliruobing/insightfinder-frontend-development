@@ -4,11 +4,11 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, WindowWithWeek} from '../../selections';
-
-import DateTimePicker from "../../ui/datetimepicker";
-
+import FilterBar from './filter-bar';
 export default class SummaryReport extends Component {
+    static contextTypes = {
+        userInstructions: React.PropTypes.object
+    };
 
     constructor(props) {
         super(props);
@@ -102,7 +102,9 @@ export default class SummaryReport extends Component {
 
     render() {
         const {view, showAddPanel, params} = this.state;
+        const {userInstructions} = this.context;
 
+        console.log(userInstructions);
         return (
             <Console.Content>
                 <div className="ui main tiny container" ref={c => this._el = c}>
@@ -134,60 +136,13 @@ export default class SummaryReport extends Component {
 
                     <div className="ui vertical segment filterPanel" style={{display: 'none'}}
                          ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-                        <label>Projects</label>
-                        <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}}/>
-                        <label>Start Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.startTime} disabled/>
-                        </div>
-                        <label>End Time</label>
-                        <div className="ui input">
-                            <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                            value={params.endTime}
-                                            onChange={this.handleEndTimeChange.bind(this)}/>
-                        </div>
-                        <label>Window (Week)</label>
-                        <WindowWithWeek value={params.weeks} onChange={this.handleWeeksChange.bind(this)}/>
-                        <Button className="orange"
-                                onClick={this.handleAddMonitoring.bind(this)}>Add
-                        </Button>
-                        <Button className="orange">Add & Save</Button>
-                        <i className="close link icon" style={{float:'right'}}
+                        <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                            onClick={this.handleToggleFilterPanel.bind(this)}/>
-
-                        <div className="ui success message">
-                            <ol>
-                                <li>Anomaly detection results will be returned immediately if a model is already
-                                    available for the specified incident duration. The incident duration should be
-                                    within the model duration and the length of the incident should be no more than half
-                                    of the model duration. Otherwise, a new model will be created to cover the specified
-                                    incident duration. All the available models are shown in the right side list.
-                                </li>
-                                <li>
-                                    <span className="bold">Model Type: </span>
-                                    choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric.
-                                </li>
-                                <li>
-                                    <span className="bold">Anomaly Threshold: </span>
-                                    choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies.
-                                </li>
-                                <li>
-                                    <span className="bold">Duration Threshold:</span>
-                                    number of minutes of continuous anomalies to trigger an alert.
-                                </li>
-                                <li>
-                                    <span className="bold">Start time/end time/duration: </span>
-                                    user specified analysis period.
-                                </li>
-                                <li>
-                                    Previously analyzed incidents: click to populate period for rerun of a previously analyzed incident.
-                                </li>
-                                <li>
-                                    Available model duration includes a list of models for the current project.
-                                </li>
-                            </ol>
-                        </div>
+                        <FilterBar/>
+                        {userInstructions.clouddailysummary &&
+                            <div className="ui success message"
+                                 dangerouslySetInnerHTML={{__html: userInstructions.clouddailysummary}}></div>
+                        }
                     </div>
 
                     <div className="ui vertical segment">
