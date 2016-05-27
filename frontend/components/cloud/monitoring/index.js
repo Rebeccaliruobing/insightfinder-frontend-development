@@ -1,45 +1,30 @@
 import React from 'react';
 import {Link, IndexLink} from 'react-router';
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
+import {BaseComponent, Console, ButtonGroup, Button, 
+  Dropdown, Accordion, Message} from '../../../artui/react';
+import {ProjectSelection, 
+  ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 import ProjectsSummary from './summary';
 import ProjectMetric from './metric';
 
-
-class LiveMonitoring extends React.Component {
+class LiveMonitoring extends BaseComponent {
 
   constructor(props) {
     super(props);
 
     this._el = null;
-    
     this.state = {
-      view: 'chart',
+      view: 'summary',
       showAddPanel: false,
       addedName: '',
+      
       addedProjects: ['app2AWS', 'appWestAWS']
     };
+    
     this.handleAddMonitoring.bind(this);
   }
 
   componentDidMount() {
-    $.api({
-      action: 'liveAnalysis',
-      method: 'POST',
-      on: 'now',
-      beforeSend: (settings) => {
-        settings.data = {
-          'pvalue': '',
-          'cvalue': '',
-          'modelType': ''
-        };
-        return settings;
-      },
-      onSuccess: (resp) => {
-      },
-      onError: (error) => {
-      }
-    });
   }
   
   handleAddMonitoring() {
@@ -55,6 +40,7 @@ class LiveMonitoring extends React.Component {
   }
 
   render() {
+    
     const {view, showAddPanel, addedProjects} = this.state;
     
     return (
@@ -73,10 +59,10 @@ class LiveMonitoring extends React.Component {
               <Button><i className="setting icon"/></Button>
             </ButtonGroup>
             <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
+              <Button active={view == 'summary'} onClick={()=>this.setState({view:'summary'})}>
                 <i className="line chart icon"/>
               </Button>
-              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
+              <Button active={view == 'metric'} onClick={()=>this.setState({view:'metric'})}>
                 <i className="table icon"/>
               </Button>
             </ButtonGroup>
@@ -99,12 +85,12 @@ class LiveMonitoring extends React.Component {
                  onClick={() => this.setState({showAddPanel: false})}/>
             </div>
           }
-          { (view == 'chart') && 
+          { (view == 'summary') &&
           <ProjectsSummary projects={addedProjects}
                            onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
-          { (view == 'table') &&
-          <ProjectMetric projects={addedProjects} 
+          { (view == 'metric') &&
+          <ProjectMetric projects={addedProjects}
                          onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
         </div>
