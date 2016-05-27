@@ -14,7 +14,8 @@ class Login extends BaseComponent {
     this._$el = null;
     this.state = {
       userName: '',
-      password: ''
+      password: '',
+      error: ''
     }
   }
   
@@ -24,31 +25,46 @@ class Login extends BaseComponent {
         action: 'login',
         method: 'POST',
         beforeSend: (settings) => {
+          this.setState({
+            error: ''
+          });
           settings.data = {
             'userName': this.state['userName'],
             'password': this.state['password']
           };
           return settings;
         },
+        beforeXHR: function(xhr) {
+          xhr.setRequestHeader ('accept', 'application/json');
+          return xhr;
+        },
         onSuccess: (resp) => {
           window.location.href = '/';
         },
         onFailure: (resp) => {
-          console.log(resp);
+          if (resp && resp.message) {
+            this.setState({
+              error: resp.message
+            });
+          }
         }
       })
     }
   }
   
   render() {
-    const {userName, password} = this.state;
+    const {userName, password, error} = this.state;
     let disabled = !userName || !password;
     
     return (
-      <form className="ui form" ref={c=>this._$el = $(c)} >
+      <form className={cx('ui', {error: !!error}, 'form')} 
+            ref={c=>this._$el = $(c)} >
         <h2 className="ui image header">
           <img src={logo} className="image"/>
         </h2>
+        {!!error &&
+        <div className="ui error mini message">{error}</div>
+        }
         <div className="ui segment left aligned">
           <div className="field required">
             <label>User Name</label>

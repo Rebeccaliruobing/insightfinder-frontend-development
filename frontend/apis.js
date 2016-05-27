@@ -1,12 +1,24 @@
-// const baseUrl = 'https://insightfinderui.appspot.com/';
-const baseUrl = '/';
+const baseUrl = 'https://insightfinderui.appspot.com/api/v1/';
+const localBaseUrl = '/';
+
+// rest访问其他地址会导致跨域错误, 可安装chrome 插件
+// https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
+
+// TODO: [FIX] 返回的数据格式中success为字符串, 应为boolean类型.
+$.fn.api.settings.successTest = function(response) {
+  if(response && response.success && 
+    response.success.toLowerCase() === 'true'){
+    return response.success
+  }
+  return false;
+};
 
 $.fn.api.settings.api = {
-    'login': baseUrl + 'login-check',
-    'liveAnalysis': baseUrl + 'liveanalysis',
-    'userInstructions': `${baseUrl}static/userInstructions.json`,
-    'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
-    'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`
+    'login': `${baseUrl}login-check`,
+    'liveAnalysis': `${baseUrl}liveanalysis`,
+    'userInstructions': `${localBaseUrl}static/userInstructions.json`,
+    'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
+    'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
 };
 
 let request = function (method, action, data, resolve, reject) {
