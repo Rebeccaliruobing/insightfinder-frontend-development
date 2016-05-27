@@ -1,6 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
-import {BaseComponent, PropTypes, Table} from '../../../artui/react';
+import {BaseComponent, PropTypes, Accordion, Table} from '../../../artui/react';
 
 class ProjectMetric extends BaseComponent {
   static propTypes = {
@@ -8,7 +7,7 @@ class ProjectMetric extends BaseComponent {
 
   static defaultProps = {
   };
-  
+
   constructor(props) {
     super(props);
     this.projectData =[{
@@ -30,11 +29,11 @@ class ProjectMetric extends BaseComponent {
       diskReadBytes: [0.00, 0.0, 0.0, 0.0],
       diskWriteBytes: [0.00, 0.0, 0.0, 0.0]
     }];
-    
+
     this.state =  {
     }
   }
-  
+
   renderRow(instance) {
     return [
       <td key="inst">{instance.name}</td>,
@@ -76,14 +75,14 @@ class ProjectMetric extends BaseComponent {
     projects.map((project, index) => {
       let instances = this.projectData;
       if (instances.length > 0) {
-        
+
         rows.push((
           <tr key={project + '_' + instances[0].name}>
             <td rowSpan={instances.length}>{project}</td>
             {this.renderRow(instances[0])}
           </tr>
         ));
-        
+
         for(let i = 1; i < instances.length; ++i) {
           rows.push((
             <tr key={project + '_' + instances[i].name}>
@@ -96,58 +95,66 @@ class ProjectMetric extends BaseComponent {
 
     return rows;
   }
-    
+
   render() {
     return (
-      <div className="ui vertical segment">
-        <Table className="selectable single line striped celled structured">
-          <thead>
-          <tr>
-            <th rowSpan="2">Project</th>
-            <th rowSpan="2">Instance</th>
-            <th colSpan="4">CPU Utilization (%)</th>
-            <th colSpan="4">Disk Read Ops</th>
-            <th colSpan="4">Disk Write Ops</th>
-            <th colSpan="4">Network In (bytes)</th>
-            <th colSpan="4">Network Out (bytes)</th>
-            <th colSpan="4">Disk Read Bytes</th>
-            <th colSpan="4">Disk Write Bytes</th>
-          </tr>
-          <tr>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-            <th>Min</th>
-            <th>Max</th>
-            <th>Avg</th>
-            <th>Std</th>
-          </tr>
-          </thead>
-          <tbody>
-          {this.renderRows()}
-          </tbody>
-        </Table>
+      <div className="ui vertical segment" style={{width: '100%', overflowX: 'scroll'}}>
+        <Accordion>
+          <div className="active title">
+            <i className="dropdown icon"/>
+            AWS/CloudWatch
+          </div>
+          <div className="active content">
+            <Table className="selectable single line striped celled structured">
+              <thead>
+              <tr>
+                <th rowSpan="2">Project</th>
+                <th rowSpan="2">Instance</th>
+                <th colSpan="4">CPU Utilization (%)</th>
+                <th colSpan="4">Disk Read Ops</th>
+                <th colSpan="4">Disk Write Ops</th>
+                <th colSpan="4">Network In (bytes)</th>
+                <th colSpan="4">Network Out (bytes)</th>
+                <th colSpan="4">Disk Read Bytes</th>
+                <th colSpan="4">Disk Write Bytes</th>
+              </tr>
+              <tr>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+                <th>Min</th>
+                <th>Max</th>
+                <th>Avg</th>
+                <th>Std</th>
+              </tr>
+              </thead>
+              <tbody>
+              {this.renderRows()}
+              </tbody>
+            </Table>
+          </div>
+        </Accordion>
       </div>
     )
   }

@@ -1,13 +1,8 @@
-/*
- * Details
-**/
-
-import $ from 'jquery';
 import React from 'react';
 import {withRouter} from 'react-router';
-import classNames from 'classnames';
+import cx from 'classnames';
 
-import {Console, ButtonGroup, Button, Link, Accordion} from '../../../artui/react';
+import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 
 const ProjectDetails = class extends React.Component {
@@ -15,7 +10,7 @@ const ProjectDetails = class extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      view: 'grid',
+      view: 'four',
       selectedGroup: ''
     }
   }
@@ -152,7 +147,7 @@ const ProjectDetails = class extends React.Component {
     );
   }
 
-  renderGroups() {
+  renderGroups(view) {
     let groups = [
       'Summary',
       'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
@@ -162,7 +157,7 @@ const ProjectDetails = class extends React.Component {
 
     groups.map((group, index) => {
       elems.push((
-        <div key={group} className="ui card" onClick={this.handleClick(group)}>
+        <div key={view + group} className="ui card" onClick={this.handleClick(group)}>
           <div className="content">
             <div className="header">{group}</div>
             <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
@@ -226,36 +221,38 @@ const ProjectDetails = class extends React.Component {
     let {query} = this.props.location;
     let project = query['project'];
     let {view, selectedGroup} = this.state;
+    
+    let isListView = view === 'list';
+    let contentStyle = isListView ? {} : {paddingLeft:0};
 
     return (
       <Console.Wrapper>
-        {this.renderNavs()}
-        <Console.Content>
+        {isListView && this.renderNavs()}
+        <Console.Content style={contentStyle}>
           <div className="ui main tiny container" ref={c => this._el = c}>
             <div className="ui clearing vertical segment">
               <div className="ui vertical segment">
                 {project}
                 <ButtonGroup className="right floated basic icon">
-                  <Button active={view == 'block'} onClick={()=>this.setState({view:'block'})}>
-                    <i className="block layout icon"/>
-                  </Button>
-                  <Button active={view == 'grid'} onClick={()=>this.setState({view:'grid'})}>
-                    <i className="grid layout icon"/>
-                  </Button>
+                  <Dropdown className="compact" value={this.state['view']} mode="select"
+                            onChange={(value) => {this.setState({view: value})}}>
+                    <div className="menu">
+                      <div className="item" data-value="two">2</div>
+                      <div className="item" data-value="three">3</div>
+                      <div className="item" data-value="four">4</div>
+                      <div className="item" data-value="five">5</div>
+                      <div className="item" data-value="six">6</div>
+                    </div>
+                  </Dropdown>
                   <Button active={view == 'list'} onClick={()=>this.setState({view:'list', selectedGroup: ''})}>
                     <i className="list layout icon"/>
                   </Button>
                 </ButtonGroup>
               </div>
               <div className="ui vertical segment">
-                {view == 'block' &&
-                <div className='ui three cards'>
-                  {this.renderGroups()}
-                </div>
-                }
-                {view == 'grid' &&
-                <div className='ui five cards'>
-                  {this.renderGroups()}
+                {view !== 'list' &&
+                <div className={cx('ui', view, 'cards')}>
+                  {this.renderGroups(view)}
                 </div>
                 }
                 {view == 'list' && this.renderList()}

@@ -14,11 +14,11 @@ $.fn.api.settings.successTest = function(response) {
 };
 
 $.fn.api.settings.api = {
-    'login': `${baseUrl}login-check`,
-    'liveAnalysis': `${baseUrl}liveanalysis`,
-    'userInstructions': `${localBaseUrl}static/userInstructions.json`,
-    'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
-    'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
+  'login': `${baseUrl}login-check`,
+  'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
+  'liveAnalysis': `${baseUrl}liveanalysis`,
+  'userInstructions': `${localBaseUrl}static/userInstructions.json`,
+  'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -33,8 +33,8 @@ let request = function (method, action, data, resolve, reject) {
                 'Content-Type': 'application/json'
             },
             method: method,
-            body: formData,
-            credentials: 'include'
+            body: formData
+            // credentials: 'include'
         })
     ).then(function (response) {
         return response.json()
