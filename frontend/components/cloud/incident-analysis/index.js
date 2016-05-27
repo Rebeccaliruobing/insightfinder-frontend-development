@@ -9,87 +9,88 @@ import FilterBar from  './filter-bar';
 
 export default class IncidentDetection extends Component {
 
-    static contextTypes = {
-        userInstructions: React.PropTypes.object
+  static contextTypes = {
+    userInstructions: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+    let weeks = 1;
+    this.state = {
+      view: 'chart',
+      dateIndex: 0,
+      timeIndex: 0,
+      params: {
+        showAddPanel: false,
+        projects: [],
+        weeks: weeks,
+        endTime: moment(new Date()).toDate(),
+        startTime: moment(new Date()).add(-7 * weeks, 'days')
+      }
     };
+  }
 
-    constructor(props) {
-        super(props);
-        let weeks = 1;
-        this.state = {
-            view: 'chart',
-            dateIndex: 0,
-            timeIndex: 0,
-            params: {
-                showAddPanel: false,
-                projects: [],
-                weeks: weeks,
-                endTime: moment(new Date()).toDate(),
-                startTime: moment(new Date()).add(-7 * weeks, 'days')
-            }
-        };
-    }
+  componentDidMount() {
 
-    componentDidMount() {
+  }
 
-    }
+  handleToggleFilterPanel() {
+    this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+      this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
+    })
+  }
 
-    handleToggleFilterPanel() {
-        this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
-            this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
-        })
-    }
+  handleFilterChange(data) {
+    this.$filterPanel.slideUp();
+    alert(JSON.stringify(data));
+  }
 
-    render() {
-        const {view, showAddPanel, params} = this.state;
-        const {userInstructions} = this.context;
-        return (
-            <Console.Content>
-                <div className="ui main tiny container" ref={c => this._el = c}>
-                    <div className="ui clearing vertical segment">
-                        <div className="ui breadcrumb">
-                            <IndexLink to="/" className="section">Home</IndexLink>
-                            <i className="right angle icon divider"/>
-                            <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
-                            <i className="right angle icon divider"/>
-                            <div className="active section">Incident Analysis</div>
-                        </div>
-                        <ButtonGroup className="right floated basic icon">
-                            <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                                <i className="ellipsis horizontal icon"/>
-                            </Button>
-                            <Button>
-                                <i className="setting icon"/>
-                            </Button>
-                        </ButtonGroup>
-                        <ButtonGroup className="right floated basic icon">
-                            <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
-                                <i className="line chart icon"/>
-                            </Button>
-                            <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
-                                <i className="table icon"/>
-                            </Button>
-                        </ButtonGroup>
-                    </div>
+  render() {
+    const {view, showAddPanel, params} = this.state;
+    const {userInstructions} = this.context;
+    return (
+      <Console.Content>
+        <div className="ui main tiny container" ref={c => this._el = c}>
+          <div className="ui clearing vertical segment">
+            <div className="ui breadcrumb">
+              <IndexLink to="/" className="section">Home</IndexLink>
+              <i className="right angle icon divider"/>
+              <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
+              <i className="right angle icon divider"/>
+              <div className="active section">Incident Analysis</div>
+            </div>
+            <ButtonGroup className="right floated basic icon">
+              <Button onClick={this.handleToggleFilterPanel.bind(this)}>
+                <i className="ellipsis horizontal icon"/>
+              </Button>
+              <Button>
+                <i className="setting icon"/>
+              </Button>
+            </ButtonGroup>
+            <ButtonGroup className="right floated basic icon">
+              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
+                <i className="line chart icon"/>
+              </Button>
+              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
+                <i className="table icon"/>
+              </Button>
+            </ButtonGroup>
+          </div>
 
-                    <div className="ui vertical segment filterPanel" style={{display: 'none'}}
-                         ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
+          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+               ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
 
-                        <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
-                           onClick={this.handleToggleFilterPanel.bind(this)}/>
-                        <FilterBar {...this.props}/>
+            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
+               onClick={this.handleToggleFilterPanel.bind(this)}/>
 
-                        <div className="ui success message"
-                             dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}></div>
-                    </div>
+            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
+            <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}/>
+          </div>
 
-                    <div className="ui vertical segment">
-                        <div className="ui info message">
-
-                        </div>
-                    </div>
-                </div>
-            </Console.Content>
-        );
-    }
+          <div className="ui vertical segment">
+          </div>
+        </div>
+      </Console.Content>
+    );
+  }
 }

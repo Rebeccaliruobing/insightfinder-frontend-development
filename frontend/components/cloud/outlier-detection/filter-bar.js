@@ -1,96 +1,112 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-    ProjectSelection,
-    ModelType,
-    AnomalyThreshold,
-    WindowWithWeek,
-    DurationThreshold,
-    DurationHour
+  ProjectSelection,
+  ModelType,
+  WindowWithWeek,
 } from '../../selections';
-import mockData from '../../../mock/cloud/OutlierDetection.json';
+
 import DateTimePicker from "../../ui/datetimepicker/index";
 
 export default  class FilterBar extends Component {
-    static contextTypes = {
-        userInstructions: React.PropTypes.object,
-        dashboardUservalues: React.PropTypes.object
+  static contextTypes = {
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      projectName: undefined,
+      projectType: undefined,
+      weeks: '1',
+      startTime: moment().toDate(),
+      endTime: moment().add(-1, 'w').toDate()
     };
+  }
+  
+  componentDidMount() {
+    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+  }
 
-    constructor(props) {
-        super(props);
-        let weeks = 1;
-        this.state = {
-            showAddPanel: false,
-            projects: [],
-            weeks: weeks,
-            endTime: moment(new Date()).toDate(),
-            startTime: moment(new Date()).add(-7 * weeks, 'days')
-        };
+  handleProjectChange(value, projectName) {
+    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
+    let project = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
+    // 前三部分是名称，数据类型dataType和云类型cloudType
+    let [name, dataType, cloudType] = project;
+    let update = {projectName};
+    switch (dataType) {
+      case 'AWS':
+        update.projectType = "AWS/CloudWatch";
+        break;
+      case 'GAE':
+        update.projectType = `${dataType}/CloudMonitoring`;
+        break;
+      case 'GCE':
+        update.projectType = `${dataType}/CloudMonitoring`;
+        break;
+      default:
+        update.projectType = `${cloudType}/Agent`;
     }
+    this.setState(update);
+  }
 
-    handleAddMonitoring() {
+  handleEndTimeChange(endTime) {
+    let {weeks} = this.state;
+    this.setState({
+      startTime: moment(endTime).add(-weeks, 'w').toDate(),
+      endTime
+    })
+  }
 
-    }
+  handleSubmit() {
+    this.props.onSubmit && this.props.onSubmit(this.state);
+  }
 
-    handleEndTimeChange(endTime) {
-        let startTime, params = this.state;
-        startTime = moment(endTime).add(-7 * params.weeks, 'days').toDate();
-        params = Object.assign({}, params, {startTime: startTime, endTime: endTime});
-        this.setState({...params});
+  render() {
+    const {projectName, startTime, endTime, projectType} = this.state;
+    const labelStyle = {};
 
-    }
-
-    handleWeeksChange(v) {
-        this.setState({...Object.assign({}, this.state, {weeks: v})}, ()=> {
-            this.handleEndTimeChange(this.state.endTime);
-        })
-    }
-
-    render() {
-        const params = this.state;
-        const {userInstructions, dashboardUservalues} = this.context;
-        const labelStyle = {
-            width: '100px'
-        };
-
-        return (
-            <div className="ui form">
-
-
-                <div className="inline fields">
-                    <div className="four wide field">
-                        <label style={labelStyle}>Projects</label>
-                        <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}}/>
-                    </div>
-                    <div className="four wide field">
-                        <label style={labelStyle}>Start Time</label>
-                        <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                        value={params.startTime} disabled/>
-
-                    </div>
-                    <div className="four wide field">
-                        <label style={labelStyle}>End Time</label>
-                        <DateTimePicker dateTimeFormat='YYYY-MM-DD HH:mm'
-                                        value={params.endTime}
-                                        onChange={this.handleEndTimeChange.bind(this)}/>
-
-                    </div>
-                    <div className="four wide field">
-                        <label style={labelStyle}>Window (Week)</label>
-                        <WindowWithWeek value={params.weeks} onChange={this.handleWeeksChange.bind(this)}/>
-                    </div>
-                    <Button className="orange"
-                            onClick={this.handleAddMonitoring.bind(this)}>Add
-                    </Button>
-                </div>
-                <Button className="orange">Add & Save</Button>
-
+    return (
+      <div className="ui form">
+        <div className="five fields fill">
+          <div className="field">
+            <label style={labelStyle}>Project Name</label>
+            <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+          </div>
+          <div className="field">
+            <label style={labelStyle}>Project Type</label>
+            <div className="ui input">
+              <input type="text" disabled value={projectType}/>
             </div>
-        )
-    }
+          </div>
+          <div className="field">
+            <label style={labelStyle}>Window (Week)</label>
+            <WindowWithWeek onChange={(value, text)=> this.setState({weeks: text}, ()=>this.handleEndTimeChange(endTime))}/>
+          </div>
+          <div className="field">
+            <label style={labelStyle}>Start Time</label>
+            <div className="ui input">
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} disabled/>
+            </div>
+          </div>
+          <div className="field">
+            <label style={labelStyle}>End Time</label>
+            <div className="ui input">
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
+                              onChange={this.handleEndTimeChange.bind(this)}/>
+            </div>
+          </div>
+        </div>
+
+        <div className="ui field">
+          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
+        </div>
+      </div>
+    )
+  }
 }

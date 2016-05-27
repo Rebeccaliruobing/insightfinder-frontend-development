@@ -55,54 +55,29 @@ var DateTimePicker = React.createClass({
         }) : null;
 
         var selectedDate = this._getCurrentValue();
-
-        var datePicker = React.createElement(
-            'div',
-            {className: this._getClass(), onClick: this._handleClick},
-            React.createElement(
-                'div',
-                {className: 'month-header'},
-                React.createElement(
-                    'button',
-                    {className: 'previous-month', onClick: this._handlePrev},
-                    '<'
-                ),
-                React.createElement(
-                    'div',
-                    {className: 'month-label'},
-                    this.state.currentMonth.format('MMMM YYYY')
-                ),
-                React.createElement(
-                    'button',
-                    {className: 'next-month', onClick: this._handleNext},
-                    '>'
-                )
-            ),
-            React.createElement(
-                'div',
-                null,
-                React.createElement(
-                    'table',
-                    {className: 'days'},
-                    React.createElement(
-                        'thead',
-                        null,
-                        React.createElement(
-                            'tr',
-                            null,
-                            dayColumnHeaderCaptions
-                        )
-                    ),
-                    React.createElement(Days, {
-                        month: this.state.currentMonth,
-                        weekStart: this.props.weekStart,
-                        selectedDate: selectedDate,
-                        dateValidator: this.props.dateValidator,
-                        onDayClick: this._handleDayChange
-                    })
-                )
-            ),
-            timePicker
+        var datePicker = (
+            <div className={this._getClass() } onClick={this._handleClick}>
+                <div className="month-header">
+                    <button className="previous-month" onClick={this._handlePrev}/>
+                    <div className="month-label">{this.state.currentMonth.format('MMMM YYYY')}</div>
+                    <button className="next-month" onClick={this._handleNext}/>
+                </div>
+                <div>
+                    <table className="days">
+                        <thead>
+                        <tr>{dayColumnHeaderCaptions}</tr>
+                        </thead>
+                        <Days {...{
+                            month: this.state.currentMonth,
+                            weekStart: this.props.weekStart,
+                            selectedDate: selectedDate,
+                            dateValidator: this.props.dateValidator,
+                            onDayClick: this._handleDayChange
+                        }}/>
+                    </table>
+                </div>
+                {timePicker}
+            </div>
         );
 
         if (this.props.inputMode) {
@@ -114,6 +89,7 @@ var DateTimePicker = React.createClass({
                     onClick: this._handleInputClick,
                     value: this._getFormattedCurrentValue(),
                     readOnly: true,
+                    style: {width: "100%"}
                 })),
                 datePicker
             );

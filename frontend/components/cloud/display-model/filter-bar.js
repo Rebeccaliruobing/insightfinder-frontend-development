@@ -94,6 +94,7 @@ export default  class FilterBar extends Component {
               <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} disabled/>
             </div>
           </div>
+
           <div className="field">
             <label style={labelStyle}>End Time</label>
             <div className="ui input">

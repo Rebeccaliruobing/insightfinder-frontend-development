@@ -11,7 +11,7 @@ class ProjectSelection extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      projects: ['app3GAE', 'VCL5', 'hadoopAWS']
+      projects: []
     }
   }
 
@@ -20,9 +20,8 @@ class ProjectSelection extends React.Component {
 
     let {value, ...others} = this.props;
 
-    let projects= (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
 
-    console.log(projects);
     return (
       <Dropdown mode="select" value={value} {...others}>
         <div className="menu">
@@ -48,6 +47,7 @@ const ModelType = (props) => {
       <div className="menu">
         <div className="item">Holistic</div>
         <div className="item">Split</div>
+        <div className="item">Hybird</div>
       </div>
     </Dropdown>
   );
