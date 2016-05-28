@@ -4,8 +4,10 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
-
 import FilterBar from  './filter-bar';
+
+import LinkTender from './LinkTender';
+
 export default class DisplayModel extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object
@@ -83,6 +85,7 @@ export default class DisplayModel extends Component {
           </div>
 
           <div className="ui vertical segment">
+            <LinkTender/>
           </div>
         </div>
       </Console.Content>

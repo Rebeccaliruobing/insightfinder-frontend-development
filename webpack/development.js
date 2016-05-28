@@ -2,7 +2,7 @@
 
 /**
  * 开发环境的Webpack配置文件
-**/
+ **/
 
 const path = require('path');
 const merge = require('lodash/merge');
@@ -20,15 +20,17 @@ const AssetsManifestPlugin = require('./assets-manifest-plugin');
 
 const settings = require('./common');
 
+const port = '10087';
+
 module.exports = merge({}, {
   output: {
     pathinfo: true,
 
     // TODO: 应使用js变量来替换
-    publicPath: 'http://0.0.0.0:10086/static/'
+    publicPath: 'http://0.0.0.0:' + port + '/static/'
   },
   plugins: [
-    
+
     // 有错误时不刷新页面
     new webpack.NoErrorsPlugin(),
 
@@ -52,11 +54,11 @@ module.exports = merge({}, {
     }),
 
     new HtmlWebpackPlugin({
-        title: 'InsightFinder',
-        filename: 'dev/index.html',
-        template: './templates/index.ejs',
-        inject: false,
-        alwaysWriteToDisk: true
+      title: 'InsightFinder',
+      filename: 'dev/index.html',
+      template: './templates/index.ejs',
+      inject: false,
+      alwaysWriteToDisk: true
     }),
     new HtmlWebpackPlugin({
       title: 'InsightFinder',
@@ -74,19 +76,19 @@ module.exports = merge({}, {
     }),
 
     new HtmlWebpackHarddiskPlugin({
-        outputDir: settings.output.path
+      outputDir: settings.output.path
     })
 
   ],
   devtool: '#inline-source-map',
   devServer: {
     hot: true,
-    port: 10086,
     host: '0.0.0.0',
+    port: port,
     inline: false,
     headers: {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Credentials": false 
+      "Access-Control-Allow-Credentials": false
     }
   }
 }, settings);
