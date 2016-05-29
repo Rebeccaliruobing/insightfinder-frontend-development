@@ -15,7 +15,7 @@ $.fn.api.settings.successTest = function(response) {
 
 $.fn.api.settings.api = {
   'login': `${baseUrl}login-check`,
-  'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
+  'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
   'liveAnalysis': `${baseUrl}liveanalysis`,
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
   'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
