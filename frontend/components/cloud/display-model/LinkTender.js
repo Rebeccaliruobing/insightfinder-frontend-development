@@ -207,12 +207,13 @@ export default class LinkTender extends React.Component {
   handleMouseUp(e) {
     let svg = this.state.svg;
     let selectRange = this.state.selectRange;
-    let x1 = selectRange.x1 * this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
-    let x2 = selectRange.x2 * this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
-    let y1 = selectRange.y1 * this.state.zoomRange.zoomY + Math.min(this.state.zoomRange.y1, this.state.zoomRange.y2);
-    let y2 = selectRange.y2 * this.state.zoomRange.zoomY + Math.min(this.state.zoomRange.y1, this.state.zoomRange.y2);
+    let x1 = selectRange.x1 / this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
+    let x2 = selectRange.x2 / this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
+    let y1 = selectRange.y1 / this.state.zoomRange.zoomY + Math.min(this.state.zoomRange.y1, this.state.zoomRange.y2);
+    let y2 = selectRange.y2 / this.state.zoomRange.zoomY + Math.min(this.state.zoomRange.y1, this.state.zoomRange.y2);
     let zoomX = svg.width / Math.abs(x1 - x2);
     let zoomY = svg.height / Math.abs(y1 - y2);
+    if ((x1 == x2) || (y1 == y2)) return this.setState({selectRange: {}});
     this.setState({zoomRange: {x1, x2, y1, y2, zoomX, zoomY}, selectRange: {}})
   }
 
@@ -240,27 +241,16 @@ export default class LinkTender extends React.Component {
             {types.map((type, index)=> {
               var y = stageHeight * index + stageHeight * 0.5;
               y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
-              return [
-                <line key={type} x1={0} y1={y} x2={svg.width - 100} y2={y}
-                      style={{strokeWidth: 1, stroke: '#f1f1f1'}}/>
-              ].concat(
-                this.getWrapText(type.split("_").join(" "), 16).map((text, i)=>
-                  <text className="no-select" key={`${type}-text=${i}`}
-                        x={svg.width - 100} y={y + i * 15 - 5}>{text}</text>
-                ))
+              return <line key={type} x1={0} y1={y} x2={svg.width - 100} y2={y}
+                           style={{strokeWidth: 1, stroke: '#f1f1f1'}}/>
             })}
             {dataArray.map(([record, ...records], i) => {
               var x = stageWidth * i + stageWidth / 2;
               x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
-              return [
-                <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
-                      style={{strokeWidth: 1, stroke: '#f1f1f1'}}/>,
-                !(i % 2) &&
-                <text className="no-select" key={'x-text' + i} x={x - 32}
-                      y={svg.height - stageHeight / 4}>{record.substr(5, 11)}</text>
-              ]
-            })
-            }
+              return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
+                           style={{strokeWidth: 1, stroke: '#f1f1f1'}}/>
+
+            })}
             {lines.map(this.renderLine.bind(this))}
             {points.map(this.renderPoint.bind(this))}
 
@@ -279,6 +269,30 @@ export default class LinkTender extends React.Component {
                   width={Math.abs(selectRange.x1 - selectRange.x2) || 0}
                   height={Math.abs(selectRange.y1 - selectRange.y2) || 0}
                   style={{fill:'blue',stroke:'blue',strokeWidth:2,fillOpacity:0.1,strokeOpacity:0.5}}/>
+
+            <rect x={800} y={0} width={100} height={300}
+                  style={{fill:'white',stroke:'white',strokeWidth:2}}/>
+            <rect x={0} y={svg.height - stageHeight / 4} width={900} height={stageHeight / 4}
+                  style={{fill:'white',stroke:'white',strokeWidth:2}}/>
+
+            {types.map((type, index)=> {
+              var y = stageHeight * index + stageHeight * 0.5;
+              y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
+              return this.getWrapText(type.split("_").join(" "), 16).map((text, i)=>
+                <text className="no-select" key={`${type}-text=${i}`}
+                      x={svg.width - 100} y={y + i * 15 - 5}>{text}</text>
+              )
+            })}
+
+            {dataArray.map(([record, ...records], i) => {
+              var x = stageWidth * i + stageWidth / 2;
+              x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
+
+              return (i % 2) ? undefined : <text className="no-select" key={'x-text' + i} x={x - 16}
+                                                 y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
+
+            })}
+
           </svg>
         </div>
       </div>
