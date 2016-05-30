@@ -32,4 +32,4 @@ export const cloudRoute = (
       <Route component={SummaryReport} path="summary-report" />
       <Route component={DisplayModel} path="display-model" />
     </Route>
-)
+);

@@ -63,6 +63,7 @@
     "react-addons-pure-render-mixin": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-router": "^2.4.0",
-    "react-timeout": "^1.0.0"
+    "react-timeout": "^1.0.0",
+    "store": "git+https://github.com/marcuswestin/store.js.git"
   }
 }
