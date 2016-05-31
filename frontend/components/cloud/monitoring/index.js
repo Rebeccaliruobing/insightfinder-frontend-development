@@ -1,13 +1,25 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
-import {BaseComponent, Console, ButtonGroup, Button, 
-  Dropdown, Accordion, Message} from '../../../artui/react';
-import {ProjectSelection, 
-  ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
+import {
+  BaseComponent, Console, ButtonGroup, Button,
+  Dropdown, Accordion, Message
+} from '../../../artui/react';
+import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 import ProjectsSummary from './summary';
 import ProjectMetric from './metric';
 
+import apis from '../../../apis';
+
+import FilterBar from './filter-bar';
+
 class LiveMonitoring extends BaseComponent {
+
+  static contextType = {
+    router: React.PropTypes.object,
+    userInstructions: React.PropTypes.object
+
+  };
 
   constructor(props) {
     super(props);
@@ -17,16 +29,16 @@ class LiveMonitoring extends BaseComponent {
       view: 'summary',
       showAddPanel: false,
       addedName: '',
-      
+
       addedProjects: ['app2AWS', 'appWestAWS']
     };
-    
+
     this.handleAddMonitoring.bind(this);
   }
 
   componentDidMount() {
   }
-  
+
   handleAddMonitoring() {
     let {addedProjects, addedName} = this.state;
     addedProjects.push(addedName);
@@ -39,10 +51,27 @@ class LiveMonitoring extends BaseComponent {
     window.open('/liveMonitoring?project=' + project);
   }
 
+
+  handleToggleFilterPanel() {
+    this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+      this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
+    })
+  }
+
+  handleFilterChange(data) {
+    this.$filterPanel.slideUp();
+    alert(JSON.stringify(data));
+    apis.postLiveAnalysis(data.projectName, data.modelType, data.anomalyThreshold, data.durationHours).then((resp) => {
+      console.log(resp);
+    });
+  }
+
   render() {
-    
+
+
     const {view, showAddPanel, addedProjects} = this.state;
-    
+    const userInstructions = this.context.userInstructions;
+
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -55,7 +84,9 @@ class LiveMonitoring extends BaseComponent {
               <div className="active section">Live Monitoring</div>
             </div>
             <ButtonGroup className="right floated basic icon">
-              <Button><i className="add icon" onClick={() => this.setState({showAddPanel: true})} /></Button>
+              <Button onClick={this.handleToggleFilterPanel.bind(this)}>
+                <i className="ellipsis horizontal icon"/>
+              </Button>
               <Button><i className="setting icon"/></Button>
             </ButtonGroup>
             <ButtonGroup className="right floated basic icon">
@@ -67,24 +98,18 @@ class LiveMonitoring extends BaseComponent {
               </Button>
             </ButtonGroup>
           </div>
-          {
-            showAddPanel &&
-            <div className="ui vertical segment">
-              <label>Projects </label>
-              <ProjectSelection onChange={(value, text) => {this.setState({addedName: text})}} />
-              <span>Model Type </span>
-              <ModelType />
-              <span>Anomaly Threshold </span>
-              <AnomalyThreshold />
-              <span>Duration Threshold (minute) </span>
-              <DurationThreshold />
-              <Button className="orange"
-                      onClick={this.handleAddMonitoring.bind(this)}>Add</Button>
-              <Button className="orange">Add & Save</Button>
-              <i className="close link icon" style={{float:'right'}} 
-                 onClick={() => this.setState({showAddPanel: false})}/>
-            </div>
-          }
+
+          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+               ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
+
+            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
+               onClick={this.handleToggleFilterPanel.bind(this)}/>
+
+            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
+            <Message dangerouslySetInnerHTML={{__html: userInstructions && userInstructions.cloudmonitor}}/>
+          </div>
+
+
           { (view == 'summary') &&
           <ProjectsSummary projects={addedProjects}
                            onProjectSelected={(project) => this.handleProjectSelected(project)}/>

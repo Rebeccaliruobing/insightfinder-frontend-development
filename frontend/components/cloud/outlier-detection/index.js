@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-
+import store from 'store';
 import {Link, IndexLink} from 'react-router';
 import RcSlider from '../../ui/rc-slider';
 import HeatMap from '../../ui/graph/HeatMap';
@@ -7,9 +7,13 @@ import {
   Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
 } from '../../../artui/react/index';
 import {Dygraph} from '../../../artui/react/dataviz';
+
+import apis from '../../../apis';
+
 import mockData from '../../../mock/cloud/OutlierDetection.json';
 
 import FilterBar from './filter-bar';
+
 
 class DisplayChart extends Component {
 
@@ -164,6 +168,12 @@ export default class OutlierDetection extends Component {
     this.setHeatMap(0, 0);
   }
 
+  loadData(startTime, endTime, projectName) {
+    apis.postCloudOutlier(startTime, endTime, projectName).then((resp)=> {
+      console.log(resp)
+    })
+  }
+
   setHeatMap(dateIndex = 0, timeIndex = 0) {
     let dataArray = [];
     mockData.data[dateIndex].mapData.NASValues.forEach((line, index) => {
@@ -198,8 +208,10 @@ export default class OutlierDetection extends Component {
   }
 
   handleFilterChange(data) {
+    let startTime = moment(data.startTime).format('YYYY-MM-DD HH:mm');
+    let endTime = moment(data.endTime).format('YYYY-MM-DD HH:mm');
+    this.loadData(startTime, endTime, data.projectName);
     this.$filterPanel.slideUp();
-    alert(JSON.stringify(data));
   }
 
   render() {

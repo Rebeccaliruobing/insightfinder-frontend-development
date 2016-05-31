@@ -1,3 +1,5 @@
+import store from 'store';
+
 const baseUrl = 'https://insightfinderui.appspot.com/api/v1/';
 const localBaseUrl = '/';
 
@@ -14,8 +16,13 @@ $.fn.api.settings.successTest = function (response) {
 
 $.fn.api.settings.api = {
   'login': `${baseUrl}login-check`,
-  'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
-  'liveAnalysis': `${baseUrl}liveanalysis`,
+
+  // 'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
+  'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
+  'live analysis': `${baseUrl}liveAnalysis`,
+  'cloud outlier': `${baseUrl}cloudOutlierDetection`,
+  'cloud rollout': `${baseUrl}cloudRolloutCheck`,
+
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
   'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
 };
@@ -23,25 +30,23 @@ $.fn.api.settings.api = {
 let request = function (method, action, data, resolve, reject) {
   var formData = new FormData();
   _.keys(data).forEach((k)=> formData.append(k, data[k]));
-
-  (['GET', 'HEAD'].indexOf(method) >= 0
-      ? fetch(`${$.fn.api.settings.api[action]}?${$.param(data)}`)
-      : fetch($.fn.api.settings.api[action], {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: method,
-      body: formData
-      // credentials: 'include'
-    })
-  ).then(function (response) {
-    return response.json()
-  }).then(function (resp) {
+  let xhr;
+  switch (method) {
+    case 'GET':
+      xhr = $.get($.fn.api.settings.api[action], data);
+      break;
+    case 'HEAD':
+      xhr = $.get($.fn.api.settings.api[action], data);
+      break;
+    default:
+      xhr = $.post($.fn.api.settings.api[action], data);
+      break;
+  }
+  xhr.done(function (resp) {
     resolve(resp);
-  }).catch(function (ex) {
-    reject(ex);
-  });
+  }).fail(function (error) {
+    reject(error);
+  })
 };
 
 let requestGet = function (action, data, resolve, reject) {
@@ -51,26 +56,146 @@ let requestPost = function (action, data, resolve, reject) {
   return request('POST', action, data, resolve, reject);
 };
 
-export default {
 
-  getUserInstructions () {
+/**
+ 总体:
+ Dashboard,
+ DailySummaryReport,
+
+ 项目分析:
+ PostMortem,
+ PublishedDetection,
+ LiveAnalysis,
+
+ 热图:
+ CloudOutlierDetection,
+ CloudRolloutCheck,
+ DisplayProjectModel,
+ DisplayFileModel,
+
+ 文件分析:
+ UploadVisualization,
+ UploadTraining,
+ UploadUpdate,
+ UploadDetection,
+ */
+export default {
+  getUserInstructions (userName = store.get('userName'),
+                       token = store.get('token'),
+                       operation) {
+
     return new Promise(function (resolve, reject) {
-      requestGet('userInstructions', {}, resolve, reject);
+      requestGet('userInstructions', {
+        userName,
+        token,
+        operation
+      }, resolve, reject);
     });
   },
   postLogin(userName, password) {
     return new Promise(function (resolve, reject) {
-      requestGet('login', {userName, password}, resolve, reject);
+      requestPost('login', {userName, password}, resolve, reject);
     });
   },
-  postDashboardUserValues (userName:String = store.get('userName'), operation:String = 'display') {
+  /**
+   *
+   * @param userName
+   * @param token
+   * @param operation
+   * @returns {Promise}
+   */
+  postDashboardUserValues (userName:String = store.get('userName'), token = store.get('token'), operation:String = 'display') {
     return new Promise(function (resolve, reject) {
-      requestPost('dashboard uservalues', {userName, operation}, resolve, reject);
+      requestPost('dashboard uservalues', {userName, token, operation}, resolve, reject);
     });
   },
   postDashboardDailySummaryReport (userName:String = store.get('userName')) {
     return new Promise(function (resolve, reject) {
       requestPost('dashboard dailysummaryreport', {userName}, resolve, reject);
     });
-  }
+  },
+  /**
+   *
+   * @param userName
+   * @param token
+   * @param pvalue
+   * @param cvalue
+   * @param modelType
+   * @param projectName
+   * @returns {Promise}
+   */
+  postLiveAnalysis(projectName, 
+                   modelType, 
+                   pvalue/*Anomaly Threshold */,
+                   cvalue/*Duration Threshold*/,
+                   userName = store.get('userName'),
+                   token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      requestPost('live analysis', {
+        userName,
+        token,
+        pvalue,
+        cvalue /*Anomaly Threshold */,
+        modelType /*Duration Threshold*/,
+        projectName
+      }, resolve, reject);
+    });
+  },
+
+  /**
+   *
+   * @param userName
+   * @param token
+   * @param startTime
+   * @param endTime
+   * @param projectName
+   * @param origin
+   * @returns {Promise}
+   */
+  postCloudOutlier(startTime,
+                   endTime,
+                   projectName,
+                   origin,
+                   userName = store.get('userName'),
+                   token = store.get('token'),) {
+    return new Promise(function (resolve, reject) {
+      requestPost('cloud outlier', {
+        userName,
+        token,
+        startTime,
+        endTime,
+        projectName,
+        origin
+      }, resolve, reject);
+    });
+  },
+
+  /**
+   *
+   * @param userName
+   * @param token
+   * @param startTime
+   * @param endTime
+   * @param projectName
+   * @param origin
+   * @returns {Promise}
+   */
+  postCloudRollout(userName = store.get('userName'),
+                   token = store.get('token'),
+                   startTime,
+                   endTime,
+                   projectName,
+                   origin) {
+    return new Promise(function (resolve, reject) {
+      requestPost('cloud rollout', {
+        userName,
+        token,
+        startTime,
+        endTime,
+        projectName,
+        origin
+      }, resolve, reject);
+    });
+  },
+
 };
