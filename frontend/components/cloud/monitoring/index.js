@@ -60,14 +60,10 @@ class LiveMonitoring extends BaseComponent {
   }
 
   handleHighlight(v) {
-    switch (v) {
-      case v > 0.7:
-        return "rgba(255, 255, 102, 1.0)";
-      case v > 0.5:
-        return "rgba(200, 200, 150, 1.0)";
-      default:
-        return "rgba(102, 255, 102, 1.0)"
-    }
+    if (v > 0.7) return "rgba(255, 255, 102, 1.0)";
+    if (v > 0.5) return "rgba(200, 200, 150, 1.0)";
+
+    return "rgba(102, 255, 102, 1.0)";
   }
 
   handleFilterChange(data) {
@@ -159,9 +155,10 @@ class LiveMonitoring extends BaseComponent {
 
             <FilterBar loading={this.state.filterLoading} {...this.props}
                        onSubmit={this.handleFilterChange.bind(this)}/>
-            <Message dangerouslySetInnerHTML={{__html: userInstructions && userInstructions.cloudmonitor}}/>
-          </div>
+            {userInstructions && userInstructions.cloudmonitor &&
+            <Message dangerouslySetInnerHTML={{__html: userInstructions && userInstructions.cloudmonitor}}/>}
 
+          </div>
 
           { (view == 'summary') &&
           <ProjectsSummary projects={addedProjects}
