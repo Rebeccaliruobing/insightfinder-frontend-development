@@ -59,9 +59,9 @@ class LiveMonitoring extends BaseComponent {
     })
   }
 
-  handleHighlight(v) {
-    if (v > 0.7) return "rgba(255, 255, 102, 1.0)";
-    if (v > 0.5) return "rgba(200, 200, 150, 1.0)";
+  handleHighlight(timestamp, ...v) {
+    if (Math.max.apply(Math, v) > 0.7) return "rgba(255, 255, 102, 1.0)";
+    if (Math.max.apply(Math, v) > 0.5) return "rgba(200, 200, 150, 1.0)";
 
     return "rgba(102, 255, 102, 1.0)";
   }
@@ -69,45 +69,47 @@ class LiveMonitoring extends BaseComponent {
   handleFilterChange(data) {
     this.setState({'filterLoading': true}, ()=> {
       apis.postLiveAnalysis(data.projectName, data.modelType, data.anomalyThreshold, data.durationHours).then((resp) => {
+        if (resp.success) {
+          resp.data.dataMap = {};
+          resp.data.table = resp.data.data.split("\\n").map((line)=>line.split(","));
+          resp.data.table[0].forEach((head, index)=> {
+            let info = /(\w+)\[(i-\w+)\]:(\d)/g.exec(head);
+            if (info) {
+              let [h, metric, instance, groupId]  = info;
+              var key = `${groupId},${resp.data.metricUnitMapping.find((m)=>m.metric == metric).unit}`;
+              if (!resp.data.dataMap[key]) resp.data.dataMap[key] = [];
 
-        resp.data.dataMap = {};
-        resp.data.table = resp.data.data.split("\\n").map((line)=>line.split(","));
-        resp.data.table[0].forEach((head, index)=> {
-          let info = /(\w+)\[(i-\w+)\]:(\d)/g.exec(head);
-          if (info) {
-            let [h, metric, instance, groupId]  = info;
-            var key = `${groupId},${resp.data.metricUnitMapping.find((m)=>m.metric == metric).unit}`;
-            if (!resp.data.dataMap[key]) resp.data.dataMap[key] = [];
-
-            resp.data.dataMap[key].push({
-              head, metric, instance, groupId, index
-            })
-          }
-        });
-        resp.data.dataGroups = _.sortBy(_.toPairs(resp.data.dataMap), ([k])=>k).map(([key, metrics])=> {
-          let data = resp.data.table.slice(1).map((line, i)=> {
-            return [
-              moment(parseInt(line[0])).toDate(),
-              ...line.filter((d, i)=>metrics.find(({index})=>index == i)).map(parseFloat)]
+              resp.data.dataMap[key].push({
+                head, metric, instance, groupId, index
+              })
+            }
           });
-          return {
-            key, metrics,
-            element: <Dygraph key={key}
-                              ylabel={key.split(",")[1]}
-                              xlabel={`Metric Group ${key.split(",")[0]}`}
-                              data={data}
-                              labels={['timestamp', ...metrics.map((m)=>m.metric)]}
-                              style={{width: '100%'}}
-                              highlightCallback={this.handleHighlight.bind(this)}
-                              highlightCircleSize={2}
-                              highlightSeriesOpts={{
-                            strokeWidth: 1,
-                            strokeBorderWidth: 1,
-                            highlightCircleSize: 3
-                          }}/>
-          }
-        });
-
+          resp.data.dataGroups = _.sortBy(_.toPairs(resp.data.dataMap), ([k])=>k).map(([key, metrics])=> {
+            let data = resp.data.table.slice(1).map((line, i)=> {
+              return [
+                moment(parseInt(line[0])).toDate(),
+                ...line.filter((d, i)=>metrics.find(({index})=>index == i)).map(parseFloat)]
+            });
+            return {
+              key, metrics,
+              element: <Dygraph key={key}
+                                ylabel={key.split(",")[1]}
+                                xlabel={`Metric Group ${key.split(",")[0]}`}
+                                data={data}
+                                labels={['timestamp', ...metrics.map((m)=>m.metric)]}
+                                style={{width: '100%'}}
+                                highlightCallback={this.handleHighlight.bind(this)}
+                                highlightCircleSize={2}
+                                highlightSeriesOpts={{
+                              strokeWidth: 1,
+                              strokeBorderWidth: 1,
+                              highlightCircleSize: 3
+                            }}/>
+            }
+          });
+        } else {
+          alert(resp.message);
+        }
         this.$filterPanel.slideUp();
         resp.filterLoading = false;
         this.setState(resp);

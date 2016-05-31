@@ -59,7 +59,7 @@ class Dygraph extends BaseComponent {
         var left = bottom_left[0];
         var right = top_right[0];
         canvas.fillStyle = this.props.highlightCallback(value);
-        canvas.fillRect(left, area.y, right - left, area.h / 10);
+        canvas.fillRect(left, area.y, right - left, 20);
       })
     }
   }

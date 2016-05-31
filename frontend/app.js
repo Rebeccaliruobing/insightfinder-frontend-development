@@ -35,7 +35,7 @@ class App extends React.Component {
       dashboardUservalues,
       dashboardDailySummaryReport
     } = this.context;
-    let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0 && _.keys(dashboardDailySummaryReport).length > 0);
+    let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
 
     return (
       <Console className={cx({'ui form loading': loading})}>
@@ -140,9 +140,9 @@ class AppRoute extends React.Component {
       });
       this.setState({dashboardUservalues: resp});
     });
-    apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
-      this.setState({dashboardDailySummaryReport: resp});
-    });
+    // apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
+    //   this.setState({dashboardDailySummaryReport: resp});
+    // });
   }
 
 
