@@ -8,6 +8,7 @@ import {
 import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 import ProjectsSummary from './summary';
 import ProjectMetric from './metric';
+import {Dygraph} from '../../../artui/react/dataviz';
 
 import apis from '../../../apis';
 
@@ -58,18 +59,69 @@ class LiveMonitoring extends BaseComponent {
     })
   }
 
+  handleHighlight(v) {
+    switch (v) {
+      case v > 0.7:
+        return "rgba(255, 255, 102, 1.0)";
+      case v > 0.5:
+        return "rgba(200, 200, 150, 1.0)";
+      default:
+        return "rgba(102, 255, 102, 1.0)"
+    }
+  }
+
   handleFilterChange(data) {
-    this.$filterPanel.slideUp();
-    alert(JSON.stringify(data));
-    apis.postLiveAnalysis(data.projectName, data.modelType, data.anomalyThreshold, data.durationHours).then((resp) => {
-      console.log(resp);
+    this.setState({'filterLoading': true}, ()=> {
+      apis.postLiveAnalysis(data.projectName, data.modelType, data.anomalyThreshold, data.durationHours).then((resp) => {
+
+        resp.data.dataMap = {};
+        resp.data.table = resp.data.data.split("\\n").map((line)=>line.split(","));
+        resp.data.table[0].forEach((head, index)=> {
+          let info = /(\w+)\[(i-\w+)\]:(\d)/g.exec(head);
+          if (info) {
+            let [h, metric, instance, groupId]  = info;
+            var key = `${groupId},${resp.data.metricUnitMapping.find((m)=>m.metric == metric).unit}`;
+            if (!resp.data.dataMap[key]) resp.data.dataMap[key] = [];
+
+            resp.data.dataMap[key].push({
+              head, metric, instance, groupId, index
+            })
+          }
+        });
+        resp.data.dataGroups = _.sortBy(_.toPairs(resp.data.dataMap), ([k])=>k).map(([key, metrics])=> {
+          let data = resp.data.table.slice(1).map((line, i)=> {
+            return [
+              moment(parseInt(line[0])).toDate(),
+              ...line.filter((d, i)=>metrics.find(({index})=>index == i)).map(parseFloat)]
+          });
+          return {
+            key, metrics,
+            element: <Dygraph key={key}
+                              ylabel={key.split(",")[1]}
+                              xlabel={`Metric Group ${key.split(",")[0]}`}
+                              data={data}
+                              labels={['timestamp', ...metrics.map((m)=>m.metric)]}
+                              style={{width: '100%'}}
+                              highlightCallback={this.handleHighlight.bind(this)}
+                              highlightCircleSize={2}
+                              highlightSeriesOpts={{
+                            strokeWidth: 1,
+                            strokeBorderWidth: 1,
+                            highlightCircleSize: 3
+                          }}/>
+          }
+        });
+
+        this.$filterPanel.slideUp();
+        resp.filterLoading = false;
+        this.setState(resp);
+      });
     });
   }
 
   render() {
 
-
-    const {view, showAddPanel, addedProjects} = this.state;
+    const {view, addedProjects, data, success} = this.state;
     const userInstructions = this.context.userInstructions;
 
     return (
@@ -105,7 +157,8 @@ class LiveMonitoring extends BaseComponent {
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
 
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
+            <FilterBar loading={this.state.filterLoading} {...this.props}
+                       onSubmit={this.handleFilterChange.bind(this)}/>
             <Message dangerouslySetInnerHTML={{__html: userInstructions && userInstructions.cloudmonitor}}/>
           </div>
 
@@ -118,6 +171,18 @@ class LiveMonitoring extends BaseComponent {
           <ProjectMetric projects={addedProjects}
                          onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
+          {
+            success && data.dataGroups.map(({key, metrics, element})=> {
+              return (
+                <div key={key} className="ui card" style={{width: "100%"}}>
+                  <div className="content">
+                    {element}
+                  </div>
+                </div>
+              )
+            })
+          }
+
         </div>
       </Console.Content>
     )

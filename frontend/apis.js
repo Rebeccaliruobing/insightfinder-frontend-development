@@ -80,16 +80,10 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 export default {
-  getUserInstructions (userName = store.get('userName'),
-                       token = store.get('token'),
-                       operation) {
+  getUserInstructions (userName = store.get('userName'), token = store.get('token'), operation) {
 
     return new Promise(function (resolve, reject) {
-      requestGet('userInstructions', {
-        userName,
-        token,
-        operation
-      }, resolve, reject);
+      requestGet('userInstructions', {userName, token, operation}, resolve, reject);
     });
   },
   postLogin(userName, password) {
@@ -124,21 +118,20 @@ export default {
    * @param projectName
    * @returns {Promise}
    */
-  postLiveAnalysis(projectName, 
-                   modelType, 
-                   pvalue/*Anomaly Threshold */,
-                   cvalue/*Duration Threshold*/,
-                   userName = store.get('userName'),
-                   token = store.get('token')) {
+  postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      requestPost('live analysis', {
-        userName,
-        token,
-        pvalue,
-        cvalue /*Anomaly Threshold */,
-        modelType /*Duration Threshold*/,
-        projectName
-      }, resolve, reject);
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['live analysis'],
+        data: $.param({userName, token, pvalue, cvalue, modelType, projectName}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
     });
   },
 
@@ -152,21 +145,9 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudOutlier(startTime,
-                   endTime,
-                   projectName,
-                   origin,
-                   userName = store.get('userName'),
-                   token = store.get('token'),) {
+  postCloudOutlier(startTime, endTime, projectName, origin, userName = store.get('userName'), token = store.get('token'),) {
     return new Promise(function (resolve, reject) {
-      requestPost('cloud outlier', {
-        userName,
-        token,
-        startTime,
-        endTime,
-        projectName,
-        origin
-      }, resolve, reject);
+      requestPost('cloud outlier', {userName, token, startTime, endTime, projectName, origin}, resolve, reject);
     });
   },
 
@@ -180,21 +161,9 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudRollout(userName = store.get('userName'),
-                   token = store.get('token'),
-                   startTime,
-                   endTime,
-                   projectName,
-                   origin) {
+  postCloudRollout(userName = store.get('userName'), token = store.get('token'), startTime, endTime, projectName, origin) {
     return new Promise(function (resolve, reject) {
-      requestPost('cloud rollout', {
-        userName,
-        token,
-        startTime,
-        endTime,
-        projectName,
-        origin
-      }, resolve, reject);
+      requestPost('cloud rollout', {userName, token, startTime, endTime, projectName, origin}, resolve, reject);
     });
   },
 
