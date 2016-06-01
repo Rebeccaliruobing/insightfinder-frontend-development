@@ -101,8 +101,8 @@ class ProjectSummary extends BaseComponent {
   }
   
   updateLiveAnalysis() {
-    let {projectName, modelType, anomalyThreshold, durationHours} = this.props;
-    apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationHours)
+    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
+    apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
       .then(resp => {
         let update = {};
         if (resp.success) {
@@ -121,7 +121,7 @@ class ProjectSummary extends BaseComponent {
   }
   
   render() {
-    let {projectName, modelType, anomalyThreshold, durationHours} = this.props;
+    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
     let {loading, showCloser, data} = this.state;
     let cardStyle = cx(
       'ui card', 
@@ -134,14 +134,14 @@ class ProjectSummary extends BaseComponent {
            onClick={() => this.props.onSelected() }>
         <div className="content">
           {showCloser &&
-          <i className="close link icon" style={{position:'absolute', top: 10, right:0, zIndex:1}}
+          <i className="close link icon" style={{position:'absolute', top: 10, right:5, zIndex:1}}
              onClick={this.handleClose.bind(this)}/>
           }
           <div className="header">{projectName}</div>
           <div className="meta">
             <span>{modelType} /</span>
             <span>{anomalyThreshold} /</span>
-            <span>{durationHours} hours</span>
+            <span>{durationThreshold} mins</span>
           </div>
           {data && data.length > 0 &&
           <Dygraph data={data}

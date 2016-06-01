@@ -4,30 +4,25 @@ import classNames from 'classnames';
 
 class ProjectSelection extends React.Component {
 
-    static contextTypes = {
-        dashboardUservalues: React.PropTypes.object
-    };
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
 
   constructor(props) {
     super(props);
-    this.state = {
-      projects: []
-    }
   }
 
   render() {
 
-
-    let {value, ...others} = this.props;
-
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-
     return (
-      <Dropdown mode="select" value={value} {...others}>
-        <div className="menu">
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu"> 
           {
             projects.map((p) => {
-              return <div key={p.projectName} className="item">{p.projectName}</div>
+              return <div className="item" key={p.projectName}
+                          data-value={p.projectName}>{p.projectName}</div>
             })
           }
         </div>
@@ -35,10 +30,6 @@ class ProjectSelection extends React.Component {
     );
   }
 }
-
-ProjectSelection.defaultProps = {
-  multiple: false
-};
 
 const ModelType = (props) => {
   return (

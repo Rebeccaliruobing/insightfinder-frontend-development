@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
-import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
   ProjectSelection,
   ModelType,
-  DurationHour,
+  DurationThreshold,
   AnomalyThreshold
 } from '../../selections';
 
@@ -22,11 +21,8 @@ export default  class FilterBar extends Component {
       projectName: undefined,
       projectType: undefined,
       modelType: 'Holistic',
-      anomalyThreshold: 0.95,
-      durationHours: 1,
-      weeks: '1',
-      startTime: moment().toDate(),
-      endTime: moment().add(-1, 'w').toDate()
+      anomalyThreshold: 0.99,
+      durationThreshold: 1
     };
   }
 
@@ -39,8 +35,9 @@ export default  class FilterBar extends Component {
   }
 
   handleProjectChange(value, projectName) {
-    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
+    let {projectString} = this.context.dashboardUservalues;
     let project = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
+    
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
     let update = {projectName};
@@ -60,20 +57,12 @@ export default  class FilterBar extends Component {
     this.setState(update);
   }
 
-  handleEndTimeChange(endTime) {
-    let {weeks} = this.state;
-    this.setState({
-      startTime: moment(endTime).add(-weeks, 'w').toDate(),
-      endTime
-    })
-  }
-
   handleSubmit() {
     this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
   render() {
-    const {projectName, anomalyThreshold, durationHours, projectType, modelType} = this.state;
+    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType} = this.state;
     const labelStyle = {};
     const submitStyle = cx(
       'orange', {
@@ -102,8 +91,8 @@ export default  class FilterBar extends Component {
             <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Duration (Hour)</label>
-            <DurationHour value={durationHours} onChange={(v, t)=>this.setState({durationHours: t})}/>
+            <label style={labelStyle}>Duration Threshold</label>
+            <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
           </div>
           <div className="field">
             <Button className={submitStyle} style={{marginTop: 20}}
