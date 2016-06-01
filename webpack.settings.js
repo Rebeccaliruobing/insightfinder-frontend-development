@@ -6,9 +6,7 @@ module.exports = {
   entry: {
     commons: './commons',
     assets: './assets',
-    app: './app',
-    auth: './auth',
-    liveMonitoring: './liveMonitoring'
+    app: './app'
   },
   
   providePlugin: {

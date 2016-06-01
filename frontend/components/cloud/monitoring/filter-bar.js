@@ -10,8 +10,6 @@ import {
   AnomalyThreshold
 } from '../../selections';
 
-import DateTimePicker from "../../ui/datetimepicker/index";
-
 export default  class FilterBar extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
@@ -23,6 +21,9 @@ export default  class FilterBar extends Component {
     this.state = {
       projectName: undefined,
       projectType: undefined,
+      modelType: 'Holistic',
+      anomalyThreshold: 0.95,
+      durationHours: 6,
       weeks: '1',
       startTime: moment().toDate(),
       endTime: moment().add(-1, 'w').toDate()
@@ -31,7 +32,10 @@ export default  class FilterBar extends Component {
 
   componentDidMount() {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+    
+    if (projects.length > 0) {
+      this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+    }
   }
 
   handleProjectChange(value, projectName) {
@@ -69,39 +73,42 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, anomalyThreshold, durationHours, projectType} = this.state;
+    const {projectName, anomalyThreshold, durationHours, projectType, modelType} = this.state;
     const labelStyle = {};
+    const submitStyle = cx(
+      'orange', {
+        loading: this.props.loading,
+        disabled: !projectName || !modelType
+      }
+    );
 
     return (
       <div className="ui form">
-        <div className="five fields fill">
+        <div className="six fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
             <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>
-            <div className="ui input">
-              <input type="text" disabled value={projectType}/>
-            </div>
+            <div style={{paddingTop:'0.5em', paddingLeft:'1em'}}>{projectType}</div>
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Anomaly Threshold</label>
-            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: t})}/>
+            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Duration (Hour)</label>
             <DurationHour value={durationHours} onChange={(v, t)=>this.setState({durationHours: t})}/>
           </div>
-
-        </div>
-
-        <div className="ui field">
-          <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          <div className="field">
+            <Button className={submitStyle} style={{marginTop: 20}}
+                    onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          </div>
         </div>
       </div>
     )

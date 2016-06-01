@@ -16,8 +16,7 @@ $.fn.api.settings.successTest = function (response) {
 
 $.fn.api.settings.api = {
   'login': `${baseUrl}login-check`,
-
-  // 'dashboard uservalues': `${localBaseUrl}dashboard-uservalues`,
+  
   'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
   'live analysis': `${baseUrl}liveAnalysis`,
   'cloud outlier': `${baseUrl}cloudOutlierDetection`,
@@ -80,12 +79,16 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 export default {
-  getUserInstructions (userName = store.get('userName'), token = store.get('token'), operation) {
-
+  
+  getUserInstructions (
+    userName = store.get('userName'), 
+    token = store.get('token'), 
+    operation) {
     return new Promise(function (resolve, reject) {
       requestGet('userInstructions', {userName, token, operation}, resolve, reject);
     });
   },
+  
   postLogin(userName, password) {
     return new Promise(function (resolve, reject) {
       requestPost('login', {userName, password}, resolve, reject);

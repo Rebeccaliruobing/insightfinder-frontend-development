@@ -1,17 +1,14 @@
 import React from 'react';
+import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
 import {
   BaseComponent, Console, ButtonGroup, Button,
   Dropdown, Accordion, Message
 } from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
-import ProjectsSummary from './summary';
+
+import ProjectSummary from './summary';
 import ProjectMetric from './metric';
-import {Dygraph} from '../../../artui/react/dataviz';
-
-import apis from '../../../apis';
-
 import FilterBar from './filter-bar';
 
 class LiveMonitoring extends BaseComponent {
@@ -19,7 +16,6 @@ class LiveMonitoring extends BaseComponent {
   static contextType = {
     router: React.PropTypes.object,
     userInstructions: React.PropTypes.object
-
   };
 
   constructor(props) {
@@ -29,97 +25,48 @@ class LiveMonitoring extends BaseComponent {
     this.state = {
       view: 'summary',
       showAddPanel: false,
-      addedName: '',
-
-      addedProjects: ['app2AWS', 'appWestAWS']
+      addedProjects: []
     };
-
-    this.handleAddMonitoring.bind(this);
+    
+    this.handleProjectSelected.bind(this);
   }
 
   componentDidMount() {
   }
 
-  handleAddMonitoring() {
-    let {addedProjects, addedName} = this.state;
-    addedProjects.push(addedName);
-    this.setState({
-      'addedProjects': addedProjects
-    });
-  }
-
   handleProjectSelected(project) {
-    window.open('/liveMonitoring?project=' + project);
+    window.open('#/liveMonitoring?project=' + project.projectName);
   }
-
-
+  
   handleToggleFilterPanel() {
     this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
       this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
     })
   }
 
-  handleHighlight(timestamp, ...v) {
-    if (Math.max.apply(Math, v) > 0.7) return "rgba(255, 255, 102, 1.0)";
-    if (Math.max.apply(Math, v) > 0.5) return "rgba(200, 200, 150, 1.0)";
-
-    return "rgba(102, 255, 102, 1.0)";
+  handleFilterChange(project) {
+    let {addedProjects} = this.state;
+    if (_.find(addedProjects, p => {
+        return _.isEqual(p, project);
+      })) {
+      alert('The project with same parameters already exist');
+    } else {
+      addedProjects.push(project);
+      this.setState({addedProjects: addedProjects});
+    }
   }
-
-  handleFilterChange(data) {
-    this.setState({'filterLoading': true}, ()=> {
-      apis.postLiveAnalysis(data.projectName, data.modelType, data.anomalyThreshold, data.durationHours).then((resp) => {
-        if (resp.success) {
-          resp.data.dataMap = {};
-          resp.data.table = resp.data.data.split("\\n").map((line)=>line.split(","));
-          resp.data.table[0].forEach((head, index)=> {
-            let info = /(\w+)\[(i-\w+)\]:(\d)/g.exec(head);
-            if (info) {
-              let [h, metric, instance, groupId]  = info;
-              var key = `${groupId},${resp.data.metricUnitMapping.find((m)=>m.metric == metric).unit}`;
-              if (!resp.data.dataMap[key]) resp.data.dataMap[key] = [];
-
-              resp.data.dataMap[key].push({
-                head, metric, instance, groupId, index
-              })
-            }
-          });
-          resp.data.dataGroups = _.sortBy(_.toPairs(resp.data.dataMap), ([k])=>k).map(([key, metrics])=> {
-            let data = resp.data.table.slice(1).map((line, i)=> {
-              return [
-                moment(parseInt(line[0])).toDate(),
-                ...line.filter((d, i)=>metrics.find(({index})=>index == i)).map(parseFloat)]
-            });
-            return {
-              key, metrics,
-              element: <Dygraph key={key}
-                                ylabel={key.split(",")[1]}
-                                xlabel={`Metric Group ${key.split(",")[0]}`}
-                                data={data}
-                                labels={['timestamp', ...metrics.map((m)=>m.metric)]}
-                                style={{width: '100%'}}
-                                highlightCallback={this.handleHighlight.bind(this)}
-                                highlightCircleSize={2}
-                                highlightSeriesOpts={{
-                              strokeWidth: 1,
-                              strokeBorderWidth: 1,
-                              highlightCircleSize: 3
-                            }}/>
-            }
-          });
-        } else {
-          alert(resp.message);
-        }
-        this.$filterPanel.slideUp();
-        resp.filterLoading = false;
-        this.setState(resp);
-      });
+  
+  handleProjectRemove(project) {
+    let {addedProjects} = this.state;
+    _.remove(addedProjects, (p) => {
+      return _.isEqual(p, project)
     });
+    
+    this.setState({addedProjects});
   }
 
   render() {
-
-    const {view, addedProjects, data, success} = this.state;
+    const {view, addedProjects} = this.state;
     const userInstructions = this.context.userInstructions;
 
     return (
@@ -151,37 +98,30 @@ class LiveMonitoring extends BaseComponent {
 
           <div className="ui vertical segment filterPanel" style={{display: 'none'}}
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-
-            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
+            <i className="close link icon" style={{position:'absolute', top: 10, right:0, zIndex:1}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
-
-            <FilterBar loading={this.state.filterLoading} {...this.props}
-                       onSubmit={this.handleFilterChange.bind(this)}/>
+            
             {userInstructions && userInstructions.cloudmonitor &&
-            <Message dangerouslySetInnerHTML={{__html: userInstructions && userInstructions.cloudmonitor}}/>}
-
+            <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudmonitor}}/>}
+            <FilterBar onSubmit={this.handleFilterChange.bind(this)}/>
           </div>
 
           { (view == 'summary') &&
-          <ProjectsSummary projects={addedProjects}
-                           onProjectSelected={(project) => this.handleProjectSelected(project)}/>
+          <div className="ui vertical segment">
+            <div className="ui four cards">
+              {addedProjects.map((project, index) => {
+                return <ProjectSummary {...project} key={index}
+                                       onSelected={() => this.handleProjectSelected(project)}
+                                       onClose={() => this.handleProjectRemove(project)} />
+              })}
+            </div>
+          </div>
           }
+            
           { (view == 'metric') &&
           <ProjectMetric projects={addedProjects}
                          onProjectSelected={(project) => this.handleProjectSelected(project)}/>
           }
-          {
-            success && data.dataGroups.map(({key, metrics, element})=> {
-              return (
-                <div key={key} className="ui card" style={{width: "100%"}}>
-                  <div className="content">
-                    {element}
-                  </div>
-                </div>
-              )
-            })
-          }
-
         </div>
       </Console.Content>
     )
