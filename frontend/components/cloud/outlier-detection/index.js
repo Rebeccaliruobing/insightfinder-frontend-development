@@ -77,9 +77,9 @@ class HeatMapCard extends Component {
         </div>
         <div className="content">
           <div className="meta">
-                        <span className="date">
-                            {moment(mockData.data[dateIndex].startTime).format('YYYY-MM-DD HH:mm')}
-                        </span>
+              <span className="date">
+                  {moment(this.props.title).format('YYYY-MM-DD HH:mm')}
+              </span>
           </div>
         </div>
         {showPopup &&
@@ -165,32 +165,48 @@ export default class OutlierDetection extends Component {
   }
 
   componentDidMount() {
-    this.setHeatMap(0, 0);
   }
 
-  loadData(startTime, endTime, projectName) {
-    apis.postCloudOutlier(startTime, endTime, projectName).then((resp)=> {
-      console.log(resp)
+  handleData(data) {
+    this.setState({data: data}, ()=> {
+      this.setHeatMap(0, 0);
     })
   }
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
-    let dataArray = [];
-    mockData.data[dateIndex].mapData.NASValues.forEach((line, index) => {
-      var lineArray = line.split(",");
-      var colIndex = lineArray.splice(0, 1);
-      dataArray.push({
-        colIndex: colIndex % 32,
-        rowIndex: parseInt(index / 32),
-        value: lineArray[lineArray.length - 2]
+    let maps;
+    if (_.isArray(this.state.data.splitByInstanceModelData[dateIndex].mapData)) {
+      maps = this.state.data.splitByInstanceModelData[dateIndex].mapData.map((data, index)=> {
+        let dataArray = [];
+        data.NASValues.forEach((line, index) => {
+          var lineArray = line.split(",");
+          var colIndex = lineArray.splice(0, 1);
+          dataArray.push({
+            colIndex: colIndex % 32,
+            rowIndex: parseInt(index / 32),
+            value: lineArray[lineArray.length - 2]
+          });
+        });
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={6} title={data.startTime}
+                            dateIndex={dateIndex} data={dataArray}/>;
       });
-    });
+    } else {
+      let dataArray = [];
+      this.state.data.splitByInstanceModelData[dateIndex].mapData.NASValues.forEach((line, index) => {
+        var lineArray = line.split(",");
+        var colIndex = lineArray.splice(0, 1);
+        dataArray.push({
+          colIndex: colIndex % 32,
+          rowIndex: parseInt(index / 32),
+          value: lineArray[lineArray.length - 2]
+        });
+      });
+      maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={6}
+                          title={this.state.data.splitByInstanceModelData[dateIndex].startTime}
+                          dateIndex={dateIndex} data={dataArray}/>
+    }
 
-    this.setState({
-      heatMap: (
-        <HeatMapCard duration={300} itemSize={6} dateIndex={dateIndex} data={dataArray}/>
-      )
-    });
+    this.setState({heatMaps: maps});
   }
 
   handleDateIndexChange(value) {
@@ -208,10 +224,23 @@ export default class OutlierDetection extends Component {
   }
 
   handleFilterChange(data) {
-    let startTime = moment(data.startTime).format('YYYY-MM-DD HH:mm');
-    let endTime = moment(data.endTime).format('YYYY-MM-DD HH:mm');
-    this.loadData(startTime, endTime, data.projectName);
-    this.$filterPanel.slideUp();
+    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+
+    this.setState({loading: true}, () => {
+      apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
+        if (resp.success) {
+          resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
+          resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
+          resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
+          this.handleData(resp.data);
+          this.$filterPanel.slideUp()
+        }
+        this.setState({loading: false});
+      }).catch(()=> {
+        this.setState({loading: false});
+      })
+    });
   }
 
   render() {
@@ -251,7 +280,7 @@ export default class OutlierDetection extends Component {
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
+            <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
             <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudoutlier}}/>
           </div>
 
@@ -262,12 +291,15 @@ export default class OutlierDetection extends Component {
               values.
             </div>
             <div className="padding40">
-              <RcSlider max={6} value={this.state.dateIndex}
-                        marks={_.zipObject(_.range(0, 6), _.range(0, 6).map((index)=> moment(mockData.data[index].startTime).format('YYYY-MM-DD HH:mm')))}
-                        onChange={this.handleDateIndexChange.bind(this)}/>
+              {this.state.data && (
+                <RcSlider max={this.state.data.splitByInstanceModelData.length - 1}
+                          value={this.state.dateIndex}
+                          marks={this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('YYYY-MM-DD HH:mm'))}
+                          onChange={this.handleDateIndexChange.bind(this)}/>
+              )}
             </div>
             <div className="ui four cards">
-              {this.state.heatMap}
+              {this.state.heatMaps}
             </div>
           </div>
         </div>

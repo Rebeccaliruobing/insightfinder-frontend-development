@@ -193,6 +193,7 @@ const ProjectDetails = class extends React.Component {
             <Dygraph data={_.range(0, 100).map((item, index)=>[index, Math.random() * 1000])}
                      labels={['x', 'y']}
                      style={{height: 150}}
+                     showRangeSelector={true}
                      highlightCircleSize={2}
                      highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                      highlightCallback={this.handleHighlight}/>
