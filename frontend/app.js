@@ -27,7 +27,7 @@ class App extends React.Component {
     store.remove('userInfo');
     store.remove('userName');
     store.remove('token');
-    window.location.href = '/';
+    window.location.reload();
   }
   
   render() {
