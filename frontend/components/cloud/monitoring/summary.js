@@ -83,7 +83,7 @@ class ProjectSummary extends BaseComponent {
   parseAnomalyText(data) {
     var self = this;
     $.each(data, function(i,a){
-      var atext = [];
+      var atext = {};
       var lines = a.anomalies.split('\n');
       $.each(lines, function(lineNo, line) {
         var items = line.split(',');
@@ -106,7 +106,6 @@ class ProjectSummary extends BaseComponent {
       .then(resp => {
         let update = {};
         if (resp.success) {
-          alert(resp.data);
           this.parseAnomalyText(resp.data.anomalyString);
           this.parseAnomalyData(resp.data.detectionResults);
           
