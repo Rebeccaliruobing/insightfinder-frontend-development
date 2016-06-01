@@ -187,7 +187,7 @@ export default class OutlierDetection extends Component {
             value: lineArray[lineArray.length - 2]
           });
         });
-        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={6} title={data.startTime}
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={data.startTime}
                             dateIndex={dateIndex} data={dataArray}/>;
       });
     } else {
@@ -201,7 +201,7 @@ export default class OutlierDetection extends Component {
           value: lineArray[lineArray.length - 2]
         });
       });
-      maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={6}
+      maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={4}
                           title={this.state.data.splitByInstanceModelData[dateIndex].startTime}
                           dateIndex={dateIndex} data={dataArray}/>
     }
@@ -294,7 +294,7 @@ export default class OutlierDetection extends Component {
               {this.state.data && (
                 <RcSlider max={this.state.data.splitByInstanceModelData.length - 1}
                           value={this.state.dateIndex}
-                          marks={this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('YYYY-MM-DD HH:mm'))}
+                          marks={this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('YYYY-MM-DD HH:mm')).sort()}
                           onChange={this.handleDateIndexChange.bind(this)}/>
               )}
             </div>
