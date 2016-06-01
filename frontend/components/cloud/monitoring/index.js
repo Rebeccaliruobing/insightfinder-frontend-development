@@ -5,7 +5,6 @@ import {
   BaseComponent, Console, ButtonGroup, Button,
   Dropdown, Accordion, Message
 } from '../../../artui/react';
-import {ProjectSelection, ModelType, AnomalyThreshold, DurationThreshold} from '../../selections';
 import ProjectsSummary from './summary';
 import ProjectMetric from './metric';
 import {Dygraph} from '../../../artui/react/dataviz';
