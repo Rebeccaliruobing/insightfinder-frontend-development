@@ -1,16 +1,14 @@
 import React from 'react';
+import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
 import {
   BaseComponent, Console, ButtonGroup, Button,
   Dropdown, Accordion, Message
 } from '../../../artui/react';
+
 import ProjectSummary from './summary';
 import ProjectMetric from './metric';
-import {Dygraph} from '../../../artui/react/dataviz';
-
-import apis from '../../../apis';
-
 import FilterBar from './filter-bar';
 
 class LiveMonitoring extends BaseComponent {
@@ -27,7 +25,6 @@ class LiveMonitoring extends BaseComponent {
     this.state = {
       view: 'summary',
       showAddPanel: false,
-      filterLoading: false,
       addedProjects: []
     };
     
@@ -48,21 +45,21 @@ class LiveMonitoring extends BaseComponent {
   }
 
   handleFilterChange(project) {
-    
-    let self = this;
     let {addedProjects} = this.state;
-    this.setState({'filterLoading': true}, () => {
+    if (_.find(addedProjects, p => {
+        return _.isEqual(p, project);
+      })) {
+      alert('The project with same parameters already exist');
+    } else {
       addedProjects.push(project);
-      self.setState({addedProjects: addedProjects}, () => {
-        self.setState({filterLoading: false});
-      });
-    });
+      this.setState({addedProjects: addedProjects});
+    }
   }
   
   handleProjectRemove(project) {
     let {addedProjects} = this.state;
-    addedProjects = _.remove(addedProjects, (p) => {
-      _.isEqual(p, project);
+    _.remove(addedProjects, (p) => {
+      return _.isEqual(p, project)
     });
     
     this.setState({addedProjects});
@@ -106,15 +103,14 @@ class LiveMonitoring extends BaseComponent {
             
             {userInstructions && userInstructions.cloudmonitor &&
             <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudmonitor}}/>}
-            <FilterBar loading={this.state.filterLoading} 
-                       onSubmit={this.handleFilterChange.bind(this)}/>
+            <FilterBar onSubmit={this.handleFilterChange.bind(this)}/>
           </div>
 
           { (view == 'summary') &&
           <div className="ui vertical segment">
             <div className="ui four cards">
               {addedProjects.map((project, index) => {
-                return <ProjectSummary project={project} key={index}
+                return <ProjectSummary {...project} key={index}
                                        onSelected={() => this.handleProjectSelected(project)}
                                        onClose={() => this.handleProjectRemove(project)} />
               })}
