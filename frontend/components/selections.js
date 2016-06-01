@@ -74,6 +74,10 @@ const DurationThreshold =  (props) => {
     <Dropdown mode="select" {...props}>
       <i className="dropdown icon"/>
       <div className="menu">
+        <div className="item">1</div>
+        <div className="item">2</div>
+        <div className="item">3</div>
+        <div className="item">4</div>
         <div className="item">5</div>
         <div className="item">10</div>
         <div className="item">15</div>
