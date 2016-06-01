@@ -19,8 +19,9 @@ $.fn.api.settings.api = {
   
   'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
   'live analysis': `${baseUrl}liveAnalysis`,
-  'cloud outlier': `${baseUrl}cloudOutlierDetection`,
-  'cloud rollout': `${baseUrl}cloudRolloutCheck`,
+  'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
+  'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
+  'display project model': `${baseUrl}displayProjectModel`,
 
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
   'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
@@ -148,9 +149,20 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudOutlier(startTime, endTime, projectName, origin, userName = store.get('userName'), token = store.get('token'),) {
+  postCloudOutlierDetection(startTime, endTime, projectName, origin='cloudoutlier', userName = store.get('userName'), token = store.get('token'),) {
     return new Promise(function (resolve, reject) {
-      requestPost('cloud outlier', {userName, token, startTime, endTime, projectName, origin}, resolve, reject);
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['cloud outlier detection'],
+        data: $.param({startTime, endTime, projectName, origin, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
     });
   },
 
@@ -164,9 +176,46 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudRollout(userName = store.get('userName'), token = store.get('token'), startTime, endTime, projectName, origin) {
+  postCloudRolloutCheck(startTime, endTime, projectName, origin='cloudrollout', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      requestPost('cloud rollout', {userName, token, startTime, endTime, projectName, origin}, resolve, reject);
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['cloud rollout check'],
+        data: $.param({startTime, endTime, projectName, origin, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+  /**
+   *
+   * @param startTime
+   * @param endTime
+   * @param projectName
+   * @param origin
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postDisplayProjectModel(startTime, endTime, projectName, origin='clouddisplay', userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['display project model'],
+        data: $.param({startTime, endTime, projectName, origin, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
     });
   },
 

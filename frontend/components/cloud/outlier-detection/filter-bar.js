@@ -23,8 +23,8 @@ export default  class FilterBar extends Component {
       projectName: undefined,
       projectType: undefined,
       weeks: '1',
-      startTime: moment().toDate(),
-      endTime: moment().add(-1, 'w').toDate()
+      startTime: moment().add(-1, 'w').toDate(),
+      endTime: moment().toDate()
     };
   }
   
@@ -86,7 +86,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Window (Week)</label>
-            <WindowWithWeek onChange={(value, text)=> this.setState({weeks: text}, ()=>this.handleEndTimeChange(endTime))}/>
+            <WindowWithWeek value={1} onChange={(value, text)=> this.setState({weeks: text}, ()=>this.handleEndTimeChange(endTime))}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Start Time</label>
@@ -104,7 +104,8 @@ export default  class FilterBar extends Component {
         </div>
 
         <div className="ui field">
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          <Button className={cx('orange', {'loading': this.props.loading})}
+                  onClick={this.handleSubmit.bind(this)}>Submit</Button>
         </div>
       </div>
     )
