@@ -11,13 +11,19 @@ class Point {
   title;
 
   constructor(x:number, y:number) {
-    this.id = `point-${x}-${y}`;
+    this.id = `point-${parseInt(x)}-${parseInt(y)}`;
     this.x = x;
     this.y = y;
   }
 
   hasLine(l:Line) {
     return this.inLines.indexOf(l) >= 0 || this.outLines.indexOf(l) >= 0;
+  }
+  hasLineIn(l:Line) {
+    return this.inLines.indexOf(l) >= 0;
+  }
+  hasLineOut(l:Line) {
+    return this.outLines.indexOf(l) >= 0;
   }
 }
 
@@ -43,8 +49,18 @@ class Line {
   getArrow(style) {
     let {x, y} = this.toPoint;
     let height = 10;
-    let x2 = x - Math.sin(45) * height, y2 = y - Math.cos(5), y3 = y + Math.cos(5);
-    return <polygon points={`${x},${y} ${x2},${y2} ${x2},${y3}`} style={style}/>
+    let x2 = x - Math.sin(20) * height,
+      x3 = x - Math.sin(20) * height,
+      y2 = y - Math.cos(20) * height,
+      y3 = y + Math.cos(20) * height;
+    return (
+      <defs>
+        <marker id={`${this.id}-arrow`} markerWidth="10" markerHeight="10" refx="0" refy="3" orient="auto"
+                markerUnits="strokeWidth">
+          <path d="M2,2 L2,11 L10,6 L2,2" fill="#f00"/>
+        </marker>
+      </defs>
+    )
   }
 }
 
@@ -143,6 +159,7 @@ export default class LinkTender extends React.Component {
     let isHover = this.state.hoverNode == line.id;
     isHover = (this.state.point && this.state.point.hasLine(line)) || isHover;
 
+    let hoverColor = (this.state.point && this.state.point.hasLineIn(line)) ? '3366FF' : '33FF66';
 
     let zoomRange = this.state.zoomRange;
 
@@ -155,15 +172,25 @@ export default class LinkTender extends React.Component {
     y2 = (y2 - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
     let style = {
-      strokeWidth: (isHover ? 3 : 1) * (zoomRange.zoomX + zoomRange.zoomY) / 2,
-      stroke: isHover ? "#3366FF" : '#999',
+      strokeWidth: (isHover ? 2 : 1) * (zoomRange.zoomX + zoomRange.zoomY) / 2,
+      stroke: isHover ? `#${hoverColor}` : '#999',
       cursor: 'pointer'
     };
 
+    let hoverArrow = (
+      <defs>
+        <marker id={`hover-arrow-${hoverColor}`} markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+          <path d="M2,2 L2,11 L10,6 L2,2" style={{strokeWidth: 0, fill: hoverColor}}/>
+        </marker>
+      </defs>
+    )
+
     return [
+      isHover ? hoverArrow : undefined,
       <line key={line.id} x1={x1} y1={y1} x2={x2} y2={y2} style={style}
             onMouseEnter={()=>this.setState({hoverNode: line.id})}
-            onMouseLeave={()=> isHover && this.setState({hoverNode: undefined})}/>
+            onMouseLeave={()=> isHover && this.setState({hoverNode: undefined})}
+            markerEnd={`url(#${isHover ? 'hover-' : ''}arrow${isHover ? ('-' + hoverColor) : ''})`}/>
     ]
   }
 
@@ -221,6 +248,7 @@ export default class LinkTender extends React.Component {
     let {types, svg, points, lines, point, dataArray, selectRange, zoomRange} = this.state;
     let stageHeight = svg.height / Math.max(types.length, 1);
     let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
+    let {zoomX, zoomY} = zoomRange;
     let reset = ()=> {
       this.setState({
         zoomRange: {
@@ -238,6 +266,12 @@ export default class LinkTender extends React.Component {
                         onMouseDown={this.handleMouseDown.bind(this)}
                         onMouseMove={this.handleMouseMove.bind(this)}
                         onMouseUp={this.handleMouseUp.bind(this)}>
+
+            <defs>
+              <marker id={`arrow`} markerWidth="13" markerHeight="13" refX="10" refY="6" orient="auto">
+                <path d="M2,2 L2,11 L10,6 L2,2" style={{fill: '#999'}}/>
+              </marker>
+            </defs>
             {types.map((type, index)=> {
               var y = stageHeight * index + stageHeight * 0.5;
               y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
