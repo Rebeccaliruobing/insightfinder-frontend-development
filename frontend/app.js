@@ -28,6 +28,13 @@ class App extends React.Component {
     dashboardDailySummaryReport: React.PropTypes.object
   };
 
+  handleLogoff() {
+    store.remove('userInfo');
+    store.remove('userName');
+    store.remove('token');
+    window.location.href = '/';
+  }
+  
   render() {
     let {
       userInfo,
@@ -49,7 +56,7 @@ class App extends React.Component {
               {userInfo.userName}
               <i className="dropdown icon"/>
               <div className="menu">
-                <div className="item">
+                <div className="item" onClick={this.handleLogoff.bind(this)}>
                   <i className="icon power"/>Logout
                 </div>
               </div>
@@ -65,7 +72,6 @@ class App extends React.Component {
 const appHistory = useRouterHistory(createHashHistory)({queryKey: false});
 
 const routes = (
-
   <Router history={appHistory}>
     <Route component={App} path="/">
       <IndexRedirect to="/cloud"/>
@@ -167,6 +173,4 @@ class AppRoute extends React.Component {
 }
 
 $('body').prepend($('<div id="app"></div>'));
-
-
 ReactDOM.render(<AppRoute/>, document.querySelector('#app'));

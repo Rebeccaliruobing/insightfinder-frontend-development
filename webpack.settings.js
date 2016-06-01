@@ -7,7 +7,6 @@ module.exports = {
     commons: './commons',
     assets: './assets',
     app: './app',
-    auth: './auth',
     liveMonitoring: './liveMonitoring'
   },
   
