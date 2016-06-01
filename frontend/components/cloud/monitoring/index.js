@@ -49,7 +49,7 @@ class LiveMonitoring extends BaseComponent {
   }
 
   handleProjectSelected(project) {
-    window.open('/liveMonitoring?project=' + project);
+    window.open('/#/liveMonitoring?project=' + project);
   }
 
 

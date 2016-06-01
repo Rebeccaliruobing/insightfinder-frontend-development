@@ -11,6 +11,7 @@ import store from 'store';
 import Login from './components/auth/login'
 import {cloudRoute} from './components/cloud';
 import {settingsRoute} from './components/settings';
+import ProjectDetails from './components/cloud/monitoring/details';
 import apis from './apis';
 
 
@@ -69,6 +70,16 @@ class App extends React.Component {
   }
 }
 
+const liveMonitoringApp = function(props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')} />
+      <ProjectDetails location={location} params={params} />
+    </Console>
+  );
+};
+
 const appHistory = useRouterHistory(createHashHistory)({queryKey: false});
 
 const routes = (
@@ -78,6 +89,7 @@ const routes = (
       {cloudRoute}
       {settingsRoute}
     </Route>
+    <Route component={liveMonitoringApp} path="/liveMonitoring"/>
   </Router>
 );
 
