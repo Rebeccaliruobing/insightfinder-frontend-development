@@ -66,6 +66,9 @@ class Line {
 
 
 export default class LinkTender extends React.Component {
+  defaultProps = {
+    data: DataLinks
+  }
   constructor(props) {
     super(props);
     this.state = {
@@ -92,7 +95,7 @@ export default class LinkTender extends React.Component {
   componentDidMount() {
     let dataArray = [];
     let types = [];
-    DataLinks.split("\n").forEach((line)=> {
+    this.props.data.split("\n").forEach((line)=> {
       let [d1, d2, d3, d4] = line.split(".");
       if ((parseInt(d1) + '') == d1) {
         dataArray[dataArray.length - 1].push(line);

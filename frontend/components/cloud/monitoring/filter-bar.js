@@ -23,7 +23,7 @@ export default  class FilterBar extends Component {
       projectType: undefined,
       modelType: 'Holistic',
       anomalyThreshold: 0.95,
-      durationHours: 6,
+      durationHours: 1,
       weeks: '1',
       startTime: moment().toDate(),
       endTime: moment().add(-1, 'w').toDate()

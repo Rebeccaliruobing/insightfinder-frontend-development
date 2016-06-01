@@ -103,10 +103,16 @@ const DurationHour = (props) => {
     <Dropdown mode="select" {...props}>
       <i className="dropdown icon"/>
       <div className="menu">
-        <div className="item">6</div>
-        <div className="item">12</div>
-        <div className="item">18</div>
-        <div className="item">24</div>
+        <div className="item">1</div>
+        <div className="item">2</div>
+        <div className="item">3</div>
+        <div className="item">4</div>
+        <div className="item">5</div>
+        <div className="item">10</div>
+        <div className="item">15</div>
+        <div className="item">20</div>
+        <div className="item">25</div>
+        <div className="item">30</div>
       </div>
     </Dropdown>
   )

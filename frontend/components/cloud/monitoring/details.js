@@ -194,11 +194,7 @@ const ProjectDetails = class extends React.Component {
                      labels={['x', 'y']}
                      style={{height: 150}}
                      highlightCircleSize={2}
-                     highlightSeriesOpts={{
-                          strokeWidth: 3,
-                          strokeBorderWidth: 1,
-                          highlightCircleSize: 5
-                        }}
+                     highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                      highlightCallback={this.handleHighlight}/>
           </div>
         </Accordion>

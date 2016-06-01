@@ -41,6 +41,12 @@ class Dygraph extends BaseComponent {
 
   static defaultProps = Object.assign({
     tag: 'div',
+    labelsDivStyles: {
+      'backgroundColor': 'transparent',
+      'float': 'right',
+      'textAlign': 'right'
+    },
+    isZoomedIgnoreProgrammaticZoom: true
   }, DygraphDefaultProps);
 
   constructor(props) {
