@@ -10,8 +10,6 @@ import {
   AnomalyThreshold
 } from '../../selections';
 
-import DateTimePicker from "../../ui/datetimepicker/index";
-
 export default  class FilterBar extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
@@ -75,12 +73,18 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, anomalyThreshold, durationHours, projectType} = this.state;
+    const {projectName, anomalyThreshold, durationHours, projectType, modelType} = this.state;
     const labelStyle = {};
+    const submitStyle = cx(
+      'orange', {
+        loading: this.props.loading,
+        disabled: !projectName || !modelType
+      }
+    );
 
     return (
       <div className="ui form">
-        <div className="five fields fill">
+        <div className="six fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
             <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
@@ -91,21 +95,20 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Anomaly Threshold</label>
-            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: t})}/>
+            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Duration (Hour)</label>
             <DurationHour value={durationHours} onChange={(v, t)=>this.setState({durationHours: t})}/>
           </div>
-        </div>
-
-        <div className="ui field">
-          <Button className={cx('orange', {'loading': this.props.loading})}
-                  onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          <div className="field">
+            <Button className={submitStyle} style={{marginTop: 20}}
+                    onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          </div>
         </div>
       </div>
     )
