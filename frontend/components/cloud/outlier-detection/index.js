@@ -65,20 +65,20 @@ class HeatMapCard extends Component {
 
     let groups = [
       'Summary',
-      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
-      // 'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+      'Metric Group 1', 'Metric Group 2', 'Metric Group 3',
+      // 'Metric Group 4', 'Metric Group 5', 'Metric Group 6'
     ];
     return (
       <div className="ui card">
-        <div className="image">
+        <div className="image" style={{backgroudColor: '#FFF'}}>
           <a target="_blank" onClick={this.showPopup.bind(this)}>
             <HeatMap duration={duration} itemSize={itemSize} data={data}/>
           </a>
         </div>
         <div className="content">
           <div className="meta">
-              <span className="date">
-                  {moment(this.props.title).format('YYYY-MM-DD HH:mm')}
+              <span className="date" style={{textAlign: 'text-center'}}>
+                  {this.props.title}
               </span>
           </div>
         </div>
@@ -88,7 +88,7 @@ class HeatMapCard extends Component {
           <div className="ui standard test modal transition visible active scrolling"
                style={{display: 'block !important', top: 188}}>
             <div className="header">
-              Group 1
+              {this.props.title}
             </div>
             <div className="content">
               <div style={{width: '100%'}}>
@@ -175,8 +175,8 @@ export default class OutlierDetection extends Component {
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
     let maps;
-    if (_.isArray(this.state.data.splitByInstanceModelData[dateIndex].mapData)) {
-      maps = this.state.data.splitByInstanceModelData[dateIndex].mapData.map((data, index)=> {
+    if (_.isArray(this.state.data.splitByGroupModelData[dateIndex].mapData)) {
+      maps = this.state.data.splitByGroupModelData[dateIndex].mapData.map((data, index)=> {
         let dataArray = [];
         data.NASValues.forEach((line, index) => {
           var lineArray = line.split(",");
@@ -187,12 +187,13 @@ export default class OutlierDetection extends Component {
             value: lineArray[lineArray.length - 2]
           });
         });
-        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={data.startTime}
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4}
+                            title={data.instanceName || `Group ${data.groupId}`}
                             dateIndex={dateIndex} data={dataArray}/>;
       });
     } else {
       let dataArray = [];
-      this.state.data.splitByInstanceModelData[dateIndex].mapData.NASValues.forEach((line, index) => {
+      this.state.data.splitByGroupModelData[dateIndex].mapData.NASValues.forEach((line, index) => {
         var lineArray = line.split(",");
         var colIndex = lineArray.splice(0, 1);
         dataArray.push({
@@ -202,13 +203,12 @@ export default class OutlierDetection extends Component {
         });
       });
       maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={4}
-                          title={this.state.data.splitByInstanceModelData[dateIndex].startTime}
+                          title={`Group ${this.state.data.splitByGroupModelData[dateIndex].groupId}`}
                           dateIndex={dateIndex} data={dataArray}/>
     }
 
     this.setState({heatMaps: maps});
   }
-
   handleDateIndexChange(value) {
     this.setState({
       dateIndex: parseInt(value),
@@ -266,17 +266,9 @@ export default class OutlierDetection extends Component {
                 <i className="setting icon"/>
               </Button>
             </ButtonGroup>
-            <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
-                <i className="line chart icon"/>
-              </Button>
-              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
-                <i className="table icon"/>
-              </Button>
-            </ButtonGroup>
           </div>
 
-          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+          <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>

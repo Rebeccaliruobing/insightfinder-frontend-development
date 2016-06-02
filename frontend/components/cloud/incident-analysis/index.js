@@ -67,17 +67,9 @@ export default class IncidentDetection extends Component {
                 <i className="setting icon"/>
               </Button>
             </ButtonGroup>
-            <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
-                <i className="line chart icon"/>
-              </Button>
-              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
-                <i className="table icon"/>
-              </Button>
-            </ButtonGroup>
           </div>
 
-          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+          <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
 
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}

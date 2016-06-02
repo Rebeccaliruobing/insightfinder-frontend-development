@@ -51,7 +51,7 @@ class HeatMap extends React.Component {
 
   render() {
     return (
-      <div className={cx('heatmap inlin-block')}>
+      <div className={cx('heatmap inlin-block')} style={{backgroundColor: '#FFF'}}>
         <svg ref={this._refSvg.bind(this)}></svg>
       </div>
     )
