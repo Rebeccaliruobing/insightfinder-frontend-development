@@ -8,7 +8,6 @@ import {
 } from '../../../artui/react';
 
 import ProjectSummary from './summary';
-import ProjectMetric from './metric';
 import FilterBar from './filter-bar';
 
 class LiveMonitoring extends BaseComponent {
@@ -23,7 +22,6 @@ class LiveMonitoring extends BaseComponent {
 
     this._el = null;
     this.state = {
-      view: 'summary',
       showAddPanel: false,
       addedProjects: []
     };
@@ -66,7 +64,7 @@ class LiveMonitoring extends BaseComponent {
   }
 
   render() {
-    const {view, addedProjects} = this.state;
+    const {addedProjects} = this.state;
     const userInstructions = this.context.userInstructions;
 
     return (
@@ -86,14 +84,6 @@ class LiveMonitoring extends BaseComponent {
               </Button>
               <Button><i className="setting icon"/></Button>
             </ButtonGroup>
-            <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'summary'} onClick={()=>this.setState({view:'summary'})}>
-                <i className="line chart icon"/>
-              </Button>
-              <Button active={view == 'metric'} onClick={()=>this.setState({view:'metric'})}>
-                <i className="table icon"/>
-              </Button>
-            </ButtonGroup>
           </div>
 
           <div className="ui vertical segment filterPanel" style={{display: 'none'}}
@@ -106,7 +96,6 @@ class LiveMonitoring extends BaseComponent {
             <FilterBar onSubmit={this.handleFilterChange.bind(this)}/>
           </div>
 
-          { (view == 'summary') &&
           <div className="ui vertical segment">
             <div className="ui four cards">
               {addedProjects.map((project, index) => {
@@ -116,12 +105,6 @@ class LiveMonitoring extends BaseComponent {
               })}
             </div>
           </div>
-          }
-            
-          { (view == 'metric') &&
-          <ProjectMetric projects={addedProjects}
-                         onProjectSelected={(project) => this.handleProjectSelected(project)}/>
-          }
         </div>
       </Console.Content>
     )

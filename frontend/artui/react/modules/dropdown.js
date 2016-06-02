@@ -104,7 +104,7 @@ class Dropdown extends BaseComponent {
     let textElem = (
       <span key="t" 
             className={!!text ? 'text' : (!!defaultText ? 'default text': 'text')}> 
-        {text || defaultText}
+        {text || value || defaultText}
       </span>
     );
 
