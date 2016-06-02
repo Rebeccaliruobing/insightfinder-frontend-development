@@ -86,17 +86,9 @@ class LiveMonitoring extends BaseComponent {
               </Button>
               <Button><i className="setting icon"/></Button>
             </ButtonGroup>
-            <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'summary'} onClick={()=>this.setState({view:'summary'})}>
-                <i className="line chart icon"/>
-              </Button>
-              <Button active={view == 'metric'} onClick={()=>this.setState({view:'metric'})}>
-                <i className="table icon"/>
-              </Button>
-            </ButtonGroup>
           </div>
 
-          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+          <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{position:'absolute', top: 10, right:0, zIndex:1}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>

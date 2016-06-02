@@ -2,6 +2,7 @@ import React from 'react';
 import {Console, Accordion, Link, IndexLink} from '../../artui/react';
 
 export default function(props) {
+  // <Link to="/cloud/display-model" className="item">Display Model</Link>
   return (
     <Console.Navbar>
       <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
@@ -13,7 +14,7 @@ export default function(props) {
             <Link to="/cloud/outlier-detection" className="item">Cluster Outlier Detection</Link>
             <Link to="/cloud/software-rollout-check" className="item">Software Rollout Check</Link>
             <Link to="/cloud/summary-report" className="item">Summary Report</Link>
-            <Link to="/cloud/display-model" className="item">Display Model</Link>
+
           </div>
         </div>
         <div className="item">

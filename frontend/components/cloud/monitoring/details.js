@@ -42,8 +42,8 @@ const ProjectDetails = class extends React.Component {
             <a className="active title"><i className="dropdown icon"/>List of Charts</a>
             <div className="active content menu">
               <Link to="" className="item">Summary</Link>
-              <Link to="" className="item">Normalization Group 1</Link>
-              <Link to="" className="item">Normalization Group 2</Link>
+              <Link to="" className="item">Metric Group 1</Link>
+              <Link to="" className="item">Metric Group 2</Link>
             </div>
           </div>
           <div className="item">
@@ -66,7 +66,7 @@ const ProjectDetails = class extends React.Component {
               <div className="content">
                 <a className="author">Matt</a>
                 <div className="metadata">
-                  <span className="date">Today at 5:42PM</span>
+                  <span className="date" style={{textAlign: 'text-center'}}>Today at 5:42PM</span>
                 </div>
                 <div className="text">
                   Do something!
@@ -77,7 +77,7 @@ const ProjectDetails = class extends React.Component {
               <div className="content">
                 <a className="author">Jacob</a>
                 <div className="metadata">
-                  <span className="date">Today at 6:02PM</span>
+                  <span className="date" style={{textAlign: 'text-center'}}>Today at 6:02PM</span>
                 </div>
                 <div className="text">
                   Fixed!
@@ -104,7 +104,7 @@ const ProjectDetails = class extends React.Component {
               <div className="content">
                 <a className="author">Matt</a>
                 <div className="metadata">
-                  <span className="date">Today at 5:42PM</span>
+                  <span className="date" style={{textAlign: 'text-center'}}>Today at 5:42PM</span>
                 </div>
                 <div className="text">
                   Do something!
@@ -150,8 +150,8 @@ const ProjectDetails = class extends React.Component {
   renderGroups(view) {
     let groups = [
       'Summary',
-      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
-      'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+      'Metric Group 1', 'Metric Group 2', 'Metric Group 3',
+      'Metric Group 4', 'Metric Group 5', 'Metric Group 6'
     ];
     let elems = [];
 
@@ -181,8 +181,8 @@ const ProjectDetails = class extends React.Component {
   renderList() {
     let groups = [
       'Summary',
-      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
-      'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+      'Metric Group 1', 'Metric Group 2', 'Metric Group 3',
+      'Metric Group 4', 'Metric Group 5', 'Metric Group 6'
     ];
     let elems = [];
     groups.map((group, index) => {

@@ -147,7 +147,7 @@ class LiveMonitoring extends BaseComponent {
             </ButtonGroup>
           </div>
 
-          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+          <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>

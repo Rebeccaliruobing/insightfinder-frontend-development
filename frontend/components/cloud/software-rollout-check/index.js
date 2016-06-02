@@ -65,20 +65,20 @@ class HeatMapCard extends Component {
 
     let groups = [
       'Summary',
-      'Normalization Group 1', 'Normalization Group 2', 'Normalization Group 3',
-      // 'Normalization Group 4', 'Normalization Group 5', 'Normalization Group 6'
+      'Metric Group 1', 'Metric Group 2', 'Metric Group 3',
+      // 'Metric Group 4', 'Metric Group 5', 'Metric Group 6'
     ];
     return (
       <div className="ui card">
-        <div className="image">
+        <div className="image" style={{backgroudColor: '#FFF'}}>
           <a target="_blank" onClick={this.showPopup.bind(this)}>
             <HeatMap duration={duration} itemSize={itemSize} data={data}/>
           </a>
         </div>
         <div className="content">
           <div className="meta">
-              <span className="date">
-                  {moment(this.props.title).format('YYYY-MM-DD HH:mm')}
+              <span className="date" style={{textAlign: 'text-center'}}>
+                  {this.props.title}
               </span>
           </div>
         </div>
@@ -88,7 +88,7 @@ class HeatMapCard extends Component {
           <div className="ui standard test modal transition visible active scrolling"
                style={{display: 'block !important', top: 188}}>
             <div className="header">
-              Group 1
+              {this.props.title}
             </div>
             <div className="content">
               <div style={{width: '100%'}}>
@@ -187,7 +187,8 @@ export default class SoftwareRolloutCheck extends Component {
             value: lineArray[lineArray.length - 2]
           });
         });
-        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={data.startTime}
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4}
+                            title={data.instanceName || `Group ${data.groupId}`}
                             dateIndex={dateIndex} data={dataArray}/>;
       });
     } else {
@@ -202,7 +203,7 @@ export default class SoftwareRolloutCheck extends Component {
         });
       });
       maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={4}
-                          title={this.state.data.splitByGroupModelData[dateIndex].startTime}
+                          title={`Group ${this.state.data.splitByGroupModelData[dateIndex].groupId}`}
                           dateIndex={dateIndex} data={dataArray}/>
     }
 
@@ -266,22 +267,14 @@ export default class SoftwareRolloutCheck extends Component {
                 <i className="setting icon"/>
               </Button>
             </ButtonGroup>
-            <ButtonGroup className="right floated basic icon">
-              <Button active={view == 'chart'} onClick={()=>this.setState({view:'chart'})}>
-                <i className="line chart icon"/>
-              </Button>
-              <Button active={view == 'table'} onClick={()=>this.setState({view:'table'})}>
-                <i className="table icon"/>
-              </Button>
-            </ButtonGroup>
           </div>
 
-          <div className="ui vertical segment filterPanel" style={{display: 'none'}}
+          <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
             <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-            <Message dangerouslySetInnerHTML={{__html: userInstructions.rolloutcheck}}/>
+            <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudrollout}}/>
           </div>
 
           <div className="ui vertical segment">
