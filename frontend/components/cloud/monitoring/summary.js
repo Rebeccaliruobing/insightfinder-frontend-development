@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import ReactTimeout from 'react-timeout'
 import {BaseComponent, PropTypes, Table} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
@@ -102,6 +103,7 @@ class ProjectSummary extends BaseComponent {
   
   updateLiveAnalysis() {
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
+    this.setState({loading: true});
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
       .then(resp => {
         let update = {};
@@ -116,6 +118,7 @@ class ProjectSummary extends BaseComponent {
         }
         update.loading = false;
         this.setState(update);
+        this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
       });
   }
   
@@ -157,4 +160,4 @@ class ProjectSummary extends BaseComponent {
   }
 }
 
-export default ProjectSummary;
+export default ReactTimeout(ProjectSummary);
