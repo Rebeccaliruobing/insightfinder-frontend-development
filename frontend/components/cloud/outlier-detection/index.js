@@ -57,7 +57,6 @@ export default class OutlierDetection extends Component {
       });
 
       let title;
-      // TODO: generate heatmap title by data;
       if (data.instanceName) {
         title = data.instanceName
       } else {
