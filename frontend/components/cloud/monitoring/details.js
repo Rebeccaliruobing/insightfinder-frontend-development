@@ -11,6 +11,7 @@ const ProjectDetails = class extends React.Component {
     super(props);
     this.state = {
       view: 'four',
+      viewText: 4,
       selectedGroup: ''
     }
   }
@@ -231,8 +232,10 @@ const ProjectDetails = class extends React.Component {
               <div className="ui vertical segment">
                 {project}
                 <ButtonGroup className="right floated basic icon">
-                  <Dropdown className="compact" value={this.state['view']} mode="select"
-                            onChange={(value) => {this.setState({view: value})}}>
+                  <Dropdown className="compact" 
+                            value={this.state['view']} text={this.state['viewText']} 
+                            mode="select"
+                            onChange={(value, text) => {this.setState({view: value, viewText: text})}}>
                     <div className="menu">
                       <div className="item" data-value="two">2</div>
                       <div className="item" data-value="three">3</div>

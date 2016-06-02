@@ -132,7 +132,7 @@ class ProjectSummary extends BaseComponent {
            onMouseLeave={() => this.setState({showCloser:false})}
            onClick={() => this.props.onSelected() }>
         <div className="content">
-          {showCloser &&
+          {!loading && showCloser &&
           <i className="close link icon" style={{position:'absolute', top: 10, right:5, zIndex:1}}
              onClick={this.handleClose.bind(this)}/>
           }
