@@ -21,7 +21,7 @@ class LiveMonitoring extends BaseComponent {
 
     this._el = null;
     this.state = {
-      showAddPanel: false,
+      showAddPanel: true,
       addedProjects: []
     };
     

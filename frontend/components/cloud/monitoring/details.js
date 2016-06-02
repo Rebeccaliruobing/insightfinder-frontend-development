@@ -1,5 +1,5 @@
 import React from 'react';
-import {withRouter} from 'react-router';
+import ReactTimeout from 'react-timeout'
 import cx from 'classnames';
 
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
@@ -19,12 +19,6 @@ const ProjectDetails = class extends React.Component {
   componentDidMount() {
   }
   
-  componentDidUpdate() {
-  }
-  
-  componentWillUnmount() {
-  }
-
   handleHighlight(v){
     return Math.max.apply(Math, v) > 850 ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
   }
@@ -217,7 +211,7 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
-    let project = query['project'];
+    const {projectName, anomalyThreshold, durationThreshold, modelType} = query;
     let {view, selectedGroup} = this.state;
     
     let isListView = view === 'list';
@@ -230,7 +224,7 @@ const ProjectDetails = class extends React.Component {
           <div className="ui main tiny container" ref={c => this._el = c}>
             <div className="ui clearing vertical segment">
               <div className="ui vertical segment">
-                {project}
+                {projectName}
                 <ButtonGroup className="right floated basic icon">
                   <Dropdown className="compact" 
                             value={this.state['view']} text={this.state['viewText']} 
@@ -271,4 +265,4 @@ const ProjectDetails = class extends React.Component {
   }
 };
 
-export default ProjectDetails;
+export default ReactTimeout(ProjectDetails);

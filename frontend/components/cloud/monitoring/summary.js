@@ -21,6 +21,7 @@ class ProjectSummary extends BaseComponent {
       data: [],
       loading: true
     };
+    this.hintMapping = [];
     this.anomalyTexts = [];
     this.anomalies = [];
   }
@@ -49,15 +50,14 @@ class ProjectSummary extends BaseComponent {
   parseAnomalyData(data) {
     
     let self = this;
-    
-    $.each(data, function(i,a){
-      var atext = (data.length == 1)?self.anomalyTexts[0]:self.anomalyTexts[i];
+    let arr = data;
+    $.each(arr, function(i,a){
+      var atext = (arr.length === 1)?self.anomalyTexts[0]:self.anomalyTexts[i];
       var alies = [];
       var lines = a.detectionResults.split('\n');
-      
       $.each(lines, function(lineNo, line) {
         var items = line.split(',');
-        if (lineNo == 0) {
+        if (lineNo === 0) {
           $.each(items, function(seriesNo, item) {
             if (seriesNo > 0) {
               // if multiple output types are present, parse them here
@@ -68,31 +68,66 @@ class ProjectSummary extends BaseComponent {
             var ts = parseInt(items[0]);
             var val = parseFloat(items[1]);
             alies.push({
+              groupId : a.groupId,
               time : new Date(ts),
               timestamp : ts,
               val : val,
               text : (parseFloat(items[1])>0)?atext[ts]:"",
-              metrs : (parseFloat(items[1])>0)?(self.extractMetrics(atext[ts], 1)):[]
+              metrs : (parseFloat(items[1])>0)?(self.extractMetric(atext[ts])):[]
             });
           }
         }
       });
-      self.anomalies.push(alies);
+      self.anomalies[a.groupId] = alies
     });
   }
 
   parseAnomalyText(data) {
+    let arr = data;
     var self = this;
-    $.each(data, function(i,a){
+    
+    $.each(arr, function(i,a){
       var atext = {};
-      var lines = a.anomalies.split('\n');
-      $.each(lines, function(lineNo, line) {
-        var items = line.split(',');
-        if(items[2]){
-          var hints = items[2].split(':');
-          atext[parseInt(items[0])] = hints[1];
-        }
-      });
+      if(a.anomalies!=""){
+        var lines = a.anomalies.split('\n');
+        $.each(lines, function(lineNo, line) {
+          var items = line.split(',');
+          if(items[2]){
+            var hints = items[2].trim().split(':');
+            // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
+            var hintss = hints[1].trim().split(';');
+            var newhints = "";
+            try{
+              $.each(hintss, function(ihint,hint){
+                // 1.Change_inflicted(min)[node0](1.0);
+                // 0=#.metric, 1=node, 2=(val)
+                var hintparts = hint.split(/\[|\]/);
+                var metric = hintparts[0].split('.')[1];
+                var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
+                var newval = hintparts[2].split(/\(|\)/)[1];
+                console.log(hintparts, valparts);
+                if(self.hintMapping[metric.trim()]!=undefined){
+                  var thisMap = self.hintMapping[metric.trim()];
+                  if(thisMap[parseInt(valparts[0])]!=undefined){
+                    newval = thisMap[parseInt(valparts[0])];
+                  }
+                }
+                //console.log(hintparts);
+                newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
+                if(ihint<hintss.length-1){
+                  newhints = newhints+"; ";
+                }
+              });
+              //console.log(newhints);
+            } catch (err){
+              newhints = hints[1];
+            }
+
+            atext[parseInt(items[0])] = newhints;
+            console.log(hints[1]);
+          }
+        });
+      }
       self.anomalyTexts.push(atext);
     });
   }
@@ -151,8 +186,7 @@ class ProjectSummary extends BaseComponent {
                    style={{width: '100%', height: '100%'}}
                    animatedZooms={true} highlightCircleSize={2} strokeWidth={3}
                    labelsDivStyles={{padding: '4px', margin:'15px'}}
-                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-          />
+                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}} />
           }
         </div>
       </div>
