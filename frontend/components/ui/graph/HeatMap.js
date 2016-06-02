@@ -39,7 +39,7 @@ class HeatMap extends React.Component {
       '#F8CF54',
       '#F7A856',
       '#F68459',
-      '#F5605B'
+      '#FF0000'
     ],
     duration: 100
   };
