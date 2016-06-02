@@ -13,7 +13,6 @@ import FilterBar from './filter-bar';
 class LiveMonitoring extends BaseComponent {
 
   static contextType = {
-    router: React.PropTypes.object,
     userInstructions: React.PropTypes.object
   };
 
@@ -33,7 +32,10 @@ class LiveMonitoring extends BaseComponent {
   }
 
   handleProjectSelected(project) {
-    window.open('#/liveMonitoring?project=' + project.projectName);
+    const {projectName, anomalyThreshold, durationThreshold, modelType} = project;
+    window.open(
+      `#/liveMonitoring?projectName=${projectName}&modelType=${modelType}&anomalyThreshold=${anomalyThreshold}&durationThreshold=${durationThreshold}`
+    );
   }
   
   handleToggleFilterPanel() {
