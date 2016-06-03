@@ -18,7 +18,7 @@ class Dropdown extends BaseComponent {
       PropTypes.arrayOf(PropTypes.string), 
       PropTypes.arrayOf(PropTypes.number)
     ]),
-    text: PropTypes.string,
+    text: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     defaultText: PropTypes.string,
     icon: PropTypes.element,
     
