@@ -10,8 +10,18 @@ class AmazonProjects extends React.Component {
       showModal: false
     };
   }
+  
+  componentDidMount() {
+    this.loadProjects()
+  }
+  
+  loadProjects() {
+    //  TODO: load projects
+  }
 
   handleModalClose = () => this.setState({showModal: false});
+  
+  
 
   render() {
     return (
@@ -42,7 +52,7 @@ class AmazonProjects extends React.Component {
           <tr>
             <td className="collapsing">
               <div className="ui fitted checkbox">
-                <input type="checkbox" /><label></label>
+                <input type="checkbox"/><label></label>
               </div>
             </td>
             <td>12</td>

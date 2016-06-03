@@ -2,7 +2,7 @@
 """
     本模块包括URL路由定义及对应的视图。
 """
-from flask import jsonify
+from flask import jsonify, request
 
 
 def init_app(app):
@@ -29,5 +29,5 @@ def init_app(app):
 
         return jsonify({
             'success': True,
-            'fileUrl': ''
+            'fileUrl': 'example.com/path'
         })

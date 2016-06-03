@@ -11,6 +11,15 @@ class CustomProjects extends React.Component {
     };
   }
 
+
+  componentDidMount() {
+    this.loadProjects()
+  }
+
+  loadProjects() {
+    //  TODO: load projects
+  }
+
   handleModalClose = () => this.setState({showModal: false});
 
   render() {
@@ -29,35 +38,32 @@ class CustomProjects extends React.Component {
           <tr>
             <th className="collapsing">
               <div className="ui fitted checkbox">
-                <input type="checkbox" /><label></label>
+                <input type="checkbox"/><label></label>
               </div>
             </th>
             <th>Project Name</th>
-            <th>AWS Access Id</th>
-            <th>Secret Access Key</th>
-            <th>Availability Zone</th>
+            <th>Project Type</th>
+            <th>Sampling Interval</th>
           </tr>
           </thead>
           <tbody>
           <tr>
             <td className="collapsing">
               <div className="ui fitted checkbox">
-                <input type="checkbox" /><label></label>
+                <input type="checkbox"/><label></label>
               </div>
             </td>
             <td>12</td>
-            <td>AWE</td>
             <td>AWE</td>
             <td>AWE</td>
           </tr>
           <tr>
             <td className="collapsing">
               <div className="ui fitted checkbox">
-                <input type="checkbox" /><label></label>
+                <input type="checkbox"/><label></label>
               </div>
             </td>
             <td>12</td>
-            <td>AWE</td>
             <td>AWE</td>
             <td>AWE</td>
           </tr>

@@ -51,18 +51,6 @@ class Projects extends React.Component {
             <i className="right angle icon divider"/>
             <div className="active section">Projects</div>
           </Console.Breadcrumb>
-          {tabStates['amazon'] === 'active' &&
-          <div className="ui message attached"
-               dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
-          }
-          {tabStates['google'] === 'active' &&
-          <div className="ui message attached"
-               dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
-          }
-          {tabStates['custom'] === 'active' &&
-          <div className="ui message attached"
-               dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
-          }
           <div className="ui pointing secondary menu">
             <a className={tabStates['custom'] + ' item'}
                onClick={(e) => this.selectTab(e, 'custom')}>Insight Agent</a>
@@ -80,6 +68,7 @@ class Projects extends React.Component {
           <div className={tabStates['custom'] + ' ui tab segment'}>
             {tabStates['custom'] === 'active' ? <CustomProjects/> : null}
           </div>
+          <div className="ui message attached" dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
         </div>
       </Console.Content>
     )

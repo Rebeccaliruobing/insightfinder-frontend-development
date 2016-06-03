@@ -8,8 +8,6 @@ export default function (props) {
         <div className="item">
           <a className="active title"><i className="dropdown icon"/>Use Case</a>
           <div className="active content menu">
-            <Link to="/usecase/list-all" className="item">List All</Link>
-            <Link to="/usecase/search" className="item">Search</Link>
             <Link to="/usecase/explore" className="item">Explore</Link>
           </div>
         </div>

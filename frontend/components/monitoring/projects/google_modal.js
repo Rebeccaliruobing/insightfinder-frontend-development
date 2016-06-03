@@ -1,7 +1,6 @@
 import 'blueimp-file-upload/css/jquery.fileupload.css';
 
 
-
 require('script-loader!blueimp-file-upload/js/vendor/jquery.ui.widget');
 require('script-loader!blueimp-file-upload');
 
@@ -18,9 +17,16 @@ class GoogleProjectModal extends React.Component {
   }
 
   componentDidMount() {
-    if (this._dropdown) {
-      $(this._dropdown).dropdown();
-    }
+    this.loadProjects()
+  }
+
+  loadProjects() {
+    //  TODO: load projects
+  }
+
+  handleSubmit() {
+    console.log(this.state);
+    debugger;
   }
 
   render() {
@@ -30,38 +36,38 @@ class GoogleProjectModal extends React.Component {
           <form className="ui form">
             <div className="field">
               <label>Project Name</label>
-              <input type="text" name="name"/>
+              <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
               <label>Project ID</label>
-              <input type="text" name="project_id"/>
+              <input type="text" name="project_id" onChange={(e)=>this.setState({projectId: e.target.value})}/>
             </div>
+
             <div className="field">
               <label>Project Type</label>
-              <div className="ui selection dropdown" ref={c => this._dropdown = c}>
-                <input name="type" type="hidden" value="0,1"/>
-                <i className="dropdown icon"/>
-                <span className="default text"/>
-                <div className="menu">
-                  <div className="item">GAE</div>
-                  <div className="item">GCE</div>
-                </div>
-              </div>
+              <select className="ui dropdown" onChange={(e)=>this.setState({projectType: e.target.value})}>
+                <option className="item">Project Type</option>
+                <option className="item" value="GAE">GAE</option>
+                <option className="item" value="GCE">GCE</option>
+              </select>
             </div>
             <div className="field">
               <label>Service Account Email</label>
-              <input type="text" name="email"/>
+              <input type="text" name="email" onChange={(e)=>this.setState({email: e.target.value})}/>
             </div>
             <div className="field">
               <label>.p12 key file</label>
-              <input type="file" name="p12" ref={this.fileUploadRef}/>
+              <div className="ui button fileinput-button">
+                Upload .p12 key file
+                <input type="file" name="file" ref={this.fileUploadRef}/>
+              </div>
             </div>
           </form>
         </div>
         <div className="actions">
           <div className="ui button deny">Cancel</div>
           <div className="ui button approve labeled">
-            <div className="ui button orange">
+            <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
               <i className="save icon"/>Register
             </div>
           </div>
@@ -88,6 +94,7 @@ class GoogleProjectModal extends React.Component {
       })
       .bind('fileuploaddone', function (e, data) {
         var resp = data.response().jqXHR.responseJSON;
+        debugger;
       });
 
   }

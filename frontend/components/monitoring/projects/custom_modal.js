@@ -4,22 +4,23 @@ import {Modal} from '../../../artui/react/index';
 
 
 class CustomProjectModal extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this._dropdown = null;
   }
 
   componentDidMount() {
-    if(this._dropdown){
+    if (this._dropdown) {
       $(this._dropdown).dropdown();
     }
   }
 
-  handleSubmit() {
-    alert(JSON.stringify(this.state));
+  handleSubmit() { 
+    console.log(this.state);
+    debugger;
   }
 
-  render(){
+  render() {
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="content">
@@ -31,19 +32,21 @@ class CustomProjectModal extends React.Component {
             <div className="field">
               <label>Project Type (Optional)</label>
 
-              <select className="ui dropdown" onChange={(e)=>this.setState({projectName: e.target.value})}>
-                  <option className="item" value="AWS">AWS</option>
-                  <option className="item" value="GAE">GAE</option>
-                  <option className="item" value="GCE">GCE</option>
-                  <option className="item" value="private cloud">Private Cloud</option>
+              <select className="ui dropdown" onChange={(e)=>this.setState({projectType: e.target.value})}>
+                <option className="item">Project Type</option>
+                <option className="item" value="AWS">AWS</option>
+                <option className="item" value="GAE">GAE</option>
+                <option className="item" value="GCE">GCE</option>
+                <option className="item" value="private cloud">Private Cloud</option>
               </select>
 
             </div>
             <div className="field">
               <label>Sampling Interval (Optional)</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({projectName: e.target.value})}>
-                  <option className="item" value="1">1 minute</option>
-                  <option className="item" value="5">5 minutes</option>
+              <select className="ui dropdown" onChange={(e)=>this.setState({interval: e.target.value})}>
+                <option className="item">Sampling Interval</option>
+                <option className="item" value="1">1 minute</option>
+                <option className="item" value="5">5 minutes</option>
               </select>
 
             </div>
