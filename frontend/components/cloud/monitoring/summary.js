@@ -31,22 +31,6 @@ class ProjectSummary extends BaseComponent {
     this.props.onClose();
   }
 
-  extractMetrics(atext,spart) {
-    if(!atext){
-      return "";
-    }
-    var ret = [];
-    var items = atext.split(';');
-    $.each(items, function(itemNo,item) {
-      var parts = item.trim().split(/\[|\]|\./);
-      ret.push(parts[spart]);
-    });
-    ret = ret.filter(function(el, index, arr) {
-      return index === arr.indexOf(el);
-    });
-    return ret;
-  }
-  
   extractMetric(atext) {
     if(!atext){
       return "";
@@ -123,26 +107,22 @@ class ProjectSummary extends BaseComponent {
                 var metric = hintparts[0].split('.')[1];
                 var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                 var newval = hintparts[2].split(/\(|\)/)[1];
-                console.log(hintparts, valparts);
                 if(self.hintMapping[metric.trim()]!=undefined){
                   var thisMap = self.hintMapping[metric.trim()];
                   if(thisMap[parseInt(valparts[0])]!=undefined){
                     newval = thisMap[parseInt(valparts[0])];
                   }
                 }
-                //console.log(hintparts);
                 newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
                 if(ihint<hintss.length-1){
                   newhints = newhints+"; ";
                 }
               });
-              //console.log(newhints);
             } catch (err){
               newhints = hints[1];
             }
 
             atext[parseInt(items[0])] = newhints;
-            console.log(hints[1]);
           }
         });
       }
