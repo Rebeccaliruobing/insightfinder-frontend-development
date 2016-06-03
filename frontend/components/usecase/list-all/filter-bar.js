@@ -13,7 +13,8 @@ import DateTimePicker from "../../ui/datetimepicker/index";
 export default  class FilterBar extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object
+    dashboardUservalues: React.PropTypes.object,
+    router: React.PropTypes.object
   };
 
   constructor(props) {
@@ -27,16 +28,26 @@ export default  class FilterBar extends Component {
   }
 
   componentDidMount() {
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+
   }
 
   handleSelectItem(item) {
-    return (item)=> {
+    return (e)=> {
+      let [startTime, endTime] = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z)/g.exec(item.dataChunkName);
+
+      let nameField = item.modelName ? 'Model Name' : 'Project Name';
+      let nameFieldName = item.modelName ? 'modelName' : 'projectName';
+      let nameFieldValue = item[nameFieldName];
       this.setState({
-        startTime: moment(item.startTime).toDate(),
-        endTime: moment(item.startTime).toDate(),
-        anomalyThreshold: parseFloat(item.anomalyThreshold)
+        nameField,
+        nameFieldName,
+        nameFieldValue,
+        startTime: moment(startTime).toDate(),
+        endTime: moment(endTime).toDate(),
+        cvalue: parseInt(item.cvalue),
+        pvalue: parseFloat(item.pvalue),
+        activeItem: item,
+        description: item.metaData.desc
       })
     }
   }
@@ -46,61 +57,41 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {startTime, endTime, anomalyThreshold, durationThreshold, description} = this.state;
+    const {startTime, endTime, description, cvalue, pvalue, nameField, nameFieldName, nameFieldValue} = this.state;
     const labelStyle = {};
 
-
-    const list = [{
-      "startTime": "2016-06-01T14:19:00.991Z",
-      "endTime": "2016-06-01T20:49:00.778Z",
-      "modelKey": "af5c431b2c76bb6237a61e6b77fe727c1f958ab8",
-      "anomalyThreshold": "0.99"
-    }, {
-      "startTime": "2016-05-30T12:54:00.603Z",
-      "endTime": "2016-05-30T19:39:00.439Z",
-      "modelKey": "bd4eb66eb1580bba25aaa81f9b5791b93cf1d1aa",
-      "anomalyThreshold": "0.95"
-    }, {
-      "startTime": "2016-05-30T10:44:00.120Z",
-      "endTime": "2016-05-30T16:19:00.308Z",
-      "modelKey": "572d04ee42c98258409dd8114c50c33618118b18",
-      "anomalyThreshold": "0.80"
-    }, {
-      "startTime": "2016-05-28T15:19:00.651Z",
-      "endTime": "2016-05-30T06:54:00.304Z",
-      "modelKey": "99d4ddeb99ce9c890e55bc6c7418de1d03841d48",
-      "anomalyThreshold": "0.70"
-    }, {
-      "startTime": "2016-05-27T14:19:00.536Z",
-      "endTime": "2016-05-28T04:04:00.896Z",
-      "modelKey": "99d4ddeb99ce9c890e55bc6c7418de1d03841d48",
-      "anomalyThreshold": "0.60"
-    }];
-
+    let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
+    let system = this.props.location.query.system;
     return (
       <div className="ui form">
         <div className="ui grid">
           <div className="five wide column">
+
+            <div className="field">
+              <label style={labelStyle}>{nameField || 'Project Name'}</label>
+              <input className="ui input" value={nameFieldValue} readonly/>
+            </div>
+
             <div className="field">
               <label style={labelStyle}>Anomaly Threshold</label>
-              <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: t})}/>
+              <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
             </div>
             <div className="field">
               <label style={labelStyle}>Duration Threshold</label>
-              <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
+              <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
             </div>
           </div>
           <div className="five wide column">
             <div className="field">
               <label style={labelStyle}>Start Time</label>
               <div className="ui input">
-                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} disabled/>
+                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readonly/>
               </div>
             </div>
             <div className="field">
               <label style={labelStyle}>End Time</label>
               <div className="ui input">
-                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime} disabled/>
+                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime} readonly/>
               </div>
             </div>
           </div>
@@ -118,11 +109,33 @@ export default  class FilterBar extends Component {
             <div className="ui field">
               <table className="ui selectable celled table">
                 <tbody>
-                {list.map((item, index)=>
-                  <tr key={index} onClick={this.handleSelectItem(item)}>
-                    <td>{item.startTime} / {item.endTime}</td>
-                  </tr>
-                )}
+                {publishedData.map((item, index)=> {
+                  var pubMode = "public";
+                  if (item.ownerOnly != null && item.ownerOnly) {
+                    if (item.sharedUsernames === '[]') {
+                      pubMode = "group";
+                    } else {
+                      pubMode = "private";
+                    }
+                  }
+
+                  let sys = item.metaData.system.toLowerCase();
+
+                  let shouldShow = true;
+                  if (system && ['cassandra', 'hadoop'].indexOf(system.toLowerCase()) >= 0 && system.toLowerCase() != sys) {
+                      shouldShow = false
+                  } else if (system == 'Other' && ['cassandra', 'hadoop'].indexOf(sys) >= 0) {
+                    shouldShow = false
+                  }
+
+                  return shouldShow && (
+                      <tr key={index} onClick={this.handleSelectItem(item)}>
+                        <td>System: {item.metaData.system}, incident name/bug ID: {item.metaData.name},
+                          owner: {item.fromUser},
+                          sharing mode: {pubMode}</td>
+                      </tr>
+                    )
+                })}
                 </tbody>
               </table>
             </div>

@@ -8,7 +8,8 @@ import FilterBar            from './filter-bar';
 
 export default class ListAll extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object
+    userInstructions: React.PropTypes.object,
+    router: React.PropTypes.object
   };
 
   constructor(props) {
@@ -44,28 +45,23 @@ export default class ListAll extends Component {
   }
 
   handleFilterChange(data) {
-    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let {cvalue, pvalue} = data;
+    let {modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData,} = data.activeItem;
+    metaData = JSON.stringify(metaData);
 
-    this.setState({loading: true}, () => {
-      apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
-        if (resp.success) {
-          resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
-          resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
-          resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
-          this.handleData(resp.data);
-          this.$filterPanel.slideUp()
-        }
-        this.setState({loading: false});
-      }).catch(()=> {
-        this.setState({loading: false});
-      })
+    apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
+      debugger;
+    }).catch((err)=>{
+    
     });
   }
 
   render() {
     const {view, showAddPanel, params} = this.state;
-    const {userInstructions} = this.context;
+    const {userInstructions, router} = this.context;
+    
+
+    let system = this.props.location.query.system;
 
     return (
       <Console.Content>
@@ -76,7 +72,7 @@ export default class ListAll extends Component {
               <i className="right angle icon divider"/>
               <Link to="/cloud/monitoring" className="section">Use Cases</Link>
               <i className="right angle icon divider"/>
-              <div className="active section">List All</div>
+              <div className="active section">List All {system ? `(${system})` : ''}</div>
             </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>

@@ -69,35 +69,7 @@ export default class ListAll extends Component {
 
     return (
       <Console.Content>
-        <div className="ui main tiny container" ref={c => this._el = c}>
-          <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/cloud/monitoring" className="section">Use Cases</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">List All</div>
-            </div>
-            <ButtonGroup className="right floated basic icon">
-              <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
-              </Button>
-              <Button>
-                <i className="setting icon"/>
-              </Button>
-            </ButtonGroup>
-          </div>
-
-          <div className="ui vertical segment filterPanel"
-               ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
-               onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-          </div>
-
-          <div className="ui vertical segment">
-          </div>
-        </div>
+        <h1 className="text-center">Coming soon...</h1>
       </Console.Content>
     );
   }

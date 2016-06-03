@@ -1,4 +1,5 @@
 import React, {Component}   from 'react';
+import ReactDOM             from 'react-dom';
 import {Link, IndexLink}    from 'react-router';
 import {
   Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
@@ -67,38 +68,47 @@ export default class ListAll extends Component {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
 
+
+    const containerWidth = $("body").width() - 360;
+
+    const blockStyle = {
+      textAlign: 'center',
+      backgroundColor: 'rgb(80, 80, 119)',
+      height: 300,
+      lineHeight: `300px`
+    };
+    const wrapperStyle = {
+      padding: 30
+    };
+    const linkStyle = {
+      display: 'block',
+      color: '#fff',
+    };
+
+
     return (
       <Console.Content>
-        <div className="ui main tiny container" ref={c => this._el = c}>
-          <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/cloud/monitoring" className="section">Use Cases</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">List All</div>
+        <div style={{padding: 20}}>
+          <div className="ui three column grid">
+            <div className="wide column text-center" style={wrapperStyle}>
+              <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
+                <a style={linkStyle} href={`#/usecase/list-some?system=Cassandra`}>Cassandra</a>
+              </div>
             </div>
-            <ButtonGroup className="right floated basic icon">
-              <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
-              </Button>
-              <Button>
-                <i className="setting icon"/>
-              </Button>
-            </ButtonGroup>
-          </div>
-
-          <div className="ui vertical segment filterPanel"
-               ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
-               onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-          </div>
-
-          <div className="ui vertical segment">
+            <div className="wide column text-center" style={wrapperStyle}>
+              <div style={Object.assign({}, blockStyle, {backgroundColor: '#66ccff'})}>
+                <a style={linkStyle} href={`#/usecase/list-some?system=Hadoop`}>Hadoop</a>
+              </div>
+            </div>
+            <div className="wide column text-center" style={wrapperStyle}>
+              <div style={Object.assign({}, blockStyle)}>
+                <a style={linkStyle} href={`#/usecase/list-some?system=Other`}>Other</a>
+              </div>
+            </div>
           </div>
         </div>
       </Console.Content>
     );
   }
+
 }

@@ -24,7 +24,8 @@ $.fn.api.settings.api = {
   'display project model': `${baseUrl}displayProjectModel`,
 
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
-  'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`
+  'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
+  'published detection': `${baseUrl}publishedDetection`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -218,6 +219,50 @@ export default {
         type: 'POST',
         url: $.fn.api.settings.api['display project model'],
         data: $.param({startTime, endTime, projectName, origin, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+
+
+    // String userName = req.getParameter("userName");
+		// String token = req.getParameter("token");
+		// String p_value = req.getParameter("pvalue");
+		// String c_value = req.getParameter("cvalue");
+		// String modelKey = req.getParameter("modelKey");
+		// String modelName = req.getParameter("modelName");
+		// String projectName = req.getParameter("projectName");
+		// String modelType = req.getParameter("modelType");
+		// String fromUser = req.getParameter("fromUser");
+		// String dataChunkName = req.getParameter("dataChunkName");
+		// String metaData = req.getParameter("metaData");
+  /**
+   *
+   * @param pvalue
+   * @param cvalue
+   * @param modelKey
+   * @param modelName
+   * @param projectName
+   * @param modelType
+   * @param fromUser
+   * @param dataChunkName
+   * @param metaData
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['published detection'],
+        data: $.param({pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, userName, token}),
         beforeSend: function (request) {
           request.setRequestHeader("Accept", 'application/json');
         }

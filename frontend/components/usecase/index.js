@@ -18,18 +18,19 @@ export class UseCase extends React.Component {
   }
 }
 
-export const useCaseRoute = (
-  <Route component={UseCase} path="usecase">
-    <IndexRoute component={ListAll}/>
-    <Route path="list-all" component={ListAll}/>
-  </Route>
-);
-
 // export const useCaseRoute = (
 //   <Route component={UseCase} path="usecase">
 //     <IndexRoute component={ListAll}/>
 //     <Route path="list-all" component={ListAll}/>
-//     <Route path="search" component={Search}/>
-//     <Route path="explore" component={Explore}/>
 //   </Route>
 // );
+
+export const useCaseRoute = (
+  <Route component={UseCase} path="usecase">
+    <IndexRoute component={ListAll}/>
+    <Route path="list-all" component={ListAll}/>
+    <Route path="list-some" component={ListAll}/>
+    <Route path="search" component={Search}/>
+    <Route path="explore" component={Explore}/>
+  </Route>
+);
