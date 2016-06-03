@@ -3,7 +3,7 @@
  */
 
 import 'babel-polyfill';
-import 'jquery';
+require('expose?$!expose?jQuery!jquery');
 import 'react';
 import 'react-dom';
 import 'react-router';
@@ -24,3 +24,4 @@ import 'react-timeout';
 import './artui/react';
 import './artui/react/dataviz';
 import './commons.less';
+

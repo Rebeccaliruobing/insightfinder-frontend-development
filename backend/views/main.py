@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from flask import render_template
+from flask import render_template, jsonify
 from ..core import ActionView
 
 
@@ -10,3 +10,8 @@ class MainView(ActionView):
 
     def all(self, path=None):
         return render_template('index.html')
+
+    def upload(self):
+        return jsonify({
+            'success': True
+        })

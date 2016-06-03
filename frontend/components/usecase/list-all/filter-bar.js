@@ -46,7 +46,8 @@ export default  class FilterBar extends Component {
         endTime: moment(endTime).toDate(),
         cvalue: parseInt(item.cvalue),
         pvalue: parseFloat(item.pvalue),
-        activeItem: item
+        activeItem: item,
+        description: item.metaData.desc
       })
     }
   }
