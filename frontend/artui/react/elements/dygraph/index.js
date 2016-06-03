@@ -59,12 +59,12 @@ class Dygraph extends BaseComponent {
 
   _underlayCallback(canvas, area, g){
     if (this.props.highlightCallback) {
-      this.props.data.forEach((value, index) =>{
-        var bottom_left = g.toDomCoords(index + 0.5, -20);
-        var top_right = g.toDomCoords(index + 1.5, +20);
+      this.props.data.forEach(([i, ...arr], index) =>{
+        var bottom_left = g.toDomCoords(this.props.data[Math.max(index - 1, 0)][0], -20);
+        var top_right = g.toDomCoords(this.props.data[Math.min(index + 1, this.props.data.length - 1)][0], +20);
         var left = bottom_left[0];
         var right = top_right[0];
-        canvas.fillStyle = this.props.highlightCallback(value);
+        canvas.fillStyle = this.props.highlightCallback(arr);
         canvas.fillRect(left, area.y, right - left, 20);
       })
     }

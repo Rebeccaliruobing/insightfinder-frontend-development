@@ -90,7 +90,7 @@ class LiveAnalysisCharts extends React.Component {
                                style={{height: 150, width: '100%'}}
                                highlightCircleSize={2}
                                animatedZooms={true}
-                               highlightCallback={this.handleHighlight}
+                               highlightCallback={this.handleHighlight(group.sdata)}
                                highlightSeriesOpts={{
                       strokeWidth: 3,
                       strokeBorderWidth: 1,
@@ -109,8 +109,12 @@ class LiveAnalysisCharts extends React.Component {
     )
   }
 
-  handleHighlight(v) {
-    return Math.max.apply(Math, v) > 850 ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
+  handleHighlight(data) {
+      let max = Math.max.apply(Math,data.map(([d, ...arr])=>Math.max.apply(Math, arr)));
+      return (v) =>{
+          return Math.max.apply(Math, v) > (max / 2) ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
+      }
+
   }
 
 }

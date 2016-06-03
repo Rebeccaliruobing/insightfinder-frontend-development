@@ -29,15 +29,7 @@ class HeatMap extends React.Component {
     cellSize: defaultSize / 24 - 1,
     margin: {top: 0, right: 0, bottom: 0, left: 0},
     colorCalibration: [
-      '#0000ff',
-      '#3333ee',
-      '#96a6cc',
-      '#d7ffff',
-      '#c7ffb4',
-      '#fdff4b',
-      '#ff9722',
-      '#ff6a19',
-      '#ff0000',
+      "red", "yellow", "blue"
     ],
     duration: 100
   };
@@ -79,12 +71,17 @@ class HeatMap extends React.Component {
         .attr('y', (item) =>itemSize * item.rowIndex)
         .attr('fill', '#ffffff');
 
+        debugger;
+      var flatArray = data.map((item)=>parseFloat(item.value));
+      var dataMax = Math.max.apply(Math, data.map((item)=>parseFloat(item.value)));
+      var dataMin = Math.min.apply(Math, data.map((item)=>parseFloat(item.value)));
+      var colorScale = d3.scale.linear().domain([dataMin, (dataMin+dataMax)/2, dataMax]).range(["red", "yellow", "blue"]);
+
       rect
         .filter((item) =>(item.value >= 0))
         .transition()
         .attrTween('fill', function (d, i, a) {
-          var colorIndex = d3.scale.quantize().range(_.range(0, colorCalibration.length)).domain(([0, duration]));
-          return ()=>colorCalibration[colorCalibration.length - colorIndex(d.value) - 1];
+          return ()=>colorScale(parseFloat(d.value));
         });
     }, 1);
   }
