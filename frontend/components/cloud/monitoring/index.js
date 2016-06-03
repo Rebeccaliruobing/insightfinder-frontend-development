@@ -12,31 +12,44 @@ import {
 import ProjectSummary from './summary';
 import FilterBar from './filter-bar';
 
-function Settings(props) {
-  return (
-    <Modal {...props} size="tiny" closable={true}>
-      <div className="content">
-        <form className="ui inline form">
-          <div className="field">
-            <label>Charts per line</label>
-            <input type="number" name="" />
-          </div>
-          <div className="field">
-            <label>Project ID</label>
-            <input type="text" name="project_id" />
-          </div>
-        </form>
-      </div>
-      <div className="actions">
-        <div className="ui button deny">Cancel</div>
-        <div className="ui button approve labeled">
-          <div className="ui button orange">
-            <i className="save icon"/>Register
+class Settings extends BaseComponent {
+
+  constructor(props) {
+    super(props);
+  }
+  
+  render(){
+    return (
+      <Modal {...this.props} size="tiny" closable={true}>
+        <div className="content">
+          <form className="ui inline form">
+            <div className="field">
+              <label>Charts per line</label>
+              <Dropdown className="compact" mode="select"
+                        onChange={(value, text) => {this.setState({view: value, viewText: text})}}>
+                <div className="menu">
+                  <div className="item" data-value="one">1</div>
+                  <div className="item" data-value="two">2</div>
+                  <div className="item" data-value="three">3</div>
+                  <div className="item" data-value="four">4</div>
+                  <div className="item" data-value="five">5</div>
+                  <div className="item" data-value="six">6</div>
+                </div>
+              </Dropdown>
+            </div>
+          </form>
+        </div>
+        <div className="actions">
+          <div className="ui button deny">Cancel</div>
+          <div className="ui button approve labeled">
+            <div className="ui button orange">
+              <i className="save icon"/>Save
+            </div>
           </div>
         </div>
-      </div>
-    </Modal>
-  )
+      </Modal>
+    )
+  }
 }
 
 class LiveMonitoring extends BaseComponent {
@@ -113,7 +126,7 @@ class LiveMonitoring extends BaseComponent {
                   <span className="ui mini popup">Expand & Close Add Panel</span>
                 </Popup>
               </Button>
-              <Button onClick={() => this.setState({showSettings: true})}>
+              <Button onClick={() => this.setState({showSettings: false})}>
                 <Popup position="bottom right">
                   <i className="setting icon"/>
                   <span className="ui mini popup">Layout Setting</span>
@@ -131,7 +144,7 @@ class LiveMonitoring extends BaseComponent {
           </div>
 
           <div className="ui vertical segment">
-            <div className="ui four cards">
+            <div className="ui three cards">
               {addedProjects.map((project, index) => {
                 return <ProjectSummary {...project} key={index}
                                        onClose={() => this.handleProjectRemove(project)} />
@@ -139,7 +152,9 @@ class LiveMonitoring extends BaseComponent {
             </div>
           </div>
         </div>
-        { showSettings && <Settings onClose={() => this.setState({showSettings: false})}/> } 
+        { showSettings &&
+        <Settings onClose={() => this.setState({showSettings: false})} />
+        }
       </Console.Content>
     )
   }
