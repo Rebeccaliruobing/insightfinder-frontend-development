@@ -5,7 +5,7 @@ import cx from 'classnames';
 import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
 import {
-  BaseComponent, Console, ButtonGroup, Button, Popup, Modal
+  BaseComponent, Console, ButtonGroup, Button, Popup, Modal,
   Dropdown, Accordion, Message
 } from '../../../artui/react';
 
@@ -54,8 +54,6 @@ class LiveMonitoring extends BaseComponent {
       showAddPanel: true,
       addedProjects: store.has(this._skey) ? store.get(this._skey) : []
     };
-    
-    this.handleProjectSelected.bind(this);
   }
 
   componentDidMount() {
