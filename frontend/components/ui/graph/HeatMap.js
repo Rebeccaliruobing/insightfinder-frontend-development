@@ -84,9 +84,6 @@ class HeatMap extends React.Component {
       rect
         .filter((item) =>(item.value >= 0))
         .transition()
-        .delay((d) =>d.colIndex * d.rowIndex * 0.1)
-        .transition()
-        .duration(1000)
         .attrTween('fill', function (d, i, a) {
           var colorIndex = d3.scale.quantize().range(_.range(0, colorCalibration.length)).domain(([0, duration]));
           return ()=>colorCalibration[colorCalibration.length - colorIndex(d.value) - 1];

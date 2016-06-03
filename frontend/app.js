@@ -2,7 +2,7 @@ import './app.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory, 
+import {Router, Route, browserHistory,
   useRouterHistory, IndexRoute, IndexRedirect} from 'react-router';
 import {createHashHistory} from 'history'
 import store from 'store';
@@ -10,8 +10,9 @@ import store from 'store';
 import {Console, Link} from './artui/react';
 
 import Login from './components/auth/login'
-import {cloudRoute} from './components/cloud';
-import {settingsRoute} from './components/settings';
+import {cloudRoute} from './components/cloud/index';
+import {settingsRoute} from './components/settings/index';
+import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import apis from './apis';
 
@@ -29,7 +30,7 @@ class App extends React.Component {
     store.remove('token');
     window.location.reload();
   }
-  
+
   render() {
     let {
       userInfo,
@@ -37,7 +38,7 @@ class App extends React.Component {
       dashboardUservalues,
       dashboardDailySummaryReport
     } = this.context;
-    
+
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
 
     return (
@@ -45,6 +46,7 @@ class App extends React.Component {
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Cloud Monitoring</Link>
           <Link to="/settings" className="item">Project Settings</Link>
+          <Link to="/usecase" className="item">Use Cases</Link>
           <Link to="/file" className="item">File Analysis</Link>
           <div className="right menu">
             <div className="ui right simple dropdown item">
@@ -83,6 +85,7 @@ const routes = (
       <IndexRedirect to="/cloud"/>
       {cloudRoute}
       {settingsRoute}
+      {useCaseRoute}
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
   </Router>
@@ -136,9 +139,9 @@ class AppRoute extends React.Component {
     apis.getUserInstructions().then((resp)=> {
       this.setState({userInstructions: resp});
     });
-    
+
     apis.postDashboardUserValues(store.get('userName')).then((resp)=> {
-      
+
       resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
       resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
       resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
@@ -157,10 +160,10 @@ class AppRoute extends React.Component {
           metaData: JSON.parse(info.metaData)
         });
       });
-      
+
       this.setState({dashboardUservalues: resp});
     });
-    
+
     // apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
     //   this.setState({dashboardDailySummaryReport: resp});
     // });

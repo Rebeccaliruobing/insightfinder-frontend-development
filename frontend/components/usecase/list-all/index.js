@@ -1,13 +1,12 @@
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
-import moment from 'moment';
-import {Link, IndexLink} from 'react-router';
+import React, {Component}   from 'react';
+import {Link, IndexLink}    from 'react-router';
+import {
+  Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
+}                           from '../../../artui/react/index';
+import apis                 from '../../../apis';
+import FilterBar            from './filter-bar';
 
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import FilterBar from './filter-bar';
-import apis from '../../../apis';
-
-export default class SummaryReport extends Component {
+export default class ListAll extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object
   };
@@ -19,7 +18,6 @@ export default class SummaryReport extends Component {
       view: 'chart',
       dateIndex: 0,
       timeIndex: 0,
-      summaryReport: '',
       params: {
         showAddPanel: false,
         projects: [],
@@ -33,6 +31,12 @@ export default class SummaryReport extends Component {
   componentDidMount() {
   }
 
+  handleData(data) {
+    this.setState({data: data}, ()=> {
+      this.setHeatMap(0, 0);
+    })
+  }
+
   handleToggleFilterPanel() {
     this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
       this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
@@ -40,19 +44,29 @@ export default class SummaryReport extends Component {
   }
 
   handleFilterChange(data) {
-    this.$filterPanel.slideUp();
-    apis.postDashboardDailySummaryReport().then((resp) => {
-      this.setState({summaryReport: resp.data.content, projectName: data.projectName})
-    }).catch(()=> {
+    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
+    this.setState({loading: true}, () => {
+      apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
+        if (resp.success) {
+          resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
+          resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
+          resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
+          this.handleData(resp.data);
+          this.$filterPanel.slideUp()
+        }
+        this.setState({loading: false});
+      }).catch(()=> {
+        this.setState({loading: false});
+      })
     });
   }
 
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
-    var summaryReport = this.state.summaryReport;
-    summaryReport = summaryReport.split("<\/th>").join("").split("<\/td>").join("");
+
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -60,9 +74,9 @@ export default class SummaryReport extends Component {
             <div className="ui breadcrumb">
               <IndexLink to="/" className="section">Home</IndexLink>
               <i className="right angle icon divider"/>
-              <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
+              <Link to="/cloud/monitoring" className="section">Use Cases</Link>
               <i className="right angle icon divider"/>
-              <div className="active section">Summary Report</div>
+              <div className="active section">List All</div>
             </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
@@ -78,28 +92,13 @@ export default class SummaryReport extends Component {
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-            {userInstructions.clouddailysummary &&
-            <Message dangerouslySetInnerHTML={{__html: summaryReport}}/>
-            }
+            <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
           </div>
 
-          <div key={Date.now()} className="ui vertical segment"
-               dangerouslySetInnerHTML={{__html: this.state.summaryReport}}
-               ref={this.summaryRef.bind(this)}></div>
+          <div className="ui vertical segment">
+          </div>
         </div>
       </Console.Content>
     );
-
-  }
-
-  summaryRef(r) {
-    // TODO: 接口返回有误,修正后改回
-
-    // true line
-    $(ReactDOM.findDOMNode(r)).find(`#dailysummary_${this.state.projectName}`).show();
-
-    // temp line
-    // $(ReactDOM.findDOMNode(r)).find("[id^=dailysummary_]").show();
   }
 }
