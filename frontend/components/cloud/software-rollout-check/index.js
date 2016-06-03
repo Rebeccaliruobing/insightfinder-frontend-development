@@ -65,7 +65,7 @@ export default class SoftwareRolloutCheck extends Component {
       } else {
         title = <span>{`Group ${data.groupId}`}({new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})</span>;
       }
-      return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={title}
+      return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
                           dateIndex={dateIndex} data={dataArray}/>;
 
     });

@@ -179,7 +179,7 @@ class HeatmapGroup extends Component {
             value: lineArray[lineArray.length - 2]
           });
         });
-        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={data.startTime}
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={data.startTime}
                             dateIndex={dateIndex} data={dataArray}/>;
       });
     } else {
@@ -193,7 +193,7 @@ class HeatmapGroup extends Component {
           value: lineArray[lineArray.length - 2]
         });
       });
-      maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={4} title={data[dateIndex].startTime}
+      maps = <HeatMapCard key={`${dateIndex}`} duration={120} itemSize={4} title={data[dateIndex].startTime}
                           dateIndex={dateIndex} data={dataArray}/>
     }
 
@@ -265,7 +265,7 @@ export default class DisplayModel extends Component {
             value: lineArray[lineArray.length - 2]
           });
         });
-        return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={6} title={data.startTime}
+        return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={6} title={data.startTime}
                             dateIndex={dateIndex} data={dataArray}/>;
       });
     } else {
@@ -279,7 +279,7 @@ export default class DisplayModel extends Component {
           value: lineArray[lineArray.length - 2]
         });
       });
-      maps = <HeatMapCard key={`${dateIndex}`} duration={300} itemSize={4}
+      maps = <HeatMapCard key={`${dateIndex}`} duration={120} itemSize={4}
                           title={this.state.data.splitByGroupModelData[dateIndex].startTime}
                           dateIndex={dateIndex} data={dataArray}/>
     }
