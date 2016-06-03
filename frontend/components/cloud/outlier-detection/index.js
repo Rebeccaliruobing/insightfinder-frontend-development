@@ -62,7 +62,7 @@ export default class OutlierDetection extends Component {
       } else {
         title = `Metric Group ${data.groupId}`;
       }
-      return <HeatMapCard key={`${dateIndex}-${index}`} duration={300} itemSize={4} title={title}
+      return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
                           dateIndex={dateIndex} data={dataArray}/>;
     });
 

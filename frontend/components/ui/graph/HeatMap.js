@@ -29,17 +29,15 @@ class HeatMap extends React.Component {
     cellSize: defaultSize / 24 - 1,
     margin: {top: 0, right: 0, bottom: 0, left: 0},
     colorCalibration: [
-      '#41FF91',
-      '#44FE66',
-      '#51FD47',
-      '#7EFC4A',
-      '#A9FB4C',
-      '#D3F94F',
-      '#F9F751',
-      '#F8CF54',
-      '#F7A856',
-      '#F68459',
-      '#FF0000'
+      '#0000ff',
+      '#3333ee',
+      '#96a6cc',
+      '#d7ffff',
+      '#c7ffb4',
+      '#fdff4b',
+      '#ff9722',
+      '#ff6a19',
+      '#ff0000',
     ],
     duration: 100
   };
@@ -84,9 +82,6 @@ class HeatMap extends React.Component {
       rect
         .filter((item) =>(item.value >= 0))
         .transition()
-        .delay((d) =>d.colIndex * d.rowIndex * 0.1)
-        .transition()
-        .duration(1000)
         .attrTween('fill', function (d, i, a) {
           var colorIndex = d3.scale.quantize().range(_.range(0, colorCalibration.length)).domain(([0, duration]));
           return ()=>colorCalibration[colorCalibration.length - colorIndex(d.value) - 1];

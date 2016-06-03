@@ -16,7 +16,7 @@ $.fn.api.settings.successTest = function (response) {
 
 $.fn.api.settings.api = {
   'login': `${baseUrl}login-check`,
-  
+
   'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
   'live analysis': `${baseUrl}liveAnalysis`,
   'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
@@ -24,7 +24,7 @@ $.fn.api.settings.api = {
   'display project model': `${baseUrl}displayProjectModel`,
 
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
-  'dashboard dailysummaryreport': `${localBaseUrl}dashboard-dailysummaryreport`
+  'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -80,16 +80,15 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 export default {
-  
-  getUserInstructions (
-    userName = store.get('userName'), 
-    token = store.get('token'), 
-    operation) {
+
+  getUserInstructions (userName = store.get('userName'),
+                       token = store.get('token'),
+                       operation) {
     return new Promise(function (resolve, reject) {
       requestGet('userInstructions', {userName, token, operation}, resolve, reject);
     });
   },
-  
+
   postLogin(userName, password) {
     return new Promise(function (resolve, reject) {
       requestPost('login', {userName, password}, resolve, reject);
@@ -107,9 +106,20 @@ export default {
       requestPost('dashboard uservalues', {userName, token, operation}, resolve, reject);
     });
   },
-  postDashboardDailySummaryReport (userName:String = store.get('userName')) {
+  postDashboardDailySummaryReport (userName:String = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      requestPost('dashboard dailysummaryreport', {userName}, resolve, reject);
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['dashboard dailysummaryreport'],
+        data: $.param({userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
     });
   },
   /**
@@ -149,7 +159,7 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudOutlierDetection(startTime, endTime, projectName, origin='cloudoutlier', userName = store.get('userName'), token = store.get('token'),) {
+  postCloudOutlierDetection(startTime, endTime, projectName, origin = 'cloudoutlier', userName = store.get('userName'), token = store.get('token'),) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -176,7 +186,7 @@ export default {
    * @param origin
    * @returns {Promise}
    */
-  postCloudRolloutCheck(startTime, endTime, projectName, origin='cloudrollout', userName = store.get('userName'), token = store.get('token')) {
+  postCloudRolloutCheck(startTime, endTime, projectName, origin = 'cloudrollout', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -202,7 +212,7 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postDisplayProjectModel(startTime, endTime, projectName, origin='clouddisplay', userName = store.get('userName'), token = store.get('token')) {
+  postDisplayProjectModel(startTime, endTime, projectName, origin = 'clouddisplay', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
