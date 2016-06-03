@@ -10,6 +10,7 @@ import 'react-router';
 import 'lodash';
 import 'classnames';
 import 'moment';
+import 'store';
 
 import './artui';
 import './artui/i18n/zh-CN';
