@@ -8,6 +8,10 @@ import apis from '../../../apis';
 import DataParser from '../dataparser';
 
 const ProjectDetails = class extends React.Component {
+
+  static propTypes = {
+    updateData: React.PropTypes.func
+  };
   
   constructor(props) {
     super(props);
@@ -21,7 +25,7 @@ const ProjectDetails = class extends React.Component {
   }
 
   componentDidMount() {
-    this.updateLiveAnalysis();
+    (this.props.updateData || this.updateLiveAnalysis)(this);
   }
 
   updateLiveAnalysis() {

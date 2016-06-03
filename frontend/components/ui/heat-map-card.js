@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import HeatMap from './graph/HeatMap';
 import {Dygraph} from '../../artui/react/dataviz';
+import LiveAnalysis from '../cloud/liveanalysis';
 class DisplayChart extends Component {
 
   handleHighlight(v) {
@@ -52,6 +53,7 @@ export default class HeatMapCard extends Component {
       'Summary',
       'Metric Group 1', 'Metric Group 2', 'Metric Group 3',
     ];
+    debugger;
     return (
       <div className="ui card">
         <div className="image" style={{backgroudColor: '#FFF'}}>
@@ -75,6 +77,7 @@ export default class HeatMapCard extends Component {
               {this.props.title}
             </div>
             <div className="content">
+                
               <div style={{width: '100%'}}>
 
                 <Dygraph

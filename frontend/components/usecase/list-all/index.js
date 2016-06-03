@@ -6,6 +6,8 @@ import {
 import apis                 from '../../../apis';
 import FilterBar            from './filter-bar';
 
+import LiveAnalysisCharts       from '../../cloud/liveanalysis';
+
 export default class ListAll extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
@@ -19,6 +21,7 @@ export default class ListAll extends Component {
       view: 'chart',
       dateIndex: 0,
       timeIndex: 0,
+      loading: false,
       params: {
         showAddPanel: false,
         projects: [],
@@ -49,17 +52,27 @@ export default class ListAll extends Component {
     let {modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData,} = data.activeItem;
     metaData = JSON.stringify(metaData);
 
-    apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
-      debugger;
-    }).catch((err)=>{
-    
-    });
+    this.setState({loading: true}, ()=>{
+      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
+        resp.loading = false;
+        this.setState(resp);
+      }).catch((err)=>{
+        this.setState({loading: false});
+      });
+    })
+  }
+
+  handleUpdateData(detailComp) {
+    setTimeout(()=>{
+      this.handleUpdateData(detailComp)
+    }, 5000 * 60);
+
   }
 
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions, router} = this.context;
-    
+
 
     let system = this.props.location.query.system;
 
@@ -92,6 +105,7 @@ export default class ListAll extends Component {
           </div>
 
           <div className="ui vertical segment">
+            {this.state.success && <LiveAnalysisCharts data={this.state.data}/>}
           </div>
         </div>
       </Console.Content>

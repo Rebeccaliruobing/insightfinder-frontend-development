@@ -56,13 +56,15 @@ export default class OutlierDetection extends Component {
         });
       });
 
-      let title;
+      let title, groupId;
       if (data.instanceName) {
-        title = data.instanceName
+        title = data.instanceName;
+        groupId = data.instanceName;
       } else {
         title = `Metric Group ${data.groupId}`;
+        groupId = data.groupId;
       }
-      return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
+      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
                           dateIndex={dateIndex} data={dataArray}/>;
     });
 
@@ -90,6 +92,7 @@ export default class OutlierDetection extends Component {
     this.setState({loading: true}, () => {
       apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
         if (resp.success) {
+          resp.data.originData = Object.assign({}, resp.data);
           resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);

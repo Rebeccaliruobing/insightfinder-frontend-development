@@ -1,6 +1,6 @@
 /*
  * React component of dygraphs
- * 
+ *
  * http://dygraphs.com/options.html
  * https://github.com/motiz88/react-dygraphs
  **/
