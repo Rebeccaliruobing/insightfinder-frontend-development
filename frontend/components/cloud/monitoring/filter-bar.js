@@ -96,7 +96,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <Button className={submitStyle} style={{marginTop: 20}}
-                    onClick={this.handleSubmit.bind(this)}>Submit</Button>
+                    onClick={this.handleSubmit.bind(this)}>Add</Button>
           </div>
         </div>
       </div>

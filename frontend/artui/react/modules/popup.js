@@ -19,7 +19,7 @@ const Popup = class extends React.Component {
       $(content).popup({
         inline: true,
         hoverable: true,
-        position: 'right center'
+        position: this.props.position || 'right center'
       })
     }
   }
