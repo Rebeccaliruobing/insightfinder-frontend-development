@@ -104,28 +104,28 @@ class DataParser {
             // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
             var hintss = hints[1].trim().split(';');
             var newhints = "";
-            try{
-              $.each(hintss, function(ihint,hint){
-                // 1.Change_inflicted(min)[node0](1.0);
-                // 0=#.metric, 1=node, 2=(val)
-                var hintparts = hint.split(/\[|\]/);
-                var metric = hintparts[0].split('.')[1];
-                var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
-                var newval = hintparts[2].split(/\(|\)/)[1];
-                if(self.hintMapping[metric.trim()]!=undefined){
-                  var thisMap = self.hintMapping[metric.trim()];
-                  if(thisMap[parseInt(valparts[0])]!=undefined){
-                    newval = thisMap[parseInt(valparts[0])];
+            $.each(hintss, function(ihint,hint){
+              // 1.Change_inflicted(min)[node0](1.0);
+              // 0=#.metric, 1=node, 2=(val)
+              var hintparts = hint.split(/\[|\]/);
+              var metric = hintparts[0].split('.')[1];
+              try{
+                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
+                  var newval = hintparts[2].split(/\(|\)/)[1];
+                  if(hintMapping[metric.trim()]!=undefined){
+                      var thisMap = hintMapping[metric.trim()];
+                      if(thisMap[parseInt(valparts[0])]!=undefined){ 
+                          newval = thisMap[parseInt(valparts[0])];
+                      }
                   }
-                }
-                newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
-                if(ihint<hintss.length-1){
-                  newhints = newhints+"; ";
-                }
-              });
-            } catch (err){
-              newhints = hints[1];
-            }
+                  newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
+                  if(ihint<hintss.length-1){
+                      newhints = newhints+"; ";
+                  }
+              } catch (err){
+                  newhints = hints[1];
+              }
+            });
 
             atext[parseInt(items[0])] = newhints;
           }
