@@ -99,8 +99,7 @@ export default  class FilterBar extends Component {
 
             <div className="field">
               <label style={labelStyle}>Incident Description</label>
-                <textarea className="ui input" defaultValue={description} name="description" style={{height: '8em'}}
-                          onChange={(e)=>this.setState({description: e.target.value})}></textarea>
+                <textarea className="ui input" value={description} name="description" style={{height: '8em'}} readonly></textarea>
             </div>
           </div>
         </div>
