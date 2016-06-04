@@ -54,8 +54,8 @@ class ProjectSummary extends BaseComponent {
           $.map(dp.anomalyTexts, (o) => {
             _.forIn(o, (v, k) => {
               annotations.push({
-                series: 'y',
-                x: new Date(parseInt(k)),
+                series: 'D',
+                x: k,
                 shortText: 'L',
                 text: v
               })
@@ -140,6 +140,7 @@ class ProjectSummary extends BaseComponent {
           {data && data.length > 0 &&
           <Dygraph className="live monitoring summary" data={data}
                    ylabel="Anomaly Degree"
+                   labels={['X', 'D']}
                    axisLabelWidth={35}
                    style={{width: '100%', height: '200px'}}
                    animatedZooms={true} highlightCircleSize={2} strokeWidth={3}
