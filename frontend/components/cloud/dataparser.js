@@ -11,14 +11,15 @@ class DataParser {
     // TODO: How to get hintMapping?
     this.hintMapping = {};
     
-    this.anomalyTexts = undefined;
-    this.causalDataArray = undefined;
-    this.causalTypes = undefined;
-    this.anomalies = undefined;
-    this.seriesOptions = undefined;
-    this.stats = undefined;
+    this.anomalyTexts = null;
+    this.causalDataArray = null;
+    this.causalTypes = null;
+    this.anomalies = null;
+    this.seriesOptions = null;
+    this.stats = null;
     this.metricUnitMap = [];
-    this.groupsData = undefined;
+    this.groupsData = null;
+    this.groupmetrics = null;
     
     this.mode = this._detectionModeAndParse();
   }
@@ -311,6 +312,7 @@ class DataParser {
         return idx === arr.indexOf(el);
       });
     });
+    this.groupmetrics = groupmetrics;
     
     let gdata = _.map(groups, grp => {
       

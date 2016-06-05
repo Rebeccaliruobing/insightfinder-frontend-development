@@ -87,10 +87,11 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
+    const {projectName, anomalyThreshold, durationThreshold, modelType} = query;
     let {data, loading} = this.state;
 
     return (
-      <LiveAnalysisCharts data={data} loading={loading} />
+      <LiveAnalysisCharts projectName={projectName} data={data} loading={loading} />
     )
   }
 };
