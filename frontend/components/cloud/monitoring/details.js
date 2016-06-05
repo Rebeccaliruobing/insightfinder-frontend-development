@@ -18,10 +18,8 @@ const ProjectDetails = class extends React.Component {
     super(props);
 
     this.state = {
-      view: 'four',
-      viewText: 4,
-      loading: false,
-      selectedGroup: ''
+      data: undefined,
+      loading: false
     }
   }
 
@@ -30,7 +28,6 @@ const ProjectDetails = class extends React.Component {
   }
 
   updateLiveAnalysis() {
-      ;
     let {query} = this.props.location;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = query;
 
@@ -90,21 +87,10 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
-    const {projectName} = query;
-    let {view, loading, selectedGroup, data} = this.state;
-
-    let isListView = view === 'list';
-    let contentStyle = isListView ? {} : {paddingLeft:0};
+    let {data, loading} = this.state;
 
     return (
-      <Console.Wrapper>
-        {isListView && this.renderNavs()}
-        <Console.Content style={contentStyle}>
-          <div className="ui main tiny container" style={{minHeight:'100%'}}>
-            {this.state.data && <LiveAnalysisCharts data={this.state.data}/>}
-          </div>
-        </Console.Content>
-      </Console.Wrapper>
+      <LiveAnalysisCharts data={data} loading={loading} />
     )
   }
 };

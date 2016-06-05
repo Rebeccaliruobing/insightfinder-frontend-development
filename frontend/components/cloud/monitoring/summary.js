@@ -64,8 +64,8 @@ class ProjectSummary extends BaseComponent {
     let cardStyle = cx(
       'ui card', 
       loading ? 'form loading':'');
-    
-    let sdata = !data ? undefined: new DataParser(modelType, data).getSummaryData();
+
+    let sdata = !data ? undefined: new DataParser(data).getSummaryData();
     
     return (
       <div className={cardStyle}
