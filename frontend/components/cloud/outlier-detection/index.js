@@ -43,7 +43,7 @@ export default class OutlierDetection extends Component {
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
 
-    let {mapData, startTime, endTime }= this.state.data.splitByInstanceModelData[dateIndex];
+    let {mapData, startTime, endTime}= this.state.data.splitByInstanceModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -64,11 +64,12 @@ export default class OutlierDetection extends Component {
         title = `Metric Group ${data.groupId}`;
         groupId = data.groupId;
       }
-      
+
       // return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
       //                     duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
       //                     />;
-      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
+      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
+                          duration={120} itemSize={4} title={title}
                           dateIndex={dateIndex} data={dataArray} link={`#/incidentAnalysis?${$.param({
                           metricNameList: data.metricNameList,
                           projectName: this.state.data.projectName, pvalue:0.95,cvalue:3, modelType: "Holistic",
@@ -119,6 +120,7 @@ export default class OutlierDetection extends Component {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
 
+    const marks = this.state.data && this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -156,9 +158,8 @@ export default class OutlierDetection extends Component {
             </div>
             <div className="padding40">
               {this.state.data && (
-                <RcSlider max={this.state.data.splitByInstanceModelData.length - 1}
-                          value={this.state.dateIndex}
-                          marks={this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort()}
+                <RcSlider max={this.state.data.splitByInstanceModelData.length - 1} value={this.state.dateIndex}
+                          marks={marks ? _.fromPairs(marks.map((mark, index)=>[index, mark.split(" ")[0]])) : {}}
                           onChange={this.handleDateIndexChange.bind(this)}/>
               )}
             </div>

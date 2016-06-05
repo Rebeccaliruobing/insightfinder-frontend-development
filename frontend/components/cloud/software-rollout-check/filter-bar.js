@@ -80,9 +80,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>
-            <div className="ui input">
-              <input type="text" readonly value={projectType}/>
-            </div>
+            <div style={{paddingTop:'0.5em', paddingLeft:'1em'}}>{projectType}</div>
           </div>
           <div className="field">
             <label style={labelStyle}>Window (Week)</label>

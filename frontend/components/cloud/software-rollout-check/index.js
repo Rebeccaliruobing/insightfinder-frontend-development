@@ -39,13 +39,15 @@ export default class SoftwareRolloutCheck extends Component {
   }
 
   handleData(data) {
+    debugger;
     this.setState({data: data}, ()=> {
       this.setHeatMap(0, 0);
     })
   }
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
-    let {mapData, startTime, endTime} = this.state.data.splitByInstanceModelData[dateIndex];
+    debugger;
+    let {mapData, startTime, endTime} = this.state.data.holisticModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -63,9 +65,9 @@ export default class SoftwareRolloutCheck extends Component {
       if (data.instanceName) {
         title = data.instanceName
       } else {
-        title = <span>{`Group ${data.groupId}`}({new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})</span>;
+        title = <span>{`Group ${data.groupId}`}({data.metricNameList ? new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",") : ''})</span>;
       }
-      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
+      return <HeatMapCard originData={this.state.data.originData} groupId={data.groupId} key={`${dateIndex}-${index}`}
                           duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
                           link={`#/incidentAnalysis?${$.param({
                           metricNameList: data.metricNameList,
@@ -117,7 +119,7 @@ export default class SoftwareRolloutCheck extends Component {
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
-
+    const marks = this.state.data && this.state.data.holisticModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -155,9 +157,8 @@ export default class SoftwareRolloutCheck extends Component {
             </div>
             <div className="padding40">
               {this.state.data && (
-                <RcSlider max={this.state.data.splitByGroupModelData.length - 1}
-                          value={this.state.dateIndex}
-                          marks={this.state.data.splitByGroupModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort()}
+                <RcSlider max={this.state.data.holisticModelData.length - 1} value={this.state.dateIndex}
+                          marks={marks ? _.fromPairs(marks.map((mark, index)=>[index, mark.split(" ")[0]])) : {}}
                           onChange={this.handleDateIndexChange.bind(this)}/>
               )}
             </div>
