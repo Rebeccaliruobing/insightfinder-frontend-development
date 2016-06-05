@@ -81,7 +81,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Project Type</label>
             <div className="ui input">
-              <input type="text" disabled value={projectType}/>
+              <input type="text" readonly value={projectType}/>
             </div>
           </div>
           <div className="field">
@@ -91,7 +91,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Start Time</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} disabled/>
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readonly/>
             </div>
           </div>
           <div className="field">
