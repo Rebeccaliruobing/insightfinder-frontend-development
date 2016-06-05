@@ -20,7 +20,7 @@ class ProjectSummary extends BaseComponent {
     this.state = {
       showCloser: false,
       data: undefined,
-      loading: true
+      loading: false
     };
   }
 
@@ -37,23 +37,24 @@ class ProjectSummary extends BaseComponent {
     let self = this;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
     
-    this.setState({loading: true});
-    
-    apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
-      .then(resp => {
-        let update = {};
-        if (resp.success) {
-          update.data = resp.data;
-        } else {
-          alert(resp.message);
-        }
-        update.loading = false;
-        this.setState(update);
-        this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
-      })
-      .catch(msg=> {
-        alert(msg);
-      });
+    if (modelType == 'Holistic') {
+      this.setState({loading: true});
+      apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
+        .then(resp => {
+          let update = {};
+          if (resp.success) {
+            update.data = resp.data;
+          } else {
+            alert(resp.message);
+          }
+          update.loading = false;
+          this.setState(update);
+          this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
+        })
+        .catch(msg=> {
+          alert(msg);
+        });
+    }
   }
   
   render() {
@@ -64,7 +65,7 @@ class ProjectSummary extends BaseComponent {
       'ui card', 
       loading ? 'form loading':'');
     
-    let sdata = (!data) ? undefined: new DataParser(modelType, data).getSummaryData();
+    let sdata = !data ? undefined: new DataParser(modelType, data).getSummaryData();
     
     return (
       <div className={cardStyle}
@@ -98,6 +99,7 @@ class ProjectSummary extends BaseComponent {
                    annotations={sdata.annotations}
                    highlights={sdata.highlights} />
           }
+          {(!sdata && modelType != 'Holistic') && <span>No summary</span> }
         </div>
       </div>
     )
