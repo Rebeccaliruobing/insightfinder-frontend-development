@@ -3,14 +3,16 @@ import _ from 'lodash';
 
 class DataParser {
   
-  constructor(data) {
+  constructor(mode, data) {
     
     this.data = data;
+    this.mode = mode;
 
-    this.hintMapping = [];
+    // TODO: How to get hintMapping?
+    this.hintMapping = undefined;
     
-    this.anomalyTexts = [];
-    this.anomalies = [];
+    this.anomalyTexts = undefined;
+    this.anomalies = undefined;
     
     this.metricUnitMap = [];
     this.seriesOptions = [];
@@ -19,16 +21,6 @@ class DataParser {
     this.gmpairs = [];
     this.groupmetrics = [];
 
-  }
-  
-  parseMetricUnitMap() {
-    var arr = this.data.metricUnitMapping;
-    if(!arr || arr.length === 0){
-      console.log("Empty metric unit map!");
-    }
-    $.each(arr, function(i,a){
-      this.metricUnitMap[a.metric] = a.unit;
-    });
   }
   
   _parseData(data) {
@@ -70,10 +62,10 @@ class DataParser {
     return soptions;
   };
 
-  extractMetric(atext) {
-    if(!atext){
-      return "";
-    }
+  _extractMetric(atext) {
+
+    if(!atext) return '';
+
     var ret = [];
     var items = atext.split(';');
     $.each(items, function(itemNo,item) {
@@ -88,60 +80,77 @@ class DataParser {
     return ret;
   };
 
-  parseAnomalyText() {
+  _parseAnomalyText() {
+    
+    if (this.anomalyTexts) return;
     
     let arr = this.data.anomalyString;
-    var self = this;
-
+    let anomalyTexts = [];
+    let hintMapping = this.hintMapping || {};
+    
     $.each(arr, function(i,a){
-      var atext = {};
+      
       if(a.anomalies!=""){
-        var lines = a.anomalies.split('\\n');
+        var atext = {};
+        
+        var lines = a.anomalies.split('\n');
         $.each(lines, function(lineNo, line) {
+          
           var items = line.split(',');
+          
           if(items[2]){
             var hints = items[2].trim().split(':');
             // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
             var hintss = hints[1].trim().split(';');
             var newhints = "";
-            $.each(hintss, function(ihint,hint){
+            
+            $.each(hintss, function(ihint, hint){
               // 1.Change_inflicted(min)[node0](1.0);
               // 0=#.metric, 1=node, 2=(val)
               var hintparts = hint.split(/\[|\]/);
               var metric = hintparts[0].split('.')[1];
               try{
-                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
-                  var newval = hintparts[2].split(/\(|\)/)[1];
-                  if(hintMapping[metric.trim()]!=undefined){
-                      var thisMap = hintMapping[metric.trim()];
-                      if(thisMap[parseInt(valparts[0])]!=undefined){ 
-                          newval = thisMap[parseInt(valparts[0])];
-                      }
+                var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
+                var newval = hintparts[2].split(/\(|\)/)[1];
+                if(hintMapping[metric.trim()]!=undefined){
+                  var thisMap = hintMapping[metric.trim()];
+                  if(thisMap[parseInt(valparts[0])]!=undefined){
+                    newval = thisMap[parseInt(valparts[0])];
                   }
-                  newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
-                  if(ihint<hintss.length-1){
-                      newhints = newhints+"; ";
-                  }
+                }
+                newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
+                if(ihint<hintss.length-1){
+                  newhints = newhints+"; ";
+                }
               } catch (err){
-                  newhints = hints[1];
+                newhints = hints[1];
               }
             });
-
             atext[parseInt(items[0])] = newhints;
           }
         });
       }
-      self.anomalyTexts.push(atext);
+      anomalyTexts.push(atext);
     });
+    
+    this.anomalyTexts = anomalyTexts;
   }
   
-  parseAnomalyData() {
-
-    let self = this;
-    let arr = this.data.detectionResults;
+  _parseAnomalyData() {
     
+    if (this.anomalies) return;
+    if (!this.anomalyTexts) {
+      this._parseAnomalyText();
+    }
+    
+    let anomalyTexts = this.anomalyTexts;
+    let anomalies = {};
+    
+    let self = this;
+    let arr = this.data['detectionResults'];
+
     $.each(arr, function(i,a){
-      var atext = (arr.length === 1)?self.anomalyTexts[0]:self.anomalyTexts[i];
+      var atext = (arr.length === 1) ? anomalyTexts[0] : anomalyTexts[i];
       var alies = [];
       var lines = a.detectionResults.split('\\n');
       $.each(lines, function(lineNo, line) {
@@ -162,15 +171,52 @@ class DataParser {
               timestamp : ts,
               val : val,
               text : (parseFloat(items[1])>0)?atext[ts]:"",
-              metrs : (parseFloat(items[1])>0)?(self.extractMetric(atext[ts])):[]
+              metrs : (parseFloat(items[1])>0)?(self._extractMetric(atext[ts])):[]
             });
           }
         }
       });
-      self.anomalies[a.groupId] = alies
+      anomalies[a.groupId] = alies
     });
+    this.anomalies = anomalies;
   }
-
+  
+  getSummaryData() {
+    
+    this._parseAnomalyData();
+    
+    // TODO: Check chart mode, only holistic has summary
+    let alies = this.anomalies[0];
+    let annotations = [];
+    
+    let index = 0;
+    let highlights = _.map(alies, a => {
+      return {
+        start: a.timestamp,
+        end: a.timestamp,
+        val: a.val < 0 ? 0 : Math.min(10, a.val)
+      }
+    });
+    
+    _.map(this.anomalyTexts, (o) => {
+      _.forIn(o, (v, k) => {
+        index++;
+        annotations.push({
+          series: 'D',
+          x: k,
+          shortText: index.toString(),
+          text: v
+        })
+      });
+    });
+    
+    return {
+      series: _.map(alies, a => [a.time, a.val]),
+      highlights: highlights,
+      annotations: annotations
+    }
+  }
+  
   getGroupData() {
     let soptions = this._parseData(this.data.data);
     
