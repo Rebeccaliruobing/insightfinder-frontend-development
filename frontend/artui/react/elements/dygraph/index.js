@@ -57,34 +57,46 @@ class Dygraph extends BaseComponent {
     this._dygraph = null;
   }
 
-  _underlayCallback(canvas, area, g){
-    if (this.props.highlightCallback) {
-      this.props.data.forEach(([i, ...arr], index) =>{
-        var bottom_left = g.toDomCoords(this.props.data[Math.max(index - 1, 0)][0], -20);
-        var top_right = g.toDomCoords(this.props.data[Math.min(index + 1, this.props.data.length - 1)][0], +20);
-        var left = bottom_left[0];
-        var right = top_right[0];
-        canvas.fillStyle = this.props.highlightCallback(arr);
-        canvas.fillRect(left, area.y, right - left, 20);
-      })
-    }
-  }
+  _highlight_period(canvas, area, g, x_start, x_end, val) {
+    // val between 0-green to 1-yellow to 10-red (logarithmic)
+    var canvas_left_x = g.toDomXCoord(x_start);
+    var canvas_right_x = g.toDomXCoord(x_end);
+    var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
 
+    var rcolor, gcolor;
+    if (val <= 1) {
+      if (val < 0) val = 0;
+      rcolor = Math.floor(255 * val);
+      gcolor = 255;
+    } else {
+      if (val > 10) val = 10;
+      rcolor = 255;
+      //gcolor = Math.floor(255 - 16 ^ Math.log10(10*val));
+      gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+    }
+    canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + ",0,1.0)";
+    canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
+  }
+  
   componentDidMount() {
 
     if (this._el) {
       const {known: initAttrs, rest} = spreadDygraphProps(this.props, true);
-      let {annotations} = rest;
+      let {annotations, highlights} = rest;
 
       this._interactionProxy.target =
         initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
       initAttrs.interactionModel = this._interactionProxy;
 
-      initAttrs.underlayCallback = (canvas, area, g)=>{
-        this._underlayCallback(canvas, area, g);
+      initAttrs.underlayCallback = (canvas, area, g)=> {
+        // If has highlights, set
+        if (highlights) {
+          highlights.forEach(o =>{
+            this._highlight_period(canvas, area, g, o.start, o.end, o.val);
+          });
+        }
         this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);
       };
-
 
       this._dygraph = new DygraphBase(this._el, this.props.data, initAttrs);
 
@@ -122,7 +134,7 @@ class Dygraph extends BaseComponent {
 
   render() {
     let {known, rest} = spreadDygraphProps(this.props, false);
-    let {tag, annotations, className, style, ...others} =  rest;
+    let {tag, className, style, ...others} =  rest;
 
     let classes = classNames('ui', className, 'graph');
     style = Object.assign(style || {}, {});
