@@ -15,6 +15,7 @@ import './semantic/dist/components/popup';
 import './semantic/dist/components/accordion';
 import './semantic/dist/components/dimmer';
 import './semantic/dist/components/modal';
+import './semantic/dist/components/tab';
 
 import './core/modules/transition';
 import './core/behaviors/api';

@@ -7,9 +7,9 @@ import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../
 import {
   ProjectSelection,
   ModelType,
+  DurationHour,
   AnomalyThreshold,
-  DurationThreshold,
-  DurationHour
+  DurationThreshold
 } from '../../selections';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
@@ -24,8 +24,8 @@ export default  class FilterBar extends Component {
     super(props);
     this.state = {
       projectName: undefined,
-      anomalyThreshold: 0.99,
-      durationThreshold: 5,
+      pvalue: 0.99,
+      cvalue: 5,
       durationHours: 6,
       modelKey: undefined,
       projectType: undefined,
@@ -61,12 +61,12 @@ export default  class FilterBar extends Component {
     const data = dataAllInfo.find((data)=>data.projectName == projectName);
     const dataCoverages = (data.dataCoverages || []);
     update.incidentList = ((incidentInfo && incidentInfo.incidentList) || []).map((incident)=> {
-      let [startTime, endTime, modelKey, anomalyThreshold, ] = incident.split("_");
+      let [startTime, endTime, modelKey, pvalue, ] = incident.split("_");
       return {
         startTime: moment(startTime).toDate(),
         endTime: moment(endTime).toDate(),
         modelKey,
-        anomalyThreshold,
+        pvalue,
         record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
       }
     });
@@ -74,7 +74,7 @@ export default  class FilterBar extends Component {
   }
 
   handleEndTimeChange(endTime) {
-    let {durationHours, durationThreshold} = this.state;
+    let {durationHours, cvalue} = this.state;
     this.setState({
       startTime: moment(endTime).add(-durationHours, 'hour').toDate(),
       endTime
@@ -83,11 +83,11 @@ export default  class FilterBar extends Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {startTime, endTime, modelKey, anomalyThreshold} = incident;
+      let {startTime, endTime, modelKey, pvalue} = incident;
       this.setState({
         startTime: startTime,
         endTime: endTime,
-        anomalyThreshold: anomalyThreshold,
+        pvalue: pvalue,
         incident: incident,
         modelKey: modelKey
       })
@@ -103,7 +103,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, startTime, endTime, anomalyThreshold, durationThreshold, projectType, modelKey, durationHours, incidentList} = this.state;
+    const {projectName, startTime, endTime, pvalue, cvalue, projectType, modelKey, durationHours, incidentList} = this.state;
     const {userInstructions, dashboardUservalues} = this.context;
     const labelStyle = {};
 
@@ -119,7 +119,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Project Type</label>
             <div className="ui input">
-              <input type="text" disabled value={projectType}/>
+              <input type="text" readonly value={projectType}/>
             </div>
           </div>
           <div className="field">
@@ -129,18 +129,18 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Model Key</label>
             <div className="ui input">
-              <input type="text" disabled value={modelKey}/>
+              <input type="text" readonly value={modelKey}/>
             </div>
           </div>
         </div>
         <div className="four fields fill">
           <div className="field">
             <label style={labelStyle}>Anomaly Threshold</label>
-            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: t})}/>
+            <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Duration Threshold (Minute)</label>
-            <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
+            <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Duration (Hour)</label>
@@ -175,7 +175,7 @@ export default  class FilterBar extends Component {
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
               {incidentList.map((incident)=> {
-                let {startTime, endTime, modelKey, anomalyThreshold, record} = incident;
+                let {startTime, endTime, modelKey, pvalue, record} = incident;
                 let bgColor = (incident.startTime == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className="item" key={startTime.getTime()} style={{'backgroundColor': bgColor}}>

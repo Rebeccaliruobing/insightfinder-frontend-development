@@ -6,16 +6,17 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
 import DataParser from '../dataparser';
+import LiveAnalysisCharts from '../liveanalysis'
 
 const ProjectDetails = class extends React.Component {
 
   static propTypes = {
     updateData: React.PropTypes.func
   };
-  
+
   constructor(props) {
     super(props);
-    
+
     this.state = {
       view: 'four',
       viewText: 4,
@@ -25,13 +26,14 @@ const ProjectDetails = class extends React.Component {
   }
 
   componentDidMount() {
-    (this.props.updateData || this.updateLiveAnalysis)(this);
+    (this.props.updateData || this.updateLiveAnalysis.bind(this))(this);
   }
 
   updateLiveAnalysis() {
+      debugger;
     let {query} = this.props.location;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = query;
-    
+
     this.setState({loading: true});
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
       .then(resp => {
@@ -49,11 +51,11 @@ const ProjectDetails = class extends React.Component {
         alert(msg);
       });
   }
-  
+
   renderNavs() {}
-  
+
   renderGroups(view) {
-    
+
     let {data} = this.state;
     let dp = new DataParser(data);
     let groups = dp.getGroupData();
@@ -81,11 +83,11 @@ const ProjectDetails = class extends React.Component {
     });
     return elems;
   }
-  
+
   renderList() {}
-  
+
   renderSelectedGroup() {}
-  
+
   render() {
     let {query} = this.props.location;
     const {projectName} = query;
@@ -99,40 +101,7 @@ const ProjectDetails = class extends React.Component {
         {isListView && this.renderNavs()}
         <Console.Content style={contentStyle}>
           <div className="ui main tiny container" style={{minHeight:'100%'}}>
-            <div className="ui clearing vertical segment">
-              {projectName}
-              <ButtonGroup className="right floated basic icon">
-                <Dropdown className="compact"
-                          value={this.state['view']} text={this.state['viewText']}
-                          mode="select"
-                          onChange={(value, text) => {this.setState({view: value, viewText: text})}}>
-                  <div className="menu">
-                    <div className="item" data-value="two">2</div>
-                    <div className="item" data-value="three">3</div>
-                    <div className="item" data-value="four">4</div>
-                    <div className="item" data-value="five">5</div>
-                    <div className="item" data-value="six">6</div>
-                  </div>
-                </Dropdown>
-                <Button active={view == 'list'} onClick={()=>this.setState({view:'list', selectedGroup: ''})}>
-                  <i className="list layout icon"/>
-                </Button>
-              </ButtonGroup>
-            </div>
-            <div className="ui vertical segment">
-              {!isListView && !!data &&
-              <div className={cx('ui', view, 'cards')}>
-                {this.renderGroups(view)}
-              </div>
-              }
-              {isListView && this.renderList()}
-            </div>
-            {!!selectedGroup &&
-            <div className="ui vertical segment">
-              <h4 className="ui header">{selectedGroup}</h4>
-              {this.renderSelectedGroup()}
-            </div>
-            }
+            {this.state.data && <LiveAnalysisCharts data={this.state.data}/>}
           </div>
         </Console.Content>
       </Console.Wrapper>

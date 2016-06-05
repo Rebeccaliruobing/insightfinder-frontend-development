@@ -25,7 +25,8 @@ $.fn.api.settings.api = {
 
   'userInstructions': `${localBaseUrl}static/userInstructions.json`,
   'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
-  'published detection': `${baseUrl}publishedDetection`
+  'published detection': `${baseUrl}publishedDetection`,
+  'post mortem': `${baseUrl}postMortem`,
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -150,6 +151,37 @@ export default {
     });
   },
 
+
+  /**
+   *
+   * @param modelKey
+   * @param startTime
+   * @param endTime
+   * @param userName
+   * @param token
+   * @param pvalue
+   * @param cvalue
+   * @param modelType
+   * @param projectName
+   * @returns {Promise}
+   */
+  postPostMortem(projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['post mortem'],
+        data: $.param({userName, token, pvalue, cvalue, modelType, projectName, modelKey, startTime, endTime}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+
   /**
    *
    * @param userName
@@ -231,17 +263,17 @@ export default {
   },
 
 
-    // String userName = req.getParameter("userName");
-		// String token = req.getParameter("token");
-		// String p_value = req.getParameter("pvalue");
-		// String c_value = req.getParameter("cvalue");
-		// String modelKey = req.getParameter("modelKey");
-		// String modelName = req.getParameter("modelName");
-		// String projectName = req.getParameter("projectName");
-		// String modelType = req.getParameter("modelType");
-		// String fromUser = req.getParameter("fromUser");
-		// String dataChunkName = req.getParameter("dataChunkName");
-		// String metaData = req.getParameter("metaData");
+  // String userName = req.getParameter("userName");
+  // String token = req.getParameter("token");
+  // String p_value = req.getParameter("pvalue");
+  // String c_value = req.getParameter("cvalue");
+  // String modelKey = req.getParameter("modelKey");
+  // String modelName = req.getParameter("modelName");
+  // String projectName = req.getParameter("projectName");
+  // String modelType = req.getParameter("modelType");
+  // String fromUser = req.getParameter("fromUser");
+  // String dataChunkName = req.getParameter("dataChunkName");
+  // String metaData = req.getParameter("metaData");
   /**
    *
    * @param pvalue
@@ -262,7 +294,19 @@ export default {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['published detection'],
-        data: $.param({pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, userName, token}),
+        data: $.param({
+          pvalue,
+          cvalue,
+          modelKey,
+          modelName,
+          projectName,
+          modelType,
+          fromUser,
+          dataChunkName,
+          metaData,
+          userName,
+          token
+        }),
         beforeSend: function (request) {
           request.setRequestHeader("Accept", 'application/json');
         }
@@ -273,5 +317,6 @@ export default {
       });
     });
   },
+  
 
 };

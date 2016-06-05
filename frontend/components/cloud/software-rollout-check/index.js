@@ -45,7 +45,7 @@ export default class SoftwareRolloutCheck extends Component {
   }
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
-    let mapData = this.state.data.splitByGroupModelData[dateIndex].mapData;
+    let {mapData, startTime, endTime} = this.state.data.splitByInstanceModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -65,9 +65,12 @@ export default class SoftwareRolloutCheck extends Component {
       } else {
         title = <span>{`Group ${data.groupId}`}({new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})</span>;
       }
-      return <HeatMapCard key={`${dateIndex}-${index}`} duration={120} itemSize={4} title={title}
-                          dateIndex={dateIndex} data={dataArray}/>;
-
+      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
+                          duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
+                          link={`#/incidentAnalysis?${$.param({
+                          metricNameList: data.metricNameList,
+                          projectName: this.state.data.projectName, pvalue:0.95,cvalue:3, modelType: "Holistic",
+                          startTime, endTime, groupId: data.groupId, instanceName: data.instanceName, modelKey: 'Search by time'})}`}/>;
     });
 
     this.setState({heatMaps: maps});
@@ -94,6 +97,10 @@ export default class SoftwareRolloutCheck extends Component {
     this.setState({loading: true}, () => {
       apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {
         if (resp.success) {
+
+          resp.data.originData = Object.assign({}, resp.data);
+          resp.data.projectName = data.projectName;
+
           resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);

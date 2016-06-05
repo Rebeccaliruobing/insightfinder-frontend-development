@@ -4,6 +4,7 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
+import apis from '../../../apis';
 
 import FilterBar from  './filter-bar';
 
@@ -20,6 +21,7 @@ export default class IncidentDetection extends Component {
       view: 'chart',
       dateIndex: 0,
       timeIndex: 0,
+      loading: false,
       params: {
         showAddPanel: false,
         projects: [],
@@ -41,8 +43,20 @@ export default class IncidentDetection extends Component {
   }
 
   handleFilterChange(data) {
-    this.$filterPanel.slideUp();
-    alert(JSON.stringify(data));
+
+    let {projectName, pvalue, cvalue, modelType, modelKey} = data;
+
+    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    window.open(`#/incidentAnalysis?${$.param(Object.assign({}, {
+      startTime,
+      endTime,
+      projectName,
+      pvalue,
+      cvalue,
+      modelType,
+      modelKey
+    }))}`, '_blank');
   }
 
   render() {

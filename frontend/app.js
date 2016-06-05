@@ -14,6 +14,7 @@ import {cloudRoute} from './components/cloud/index';
 import {settingsRoute} from './components/settings/index';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
+import IncidentDetails from './components/cloud/incident-analysis/details';
 import apis from './apis';
 
 class App extends React.Component {
@@ -73,7 +74,18 @@ const liveMonitoringApp = function(props) {
   return (
     <Console>
       <Console.Topbar logo={require('./images/logo.png')} />
-      <ProjectDetails location={location} params={params} />
+      <ProjectDetails  location={location} params={params} />
+    </Console>
+  );
+};
+
+// Incident Analysis Details
+const incidentAnalysisApp = function (props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')} />
+      <IncidentDetails location={location} params={params} />
     </Console>
   );
 };
@@ -88,6 +100,7 @@ const routes = (
       {useCaseRoute}
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
+    <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
   </Router>
 );
 

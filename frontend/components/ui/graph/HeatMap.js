@@ -71,7 +71,6 @@ class HeatMap extends React.Component {
         .attr('y', (item) =>itemSize * item.rowIndex)
         .attr('fill', '#ffffff');
 
-        debugger;
       var flatArray = data.map((item)=>parseFloat(item.value));
       var dataMax = Math.max.apply(Math, data.map((item)=>parseFloat(item.value)));
       var dataMin = Math.min.apply(Math, data.map((item)=>parseFloat(item.value)));
