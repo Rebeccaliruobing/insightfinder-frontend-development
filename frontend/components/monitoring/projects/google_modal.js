@@ -26,7 +26,7 @@ class GoogleProjectModal extends React.Component {
 
   handleSubmit() {
     console.log(this.state);
-    debugger;
+    ;
   }
 
   render() {
@@ -94,7 +94,7 @@ class GoogleProjectModal extends React.Component {
       })
       .bind('fileuploaddone', function (e, data) {
         var resp = data.response().jqXHR.responseJSON;
-        debugger;
+        ;
       });
 
   }

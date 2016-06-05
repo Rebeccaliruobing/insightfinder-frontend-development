@@ -10,8 +10,10 @@ import CustomProjects from './custom';
 class Projects extends React.Component {
 
   static contextTypes = {
-    userInstructions: React.PropTypes.object
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object
   };
+
 
   constructor(props) {
     super(props);
@@ -40,6 +42,27 @@ class Projects extends React.Component {
 
     var tabStates = this.state['tabStates'];
     var userInstructions = this.context.userInstructions;
+    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
+
+    let projectGroupByType = {'AWS': [], 'Google': [], 'custom': []};
+
+    projectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
+      let [name, dataType, cloudType] = project;
+      ;
+      switch (dataType) {
+        case 'AWS':
+          projectGroupByType.AWS.push({name, dataType, cloudType});
+          break;
+        case 'GAE':
+          projectGroupByType.Google.push({name, dataType, cloudType});
+          break;
+        case 'GCE':
+          projectGroupByType.Google.push({name, dataType, cloudType});
+          break;
+        default:
+          projectGroupByType.custom.push({name, dataType, cloudType});
+      }
+    });
 
     return (
       <Console.Content>
@@ -60,13 +83,13 @@ class Projects extends React.Component {
                onClick={(e) => this.selectTab(e, 'google')}>Google Cloud Monitoring</a>
           </div>
           <div className={tabStates['amazon'] + ' ui tab segment'}>
-            {tabStates['amazon'] === 'active' ? <AmazonProjects/> : null}
+            {tabStates['amazon'] === 'active' ? <AmazonProjects projects={projectGroupByType.AWS}/> : null}
           </div>
           <div className={tabStates['google'] + ' ui tab segment'}>
-            {tabStates['google'] === 'active' ? <ProjectsGoogle/> : null}
+            {tabStates['google'] === 'active' ? <ProjectsGoogle projects={projectGroupByType.Google}/> : null}
           </div>
           <div className={tabStates['custom'] + ' ui tab segment'}>
-            {tabStates['custom'] === 'active' ? <CustomProjects/> : null}
+            {tabStates['custom'] === 'active' ? <CustomProjects projects={projectGroupByType.custom}/> : null}
           </div>
           <div className="ui message attached" dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
         </div>

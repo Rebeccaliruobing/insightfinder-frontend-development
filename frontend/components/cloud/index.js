@@ -34,7 +34,6 @@ export const cloudRoute = (
       <Route component={SummaryReport} path="summary-report" />
       <Route component={DisplayModel} path="display-model" />
 
-      <Route component={Projects} path="newproject" />
-      <Route component={Projects} path="removeproject" />
+      <Route component={Projects} path="project-list" />
     </Route>
 );

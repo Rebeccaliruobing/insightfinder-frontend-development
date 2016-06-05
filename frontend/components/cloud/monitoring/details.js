@@ -30,7 +30,7 @@ const ProjectDetails = class extends React.Component {
   }
 
   updateLiveAnalysis() {
-      debugger;
+      ;
     let {query} = this.props.location;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = query;
 

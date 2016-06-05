@@ -27,6 +27,9 @@ $.fn.api.settings.api = {
   'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
   'published detection': `${baseUrl}publishedDetection`,
   'post mortem': `${baseUrl}postMortem`,
+  'add custom project': `${baseUrl}add-custom-project`,
+  'add aws project': `${baseUrl}add-aws-project`,
+  'remove project': `${baseUrl}remove-project`,
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -317,6 +320,97 @@ export default {
       });
     });
   },
-  
+
+  /**
+   *
+   * @param projectName
+   * @param projectCloudType
+   * @param samplingInterval
+   * @param email
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postAddCustomProject(projectName, projectCloudType, samplingInterval, email = '', userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['add custom project'],
+        data: $.param({projectName, projectCloudType, samplingInterval, email, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+
+  /**
+   *
+   * @param projectName
+   * @param projectCloudType
+   * @param samplingInterval
+   * @param email
+   * @param zone
+   * @param access_key
+   * @param secrete_key
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postAddAWSProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+    ;
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['add custom project'],
+        data: $.param({
+          projectName,
+          projectCloudType,
+          samplingInterval,
+          zone,
+          'access-key': access_key,
+          'secrete-key': secrete_key,
+          email,
+          userName,
+          token
+        }),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+  /**
+   *
+   * @param projectName
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postRemoveProject(projectName, userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['remove project'],
+        data: $.param({projectName, userName, token}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        reject(error);
+      });
+    });
+  },
+
 
 };

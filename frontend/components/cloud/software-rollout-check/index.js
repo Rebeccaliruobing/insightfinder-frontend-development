@@ -39,14 +39,14 @@ export default class SoftwareRolloutCheck extends Component {
   }
 
   handleData(data) {
-    debugger;
+    ;
     this.setState({data: data}, ()=> {
       this.setHeatMap(0, 0);
     })
   }
 
   setHeatMap(dateIndex = 0, timeIndex = 0) {
-    debugger;
+    ;
     let {mapData, startTime, endTime} = this.state.data.holisticModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];

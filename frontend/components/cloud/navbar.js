@@ -20,8 +20,7 @@ export default function(props) {
         <div className="item">
           <a className="active title"><i className="dropdown icon"/>Project Management</a>
           <div className="active content menu">
-            <Link to="/cloud/newproject" className="item">Register Project</Link>
-            <Link to="/cloud/removeproject" className="item">Remove Project</Link>
+            <Link to="/cloud/project-list" className="item">Register List</Link>
           </div>
         </div>
       </Accordion>

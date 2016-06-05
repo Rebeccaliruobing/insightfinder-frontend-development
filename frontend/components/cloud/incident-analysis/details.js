@@ -30,7 +30,7 @@ const ProjectDetails = class extends React.Component {
   }
 
   updateData() {
-    debugger;
+    ;
     let {query} = this.props.location;
     let {projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, groupId} = query;
     this.setState({loading: true}, ()=> {

@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import {Modal} from '../../../artui/react/index';
+import apis from '../../../apis';
 
 
 class CustomProjectModal extends React.Component {
@@ -15,9 +16,17 @@ class CustomProjectModal extends React.Component {
     }
   }
 
-  handleSubmit() { 
-    console.log(this.state);
-    debugger;
+  handleSubmit() {
+    let {projectName, projectCloudType, samplingInterval} = this.state;
+    apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
+      let c = confirm("You have to refresh website to update data");
+      while (!c) {
+        c = confirm("You have to refresh website to update data");
+      }
+      window.location.reload();
+    }).catch((e)=> {
+      alert(e);
+    });
   }
 
   render() {
@@ -32,7 +41,7 @@ class CustomProjectModal extends React.Component {
             <div className="field">
               <label>Project Type (Optional)</label>
 
-              <select className="ui dropdown" onChange={(e)=>this.setState({projectType: e.target.value})}>
+              <select className="ui dropdown" onChange={(e)=>this.setState({projectCloudType: e.target.value})}>
                 <option className="item">Project Type</option>
                 <option className="item" value="AWS">AWS</option>
                 <option className="item" value="GAE">GAE</option>
@@ -43,7 +52,7 @@ class CustomProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>Sampling Interval (Optional)</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({interval: e.target.value})}>
+              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
                 <option className="item">Sampling Interval</option>
                 <option className="item" value="1">1 minute</option>
                 <option className="item" value="5">5 minutes</option>
