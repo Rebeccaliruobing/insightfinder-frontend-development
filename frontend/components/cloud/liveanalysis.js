@@ -6,8 +6,6 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../.
 import {Dygraph} from '../../artui/react/dataviz';
 import DataParser from './dataparser';
 
-
-
 class LiveAnalysisCharts extends React.Component {
 
   static propTypes = {
@@ -18,7 +16,8 @@ class LiveAnalysisCharts extends React.Component {
 
   static defaultProps = {
     view: 'list',
-    loading: true
+    loading: true,
+    summarySelected: false
   };
 
   constructor(props) {
@@ -27,7 +26,8 @@ class LiveAnalysisCharts extends React.Component {
     
     this.state = {
       view: this.props['view'],
-      viewText: 4,
+      columns: 'four',
+      columnsText: 4,
       selectedGroupId: undefined
     };
   }
@@ -41,12 +41,45 @@ class LiveAnalysisCharts extends React.Component {
     }
   }
   
-  renderGroups(summary, groups) {
+  renderSummaryDetail(summary) {
+    return (
+      <Dygraph key="summary" className="live monitoring summary" data={summary.series}
+               ylabel="Anomaly Degree"
+               labels={['X', 'Y1']}
+               axisLabelWidth={35}
+               style={{width: '100%', height: '200px'}}
+               highlightCircleSize={2} strokeWidth={3}
+               labelsDivStyles={{padding: '4px', margin:'15px'}}
+               highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+               annotations={summary.annotations}
+               showRangeSelector={true}
+               highlights={summary.highlights} />
+
+    )
+  }
+  
+  renderGroupDetail(group) {
+    return (
+      <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
+               title={"Metric Group" + group.id}
+               labels={group.sname}
+               style={{width: '100%', height: 200}}
+               showRangeSelector={true}
+               highlightCircleSize={2}
+               highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+               highlights={group.highlights}
+      />
+    )
+  }
+  
+  renderThumbnail(summary, groups) {
+    let {columns} = this.state;
     let elems = [];
     
     if(summary) {
       elems.push((
-        <div key='summary' className="ui card">
+        <div key={columns+summary} className="ui card" 
+             onClick={() => this.setState({summarySelected:true, selectedGroupId: null})}>
           <div className="content">
             <div className="header">Summary</div>
             <Dygraph className="live monitoring summary" data={summary.series}
@@ -67,7 +100,8 @@ class LiveAnalysisCharts extends React.Component {
     if (groups) {
       groups.map((group) => {
         elems.push((
-          <div key={group.id} className="ui card" onClick={this.handleClick(group)}>
+          <div key={columns + group.id} className="ui card" 
+               onClick={() => this.setState({selectedGroupId: group.id, summarySelected:false})}>
             <div className="content">
               <div className="header"></div>
               <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
@@ -99,7 +133,7 @@ class LiveAnalysisCharts extends React.Component {
             <Link key={k} to="">Metric Group {k}</Link>
             <div key="metrics" className="menu">
               {v.map(g=> {
-                return (<div key={g} className="item">{g}</div>)
+                return (<div key={g} className="item">- {g}</div>)
               })}
             </div>
           </div>
@@ -128,36 +162,14 @@ class LiveAnalysisCharts extends React.Component {
   
   renderList(summary, groups) {
     let elems = [];
-    
+
     if (summary) {
-      elems.push((
-        <Dygraph key="summary" className="live monitoring summary" data={summary.series}
-                           ylabel="Anomaly Degree"
-                           labels={['X', 'Y1']}
-                           axisLabelWidth={35}
-                           style={{width: '100%', height: '200px'}}
-                           highlightCircleSize={2} strokeWidth={3}
-                           labelsDivStyles={{padding: '4px', margin:'15px'}}
-                           highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                           annotations={summary.annotations}
-                           showRangeSelector={true}
-                           highlights={summary.highlights} />
-      ));
+      elems.push(this.renderSummaryDetail(summary))
     }
     
     if (groups) {
       groups.map((group) => {
-        elems.push((
-          <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
-                   title={"Metric Group" + group.id}
-                   labels={group.sname}
-                   style={{width: '100%', height: 200}}
-                   showRangeSelector={true}
-                   highlightCircleSize={2}
-                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                   highlights={group.highlights}
-          />
-        ));
+        elems.push(this.renderGroupDetail(group));
       });
     }
     
@@ -167,7 +179,7 @@ class LiveAnalysisCharts extends React.Component {
   render() {
     
     let {data, loading, projectName} = this.props;
-    let {columns, view, selectedGroupId} = this.state;
+    let {columns, view, summarySelected, selectedGroupId} = this.state;
 
     let isListView = view === 'list';
     let contentStyle = isListView ? {} : {paddingLeft:0};
@@ -188,16 +200,19 @@ class LiveAnalysisCharts extends React.Component {
     
     return (
     <Console.Wrapper>
-      {isListView && this.renderNavs()}
+      {!loading && isListView && this.renderNavs()}
       <Console.Content style={contentStyle} className={contentClass}>
         <div className="ui main tiny container" style={{minHeight:'100%'}}>
+          {!loading &&
           <div className="ui vertical segment">
             {projectName}
             <ButtonGroup className="right floated basic icon">
               <Dropdown className="compact"
-                        value={this.state['view']} text={this.state['viewText']}
+                        value={this.state['columns']} text={this.state['columnsText']}
                         mode="select"
-                        onChange={(value, text) => {this.setState({view: value, viewText: text})}}>
+                        class={{zIndex:1000}}
+                        onChange={(value, text) => {this.setState(
+                        {view: 'thumbnail', columns: value, columnsText: text})}}>
                 <div className="menu">
                   <div className="item" data-value="two">2</div>
                   <div className="item" data-value="three">3</div>
@@ -206,18 +221,22 @@ class LiveAnalysisCharts extends React.Component {
                   <div className="item" data-value="six">6</div>
                 </div>
               </Dropdown>
-              <Button active={view == 'list'} onClick={()=>this.setState({view:'list', selectedGroupId: undefined})}>
+              <Button active={view == 'list'}
+                      onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
                 <i className="list layout icon"/>
               </Button>
             </ButtonGroup>
           </div>
+          }
           <div className="ui vertical segment">
             {!isListView &&
             <div className={cx('ui', columns, 'cards')}>
-              {this.renderGroups(summary, groups)}
+              {this.renderThumbnail(summary, groups)}
             </div>
             }
             {isListView && this.renderList(summary, groups)}
+            {summary && summarySelected && this.renderSummaryDetail(summary)}
+            {!!selectedGroup && this.renderGroupDetail(selectedGroup)}
           </div>
         </div>
       </Console.Content>
