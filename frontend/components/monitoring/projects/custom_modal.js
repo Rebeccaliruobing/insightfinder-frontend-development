@@ -5,6 +5,10 @@ import apis from '../../../apis';
 
 
 class CustomProjectModal extends React.Component {
+  static contextTypes = {
+    root: React.PropTypes.object,
+  };
+  
   constructor(props) {
     super(props);
     this._dropdown = null;
@@ -19,11 +23,7 @@ class CustomProjectModal extends React.Component {
   handleSubmit() {
     let {projectName, projectCloudType, samplingInterval} = this.state;
     apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
-      let c = confirm("You have to refresh website to update data");
-      while (!c) {
-        c = confirm("You have to refresh website to update data");
-      }
-      window.location.reload();
+      this.context.root.loadData();
     }).catch((e)=> {
       alert(e);
     });

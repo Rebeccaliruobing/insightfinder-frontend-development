@@ -42,8 +42,8 @@ Hoverable.propTypes = {
   tag: React.PropTypes.string,
   hovered: React.PropTypes.bool,
   replace: React.PropTypes.bool,
-  content: React.PropTypes.node,
-  children: React.PropTypes.node
+  content: React.PropTypes.object,
+  children: React.PropTypes.object
 };
 
 Hoverable.defaultProps = {

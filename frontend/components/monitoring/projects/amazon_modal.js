@@ -5,6 +5,10 @@ import apis from '../../../apis';
 
 
 class AmazonProjectModal extends React.Component {
+  static contextTypes = {
+    root: React.PropTypes.object,
+  };
+
   constructor(props) {
     super(props);
     this._dropdown = null;
@@ -19,14 +23,9 @@ class AmazonProjectModal extends React.Component {
 
   handleSubmit() {
 
-    let {projectName, samplingInterval, zone, access_key, secrete_key,} = this.state;
-    let projectCloudType = 'AWS';
-    apis.postAddAWSProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key,).then((resp)=> {
-      let c = confirm("You have to refresh website to update data");
-      while (!c) {
-        c = confirm("You have to refresh website to update data");
-      }
-      window.location.reload();
+    let {projectName, zone, access_key, secrete_key, email} = this.state;
+    apis.postAddAWSProject(projectName, zone, access_key, secrete_key, email).then((resp)=> {
+      this.context.root.loadData();
     }).catch((e)=> {
       alert(e);
     });
@@ -44,12 +43,8 @@ class AmazonProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>AWS Access ID*</label>
-              <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
-            </div>
-            <div className="field">
-              <label>Secret Access Key*</label>
-              <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
+              <label>Email</label>
+              <input type="text" name="name" onChange={(e)=>this.setState({email: e.target.value})}/>
             </div>
             <div className="field">
               <label>Availability Zone</label>
@@ -67,12 +62,12 @@ class AmazonProjectModal extends React.Component {
               </select>
             </div>
             <div className="field">
-              <label>Sampling Interval (Optional)</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
-                <option className="item">Sampling Interval (Optional)</option>
-                <option className="item" value="1">1 minute</option>
-                <option className="item" value="5">5 minutes</option>
-              </select>
+              <label>AWS Access ID*</label>
+              <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
+            </div>
+            <div className="field">
+              <label>Secret Access Key*</label>
+              <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
             </div>
           </form>
         </div>

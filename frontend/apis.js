@@ -28,7 +28,7 @@ $.fn.api.settings.api = {
   'published detection': `${baseUrl}publishedDetection`,
   'post mortem': `${baseUrl}postMortem`,
   'add custom project': `${baseUrl}add-custom-project`,
-  'add aws project': `${baseUrl}add-aws-project`,
+  'add aws project': `${baseUrl}add-amazon-project`,
   'remove project': `${baseUrl}remove-project`,
 };
 
@@ -351,8 +351,6 @@ export default {
   /**
    *
    * @param projectName
-   * @param projectCloudType
-   * @param samplingInterval
    * @param email
    * @param zone
    * @param access_key
@@ -361,16 +359,13 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postAddAWSProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
-    ;
+  postAddAWSProject(projectName, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
-        url: $.fn.api.settings.api['add custom project'],
+        url: $.fn.api.settings.api['add aws project'],
         data: $.param({
           projectName,
-          projectCloudType,
-          samplingInterval,
           zone,
           'access-key': access_key,
           'secrete-key': secrete_key,

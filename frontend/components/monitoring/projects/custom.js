@@ -4,6 +4,10 @@ import apis from '../../../apis';
 
 
 class CustomProjects extends React.Component {
+  static contextTypes = {
+    root: React.PropTypes.object,
+  };
+  
 
   constructor(props) {
     super(props);
@@ -28,11 +32,7 @@ class CustomProjects extends React.Component {
     return (e) => {
       if (!window.confirm("Confirm?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
-        let c = confirm("You have to refresh website to update data");
-        while (!c) {
-          c = confirm("You have to refresh website to update data");
-        }
-        window.location.reload();
+        this.context.root.loadData();
       }).catch((e)=> {
 
       });

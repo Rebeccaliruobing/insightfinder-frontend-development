@@ -2,8 +2,10 @@ import './app.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {Router, Route, browserHistory,
-  useRouterHistory, IndexRoute, IndexRedirect} from 'react-router';
+import {
+  Router, Route, browserHistory,
+  useRouterHistory, IndexRoute, IndexRedirect
+} from 'react-router';
 import {createHashHistory} from 'history'
 import store from 'store';
 
@@ -69,12 +71,12 @@ class App extends React.Component {
 }
 
 // Live Monitoring project detail page
-const liveMonitoringApp = function(props) {
+const liveMonitoringApp = function (props) {
   let {location, params} = props;
   return (
     <Console>
-      <Console.Topbar logo={require('./images/logo.png')} />
-      <ProjectDetails  location={location} params={params} />
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <ProjectDetails location={location} params={params}/>
     </Console>
   );
 };
@@ -84,8 +86,8 @@ const incidentAnalysisApp = function (props) {
   let {location, params} = props;
   return (
     <Console>
-      <Console.Topbar logo={require('./images/logo.png')} />
-      <IncidentDetails location={location} params={params} />
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <IncidentDetails location={location} params={params}/>
     </Console>
   );
 };
@@ -121,7 +123,8 @@ class AppRoute extends React.Component {
     userInfo: React.PropTypes.object,
     userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
-    dashboardDailySummaryReport: React.PropTypes.object
+    dashboardDailySummaryReport: React.PropTypes.object,
+    root: React.PropTypes.object
   };
 
   getChildContext() {
@@ -135,7 +138,10 @@ class AppRoute extends React.Component {
       userInfo,
       userInstructions,
       dashboardUservalues,
-      dashboardDailySummaryReport
+      dashboardDailySummaryReport,
+      root: {
+        loadData: this.loadData.bind(this)
+      }
     }
   }
 
@@ -144,42 +150,49 @@ class AppRoute extends React.Component {
   }
 
   loadData() {
-    // Load data only when user login
-    if (!(store.get('userName') && store.get('token'))) {
-      return;
-    }
+    this.setState({
+      userInstructions: {},
+      dashboardUservalues: {},
+      dashboardDailySummaryReport: {}
+    }, ()=> {
 
-    apis.getUserInstructions().then((resp)=> {
-      this.setState({userInstructions: resp});
-    });
+      // Load data only when user login
+      if (!(store.get('userName') && store.get('token'))) {
+        return;
+      }
 
-    apis.postDashboardUserValues(store.get('userName')).then((resp)=> {
-
-      resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
-      resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
-      resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
-      resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
-      resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
-      resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
-
-      resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
-        return Object.assign({}, info, {
-          metricSettings: JSON.parse(info.metricSettings)
-        });
+      apis.getUserInstructions().then((resp)=> {
+        this.setState({userInstructions: resp});
       });
 
-      resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
-        return Object.assign({}, info, {
-          metaData: JSON.parse(info.metaData)
+      apis.postDashboardUserValues(store.get('userName')).then((resp)=> {
+
+        resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
+        resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
+        resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
+        resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
+        resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
+        resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
+
+        resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
+          return Object.assign({}, info, {
+            metricSettings: JSON.parse(info.metricSettings)
+          });
         });
+
+        resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
+          return Object.assign({}, info, {
+            metaData: JSON.parse(info.metaData)
+          });
+        });
+
+        this.setState({dashboardUservalues: resp});
       });
 
-      this.setState({dashboardUservalues: resp});
+      // apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
+      //   this.setState({dashboardDailySummaryReport: resp});
+      // });
     });
-
-    // apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
-    //   this.setState({dashboardDailySummaryReport: resp});
-    // });
   }
 
 
