@@ -75,7 +75,7 @@ class DataParser {
       $.each(arr, function(i,a){
         var atext = [];
         if(a.anomalies!=""){
-          var lines = a.anomalies.split('\n');
+          var lines = a.anomalies.split('\\n');
           $.each(lines, function(lineNo, line) {
             var items = line.split(',');
 
@@ -250,11 +250,13 @@ class DataParser {
 
     this.seriesOptions = soptions;
   };
+  
   getSummaryData() {
     
     this._parseAnomalyData();
     
-    // TODO: Check chart mode, only holistic has summary
+    if (this.mode != 'holistic') return null;
+    
     let alies = this.anomalies[0];
     let annotations = [];
     
@@ -271,7 +273,7 @@ class DataParser {
       _.forIn(o, (v, k) => {
         index++;
         annotations.push({
-          series: 'D',
+          series: 'Y1',
           x: k,
           shortText: index.toString(),
           text: v

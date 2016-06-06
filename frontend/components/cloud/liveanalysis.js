@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import store from 'store';
+import moment from 'moment';
 
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../artui/react';
 import {Dygraph} from '../../artui/react/dataviz';
@@ -16,8 +17,7 @@ class LiveAnalysisCharts extends React.Component {
 
   static defaultProps = {
     view: 'list',
-    loading: true,
-    summarySelected: false
+    loading: true
   };
 
   constructor(props) {
@@ -28,17 +28,13 @@ class LiveAnalysisCharts extends React.Component {
       view: this.props['view'],
       columns: 'four',
       columnsText: 4,
-      selectedGroupId: undefined
+      selectedGroupId: undefined,
+      summarySelected: false,
+      selectedAnnotation: null
     };
   }
 
   componentDidMount() {
-  }
-
-  handleClick(group) {
-    return (e) => {
-      this.setState({selectedGroupId: group.id})
-    }
   }
   
   renderSummaryDetail(summary) {
@@ -50,11 +46,11 @@ class LiveAnalysisCharts extends React.Component {
                style={{width: '100%', height: '200px'}}
                highlightCircleSize={2} strokeWidth={3}
                labelsDivStyles={{padding: '4px', margin:'15px'}}
+               showRangeSelector={true}
                highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                annotations={summary.annotations}
-               showRangeSelector={true}
+               onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
                highlights={summary.highlights} />
-
     )
   }
   
@@ -65,6 +61,7 @@ class LiveAnalysisCharts extends React.Component {
                labels={group.sname}
                style={{width: '100%', height: 200}}
                showRangeSelector={true}
+               labelsDivStyles={{padding: '4px', margin:'15px'}}
                highlightCircleSize={2}
                highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                highlights={group.highlights}
@@ -160,6 +157,32 @@ class LiveAnalysisCharts extends React.Component {
     )
   }
   
+  renderAnnotation() {
+    let {selectedAnnotation} = this.state;
+    if (selectedAnnotation) {
+      let {shortText, x, text} = selectedAnnotation;
+      return (
+        <Accordion className="ui styled fluid accordion" exclusive={true}>
+          <div className="title">
+            <i className="dropdown icon"/>
+            {shortText}: {moment(parseInt(x)).format("YYYY-MM-DD HH:mm")}
+          </div>
+          <div className="active content">
+            {text}
+            <form className="ui reply form">
+              <div className="field">
+                <textarea rows="3"/>
+              </div>
+              <div className="ui blue labeled submit icon button">
+                <i className="icon edit"/> Add Comments
+              </div>
+            </form>
+          </div>
+        </Accordion>
+      )
+    }
+  }
+  
   renderList(summary, groups) {
     let elems = [];
 
@@ -172,8 +195,17 @@ class LiveAnalysisCharts extends React.Component {
         elems.push(this.renderGroupDetail(group));
       });
     }
-    
-    return elems;
+
+    return(
+      <div className="ui grid">
+        <div className="twelve wide column">
+          {elems}
+        </div>
+        <div className="four wide column">
+          {this.renderAnnotation()}
+        </div>
+      </div>
+    )
   }
 
   render() {
@@ -235,8 +267,8 @@ class LiveAnalysisCharts extends React.Component {
             </div>
             }
             {isListView && this.renderList(summary, groups)}
-            {summary && summarySelected && this.renderSummaryDetail(summary)}
-            {!!selectedGroup && this.renderGroupDetail(selectedGroup)}
+            {!isListView && summary && summarySelected && this.renderSummaryDetail(summary)}
+            {!isListView && !!selectedGroup && this.renderGroupDetail(selectedGroup)}
           </div>
         </div>
       </Console.Content>

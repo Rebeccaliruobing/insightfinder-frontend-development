@@ -90,7 +90,7 @@ class ProjectSummary extends BaseComponent {
           {sdata &&
           <Dygraph className="live monitoring summary" data={sdata.series}
                    ylabel="Anomaly Degree"
-                   labels={['X', 'D']}
+                   labels={['X', 'Y1']}
                    axisLabelWidth={35}
                    style={{width: '100%', height: '200px'}}
                    animatedZooms={true} highlightCircleSize={2} strokeWidth={3}
