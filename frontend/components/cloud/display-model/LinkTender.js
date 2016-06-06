@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import DataLinks from '../../../mock/cloud/DataLinks';
 
 
@@ -19,9 +20,11 @@ class Point {
   hasLine(l:Line) {
     return this.inLines.indexOf(l) >= 0 || this.outLines.indexOf(l) >= 0;
   }
+
   hasLineIn(l:Line) {
     return this.inLines.indexOf(l) >= 0;
   }
+
   hasLineOut(l:Line) {
     return this.outLines.indexOf(l) >= 0;
   }
@@ -69,6 +72,7 @@ export default class LinkTender extends React.Component {
   defaultProps = {
     data: DataLinks
   }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -104,7 +108,7 @@ export default class LinkTender extends React.Component {
     dataArray.forEach(([x, ...records], i) => {
       lastPoints[i] = [];
       records.map((text)=> {
-        var type = (/([a-z_]+)/g).exec(text)[0];
+        var type = (/([a-z_]+ \[node\d+\])/g).exec(text)[0];
         var x = stageWidth * i + stageWidth / 2;
         var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
@@ -122,8 +126,55 @@ export default class LinkTender extends React.Component {
     this.setState(state);
   }
 
+  highLightPoint(point) {
+    let $component = $(point.component);
+    $component.attr({r: 8}).css({
+      strokeWidth: 1,
+      stroke: 'rgb(255, 127, 14)',
+      cursor: 'pointer'
+    });
+
+    $(this.$showText).text(point.title).attr({
+      x: point.component.getAttribute('x'),
+      y: point.component.getAttribute('y')
+    });
+
+    point.outLines.forEach((line)=>this.highLightLine(line, 'blue'));
+    point.inLines.forEach((line)=>this.highLightLine(line, 'green'));
+
+  }
+
+  unHighLightPoint(point) {
+    let $component = $(point.component);
+    $component.attr({r: 5}).css({
+      strokeWidth: 1,
+      stroke: '#fff',
+      cursor: 'pointer'
+    });
+    $(this.$showText).text('').attr({x: point.x, y: point.y});
+    point.outLines.forEach((line)=>this.unHighLightLine(line));
+    point.inLines.forEach((line)=>this.unHighLightLine(line));
+  }
+
+  highLightLine(line, color) {
+    let hex = ({green: '#33ff66', blue: '#3366ff'})[color];
+    $(line.component).attr({'marker-end': `url(#arrow-${color})`}).css({
+      strokeWidth: 2,
+      stroke: hex,
+      cursor: 'pointer'
+    });
+  }
+
+  unHighLightLine(line) {
+    $(line.component).attr({'marker-end': `url(#arrow)`}).css({
+      strokeWidth: 1,
+      stroke: "#999",
+      cursor: 'pointer'
+    });
+  }
+
   renderPoint(point) {
-    let isHover = this.state.hoverNode == point.id;
+    let isHover = false;
 
     let {x, y} = point;
     let zoomRange = this.state.zoomRange;
@@ -131,22 +182,19 @@ export default class LinkTender extends React.Component {
     x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
     y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
-    return [
-      <circle key={point.id} class="node" r={(isHover ? 8 : 5) * (zoomRange.zoomX + zoomRange.zoomY) / 2}
+    return (
+      <circle ref={(c)=>point.component = c} key={point.id} class="node" r={(isHover ? 8 : 5)}
               cx={x} cy={y} fill="rgb(255, 127, 14)"
               style={{strokeWidth: 1, stroke: isHover ? 'rgb(255, 127, 14)' : '#fff', cursor: 'pointer'}}
-              onMouseEnter={()=>this.setState({hoverNode: point.id, point})}
-              onMouseLeave={()=> isHover && this.setState({hoverNode: undefined, point: undefined})}>
+              onMouseEnter={()=>this.highLightPoint(point)}
+              onMouseLeave={()=>this.unHighLightPoint(point)}>
         <title>{point.title}</title>
       </circle>
-    ]
+    );
   }
 
   renderLine(line) {
-    let isHover = this.state.hoverNode == line.id;
-    isHover = (this.state.point && this.state.point.hasLine(line)) || isHover;
 
-    let hoverColor = (this.state.point && this.state.point.hasLineIn(line)) ? '3366FF' : '33FF66';
 
     let zoomRange = this.state.zoomRange;
 
@@ -159,26 +207,20 @@ export default class LinkTender extends React.Component {
     y2 = (y2 - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
     let style = {
-      strokeWidth: (isHover ? 2 : 1) * (zoomRange.zoomX + zoomRange.zoomY) / 2,
-      stroke: isHover ? `#${hoverColor}` : '#999',
+      strokeWidth: 1,
+      stroke: '#999',
       cursor: 'pointer'
     };
 
-    let hoverArrow = (
-      <defs>
-        <marker id={`hover-arrow-${hoverColor}`} markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
-          <path d="M2,2 L2,11 L10,6 L2,2" style={{strokeWidth: 0, fill: hoverColor}}/>
-        </marker>
-      </defs>
+    return (
+      <g key={line.id}>
+        <line ref={(c)=>line.component = c}
+              x1={x1} y1={y1} x2={x2} y2={y2} style={style}
+              onMouseEnter={()=>this.highLightLine(line, 'blue')}
+              onMouseLeave={()=>this.unHighLightLine(line)}
+              markerEnd={`url(#arrow)`}/>
+      </g>
     )
-
-    return [
-      isHover ? hoverArrow : undefined,
-      <line key={line.id} x1={x1} y1={y1} x2={x2} y2={y2} style={style}
-            onMouseEnter={()=>this.setState({hoverNode: line.id})}
-            onMouseLeave={()=> isHover && this.setState({hoverNode: undefined})}
-            markerEnd={`url(#${isHover ? 'hover-' : ''}arrow${isHover ? ('-' + hoverColor) : ''})`}/>
-    ]
   }
 
   getWrapText(text, maxLength:number) {
@@ -214,13 +256,22 @@ export default class LinkTender extends React.Component {
   handleMouseMove(e) {
     let {layerX, layerY} = e.nativeEvent;
     let selectRange = this.state.selectRange;
-    // if (selectRange.x1 == layerX || selectRange.y1 == layerY) return;
-    this.setState({selectRange: Object.assign({}, selectRange, {x2: layerX, y2: layerY})})
+    selectRange.x2 = layerX;
+    selectRange.y2 = layerY;
+    $(this.$selectReact).attr({
+      x: Math.min(selectRange.x1, selectRange.x2) || 0,
+      y: Math.min(selectRange.y1, selectRange.y2) || 0,
+      width: Math.abs(selectRange.x1 - selectRange.x2) || 0,
+      height: Math.abs(selectRange.y1 - selectRange.y2) || 0
+    });
   }
 
   handleMouseUp(e) {
+    let {layerX, layerY} = e.nativeEvent;
     let svg = this.state.svg;
     let selectRange = this.state.selectRange;
+    selectRange.x2 = layerX;
+    selectRange.y2 = layerY;
     let x1 = selectRange.x1 / this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
     let x2 = selectRange.x2 / this.state.zoomRange.zoomX + Math.min(this.state.zoomRange.x1, this.state.zoomRange.x2);
     let y1 = selectRange.y1 / this.state.zoomRange.zoomY + Math.min(this.state.zoomRange.y1, this.state.zoomRange.y2);
@@ -259,6 +310,14 @@ export default class LinkTender extends React.Component {
               <marker id={`arrow`} markerWidth="13" markerHeight="13" refX="10" refY="6" orient="auto">
                 <path d="M2,2 L2,11 L10,6 L2,2" style={{fill: '#999'}}/>
               </marker>
+
+              <marker id={`arrow-blue`} markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M2,2 L2,11 L10,6 L2,2" style={{strokeWidth: 0, fill: '#3366FF'}}/>
+              </marker>
+
+              <marker id={`arrow-green`} markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+                <path d="M2,2 L2,11 L10,6 L2,2" style={{strokeWidth: 0, fill: '#33FF66'}}/>
+              </marker>
             </defs>
             {types.map((type, index)=> {
               var y = stageHeight * index + stageHeight * 0.5;
@@ -276,17 +335,9 @@ export default class LinkTender extends React.Component {
             {lines.map(this.renderLine.bind(this))}
             {points.map(this.renderPoint.bind(this))}
 
-            {
-              point &&
-              this.getWrapText(point.title, 16).map((text, index)=>
-                <text className="no-select" key={'hover-text-' + index}
-                      x={(point.x + 10 - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX}
-                      y={(point.y - 5 + index * 15 - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY}>
-                  {text}
-                </text>
-              )
-            }
-            <rect x={Math.min(selectRange.x1, selectRange.x2) || 0}
+            <text ref={(c)=>this.$showText = c}></text>
+            <rect ref={(c)=>this.$selectReact = ReactDOM.findDOMNode(c)}
+                  x={Math.min(selectRange.x1, selectRange.x2) || 0}
                   y={Math.min(selectRange.y1, selectRange.y2) || 0}
                   width={Math.abs(selectRange.x1 - selectRange.x2) || 0}
                   height={Math.abs(selectRange.y1 - selectRange.y2) || 0}
