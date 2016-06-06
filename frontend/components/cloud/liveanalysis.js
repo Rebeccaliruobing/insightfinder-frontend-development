@@ -39,18 +39,21 @@ class LiveAnalysisCharts extends React.Component {
   
   renderSummaryDetail(summary) {
     return (
-      <Dygraph key="summary" className="live monitoring summary" data={summary.series}
-               ylabel="Anomaly Degree"
-               labels={['X', 'Y1']}
-               axisLabelWidth={35}
-               style={{width: '100%', height: '200px'}}
-               highlightCircleSize={2} strokeWidth={3}
-               labelsDivStyles={{padding: '4px', margin:'15px'}}
-               showRangeSelector={true}
-               highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-               annotations={summary.annotations}
-               onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
-               highlights={summary.highlights} />
+      <div id="summary">
+        <h4 className="ui header">Analysis Summary</h4>
+        <Dygraph key="summary" className="live monitoring summary" data={summary.series}
+                 ylabel="Anomaly Degree"
+                 labels={['X', 'Y1']}
+                 axisLabelWidth={35}
+                 style={{width: '100%', height: '200px'}}
+                 highlightCircleSize={2} strokeWidth={3}
+                 labelsDivStyles={{padding: '4px', margin:'15px'}}
+                 showRangeSelector={true}
+                 highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                 annotations={summary.annotations}
+                 onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
+                 highlights={summary.highlights} />
+      </div>
     )
   }
   
@@ -127,7 +130,7 @@ class LiveAnalysisCharts extends React.Component {
       _.forEach(this.dp.groupmetrics, (v,k) => {
         items.push((
           <div className="item">
-            <Link key={k} to="">Metric Group {k}</Link>
+            <a key={k} href={window.location}>Metric Group {k}</a>
             <div key="metrics" className="menu">
               {v.map(g=> {
                 return (<div key={g} className="item">- {g}</div>)
@@ -139,7 +142,7 @@ class LiveAnalysisCharts extends React.Component {
       
       elem = (
         <div className="active content menu">
-          <Link to="" className="item">Summary</Link>
+          <a key="summary" href={window.location} className="item">Summary</a>
           {items}
         </div>
       );
@@ -149,7 +152,7 @@ class LiveAnalysisCharts extends React.Component {
       <Console.Navbar>
         <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
           <div className="item">
-            <a className="active title"><i className="dropdown icon"/>List of Charts</a>
+            <a key="root" className="active title"><i className="dropdown icon"/>List of Charts</a>
             {elem}
           </div>
         </Accordion>
