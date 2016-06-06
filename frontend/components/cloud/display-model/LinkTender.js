@@ -108,7 +108,9 @@ export default class LinkTender extends React.Component {
     dataArray.forEach(([x, ...records], i) => {
       lastPoints[i] = [];
       records.map((text)=> {
-        var type = (/([a-z_]+ \[node\d+\])/g).exec(text)[0];
+        var pos = text.indexOf('.');
+        var type = text.slice(pos+1).split('(')[0];
+        // var type = (/([a-z_]+ \[node\d+\])/g).exec(text)[0];
         var x = stageWidth * i + stageWidth / 2;
         var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 

@@ -158,6 +158,7 @@ class LiveAnalysisCharts extends React.Component {
         <div className="active content menu">
           <a key="summary" href={window.location} className="item">Summary</a>
           {items}
+          <a key="causal" href={window.location} className="item">Causal Graph</a>
         </div>
       );
     }
