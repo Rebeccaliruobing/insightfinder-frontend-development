@@ -135,8 +135,8 @@ export default class LinkTender extends React.Component {
     });
 
     $(this.$showText).text(point.title).attr({
-      x: point.component.getAttribute('x'),
-      y: point.component.getAttribute('y')
+      x: point.component.getAttribute('cx'),
+      y: point.component.getAttribute('cy')
     });
 
     point.outLines.forEach((line)=>this.highLightLine(line, 'blue'));
