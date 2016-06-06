@@ -19,6 +19,7 @@ class DataParser {
     this.stats = null;
     this.metricUnitMap = [];
     this.groupsData = null;
+    this.summaryData = null;
     this.groupmetrics = null;
     
     this.mode = this._detectionModeAndParse();
@@ -253,6 +254,8 @@ class DataParser {
   
   getSummaryData() {
     
+    if (this.summaryData) return this.summaryData;
+    
     this._parseAnomalyData();
     
     if (this.mode != 'holistic') return null;
@@ -281,11 +284,12 @@ class DataParser {
       });
     });
     
-    return {
+    this.summaryData = {
       series: _.map(alies, a => [a.time, a.val]),
       highlights: highlights,
       annotations: annotations
-    }
+    };
+    return this.summaryData;
   }
   
   getGroupsData() {
@@ -316,7 +320,7 @@ class DataParser {
     });
     this.groupmetrics = groupmetrics;
     
-    let gdata = _.map(groups, grp => {
+    this.groupsData = _.map(groups, grp => {
       
       let series = _.filter(soptions, o => o.groupId == grp);
       let alies = [];
@@ -372,7 +376,7 @@ class DataParser {
       };
     });
     
-    return gdata;
+    return this.groupsData;
   }
 }
 

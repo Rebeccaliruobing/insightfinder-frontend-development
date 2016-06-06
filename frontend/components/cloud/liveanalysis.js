@@ -6,6 +6,7 @@ import moment from 'moment';
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../artui/react';
 import {Dygraph} from '../../artui/react/dataviz';
 import DataParser from './dataparser';
+import LinkTender from './display-model/LinkTender'
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -33,8 +34,15 @@ class LiveAnalysisCharts extends React.Component {
       selectedAnnotation: null
     };
   }
-
-  componentDidMount() {
+  
+  componentWillUpdate(nextProps, nextState) {
+    if (this.props.data !== nextProps.data) {
+      this.dp = new DataParser(nextProps.data);
+      
+      // Parse all data
+      this.dp.getSummaryData();
+      this.dp.getGroupsData();
+    }
   }
   
   renderSummaryDetail(summary) {
@@ -72,7 +80,13 @@ class LiveAnalysisCharts extends React.Component {
     )
   }
   
-  renderThumbnail(summary, groups) {
+  renderThumbnail() {
+    
+    if (!this.dp) return;
+    
+    let summary = this.dp.summaryData;
+    let groups = this.dp.groupsData;
+    
     let {columns} = this.state;
     let elems = [];
     
@@ -129,8 +143,8 @@ class LiveAnalysisCharts extends React.Component {
       
       _.forEach(this.dp.groupmetrics, (v,k) => {
         items.push((
-          <div className="item">
-            <a key={k} href={window.location}>Metric Group {k}</a>
+          <div key={k} className="item">
+            <a key='link' href={window.location}>Metric Group {k}</a>
             <div key="metrics" className="menu">
               {v.map(g=> {
                 return (<div key={g} className="item">- {g}</div>)
@@ -186,9 +200,17 @@ class LiveAnalysisCharts extends React.Component {
     }
   }
   
-  renderList(summary, groups) {
+  renderList() {
+    
+    if (!this.dp) return;
+    
     let elems = [];
 
+    let summary = this.dp.summaryData;
+    let groups = this.dp.groupsData;
+    let dataArray = this.dp.causalDataArray;
+    let types = this.dp.causalTypes;
+    
     if (summary) {
       elems.push(this.renderSummaryDetail(summary))
     }
@@ -197,6 +219,12 @@ class LiveAnalysisCharts extends React.Component {
       groups.map((group) => {
         elems.push(this.renderGroupDetail(group));
       });
+    }
+    
+    if (dataArray && types) {
+      // elems.push((
+      //   <LinkTender dataArray={dataArray} types={types} />
+      // ));
     }
 
     return(
@@ -219,18 +247,17 @@ class LiveAnalysisCharts extends React.Component {
     let isListView = view === 'list';
     let contentStyle = isListView ? {} : {paddingLeft:0};
     let contentClass = loading ? 'ui form loading' : '';
-    
-    let summary, groups, selectedGroup = undefined;
-    
-    if (data) {
+    let summary, groups, selectedGroup = null;
+
+    if (data && !this.dp) {
+      // Only parse the data at first time
       this.dp = new DataParser(data);
-      if (this.dp.mode == 'holistic') {
-        summary = this.dp.getSummaryData();
-      }
+    }
+    
+    if (this.dp) {
+      summary = this.dp.summaryData;
       groups = this.dp.getGroupsData();
       selectedGroup = _.find(groups, g => g.id == selectedGroupId);
-    } else {
-      this.dp = null;
     }
     
     return (
@@ -266,11 +293,11 @@ class LiveAnalysisCharts extends React.Component {
           <div className="ui vertical segment">
             {!isListView &&
             <div className={cx('ui', columns, 'cards')}>
-              {this.renderThumbnail(summary, groups)}
+              {this.renderThumbnail()}
             </div>
             }
-            {isListView && this.renderList(summary, groups)}
-            {!isListView && summary && summarySelected && this.renderSummaryDetail(summary)}
+            {isListView && this.renderList()}
+            {!isListView && summarySelected && this.renderSummaryDetail(summary)}
             {!isListView && !!selectedGroup && this.renderGroupDetail(selectedGroup)}
           </div>
         </div>

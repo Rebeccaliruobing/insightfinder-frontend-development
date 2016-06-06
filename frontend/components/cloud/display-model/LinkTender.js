@@ -72,8 +72,6 @@ export default class LinkTender extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      dataArray: [],
-      types: [],
       svg: {
         width: 900,
         height: 300,
@@ -93,49 +91,35 @@ export default class LinkTender extends React.Component {
   }
 
   componentDidMount() {
-    let dataArray = [];
-    let types = [];
-    this.props.data.split("\n").forEach((line)=> {
-      let [d1, d2, d3, d4] = line.split(".");
-      if ((parseInt(d1) + '') == d1) {
-        dataArray[dataArray.length - 1].push(line);
-        var type = (/([a-z_]+)/g).exec(line)[0];
-        if (types.indexOf(type) < 0) types.push(type);
-      } else if (line.trim()) {
-        dataArray.push([line]);
-      }
-    });
-    this.setState({dataArray, types}, ()=> {
+    let {dataArray, types} = this.props;
+    let state = this.state;
+    let {svg} = state;
+    state.points = [];
+    state.lines = [];
 
-      let state = this.state;
-      let {dataArray, types, svg} = state;
-      state.points = [];
-      state.lines = [];
+    let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
+    let stageHeight = svg.height / Math.max(types.length, 1);
+    let lastPoints = [];
 
-      let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
-      let stageHeight = svg.height / Math.max(types.length, 1);
-      let lastPoints = [];
+    dataArray.forEach(([x, ...records], i) => {
+      lastPoints[i] = [];
+      records.map((text)=> {
+        var type = (/([a-z_]+)/g).exec(text)[0];
+        var x = stageWidth * i + stageWidth / 2;
+        var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
-      dataArray.forEach(([x, ...records], i) => {
-        lastPoints[i] = [];
-        records.map((text)=> {
-          var type = (/([a-z_]+)/g).exec(text)[0];
-          var x = stageWidth * i + stageWidth / 2;
-          var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
+        var point = new Point(x, y);
+        point.title = text;
 
-          var point = new Point(x, y);
-          point.title = text;
-
-          lastPoints[i].push(point);
-          state.points.push(point);
-          lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
-            state.lines.push(new Line(p1, point))
-          });
-          return point;
+        lastPoints[i].push(point);
+        state.points.push(point);
+        lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
+          state.lines.push(new Line(p1, point))
         });
+        return point;
       });
-      this.setState(state);
     });
+    this.setState(state);
   }
 
   renderPoint(point) {
@@ -248,7 +232,8 @@ export default class LinkTender extends React.Component {
   }
 
   render() {
-    let {types, svg, points, lines, point, dataArray, selectRange, zoomRange} = this.state;
+    let {dataArray, types} = this.props;
+    let {svg, points, lines, point, selectRange, zoomRange} = this.state;
     let stageHeight = svg.height / Math.max(types.length, 1);
     let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
     let {zoomX, zoomY} = zoomRange;
