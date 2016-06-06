@@ -1,142 +1,229 @@
-import $ from 'jquery';
 import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactTimeout from 'react-timeout';
 import cx from 'classnames';
+import store from 'store';
 
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../artui/react';
 import {Dygraph} from '../../artui/react/dataviz';
-import apis from '../../apis';
 import DataParser from './dataparser';
+
 
 
 class LiveAnalysisCharts extends React.Component {
 
   static propTypes = {
-    data: React.PropTypes.object.isRequired,
-    groupid: React.PropTypes.number,
-    view: React.PropTypes.oneOf(['list'])
+    data: React.PropTypes.object,
+    loading: React.PropTypes.bool,
+    view: React.PropTypes.oneOf(['list', 'thumbnail']),
   };
 
   static defaultProps = {
-    view: 'list'
+    view: 'list',
+    loading: true
   };
 
   constructor(props) {
     super(props);
+    this.dp = null;
+    
     this.state = {
-      columns: 'four'
+      view: this.props['view'],
+      viewText: 4,
+      selectedGroupId: undefined
     };
   }
 
   componentDidMount() {
-
   }
 
-  handleSelectGroup(group) {
+  handleClick(group) {
     return (e) => {
-      this.setState({groupId: group.id})
+      this.setState({selectedGroupId: group.id})
     }
+  }
+  
+  renderGroups(summary, groups) {
+    let elems = [];
+    
+    if(summary) {
+      elems.push((
+        <div key='summary' className="ui card">
+          <div className="content">
+            <div className="header">Summary</div>
+            <Dygraph className="live monitoring summary" data={summary.series}
+                     ylabel="Anomaly Degree"
+                     labels={['X', 'Y1']}
+                     axisLabelWidth={35}
+                     style={{width: '100%', height: '200px'}}
+                     highlightCircleSize={2} strokeWidth={3}
+                     labelsDivStyles={{padding: '4px', margin:'15px'}}
+                     highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                     annotations={summary.annotations}
+                     highlights={summary.highlights} />
+          </div>
+        </div>
+      ));
+    }
+    
+    if (groups) {
+      groups.map((group) => {
+        elems.push((
+          <div key={group.id} className="ui card" onClick={this.handleClick(group)}>
+            <div className="content">
+              <div className="header"></div>
+              <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
+                       title={"Metric Group" + group.id}
+                       labels={group.sname}
+                       style={{width: '100%', height: 200}}
+                       highlightCircleSize={2}
+                       highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                       highlights={group.highlights}
+              />
+            </div>
+          </div>
+        ));
+      });
+    }
+
+    return elems;
+  }
+
+  renderNavs() {
+    
+    let elem = null;
+    if (this.dp) {
+      let items = [];
+      
+      _.forEach(this.dp.groupmetrics, (v,k) => {
+        items.push((
+          <div className="item">
+            <Link key={k} to="">Metric Group {k}</Link>
+            <div key="metrics" className="menu">
+              {v.map(g=> {
+                return (<div key={g} className="item">{g}</div>)
+              })}
+            </div>
+          </div>
+        ));
+      });
+      
+      elem = (
+        <div className="active content menu">
+          <Link to="" className="item">Summary</Link>
+          {items}
+        </div>
+      );
+    }
+    
+    return (
+      <Console.Navbar>
+        <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
+          <div className="item">
+            <a className="active title"><i className="dropdown icon"/>List of Charts</a>
+            {elem}
+          </div>
+        </Accordion>
+      </Console.Navbar>
+    )
+  }
+  
+  renderList(summary, groups) {
+    let elems = [];
+    
+    if (summary) {
+      elems.push((
+        <Dygraph key="summary" className="live monitoring summary" data={summary.series}
+                           ylabel="Anomaly Degree"
+                           labels={['X', 'Y1']}
+                           axisLabelWidth={35}
+                           style={{width: '100%', height: '200px'}}
+                           highlightCircleSize={2} strokeWidth={3}
+                           labelsDivStyles={{padding: '4px', margin:'15px'}}
+                           highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                           annotations={summary.annotations}
+                           showRangeSelector={true}
+                           highlights={summary.highlights} />
+      ));
+    }
+    
+    if (groups) {
+      groups.map((group) => {
+        elems.push((
+          <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
+                   title={"Metric Group" + group.id}
+                   labels={group.sname}
+                   style={{width: '100%', height: 200}}
+                   showRangeSelector={true}
+                   highlightCircleSize={2}
+                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                   highlights={group.highlights}
+          />
+        ));
+      });
+    }
+    
+    return elems;
   }
 
   render() {
-    let {data, view, columns} = this.props;
-    let dp = new DataParser(data);
-    let groups = dp.getGroupData();
-    let groupId = this.state.groupId || this.props.groudId;
-    let group = groups.find((g)=>g.id == groupId);
+    
+    let {data, loading, projectName} = this.props;
+    let {columns, view, selectedGroupId} = this.state;
 
+    let isListView = view === 'list';
+    let contentStyle = isListView ? {} : {paddingLeft:0};
+    let contentClass = loading ? 'ui form loading' : '';
+    
+    let summary, groups, selectedGroup = undefined;
+    
+    if (data) {
+      this.dp = new DataParser(data);
+      if (this.dp.mode == 'holistic') {
+        summary = this.dp.getSummaryData();
+      }
+      groups = this.dp.getGroupsData();
+      selectedGroup = _.find(groups, g => g.id == selectedGroupId);
+    } else {
+      this.dp = null;
+    }
+    
     return (
-      <div className="ui vertical segment">
-
-        <Tab>
-          <div className="ui top attached tabular menu">
-            <a className="item active" data-tab="first">Charts</a>
-            <a className="item" data-tab="second">Table</a>
-          </div>
-          <div className="ui bottom attached tab segment active" data-tab="first">
-
-            <div className="ui grid">
-              <div className="eight wide column">
-                <button className="ui basic button"
-                        onClick={this.props.onBack || (()=>this.setState({groupId: void 0}))}>
-                  Back
-                </button>
-              </div>
-              <div className="eight wide column">
-                <button className="ui basic button" style={{float: 'right'}}
-                        onClick={()=>this.setState({columns: this.state.columns == 'four' ? 'two' : 'four'})}>
-                  Change Layout
-                </button>
-              </div>
-            </div>
-
-            <div className={`ui ${this.state.columns} cards`}>
-              {
-                groups.map((group) => {
-                  return ((
-                    <div key={`${columns}-${group.id}`} className="ui card"
-                         onClick={this.handleSelectGroup(group)}>
-                      <div className="content">
-                        <Dygraph data={group.sdata}
-                                 title={"Metric Group" + group.id}
-                                 labels={group.sname}
-                                 style={{height: 150, width: '100%'}}
-                                 highlightCircleSize={2}
-                                 animatedZooms={true}
-                                 highlightCallback={this.handleHighlight(group.sdata)}
-                                 highlightSeriesOpts={{
-                      strokeWidth: 3,
-                      strokeBorderWidth: 1,
-                      highlightCircleSize: 5
-                    }}
-                        />
-                      </div>
-                    </div>
-                  ));
-                })
-              }
-            </div>
-
-            {group &&
-            <div className={`ui one cards`}>
-              <div key={view + group.id} className="ui card" onClick={this.handleSelectGroup(group)}>
-                <div className="content">
-                  <Dygraph data={group.sdata}
-                           title={"Metric Group" + group.id}
-                           labels={group.sname}
-                           style={{height: 250, width: '100%'}}
-                           highlightCircleSize={2}
-                           highlightCallback={this.handleHighlight}
-                           highlightSeriesOpts={{
-                      strokeWidth: 3,
-                      strokeBorderWidth: 1,
-                      highlightCircleSize: 5
-                    }}
-                  />
+    <Console.Wrapper>
+      {isListView && this.renderNavs()}
+      <Console.Content style={contentStyle} className={contentClass}>
+        <div className="ui main tiny container" style={{minHeight:'100%'}}>
+          <div className="ui vertical segment">
+            {projectName}
+            <ButtonGroup className="right floated basic icon">
+              <Dropdown className="compact"
+                        value={this.state['view']} text={this.state['viewText']}
+                        mode="select"
+                        onChange={(value, text) => {this.setState({view: value, viewText: text})}}>
+                <div className="menu">
+                  <div className="item" data-value="two">2</div>
+                  <div className="item" data-value="three">3</div>
+                  <div className="item" data-value="four">4</div>
+                  <div className="item" data-value="five">5</div>
+                  <div className="item" data-value="six">6</div>
                 </div>
-              </div>
+              </Dropdown>
+              <Button active={view == 'list'} onClick={()=>this.setState({view:'list', selectedGroupId: undefined})}>
+                <i className="list layout icon"/>
+              </Button>
+            </ButtonGroup>
+          </div>
+          <div className="ui vertical segment">
+            {!isListView &&
+            <div className={cx('ui', columns, 'cards')}>
+              {this.renderGroups(summary, groups)}
             </div>
             }
-
+            {isListView && this.renderList(summary, groups)}
           </div>
-          <div className="ui bottom attached tab segment" data-tab="second">
-            Table
-          </div>
-        </Tab>
-
-      </div>
+        </div>
+      </Console.Content>
+    </Console.Wrapper>
     )
   }
-
-  handleHighlight(data) {
-    let max = Math.max.apply(Math, data.map(([d, ...arr])=>Math.max.apply(Math, arr)));
-    return (v) => {
-      return Math.max.apply(Math, v) > (max / 2) ? "rgba(255, 255, 102, 1.0)" : "rgba(102, 255, 102, 1.0)"
-    }
-
-  }
-
 }
 
 export default LiveAnalysisCharts;
