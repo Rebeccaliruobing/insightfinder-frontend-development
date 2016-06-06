@@ -222,9 +222,10 @@ class LiveAnalysisCharts extends React.Component {
     }
     
     if (dataArray && types) {
-      // elems.push((
-      //   <LinkTender dataArray={dataArray} types={types} />
-      // ));
+      debugger;
+      elems.push((
+        <LinkTender dataArray={dataArray} types={types}/>
+      ));
     }
 
     return(

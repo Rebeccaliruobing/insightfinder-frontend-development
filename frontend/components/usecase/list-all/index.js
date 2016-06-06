@@ -105,7 +105,7 @@ export default class ListAll extends Component {
           </div>
 
           <div className="ui vertical segment">
-            {this.state.success && <LiveAnalysisCharts data={this.state.data}/>}
+            {this.state.success && <LiveAnalysisCharts loading={false} data={this.state.data}/>}
           </div>
         </div>
       </Console.Content>
