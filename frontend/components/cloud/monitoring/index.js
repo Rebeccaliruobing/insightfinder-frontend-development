@@ -145,9 +145,11 @@ class LiveMonitoring extends BaseComponent {
 
           <div className="ui vertical segment">
             <div className="ui three cards">
-              {addedProjects.map((project, index) => {
-                return <ProjectSummary {...project} key={index}
-                                       onClose={() => this.handleProjectRemove(project)} />
+              {addedProjects.map((p, index) => {
+                let key = p.projectName + p.modelType + 
+                  p.anomalyThreshold.toString() + p.durationThreshold.toString();
+                return <ProjectSummary {...p} key={key}
+                                       onClose={() => this.handleProjectRemove(p)} />
               })}
             </div>
           </div>
