@@ -25,7 +25,7 @@ class AmazonProjectModal extends React.Component {
 
     let {projectName, zone, access_key, secrete_key, email} = this.state;
     apis.postAddAWSProject(projectName, zone, access_key, secrete_key, email).then((resp)=> {
-      this.context.root.loadData();
+      if(resp.success) {this.context.root.loadData();} else {alert(resp.message);}
     }).catch((e)=> {
       alert(e);
     });

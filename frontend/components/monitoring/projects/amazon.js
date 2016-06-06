@@ -30,7 +30,7 @@ class AmazonProjects extends React.Component {
     return (e) => {
       if (!window.confirm("Confirm?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
-        this.context.root.loadData();
+        if(resp.success) {this.context.root.loadData();} else {alert(resp.message);}
       }).catch((e)=> {
 
       });
