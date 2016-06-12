@@ -17,6 +17,7 @@ import {settingsRoute} from './components/settings/index';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
+import UseCaseDetails from './components/usecase/details';
 import apis from './apis';
 
 class App extends React.Component {
@@ -92,6 +93,17 @@ const incidentAnalysisApp = function (props) {
   );
 };
 
+// Incident Analysis Details
+const useCaseApp = function (props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <UseCaseDetails location={location} params={params}/>
+    </Console>
+  );
+};
+
 const appHistory = useRouterHistory(createHashHistory)({queryKey: false});
 const routes = (
   <Router history={appHistory}>
@@ -103,6 +115,7 @@ const routes = (
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
+    <Route component={useCaseApp} path="/useCaseDetails"/>
   </Router>
 );
 

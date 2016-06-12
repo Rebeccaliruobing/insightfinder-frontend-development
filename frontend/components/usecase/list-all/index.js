@@ -52,14 +52,19 @@ export default class ListAll extends Component {
     let {modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData,} = data.activeItem;
     metaData = JSON.stringify(metaData);
 
-    this.setState({loading: true}, ()=>{
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
-        resp.loading = false;
-        this.setState(resp);
-      }).catch((err)=>{
-        this.setState({loading: false});
-      });
-    })
+
+    window.open(`#/useCaseDetails?${$.param(Object.assign({}, {
+      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData
+    }))}`, '_blank');
+
+    // this.setState({loading: true}, ()=>{
+    //   apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
+    //     resp.loading = false;
+    //     this.setState(resp);
+    //   }).catch((err)=>{
+    //     this.setState({loading: false});
+    //   });
+    // })
   }
 
   handleUpdateData(detailComp) {

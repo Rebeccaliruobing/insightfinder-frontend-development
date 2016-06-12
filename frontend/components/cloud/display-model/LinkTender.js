@@ -71,7 +71,7 @@ class Line {
 export default class LinkTender extends React.Component {
   defaultProps = {
     data: DataLinks
-  }
+  };
 
   constructor(props) {
     super(props);
