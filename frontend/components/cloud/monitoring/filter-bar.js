@@ -58,7 +58,10 @@ export default  class FilterBar extends Component {
   }
 
   handleSubmit() {
-    this.props.onSubmit && this.props.onSubmit(this.state);
+    //this.props.onSubmit && this.props.onSubmit(this.state);
+    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType} = this.state;
+    var url = '/#/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
+    window.open(url,'_blank');
   }
 
   render() {

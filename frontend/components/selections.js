@@ -38,7 +38,7 @@ const ModelType = (props) => {
       <div className="menu">
         <div className="item" data-value="Holistic">Holistic</div>
         <div className="item" data-value="Split">Split</div>
-        <div className="item" data-value="Hybird">Hybird</div>
+        <div className="item" data-value="Hybrid">Hybrid</div>
       </div>
     </Dropdown>
   );
