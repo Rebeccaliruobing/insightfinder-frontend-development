@@ -80,12 +80,13 @@ export default class OutlierDetection extends Component {
     this.setState({heatMaps: maps});
   }
 
-  handleDateIndexChange(value) {
-    this.setState({
-      dateIndex: parseInt(value),
-    }, ()=> {
-      this.setHeatMap(this.state.dateIndex, this.state.timeIndex);
-    })
+  handleDateIndexChange(startIndex) {
+    return (value) =>
+      this.setState({
+        dateIndex: parseInt(value + startIndex),
+      }, ()=> {
+        this.setHeatMap(this.state.dateIndex, this.state.timeIndex);
+      })
   }
 
   handleToggleFilterPanel() {
@@ -116,11 +117,28 @@ export default class OutlierDetection extends Component {
     });
   }
 
+  renderSlider() {
+    const marks = this.state.data && this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+    if (!marks) return;
+    const dateIndex = this.state.dateIndex;
+    const startIndex = Math.max(dateIndex - 5, 0);
+    const endIndex = Math.min(startIndex + 10, marks.length - 1);
+    return (
+      <div className="padding40" key={dateIndex}>
+        {this.state.data && (
+          <RcSlider max={endIndex - startIndex - 1} value={dateIndex - startIndex}
+                    marks={marks ? _.fromPairs(_.slice(marks, startIndex, endIndex).map((mark, index)=>[index, mark])) : {}}
+                    onChange={this.handleDateIndexChange(startIndex)}/>
+        )}
+      </div>
+    )
+  }
+
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
 
-    const marks = this.state.data && this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -156,13 +174,7 @@ export default class OutlierDetection extends Component {
               (i.e. normal states) and the size of the red areas indicates the ranges of different metric
               values.
             </div>
-            <div className="padding40">
-              {this.state.data && (
-                <RcSlider max={this.state.data.splitByInstanceModelData.length - 1} value={this.state.dateIndex}
-                          marks={marks ? _.fromPairs(marks.map((mark, index)=>[index, mark.split(" ")[0]])) : {}}
-                          onChange={this.handleDateIndexChange.bind(this)}/>
-              )}
-            </div>
+            {this.renderSlider()}
             <div className="ui four cards">
               {this.state.heatMaps}
             </div>
