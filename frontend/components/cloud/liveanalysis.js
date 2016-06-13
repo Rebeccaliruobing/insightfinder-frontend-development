@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import store from 'store';
 import moment from 'moment';
@@ -24,7 +25,7 @@ class LiveAnalysisCharts extends React.Component {
   constructor(props) {
     super(props);
     this.dp = null;
-    
+
     this.state = {
       view: this.props['view'],
       columns: 'four',
@@ -34,17 +35,17 @@ class LiveAnalysisCharts extends React.Component {
       selectedAnnotation: null
     };
   }
-  
+
   componentWillUpdate(nextProps, nextState) {
     if (this.props.data !== nextProps.data) {
       this.dp = new DataParser(nextProps.data);
-      
+
       // Parse all data
       this.dp.getSummaryData();
       this.dp.getGroupsData();
     }
   }
-  
+
   renderSummaryDetail(summary) {
     return (
       <div id="summary">
@@ -60,17 +61,17 @@ class LiveAnalysisCharts extends React.Component {
                  highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                  annotations={summary.annotations}
                  onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
-                 highlights={summary.highlights} />
+                 highlights={summary.highlights}/>
       </div>
     )
   }
-  
+
   renderGroupDetail(group) {
     return (
       <Dygraph key={group.id} className="live monitoring summary" data={group.sdata}
                title={"Metric Group" + group.id}
                labels={group.sname}
-               style={{width: '100%', height: 200}}
+               style={{width: '100%', height: 300}}
                showRangeSelector={true}
                labelsDivStyles={{padding: '4px', margin:'15px'}}
                highlightCircleSize={2}
@@ -79,20 +80,23 @@ class LiveAnalysisCharts extends React.Component {
       />
     )
   }
-  
+
   renderThumbnail() {
-    
+
     if (!this.dp) return;
-    
+
     let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
-    
-    let {columns} = this.state;
+
+    let {columns, view, selectedGroupId, summarySelected} = this.state;
+    let isListView = view === 'list';
     let elems = [];
-    
-    if(summary) {
+    let selectIndex = 0;
+
+    if (summary) {
+      selectIndex = 1;
       elems.push((
-        <div key={columns+summary} className="ui card" 
+        <div key={columns+summary} className="ui card"
              onClick={() => this.setState({summarySelected:true, selectedGroupId: null})}>
           <div className="content">
             <div className="header">Summary</div>
@@ -105,16 +109,28 @@ class LiveAnalysisCharts extends React.Component {
                      labelsDivStyles={{padding: '4px', margin:'15px'}}
                      highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
                      annotations={summary.annotations}
-                     highlights={summary.highlights} />
+                     highlights={summary.highlights}/>
           </div>
         </div>
       ));
     }
-    
+
     if (groups) {
-      groups.map((group) => {
+      let rowCount = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
+      let groupsData, selectedGroup;
+      if (this.dp) {
+        groupsData = this.dp.getGroupsData();
+        selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
+      }
+
+
+      groups.map((group, index) => {
+
+        if (selectedGroupId == group.id) {
+          selectIndex = selectIndex + index;
+        }
         elems.push((
-          <div key={columns + group.id} className="ui card" 
+          <div key={columns + group.id} className="ui card"
                onClick={() => this.setState({selectedGroupId: group.id, summarySelected:false})}>
             <div className="content">
               <div className="header"></div>
@@ -130,18 +146,63 @@ class LiveAnalysisCharts extends React.Component {
           </div>
         ));
       });
+
+      let rowIndex = selectIndex % rowCount;
+      selectIndex = selectIndex + rowCount - rowIndex;
+      if (!isListView && summarySelected) {
+        if (this.dp) {
+          let summary = this.dp.summaryData;
+          elems = elems.slice(0, rowCount).concat([(
+            <div className="live monitoring summary" ref={(c)=>{
+              $(c).slideDown('fast', ()=>{
+              ReactDOM.render((
+                <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
+                  {this.renderSummaryDetail(summary)}
+                </div>
+              ), c)
+              })
+            }} style={{width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 50, display: 'none'}}>
+
+            </div>
+          )]).concat(elems.slice(rowCount))
+        }
+      } else if (selectedGroup) {
+        elems = elems.slice(0, selectIndex).concat([(
+          <div className="live monitoring summary" ref={(c)=>{
+            $(c).slideDown('fast', ()=>{
+              ReactDOM.render((
+                <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
+                  <Dygraph key={selectedGroup.id} data={selectedGroup.sdata}
+                           title={"Metric Group" + selectedGroup.id}
+                           labels={selectedGroup.sname}
+                           style={{width: '100%', height: 300}}
+                           showRangeSelector={true}
+                           labelsDivStyles={{padding: '4px', margin:'15px'}}
+                           highlightCircleSize={2}
+                           highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
+                           highlights={selectedGroup.highlights}
+                  />
+                </div>
+              ), c)
+            })
+          }} style={{width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 50, display: 'none'}}>
+
+          </div>
+        )]).concat(elems.slice(selectIndex));
+      }
+
     }
 
     return elems;
   }
 
   renderNavs() {
-    
+
     let elem = null;
     if (this.dp) {
       let items = [];
-      
-      _.forEach(this.dp.groupmetrics, (v,k) => {
+
+      _.forEach(this.dp.groupmetrics, (v, k) => {
         items.push((
           <div key={k} className="item">
             <a key='link' href={window.location}>Metric Group {k}</a>
@@ -153,7 +214,7 @@ class LiveAnalysisCharts extends React.Component {
           </div>
         ));
       });
-      
+
       elem = (
         <div className="active content menu">
           <a key="summary" href={window.location} className="item">Summary</a>
@@ -162,7 +223,7 @@ class LiveAnalysisCharts extends React.Component {
         </div>
       );
     }
-    
+
     return (
       <Console.Navbar>
         <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
@@ -174,7 +235,7 @@ class LiveAnalysisCharts extends React.Component {
       </Console.Navbar>
     )
   }
-  
+
   renderAnnotation() {
     let {selectedAnnotation} = this.state;
     if (selectedAnnotation) {
@@ -200,28 +261,28 @@ class LiveAnalysisCharts extends React.Component {
       )
     }
   }
-  
+
   renderList() {
-    
+
     if (!this.dp) return;
-    
+
     let elems = [];
 
     let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
     let dataArray = this.dp.causalDataArray;
     let types = this.dp.causalTypes;
-    
+
     if (summary) {
       elems.push(this.renderSummaryDetail(summary))
     }
-    
+
     if (groups) {
       groups.map((group) => {
         elems.push(this.renderGroupDetail(group));
       });
     }
-    
+
     if (dataArray && types) {
       debugger;
       elems.push((
@@ -229,7 +290,7 @@ class LiveAnalysisCharts extends React.Component {
       ));
     }
 
-    return(
+    return (
       <div className="ui grid">
         <div className="twelve wide column">
           {elems}
@@ -242,69 +303,63 @@ class LiveAnalysisCharts extends React.Component {
   }
 
   render() {
-    
+
     let {data, loading, projectName} = this.props;
-    let {columns, view, summarySelected, selectedGroupId} = this.state;
+    let {columns, view, summarySelected} = this.state;
 
     let isListView = view === 'list';
-    let contentStyle = isListView ? {} : {paddingLeft:0};
+    let contentStyle = isListView ? {} : {paddingLeft: 0};
     let contentClass = loading ? 'ui form loading' : '';
-    let summary, groups, selectedGroup = null;
+    let summary;
 
     if (data && !this.dp) {
       // Only parse the data at first time
       this.dp = new DataParser(data);
     }
-    
-    if (this.dp) {
-      summary = this.dp.summaryData;
-      groups = this.dp.getGroupsData();
-      selectedGroup = _.find(groups, g => g.id == selectedGroupId);
-    }
-    
     return (
-    <Console.Wrapper>
-      {!loading && isListView && this.renderNavs()}
-      <Console.Content style={contentStyle} className={contentClass}>
-        <div className="ui main tiny container" style={{minHeight:'100%'}}>
-          {!loading &&
-          <div className="ui vertical segment">
-            {projectName}
-            <ButtonGroup className="right floated basic icon">
-              <Dropdown className="compact"
-                        value={this.state['columns']} text={this.state['columnsText']}
-                        mode="select"
-                        class={{zIndex:1000}}
-                        onChange={(value, text) => {this.setState(
+      <Console.Wrapper>
+        {!loading && isListView && this.renderNavs()}
+        <Console.Content style={contentStyle} className={contentClass}>
+          <div className="ui main tiny container" style={{minHeight:'100%'}}>
+            {!loading &&
+            <div className="ui vertical segment">
+              {projectName}
+              <ButtonGroup className="right floated basic icon">
+                <Dropdown className="compact"
+                          value={this.state['columns']} text={this.state['columnsText']}
+                          mode="select"
+                          class={{zIndex:1000}}
+                          onChange={(value, text) => {this.setState(
                         {view: 'thumbnail', columns: value, columnsText: text})}}>
-                <div className="menu">
-                  <div className="item" data-value="two">2</div>
-                  <div className="item" data-value="three">3</div>
-                  <div className="item" data-value="four">4</div>
-                  <div className="item" data-value="five">5</div>
-                  <div className="item" data-value="six">6</div>
-                </div>
-              </Dropdown>
-              <Button active={view == 'list'}
-                      onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
-                <i className="list layout icon"/>
-              </Button>
-            </ButtonGroup>
-          </div>
-          }
-          <div className="ui vertical segment">
-            {!isListView &&
-            <div className={cx('ui', columns, 'cards')}>
-              {this.renderThumbnail()}
+                  <div className="menu">
+                    <div className="item" data-value="two">2</div>
+                    <div className="item" data-value="three">3</div>
+                    <div className="item" data-value="four">4</div>
+                    <div className="item" data-value="five">5</div>
+                    <div className="item" data-value="six">6</div>
+                  </div>
+                </Dropdown>
+                <Button active={view == 'list'}
+                        onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
+                  <i className="list layout icon"/>
+                </Button>
+              </ButtonGroup>
             </div>
             }
-            {isListView && this.renderList()}
-            {!isListView && summarySelected && this.renderSummaryDetail(summary)}
-            {!isListView && !!selectedGroup && this.renderGroupDetail(selectedGroup)}
+            <div className="ui vertical segment">
+
+              {!isListView &&
+              <div className={cx('ui', columns, 'cards')}>
+                {this.renderThumbnail()}
+              </div>
+              }
+              {isListView && this.renderList()}
+
+
+            </div>
           </div>
-        </div>
-      </Console.Content>
-    </Console.Wrapper>
+        </Console.Content>
+      </Console.Wrapper>
     )
   }
 }

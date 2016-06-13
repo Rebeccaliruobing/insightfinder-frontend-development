@@ -66,7 +66,7 @@ module.exports = merge({}, {
     })
 
   ],
-  devtool: '#inline-source-map',
+  devtool: '#eval-source-map',
   devServer: {
     hot: true,
     host: '0.0.0.0',
