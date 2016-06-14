@@ -41,8 +41,8 @@ export default class OutlierDetection extends Component {
   }
 
   setHeatMap(dateIndex = 0) {
-    let {mapData, startTime, endTime}= this.state.data.splitByGroupModelData[dateIndex];
-    let maps = mapData.map((data, index)=> {
+    let {mapData, startTime, endTime}= this.state.data.splitByInstanceModelData[dateIndex];
+    let maps = mapData.filter((data)=> !!data.NASValues).map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
         var lineArray = line.split(",");
@@ -87,6 +87,7 @@ export default class OutlierDetection extends Component {
       }
     });
 
+
     this.setState({heatMaps: maps, dateIndex});
   }
 
@@ -123,14 +124,14 @@ export default class OutlierDetection extends Component {
   }
 
   renderSlider() {
-    let marks = this.state.data && this.state.data.splitByGroupModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+    let marks = this.state.data && this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
     if (!marks) return;
     const dateIndex = this.state.dateIndex;
     const startIndex = Math.max(dateIndex - 5, 0);
     const endIndex = Math.min(startIndex + 10, marks.length - 1);
     marks = _.fromPairs(_.slice(marks, startIndex, endIndex - startIndex + 1).map((mark, index)=>[index, mark]));
     return (
-      <div className="padding40" key={dateIndex}>
+      <div className="padding40">
         {this.state.data && (
           <RcSlider key={'slider-' + startIndex} onChange={this.handleDateIndexChange(startIndex)}
                     max={endIndex - startIndex + 1} value={dateIndex - startIndex} marks={marks}/>

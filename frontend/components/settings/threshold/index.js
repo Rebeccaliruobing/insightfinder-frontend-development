@@ -57,22 +57,6 @@ export default class ThresholdSettings extends React.Component {
               <i className="right angle icon divider"/>
               <div className="active section">Threshold</div>
             </div>
-            <ButtonGroup className="right floated basic icon">
-              <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
-              </Button>
-              <Button>
-                <i className="setting icon"/>
-              </Button>
-            </ButtonGroup>
-          </div>
-
-          <div className="ui vertical segment filterPanel"
-               ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-            <i className="close link icon" style={{float:'right'}}
-               onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-            <Message dangerouslySetInnerHTML={{__html: ""}}/>
           </div>
 
           <div className="ui vertical segment">

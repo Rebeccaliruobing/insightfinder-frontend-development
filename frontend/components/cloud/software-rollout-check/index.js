@@ -121,7 +121,7 @@ export default class SoftwareRolloutCheck extends Component {
     const endIndex = Math.min(startIndex + 10, marks.length - 1);
     marks = _.fromPairs(_.slice(marks, startIndex, endIndex - startIndex + 1).map((mark, index)=>[index, mark]));
     return (
-      <div className="padding40" key={dateIndex}>
+      <div className="padding40">
         {this.state.data && (
           <RcSlider key={'slider-' + startIndex} onChange={this.handleDateIndexChange(startIndex)}
                     max={endIndex - startIndex + 1} value={dateIndex - startIndex} marks={marks}/>
