@@ -13,16 +13,13 @@ def init_app(app):
     from . import apis
     main_view = MainView.as_view(b'main_view')
     auth_view = AuthView.as_view(b'auth_view')
-    live_monitoring_view = LiveMonitoringView.as_view(b'live_monitoring_view')
-
 
     app.add_url_rule('/auth/', view_func=auth_view)
     app.add_url_rule('/auth/<string:action>', view_func=auth_view)
 
-    app.add_url_rule('/liveMonitoring', view_func=live_monitoring_view)
-
     app.add_url_rule('/', view_func=main_view)
-    # app.add_url_rule('/<path:path>', defaults={'action': 'all'}, view_func=main_view)
+    app.add_url_rule('/<path:path>', defaults={'action': 'all'}, view_func=main_view)
+    app.add_url_rule('/liveMonitoring', view_func=main_view)
 
     @app.route("/upload", methods=['POST'])
     def upload():

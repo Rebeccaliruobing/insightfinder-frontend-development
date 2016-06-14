@@ -1,6 +1,6 @@
 import store from 'store';
 
-const baseUrl = '/api/v1/';
+const baseUrl = window.API_BASE_URL || '/api/v1/';
 const localBaseUrl = '/';
 
 // rest访问其他地址会导致跨域错误, 可安装chrome 插件

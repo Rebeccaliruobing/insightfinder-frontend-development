@@ -68,7 +68,7 @@ module.exports = merge({}, {
     // 生成HTML页面
     new HtmlWebpackPlugin({
         title: 'InsightFinder',
-        filename: 'index.html',
+        filename: 'index.jsp',
         template: './templates/index.ejs',
         inject: false,
         alwaysWriteToDisk: true
