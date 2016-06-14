@@ -14,6 +14,10 @@ import Navbar from './navbar';
 
 class LiveAnalysisCharts extends React.Component {
 
+  static contextPropTypes = {
+    router: React.PropTypes.object
+  };
+
   static propTypes = {
     data: React.PropTypes.object,
     loading: React.PropTypes.bool,
@@ -32,6 +36,7 @@ class LiveAnalysisCharts extends React.Component {
     this.dp = null;
 
     this.state = {
+      instanceName: false,
       view: store.get(DefaultView, 'list'),
       columns: store.get(GridColumns, 'four'),
       selectedGroupId: undefined,
@@ -42,18 +47,14 @@ class LiveAnalysisCharts extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
+    let instanceName = this.props.location.query.instanceName;
     if (this.props.data !== nextProps.data && nextProps.data) {
       if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
-        this.setState({'selectedGroupId': nextProps.groupId, view: 'grid'},()=>{
-          this.dp = new DataParser(nextProps.data);
-          this.dp.getSummaryData();
-          this.dp.getGroupsData();
-        });
-      }else {
-        this.dp = new DataParser(nextProps.data);
-        this.dp.getSummaryData();
-        this.dp.getGroupsData();
+        this.setState({'selectedGroupId': nextProps.groupId, view: 'grid', instanceName});
       }
+      this.dp = new DataParser(nextProps.data, instanceName);
+      this.dp.getSummaryData();
+      this.dp.getGroupsData();
     }
   }
 
@@ -99,12 +100,12 @@ class LiveAnalysisCharts extends React.Component {
     let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
 
-    let {columns, view, selectedGroupId, summarySelected} = this.state;
+    let {columns, view, selectedGroupId, summarySelected, instanceName} = this.state;
     let isListView = view === 'list';
     let elems = [];
     let selectIndex = 0;
 
-    if (summary) {
+    if (!instanceName && summary) {
       selectIndex = 1;
       elems.push((
         <div key={columns+summary} className="ui card"

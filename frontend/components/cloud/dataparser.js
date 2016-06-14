@@ -4,9 +4,10 @@ import moment from 'moment';
 
 class DataParser {
   
-  constructor(data) {
+  constructor(data, instanceName) {
     
     this.data = data;
+    this.instanceName = instanceName;
 
     // TODO: How to get hintMapping?
     this.hintMapping = {};
