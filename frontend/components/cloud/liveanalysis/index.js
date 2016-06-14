@@ -49,12 +49,13 @@ class LiveAnalysisCharts extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    let instanceName = this.props.location.query.instanceName;
+    // let instanceName = this.props.location.query.instanceName;
     if (this.props.data !== nextProps.data && nextProps.data) {
-      if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
-        this.setState({'selectedGroupId': nextProps.groupId, view: 'grid', instanceName});
-      }
-      this.dp = new DataParser(nextProps.data, instanceName);
+      // if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
+      //   this.setState({'selectedGroupId': nextProps.groupId, view: 'grid', instanceName});
+      // }
+      let {data, loading, onRefresh, ...rest} = nextProps;
+      this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
       this.dp.getGroupsData();
     }
@@ -230,14 +231,22 @@ class LiveAnalysisCharts extends React.Component {
 
     let summary = this.dp ? this.dp.summaryData : undefined;
     let groups = this.dp ? this.dp.groupsData : [];
+    let {listGraphZoomOpt} = this.state;
+    console.log(listGraphZoomOpt);
 
     return (
       <div className="ui grid">
         <div className="twelve wide column">
           <SummaryDetail summary={summary} id="list_summary" 
-                         onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})} />
+                         onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})}
+                         drawCallback={(g) => this.setState({
+                         listGraphZoomOpt: {
+                          dateWindow: g.xAxisRange(),
+                          valueRange: g.yAxisRange()
+                         }})} />
           { groups.map((group) => {
-            return <GroupDetail id={'list_group_' + group.id} key={group.id} group={group} />
+            return <GroupDetail id={'list_group_' + group.id} key={group.id} 
+                                group={group} />
           })}
         </div>
         <div className="four wide column">

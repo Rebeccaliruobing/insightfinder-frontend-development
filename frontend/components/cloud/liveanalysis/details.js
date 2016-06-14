@@ -1,29 +1,40 @@
 import React from 'react';
 import {Dygraph} from '../../../artui/react/dataviz';
 
+
+const DetailGraph = (props) => {
+  return (
+    <Dygraph
+      style={{width: '100%', height: '200px'}}
+      animatedZooms={true}
+      axisLabelWidth={35}
+      highlightCircleSize={2} strokeWidth={2}
+      labelsDivStyles={{padding: '4px', margin:'15px'}}
+      highlightSeriesOpts={{strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3}}
+      {...props}
+    />
+  )
+};
+
 export class GroupDetail extends React.Component {
 
   shouldComponentUpdate(nextProps, extState) {
-    return nextProps.group !== this.props.group;
+    return nextProps.group !== this.props.group ||
+        nextProps.dateWindow !== this.props.dateWindow ||
+        nextProps.valueRange !== this.props.valueRange;
   }
 
   render() {
-    let {group, id} = this.props;
+    let {group, id, ...rest} = this.props;
     if (group) {
       console.log(group);
       return (
         <div id={id} className="detail-charts">
           <h4 className="ui header">{`Metric Group${group.id}`}</h4>
-          <Dygraph data={group.sdata}
-                   ylabel={group.unit}
-                   labels={group.sname}
-                   axisLabelWidth={35}
-                   style={{width: '100%', height: '200px'}}
-                   highlightCircleSize={2} strokeWidth={3}
-                   labelsDivStyles={{padding: '4px', margin:'15px'}}
-                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                   highlights={group.highlights}
-          />
+          <DetailGraph data={group.sdata}
+                       ylabel={group.unit}
+                       labels={group.sname}
+                       highlights={group.highlights} {...rest}/>
         </div>
       )
     } else {
@@ -39,28 +50,24 @@ export class SummaryDetail extends React.Component {
   };
 
   shouldComponentUpdate(nextProps, extState) {
-    return nextProps.summary !== this.props.summary;
+    return nextProps.summary !== this.props.summary ||
+      nextProps.dateWindow !== this.props.dateWindow ||
+      nextProps.valueRange !== this.props.valueRange;
   }
 
   render() {
-    let {summary, onAnnotationSelect, id} = this.props;
+    let {summary, onAnnotationSelect, id, ...rest} = this.props;
 
     if (summary) {
       return (
         <div id={id} className="detail-charts">
           <h4 className="ui header">Analysis Summary</h4>
-          <Dygraph data={summary.series}
-                   ylabel="Anomaly Degree"
-                   labels={['X', 'Y1']}
-                   animatedZooms={true}
-                   axisLabelWidth={35}
-                   style={{width: '100%', height: '200px'}}
-                   highlightCircleSize={2} strokeWidth={3}
-                   labelsDivStyles={{padding: '4px', margin:'15px'}}
-                   highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                   annotations={summary.annotations}
-                   onAnnotationClick={(a) => onAnnotationSelect(a)}
-                   highlights={summary.highlights}/>
+          <DetailGraph data={summary.series}
+                       ylabel="Anomaly Degree"
+                       labels={['X', 'Y1']}
+                       annotations={summary.annotations}
+                       onAnnotationClick={(a) => onAnnotationSelect(a)}
+                       highlights={summary.highlights} {...rest} />
         </div>
       )
     } else {
