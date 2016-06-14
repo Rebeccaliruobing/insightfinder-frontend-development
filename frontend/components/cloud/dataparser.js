@@ -216,7 +216,7 @@ class DataParser {
     
     if (this.anomalies) return;
     this._parseAnomalyText();
-    this._parseAnomalyConsolidatedText();
+    // this._parseAnomalyConsolidatedText();
     
     if (this.mode != 'error') {
 

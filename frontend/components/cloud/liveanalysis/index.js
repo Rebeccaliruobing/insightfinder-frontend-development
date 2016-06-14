@@ -4,36 +4,35 @@ import cx from 'classnames';
 import store from 'store';
 import moment from 'moment';
 
-import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../artui/react';
-import {Dygraph} from '../../artui/react/dataviz';
-import DataParser from './dataparser';
-import LinkTender from './display-model/LinkTender'
-import {ChartsRefreshInterval} from '../storeKeys';
-import LiveAnalysisChartsSetting from './liveanalysis_setting';
+import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../../artui/react';
+import {Dygraph} from '../../../artui/react/dataviz';
+import DataParser from '../dataparser';
+import LinkTender from '../display-model/LinkTender'
+import SettingModal from './setting';
+import {GridColumns, DefaultView} from '../../storeKeys';
+import Navbar from './navbar';
 
 class LiveAnalysisCharts extends React.Component {
 
   static propTypes = {
     data: React.PropTypes.object,
     loading: React.PropTypes.bool,
-    view: React.PropTypes.oneOf(['list', 'thumbnail']),
     onRefresh: React.PropTypes.func
   };
 
   static defaultProps = {
-    view: 'list',
     loading: true,
     onRefresh: () => {}
   };
 
   constructor(props) {
+    
     super(props);
     this.dp = null;
 
     this.state = {
-      view: this.props['view'],
-      columns: 'four',
-      columnsText: 4,
+      view: store.get(DefaultView, 'list'),
+      columns: store.get(GridColumns, 'four'),
       selectedGroupId: undefined,
       summarySelected: false,
       selectedAnnotation: null,
@@ -42,10 +41,8 @@ class LiveAnalysisCharts extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (this.props.data !== nextProps.data) {
+    if (this.props.data !== nextProps.data && nextProps.data) {
       this.dp = new DataParser(nextProps.data);
-
-      // Parse all data
       this.dp.getSummaryData();
       this.dp.getGroupsData();
     }
@@ -201,45 +198,6 @@ class LiveAnalysisCharts extends React.Component {
     return elems;
   }
 
-  renderNavs() {
-
-    let elem = null;
-    if (this.dp) {
-      let items = [];
-
-      _.forEach(this.dp.groupmetrics, (v, k) => {
-        items.push((
-          <div key={k} className="item">
-            <a key='link' href={window.location}>Metric Group {k}</a>
-            <div key="metrics" className="menu">
-              {v.map(g=> {
-                return (<div key={g} className="item">- {g}</div>)
-              })}
-            </div>
-          </div>
-        ));
-      });
-
-      elem = (
-        <div className="active content menu">
-          <a key="summary" href={window.location} className="item">Summary</a>
-          {items}
-        </div>
-      );
-    }
-
-    return (
-      <Console.Navbar>
-        <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
-          <div className="item">
-            <a key="root" className="active title"><i className="dropdown icon"/>List of Charts</a>
-            {elem}
-          </div>
-        </Accordion>
-      </Console.Navbar>
-    )
-  }
-
   renderAnnotation() {
     let {selectedAnnotation} = this.state;
     if (selectedAnnotation) {
@@ -307,21 +265,30 @@ class LiveAnalysisCharts extends React.Component {
 
   render() {
 
-    let {data, loading, projectName, onRefresh} = this.props;
-    let {columns, view, summarySelected} = this.state;
+    let {data, loading, onRefresh} = this.props;
+    let {columns, view} = this.state;
 
     let isListView = view === 'list';
+    let navbarStyle = isListView ? {} : {display: 'none'};
     let contentStyle = isListView ? {} : {paddingLeft: 0};
     let contentClass = loading ? 'ui form loading' : '';
-    let summary;
 
     if (data && !this.dp) {
-      // Only parse the data at first time
+      // Since componentWillUpdate is not called at initial time, so 
+      // we need to parse the data
       this.dp = new DataParser(data);
+      this.dp.getSummaryData();
+      this.dp.getGroupsData();
     }
+    
+    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
+    
+    console.log('rendering');
     return (
       <Console.Wrapper>
-        {!loading && isListView && this.renderNavs()}
+        <Console.Navbar style={navbarStyle}>
+          <Navbar groupMetrics={groupMetrics} />
+        </Console.Navbar>
         <Console.Content style={contentStyle} className={contentClass}>
           <div className="ui main tiny container" style={{minHeight:'100%'}}>
             {!loading &&
@@ -336,23 +303,13 @@ class LiveAnalysisCharts extends React.Component {
                 <i className="icon setting"/>Setting
               </Button>
               <ButtonGroup className="right floated basic icon">
-                <Dropdown className="compact"
-                          value={this.state['columns']} text={this.state['columnsText']}
-                          mode="select"
-                          class={{zIndex:1000}}
-                          onChange={(value, text) => {this.setState(
-                        {view: 'thumbnail', columns: value, columnsText: text})}}>
-                  <div className="menu">
-                    <div className="item" data-value="two">2</div>
-                    <div className="item" data-value="three">3</div>
-                    <div className="item" data-value="four">4</div>
-                    <div className="item" data-value="five">5</div>
-                    <div className="item" data-value="six">6</div>
-                  </div>
-                </Dropdown>
-                <Button active={view == 'list'}
+                <Button active={view === 'list'}
                         onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
                   <i className="list layout icon"/>
+                </Button>
+                <Button active={view === 'grid'}
+                        onClick={()=>this.setState({view:'grid', summarySelected:false,selectedGroupId: null})}>
+                  <i className="grid layout icon"/>
                 </Button>
               </ButtonGroup>
             </div>
@@ -369,7 +326,7 @@ class LiveAnalysisCharts extends React.Component {
           </div>
           {
             this.state.showSettingModal &&
-            <LiveAnalysisChartsSetting onClose={() => this.setState({showSettingModal: false})}/>
+            <SettingModal onClose={() => this.setState({showSettingModal: false})}/>
           }
         </Console.Content>
       </Console.Wrapper>

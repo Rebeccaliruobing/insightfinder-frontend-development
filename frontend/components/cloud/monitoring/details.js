@@ -11,26 +11,30 @@ import {ChartsRefreshInterval} from '../../storeKeys';
 const ProjectDetails = class extends React.Component {
 
   static propTypes = {
-    updateData: React.PropTypes.func
   };
 
   constructor(props) {
     super(props);
-
     this.state = {
-      data: undefined,
+      data: null,
       loading: false
     }
   }
 
   componentDidMount() {
-    (this.props.updateData || this.updateLiveAnalysis.bind(this))(this);
+    this.updateLiveAnalysis();
+  }
+  componentWillUnmount() {
+    this.props.clearTimeout(this.timeout);
   }
 
   updateLiveAnalysis() {
+    
     let {query} = this.props.location;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = query;
-    let refreshInterval = store.get(ChartsRefreshInterval, 5);
+    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
+
+    this.props.clearTimeout(this.timeout);
 
     this.setState({loading: true});
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
@@ -43,18 +47,23 @@ const ProjectDetails = class extends React.Component {
         }
         update.loading = false;
         this.setState(update);
-        this.props.setTimeout(this.updateLiveAnalysis.bind(this), refreshInterval * 1000 * 60);
+        if (refreshInterval > 0) {
+          this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), refreshInterval * 1000 * 60);
+        }
       })
       .catch(msg=> {
-        alert(msg);
+        this.setState({loading:false});
+        console.log('load data error');
+        console.log(msg);
       });
   }
 
   render() {
-    let {query} = this.props.location;
+    
+    const {query} = this.props.location;
     const {projectName, anomalyThreshold, durationThreshold, modelType} = query;
     
-    let {data, loading} = this.state;
+    let {loading, data} = this.state;
 
     return (
     <Console>
