@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>InsightFinder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="<%= require('../images/favicon.png') %>" type="image/x-icon">
@@ -16,7 +16,7 @@
     </script>
 </head>
 <body>
-<script src="<%= htmlWebpackPlugin.files.chunks.commons.entry %>"></script>
-<script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>"></script>
+<script src="<%= htmlWebpackPlugin.files.chunks.commons.entry %>" charset="utf-8"></script>
+<script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>" charset="utf-8"></script>
 </body>
 </html>
