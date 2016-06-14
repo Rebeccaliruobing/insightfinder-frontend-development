@@ -28,6 +28,7 @@ class DataParser {
   
   _detectionModeAndParse(){
     var arr = this.data['anomalyString'];
+    if (!arr) return 'split';
     if(arr.length === 0){
       return "error";
     }

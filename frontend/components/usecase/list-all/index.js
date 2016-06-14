@@ -53,7 +53,7 @@ export default class ListAll extends Component {
     metaData = JSON.stringify(metaData);
 
 
-    window.open(`#/useCaseDetails?${$.param(Object.assign({}, {
+    window.open(`/useCaseDetails?${$.param(Object.assign({}, {
       pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData
     }))}`, '_blank');
 

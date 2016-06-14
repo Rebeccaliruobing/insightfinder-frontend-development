@@ -11,6 +11,7 @@ const webpack = require('webpack');
 const currentDir = process.cwd();
 
 // Plugins
+const HappyPack = require('happypack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
@@ -30,6 +31,8 @@ module.exports = merge({}, {
     publicPath: 'http://0.0.0.0:' + port + '/static/'
   },
   plugins: [
+
+    new HappyPack({ id: 'js' }),
 
     // 有错误时不刷新页面
     new webpack.NoErrorsPlugin(),

@@ -6,7 +6,7 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
 import DataParser from '../dataparser';
-import LiveAnalysisCharts from '../liveanalysis'
+import LiveAnalysisCharts from '../liveanalysis/index'
 
 const ProjectDetails = class extends React.Component {
 
@@ -48,6 +48,7 @@ const ProjectDetails = class extends React.Component {
           this.props.setTimeout(this.updateData.bind(this), 5000 * 60);
         })
         .catch(msg=> {
+          debugger;
           alert(msg);
         });
     });
@@ -56,11 +57,11 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
-    const {projectName, anomalyThreshold, durationThreshold, modelType} = query;
-    let {data, loading} = this.state;
+    const {projectName} = query;
+    let {data, groupId, loading} = this.state;
 
     return (
-      <LiveAnalysisCharts projectName={projectName} data={data} loading={loading} />
+      <LiveAnalysisCharts groupId={groupId}projectName={projectName} data={data} loading={loading} />
     );
   }
 };

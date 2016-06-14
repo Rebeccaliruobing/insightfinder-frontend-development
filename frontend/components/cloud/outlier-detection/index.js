@@ -20,6 +20,7 @@ export default class OutlierDetection extends Component {
     let weeks = 1;
     this.state = {
       view: 'chart',
+      heatMaps: [],
       dateIndex: 0,
       timeIndex: 0,
       params: {
@@ -36,14 +37,11 @@ export default class OutlierDetection extends Component {
   }
 
   handleData(data) {
-    this.setState({data: data}, ()=> {
-      this.setHeatMap(0, 0);
-    })
+    this.setState({data: data}, ()=> this.setHeatMap(0, 0))
   }
 
-  setHeatMap(dateIndex = 0, timeIndex = 0) {
-
-    let {mapData, startTime, endTime}= this.state.data.splitByInstanceModelData[dateIndex];
+  setHeatMap(dateIndex = 0) {
+    let {mapData, startTime, endTime}= this.state.data.splitByGroupModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -65,28 +63,35 @@ export default class OutlierDetection extends Component {
         groupId = data.groupId;
       }
 
-      // return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
-      //                     duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
-      //                     />;
-      return <HeatMapCard originData={this.state.data.originData} groupId={groupId} key={`${dateIndex}-${index}`}
-                          duration={120} itemSize={4} title={title}
-                          dateIndex={dateIndex} data={dataArray} link={`#/incidentAnalysis?${$.param({
-                          metricNameList: data.metricNameList,
-                          projectName: this.state.data.projectName, pvalue:0.95,cvalue:3, modelType: "Holistic",
-                          startTime, endTime, groupId, instanceName: data.instanceName, modelKey: 'Search by time'
-      })}`}/>;
+      return {
+        originData: this.state.data.originData,
+        groupId: groupId,
+        key: `${dateIndex}-${index}`,
+        duration: 120,
+        itemSize: 4,
+        title,
+        dateIndex,
+        data: dataArray,
+        link: `/incidentAnalysis?${$.param({
+          metricNameList: data.metricNameList,
+          projectName: this.state.data.projectName,
+          pvalue: 0.95,
+          cvalue: 3,
+          modelType: "Holistic",
+          startTime,
+          endTime,
+          groupId,
+          instanceName: data.instanceName,
+          modelKey: 'Search by time'
+        })}`
+      }
     });
 
-    this.setState({heatMaps: maps});
+    this.setState({heatMaps: maps, dateIndex});
   }
 
   handleDateIndexChange(startIndex) {
-    return (value) =>
-      this.setState({
-        dateIndex: parseInt(value + startIndex),
-      }, ()=> {
-        this.setHeatMap(this.state.dateIndex, this.state.timeIndex);
-      })
+    return (value) => this.setHeatMap(parseInt(value + startIndex))
   }
 
   handleToggleFilterPanel() {
@@ -118,17 +123,17 @@ export default class OutlierDetection extends Component {
   }
 
   renderSlider() {
-    const marks = this.state.data && this.state.data.splitByInstanceModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+    let marks = this.state.data && this.state.data.splitByGroupModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
     if (!marks) return;
     const dateIndex = this.state.dateIndex;
     const startIndex = Math.max(dateIndex - 5, 0);
     const endIndex = Math.min(startIndex + 10, marks.length - 1);
+    marks = _.fromPairs(_.slice(marks, startIndex, endIndex - startIndex + 1).map((mark, index)=>[index, mark]));
     return (
       <div className="padding40" key={dateIndex}>
         {this.state.data && (
-          <RcSlider max={endIndex - startIndex - 1} value={dateIndex - startIndex}
-                    marks={marks ? _.fromPairs(_.slice(marks, startIndex, endIndex).map((mark, index)=>[index, mark])) : {}}
-                    onChange={this.handleDateIndexChange(startIndex)}/>
+          <RcSlider key={'slider-' + startIndex} onChange={this.handleDateIndexChange(startIndex)}
+                    max={endIndex - startIndex + 1} value={dateIndex - startIndex} marks={marks}/>
         )}
       </div>
     )
@@ -176,7 +181,7 @@ export default class OutlierDetection extends Component {
             </div>
             {this.renderSlider()}
             <div className="ui four cards">
-              {this.state.heatMaps}
+              {this.state.heatMaps.map((heatObj)=><HeatMapCard {...heatObj}/>)}
             </div>
           </div>
         </div>
