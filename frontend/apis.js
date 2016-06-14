@@ -30,6 +30,7 @@ $.fn.api.settings.api = {
   'add custom project': `${baseUrl}add-custom-project`,
   'add aws project': `${baseUrl}add-amazon-project`,
   'remove project': `${baseUrl}remove-project`,
+  'project setting': `${baseUrl}projectSetting`,
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -50,6 +51,8 @@ let request = function (method, action, data, resolve, reject) {
   xhr.done(function (resp) {
     resolve(resp);
   }).fail(function (error) {
+    console.log(arguments);
+    alert(`Server Error`);
     reject(error);
   })
 };
@@ -102,13 +105,14 @@ export default {
   /**
    *
    * @param userName
+   * @param other
    * @param token
    * @param operation
    * @returns {Promise}
    */
-  postDashboardUserValues (userName:String = store.get('userName'), token = store.get('token'), operation:String = 'display') {
+  postDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      requestPost('dashboard uservalues', {userName, token, operation}, resolve, reject);
+      requestPost('dashboard uservalues', {userName, token, operation, ...other}, resolve, reject);
     });
   },
   postDashboardDailySummaryReport (userName:String = store.get('userName'), token = store.get('token')) {
@@ -123,6 +127,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -149,6 +155,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -180,6 +188,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -207,6 +217,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -234,6 +246,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -260,6 +274,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -316,6 +332,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -343,6 +361,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -379,6 +399,8 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
@@ -402,10 +424,57 @@ export default {
       }).done(function (resp) {
         resolve(resp);
       }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
         reject(error);
       });
     });
   },
-
-
+  /**
+   *
+   * @param projectName
+   * @param cvalue
+   * @param pvalue
+   * @param cvalueEmail
+   * @param pvalueEmail
+   * @param cvalueFilter
+   * @param pvalueFilter
+   * @param minAnomalyRatioFilter
+   * @param shareUsernames
+   * @param projectHintMapFilename
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['project setting'],
+        data: $.param({
+          projectName,
+          cvalue,
+          pvalue,
+          'cvalue-email': cvalueEmail,
+          'pvalue-email': pvalueEmail,
+          'cvalue-filter': cvalueFilter,
+          'pvalue-filter': pvalueFilter,
+          minAnomalyRatioFilter,
+          shareUsernames,
+          projectHintMapFilename,
+          userName,
+          token
+        }),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
+        reject(error);
+      });
+    });
+  },
 };

@@ -173,7 +173,7 @@ class AppRoute extends React.Component {
         this.setState({userInstructions: resp});
       });
 
-      apis.postDashboardUserValues(store.get('userName')).then((resp)=> {
+      apis.postDashboardUserValues().then((resp)=> {
 
         resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
         resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
