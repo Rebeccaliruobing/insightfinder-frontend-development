@@ -12,6 +12,7 @@ class DataParser {
     this.hintMapping = {};
     
     this.anomalyTexts = null;
+    this.anomalyConsolidatedTexts = null;
     this.causalDataArray = null;
     this.causalTypes = null;
     this.anomalies = null;
@@ -61,6 +62,7 @@ class DataParser {
     });
     return ret;
   };
+  
 
   _parseAnomalyText() {
     
@@ -135,11 +137,86 @@ class DataParser {
     this.causalTypes = causalTypes;
     this.anomalyTexts = anomalyTexts;
   }
+
+  _parseAnomalyConsolidatedText() {
+    
+    if (this.anomalyConsolidatedTexts) return;
+    
+    let arr = this.data['anomalyConsolidatedString'];
+    let hintMapping = this.hintMapping;
+    let anomalyConsolidatedTexts = [];
+    let causalDataArray=[];
+    let causalTypes = [];
+    
+    if(arr){
+      $.each(arr, function(i,a){
+        var atext = [];
+        if(a.anomalies!=""){
+          var lines = a.anomalies.split('\\n');
+          $.each(lines, function(lineNo, line) {
+            var items = line.split(',');
+
+            //prepare causality chart data
+            var thisAnomaly = [];
+            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
+            thisAnomaly.push(timeString+","+items[1]);
+
+            if(items[2]){
+              var hints = items[2].trim().split(':');
+              // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
+              var hintss = hints[1].trim().split(';');
+              var newhints = "";
+              $.each(hintss, function(ihint,hint){
+                // 1.Change_inflicted(min)[node0](1.0);
+                // 0=#.metric, 1=node, 2=(val)
+                var hintparts = hint.split(/\[|\]/);
+                var metric = hintparts[0].split('.')[1];
+                if(hintparts.length==3){
+                  thisAnomaly.push(hintparts[0]+" ["+hintparts[1]+"]"+hintparts[2]);
+                } else {
+                  thisAnomaly.push(hintparts[0]+" ["+hintparts[1]+"]");
+                }
+                causalTypes.push(metric+" ["+hintparts[1]+"]");
+                try{
+                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
+                  var newval = hintparts[2].split(/\(|\)/)[1];
+                  if(hintMapping[metric.trim()]!=undefined){
+                    var thisMap = hintMapping[metric.trim()];
+                    if(thisMap[parseInt(valparts[0])]!=undefined){
+                      newval = thisMap[parseInt(valparts[0])];
+                    }
+                  }
+                  newhints = newhints+hintparts[0]+"["+hintparts[1]+"]("+newval+")";
+                  if(ihint<hintss.length-1){
+                    newhints = newhints+"; ";
+                  }
+                } catch (err){
+                  newhints = hints[1];
+                }
+              });
+
+              atext[parseInt(items[0])] = newhints;
+            }
+            causalDataArray.push(thisAnomaly);
+          });
+          causalTypes = causalTypes.filter(function(el, index, arr) {
+            return index === arr.indexOf(el);
+          });
+        }
+        anomalyConsolidatedTexts.push(atext);
+      });
+    }
+    
+    this.causalDataArray = causalDataArray;
+    this.causalTypes = causalTypes;
+    this.anomalyConsolidatedTexts = anomalyTexts;
+  }
   
   _parseAnomalyData() {
     
     if (this.anomalies) return;
     this._parseAnomalyText();
+    this._parseAnomalyConsolidatedText();
     
     if (this.mode != 'error') {
 
