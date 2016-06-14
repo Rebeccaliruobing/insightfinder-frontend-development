@@ -4,9 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {
   Router, Route, browserHistory,
-  useRouterHistory, IndexRoute, IndexRedirect
+  IndexRoute, IndexRedirect
 } from 'react-router';
-import {createHashHistory} from 'history'
 import store from 'store';
 
 import {Console, Link} from './artui/react';
@@ -104,9 +103,8 @@ const useCaseApp = function (props) {
   );
 };
 
-const appHistory = useRouterHistory(createHashHistory)({queryKey: false});
 const routes = (
-  <Router history={appHistory}>
+  <Router history={browserHistory}>
     <Route component={App} path="/">
       <IndexRedirect to="/cloud"/>
       {cloudRoute}
