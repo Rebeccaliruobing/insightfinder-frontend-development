@@ -33,7 +33,8 @@ module.exports = merge({}, {
         compact: true,
         comments: false,
         cacheDirectory: true
-      }
+      },
+      happy: { id: 'js' }
     }, {
       test: /\.json$/, loader: 'json'
     } , {

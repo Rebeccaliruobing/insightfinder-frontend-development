@@ -28,7 +28,7 @@ class LiveAnalysisCharts extends React.Component {
   };
 
   constructor(props) {
-    
+
     super(props);
     this.dp = null;
 
@@ -45,9 +45,17 @@ class LiveAnalysisCharts extends React.Component {
 
   componentWillUpdate(nextProps, nextState) {
     if (this.props.data !== nextProps.data && nextProps.data) {
-      this.dp = new DataParser(nextProps.data);
-      this.dp.getSummaryData();
-      this.dp.getGroupsData();
+      if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
+        this.setState({'selectedGroupId': nextProps.groupId, view: 'grid'},()=>{
+          this.dp = new DataParser(nextProps.data);
+          this.dp.getSummaryData();
+          this.dp.getGroupsData();
+        });
+      }else {
+        this.dp = new DataParser(nextProps.data);
+        this.dp.getSummaryData();
+        this.dp.getGroupsData();
+      }
     }
   }
 
@@ -143,12 +151,12 @@ class LiveAnalysisCharts extends React.Component {
           let summary = this.dp.summaryData;
           elems = elems.slice(0, rowCount).concat([(
             <div className="live monitoring summary" ref={(c)=>{
-              $(c).slideDown('fast', ()=>{
-              ReactDOM.render((
-                <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
-                <SummaryDetail summary={summary} />
-                </div>
-              ), c)
+              $c.slideDown('fast', ()=>{
+                ReactDOM.render((
+                  <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
+                    {this.renderSummaryDetail(summary)}
+                  </div>
+                ), c)
               })
             }} style={{width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 50, display: 'none'}}>
 
@@ -157,8 +165,14 @@ class LiveAnalysisCharts extends React.Component {
         }
       } else if (selectedGroup) {
         elems = elems.slice(0, selectIndex).concat([(
-          <div className="live monitoring summary" ref={(c)=>{
+          <div key={'expand-' + selectedGroupId} className="live monitoring summary" ref={(c)=>{
+
+            let $c = $(ReactDOM.findDOMNode(c));
             $(c).slideDown('fast', ()=>{
+
+              console.log($c.offset().top);
+              $(window.document).scrollTop($c.offset().top);
+
               ReactDOM.render((
                 <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
                   <Dygraph key={selectedGroup.id} data={selectedGroup.sdata}
@@ -248,7 +262,7 @@ class LiveAnalysisCharts extends React.Component {
       this.dp.getSummaryData();
       this.dp.getGroupsData();
     }
-    
+
     let groupMetrics = this.dp ? this.dp.groupmetrics : null;
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;
     let types = this.dp ? this.dp.causalTypes : undefined;
@@ -257,7 +271,7 @@ class LiveAnalysisCharts extends React.Component {
     return (
       <Console.Wrapper>
         <Console.Navbar style={navbarStyle}>
-          <Navbar groupMetrics={groupMetrics} />
+          <Navbar groupMetrics={groupMetrics}/>
         </Console.Navbar>
         <Console.Content style={contentStyle} className={contentClass}>
           <div className="ui main tiny container" style={{minHeight:'100%'}}>

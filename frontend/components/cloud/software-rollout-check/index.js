@@ -45,8 +45,7 @@ export default class SoftwareRolloutCheck extends Component {
     })
   }
 
-  setHeatMap(dateIndex = 0, timeIndex = 0) {
-    ;
+  setHeatMap(dateIndex = 0) {
     let {mapData, startTime, endTime} = this.state.data.holisticModelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
@@ -65,25 +64,22 @@ export default class SoftwareRolloutCheck extends Component {
       if (data.instanceName) {
         title = data.instanceName
       } else {
-        title = <span>{`Group ${data.groupId}`}({data.metricNameList ? new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",") : ''})</span>;
+        title =
+          <span>{`Group ${data.groupId}`}({data.metricNameList ? new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",") : ''})</span>;
       }
       return <HeatMapCard originData={this.state.data.originData} groupId={data.groupId} key={`${dateIndex}-${index}`}
                           duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
-                          link={`#/incidentAnalysis?${$.param({
+                          link={`/incidentAnalysis?${$.param({
                           metricNameList: data.metricNameList,
                           projectName: this.state.data.projectName, pvalue:0.95,cvalue:3, modelType: "Holistic",
                           startTime, endTime, groupId: data.groupId, instanceName: data.instanceName, modelKey: 'Search by time'})}`}/>;
     });
 
-    this.setState({heatMaps: maps});
+    this.setState({heatMaps: maps, dateIndex});
   }
 
-  handleDateIndexChange(value) {
-    this.setState({
-      dateIndex: parseInt(value),
-    }, ()=> {
-      this.setHeatMap(this.state.dateIndex, this.state.timeIndex);
-    })
+  handleDateIndexChange(startIndex) {
+    return (value) => this.setHeatMap(parseInt(value + startIndex))
   }
 
   handleToggleFilterPanel() {
@@ -116,10 +112,26 @@ export default class SoftwareRolloutCheck extends Component {
     });
   }
 
+  renderSlider() {
+
+    let marks = this.state.data && this.state.data.holisticModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+    if (!marks) return;
+    const dateIndex = this.state.dateIndex;
+    const startIndex = Math.max(dateIndex - 5, 0);
+    const endIndex = Math.min(startIndex + 10, marks.length - 1);
+    marks = _.fromPairs(_.slice(marks, startIndex, endIndex - startIndex + 1).map((mark, index)=>[index, mark]));
+    return (
+      <div className="padding40">
+        {this.state.data && (
+          <RcSlider key={'slider-' + startIndex} onChange={this.handleDateIndexChange(startIndex)}
+                    max={endIndex - startIndex + 1} value={dateIndex - startIndex} marks={marks}/>
+        )}
+      </div>
+    )
+  }
+
   render() {
-    const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
-    const marks = this.state.data && this.state.data.holisticModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -155,13 +167,7 @@ export default class SoftwareRolloutCheck extends Component {
               (i.e. normal states) and the size of the red areas indicates the ranges of different metric
               values.
             </div>
-            <div className="padding40">
-              {this.state.data && (
-                <RcSlider max={this.state.data.holisticModelData.length - 1} value={this.state.dateIndex}
-                          marks={marks ? _.fromPairs(marks.map((mark, index)=>[index, mark.split(" ")[0]])) : {}}
-                          onChange={this.handleDateIndexChange.bind(this)}/>
-              )}
-            </div>
+            {this.renderSlider()}
             <div className="ui four cards">
               {this.state.heatMaps}
             </div>
