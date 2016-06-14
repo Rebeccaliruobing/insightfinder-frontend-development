@@ -125,16 +125,6 @@
   cursor: pointer;
 }
 
-.live.monitoring.summary.ui.graph {
-  .dygraph-ylabel {
-    font-size: 12px;
-    line-height: 12px;
-  }
-  .dygraph-axis-label-y {
-    width: 35px;
-  }
-}
-
 // Topbar
 .topbar-text {
   margin-left: @2spacer !important;
@@ -160,6 +150,31 @@
       background: -o-linear-gradient(left, green, yellow, red);
       background: -moz-linear-gradient(left, green, yellow, red);
       background: linear-gradient(left, green, yellow, red);
+    }
+  }
+}
+
+.detail-charts {
+  margin-top: 20px;
+  .ui.graph {
+    .dygraph-ylabel {
+      font-size: 12px;
+      line-height: 12px;
+    }
+    .dygraph-axis-label-y {
+      width: 35px;
+    }
+  }
+}
+
+.summary-charts {
+  .ui.graph {
+    .dygraph-ylabel {
+      font-size: 12px;
+      line-height: 12px;
+    }
+    .dygraph-axis-label-y {
+      width: 35px;
     }
   }
 }

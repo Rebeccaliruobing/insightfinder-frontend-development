@@ -18,7 +18,7 @@ class DataParser {
     this.anomalies = null;
     this.seriesOptions = null;
     this.stats = null;
-    this.metricUnitMap = [];
+    this.metricUnitMap = null;
     this.groupsData = null;
     this.summaryData = null;
     this.groupmetrics = null;
@@ -43,6 +43,18 @@ class DataParser {
     } else {
       return "split";
     }
+  }
+
+  _parseMetricUnitMap() {
+    if (this.metricUnitMap) return;
+    
+    let metricUnitMap = [];
+    var arr = this.data['metricUnitMapping'];
+    $.each(arr, function(i,a){
+      metricUnitMap[a.metric] = a.unit;
+    });
+    
+    this.metricUnitMap = metricUnitMap;
   }
   
   _extractMetric(atext) {
@@ -373,11 +385,13 @@ class DataParser {
     
     if (this.groupsData) return this.groupsData;
 
+    this._parseMetricUnitMap();
     this._parseAnomalyData();
     this._parseData();
     
     let soptions = this.seriesOptions;
     let anomalies = this.anomalies;
+    let metricUnitMap = this.metricUnitMap;
     let mode = this.mode;
     
     let gmpairs = _.map(soptions, o => [o.groupId, o.metric]);
@@ -442,7 +456,7 @@ class DataParser {
         })
       });
 
-      var unit = this.metricUnitMap[groupmetrics[grp][0]];
+      var unit = metricUnitMap[groupmetrics[grp][0]];
 
       return {
         id: grp,

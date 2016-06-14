@@ -6,6 +6,7 @@ import {Modal, Dropdown} from '../../../artui/react';
 import {ChartsRefreshInterval, GridColumns, DefaultView} from '../../storeKeys';
 
 class SettingModal extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
