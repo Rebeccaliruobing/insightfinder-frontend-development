@@ -63,13 +63,16 @@ export default  class FilterBar extends Component {
     var url = '/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
     window.open(url,'_blank');
   }
+  
+  handleAdd() {
+    this.props.onSubmit && this.props.onSubmit(this.state);
+  }
 
   render() {
     const {projectName, anomalyThreshold, durationThreshold, projectType, modelType} = this.state;
     const labelStyle = {};
     const submitStyle = cx(
       'orange', {
-        loading: this.props.loading,
         disabled: !projectName || !modelType
       }
     );
@@ -99,7 +102,9 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <Button className={submitStyle} style={{marginTop: 20}}
-                    onClick={this.handleSubmit.bind(this)}>Add</Button>
+                    onClick={this.handleAdd.bind(this)}>Add</Button>
+            <Button className={submitStyle} style={{marginTop: 20}}
+                    onClick={this.handleSubmit.bind(this)}>Submit</Button>
           </div>
         </div>
       </div>

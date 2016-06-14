@@ -301,7 +301,7 @@ export default class LinkTender extends React.Component {
     };
     return (
       <div>
-        <span className="ui button green" onClick={reset}>reset</span><br/>
+        <span className="ui button mini green" onClick={reset}>Reset</span><br/>
         <div className="relative">
           <svg {...svg} style={{cursor: 'crosshair'}}
                         onMouseDown={this.handleMouseDown.bind(this)}

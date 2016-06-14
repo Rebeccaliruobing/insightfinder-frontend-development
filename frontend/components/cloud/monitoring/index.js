@@ -79,6 +79,7 @@ class LiveMonitoring extends BaseComponent {
   }
 
   handleFilterChange(project) {
+    
     let {addedProjects} = this.state;
     if (_.find(addedProjects, p => {
         return _.isEqual(p, project);

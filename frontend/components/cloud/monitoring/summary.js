@@ -32,10 +32,15 @@ class ProjectSummary extends BaseComponent {
   componentDidMount() {
     this.updateLiveAnalysis();
   }
+  
+  componentWillUnmount() {
+    this.props.clearTimeout(this.timeout);
+  }
 
   updateLiveAnalysis() {
-    let self = this;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
+
+    this.props.clearTimeout(this.timeout);
     
     if (modelType == 'Holistic') {
       this.setState({loading: true});
@@ -49,10 +54,12 @@ class ProjectSummary extends BaseComponent {
           }
           update.loading = false;
           this.setState(update);
-          this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
+          this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
         })
         .catch(msg=> {
-          alert(msg);
+          this.setState({loading:false});
+          console.log('load data error');
+          console.log(msg);
         });
     }
   }
@@ -61,19 +68,17 @@ class ProjectSummary extends BaseComponent {
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
     let query = {projectName, modelType, anomalyThreshold, durationThreshold};
     let {loading, showCloser, data} = this.state;
-    let cardStyle = cx(
-      'ui card', 
-      loading ? 'form loading':'');
+    let loadStyle = loading ? 'ui form loading':'';
 
     let sdata = !data ? undefined: new DataParser(data).getSummaryData();
     
     return (
-      <div className={cardStyle}
+      <div className='ui card'
            onMouseEnter={() => this.setState({showCloser:true})}
            onMouseLeave={() => this.setState({showCloser:false})}
            onClick={() => this.props.onSelected() }>
-        <div className="content" style={{height:260}}>
-          {!loading && showCloser &&
+        <div className="content summary-charts" style={{height:260}}>
+          {showCloser &&
           <div style={{float:'right'}}>
             <Link to="/liveMonitoring"
                   query={query} target="_blank"
@@ -87,8 +92,9 @@ class ProjectSummary extends BaseComponent {
             <span>{anomalyThreshold} /</span>
             <span>{durationThreshold} mins</span>
           </div>
+          <div className={loadStyle} style={{height: '200px'}}>
           {sdata &&
-          <Dygraph className="live monitoring summary" data={sdata.series}
+          <Dygraph data={sdata.series}
                    ylabel="Anomaly Degree"
                    labels={['X', 'Y1']}
                    axisLabelWidth={35}
@@ -100,6 +106,7 @@ class ProjectSummary extends BaseComponent {
                    highlights={sdata.highlights} />
           }
           {(!sdata && modelType != 'Holistic') && <span>No summary</span> }
+          </div>
         </div>
       </div>
     )
