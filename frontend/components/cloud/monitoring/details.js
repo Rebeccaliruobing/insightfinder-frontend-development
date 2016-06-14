@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactTimeout from 'react-timeout'
 import cx from 'classnames';
-
+import store from 'store';
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
 import LiveAnalysisCharts from '../liveanalysis'
+import {ChartsRefreshInterval} from '../../storeKeys';
 
 const ProjectDetails = class extends React.Component {
 
@@ -29,6 +30,7 @@ const ProjectDetails = class extends React.Component {
   updateLiveAnalysis() {
     let {query} = this.props.location;
     let {projectName, modelType, anomalyThreshold, durationThreshold} = query;
+    let refreshInterval = store.get(ChartsRefreshInterval, 5);
 
     this.setState({loading: true});
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
@@ -41,7 +43,7 @@ const ProjectDetails = class extends React.Component {
         }
         update.loading = false;
         this.setState(update);
-        this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
+        this.props.setTimeout(this.updateLiveAnalysis.bind(this), refreshInterval * 1000 * 60);
       })
       .catch(msg=> {
         alert(msg);
@@ -71,7 +73,7 @@ const ProjectDetails = class extends React.Component {
           </div>
         </div>
       </Console.Topbar>
-      <LiveAnalysisCharts {...query} data={data} loading={loading} />
+      <LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateLiveAnalysis()} />
     </Console>
     )
   }

@@ -8,6 +8,8 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../.
 import {Dygraph} from '../../artui/react/dataviz';
 import DataParser from './dataparser';
 import LinkTender from './display-model/LinkTender'
+import {ChartsRefreshInterval} from '../storeKeys';
+import LiveAnalysisChartsSetting from './liveanalysis_setting';
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -15,11 +17,13 @@ class LiveAnalysisCharts extends React.Component {
     data: React.PropTypes.object,
     loading: React.PropTypes.bool,
     view: React.PropTypes.oneOf(['list', 'thumbnail']),
+    onRefresh: React.PropTypes.func
   };
 
   static defaultProps = {
     view: 'list',
-    loading: true
+    loading: true,
+    onRefresh: () => {}
   };
 
   constructor(props) {
@@ -32,7 +36,8 @@ class LiveAnalysisCharts extends React.Component {
       columnsText: 4,
       selectedGroupId: undefined,
       summarySelected: false,
-      selectedAnnotation: null
+      selectedAnnotation: null,
+      showSettingModal: false
     };
   }
 
@@ -219,7 +224,6 @@ class LiveAnalysisCharts extends React.Component {
         <div className="active content menu">
           <a key="summary" href={window.location} className="item">Summary</a>
           {items}
-          <a key="causal" href={window.location} className="item">Causal Graph</a>
         </div>
       );
     }
@@ -284,7 +288,6 @@ class LiveAnalysisCharts extends React.Component {
     }
 
     if (dataArray && types) {
-      debugger;
       elems.push((
         <LinkTender dataArray={dataArray} types={types}/>
       ));
@@ -304,7 +307,7 @@ class LiveAnalysisCharts extends React.Component {
 
   render() {
 
-    let {data, loading, projectName} = this.props;
+    let {data, loading, projectName, onRefresh} = this.props;
     let {columns, view, summarySelected} = this.state;
 
     let isListView = view === 'list';
@@ -323,7 +326,15 @@ class LiveAnalysisCharts extends React.Component {
           <div className="ui main tiny container" style={{minHeight:'100%'}}>
             {!loading &&
             <div className="ui vertical segment">
-              {projectName}
+              <Button className="orange labeled icon">
+                <i className="icon random"/>Causal Graph
+              </Button>
+              <Button className="labeled icon" onClick={() => onRefresh()}>
+                <i className="icon refresh"/>Refresh
+              </Button>
+              <Button className="labeled icon" onClick={()=> this.setState({showSettingModal: true})}>
+                <i className="icon setting"/>Setting
+              </Button>
               <ButtonGroup className="right floated basic icon">
                 <Dropdown className="compact"
                           value={this.state['columns']} text={this.state['columnsText']}
@@ -354,10 +365,12 @@ class LiveAnalysisCharts extends React.Component {
               </div>
               }
               {isListView && this.renderList()}
-
-
             </div>
           </div>
+          {
+            this.state.showSettingModal &&
+            <LiveAnalysisChartsSetting onClose={() => this.setState({showSettingModal: false})}/>
+          }
         </Console.Content>
       </Console.Wrapper>
     )
