@@ -74,10 +74,7 @@ class App extends React.Component {
 const liveMonitoringApp = function (props) {
   let {location, params} = props;
   return (
-    <Console>
-      <Console.Topbar logo={require('./images/logo.png')}/>
-      <ProjectDetails location={location} params={params}/>
-    </Console>
+    <ProjectDetails location={location} params={params}/>
   );
 };
 

@@ -134,3 +134,32 @@
     width: 35px;
   }
 }
+
+// Topbar
+.topbar-text {
+  margin-left: @2spacer !important;
+  margin-right: @2spacer !important;
+  width: 100%;
+
+  .title {
+    font-size: 13px;
+    padding-top: 5px;
+    float: left;
+  }
+
+  .legend {
+    font-size: 14px;
+    float: right;
+    width: 200px;
+    padding-top: 3px;
+    .colormap2 {
+      float: left;
+      color: #EEEEEE;
+      width: 100%;
+      background: -webkit-linear-gradient(left, green, yellow, red);
+      background: -o-linear-gradient(left, green, yellow, red);
+      background: -moz-linear-gradient(left, green, yellow, red);
+      background: linear-gradient(left, green, yellow, red);
+    }
+  }
+}

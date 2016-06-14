@@ -50,10 +50,29 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
+    const {projectName, anomalyThreshold, durationThreshold, modelType} = query;
+    
     let {data, loading} = this.state;
 
     return (
+    <Console>
+      <Console.Topbar logo={require('../../../images/logo.png')}>
+        <div className="topbar-text">
+          <div className="title">
+            Please view anomaly detection result for project <b>{projectName}</b><br/>
+            with model type <b>{modelType}</b>, anomaly threshold <b>{anomalyThreshold}</b>, duration threshold: <b>{durationThreshold}</b>. 
+          </div>
+          <div className="legend">
+            <div>Anomaly color map:</div>
+            <div className="colormap2">
+              <div style={{float:'left'}}>Normal</div>
+              <div style={{float:'right'}}>Abnormal</div>
+            </div>
+          </div>
+        </div>
+      </Console.Topbar>
       <LiveAnalysisCharts {...query} data={data} loading={loading} />
+    </Console>
     )
   }
 };
