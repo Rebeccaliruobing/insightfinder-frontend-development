@@ -151,6 +151,7 @@ class LiveAnalysisCharts extends React.Component {
           let summary = this.dp.summaryData;
           elems = elems.slice(0, rowCount).concat([(
             <div className="live monitoring summary" ref={(c)=>{
+              let $c = $(ReactDOM.findDOMNode(c));
               $c.slideDown('fast', ()=>{
                 ReactDOM.render((
                   <div style={{width: '100%', backgroundColor: '#fff', padding: 20}}>
@@ -168,7 +169,7 @@ class LiveAnalysisCharts extends React.Component {
           <div key={'expand-' + selectedGroupId} className="live monitoring summary" ref={(c)=>{
 
             let $c = $(ReactDOM.findDOMNode(c));
-            $(c).slideDown('fast', ()=>{
+            $c.slideDown('fast', ()=>{
 
               console.log($c.offset().top);
               $(window.document).scrollTop($c.offset().top);
