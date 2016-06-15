@@ -8,13 +8,16 @@ import {
   DurationThreshold,
 } from '../../selections';
 
+import apis from '../../../apis';
+
 import DateTimePicker from "../../ui/datetimepicker/index";
 
 export default  class FilterBar extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
-    router: React.PropTypes.object
+    router: React.PropTypes.object,
+    root: React.PropTypes.object
   };
 
   constructor(props) {
@@ -25,6 +28,7 @@ export default  class FilterBar extends Component {
       startTime: moment().add(-1, 'w').toDate(),
       endTime: moment().toDate()
     };
+    this.handleRefresh = this.handleRefresh.bind(this);
   }
 
   componentDidMount() {
@@ -48,8 +52,69 @@ export default  class FilterBar extends Component {
         pvalue: parseFloat(item.pvalue),
         activeItem: item,
         description: item.metaData.desc
+      }, ()=> {
+        let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
+        apis.postJSONDashboardUserValues('getpubdatasettings', {
+          fromUser, dataChunkName, modelKey, projectName, modelName, modelType
+        }).then((resp)=>{
+          if (resp.success) {
+            resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
+            this.setState(resp.data);
+          }else {
+            alert(resp.message);
+          }
+        });
       })
     }
+  }
+  handleMetricSetting(index, name) {
+    return (e) =>{
+      let metricSettings = this.state.metricSettings;
+      metricSettings[index][name] = e.target.value;
+      this.setState({metricSettings});
+    }
+  }
+
+  handleSaveMetricSetting() {
+    let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = this.state.activeItem;
+    this.setState({loading: true});
+    apis.postJSONDashboardUserValues('setpubdatasettings', {
+      fromUser, dataChunkName, modelName, modelType, metricSettings: JSON.stringify(this.state.metricSettings)
+    }).then((resp)=>{
+      if (resp.success) {
+      }else {
+        alert(resp.message);
+      }
+      this.setState({loading: false});
+    });
+  }
+
+  handleToggleRow() {
+
+    let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = this.state.activeItem;
+    this.setState({loading: true});
+    apis.postJSONDashboardUserValues('togglepublisheddata', {
+      fromUser, dataChunkName, modelName, modelType, modelKey, projectName,
+    }).then((resp)=>{
+      if (resp.success) {
+        this.setState({
+          loading: false,
+          activeItem: undefined,
+          metricSettings: undefined
+        }, this.handleRefresh);
+      }else {
+        alert(resp.message);
+        this.setState({loading: false});
+      }
+
+    });
+  }
+
+  handleRefresh() {
+    this.setState({loading: true});
+    this.context.root.loadUserValues().then(()=> {
+      this.setState({loading: false})
+    })
   }
 
   handleSubmit() {
@@ -57,13 +122,13 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {startTime, endTime, description, cvalue, pvalue, nameField, nameFieldName, nameFieldValue} = this.state;
+    const {startTime, endTime, description, cvalue, pvalue, nameField, nameFieldValue, activeItem, metricSettings} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
     let system = this.props.location.query.system;
     return (
-      <div className="ui form">
+      <div className={cx('ui form', {loading: !!this.state.loading})}>
         <div className="ui grid">
           <div className="five wide column">
 
@@ -99,7 +164,8 @@ export default  class FilterBar extends Component {
 
             <div className="field">
               <label style={labelStyle}>Incident Description</label>
-                <textarea className="ui input" value={description} name="description" style={{height: '8em'}} readonly></textarea>
+              <textarea className="ui input" value={description} name="description" style={{height: '8em'}}
+                        readonly></textarea>
             </div>
           </div>
         </div>
@@ -122,13 +188,15 @@ export default  class FilterBar extends Component {
 
                   let shouldShow = true;
                   if (system && ['cassandra', 'hadoop'].indexOf(system.toLowerCase()) >= 0 && system.toLowerCase() != sys) {
-                      shouldShow = false
+                    shouldShow = false
                   } else if (system == 'Other' && ['cassandra', 'hadoop'].indexOf(sys) >= 0) {
                     shouldShow = false
                   }
 
                   return shouldShow && (
-                      <tr key={index} onClick={this.handleSelectItem(item)}>
+                      <tr key={index} onClick={this.handleSelectItem(item)} className={cx({
+                        'active': item == this.state.activeItem
+                      })}>
                         <td>System: {item.metaData.system}, incident name/bug ID: {item.metaData.name},
                           owner: {item.fromUser},
                           sharing mode: {pubMode}</td>
@@ -143,7 +211,41 @@ export default  class FilterBar extends Component {
         <div className="ui grid">
           <div className="sixteen wide column">
             <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
+            <Button className="basic" onClick={this.handleRefresh}>refresh</Button>
+            {activeItem && <Button className="basic" onClick={this.handleToggleRow.bind(this)}>toggle</Button>}
           </div>
+
+
+
+          {metricSettings && (
+
+            <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})} style={{padding: '1rem'}}>
+              <h3>Metric Settings (Optional)</h3>
+              <table className="ui celled table">
+                <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Normalization Group</th>
+                  <th>Alert Threshold</th>
+                  <th>No Alert Threshold</th>
+                </tr>
+                </thead>
+                <tbody>
+                {metricSettings.map((setting, index)=>{
+                  return (
+                    <tr key={`${index}`}>
+                      <td>{setting.smetric}</td>
+                      <td><input value={setting.groupId} onChange={this.handleMetricSetting(index, 'groupId')}/></td>
+                      <td><input value={setting.thresholdAlert} onChange={this.handleMetricSetting(index, 'thresholdAlert')}/></td>
+                      <td><input value={setting.thresholdNoAlert} onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/></td>
+                    </tr>
+                  )
+                })}
+                </tbody>
+              </table>
+              <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Submit</Button>
+            </div>
+          )}
         </div>
       </div>
     )

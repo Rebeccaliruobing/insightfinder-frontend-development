@@ -60,7 +60,6 @@ export default class IncidentDetection extends Component {
   }
 
   render() {
-    const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
     return (
       <Console.Content>

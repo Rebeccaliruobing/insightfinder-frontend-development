@@ -149,7 +149,8 @@ class AppRoute extends React.Component {
       dashboardUservalues,
       dashboardDailySummaryReport,
       root: {
-        loadData: this.loadData.bind(this)
+        loadData: this.loadData.bind(this),
+        loadUserValues: this.loadUserValues.bind(this)
       }
     }
   }
@@ -173,7 +174,12 @@ class AppRoute extends React.Component {
       apis.getUserInstructions().then((resp)=> {
         this.setState({userInstructions: resp});
       });
+      this.loadUserValues();
+    });
+  }
 
+  loadUserValues() {
+    return new Promise((resolve, reject) => {
       apis.postDashboardUserValues().then((resp)=> {
 
         resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
@@ -194,8 +200,7 @@ class AppRoute extends React.Component {
             metaData: JSON.parse(info.metaData)
           });
         });
-
-        this.setState({dashboardUservalues: resp});
+        this.setState({dashboardUservalues: resp}, ()=>resolve(this));
       });
     });
   }
