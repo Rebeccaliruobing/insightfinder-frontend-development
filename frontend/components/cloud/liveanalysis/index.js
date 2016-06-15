@@ -12,7 +12,7 @@ import TenderModal from './tenderModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import Navbar from './navbar';
-import {SummaryDetail, GroupDetail} from './details';
+import {SummaryChart, DetailsChart, SummaryDetail, GroupDetail} from './charts';
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -99,7 +99,7 @@ class LiveAnalysisCharts extends React.Component {
              onClick={() => this.setState({summarySelected:true, selectedGroupId: null})}>
           <div className="content">
             <div className="header">Summary</div>
-            <Dygraph className="live monitoring summary" data={summary.series}
+            <Dygraph data={summary.series}
                      ylabel="Anomaly Degree"
                      labels={['X', 'Y1']}
                      axisLabelWidth={35}
@@ -232,31 +232,39 @@ class LiveAnalysisCharts extends React.Component {
     let summary = this.dp ? this.dp.summaryData : undefined;
     let groups = this.dp ? this.dp.groupsData : [];
     
-    let {listGraphZoomOpt, listGraphSelection} = this.state;
+    let {listGraphZoomOpt} = this.state;
     
     return (
       <div className="ui grid">
         <div className="twelve wide column">
-          <SummaryDetail 
-            summary={summary} id="list_summary"
-            onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})}
-            drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
-            // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-            // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
-            // selection={listGraphSelection}
-            {...listGraphZoomOpt}
-          />
-          { groups.map((group) => {
-            
-            return <GroupDetail
-              group={group} id={'list_group_' + group.id} key={group.id}
-              drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
+          { summary &&
+          <div id={summary.id} className="detail-charts">
+            <h4 className="ui header">{summary.title}</h4>
+            <DetailsChart
+              data={summary}
+              onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
+              drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
               // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-              // onUnhighlight={() => this.setState({listGraphSelection: undefined })}
+              // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
               // selection={listGraphSelection}
               {...listGraphZoomOpt}
             />
-          })}
+          </div>
+          }
+          { groups.map((group) => {
+            return (
+              <div id={group.id} key={group.id} className="detail-charts">
+                <h4 className="ui header">{group.title}</h4>
+                <DetailsChart
+                  data={group}
+                  drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
+                  // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
+                  // onUnhighlight={() => this.setState({listGraphSelection: undefined })}
+                  // selection={listGraphSelection}
+                  {...listGraphZoomOpt}
+                />
+              </div>
+            )})}
         </div>
         <div className="four wide column">
           {this.renderAnnotation()}
@@ -287,7 +295,6 @@ class LiveAnalysisCharts extends React.Component {
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;
     let types = this.dp ? this.dp.causalTypes : undefined;
     
-    console.log('rendering');
     return (
       <Console.Wrapper>
         <Console.Navbar style={navbarStyle}>

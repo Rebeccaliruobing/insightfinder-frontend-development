@@ -376,10 +376,15 @@ class DataParser {
     });
     
     this.summaryData = {
-      series: _.map(alies, a => [a.time, a.val]),
+      id: 'summary',
+      title: 'Analysis Summary',
+      unit: 'Anomaly Degree',
+      sdata: _.map(alies, a => [a.time, a.val]),
+      sname: ['X', 'Y1'],
       highlights: highlights,
       annotations: annotations
     };
+    console.log(this.summaryData);
     return this.summaryData;
   }
   
@@ -461,14 +466,17 @@ class DataParser {
       var unit = metricUnitMap[groupmetrics[grp][0]];
 
       return {
-        id: grp,
+        id: 'metric_group_' + grp,
+        title: 'Metric Group ' + grp,
         sdata: sdata,
         sname: sname,
         unit: unit || '',
-        highlights: highlights
+        highlights: highlights,
+        annotations: undefined
       };
     });
     
+    console.log(this.groupsData);
     return this.groupsData;
   }
 }
