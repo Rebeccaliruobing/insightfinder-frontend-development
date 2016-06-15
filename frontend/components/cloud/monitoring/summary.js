@@ -44,6 +44,7 @@ class ProjectSummary extends BaseComponent {
   updateLiveAnalysis() {
 
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
+    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
     
     // this.props.clearTimeout(this.timeout);
     this.setState({loading: true});
