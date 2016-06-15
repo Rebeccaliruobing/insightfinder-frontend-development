@@ -31,6 +31,7 @@ class App extends React.Component {
     store.remove('userInfo');
     store.remove('userName');
     store.remove('token');
+    store.clear();
     window.location.reload();
   }
 
@@ -196,10 +197,6 @@ class AppRoute extends React.Component {
 
         this.setState({dashboardUservalues: resp});
       });
-
-      // apis.postDashboardDailySummaryReport(store.get('userName')).then((resp)=> {
-      //   this.setState({dashboardDailySummaryReport: resp});
-      // });
     });
   }
 

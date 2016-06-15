@@ -31,7 +31,8 @@ export default class SoftwareRolloutCheck extends Component {
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
         startTime: moment(new Date()).add(-7 * weeks, 'days')
-      }
+      },
+      data: {}
     };
   }
 
@@ -39,7 +40,6 @@ export default class SoftwareRolloutCheck extends Component {
   }
 
   handleData(data) {
-    ;
     this.setState({data: data}, ()=> {
       this.setHeatMap(0, 0);
     })
@@ -63,6 +63,8 @@ export default class SoftwareRolloutCheck extends Component {
 
       if (data.instanceName) {
         title = data.instanceName
+      } else if (data.groupId + '' == '0') {
+        title = 'Holistic'
       } else {
         title =
           <span>{`Group ${data.groupId}`}({data.metricNameList ? new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",") : ''})</span>;
@@ -114,17 +116,19 @@ export default class SoftwareRolloutCheck extends Component {
 
   renderSlider() {
 
-    let marks = this.state.data && this.state.data.holisticModelData.map((item, index)=> moment(item.startTime).format('MM-DD HH:mm')).sort();
+    let data = this.state.data.holisticModelData;
+    let marks = data && data.map((item, index)=> `
+      ${moment(item.startTime).format('MM-DD HH:mm')} \n
+      ${moment(item.endTime).format('MM-DD HH:mm')}
+    `).sort();
     if (!marks) return;
     const dateIndex = this.state.dateIndex;
-    const startIndex = Math.max(dateIndex - 5, 0);
-    const endIndex = Math.min(startIndex + 10, marks.length - 1);
-    marks = _.fromPairs(_.slice(marks, startIndex, endIndex - startIndex + 1).map((mark, index)=>[index, mark]));
+    debugger;
+    marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
     return (
       <div className="padding40">
         {this.state.data && (
-          <RcSlider key={'slider-' + startIndex} onChange={this.handleDateIndexChange(startIndex)}
-                    max={endIndex - startIndex + 1} value={dateIndex - startIndex} marks={marks}/>
+          <RcSlider onChange={this.handleDateIndexChange(0)} max={marks.length - 1} value={dateIndex} marks={marks}/>
         )}
       </div>
     )
