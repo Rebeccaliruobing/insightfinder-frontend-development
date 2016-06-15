@@ -61,7 +61,7 @@ const ProjectDetails = class extends React.Component {
     let {data, groupId, loading} = this.state;
 
     return (
-      <LiveAnalysisCharts groupId={groupId}projectName={projectName} data={data} loading={loading} />
+      <LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading} />
     );
   }
 };

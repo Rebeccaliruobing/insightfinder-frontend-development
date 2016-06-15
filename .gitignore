@@ -93,3 +93,4 @@ frontend/manifest-dev.json
 .idea
 static/dev
 backend/config/default.py
+.happypack

@@ -10,7 +10,6 @@ class Navbar extends React.Component {
   
   render() {
     
-    // TODO: [IMP] Add anchor
     let {groupMetrics} = this.props;
     let elem = null;
     let baseUrl = window.location.href.split('#')[0];
@@ -21,7 +20,7 @@ class Navbar extends React.Component {
       _.forEach(groupMetrics, (v, k) => {
         items.push((
           <div key={k} className="item">
-            <a key='link' href={baseUrl + '#list_group_' + k}>Metric Group {k}</a>
+            <a key='link' href={baseUrl + '#metric_group_' + k}>Metric Group {k}</a>
             <div key="metrics" className="menu">
               {v.map(g=> {
                 return (<div key={g} className="item">- {g}</div>)
@@ -33,7 +32,7 @@ class Navbar extends React.Component {
 
       elem = (
         <div className="active content menu">
-          <a key="summary" href={baseUrl + '#list_summary'} className="item">Summary</a>
+          <a key="summary" href={baseUrl + '#summary'} className="item">Summary</a>
           {items}
         </div>
       );
