@@ -34,33 +34,36 @@ class ProjectSummary extends BaseComponent {
   }
 
   componentDidMount() {
-    this.updateLiveAnalysis();
+    // this.updateLiveAnalysis();
   }
   
   componentWillUnmount() {
-    this.props.clearTimeout(this.timeout);
+    // this.props.clearTimeout(this.timeout);
   }
 
   updateLiveAnalysis() {
+
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
-
+    
     // this.props.clearTimeout(this.timeout);
-
     this.setState({loading: true});
+    
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
       .then(resp => {
         let update = {};
         if (resp.success) {
           update.data = resp.data;
+          store.set(key, resp.data);
         } else {
-          alert(resp.message);
+          console.log(resp.message);
         }
         update.loading = false;
         this.setState(update);
-        // this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
+        // this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000);
       })
       .catch(msg=> {
-        this.setState({loading:false});
+        this.setState({loading: false});
+        // this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000);
         console.log(msg);
       });
   }
@@ -70,6 +73,9 @@ class ProjectSummary extends BaseComponent {
     let query = {projectName, modelType, anomalyThreshold, durationThreshold};
     let {loading, showCloser, data} = this.state;
     let loadStyle = loading ? 'ui form loading':'';
+    
+    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
+    data = data || store.get(key, null);
 
     if (data && this.data !== data) {
       this.sdata = new DataParser(data).getSummaryData();
@@ -85,7 +91,7 @@ class ProjectSummary extends BaseComponent {
         <div className="content" style={{height:210}}>
           {showCloser &&
           <div style={{float:'right'}}>
-            <i className="refresh link icon" onClick={this.updateLiveAnalysis.bind(this)}/>
+            {!loading && <i className="refresh link icon" onClick={() => this.updateLiveAnalysis(false)}/>}
             <Link to="/liveMonitoring"
                   query={query} target="_blank"
                   style={{marginRight:5}}>Details</Link>
@@ -99,7 +105,6 @@ class ProjectSummary extends BaseComponent {
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
             {sdata && <SummaryChart data={sdata} />}
-            {!sdata && !loading && <span>No summary</span>}
           </div>
         </div>
       </div>

@@ -165,8 +165,8 @@ class DataParser {
     if(arr){
       $.each(arr, function(i,a){
         var atext = [];
-        if(a.anomalies!=""){
-          var lines = a.anomalies.split('\\n');
+        if(a.anomaliesConsolidated){
+          var lines = a.anomaliesConsolidated.split('\\n');
           $.each(lines, function(lineNo, line) {
             var items = line.split(',');
 
@@ -223,7 +223,7 @@ class DataParser {
     
     this.causalDataArray = causalDataArray;
     this.causalTypes = causalTypes;
-    this.anomalyConsolidatedTexts = anomalyTexts;
+    this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
   }
   
   _parseAnomalyData() {
