@@ -31,17 +31,22 @@ class ProjectSelection extends React.Component {
   }
 }
 
-const ModelType = (props) => {
-  return (
-    <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
-      <div className="menu">
-        <div className="item" data-value="Holistic">Holistic</div>
-        <div className="item" data-value="Split">Split</div>
-        <div className="item" data-value="Hybrid">Hybrid</div>
-      </div>
-    </Dropdown>
-  );
+class ModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="Split">Split</div>
+          <div className="item" data-value="Hybrid">Hybrid</div>
+        </div>
+      </Dropdown>
+    );
+  }
 };
 
 const  AnomalyThreshold = (props) => {

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
+import store from 'store';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
@@ -12,12 +13,15 @@ import {
   DurationThreshold
 } from '../../selections';
 
+import apis from '../../../apis';
+
 import DateTimePicker from "../../ui/datetimepicker/index";
 
 export default  class FilterBar extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object
+    dashboardUservalues: React.PropTypes.object,
+    root: React.PropTypes.object
   };
 
   constructor(props) {
@@ -85,11 +89,11 @@ export default  class FilterBar extends Component {
     return (e) => {
       let {startTime, endTime, modelKey, pvalue} = incident;
       this.setState({
-        startTime: startTime,
-        endTime: endTime,
-        pvalue: pvalue,
-        incident: incident,
-        modelKey: modelKey
+        incident,
+        startTime,
+        endTime,
+        pvalue,
+        modelKey
       })
     }
   }
@@ -98,19 +102,51 @@ export default  class FilterBar extends Component {
     this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
+  handleRemoveRow() {
+    let {projectName, startTime, endTime} = this.state;
+    startTime = startTime.getTime();
+    endTime = endTime.getTime();
+    apis.postJSONDashboardUserValues('deleterawdata', {
+      projectName, startTime, endTime,
+    }).then((resp)=> {
+      if (resp.success) {
+        this.setState({
+          incident: undefined,
+          startTime: undefined,
+          endTime: undefined,
+          pvalue: undefined,
+          modelKey: undefined
+        }, this.handleRefresh.bind(this));
+      } else {
+        alert(resp.message);
+      }
+    })
+  }
+
+  handleRefresh() {
+    this.setState({loading: true}, ()=> {
+      this.context.root.loadUserValues().then(()=> {
+        this.setState({loading: false}, ()=> {
+          let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+          if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+        });
+      })
+    });
+  }
+
   _incidentsRef(c) {
 
   }
 
   render() {
-    const {projectName, startTime, endTime, pvalue, cvalue, projectType, modelKey, durationHours, incidentList} = this.state;
-    const {userInstructions, dashboardUservalues} = this.context;
+    const {projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList} = this.state;
+    const {dashboardUservalues} = this.context;
     const labelStyle = {};
 
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
     return (
-      <div className="ui form">
+      <div className={cx('ui form', {loading: !!this.state.loading})}>
         <div className="four fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
@@ -124,7 +160,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Model Key</label>
@@ -168,6 +204,9 @@ export default  class FilterBar extends Component {
 
         <div className="ui field">
           <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
+
+          <Button className="basic" onClick={this.handleRefresh.bind(this)}>refresh</Button>
+          {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
         </div>
 
         {incidentList.length > 0 && (

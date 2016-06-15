@@ -115,6 +115,24 @@ export default {
       requestPost('dashboard uservalues', {userName, token, operation, ...other}, resolve, reject);
     });
   },
+  postJSONDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['dashboard uservalues'],
+        data: $.param( {userName, token, operation, ...other}),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
+        reject(error);
+      });
+    });
+  },
   postDashboardDailySummaryReport (userName:String = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
@@ -440,7 +458,7 @@ export default {
    * @param cvalueFilter
    * @param pvalueFilter
    * @param minAnomalyRatioFilter
-   * @param shareUsernames
+   * @param sharedUsernames
    * @param projectHintMapFilename
    * @param userName
    * @param token
