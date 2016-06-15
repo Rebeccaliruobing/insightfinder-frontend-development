@@ -27,6 +27,7 @@ export default  class FilterBar extends Component {
       pvalue: 0.99,
       cvalue: 5,
       durationHours: 6,
+      modelType: "Holistic",
       modelKey: undefined,
       projectType: undefined,
       incidentList: []
@@ -44,6 +45,7 @@ export default  class FilterBar extends Component {
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
     let update = {projectName};
+    update.modelType = "Holistic";
     switch (dataType) {
       case 'AWS':
         update.projectType = "AWS/CloudWatch";
@@ -61,12 +63,14 @@ export default  class FilterBar extends Component {
     const data = dataAllInfo.find((data)=>data.projectName == projectName);
     const dataCoverages = (data.dataCoverages || []);
     update.incidentList = ((incidentInfo && incidentInfo.incidentList) || []).map((incident)=> {
-      let [startTime, endTime, modelKey, pvalue, ] = incident.split("_");
+      let [startTime, endTime, modelKey, pvalue, cvalue] = incident.split("_");
       return {
         startTime: moment(startTime).toDate(),
         endTime: moment(endTime).toDate(),
         modelKey,
         pvalue,
+        cvalue,
+        modelType: "Holistic",
         record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
       }
     });
@@ -83,12 +87,14 @@ export default  class FilterBar extends Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {startTime, endTime, modelKey, pvalue} = incident;
+      let {startTime, endTime, modelKey, modelType, pvalue, cvalue} = incident;
       this.setState({
         startTime: startTime,
         endTime: endTime,
         pvalue: pvalue,
+        cvalue: cvalue,
         incident: incident,
+        modelType: modelType,
         modelKey: modelKey
       })
     }
@@ -103,7 +109,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, startTime, endTime, pvalue, cvalue, projectType, modelKey, durationHours, incidentList} = this.state;
+    const {projectName, startTime, endTime, pvalue, cvalue, projectType, modelType, modelKey, durationHours, incidentList} = this.state;
     const {userInstructions, dashboardUservalues} = this.context;
     const labelStyle = {};
 
@@ -124,7 +130,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} text={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Model Key</label>
@@ -175,7 +181,7 @@ export default  class FilterBar extends Component {
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
               {incidentList.map((incident)=> {
-                let {startTime, endTime, modelKey, pvalue, record} = incident;
+                let {startTime, endTime, modelKey, modelType, pvalue, cvalue, record} = incident;
                 let bgColor = (incident.startTime == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className="item" key={startTime.getTime()} style={{'backgroundColor': bgColor}}>
