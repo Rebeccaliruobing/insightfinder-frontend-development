@@ -1,6 +1,7 @@
 import React from 'react';
 import cx from 'classnames';
 import ReactTimeout from 'react-timeout'
+import store from 'store';
 import {BaseComponent, PropTypes, Table, Link} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
@@ -43,7 +44,7 @@ class ProjectSummary extends BaseComponent {
   updateLiveAnalysis() {
     let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
 
-    this.props.clearTimeout(this.timeout);
+    // this.props.clearTimeout(this.timeout);
 
     this.setState({loading: true});
     apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
@@ -56,11 +57,10 @@ class ProjectSummary extends BaseComponent {
         }
         update.loading = false;
         this.setState(update);
-        this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
+        // this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000 * 60);
       })
       .catch(msg=> {
         this.setState({loading:false});
-        console.log('load data error');
         console.log(msg);
       });
   }
@@ -82,9 +82,10 @@ class ProjectSummary extends BaseComponent {
            onMouseEnter={() => this.setState({showCloser:true})}
            onMouseLeave={() => this.setState({showCloser:false})}
            onClick={() => this.props.onSelected() }>
-        <div className="content" style={{height:260}}>
+        <div className="content" style={{height:210}}>
           {showCloser &&
           <div style={{float:'right'}}>
+            <i className="refresh link icon" onClick={this.updateLiveAnalysis.bind(this)}/>
             <Link to="/liveMonitoring"
                   query={query} target="_blank"
                   style={{marginRight:5}}>Details</Link>
@@ -96,7 +97,7 @@ class ProjectSummary extends BaseComponent {
             <span>{anomalyThreshold} /</span>
             <span>{durationThreshold} mins</span>
           </div>
-          <div className={loadStyle} style={{height: '200px'}}>
+          <div className={loadStyle} style={{height: '150px'}}>
             {sdata && <SummaryChart data={sdata} />}
             {!sdata && !loading && <span>No summary</span>}
           </div>
