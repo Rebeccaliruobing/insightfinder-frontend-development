@@ -30,7 +30,7 @@ $.fn.api.settings.api = {
   'add custom project': `${baseUrl}add-custom-project`,
   'add aws project': `${baseUrl}add-amazon-project`,
   'remove project': `${baseUrl}remove-project`,
-  'project setting': `${baseUrl}projectSetting`,
+  'project setting': `${baseUrl}emailAlertSetting`,
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -446,7 +446,7 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+  postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -460,7 +460,7 @@ export default {
           'cvalue-filter': cvalueFilter,
           'pvalue-filter': pvalueFilter,
           minAnomalyRatioFilter,
-          shareUsernames,
+          sharedUsernames,
           projectHintMapFilename,
           userName,
           token
@@ -477,4 +477,5 @@ export default {
       });
     });
   },
+
 };

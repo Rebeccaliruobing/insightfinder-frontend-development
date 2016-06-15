@@ -16,7 +16,8 @@ import {
 export default class ThresholdSettings extends React.Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object
+    dashboardUservalues: React.PropTypes.object,
+    root: React.PropTypes.object
   };
 
   constructor(props) {
@@ -238,7 +239,7 @@ export default class ThresholdSettings extends React.Component {
     this.setState({settingLoading: true}, ()=> {
       apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename).then((resp)=> {
         console.log(resp);
-        this.setState({settingLoading: false})
+        this.setState({settingLoading: false}, this.context.root.loadData)
       });
     });
   }
@@ -249,7 +250,7 @@ export default class ThresholdSettings extends React.Component {
         projectSettings: JSON.stringify(this.state.metricSettings)
       }).then((resp)=> {
         console.log(resp);
-        this.setState({uservaluesLoading: false})
+        this.setState({uservaluesLoading: false}, this.context.root.loadData)
       });
     });
   }
