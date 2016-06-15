@@ -92,17 +92,17 @@ export default class ListAll extends Component {
           <div className="ui three column grid">
             <div className="wide column text-center" style={wrapperStyle}>
               <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
-                <a style={linkStyle} href={`#/usecase/list-some?system=Cassandra`}>Cassandra</a>
+                <a style={linkStyle} href={`/usecase/list-some?system=Cassandra`}>Cassandra</a>
               </div>
             </div>
             <div className="wide column text-center" style={wrapperStyle}>
               <div style={Object.assign({}, blockStyle, {backgroundColor: '#66ccff'})}>
-                <a style={linkStyle} href={`#/usecase/list-some?system=Hadoop`}>Hadoop</a>
+                <a style={linkStyle} href={`/usecase/list-some?system=Hadoop`}>Hadoop</a>
               </div>
             </div>
             <div className="wide column text-center" style={wrapperStyle}>
               <div style={Object.assign({}, blockStyle)}>
-                <a style={linkStyle} href={`#/usecase/list-some?system=Other`}>Other</a>
+                <a style={linkStyle} href={`/usecase/list-some?system=Other`}>Other</a>
               </div>
             </div>
           </div>

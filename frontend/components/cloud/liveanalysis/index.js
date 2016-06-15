@@ -214,7 +214,8 @@ class LiveAnalysisCharts extends React.Component {
       <div className="ui grid">
         <div className="twelve wide column">
           { summary &&
-          <div id={summary.div_id} className="detail-charts">
+          <div key={summary.id} className="detail-charts">
+            <span id={summary.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
             <h4 className="ui header">{summary.title}</h4>
             <DetailsChart
               data={summary}
@@ -229,7 +230,8 @@ class LiveAnalysisCharts extends React.Component {
           }
           { groups.map((group) => {
             return (
-              <div id={group.div_id} key={group.id} className="detail-charts">
+              <div key={group.id} className="detail-charts" style={{position:'relative'}}>
+                <span id={group.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
                 <h4 className="ui header">{group.title}</h4>
                 <DetailsChart
                   data={group}
