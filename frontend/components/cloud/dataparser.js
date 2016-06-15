@@ -230,7 +230,7 @@ class DataParser {
     
     if (this.anomalies) return;
     this._parseAnomalyText();
-    // this._parseAnomalyConsolidatedText();
+    this._parseAnomalyConsolidatedText();
     
     if (this.mode != 'error') {
 
@@ -363,7 +363,8 @@ class DataParser {
       }
     });
     
-    _.map(this.anomalyTexts, (o) => {
+    let anomalyTexts = this.anomalyConsolidatedTexts || this.anomalyTexts;
+    _.map(anomalyTexts, (o) => {
       _.forIn(o, (v, k) => {
         index++;
         annotations.push({
