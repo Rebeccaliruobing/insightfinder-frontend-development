@@ -14,7 +14,7 @@ export class SummaryChart extends React.Component {
     let {data, ...rest} = this.props;
     return (
       <Dygraph
-        style={{width: '100%', height: '200px'}}
+        style={{width: '100%', height: '180px'}}
         axisLabelWidth={35}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{padding: '4px', margin:'15px'}}
@@ -23,7 +23,6 @@ export class SummaryChart extends React.Component {
         ylabel={data.unit}
         labels={data.sname}
         highlights={data.highlights}
-        annotations={data.annotations}
         {...rest} />
     )
   }
@@ -42,7 +41,7 @@ export class DetailsChart extends React.Component {
     let {data, ...rest} = this.props;
     return (
       <Dygraph
-        style={{width: '100%', height: '200px'}}
+        style={{width: '100%', height: '240px'}}
         axisLabelWidth={35}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{padding: '4px', margin:'15px'}}

@@ -377,6 +377,7 @@ class DataParser {
     
     this.summaryData = {
       id: 'summary',
+      div_id: 'summary',
       title: 'Analysis Summary',
       unit: 'Anomaly Degree',
       sdata: _.map(alies, a => [a.time, a.val]),
@@ -466,7 +467,8 @@ class DataParser {
       var unit = metricUnitMap[groupmetrics[grp][0]];
 
       return {
-        id: 'metric_group_' + grp,
+        id: grp,
+        div_id: 'metric_group_' + grp,
         title: 'Metric Group ' + grp,
         sdata: sdata,
         sname: sname,
