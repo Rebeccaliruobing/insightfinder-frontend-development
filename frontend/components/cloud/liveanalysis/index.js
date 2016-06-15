@@ -231,22 +231,24 @@ class LiveAnalysisCharts extends React.Component {
 
     let summary = this.dp ? this.dp.summaryData : undefined;
     let groups = this.dp ? this.dp.groupsData : [];
-    let {listGraphZoomOpt} = this.state;
-    console.log(listGraphZoomOpt);
-
+    
+    let {listGraphZoomOpt, updatedListGraphId} = this.state;
+    let summaryZoomOpt = updatedListGraphId === 'summary' ? {} : listGraphZoomOpt;
+    
     return (
       <div className="ui grid">
         <div className="twelve wide column">
           <SummaryDetail summary={summary} id="list_summary" 
                          onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})}
-                         drawCallback={(g) => this.setState({
-                         listGraphZoomOpt: {
-                          dateWindow: g.xAxisRange(),
-                          valueRange: g.yAxisRange()
-                         }})} />
+                         drawCallback={(g) => this.setState(
+                         { updatedListGraphId: 'summary', listGraphZoomOpt: { dateWindow: g.xAxisRange() }})} 
+            {...summaryZoomOpt}/>
           { groups.map((group) => {
-            return <GroupDetail id={'list_group_' + group.id} key={group.id} 
-                                group={group} />
+            let zoomOpt = updatedListGraphId === group.id ? {} : listGraphZoomOpt;
+            return <GroupDetail group={group} id={'list_group_' + group.id} key={group.id}
+                                drawCallback={(g) => this.setState({ 
+                                updatedListGraphId: group.id, 
+                                listGraphZoomOpt: { dateWindow: g.xAxisRange() }})} {...zoomOpt}/>
           })}
         </div>
         <div className="four wide column">

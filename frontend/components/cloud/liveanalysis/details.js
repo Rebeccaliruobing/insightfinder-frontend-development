@@ -6,7 +6,6 @@ const DetailGraph = (props) => {
   return (
     <Dygraph
       style={{width: '100%', height: '200px'}}
-      animatedZooms={true}
       axisLabelWidth={35}
       highlightCircleSize={2} strokeWidth={2}
       labelsDivStyles={{padding: '4px', margin:'15px'}}
@@ -27,7 +26,6 @@ export class GroupDetail extends React.Component {
   render() {
     let {group, id, ...rest} = this.props;
     if (group) {
-      console.log(group);
       return (
         <div id={id} className="detail-charts">
           <h4 className="ui header">{`Metric Group${group.id}`}</h4>
@@ -65,9 +63,9 @@ export class SummaryDetail extends React.Component {
           <DetailGraph data={summary.series}
                        ylabel="Anomaly Degree"
                        labels={['X', 'Y1']}
+                       highlights={summary.highlights}
                        annotations={summary.annotations}
-                       onAnnotationClick={(a) => onAnnotationSelect(a)}
-                       highlights={summary.highlights} {...rest} />
+                       onAnnotationClick={(a) => onAnnotationSelect(a)} {...rest} />
         </div>
       )
     } else {
