@@ -19,8 +19,9 @@ export class GroupDetail extends React.Component {
 
   shouldComponentUpdate(nextProps, extState) {
     return nextProps.group !== this.props.group ||
-        nextProps.dateWindow !== this.props.dateWindow ||
-        nextProps.valueRange !== this.props.valueRange;
+      nextProps.dateWindow !== this.props.dateWindow ||
+      nextProps.selection !== this.props.selection ||
+      nextProps.valueRange !== this.props.valueRange;
   }
 
   render() {
@@ -50,6 +51,7 @@ export class SummaryDetail extends React.Component {
   shouldComponentUpdate(nextProps, extState) {
     return nextProps.summary !== this.props.summary ||
       nextProps.dateWindow !== this.props.dateWindow ||
+      nextProps.selection !== this.props.selection ||
       nextProps.valueRange !== this.props.valueRange;
   }
 

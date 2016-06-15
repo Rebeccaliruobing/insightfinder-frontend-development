@@ -80,7 +80,7 @@ class Dygraph extends BaseComponent {
 
     if (this._el) {
       const {known: initAttrs, rest} = spreadDygraphProps(this.props, true);
-      let {annotations, highlights} = rest;
+      let {annotations, highlights, selection} = rest;
 
       // this._interactionProxy.target =
       //   initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
@@ -103,6 +103,19 @@ class Dygraph extends BaseComponent {
           this._dygraph.setAnnotations(annotations);
         });
       }
+      
+      if (selection) {
+        this._dygraph.ready(() => {
+          let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
+          if (idx !== null) {
+            this._dygraph.setSelection(idx, selection.seriesName);
+          }
+        });
+      } else {
+        this._dygraph.ready(() => {
+          this._dygraph.clearSelection();
+        });
+      }
     }
   }
 
@@ -110,7 +123,7 @@ class Dygraph extends BaseComponent {
 
     if (this._dygraph) {
       const {known: updateAttrs, rest} = spreadDygraphProps(nextProps, false);
-      let {annotations} = rest;
+      let {annotations, selection} = rest;
 
       // this._interactionProxy.target =
       //   updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
@@ -119,6 +132,15 @@ class Dygraph extends BaseComponent {
       this._dygraph.updateOptions(updateAttrs);
       if (annotations) {
         this._dygraph.setAnnotations(annotations);
+      }
+      
+      if (selection) {
+        let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
+        if (idx) {
+          // this._dygraph.setSelection(idx, selection.seriesName);
+        }
+      } else {
+        this._dygraph.clearSelection();
       }
     }
   }

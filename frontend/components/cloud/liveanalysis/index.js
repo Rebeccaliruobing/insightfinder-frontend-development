@@ -232,23 +232,30 @@ class LiveAnalysisCharts extends React.Component {
     let summary = this.dp ? this.dp.summaryData : undefined;
     let groups = this.dp ? this.dp.groupsData : [];
     
-    let {listGraphZoomOpt, updatedListGraphId} = this.state;
-    let summaryZoomOpt = updatedListGraphId === 'summary' ? {} : listGraphZoomOpt;
+    let {listGraphZoomOpt, listGraphSelection} = this.state;
     
     return (
       <div className="ui grid">
         <div className="twelve wide column">
-          <SummaryDetail summary={summary} id="list_summary" 
-                         onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})}
-                         drawCallback={(g) => this.setState(
-                         { updatedListGraphId: 'summary', listGraphZoomOpt: { dateWindow: g.xAxisRange() }})} 
-            {...summaryZoomOpt}/>
+          <SummaryDetail 
+            summary={summary} id="list_summary"
+            onAnnotationSelect={(a) => this.setState({selectedAnnotation: a})}
+            drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
+            // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
+            // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
+            // selection={listGraphSelection}
+            {...listGraphZoomOpt}
+          />
           { groups.map((group) => {
-            let zoomOpt = updatedListGraphId === group.id ? {} : listGraphZoomOpt;
-            return <GroupDetail group={group} id={'list_group_' + group.id} key={group.id}
-                                drawCallback={(g) => this.setState({ 
-                                updatedListGraphId: group.id, 
-                                listGraphZoomOpt: { dateWindow: g.xAxisRange() }})} {...zoomOpt}/>
+            
+            return <GroupDetail
+              group={group} id={'list_group_' + group.id} key={group.id}
+              drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
+              // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
+              // onUnhighlight={() => this.setState({listGraphSelection: undefined })}
+              // selection={listGraphSelection}
+              {...listGraphZoomOpt}
+            />
           })}
         </div>
         <div className="four wide column">
