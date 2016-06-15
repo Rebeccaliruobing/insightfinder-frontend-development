@@ -3,6 +3,8 @@
  *
  * http://dygraphs.com/options.html
  * https://github.com/motiz88/react-dygraphs
+ * 
+ * * Remove interaction support which causes zoom failed.
  **/
 
 import React from 'react';
@@ -11,7 +13,6 @@ import classNames from 'classnames';
 import {BaseComponent, PropTypes} from '../../base';
 import DygraphBase from '../../../core/elements/dygraph';
 import {DygraphPropTypes, DygraphDefaultProps, spreadDygraphProps} from './options';
-
 
 class InteractionModelProxy {
 
@@ -30,13 +31,10 @@ class InteractionModelProxy {
   }
 }
 
-
 class Dygraph extends BaseComponent {
 
   static propTypes = Object.assign({
     tag: PropTypes.string.isRequired,
-    // 高亮, 返回颜色
-    // highlightCallback: PropTypes.function
   }, DygraphPropTypes);
 
   static defaultProps = Object.assign({
@@ -52,7 +50,7 @@ class Dygraph extends BaseComponent {
   constructor(props) {
     super(props);
 
-    this._interactionProxy = new InteractionModelProxy();
+    // this._interactionProxy = new InteractionModelProxy();
     this._el = null;
     this._dygraph = null;
   }
@@ -84,9 +82,9 @@ class Dygraph extends BaseComponent {
       const {known: initAttrs, rest} = spreadDygraphProps(this.props, true);
       let {annotations, highlights} = rest;
 
-      this._interactionProxy.target =
-        initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
-      initAttrs.interactionModel = this._interactionProxy;
+      // this._interactionProxy.target =
+      //   initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
+      // initAttrs.interactionModel = this._interactionProxy;
 
       initAttrs.underlayCallback = (canvas, area, g)=> {
         // If has highlights, set
@@ -114,9 +112,9 @@ class Dygraph extends BaseComponent {
       const {known: updateAttrs, rest} = spreadDygraphProps(nextProps, false);
       let {annotations} = rest;
 
-      this._interactionProxy.target =
-        updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
-      updateAttrs.interactionModel = this._interactionProxy;
+      // this._interactionProxy.target =
+      //   updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
+      // updateAttrs.interactionModel = this._interactionProxy;
 
       this._dygraph.updateOptions(updateAttrs);
       if (annotations) {
