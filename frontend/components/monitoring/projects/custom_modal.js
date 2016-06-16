@@ -46,7 +46,8 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="AWS">AWS</option>
                 <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
-                <option className="item" value="private cloud">Private Cloud</option>
+                <option className="item" value="PrivateCloud">Private Cloud</option>
+                <option className="item" value="FileReplay">File Replay</option>
               </select>
 
             </div>
@@ -56,8 +57,8 @@ class CustomProjectModal extends React.Component {
                 <option className="item">Sampling Interval</option>
                 <option className="item" value="1">1 minute</option>
                 <option className="item" value="5">5 minutes</option>
+                <option className="item" value="10">10 minutes</option>
               </select>
-
             </div>
           </form>
         </div>

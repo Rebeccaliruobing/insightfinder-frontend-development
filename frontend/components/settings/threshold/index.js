@@ -48,6 +48,10 @@ export default class ThresholdSettings extends React.Component {
       projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames
     }=this.state.data;
     projectName = projectName || projectNames[0];
+
+    if (projectNames.length > 0) {
+      this.handleProjectChange(projectNames[0]);
+    }
   }
 
   handleToggleFilterPanel() {

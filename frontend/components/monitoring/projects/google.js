@@ -37,9 +37,6 @@ class GoogleProjects extends React.Component {
                 onClick={(e) => this.setState({showModal: true})}>
           <i className="icon plus"></i>Register
         </button>
-        <button className="ui small negative disabled button">
-          <i className="icon remove"></i>Remove
-        </button>
         <table className="ui small table">
           <tbody>
           {

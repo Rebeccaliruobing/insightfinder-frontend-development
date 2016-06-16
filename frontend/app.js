@@ -45,14 +45,14 @@ class App extends React.Component {
     } = this.context;
 
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
-
+    //<Link to="/file" className="item">File Analysis</Link>
+          
     return (
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Cloud Monitoring</Link>
           <Link to="/settings" className="item">Project Settings</Link>
           <Link to="/usecase" className="item">Use Cases</Link>
-          <Link to="/file" className="item">File Analysis</Link>
           <div className="right menu">
             <div className="ui right simple dropdown item">
               <i className="user icon circular teal inverted"/>

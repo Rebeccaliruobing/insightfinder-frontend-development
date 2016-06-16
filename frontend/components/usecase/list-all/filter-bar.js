@@ -231,7 +231,6 @@ export default  class FilterBar extends Component {
           <div className="sixteen wide column">
             <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
             <Button className="basic" onClick={this.handleRefresh}>refresh</Button>
-            {activeItem && <Button className="basic" onClick={this.handleToggleRow.bind(this)}>toggle</Button>}
             {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
           </div>
 
