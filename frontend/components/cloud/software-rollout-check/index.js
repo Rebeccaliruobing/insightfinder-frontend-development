@@ -47,6 +47,7 @@ export default class SoftwareRolloutCheck extends Component {
 
   setHeatMap(dateIndex = 0) {
     let {mapData, startTime, endTime} = this.state.data.modelData[dateIndex];
+    let groupIds = [];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -66,10 +67,10 @@ export default class SoftwareRolloutCheck extends Component {
       };
 
       if (data.instanceName) {
-        title = data.instanceName
+        title = data.instanceName;
         params.instanceName = data.instanceName;
       } else if (data.groupId + '' == '0') {
-        title = 'Holistic'
+        title = 'Holistic(Split model unavailable for this time)';
       } else {
         let metricNames = "";
         if (data.metricNameList) {
@@ -77,16 +78,19 @@ export default class SoftwareRolloutCheck extends Component {
         }
         title = <span>{`Group ${data.groupId}`}{metricNames}</span>;
         params.groupId = data.groupId;
+        groupIds.push(params.groupId);
       }
-      return <HeatMapCard key={`${dateIndex}-${index}`}
-                          duration={120}
-                          itemSize={4}
-                          title={title}
-                          data={dataArray}
-                          link={`/incidentAnalysis?${$.param(params)}`}/>;
+      return {
+        key: `${dateIndex}-${index}`,
+        duration: 120,
+        itemSize: 4,
+        title: title,
+        data: dataArray,
+        link: `/incidentAnalysis?${$.param(params)}`
+      };
     });
 
-    this.setState({heatMaps: maps, dateIndex});
+    this.setState({heatMaps: maps, dateIndex, groupIds});
   }
 
   handleDateIndexChange(startIndex) {
@@ -133,7 +137,6 @@ export default class SoftwareRolloutCheck extends Component {
     `).sort();
     if (!marks) return;
     const dateIndex = this.state.dateIndex;
-    debugger;
     marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
     return (
       <div className="padding40">
@@ -183,7 +186,9 @@ export default class SoftwareRolloutCheck extends Component {
             </div>
             {this.renderSlider()}
             <div className="ui four cards">
-              {this.state.heatMaps}
+              {this.state.heatMaps.map((data,)=> {
+                return <HeatMapCard {...data}/>
+              })}
             </div>
           </div>
         </div>

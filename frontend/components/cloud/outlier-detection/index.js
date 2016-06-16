@@ -120,7 +120,6 @@ export default class OutlierDetection extends Component {
               .map((d)=>`${d.startTime}\n${d.endTime}`)
             )
           );
-          debugger;
           this.handleState(state);
           this.$filterPanel.slideUp()
         }

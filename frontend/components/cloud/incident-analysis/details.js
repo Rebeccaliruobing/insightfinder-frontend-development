@@ -50,7 +50,6 @@ const ProjectDetails = class extends React.Component {
           }
         })
         .catch(msg=> {
-          debugger;
           alert(msg);
         });
     });
@@ -60,7 +59,6 @@ const ProjectDetails = class extends React.Component {
   render() {
     let {query} = this.props.location;
     let {loading, data} = this.state;
-
     return (
       <LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateData()}/>
       // <LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
