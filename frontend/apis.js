@@ -2,7 +2,7 @@ import store from 'store';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 const localBaseUrl = '/';
-const DEBUG = true;
+const DEBUG = false;
 
 // rest访问其他地址会导致跨域错误, 可安装chrome 插件
 // https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
@@ -499,12 +499,12 @@ export default {
    * @returns {Promise}
    */
   postProjectData(projectName, startTime, endTime, groupId, instanceName, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (originResolve, reject) {
-      if(DEBUG && store.get('postProjectData')) originResolve(store.get('postProjectData'));
-      let resolve = function (resp) {
-        if(DEBUG) store.set('postProjectData', resp);
-        return originResolve
-      };
+    return new Promise(function (resolve, reject) {
+      // if(DEBUG && store.get('postProjectData')) originResolve(store.get('postProjectData'));
+      // let resolve = function (resp) {
+      //   if(DEBUG) store.set('postProjectData', resp);
+      //   return originResolve
+      // };
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['project data'],
