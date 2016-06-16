@@ -1,5 +1,5 @@
 import React from 'react';
-import LinkTender from '../display-model/LinkTender'
+import CausalGraph from '../display-model/CausalGraph'
 
 import {Modal} from '../../../artui/react';
 
@@ -16,7 +16,7 @@ class TenderModal extends React.Component {
       return (
         <Modal {...this.props} size="big" closable={true}>
           <div className="content">
-            <LinkTender dataArray={dataArray} types={types}/>
+            <CausalGraph dataArray={dataArray} types={types}/>
           </div>
         </Modal>
       );

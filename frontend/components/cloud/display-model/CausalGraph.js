@@ -68,7 +68,7 @@ class Line {
 }
 
 
-export default class LinkTender extends React.Component {
+export default class CausalGraph extends React.Component {
   defaultProps = {
     data: DataLinks
   };
@@ -137,7 +137,7 @@ export default class LinkTender extends React.Component {
     });
 
     $(this.$showText).text(point.title).attr({
-      x: point.component.getAttribute('cx'),
+      x: point.component.getAttribute('cx') + 10,
       y: point.component.getAttribute('cy')
     });
 
@@ -252,11 +252,13 @@ export default class LinkTender extends React.Component {
 
   handleMouseDown(e) {
     let {layerX, layerY} = e.nativeEvent;
+    layerX = layerX - 100;
     this.setState({selectRange: Object.assign({}, this.state.selectRange, {x1: layerX, y1: layerY})})
   }
 
   handleMouseMove(e) {
     let {layerX, layerY} = e.nativeEvent;
+    layerX = layerX - 100;
     let selectRange = this.state.selectRange;
     selectRange.x2 = layerX;
     selectRange.y2 = layerY;
@@ -270,6 +272,7 @@ export default class LinkTender extends React.Component {
 
   handleMouseUp(e) {
     let {layerX, layerY} = e.nativeEvent;
+    layerX = layerX - 100;
     let svg = this.state.svg;
     let selectRange = this.state.selectRange;
     selectRange.x2 = layerX;
@@ -302,7 +305,23 @@ export default class LinkTender extends React.Component {
     return (
       <div>
         <span className="ui button mini green" onClick={reset}>Reset</span><br/>
-        <div className="relative">
+        <div className="relative" style={{display: 'flex'}}>
+          <svg {...{
+            width: 100,
+            height: 300,
+            style: {
+              // border: '1px solid #e0e0e0'
+            }
+          }}>
+            {types.map((type, index)=> {
+              var y = stageHeight * index + stageHeight * 0.5;
+              y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
+              return this.getWrapText(type.split("_").join(" "), 16).map((text, i)=>
+                <text className="no-select" key={`${type}-text=${i}`}
+                      x={0} y={y + i * 15 - 5}>{text}</text>
+              )
+            })}
+          </svg>
           <svg {...svg} style={{cursor: 'crosshair'}}
                         onMouseDown={this.handleMouseDown.bind(this)}
                         onMouseMove={this.handleMouseMove.bind(this)}
@@ -349,15 +368,6 @@ export default class LinkTender extends React.Component {
                   style={{fill:'white',stroke:'white',strokeWidth:2}}/>
             <rect x={0} y={svg.height - stageHeight / 4} width={900} height={stageHeight / 4}
                   style={{fill:'white',stroke:'white',strokeWidth:2}}/>
-
-            {types.map((type, index)=> {
-              var y = stageHeight * index + stageHeight * 0.5;
-              y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
-              return this.getWrapText(type.split("_").join(" "), 16).map((text, i)=>
-                <text className="no-select" key={`${type}-text=${i}`}
-                      x={svg.width - 100} y={y + i * 15 - 5}>{text}</text>
-              )
-            })}
 
             {dataArray.map(([record, ...records], i) => {
               var x = stageWidth * i + stageWidth / 2;
