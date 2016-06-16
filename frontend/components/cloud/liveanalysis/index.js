@@ -28,7 +28,8 @@ class LiveAnalysisCharts extends React.Component {
 
   static defaultProps = {
     loading: true,
-    onRefresh: () => {}
+    onRefresh: () => {
+    }
   };
 
   constructor(props) {
@@ -91,6 +92,16 @@ class LiveAnalysisCharts extends React.Component {
     let isListView = view === 'list';
     let elems = [];
     let selectIndex = 0;
+    let selectArrow = <div style={{
+      position: 'absolute',
+      width: 20,
+      height: 20,
+      background: '#333',
+      transform: 'rotate(45deg)',
+      left: '50%',
+      bottom: '-25px',
+      marginLeft: -3
+    }}></div>;
 
     if (!instanceName && summary) {
       selectIndex = 1;
@@ -99,8 +110,9 @@ class LiveAnalysisCharts extends React.Component {
              onClick={() => this.setState({summarySelected:true, selectedGroupId: null})}>
           <div className="content">
             <div className="header" style={{paddingBottom:8}}>{summary.title}</div>
-            <SummaryChart data={summary} />
+            <SummaryChart data={summary}/>
           </div>
+          {!isListView && summarySelected && this.dp && selectArrow}
         </div>
       ));
     }
@@ -115,16 +127,17 @@ class LiveAnalysisCharts extends React.Component {
 
       groups.map((group, index) => {
 
-        if (selectedGroupId == group.id) {
-          selectIndex = selectIndex + index;
-        }
+        let isSelectGroup = selectedGroupId == group.id;
+        if (isSelectGroup) selectIndex = selectIndex + index;
+
         elems.push((
           <div key={columns + group.id} className="ui card"
                onClick={() => this.setState({selectedGroupId: group.id, summarySelected:false})}>
             <div className="content">
               <div className="header" style={{paddingBottom:8}}>{group.title}</div>
-              <SummaryChart data={group} />
+              <SummaryChart data={group}/>
             </div>
+            {isSelectGroup && selectArrow}
           </div>
         ));
       });
@@ -135,7 +148,7 @@ class LiveAnalysisCharts extends React.Component {
         if (this.dp) {
           let summary = this.dp.summaryData;
           elems = elems.slice(0, rowCount).concat([(
-            <div key="expand-summary" ref={(c)=>{
+            <div key="expand" ref={(c)=>{
               let $c = $(ReactDOM.findDOMNode(c));
               $c.slideDown('fast', ()=>{
                 ReactDOM.render((
@@ -145,14 +158,14 @@ class LiveAnalysisCharts extends React.Component {
                   </div>
                 ), c)
               })
-            }} style={{width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 50, display: 'none'}}>
+            }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none'}}>
 
             </div>
           )]).concat(elems.slice(rowCount))
         }
       } else if (selectedGroup) {
         elems = elems.slice(0, selectIndex).concat([(
-          <div key={'expand-' + selectedGroupId} ref={(c)=>{
+          <div key={'expand'} ref={(c)=>{
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
@@ -207,9 +220,9 @@ class LiveAnalysisCharts extends React.Component {
 
     let summary = this.dp ? this.dp.summaryData : undefined;
     let groups = this.dp ? this.dp.groupsData : [];
-    
+
     let {listGraphZoomOpt} = this.state;
-    
+
     return (
       <div className="ui grid">
         <div className="twelve wide column">
@@ -242,7 +255,8 @@ class LiveAnalysisCharts extends React.Component {
                   {...listGraphZoomOpt}
                 />
               </div>
-            )})}
+            )
+          })}
         </div>
         <div className="four wide column">
           {this.renderAnnotation()}
@@ -272,7 +286,7 @@ class LiveAnalysisCharts extends React.Component {
     let groupMetrics = this.dp ? this.dp.groupmetrics : null;
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;
     let types = this.dp ? this.dp.causalTypes : undefined;
-    
+
     return (
       <Console.Wrapper>
         <Console.Navbar style={navbarStyle}>
@@ -310,7 +324,7 @@ class LiveAnalysisCharts extends React.Component {
             </div>
           </div>
           { this.state.showSettingModal &&
-          <SettingModal onClose={() => this.setState({showSettingModal: false})}/> 
+          <SettingModal onClose={() => this.setState({showSettingModal: false})}/>
           }
           { this.state.showTenderModal &&
           <TenderModal dataArray={dataArray} types={types}
