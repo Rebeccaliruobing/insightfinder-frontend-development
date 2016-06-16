@@ -34,7 +34,13 @@ class ProjectSummary extends BaseComponent {
   }
 
   componentDidMount() {
-    // this.updateLiveAnalysis();
+    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
+    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
+    let data = store.get(key, null);
+    
+    if (!data) {
+      this.updateLiveAnalysis();
+    }
   }
   
   componentWillUnmount() {

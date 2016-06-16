@@ -10,13 +10,14 @@ import store from 'store';
 
 import {Console, Link} from './artui/react';
 
-import Login from './components/auth/login'
 import {cloudRoute} from './components/cloud/index';
 import {settingsRoute} from './components/settings/index';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import UseCaseDetails from './components/usecase/details';
+import {Login, Signup, ForgotPassword, ForgotUsername} from './components/auth';
+
 import apis from './apis';
 
 class App extends React.Component {
@@ -31,7 +32,7 @@ class App extends React.Component {
     store.remove('userInfo');
     store.remove('userName');
     store.remove('token');
-    store.clear();
+    // store.clear();
     window.location.reload();
   }
 
@@ -109,6 +110,10 @@ const routes = (
       {settingsRoute}
       {useCaseRoute}
     </Route>
+    <Route component={Login} path="/login"/>
+    <Route component={Signup} path="/signup"/>
+    <Route component={ForgotPassword} path="/forgotPassword"/>
+    <Route component={ForgotUsername} path="/forgotUsername"/>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
