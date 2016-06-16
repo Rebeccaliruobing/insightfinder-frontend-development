@@ -24,17 +24,21 @@ class SignupSecond extends BaseComponent {
     let disabled = !userName || !email;
 
     return (
-      <form className={cx('ui', {error: !!error}, 'form')}
-            ref={c=>this._$el = $(c)} >
-        <h2 className="ui image header">
-          <img src={logo} className="image"/>
-        </h2>
-        {!!error &&
-        <div className="ui error mini message">{error}</div>
-        }
-        <div className="ui segment left aligned">
+      <div className="auth ui middle center aligned container">
+        <div>
+          <form className={cx('ui', {error: !!error}, 'form')}
+                ref={c=>this._$el = $(c)} >
+            <h2 className="ui image header">
+              <img src={logo} className="image"/>
+            </h2>
+            {!!error &&
+            <div className="ui error mini message">{error}</div>
+            }
+            <div className="ui segment left aligned">
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     )
   }
 }

@@ -14,59 +14,100 @@ class Signup extends BaseComponent {
     this.state = {
       userName: '',
       email: '',
+      checked: false,
       error: ''
+    }
+  }
+  
+  componentDidMount() {
+    if (this._$el) {
+      this._$el.find('.ui.submit.button').api({
+        action: 'signup',
+        method: 'POST',
+        beforeSend: (settings) => {
+          this.setState({
+            error: ''
+          });
+          settings.data = {
+            'username': this.state['userName'],
+            'email': this.state['email'],
+            'accept': true
+          };
+          return settings;
+        },
+        beforeXHR: function(xhr) {
+          xhr.setRequestHeader ('accept', 'application/json');
+          return xhr;
+        },
+        onSuccess: (resp) => {
+          window.alert(resp.message);
+          window.location.href = '/signup2';
+        },
+        onFailure: (resp) => {
+          if (resp && resp.message) {
+            this.setState({
+              error: resp.message
+            });
+          }
+        }
+      })
     }
   }
 
   render() {
 
-    const {userName, email, error} = this.state;
-    let disabled = !userName || !email;
+    const {userName, email, checked, error} = this.state;
+    let disabled = !userName || !email ||!checked;
 
     return (
-      <form className={cx('ui', {error: !!error}, 'form')}
-            ref={c=>this._$el = $(c)} >
-        <h2 className="ui image header">
-          <img src={logo} className="image"/>
-        </h2>
-        {!!error &&
-        <div className="ui error mini message">{error}</div>
-        }
-        <div className="ui segment left aligned">
-          <h4 className="ui header center aligned">Get a sign up code now</h4>
-          <div style={{fontSize:13, borderBottom: '1px solid #ccc', marginBottom:12}}>
-            <Link to="/signup2">Already have a signup code?</Link>
-          </div>
-          <div className="field required">
-            <label>User Name</label>
-            <div className="ui icon input">
-              <i className="user icon"/>
-              <input type="text" name="userName" value={userName}
-                     onChange={(e) => this.setState({userName: e.target.value})} />
+      <div className="auth ui middle center aligned container">
+        <div>
+          <form className={cx('ui', {error: !!error}, 'form')}
+                ref={c=>this._$el = $(c)} >
+            <h2 className="ui image header">
+              <img src={logo} className="image"/>
+            </h2>
+            {!!error &&
+            <div className="ui error mini message">{error}</div>
+            }
+            <div className="ui segment left aligned">
+              <h4 className="ui header center aligned">Get a sign up code now</h4>
+              <div style={{fontSize:13, borderBottom: '1px solid #ccc', marginBottom:12}}>
+                <Link to="/signup2">Already have a signup code?</Link>
+              </div>
+              <div className="field required">
+                <label>User Name</label>
+                <div className="ui icon input">
+                  <i className="user icon"/>
+                  <input type="text" name="userName" value={userName}
+                         onChange={(e) => this.setState({userName: e.target.value})} />
+                </div>
+              </div>
+              <div className="field required" style={{marginBottom: 8}}>
+                <label>Email</label>
+                <div className="ui icon input">
+                  <i className="lock icon"/>
+                  <input type="text" name="email"
+                         value={email}
+                         onChange={(e) => this.setState({email: e.target.value})}/>
+                </div>
+              </div>
+              <div className="inline field" style={{fontSize: 13}}>
+                <div className="ui checkbox">
+                  <input type="checkbox" tabindex="0" class="hidden" checked={checked} 
+                         onChange={(e) => this.setState({checked: e.target.checked})} />
+                  <label>I agree to
+                    <a href="https://insightfinder.com/terms-of-use" target="_blank">&nbsp;Terms of Use</a> and
+                    <a href="https://insightfinder.com/privacy-policy" target="_blank">&nbsp;Privacy Policy</a>.</label>
+                </div>
+              </div>
+              <div className="field">
+                <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Sign Up</div>
+              </div>
             </div>
-          </div>
-          <div className="field required" style={{marginBottom: 8}}>
-            <label>Email</label>
-            <div className="ui icon input">
-              <i className="lock icon"/>
-              <input type="text" name="email"
-                     value={email}
-                     onChange={(e) => this.setState({email: e.target.value})}/>
-            </div>
-          </div>
-          <div className="inline field" style={{fontSize: 13}}>
-            <div className="ui checkbox">
-              <input type="checkbox" tabindex="0" class="hidden" />
-              <label>I agree to 
-                <a href="https://insightfinder.com/?page_id=5411">&nbsp;Terms of Use</a> and 
-                <a href="https://insightfinder.com/?page_id=5400">&nbsp;Privacy Policy</a>.</label>
-            </div>
-          </div>
-          <div className="field">
-            <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Sign Up</div>
-          </div>
+          </form>
         </div>
-      </form>
+      </div>
     )
   }
 }

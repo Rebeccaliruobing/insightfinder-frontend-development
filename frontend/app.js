@@ -133,7 +133,7 @@ const routes = (
 
 const authRoutes = (
   <Router history={browserHistory}>
-    <Route component={AuthApp} path="/">
+    <Route path="/">
       <IndexRedirect to="/login"/>
       <Route component={Login} path="/login"/>
       <Route component={Signup} path="/signup"/>
