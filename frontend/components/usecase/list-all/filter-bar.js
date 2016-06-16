@@ -110,6 +110,25 @@ export default  class FilterBar extends Component {
     });
   }
 
+  handleRemoveRow() {
+    let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = this.state.activeItem;
+    this.setState({loading: true});
+    apis.postJSONDashboardUserValues('deletepublisheddata', {
+      fromUser, dataChunkName, modelName, modelType, modelKey, projectName,
+    }).then((resp)=>{
+      if (resp.success) {
+        this.setState({
+          loading: false,
+          activeItem: undefined,
+          metricSettings: undefined
+        }, this.handleRefresh);
+      }else {
+        alert(resp.message);
+        this.setState({loading: false});
+      }
+    });
+  }
+
   handleRefresh() {
     this.setState({loading: true});
     this.context.root.loadUserValues().then(()=> {
@@ -213,6 +232,7 @@ export default  class FilterBar extends Component {
             <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
             <Button className="basic" onClick={this.handleRefresh}>refresh</Button>
             {activeItem && <Button className="basic" onClick={this.handleToggleRow.bind(this)}>toggle</Button>}
+            {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
           </div>
 
 

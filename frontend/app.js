@@ -16,7 +16,7 @@ import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import UseCaseDetails from './components/usecase/details';
-import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './components/auth';
+import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './components/auth/index';
 
 import apis from './apis';
 
