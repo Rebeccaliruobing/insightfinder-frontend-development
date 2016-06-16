@@ -23,6 +23,7 @@ export default class OutlierDetection extends Component {
       heatMaps: [],
       dateIndex: 0,
       timeIndex: 0,
+      marks: [],
       params: {
         showAddPanel: false,
         projects: [],
@@ -32,68 +33,66 @@ export default class OutlierDetection extends Component {
       },
       data: {}
     };
+    this.handleDateIndexChange = this.handleDateIndexChange.bind(this)
   }
 
   componentDidMount() {
   }
 
-  handleData(data) {
-    this.setState({data: data}, ()=> this.setHeatMap(0, 0))
+  handleState(state) {
+    this.setState(state, ()=> this.setHeatMap(0, 0))
   }
 
   setHeatMap(dateIndex = 0) {
-    let {mapData, startTime, endTime}= this.state.data.splitByInstanceModelData[dateIndex];
-    let maps = mapData.filter((data)=> !!data.NASValues).map((data, index)=> {
-      let dataArray = [];
-      data.NASValues.forEach((line, index) => {
-        var lineArray = line.split(",");
-        var colIndex = lineArray.splice(0, 1);
-        dataArray.push({
-          colIndex: colIndex % 32,
-          rowIndex: parseInt(index / 32),
-          value: lineArray[lineArray.length - 2]
+    let mark = this.state.marks[dateIndex];
+    let [startTime, endTime] = mark.split("\n");
+    let model = this.state.modelData.find((d)=>d.startTime == startTime);
+    let maps = [];
+    if (model) {
+      maps = model.mapData.filter((data)=> !!data.NASValues).map((data, index)=> {
+        let dataArray = [];
+        data.NASValues.forEach((line, index) => {
+          var lineArray = line.split(",");
+          var colIndex = lineArray.splice(0, 1);
+          dataArray.push({
+            colIndex: colIndex % 32,
+            rowIndex: parseInt(index / 32),
+            value: lineArray[lineArray.length - 2]
+          });
         });
-      });
 
-      let title, groupId;
-      if (data.instanceName) {
-        title = data.instanceName;
-        groupId = data.instanceName;
-      } else {
-        title = `Metric Group ${data.groupId}`;
-        groupId = data.groupId;
-      }
-
-      return {
-        originData: this.state.data.originData,
-        groupId: groupId,
-        key: `${dateIndex}-${index}`,
-        duration: 120,
-        itemSize: 4,
-        title,
-        dateIndex,
-        data: dataArray,
-        link: `/incidentAnalysis?${$.param({
-          metricNameList: data.metricNameList,
-          projectName: this.state.data.projectName,
-          pvalue: 0.95,
-          cvalue: 3,
-          modelType: "Holistic",
+        let title, groupId, params = {
+          projectName: this.state.projectName,
           startTime,
-          endTime,
-          groupId,
-          instanceName: data.instanceName,
-          modelKey: 'Search by time'
-        })}`
-      }
-    });
+          endTime
+        };
+        if (data.instanceName) {
+          title = data.instanceName;
+          params.instanceName = data.instanceName;
+        } else {
+          title = `Metric Group ${data.groupId}`;
+          params.groupId = groupId = data.groupId;
+        }
+
+        return {
+          key: `${dateIndex}-${index}`,
+          duration: 120,
+          itemSize: 4,
+          title,
+          data: dataArray,
+          link: `/incidentAnalysis?${$.param(params)}`
+        }
+      });
+    } else {
+      maps = [{}]
+    }
 
 
     this.setState({heatMaps: maps, dateIndex});
   }
 
-  handleDateIndexChange(startIndex) {
-    return (value) => this.setHeatMap(parseInt(value + startIndex))
+  handleDateIndexChange(markIndex) {
+    this.setHeatMap(parseInt(markIndex))
   }
 
   handleToggleFilterPanel() {
@@ -109,12 +108,20 @@ export default class OutlierDetection extends Component {
     this.setState({loading: true}, () => {
       apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
         if (resp.success) {
-          resp.data.projectName = data.projectName;
-          resp.data.originData = Object.assign({}, resp.data);
-          resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
-          resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
-          resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
-          this.handleData(resp.data);
+          let state = {};
+          state.projectName = data.projectName;
+          state.originData = Object.assign({}, resp.data);
+          state.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
+          state.holisticModelData = JSON.parse(resp.data.holisticModelData);
+          state.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
+          state.modelData = state.splitByInstanceModelData;
+          state.marks = new Array(
+            ...new Set(_.sortBy(state.holisticModelData.filter((d)=>!!d.startTime), (d)=>d.startTime)
+              .map((d)=>`${d.startTime}\n${d.endTime}`)
+            )
+          );
+          debugger;
+          this.handleState(state);
           this.$filterPanel.slideUp()
         }
         this.setState({loading: false});
@@ -125,31 +132,26 @@ export default class OutlierDetection extends Component {
   }
 
   renderSlider() {
-
-    let data = this.state.data.splitByInstanceModelData;
-    let marks = data && data.map((item, index)=> `
-      ${moment(item.startTime).format('MM-DD HH:mm')} \n
-      ${moment(item.endTime).format('MM-DD HH:mm')}
-    `).sort();
-    if (!marks) return;
+    let marks = this.state.marks;
+    if (!marks && marks.length == 0) return;
 
     const dateIndex = this.state.dateIndex;
-    marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
+
+    marks = marks.map((mark, index)=> {
+      return !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark.split("\n").map((date)=>date.substring(5, 16).split("T").join(" ")).join("\n") : ''
+    });
 
     return (
       <div className="padding40">
         {this.state.data && (
-          <RcSlider onChange={this.handleDateIndexChange(0)} max={marks.length - 1} value={dateIndex} marks={marks}/>
+          <RcSlider onChange={this.handleDateIndexChange} max={marks.length - 1} value={dateIndex} marks={marks}/>
         )}
       </div>
     )
   }
 
   render() {
-    const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
-
-
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>

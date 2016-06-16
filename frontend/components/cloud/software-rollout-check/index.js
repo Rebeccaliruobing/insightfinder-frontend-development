@@ -46,7 +46,7 @@ export default class SoftwareRolloutCheck extends Component {
   }
 
   setHeatMap(dateIndex = 0) {
-    let {mapData, startTime, endTime} = this.state.data.holisticModelData[dateIndex];
+    let {mapData, startTime, endTime} = this.state.data.modelData[dateIndex];
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -59,22 +59,31 @@ export default class SoftwareRolloutCheck extends Component {
         });
       });
 
-      let title;
+      let title, params = {
+        projectName: this.state.data.projectName,
+        startTime,
+        endTime
+      };
 
       if (data.instanceName) {
         title = data.instanceName
+        params.instanceName = data.instanceName;
       } else if (data.groupId + '' == '0') {
         title = 'Holistic'
       } else {
-        title =
-          <span>{`Group ${data.groupId}`}({data.metricNameList ? new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",") : ''})</span>;
+        let metricNames = "";
+        if (data.metricNameList) {
+          metricNames = `(${new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})`
+        }
+        title = <span>{`Group ${data.groupId}`}{metricNames}</span>;
+        params.groupId = data.groupId;
       }
-      return <HeatMapCard originData={this.state.data.originData} groupId={data.groupId} key={`${dateIndex}-${index}`}
-                          duration={120} itemSize={4} title={title} dateIndex={dateIndex} data={dataArray}
-                          link={`/incidentAnalysis?${$.param({
-                          metricNameList: data.metricNameList,
-                          projectName: this.state.data.projectName, pvalue:0.95,cvalue:3, modelType: "Holistic",
-                          startTime, endTime, groupId: data.groupId, instanceName: data.instanceName, modelKey: 'Search by time'})}`}/>;
+      return <HeatMapCard key={`${dateIndex}-${index}`}
+                          duration={120}
+                          itemSize={4}
+                          title={title}
+                          data={dataArray}
+                          link={`/incidentAnalysis?${$.param(params)}`}/>;
     });
 
     this.setState({heatMaps: maps, dateIndex});
@@ -104,6 +113,7 @@ export default class SoftwareRolloutCheck extends Component {
           resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
+          resp.data.modelData = resp.data.holisticModelData.concat(resp.data.splitByGroupModelData);
           this.handleData(resp.data);
           this.$filterPanel.slideUp()
         }
@@ -116,7 +126,7 @@ export default class SoftwareRolloutCheck extends Component {
 
   renderSlider() {
 
-    let data = this.state.data.holisticModelData;
+    let data = this.state.data.modelData;
     let marks = data && data.map((item, index)=> `
       ${moment(item.startTime).format('MM-DD HH:mm')} \n
       ${moment(item.endTime).format('MM-DD HH:mm')}

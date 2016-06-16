@@ -109,7 +109,7 @@ export default class CausalGraph extends React.Component {
       lastPoints[i] = [];
       records.map((text)=> {
         var pos = text.indexOf('.');
-        var type = text.slice(pos+1).split('(')[0];
+        var type = text.slice(pos + 1).split('(')[0];
         // var type = (/([a-z_]+ \[node\d+\])/g).exec(text)[0];
         var x = stageWidth * i + stageWidth / 2;
         var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
@@ -370,11 +370,13 @@ export default class CausalGraph extends React.Component {
                   style={{fill:'white',stroke:'white',strokeWidth:2}}/>
 
             {dataArray.map(([record, ...records], i) => {
+              if (i % parseInt(dataArray.length / 6)) return undefined;
+
               var x = stageWidth * i + stageWidth / 2;
               x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
 
-              return (i % 2) ? undefined : <text className="no-select" key={'x-text' + i} x={x - 16}
-                                                 y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
+              return <text className="no-select" key={'x-text' + i} x={x - 16}
+                           y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
 
             })}
 

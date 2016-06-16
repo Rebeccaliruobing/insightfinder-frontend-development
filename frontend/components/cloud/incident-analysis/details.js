@@ -1,12 +1,12 @@
 import React from 'react';
+import store from 'store';
 import ReactTimeout from 'react-timeout'
-import cx from 'classnames';
-
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
-import DataParser from '../dataparser';
 import LiveAnalysisCharts from '../liveanalysis/index'
+import {ChartsRefreshInterval} from '../../storeKeys';
+
 
 const ProjectDetails = class extends React.Component {
 
@@ -30,22 +30,24 @@ const ProjectDetails = class extends React.Component {
   }
 
   updateData() {
-    
+
     let {query} = this.props.location;
-    let {projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, groupId} = query;
+    let {projectName, startTime, endTime, groupId, instanceName} = query;
+    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
     this.setState({loading: true}, ()=> {
-      apis.postPostMortem(projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime)
+      apis.postProjectData(projectName, startTime, endTime, groupId, instanceName)
         .then(resp => {
           let update = {};
           if (resp.success) {
-            update.groupId = groupId;
             update.data = resp.data;
           } else {
             alert(resp.message);
           }
           update.loading = false;
           this.setState(update);
-          this.props.setTimeout(this.updateData.bind(this), 5000 * 60);
+          if (refreshInterval > 0) {
+            this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
+          }
         })
         .catch(msg=> {
           debugger;
@@ -57,11 +59,11 @@ const ProjectDetails = class extends React.Component {
 
   render() {
     let {query} = this.props.location;
-    const {projectName} = query;
-    let {data, groupId, loading} = this.state;
+    let {loading, data} = this.state;
 
     return (
-      <LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading} />
+      <LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateData()}/>
+      // <LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
     );
   }
 };

@@ -32,6 +32,7 @@ $.fn.api.settings.api = {
   'add aws project': `${baseUrl}add-amazon-project`,
   'remove project': `${baseUrl}remove-project`,
   'project setting': `${baseUrl}emailAlertSetting`,
+  'project data': `${baseUrl}projectData`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -121,7 +122,7 @@ export default {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['dashboard uservalues'],
-        data: $.param( {userName, token, operation, ...other}),
+        data: $.param({userName, token, operation, ...other}),
         beforeSend: function (request) {
           request.setRequestHeader("Accept", 'application/json');
         }
@@ -301,17 +302,6 @@ export default {
   },
 
 
-  // String userName = req.getParameter("userName");
-  // String token = req.getParameter("token");
-  // String p_value = req.getParameter("pvalue");
-  // String c_value = req.getParameter("cvalue");
-  // String modelKey = req.getParameter("modelKey");
-  // String modelName = req.getParameter("modelName");
-  // String projectName = req.getParameter("projectName");
-  // String modelType = req.getParameter("modelType");
-  // String fromUser = req.getParameter("fromUser");
-  // String dataChunkName = req.getParameter("dataChunkName");
-  // String metaData = req.getParameter("metaData");
   /**
    *
    * @param pvalue
@@ -481,6 +471,43 @@ export default {
           minAnomalyRatioFilter,
           sharedUsernames,
           projectHintMapFilename,
+          userName,
+          token
+        }),
+        beforeSend: function (request) {
+          request.setRequestHeader("Accept", 'application/json');
+        }
+      }).done(function (resp) {
+        resolve(resp);
+      }).fail(function (error) {
+        console.log(arguments);
+        alert(`Server Error`);
+        reject(error);
+      });
+    });
+  },
+  /**
+   *
+   * @param projectName
+   * @param startTime
+   * @param endTime
+   * @param groupId
+   * @param instanceName
+   * @param userName
+   * @param token
+   * @returns {Promise}
+   */
+  postProjectData(projectName, startTime, endTime, groupId, instanceName, userName = store.get('userName'), token = store.get('token')) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: 'POST',
+        url: $.fn.api.settings.api['project data'],
+        data: $.param({
+          projectName,
+          startTime,
+          endTime,
+          groupId,
+          instanceName,
           userName,
           token
         }),
