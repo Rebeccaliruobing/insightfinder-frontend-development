@@ -8,13 +8,13 @@ export default function(props) {
         <div className="item">
           <a className="active title"><i className="dropdown icon"/>Settings</a>
           <div className="active content menu">
-            <div className="item">Threshold Settings</div>
+            <Link to="/settings/threshold" className="item">Threshold Settings</Link>
           </div>
         </div>
         <div className="item">
           <a className="active title"><i className="dropdown icon"/>Integration</a>
           <div className="active content menu">
-            <div className="item">PagerDuty Integration</div>
+            <Link to="/settings/extsvc" className="item">PagerDuty Integration</Link>
           </div>
         </div>
       </Accordion>
