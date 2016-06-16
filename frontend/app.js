@@ -221,11 +221,7 @@ class AppRoute extends React.Component {
       return routes;
     } else {
       return (
-        <div className="auth ui middle center aligned container">
-          <div>
-            <Login onSuccess={this.handleLoginSuccess.bind(this)}/>
-          </div>
-        </div>
+        <Login onSuccess={this.handleLoginSuccess.bind(this)}/>
       );
     }
   }
