@@ -8,6 +8,8 @@ const logo = require('../../images/logo.png');
 
 class ForgotUsername extends BaseComponent {
   render() {
+    const {error} = this.state;
+
     return (
       <div className="auth ui middle center aligned container">
         <div>

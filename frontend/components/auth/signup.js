@@ -2,28 +2,71 @@ import $ from 'jquery';
 import React from 'react';
 import cx from 'classnames';
 import {BaseComponent, PropTypes, Input, Link} from '../../artui/react';
-import store from 'store';
 
 const logo = require('../../images/logo.png');
 
 class Signup extends BaseComponent {
+
+  constructor(props) {
+    super(props);
+    this._$el = null;
+
+    this.state = {
+      userName: '',
+      email: '',
+      error: ''
+    }
+  }
+
   render() {
+
+    const {userName, email, error} = this.state;
+    let disabled = !userName || !email;
+
     return (
-      <div className="auth ui middle center aligned container">
-        <div>
-          <form className={cx('ui', {error: !!error}, 'form')}
-                ref={c=>this._$el = $(c)} >
-            <h2 className="ui image header">
-              <img src={logo} className="image"/>
-            </h2>
-            {!!error &&
-            <div className="ui error mini message">{error}</div>
-            }
-            <div className="ui segment left aligned">
+      <form className={cx('ui', {error: !!error}, 'form')}
+            ref={c=>this._$el = $(c)} >
+        <h2 className="ui image header">
+          <img src={logo} className="image"/>
+        </h2>
+        {!!error &&
+        <div className="ui error mini message">{error}</div>
+        }
+        <div className="ui segment left aligned">
+          <h4 className="ui header center aligned">Get a sign up code now</h4>
+          <div style={{fontSize:13, borderBottom: '1px solid #ccc', marginBottom:12}}>
+            <Link to="/signup2">Already have a signup code?</Link>
+          </div>
+          <div className="field required">
+            <label>User Name</label>
+            <div className="ui icon input">
+              <i className="user icon"/>
+              <input type="text" name="userName" value={userName}
+                     onChange={(e) => this.setState({userName: e.target.value})} />
             </div>
-          </form>
+          </div>
+          <div className="field required" style={{marginBottom: 8}}>
+            <label>Email</label>
+            <div className="ui icon input">
+              <i className="lock icon"/>
+              <input type="text" name="email"
+                     value={email}
+                     onChange={(e) => this.setState({email: e.target.value})}/>
+            </div>
+          </div>
+          <div className="inline field" style={{fontSize: 13}}>
+            <div className="ui checkbox">
+              <input type="checkbox" tabindex="0" class="hidden" />
+              <label>I agree to 
+                <a href="https://insightfinder.com/?page_id=5411">&nbsp;Terms of Use</a> and 
+                <a href="https://insightfinder.com/?page_id=5400">&nbsp;Privacy Policy</a>.</label>
+            </div>
+          </div>
+          <div className="field">
+            <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Sign Up</div>
+          </div>
         </div>
-      </div>
+      </form>
     )
   }
 }

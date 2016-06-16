@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {
   Router, Route, browserHistory,
-  IndexRoute, IndexRedirect
+  IndexRoute, IndexRedirect, Redirect
 } from 'react-router';
 import store from 'store';
 
@@ -16,7 +16,7 @@ import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import UseCaseDetails from './components/usecase/details';
-import {Login, Signup, ForgotPassword, ForgotUsername} from './components/auth';
+import {Login, Signup, SignupSecond, ForgotPassword, ForgotUsername} from './components/auth';
 
 import apis from './apis';
 
@@ -72,6 +72,16 @@ class App extends React.Component {
   }
 }
 
+const AuthApp = function(props) {
+  return (
+    <div className="auth ui middle center aligned container">
+      <div>
+        {props.children}
+      </div>
+    </div>
+  )
+};
+
 // Live Monitoring project detail page
 const liveMonitoringApp = function (props) {
   let {location, params} = props;
@@ -112,11 +122,26 @@ const routes = (
     </Route>
     <Route component={Login} path="/login"/>
     <Route component={Signup} path="/signup"/>
+    <Route component={SignupSecond} path="/signup2"/>
     <Route component={ForgotPassword} path="/forgotPassword"/>
     <Route component={ForgotUsername} path="/forgotUsername"/>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
+  </Router>
+);
+
+const authRoutes = (
+  <Router history={browserHistory}>
+    <Route component={AuthApp} path="/">
+      <IndexRedirect to="/login"/>
+      <Route component={Login} path="/login"/>
+      <Route component={Signup} path="/signup"/>
+      <Route component={SignupSecond} path="/signup2"/>
+      <Route component={ForgotPassword} path="/forgotPassword"/>
+      <Route component={ForgotUsername} path="/forgotUsername"/>
+      <Redirect from="*" to="/login" />
+    </Route>
   </Router>
 );
 
@@ -215,14 +240,16 @@ class AppRoute extends React.Component {
     store.set('userInfo', userinfo);
     this.setState({userInfo: userinfo}, this.loadData.bind(this));
   }
+  
+  isAuthenticated() {
+    return store.get('userName') && store.get('token');
+  }
 
   render() {
-    if (store.get('userName') && store.get('token')) {
+    if (this.isAuthenticated()) {
       return routes;
     } else {
-      return (
-        <Login onSuccess={this.handleLoginSuccess.bind(this)}/>
-      );
+      return authRoutes;
     }
   }
 }

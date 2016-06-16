@@ -7,7 +7,10 @@ import store from 'store';
 const logo = require('../../images/logo.png');
 
 class ForgotPassword extends BaseComponent {
+  
   render() {
+    const {error} = this.state;
+    
     return (
       <div className="auth ui middle center aligned container">
         <div>
