@@ -26,9 +26,9 @@ class SignupStep2 extends BaseComponent {
 
   renderField(display, name) {
     return (
-      <div className="inline field">
-        <label style={{width: '80px'}}>{display}</label>
-        <div className="ui icon input">
+      <div className="inline field" style={{display: 'flex'}}>
+        <label style={{width: '120px', lineHeight: '32px'}}>{display}</label>
+        <div className="ui icon input" style={{flex: 1}}>
           <input type="text" name="userName" placeholder={display}
                  value={this.state[name]}
                  onChange={(e) => this.setState(_.fromPairs([name, e.target.value]))} />
@@ -44,7 +44,7 @@ class SignupStep2 extends BaseComponent {
 
     // 姓名 公司 email
     return (
-      <div className="auth ui middle center aligned container">
+      <div className="auth ui middle center aligned container" style={{maxWidth: 400, width: 400}}>
         <div>
           <form className={cx('ui', {error: !!error}, 'form')}
                 ref={c=>this._$el = $(c)} >
