@@ -52,7 +52,7 @@ class DataParser {
     
     let metricUnitMap = [];
     var arr = this.data['metricUnitMapping'];
-    $.each(arr, function(i,a){
+    _.each(arr, function(a,i){
       metricUnitMap[a.metric] = a.unit;
     });
     
@@ -65,7 +65,7 @@ class DataParser {
 
     var ret = [];
     var items = atext.split(';');
-    $.each(items, function(itemNo,item) {
+    _.each(items, function(item, itemNo) {
       var pos = item.trim().indexOf(".");
       var pos2 = item.trim().substr(pos+1).indexOf("[");
       var metr = item.trim().substr(pos+1).substr(0,pos2);
@@ -89,11 +89,11 @@ class DataParser {
     let causalTypes = [];
     
     if(arr){
-      $.each(arr, function(i,a){
+      _.each(arr, function(a,i){
         var atext = [];
         if(a.anomalies!=""){
           var lines = a.anomalies.split('\\n');
-          $.each(lines, function(lineNo, line) {
+          _.each(lines, function(line, lineNo) {
             var items = line.split(',');
 
             //prepare causality chart data
@@ -106,7 +106,7 @@ class DataParser {
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";
-              $.each(hintss, function(ihint,hint){
+              _.each(hintss, function(hint, ihint){
                 // 1.Change_inflicted(min)[node0](1.0);
                 // 0=#.metric, 1=node, 2=(val)
                 var hintparts = hint.split(/\[|\]/);
@@ -163,11 +163,11 @@ class DataParser {
     let causalTypes = [];
     
     if(arr){
-      $.each(arr, function(i,a){
+      _.each(arr, function(a, i){
         var atext = [];
         if(a.anomaliesConsolidated){
           var lines = a.anomaliesConsolidated.split('\\n');
-          $.each(lines, function(lineNo, line) {
+          _.each(lines, function(line, lineNo) {
             var items = line.split(',');
 
             //prepare causality chart data
@@ -180,7 +180,7 @@ class DataParser {
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";
-              $.each(hintss, function(ihint,hint){
+              _.each(hintss, function(hint, ihint){
                 // 1.Change_inflicted(min)[node0](1.0);
                 // 0=#.metric, 1=node, 2=(val)
                 var hintparts = hint.split(/\[|\]/);
@@ -240,14 +240,14 @@ class DataParser {
       let self = this;
       let arr = this.data['detectionResults'];
 
-      $.each(arr, function(i,a){
+      _.each(arr, function(a, i){
         var atext = (arr.length === 1) ? anomalyTexts[0] : anomalyTexts[i];
         var alies = [];
         var lines = a.detectionResults.split('\\n');
-        $.each(lines, function(lineNo, line) {
+        _.each(lines, function(line, lineNo) {
           var items = line.split(',');
           if (lineNo === 0) {
-            $.each(items, function(seriesNo, item) {
+            _.each(items, function(item, seriesNo) {
               if (seriesNo > 0) {
                 // if multiple output types are present, parse them here
               }
@@ -287,7 +287,7 @@ class DataParser {
     let stds = stdString.split(',');
     let avails = availString.split(',');
 
-    $.each(this.seriesOptions, function(i, opt){
+    _.each(this.seriesOptions, function(opt, i){
       var stat = {
         metric: opt.metric,
         node: opt.node,
@@ -311,10 +311,10 @@ class DataParser {
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
     var lines = data.split('\\n');
-    $.each(lines, function(lineNo, line) {
+    _.each(lines, function(line, lineNo) {
       var items = line.split(',');
       if (lineNo === 0) {
-        $.each(items, function(seriesNo, item) {
+        _.each(items, function(item, seriesNo) {
           if (seriesNo > 0) {
             // cpu#% [node1]: 1
             var cats = item.trim().split(/\[|\]|\:/);
@@ -329,7 +329,7 @@ class DataParser {
         });
       } else {
         let ts = new Date(parseInt(items[0]));
-        $.each(items, function(seriesNo, item) {
+        _.each(items, function(item, seriesNo) {
           if (seriesNo > 0) {
             if(soptions[seriesNo-1]==null){
               console.log("seriesNo-1:",seriesNo-1,"so len:",soptions.length)
@@ -364,7 +364,7 @@ class DataParser {
     });
     
     let anomalyTexts = this.anomalyConsolidatedTexts || this.anomalyTexts;
-    _.map(anomalyTexts, (o) => {
+    _.each(anomalyTexts, (o) => {
       _.forIn(o, (v, k) => {
         index++;
         annotations.push({
@@ -408,11 +408,9 @@ class DataParser {
     
     let groupmetrics = {};
     // Get the metrics for each group
-    $.each(groups, function(gNo, grp){
+    _.each(groups, function(grp, gNo){
       groupmetrics[grp] = $.map(
-        gmpairs.filter(function(item,index){
-          return item[0] === grp;
-        }),
+        gmpairs.filter((item,index) =>item[0] === grp),
         function(a){ return a[1]; }
       ).filter(function(el, idx, arr) {
         return idx === arr.indexOf(el);
@@ -432,7 +430,7 @@ class DataParser {
       if(mode === "holistic"){
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];;
-        $.each(thismetrs,function(itemNo,item){
+        _.each(thismetrs,function(item, itemNo){
           var thisalies = rawalies.filter(function(ra,rai){
             return (ra.metrs.indexOf(item) != -1);
           });
@@ -454,9 +452,9 @@ class DataParser {
       });
 
       // series name & data
-      $.each(series,function(seriesNo, s){
+      _.each(series,function(s, seriesNo){
         sname.push(s.name);
-        $.each(s.data,function(itemNo, item){
+        _.each(s.data,function(item, itemNo){
           if(seriesNo === 0){
             sdata.push(item);
           } else {
@@ -478,8 +476,6 @@ class DataParser {
         annotations: undefined
       };
     });
-    
-    console.log(this.groupsData);
     return this.groupsData;
   }
 }

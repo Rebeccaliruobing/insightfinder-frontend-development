@@ -3,7 +3,7 @@ import {Dygraph} from '../../../artui/react/dataviz';
 import pureRender from 'pure-render-decorator';
 
 
-@pureRender
+// @pureRender
 export
 class SummaryChart extends React.Component {
 
@@ -32,7 +32,7 @@ class SummaryChart extends React.Component {
   }
 }
 
-@pureRender
+// @pureRender
 export class DetailsChart extends React.Component {
 
   shouldComponentUpdate(nextProps, extState) {
