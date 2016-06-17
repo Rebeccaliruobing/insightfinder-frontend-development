@@ -88,8 +88,7 @@ class LiveAnalysisCharts extends React.Component {
     let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
 
-    let {columns, view, selectedGroupId, summarySelected, instanceName} = this.state;
-    let isListView = view === 'list';
+    let {columns, selectedGroupId, instanceName} = this.state;
     let elems = [];
     let selectIndex = 0;
     let selectArrow = <div style={{
@@ -111,14 +110,20 @@ class LiveAnalysisCharts extends React.Component {
         selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
       }
 
-      groups.map((group, index) => {
+      groups.forEach((group, index) => {
 
         let isSelectGroup = selectedGroupId == group.id;
         if (isSelectGroup) selectIndex = selectIndex + index;
 
         elems.push((
           <div key={columns + group.id} className="ui card"
-               onClick={() => this.setState({selectedGroupId: group.id, summarySelected:false})}>
+               onClick={() => {
+                if (this.state.selectedGroupId == group.id) {
+                  this.setState({selectedGroupId: void 0});
+                } else {
+                  this.setState({selectedGroupId: group.id, summarySelected:false})
+                }
+               }}>
             <div className="content">
               <div className="header" style={{paddingBottom:8}}>{group.title}</div>
               <SummaryChart data={group}/>
@@ -140,10 +145,12 @@ class LiveAnalysisCharts extends React.Component {
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
                     <h4 className="ui header">{summary.title}</h4>
                     <DetailsChart data={selectedGroup} />
+                    <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
+                       style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
                   </div>
               ), c)
             })
-          }} style={{width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.8)', padding: 50, display: 'none'}}>
+          }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative'}}>
 
           </div>
         )]).concat(elems.slice(selectIndex));
