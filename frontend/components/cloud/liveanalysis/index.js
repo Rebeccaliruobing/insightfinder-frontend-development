@@ -150,20 +150,18 @@ class LiveAnalysisCharts extends React.Component {
       }
 
     }
-    if (!instanceName && summary) {
-      elems.unshift((
-        <div key={columns+summary.id} className="ui card" style={{width: '100%'}}>
-          <div className="content">
-            <div className="header" style={{paddingBottom:8}}>{summary.title}</div>
-            <SummaryChart data={summary}/>
-          </div>
-          {!isListView && summarySelected && this.dp && selectArrow}
-        </div>
-      ));
-    }
     return (
-      <div className={cx('ui', columns, 'cards')}>
-        {elems}
+
+      <div className="ui grid">
+        <div className="twelve wide column">
+          <div className={cx('ui', columns, 'cards')}>
+            {!instanceName && this.renderSummary()}
+            {elems}
+          </div>
+        </div>
+        <div className="four wide column">
+          {this.renderAnnotation()}
+        </div>
       </div>
     );
   }
@@ -194,31 +192,35 @@ class LiveAnalysisCharts extends React.Component {
     }
   }
 
+  renderSummary() {
+    let summary = this.dp ? this.dp.summaryData : undefined;
+    if (!summary) return;
+    return (
+      <div key={summary.id} className="detail-charts" style={{width: '100%'}}>
+        <span id={summary.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
+        <h4 className="ui header">{summary.title}</h4>
+        <DetailsChart
+          data={summary}
+          onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
+          drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
+          // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
+          // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
+          // selection={listGraphSelection}
+          {...this.state.listGraphZoomOpt}
+        />
+      </div>
+    )
+  }
+
   renderList() {
 
-    let summary = this.dp ? this.dp.summaryData : undefined;
+
     let groups = this.dp ? this.dp.groupsData : [];
-
     let {listGraphZoomOpt} = this.state;
-
     return (
       <div className="ui grid">
         <div className="twelve wide column">
-          { summary &&
-          <div key={summary.id} className="detail-charts">
-            <span id={summary.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
-            <h4 className="ui header">{summary.title}</h4>
-            <DetailsChart
-              data={summary}
-              onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
-              drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
-              // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-              // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
-              // selection={listGraphSelection}
-              {...listGraphZoomOpt}
-            />
-          </div>
-          }
+          {this.renderSummary()}
           { groups.map((group) => {
             return (
               <div key={group.id} className="detail-charts" style={{position:'relative'}}>
