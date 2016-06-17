@@ -30,6 +30,7 @@ module.exports = merge({}, {
       query: {
         presets: ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3', 'react'],
         // plugins: ['transform-runtime'],
+        plugins: ['transform-decorators-legacy' ],
         compact: true,
         comments: false,
         cacheDirectory: true

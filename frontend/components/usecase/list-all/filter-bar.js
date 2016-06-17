@@ -61,7 +61,7 @@ export default  class FilterBar extends Component {
             resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
             this.setState(resp.data);
           }else {
-            alert(resp.message);
+            console.error(resp.message);
           }
         });
       })
@@ -83,7 +83,7 @@ export default  class FilterBar extends Component {
     }).then((resp)=>{
       if (resp.success) {
       }else {
-        alert(resp.message);
+        console.error(resp.message);
       }
       this.setState({loading: false});
     });
@@ -103,7 +103,7 @@ export default  class FilterBar extends Component {
           metricSettings: undefined
         }, this.handleRefresh);
       }else {
-        alert(resp.message);
+        console.error(resp.message);
         this.setState({loading: false});
       }
 
@@ -123,7 +123,7 @@ export default  class FilterBar extends Component {
           metricSettings: undefined
         }, this.handleRefresh);
       }else {
-        alert(resp.message);
+        console.error(resp.message);
         this.setState({loading: false});
       }
     });

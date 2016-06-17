@@ -13,7 +13,7 @@ import apis from '../../../apis';
 import FilterBar from './filter-bar';
 
 
-export default class CloudRolloutCheck extends Component {
+export default class RolloutCheck extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object
   };

@@ -145,6 +145,10 @@ const authRoutes = (
   </Router>
 );
 
+
+console.log(routes);
+console.log(authRoutes);
+
 class AppRoute extends React.Component {
   constructor(props) {
     super(props);

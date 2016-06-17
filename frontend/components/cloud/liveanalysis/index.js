@@ -103,20 +103,6 @@ class LiveAnalysisCharts extends React.Component {
       marginLeft: -3
     }}></div>;
 
-    if (!instanceName && summary) {
-      selectIndex = 1;
-      elems.push((
-        <div key={columns+summary.id} className="ui card"
-             onClick={() => this.setState({summarySelected:true, selectedGroupId: null})}>
-          <div className="content">
-            <div className="header" style={{paddingBottom:8}}>{summary.title}</div>
-            <SummaryChart data={summary}/>
-          </div>
-          {!isListView && summarySelected && this.dp && selectArrow}
-        </div>
-      ));
-    }
-
     if (groups) {
       let rowCount = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
       let groupsData, selectedGroup;
@@ -144,26 +130,7 @@ class LiveAnalysisCharts extends React.Component {
 
       let rowIndex = selectIndex % rowCount;
       selectIndex = selectIndex + rowCount - rowIndex;
-      if (!isListView && summarySelected) {
-        if (this.dp) {
-          let summary = this.dp.summaryData;
-          elems = elems.slice(0, rowCount).concat([(
-            <div key="expand" ref={(c)=>{
-              let $c = $(ReactDOM.findDOMNode(c));
-              $c.slideDown('fast', ()=>{
-                ReactDOM.render((
-                  <div key={summary.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{summary.title}</h4>
-                    <DetailsChart data={summary} />
-                  </div>
-                ), c)
-              })
-            }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none'}}>
-
-            </div>
-          )]).concat(elems.slice(rowCount))
-        }
-      } else if (selectedGroup) {
+      if (selectedGroup) {
         elems = elems.slice(0, selectIndex).concat([(
           <div key={'expand'} ref={(c)=>{
             let $c = $(ReactDOM.findDOMNode(c));
@@ -182,6 +149,17 @@ class LiveAnalysisCharts extends React.Component {
         )]).concat(elems.slice(selectIndex));
       }
 
+    }
+    if (!instanceName && summary) {
+      elems.unshift((
+        <div key={columns+summary.id} className="ui card" style={{width: '100%'}}>
+          <div className="content">
+            <div className="header" style={{paddingBottom:8}}>{summary.title}</div>
+            <SummaryChart data={summary}/>
+          </div>
+          {!isListView && summarySelected && this.dp && selectArrow}
+        </div>
+      ));
     }
     return (
       <div className={cx('ui', columns, 'cards')}>

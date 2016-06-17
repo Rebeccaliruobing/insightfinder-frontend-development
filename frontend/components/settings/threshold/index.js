@@ -62,7 +62,7 @@ export default class ThresholdSettings extends React.Component {
 
   handleFilterChange(data) {
     this.$filterPanel.slideUp();
-    alert(JSON.stringify(data));
+    console.log(JSON.stringify(data));
   }
 
   handleProjectChange(projectName) {

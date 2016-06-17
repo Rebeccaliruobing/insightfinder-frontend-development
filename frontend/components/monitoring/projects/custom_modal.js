@@ -23,9 +23,9 @@ class CustomProjectModal extends React.Component {
   handleSubmit() {
     let {projectName, projectCloudType, samplingInterval} = this.state;
     apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
-      if(resp.success) {this.context.root.loadData();} else {alert(resp.message);}
+      if(resp.success) {this.context.root.loadData();} else {console.error(resp.message);}
     }).catch((e)=> {
-      alert(e);
+      console.log(e);
     });
   }
 

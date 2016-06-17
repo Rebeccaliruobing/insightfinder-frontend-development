@@ -40,7 +40,7 @@ class Signup extends BaseComponent {
           return xhr;
         },
         onSuccess: (resp) => {
-          window.alert(resp.message);
+          console.error(resp.message);
           window.location.href = '/signup2';
         },
         onFailure: (resp) => {

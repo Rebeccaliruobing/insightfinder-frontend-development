@@ -62,7 +62,7 @@ class ProjectSummary extends BaseComponent {
           update.data = resp.data;
           store.set(key, resp.data);
         } else {
-          console.log(resp.message);
+          console.error(resp.message);
         }
         update.loading = false;
         this.setState(update);
@@ -71,7 +71,7 @@ class ProjectSummary extends BaseComponent {
       .catch(msg=> {
         this.setState({loading: false});
         // this.timeout = this.props.setTimeout(this.updateLiveAnalysis.bind(this), 5000);
-        console.log(msg);
+        console.error(msg);
       });
   }
   

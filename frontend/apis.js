@@ -55,7 +55,7 @@ let request = function (method, action, data, resolve, reject) {
     resolve(resp);
   }).fail(function (error) {
     console.log(arguments);
-    alert(`Server Error`);
+    console.log("Server Error", arguments);
     reject(error);
   })
 };
@@ -80,7 +80,7 @@ let requestPost = function (action, data, resolve, reject) {
 
  热图:
  CloudOutlierDetection,
- CloudRolloutCheck,
+ RolloutCheck,
  DisplayProjectModel,
  DisplayFileModel,
 
@@ -131,7 +131,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -149,7 +149,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -177,7 +177,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -210,7 +210,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -239,7 +239,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -268,7 +268,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -296,7 +296,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -343,7 +343,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -372,7 +372,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -410,7 +410,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -435,7 +435,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -482,7 +482,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });
@@ -524,7 +524,7 @@ export default {
         resolve(resp);
       }).fail(function (error) {
         console.log(arguments);
-        alert(`Server Error`);
+        console.log("Server Error", arguments);
         reject(error);
       });
     });

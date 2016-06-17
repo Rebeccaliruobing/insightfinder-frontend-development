@@ -1,15 +1,19 @@
 import React from 'react';
 import {Dygraph} from '../../../artui/react/dataviz';
+import pureRender from 'pure-render-decorator';
 
-export class SummaryChart extends React.Component {
-  
+
+@pureRender
+export
+class SummaryChart extends React.Component {
+
   shouldComponentUpdate(nextProps, extState) {
     return nextProps.data !== this.props.data ||
       nextProps.dateWindow !== this.props.dateWindow ||
       nextProps.selection !== this.props.selection ||
       nextProps.valueRange !== this.props.valueRange;
   }
-  
+
   render() {
     let {data, ...rest} = this.props;
     return (
@@ -28,6 +32,7 @@ export class SummaryChart extends React.Component {
   }
 }
 
+@pureRender
 export class DetailsChart extends React.Component {
 
   shouldComponentUpdate(nextProps, extState) {

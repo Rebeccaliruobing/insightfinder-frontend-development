@@ -41,7 +41,7 @@ const ProjectDetails = class extends React.Component {
           if (resp.success) {
             update.data = resp.data;
           } else {
-            alert(resp.message);
+            console.error(resp.message);
           }
           update.loading = false;
           this.setState(update);
@@ -50,7 +50,7 @@ const ProjectDetails = class extends React.Component {
           }
         })
         .catch(msg=> {
-          alert(msg);
+          console.error(msg);
         });
     });
 

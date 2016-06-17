@@ -124,7 +124,7 @@ export default  class FilterBar extends Component {
           modelKey: undefined
         }, this.handleRefresh.bind(this));
       } else {
-        alert(resp.message);
+        console.error(resp.message);
       }
     })
   }

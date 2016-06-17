@@ -106,7 +106,7 @@ class LiveMonitoring extends BaseComponent {
             }
           });
         } else {
-          alert(resp.message);
+          console.error(resp.message);
         }
         this.$filterPanel.slideUp();
         resp.filterLoading = false;

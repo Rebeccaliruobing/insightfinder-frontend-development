@@ -40,7 +40,7 @@ export default class ExternalServices extends React.Component {
 
   handleFilterChange(data) {
     this.$filterPanel.slideUp();
-    alert(JSON.stringify(data));
+    console.log(JSON.stringify(data));
   }
 
   render() {
