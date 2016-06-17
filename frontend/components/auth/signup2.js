@@ -24,11 +24,25 @@ class SignupStep2 extends BaseComponent {
     }
   }
 
+  renderField(display, name) {
+    return (
+      <div className="inline field">
+        <label style={{width: '80px'}}>{display}</label>
+        <div className="ui icon input">
+          <input type="text" name="userName" placeholder={display}
+                 value={this.state[name]}
+                 onChange={(e) => this.setState(_.fromPairs([name, e.target.value]))} />
+        </div>
+      </div>
+    )
+  }
+
   render() {
 
     const {userName, email, signCode, pass1, pass2, fname, lname, companyName, error} = this.state;
     let disabled = !(userName && email && signCode && pass1 && pass2 && lname && fname && companyName);
 
+    // 姓名 公司 email
     return (
       <div className="auth ui middle center aligned container">
         <div>
@@ -42,14 +56,15 @@ class SignupStep2 extends BaseComponent {
             }
             <div className="ui segment left aligned">
               <h4 className="ui header center aligned">Sign up</h4>
-              <div className="inline field">
-                <label>User Name</label>
-                <div className="ui icon input">
-                  <i className="user icon"/>
-                  <input type="text" name="userName" value={userName}
-                         onChange={(e) => this.setState({userName: e.target.value})} />
-                </div>
-              </div>
+              {this.renderField("User Name", 'userName')}
+              {this.renderField("Email", 'email')}
+              {this.renderField("First Name", 'fname')}
+              {this.renderField("Last Name", 'lname')}
+              {this.renderField("Company Name", 'companyName')}
+              {this.renderField("Sign Code", 'signCode')}
+              {this.renderField("Password", 'pass1')}
+              {this.renderField("Confirm Password", 'pass2')}
+
               <div className="field">
                 <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Submit</div>
               </div>
