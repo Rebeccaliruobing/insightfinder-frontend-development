@@ -7,7 +7,7 @@ import Navbar from './navbar';
 import LiveMonitoring from './monitoring';
 import IncidentAnalysis from './incident-analysis';
 import OutlierDetection from './outlier-detection';
-import SoftwareRolloutCheck from './software-rollout-check';
+import RolloutCheck from './rollout-check';
 import SummaryReport from './summary-report';
 import DisplayModel from './display-model';
 
@@ -30,7 +30,7 @@ export const cloudRoute = (
       <Route component={LiveMonitoring} path="monitoring" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
       <Route component={OutlierDetection} path="outlier-detection" />
-      <Route component={SoftwareRolloutCheck} path="software-rollout-check" />
+      <Route component={RolloutCheck} path="rollout-check" />
       <Route component={SummaryReport} path="summary-report" />
       <Route component={DisplayModel} path="display-model" />
 

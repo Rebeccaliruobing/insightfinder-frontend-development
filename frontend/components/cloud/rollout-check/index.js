@@ -13,7 +13,7 @@ import apis from '../../../apis';
 import FilterBar from './filter-bar';
 
 
-export default class SoftwareRolloutCheck extends Component {
+export default class CloudRolloutCheck extends Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object
   };
@@ -48,6 +48,7 @@ export default class SoftwareRolloutCheck extends Component {
   setHeatMap(dateIndex = 0) {
     let {mapData, startTime, endTime} = this.state.data.modelData[dateIndex];
     let groupIds = [];
+    if(mapData === undefined) return;
     let maps = mapData.map((data, index)=> {
       let dataArray = [];
       data.NASValues.forEach((line, index) => {
@@ -73,7 +74,7 @@ export default class SoftwareRolloutCheck extends Component {
         title = 'Holistic(Split model unavailable for this time)';
       } else {
         let metricNames = "";
-        if (data.metricNameList) {
+        if (data.metricNameList && data.metricNameList != undefined) {
           metricNames = `(${new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})`
         }
         title = <span>{`Group ${data.groupId}`}{metricNames}</span>;
@@ -131,11 +132,13 @@ export default class SoftwareRolloutCheck extends Component {
   renderSlider() {
 
     let data = this.state.data.modelData;
+    if(data === undefined) return;
     let marks = data && data.map((item, index)=> `
       ${moment(item.startTime).format('MM-DD HH:mm')} \n
       ${moment(item.endTime).format('MM-DD HH:mm')}
     `).sort();
     if (!marks) return;
+    if(marks === undefined) return;
     const dateIndex = this.state.dateIndex;
     marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
     return (
@@ -186,7 +189,7 @@ export default class SoftwareRolloutCheck extends Component {
             </div>
             {this.renderSlider()}
             <div className="ui four cards">
-              {this.state.heatMaps.map((data,)=> {
+              {this.state.heatMaps!=undefined && this.state.heatMaps.map((data,)=> {
                 return <HeatMapCard {...data}/>
               })}
             </div>

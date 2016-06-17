@@ -76,7 +76,7 @@ export default  class FilterBar extends Component {
   }
 
   handleSaveMetricSetting() {
-    let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = this.state.activeItem;
+    let {fromUser, dataChunkName, modelName, modelType} = this.state.activeItem;
     this.setState({loading: true});
     apis.postJSONDashboardUserValues('setpubdatasettings', {
       fromUser, dataChunkName, modelName, modelType, metricSettings: JSON.stringify(this.state.metricSettings)
