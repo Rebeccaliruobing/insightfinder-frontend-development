@@ -28,6 +28,16 @@ class Signup extends BaseComponent {
           this.setState({
             error: ''
           });
+          
+          let email = this.state['email'];
+          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (!re.test(email)) {
+            this.setState({
+              error: 'Please input correct email address.'
+            });
+            return false;
+          }
+          
           settings.data = {
             'username': this.state['userName'],
             'email': this.state['email'],
@@ -40,7 +50,7 @@ class Signup extends BaseComponent {
           return xhr;
         },
         onSuccess: (resp) => {
-          console.error(resp.message);
+          window.alert(resp.message);
           window.location.href = '/signup2';
         },
         onFailure: (resp) => {
@@ -80,22 +90,22 @@ class Signup extends BaseComponent {
                 <div className="ui icon input">
                   <i className="user icon"/>
                   <input type="text" name="userName" value={userName}
-                         onChange={(e) => this.setState({userName: e.target.value})} />
+                         onChange={(e) => this.setState({error: '', userName: e.target.value})} />
                 </div>
               </div>
               <div className="field required" style={{marginBottom: 8}}>
                 <label>Email</label>
                 <div className="ui icon input">
-                  <i className="lock icon"/>
+                  <i className="mail icon"/>
                   <input type="text" name="email"
                          value={email}
-                         onChange={(e) => this.setState({email: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', email: e.target.value})}/>
                 </div>
               </div>
               <div className="inline field" style={{fontSize: 13}}>
                 <div className="ui checkbox">
                   <input type="checkbox" tabindex="0" class="hidden" checked={checked} 
-                         onChange={(e) => this.setState({checked: e.target.checked})} />
+                         onChange={(e) => this.setState({error: '', checked: e.target.checked})} />
                   <label>I agree to
                     <a href="https://insightfinder.com/terms-of-use" target="_blank">&nbsp;Terms of Use</a> and
                     <a href="https://insightfinder.com/privacy-policy" target="_blank">&nbsp;Privacy Policy</a>.</label>
