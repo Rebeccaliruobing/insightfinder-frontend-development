@@ -66,14 +66,16 @@ class Projects extends React.Component {
 
     return (
       <Console.Content>
-        <div className="main ui container" ref={c => this._el = c}>
-          <Console.Breadcrumb>
-            <IndexLink to="/" className="section">Home</IndexLink>
-            <i className="right angle icon divider"/>
-            <Link to="/monitoring" className="section">Cloud Monitoring</Link>
-            <i className="right angle icon divider"/>
-            <div className="active section">Projects</div>
-          </Console.Breadcrumb>
+        <div className="ui main tiny container" ref={c => this._el = c}>
+          <div className="ui clearing vertical segment">
+            <div className="ui breadcrumb">
+              <IndexLink to="/" className="section">Home</IndexLink>
+              <i className="right angle icon divider"/>
+              <Link to="/settings" className="section">Settings</Link>
+              <i className="right angle icon divider"/>
+              <div className="active section">Threshold</div>
+            </div>
+          </div>
           <div className="ui pointing secondary menu">
             <a className={tabStates['custom'] + ' item'}
                onClick={(e) => this.selectTab(e, 'custom')}>Insight Agent</a>

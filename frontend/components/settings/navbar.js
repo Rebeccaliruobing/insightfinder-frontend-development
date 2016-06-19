@@ -6,6 +6,12 @@ export default function(props) {
     <Console.Navbar>
       <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
         <div className="item">
+          <a className="active title"><i className="dropdown icon"/>Register</a>
+          <div className="active content menu">
+            <Link to="/settings/project-list" className="item">Register Project</Link>
+          </div>
+        </div>
+        <div className="item">
           <a className="active title"><i className="dropdown icon"/>Settings</a>
           <div className="active content menu">
             <Link to="/settings/threshold" className="item">Threshold Settings</Link>

@@ -50,9 +50,10 @@ class App extends React.Component {
     return (
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
-          <Link to="/cloud" className="item">Cloud Monitoring</Link>
-          <Link to="/settings" className="item">Project Settings</Link>
-          <Link to="/usecase" className="item">Use Cases</Link>
+          <Link to="/cloud" className="item">Dashboard</Link>
+          <Link to="/settings" className="item">Settings</Link>
+          <Link to="/usecase" className="item">Examples</Link>
+          <Link to="/help" className="item">Help</Link>
           <div className="right menu">
             <div className="ui right simple dropdown item">
               <i className="user icon circular teal inverted"/>

@@ -11,8 +11,6 @@ import RolloutCheck from './rollout-check';
 import SummaryReport from './summary-report';
 import DisplayModel from './display-model';
 
-import Projects from '../monitoring/projects/index';
-
 export class Cloud extends React.Component {
   render() {
     return (
@@ -32,8 +30,5 @@ export const cloudRoute = (
       <Route component={OutlierDetection} path="outlier-detection" />
       <Route component={RolloutCheck} path="rollout-check" />
       <Route component={SummaryReport} path="summary-report" />
-      <Route component={DisplayModel} path="display-model" />
-
-      <Route component={Projects} path="project-list" />
     </Route>
 );

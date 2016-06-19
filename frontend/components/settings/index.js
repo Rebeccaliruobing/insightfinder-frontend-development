@@ -3,6 +3,7 @@ import {Route, IndexRoute, IndexRedirect} from 'react-router';
 
 import {Console, Link} from '../../artui/react';
 import ThresholdSettings from './threshold';
+import Projects from '../monitoring/projects/index';
 
 import Navbar from './navbar';
 
@@ -19,7 +20,8 @@ export class Settings extends React.Component {
 
 export const settingsRoute = (
   <Route component={Settings} path="settings">
-    <IndexRedirect to="threshold" />
-    <Route component={ThresholdSettings} path="threshold" />
+  <IndexRedirect to="threshold" />
+  <Route component={Projects} path="project-list" />
+  <Route component={ThresholdSettings} path="threshold" />
   </Route>
 );
