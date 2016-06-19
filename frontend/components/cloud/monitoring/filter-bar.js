@@ -22,7 +22,7 @@ export default  class FilterBar extends Component {
       projectType: undefined,
       modelType: 'Holistic',
       anomalyThreshold: 0.99,
-      durationThreshold: 1
+      durationThreshold: 5
     };
   }
 
