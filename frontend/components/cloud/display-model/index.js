@@ -4,7 +4,7 @@ import {Link, IndexLink} from 'react-router';
 import RcSlider from '../../ui/rc-slider';
 import HeatMap from '../../ui/graph/HeatMap';
 import {
-  Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
+  Modal, Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message
 } from '../../../artui/react/index';
 import {Dygraph} from '../../../artui/react/dataviz';
 
@@ -232,8 +232,8 @@ export default class DisplayModel extends Component {
       view: 'chart',
       dateIndex: 0,
       timeIndex: 0,
+      showAddPanel: true,
       params: {
-        showAddPanel: false,
         projects: [],
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
@@ -324,6 +324,7 @@ export default class DisplayModel extends Component {
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
+    const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
 
     return (
       <Console.Content>
@@ -338,7 +339,10 @@ export default class DisplayModel extends Component {
             </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
+                <Popup position="bottom right">
+                  <i className={panelIconStyle}/>
+                  <span className="ui mini popup">Expand & Close</span>
+                </Popup>
               </Button>
               <Button>
                 <i className="setting icon"/>

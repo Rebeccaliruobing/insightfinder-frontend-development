@@ -1,7 +1,7 @@
 import React, {Component}   from 'react';
 import {Link, IndexLink}    from 'react-router';
 import {
-  Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
+  Modal, Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message
 }                           from '../../../artui/react/index';
 import apis                 from '../../../apis';
 import FilterBar            from './filter-bar';
@@ -22,8 +22,8 @@ export default class ListAll extends Component {
       dateIndex: 0,
       timeIndex: 0,
       loading: false,
+      showAddPanel: true,
       params: {
-        showAddPanel: false,
         projects: [],
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
@@ -77,6 +77,7 @@ export default class ListAll extends Component {
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions, router} = this.context;
+    const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
 
 
     let system = this.props.location.query.system;
@@ -94,7 +95,10 @@ export default class ListAll extends Component {
             </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
+                <Popup position="bottom right">
+                  <i className={panelIconStyle}/>
+                  <span className="ui mini popup">Expand & Close</span>
+                </Popup>
               </Button>
               <Button>
                 <i className="setting icon"/>

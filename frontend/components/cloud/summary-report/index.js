@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
+import {Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message} from '../../../artui/react';
 import FilterBar from './filter-bar';
 import apis from '../../../apis';
 
@@ -20,8 +20,8 @@ export default class SummaryReport extends Component {
       dateIndex: 0,
       timeIndex: 0,
       summaryReport: '',
+      showAddPanel: true,
       params: {
-        showAddPanel: false,
         projects: [],
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
@@ -51,6 +51,7 @@ export default class SummaryReport extends Component {
   render() {
     const {view, showAddPanel, params} = this.state;
     const {userInstructions} = this.context;
+    const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
     var summaryReport = this.state.summaryReport;
     summaryReport = summaryReport.split("<\/th>").join("").split("<\/td>").join("");
     return (
@@ -66,7 +67,10 @@ export default class SummaryReport extends Component {
             </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
-                <i className="ellipsis horizontal icon"/>
+                <Popup position="bottom right">
+                  <i className={panelIconStyle}/>
+                  <span className="ui mini popup">Expand & Close</span>
+                </Popup>
               </Button>
               <Button>
                 <i className="setting icon"/>
