@@ -40,7 +40,7 @@ export default class SummaryReport extends Component {
   }
 
   handleFilterChange(data) {
-    this.$filterPanel.slideUp();
+    //this.$filterPanel.slideUp();
     apis.postDashboardDailySummaryReport().then((resp) => {
       this.setState({summaryReport: resp.data.content, projectName: data.projectName})
     }).catch(()=> {
