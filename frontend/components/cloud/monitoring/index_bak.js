@@ -124,13 +124,6 @@ class LiveMonitoring extends BaseComponent {
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/cloud/monitoring" className="section">Cloud Monitoring</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">Live Monitoring</div>
-            </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
                 <i className="ellipsis horizontal icon"/>

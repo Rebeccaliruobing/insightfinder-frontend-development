@@ -139,13 +139,6 @@ export default class ThresholdSettings extends React.Component {
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/settings" className="section">Settings</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">Threshold</div>
-            </div>
           </div>
           <div className="ui vertical segment">
             <div className={cx('ui grid two columns form', {'loading': !!this.state.settingLoading})}>

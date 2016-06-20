@@ -20,7 +20,7 @@ export class Settings extends React.Component {
 
 export const settingsRoute = (
   <Route component={Settings} path="settings">
-  <IndexRedirect to="threshold" />
+  <IndexRedirect to="project-list" />
   <Route component={Projects} path="project-list" />
   <Route component={ThresholdSettings} path="threshold" />
   </Route>
