@@ -53,7 +53,7 @@ class GoogleProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>Service Account Email</label>
-              <input type="text" name="email" onChange={(e)=>this.setState({email: e.target.value})}/>
+              <input type="text" name="service-account" onChange={(e)=>this.setState({serviceAccount: e.target.value})}/>
             </div>
             <div className="field">
               <label>.p12 key file</label>

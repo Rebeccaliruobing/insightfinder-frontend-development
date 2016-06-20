@@ -32,7 +32,7 @@ class GoogleProjects extends React.Component {
 
   render() {
     return (
-      <div className="ui segment attached">
+      <div className="ui attached">
         <button className="ui small positive action button"
                 onClick={(e) => this.setState({showModal: true})}>
           <i className="icon plus"></i>Register

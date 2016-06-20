@@ -86,13 +86,6 @@ export default class ListAll extends Component {
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/cloud/monitoring" className="section">Use Cases</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">List All {system ? `(${system})` : ''}</div>
-            </div>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
                 <Popup position="bottom right">

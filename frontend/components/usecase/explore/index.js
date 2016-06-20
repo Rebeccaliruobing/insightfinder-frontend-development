@@ -74,6 +74,7 @@ export default class ListAll extends Component {
     const blockStyle = {
       textAlign: 'center',
       backgroundColor: 'rgb(80, 80, 119)',
+      width: 150,
       height: 150,
       lineHeight: `150px`
     };
@@ -89,7 +90,7 @@ export default class ListAll extends Component {
     return (
       <Console.Content>
         <div style={{padding: 20}}>
-          <div className="ui five column grid">
+          <div className="ui four column grid">
             <div className="wide column text-center" style={wrapperStyle}>
               <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
                 <a style={linkStyle} href={`/usecase/list-some?system=Cassandra`}>Cassandra</a>

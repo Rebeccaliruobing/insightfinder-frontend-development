@@ -68,13 +68,6 @@ class Projects extends React.Component {
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
-            <div className="ui breadcrumb">
-              <IndexLink to="/" className="section">Home</IndexLink>
-              <i className="right angle icon divider"/>
-              <Link to="/settings" className="section">Settings</Link>
-              <i className="right angle icon divider"/>
-              <div className="active section">Threshold</div>
-            </div>
           </div>
           <div className="ui pointing secondary menu">
             <a className={tabStates['custom'] + ' item'}
@@ -84,16 +77,15 @@ class Projects extends React.Component {
             <a className={tabStates['google'] + ' item'}
                onClick={(e) => this.selectTab(e, 'google')}>Google Cloud Monitoring</a>
           </div>
-          <div className={tabStates['amazon'] + ' ui tab segment'}>
+          <div className={tabStates['amazon'] + ' ui tab '}>
             {tabStates['amazon'] === 'active' ? <AmazonProjects projects={projectGroupByType.AWS}/> : null}
           </div>
-          <div className={tabStates['google'] + ' ui tab segment'}>
+          <div className={tabStates['google'] + ' ui tab '}>
             {tabStates['google'] === 'active' ? <ProjectsGoogle projects={projectGroupByType.Google}/> : null}
           </div>
-          <div className={tabStates['custom'] + ' ui tab segment'}>
+          <div className={tabStates['custom'] + ' ui tab '}>
             {tabStates['custom'] === 'active' ? <CustomProjects projects={projectGroupByType.custom}/> : null}
           </div>
-          <div className="ui message attached" dangerouslySetInnerHTML={{__html: userInstructions.cloudnewproject}}></div>
         </div>
       </Console.Content>
     )

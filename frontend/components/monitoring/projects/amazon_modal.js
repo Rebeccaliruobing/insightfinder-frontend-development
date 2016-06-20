@@ -43,10 +43,6 @@ class AmazonProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Email</label>
-              <input type="text" name="name" onChange={(e)=>this.setState({email: e.target.value})}/>
-            </div>
-            <div className="field">
               <label>Availability Zone</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
                 <option className="item">Availability Zone</option>
