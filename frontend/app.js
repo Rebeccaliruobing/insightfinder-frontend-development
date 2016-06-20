@@ -17,6 +17,7 @@ import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import UseCaseDetails from './components/usecase/details';
 import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './components/auth/index';
+import Help from './components/help';
 
 import apis from './apis';
 
@@ -46,7 +47,7 @@ class App extends React.Component {
 
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
     //<Link to="/file" className="item">File Analysis</Link>
-          
+
     return (
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
@@ -73,7 +74,7 @@ class App extends React.Component {
   }
 }
 
-const AuthApp = function(props) {
+const AuthApp = function (props) {
   return (
     <div className="auth ui middle center aligned container">
       <div>
@@ -120,6 +121,7 @@ const routes = (
       {cloudRoute}
       {settingsRoute}
       {useCaseRoute}
+      <Route component={Help} path="help"/>
     </Route>
     <Route component={Login} path="/login"/>
     <Route component={Signup} path="/signup"/>
@@ -141,7 +143,7 @@ const authRoutes = (
       <Route component={SignupStep2} path="/signup2"/>
       <Route component={ForgotPassword} path="/forgotPassword"/>
       <Route component={ForgotUsername} path="/forgotUsername"/>
-      <Redirect from="*" to="/login" />
+      <Redirect from="*" to="/login"/>
     </Route>
   </Router>
 );
@@ -245,7 +247,7 @@ class AppRoute extends React.Component {
     store.set('userInfo', userinfo);
     this.setState({userInfo: userinfo}, this.loadData.bind(this));
   }
-  
+
   isAuthenticated() {
     return store.get('userName') && store.get('token');
   }

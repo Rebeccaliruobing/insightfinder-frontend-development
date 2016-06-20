@@ -1,5 +1,5 @@
 import React from 'react';
-import {Console, Link} from '../../artui/react';
+import {Console, Link} from '../../artui/react/index';
 import {Route, IndexRedirect} from 'react-router';
 
 import Navbar from './navbar';
@@ -14,7 +14,7 @@ import DisplayModel from './display-model';
 export class Cloud extends React.Component {
   render() {
     return (
-      <Console.Wrapper>
+      <Console.Wrapper className="cloud-page">
         <Navbar/>
         {this.props.children}
       </Console.Wrapper>

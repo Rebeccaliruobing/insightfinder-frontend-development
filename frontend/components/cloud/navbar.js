@@ -1,22 +1,32 @@
 import React from 'react';
-import {Console, Accordion, Link, IndexLink} from '../../artui/react';
+import {Console, Accordion, Link, IndexLink} from '../../artui/react/index';
 
-export default function(props) {
+export default function (props) {
   // <Link to="/cloud/display-model" className="item">Display Model</Link>
   return (
     <Console.Navbar>
-      <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
-        <div className="item">
-          <a className="active title"><i className="dropdown icon"/>Dashboard</a>
-          <div className="active content menu">
-            <Link to="/cloud/monitoring" className="item">Live Monitoring</Link>
-            <Link to="/cloud/incident-analysis" className="item">Incident Analysis</Link>
-            <Link to="/cloud/outlier-detection" className="item">Cluster Outlier Detection</Link>
-            <Link to="/cloud/rollout-check" className="item">Software Rollout Check</Link>
-            <Link to="/cloud/summary-report" className="item">Summary Report</Link>
-          </div>
-        </div>
-      </Accordion>
+      <div className="ui vertical menu text icon-menu">
+        <Link to="/cloud/monitoring" className="item text-white">
+          <i className="line chart icon"></i>
+          <span> Live Monitoring</span>
+        </Link>
+        <Link to="/cloud/incident-analysis" className="item text-white">
+          <i className="zoom icon"></i>
+          <span> Incident Analysis</span>
+        </Link>
+        <Link to="/cloud/outlier-detection" className="item text-white">
+          <i className="icon icon-icons01 iconfont "></i>
+          <span> Cluster Outlier Detection</span>
+        </Link>
+        <Link to="/cloud/rollout-check" className="item text-white">
+          <i className="checkmark box icon"></i>
+          <span> Software Rollout Check</span>
+        </Link>
+        <Link to="/cloud/summary-report" className="item text-white">
+          <i className="icon icon-report iconfont"></i>
+          <span> Summary Report</span>
+        </Link>
+      </div>
     </Console.Navbar>
   )
 }
