@@ -87,7 +87,7 @@ export default class RolloutCheck extends Component {
         itemSize: 4,
         title: title,
         data: dataArray,
-        link: `/incidentAnalysis?${$.param(params)}`
+        link: `/projectDataOnly?${$.param(params)}`
       };
     });
 

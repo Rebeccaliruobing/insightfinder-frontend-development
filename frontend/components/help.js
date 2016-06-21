@@ -20,7 +20,6 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>Frequently Asked Questions</h3>
-                <a>Who Is Taiga For?</a>
                 <a>How do I get in In touch with you, or keep up with the Latest News?</a>
               </div>
             </div>
@@ -28,7 +27,6 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>Frequently Asked Questions</h3>
-                <a>Who Is Taiga For?</a>
                 <a>How do I get in In touch with you, or keep up with the Latest News?</a>
               </div>
             </div>
@@ -36,7 +34,6 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>Frequently Asked Questions</h3>
-                <a>Who Is Taiga For?</a>
                 <a>How do I get in In touch with you, or keep up with the Latest News?</a>
               </div>
             </div>
@@ -44,7 +41,6 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>Frequently Asked Questions</h3>
-                <a>Who Is Taiga For?</a>
                 <a>How do I get in In touch with you, or keep up with the Latest News?</a>
               </div>
             </div>
@@ -52,7 +48,6 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>Frequently Asked Questions</h3>
-                <a>Who Is Taiga For?</a>
                 <a>How do I get in In touch with you, or keep up with the Latest News?</a>
               </div>
             </div>
