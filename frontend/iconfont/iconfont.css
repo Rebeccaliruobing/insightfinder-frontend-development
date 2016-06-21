@@ -1,10 +1,10 @@
 
 @font-face {font-family: "iconfont";
-  src: url('iconfont.eot?t=1466437529'); /* IE9*/
-  src: url('iconfont.eot?t=1466437529#iefix') format('embedded-opentype'), /* IE6-IE8 */
-  url('iconfont.woff?t=1466437529') format('woff'), /* chrome, firefox */
-  url('iconfont.ttf?t=1466437529') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
-  url('iconfont.svg?t=1466437529#iconfont') format('svg'); /* iOS 4.1- */
+  src: url('iconfont.eot?t=1466521282'); /* IE9*/
+  src: url('iconfont.eot?t=1466521282#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  url('iconfont.woff?t=1466521282') format('woff'), /* chrome, firefox */
+  url('iconfont.ttf?t=1466521282') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+  url('iconfont.svg?t=1466521282#iconfont') format('svg'); /* iOS 4.1- */
 }
 
 .iconfont {
@@ -17,3 +17,5 @@
 }
 .icon-icons01:before { content: "\e6ae"; }
 .icon-report:before { content: "\e652"; }
+.icon-threshold:before { content: "\3570"; }
+.icon-puzzlepiece1:before { content: "\e624"; }

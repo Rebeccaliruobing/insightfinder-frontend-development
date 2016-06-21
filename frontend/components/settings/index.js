@@ -10,7 +10,7 @@ import Navbar from './navbar';
 export class Settings extends React.Component {
   render() {
     return (
-      <Console.Wrapper>
+      <Console.Wrapper className="settings-page">
         <Navbar/>
         {this.props.children}
       </Console.Wrapper>
