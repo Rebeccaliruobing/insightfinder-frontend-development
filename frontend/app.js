@@ -15,6 +15,7 @@ import {settingsRoute} from './components/settings/index';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
+import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './components/auth/index';
 import Help from './components/help';
@@ -103,7 +104,18 @@ const incidentAnalysisApp = function (props) {
   );
 };
 
-// Incident Analysis Details
+// project Data Only Details
+const projectDataOnlyApp = function (props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <ProjectDataDetails location={location} params={params}/>
+    </Console>
+  );
+};
+
+// Use Case Details
 const useCaseApp = function (props) {
   let {location, params} = props;
   return (
@@ -129,6 +141,7 @@ const routes = (
     <Route component={ForgotPassword} path="/forgotPassword"/>
     <Route component={ForgotUsername} path="/forgotUsername"/>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
+    <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
   </Router>

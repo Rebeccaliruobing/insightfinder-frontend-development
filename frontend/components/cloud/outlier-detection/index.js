@@ -80,7 +80,7 @@ export default class OutlierDetection extends Component {
           itemSize: 4,
           title,
           data: dataArray,
-          link: `/incidentAnalysis?${$.param(params)}`
+          link: `/projectData?${$.param(params)}`
         }
       });
     } else {

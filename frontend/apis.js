@@ -116,20 +116,7 @@ export default {
    */
   postDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      $.ajax({
-        type: 'POST',
-        url: $.fn.api.settings.api['dashboard uservalues'],
-        data: $.param({userName, token, operation, ...other}),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+      requestPost('dashboard uservalues', {userName, token, operation, ...other}, resolve, reject);
     });
   },
   postJSONDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
