@@ -30,7 +30,7 @@ export default  class FilterBar extends Component {
       projectName: undefined,
       pvalue: 0.99,
       cvalue: 5,
-      durationHours: 6,
+      durationHours: 24,
       modelType: "Holistic",
       modelKey: undefined,
       projectType: undefined,

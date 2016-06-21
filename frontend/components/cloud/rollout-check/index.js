@@ -115,12 +115,12 @@ export default class RolloutCheck extends Component {
           resp.data.originData = Object.assign({}, resp.data);
           resp.data.projectName = data.projectName;
 
+          resp.data.rolloutCheckModelKeyList = JSON.parse(resp.data.rolloutCheckModelKeyList);
           resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
-          resp.data.modelData = resp.data.holisticModelData.concat(resp.data.splitByGroupModelData);
+          resp.data.modelData = resp.data.rolloutCheckModelKeyList;
           this.handleData(resp.data);
-          this.$filterPanel.slideUp()
         }
         this.setState({loading: false});
       }).catch(()=> {
