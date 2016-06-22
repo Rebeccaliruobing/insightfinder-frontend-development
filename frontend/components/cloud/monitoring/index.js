@@ -84,7 +84,7 @@ class LiveMonitoring extends BaseComponent {
     if (_.find(addedProjects, p => {
         return _.isEqual(p, project);
       })) {
-      console.log('The project with same parameters already exist');
+      alert('The project with same parameters already exist');
     } else {
       addedProjects.push(project);
       

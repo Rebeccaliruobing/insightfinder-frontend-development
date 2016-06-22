@@ -41,7 +41,7 @@ const ProjectDetails = class extends React.Component {
           if (resp.success) {
             update.data = resp.data;
           } else {
-            console.error(resp.message);
+            alert(resp.message);
           }
           update.loading = false;
           this.setState(update);

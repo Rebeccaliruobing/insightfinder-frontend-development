@@ -26,7 +26,6 @@ class GoogleProjectModal extends React.Component {
 
   handleSubmit() {
     console.log(this.state);
-    ;
   }
 
   render() {

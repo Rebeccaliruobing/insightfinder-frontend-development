@@ -71,7 +71,9 @@ export default class RolloutCheck extends Component {
         title = data.instanceName;
         params.instanceName = data.instanceName;
       } else if (data.groupId + '' == '0') {
-        title = 'Holistic(Split model unavailable for this time)';
+        title = 'Holistic';
+        params.groupId = data.groupId;
+        groupIds.push(params.groupId);
       } else {
         let metricNames = "";
         if (data.metricNameList && data.metricNameList != undefined) {
@@ -187,7 +189,12 @@ export default class RolloutCheck extends Component {
             </div>
             {this.renderSlider()}
             <div className="ui four cards">
-              {this.state.heatMaps!=undefined && this.state.heatMaps.map((data,)=> {
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] == '0').map((data,)=> {
+                return <HeatMapCard {...data}/>
+              })}
+            </div>
+            <div className="ui four cards">
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] != '0').map((data,)=> {
                 return <HeatMapCard {...data}/>
               })}
             </div>

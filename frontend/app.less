@@ -31,7 +31,8 @@
   > .topbar {
     z-index: 32;
     > .logo {
-      background: #6699CC;
+      width: 160px;
+      background: #88bbee;
     }
   }
 }
@@ -42,24 +43,27 @@
 }
 
 .ui.console > .wrapper > .navbar {
-  background: #6699CC;
+  background: #88bbee;
 }
 
 .ui.console > .topbar {
   z-index: 1000;
 }
 
-.ui.console > .topbar > .inner > .ui.menu {
-  background: #6699CC;
-  color: #EEEEEE;
-  font-size: 16px;
-
-  > .right.menu > .item,
-  > .item {
-    color: #FFFFFF;
-    background: transparent;
-    &.active {
-      background: #88bbee;
+.ui.console > .topbar > .inner {
+  margin-left: 160px;
+  > .ui.menu {
+    background: #88bbee;
+    color: #EEEEEE;
+    font-size: 16px;
+  
+    > .right.menu > .item,
+    > .item {
+      color: #FFFFFF;
+      background: transparent;
+      &.active {
+        background: #4183C4;
+      }
     }
   }
 }
@@ -142,6 +146,7 @@
 .topbar-text {
   margin-left: @2spacer !important;
   margin-right: @2spacer !important;
+  padding-left: 40px;
   width: 100%;
 
   .title {
@@ -181,6 +186,21 @@
   }
 }
 
+.ui.inverted.menu .item {
+  color: rgba(255, 255, 255, 1);
+}
+
+.ui.vertical.secondary.menu .item:not(.dropdown) > .menu > .item{
+  color: rgba(255, 255, 255, 1);
+}
+
+.ui.vertical.inverted.menu .menu .item {
+  color: rgba(255, 255, 255, 1);
+  a:not(.ui){
+    color: rgba(255, 255, 255, 1);
+  }
+}
+
 .rc-slider-mark-text {
   width: 80px !important;
   margin-left: -40px !important;
@@ -190,7 +210,7 @@
 .ui.console > .settings-page.wrapper,
 .ui.console > .cloud-page.wrapper {
   > .navbar {
-    background: #6699CC;
+    background: #88bbee;
     overflow: inherit;
     width: 48px;
 
@@ -216,11 +236,11 @@
         > a {
           color: #fff;
           &.item.active {
-            background-color: darken(#6699CC, 20%);
+            background-color: darken(#88bbee, 20%);
           }
           &:hover {
             width: 240px;
-            background-color: darken(#6699CC, 20%);
+            background-color: darken(#88bbee, 20%);
             > span {
               left: 50px;
               line-height: 25px;

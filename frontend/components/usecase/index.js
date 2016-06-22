@@ -11,19 +11,11 @@ export class UseCase extends React.Component {
   render() {
     return (
       <Console.Wrapper>
-        <Navbar/>
         {this.props.children}
       </Console.Wrapper>
     )
   }
 }
-
-// export const useCaseRoute = (
-//   <Route component={UseCase} path="usecase">
-//     <IndexRoute component={ListAll}/>
-//     <Route path="list-all" component={ListAll}/>
-//   </Route>
-// );
 
 export const useCaseRoute = (
   <Route component={UseCase} path="usecase">
