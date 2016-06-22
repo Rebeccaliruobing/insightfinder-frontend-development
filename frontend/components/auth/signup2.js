@@ -77,7 +77,7 @@ class SignupStep2 extends BaseComponent {
           return xhr;
         },
         onSuccess: (resp) => {
-          console.error(resp.message);
+          alert(resp.message);
           window.location.href = '/login';
         },
         onFailure: (resp) => {

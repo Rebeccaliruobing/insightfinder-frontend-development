@@ -62,7 +62,7 @@ class ProjectSummary extends BaseComponent {
           update.data = resp.data;
           store.set(key, resp.data);
         } else {
-          console.error(resp.message);
+          alert(resp.message);
         }
         update.loading = false;
         this.setState(update);

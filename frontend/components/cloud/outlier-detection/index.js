@@ -121,7 +121,6 @@ export default class OutlierDetection extends Component {
             )
           );
           this.handleState(state);
-          this.$filterPanel.slideUp()
         }
         this.setState({loading: false});
       }).catch(()=> {

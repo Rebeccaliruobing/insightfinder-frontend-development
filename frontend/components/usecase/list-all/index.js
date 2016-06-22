@@ -79,7 +79,6 @@ export default class ListAll extends Component {
     const {userInstructions, router} = this.context;
     const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
 
-
     let system = this.props.location.query.system;
 
     return (
@@ -101,8 +100,6 @@ export default class ListAll extends Component {
 
           <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
-            <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
-               onClick={this.handleToggleFilterPanel.bind(this)}/>
             <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
           </div>
 

@@ -230,7 +230,9 @@ class AppRoute extends React.Component {
 
   loadUserValues() {
     return new Promise((resolve, reject) => {
-      apis.postDashboardUserValues().then((resp)=> {
+//      apis.postDashboardUserValues().then((result)=> {
+      apis.postJSONDashboardUserValues().then((result)=> {
+        let resp = result.data;
         resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
         resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
         resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);

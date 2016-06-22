@@ -71,7 +71,9 @@ export default class RolloutCheck extends Component {
         title = data.instanceName;
         params.instanceName = data.instanceName;
       } else if (data.groupId + '' == '0') {
-        title = 'Holistic(Split model unavailable for this time)';
+        title = 'Holistic';
+        params.groupId = data.groupId;
+        groupIds.push(params.groupId);
       } else {
         let metricNames = "";
         if (data.metricNameList && data.metricNameList != undefined) {
@@ -115,12 +117,12 @@ export default class RolloutCheck extends Component {
           resp.data.originData = Object.assign({}, resp.data);
           resp.data.projectName = data.projectName;
 
+          resp.data.rolloutCheckModelKeyList = JSON.parse(resp.data.rolloutCheckModelKeyList);
           resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
-          resp.data.modelData = resp.data.holisticModelData.concat(resp.data.splitByGroupModelData);
+          resp.data.modelData = resp.data.rolloutCheckModelKeyList;
           this.handleData(resp.data);
-          this.$filterPanel.slideUp()
         }
         this.setState({loading: false});
       }).catch(()=> {
@@ -187,7 +189,12 @@ export default class RolloutCheck extends Component {
             </div>
             {this.renderSlider()}
             <div className="ui four cards">
-              {this.state.heatMaps!=undefined && this.state.heatMaps.map((data,)=> {
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] == '0').map((data,)=> {
+                return <HeatMapCard {...data}/>
+              })}
+            </div>
+            <div className="ui four cards">
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] != '0').map((data,)=> {
                 return <HeatMapCard {...data}/>
               })}
             </div>
