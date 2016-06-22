@@ -52,7 +52,7 @@ export default  class FilterBar extends Component {
       default:
         update.projectType = `${cloudType}/Agent`;
     }
-    this.setState(update);
+    this.setState(update,()=>this.props.onChange && this.props.onChange(this.state));
   }
 
   handleEndTimeChange(endTime) {

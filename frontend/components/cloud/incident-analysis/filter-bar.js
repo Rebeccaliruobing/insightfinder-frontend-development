@@ -78,6 +78,9 @@ export default  class FilterBar extends Component {
         record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
       }
     });
+    update.minTime = Math.min.apply(Math, update.incidentList.map((incident)=>Math.min(incident.startTime, incident.endTime)));
+    update.maxTime = Math.max.apply(Math, update.incidentList.map((incident)=>Math.max(incident.startTime, incident.endTime)));
+    debugger;
     this.setState(update);
   }
 
@@ -87,6 +90,12 @@ export default  class FilterBar extends Component {
       startTime: moment(endTime).add(-durationHours, 'hour').toDate(),
       endTime
     })
+  }
+
+  handleModelTimeChange(timeType) {
+    return (time)=> {
+      this.setState(_.fromPairs([[timeType, time]]))
+    }
   }
 
   handleClickIncident(incident) {
@@ -140,12 +149,20 @@ export default  class FilterBar extends Component {
     });
   }
 
+  modelDateValidator(date) {
+    let timestamp = date.toDate().getTime();
+    return timestamp >= this.state.minTime && timestamp <= this.state.maxTime;
+  }
+
   _incidentsRef(c) {
 
   }
 
   render() {
-    const {projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList} = this.state;
+    const {
+      projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList,
+      modelStart, modelEnd
+    } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
 
@@ -204,6 +221,24 @@ export default  class FilterBar extends Component {
             <div className="ui input">
               <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
                               onChange={this.handleEndTimeChange.bind(this)}/>
+            </div>
+          </div>
+
+          <div className="field">
+            <label style={labelStyle}>End Time</label>
+            <div className="ui input">
+              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelStart}
+                              onChange={this.handleModelTimeChange('modelStart')}/>
+            </div>
+          </div>
+
+          <div className="field">
+            <label style={labelStyle}>Model End</label>
+            <div className="ui input">
+              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelEnd}
+                              onChange={this.handleModelTimeChange('modelEnd')}/>
             </div>
           </div>
         </div>

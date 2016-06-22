@@ -190,6 +190,8 @@ export default {
    * @param modelKey
    * @param startTime
    * @param endTime
+   * @param modelStart
+   * @param modelEnd
    * @param userName
    * @param token
    * @param pvalue
@@ -198,12 +200,24 @@ export default {
    * @param projectName
    * @returns {Promise}
    */
-  postPostMortem(projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, userName = store.get('userName'), token = store.get('token')) {
+  postPostMortem(projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, modelStart, modelEnd, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['post mortem'],
-        data: $.param({userName, token, pvalue, cvalue, modelType, projectName, modelKey, startTime, endTime}),
+        data: $.param({
+          userName,
+          token,
+          pvalue,
+          cvalue,
+          modelType,
+          projectName,
+          modelKey,
+          startTime,
+          endTime,
+          modelStart,
+          modelEnd
+        }),
         beforeSend: function (request) {
           request.setRequestHeader("Accept", 'application/json');
         }

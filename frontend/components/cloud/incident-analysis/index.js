@@ -44,7 +44,7 @@ export default class IncidentDetection extends Component {
 
   handleFilterChange(data) {
 
-    let {projectName, pvalue, cvalue, modelType, modelKey} = data;
+    let {projectName, pvalue, cvalue, modelType, modelKey, modelStart, modelEnd} = data;
     let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     window.open(`/incidentAnalysis?${$.param(Object.assign({}, {
@@ -54,7 +54,9 @@ export default class IncidentDetection extends Component {
       pvalue,
       cvalue,
       modelType,
-      modelKey
+      modelKey,
+      modelStart, 
+      modelEnd
     }))}`, '_blank');
   }
 
