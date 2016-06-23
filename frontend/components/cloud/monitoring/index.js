@@ -62,7 +62,7 @@ class LiveMonitoring extends BaseComponent {
     super(props);
 
     this._el = null;
-    this._skey = 'cloud_monitoring_addedProject';
+    this._skey = store.get('userName') + '_cloud_monitoring_addedProject';
     this.state = {
       showAddPanel: true,
       addedProjects: store.has(this._skey) ? store.get(this._skey) : []
