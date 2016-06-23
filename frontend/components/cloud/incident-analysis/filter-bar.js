@@ -63,25 +63,58 @@ export default  class FilterBar extends Component {
       default:
         update.projectType = `${cloudType}/Agent`;
     }
+
+    // const incidentInfo = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
+    // const data = dataAllInfo.find((data)=>data.projectName == projectName);
+    // const dataCoverages = (data.dataCoverages || []);
+    // update.incidentList = ((incidentInfo && incidentInfo.incidentList) || []).map((incident)=> {
+    //   let [startTime, endTime, modelKey, pvalue, cvalue] = incident.split("_");
+    //   return {
+    //     startTime: moment(startTime).toDate(),
+    //     endTime: moment(endTime).toDate(),
+    //     modelKey,
+    //     pvalue,
+    //     cvalue,
+    //     modelType: "Holistic",
+    //     record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
+    //   }
+    // });
     const incidentInfo = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
     const data = dataAllInfo.find((data)=>data.projectName == projectName);
     const dataCoverages = (data.dataCoverages || []);
-    update.incidentList = ((incidentInfo && incidentInfo.incidentList) || []).map((incident)=> {
-      let [startTime, endTime, modelKey, pvalue, cvalue] = incident.split("_");
+    update.incidentList = dataCoverages.map((incident)=> {
+      let [startTime, endTime] = incident.split(",");
+      let rec = incidentInfo.incidentList.find((inc)=> inc.indexOf(startTime) >= 0);
       return {
         startTime: moment(startTime).toDate(),
         endTime: moment(endTime).toDate(),
-        modelKey,
-        pvalue,
-        cvalue,
+        modelKey: '',
+        pvalue: 0.99,
+        cvalue: 5,
         modelType: "Holistic",
-        record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
+        record: null
       }
     });
+
     update.minTime = Math.min.apply(Math, update.incidentList.map((incident)=>Math.min(incident.startTime, incident.endTime)));
     update.maxTime = Math.max.apply(Math, update.incidentList.map((incident)=>Math.max(incident.startTime, incident.endTime)));
-    debugger;
+    //debugger;
     this.setState(update);
+  }
+
+  handleDurationChange(durationHours) {
+    let {endTime, cvalue} = this.state;
+    this.setState({
+      durationHours,
+      startTime: moment(endTime).add(-durationHours, 'hour').toDate()
+    });
+  }
+
+  handleStartTimeChange(startTime) {
+    this.setState({
+      startTime,
+      durationHours:''
+    });
   }
 
   handleEndTimeChange(endTime) {
@@ -89,7 +122,7 @@ export default  class FilterBar extends Component {
     this.setState({
       startTime: moment(endTime).add(-durationHours, 'hour').toDate(),
       endTime
-    })
+    });
   }
 
   handleModelTimeChange(timeType) {
@@ -105,6 +138,8 @@ export default  class FilterBar extends Component {
         incident,
         startTime,
         endTime,
+        modelStart:startTime,
+        modelEnd:endTime,
         pvalue,
         cvalue,
         modelKey,
@@ -150,6 +185,7 @@ export default  class FilterBar extends Component {
   }
 
   modelDateValidator(date) {
+    return true;
     let timestamp = date.toDate().getTime();
     return timestamp >= this.state.minTime && timestamp <= this.state.maxTime;
   }
@@ -203,7 +239,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Duration (Hour)</label>
-            <DurationHour value={durationHours} onChange={(v, t)=>this.setState({durationHours: t})}/>
+            <DurationHour value={durationHours} onChange={this.handleDurationChange.bind(this)}/>
           </div>
           <div className="field"></div>
         </div>
@@ -211,7 +247,8 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Start Time</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} disabled/>
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} 
+                              onChange={this.handleStartTimeChange.bind(this)}/>
             </div>
 
           </div>

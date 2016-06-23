@@ -349,7 +349,7 @@ class DataParser {
     
     this._parseAnomalyData();
     
-    if (this.mode != 'holistic') return null;
+    if (false && this.mode != 'holistic') return null;
     
     let alies = this.anomalies[0];
     let annotations = [];
