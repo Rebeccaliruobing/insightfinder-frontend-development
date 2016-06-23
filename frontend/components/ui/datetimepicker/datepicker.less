@@ -21,6 +21,9 @@ body {
 
   .previous-month {
     float: left;
+    &:before {
+      content: '<';
+    }
   }
   .month-label {
     display: inline-block;
@@ -29,6 +32,9 @@ body {
   }
   .next-month {
     float: right;
+    &:before {
+      content: '>';
+    }
   }
   button.previous-month, button.next-month {
     cursor: pointer;
