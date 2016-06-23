@@ -17,7 +17,7 @@ import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
-import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './components/auth/index';
+import {Login, Signup, SignupStep2, ForgotPassword, ResetPassword, ForgotUsername} from './components/auth/index';
 import Help from './components/help';
 
 import apis from './apis';
@@ -140,6 +140,7 @@ const routes = (
     <Route component={Signup} path="/signup"/>
     <Route component={SignupStep2} path="/signup2"/>
     <Route component={ForgotPassword} path="/forgotPassword"/>
+    <Route component={ResetPassword} path="/resetPassword"/>
     <Route component={ForgotUsername} path="/forgotUsername"/>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
@@ -156,6 +157,7 @@ const authRoutes = (
       <Route component={Signup} path="/signup"/>
       <Route component={SignupStep2} path="/signup2"/>
       <Route component={ForgotPassword} path="/forgotPassword"/>
+      <Route component={ResetPassword} path="/resetPassword"/>
       <Route component={ForgotUsername} path="/forgotUsername"/>
       <Redirect from="*" to="/login"/>
     </Route>

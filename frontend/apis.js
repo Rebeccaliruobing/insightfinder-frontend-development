@@ -19,7 +19,10 @@ $.fn.api.settings.api = {
   'login': `${baseUrl}login-check`,
   'signup': `${baseUrl}get-signup-code`,
   'signup2': `${baseUrl}signup`,
-
+  'get username reminder': `${baseUrl}get-username-reminder`,
+  'get temp password': `${baseUrl}get-temp-password`,
+  'reset password': `${baseUrl}reset-password`,
+  
   'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
   'live analysis': `${baseUrl}liveAnalysis`,
   'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
