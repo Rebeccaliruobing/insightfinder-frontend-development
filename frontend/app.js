@@ -21,6 +21,7 @@ import {Login, Signup, SignupStep2, ForgotPassword, ForgotUsername} from './comp
 import Help from './components/help';
 
 import apis from './apis';
+const userInstructionJson = require('./userInstructions.json');
 
 class App extends React.Component {
   static contextTypes = {
@@ -211,7 +212,7 @@ class AppRoute extends React.Component {
 
   loadData() {
     this.setState({
-      userInstructions: {},
+      userInstructions: userInstructionJson,
       dashboardUservalues: {},
       dashboardDailySummaryReport: {}
     }, ()=> {
@@ -221,9 +222,6 @@ class AppRoute extends React.Component {
         return;
       }
 
-      apis.getUserInstructions().then((resp)=> {
-        this.setState({userInstructions: resp});
-      });
       this.loadUserValues();
     });
   }

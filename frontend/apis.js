@@ -26,7 +26,6 @@ $.fn.api.settings.api = {
   'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
   'display project model': `${baseUrl}displayProjectModel`,
 
-  'userInstructions': `${localBaseUrl}oldstatic/userInstructions.json`,
   'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
   'published detection': `${baseUrl}publishedDetection`,
   'post mortem': `${baseUrl}postMortem`,
@@ -92,14 +91,6 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 export default {
-
-  getUserInstructions (userName = store.get('userName'),
-                       token = store.get('token'),
-                       operation) {
-    return new Promise(function (resolve, reject) {
-      requestGet('userInstructions', {userName, token, operation}, resolve, reject);
-    });
-  },
 
   postLogin(userName, password) {
     return new Promise(function (resolve, reject) {
