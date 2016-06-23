@@ -41,7 +41,7 @@ class Navbar extends React.Component {
     return (
       <Accordion className="ui vertical fluid secondary inverted pointing accordion menu">
         <div className="item">
-          <a key="root" className="active title"><i className="dropdown icon"/>List of Charts</a>
+          <a key="root" className="active title"><i className="dropdown icon"/>Charts</a>
           {elem}
         </div>
       </Accordion>

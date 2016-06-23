@@ -52,7 +52,7 @@ export default  class FilterBar extends Component {
       default:
         update.projectType = `${cloudType}/Agent`;
     }
-    this.setState(update);
+    this.setState(update,()=>this.props.onChange && this.props.onChange(this.state));
   }
 
   handleEndTimeChange(endTime) {
@@ -80,7 +80,7 @@ export default  class FilterBar extends Component {
           </div>
         </div>
         <div className="ui field">
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Load</Button>
         </div>
       </div>
     )

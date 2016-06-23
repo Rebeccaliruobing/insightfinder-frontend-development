@@ -27,12 +27,20 @@
   margin-right: @2spacer !important;
 }
 
+.text-white {
+  color: #eee;
+  > a {
+    color: #fff;
+  }
+}
+
 .ui.console {
   > .topbar {
     z-index: 32;
     > .logo {
       width: 160px;
-      background: #88bbee;
+      background: #ffffff;
+      border-bottom: thin solid #4183C4;
     }
   }
 }
@@ -40,6 +48,7 @@
 .ui.console > .wrapper > .navbar,
 .ui.console > .navbar {
   z-index: 12;
+  width:160px;
 }
 
 .ui.console > .wrapper > .navbar {
@@ -56,6 +65,7 @@
     background: #88bbee;
     color: #EEEEEE;
     font-size: 16px;
+    border-bottom: thin solid #4183C4;
   
     > .right.menu > .item,
     > .item {
@@ -66,6 +76,10 @@
       }
     }
   }
+}
+
+.ui.selection.dropdown.active.visible{
+  z-index:11;
 }
 
 .ui.console .navbar {
@@ -146,7 +160,7 @@
 .topbar-text {
   margin-left: @2spacer !important;
   margin-right: @2spacer !important;
-  padding-left: 40px;
+  padding-left: 10px;
   width: 100%;
 
   .title {
@@ -212,18 +226,18 @@
   > .navbar {
     background: #88bbee;
     overflow: inherit;
-    width: 48px;
+    width: 60px;
 
   }
 
   > .topbar > .logo {
-    width: 48px;
+    width: 60px;
     > img {
       width: 100%;
     }
   }
   > .content {
-    padding-left: 48px;
+    padding-left: 80px;
   }
 
   .navbar {
@@ -242,18 +256,20 @@
             width: 240px;
             background-color: darken(#88bbee, 20%);
             > span {
-              left: 50px;
-              line-height: 25px;
+              left: 60px;
+              line-height: 35px;
               display: inline-block;
             }
           }
           > i {
-            font-size: 25px;
+            font-size: 35px;
           }
           > span {
             position: absolute;
             left: 100%;
             display: none;
+            line-height: 35px;
+            font-size: 15px;
           }
         }
       }

@@ -41,7 +41,17 @@ export default class SummaryReport extends Component {
 
   handleFilterChange(data) {
     //this.$filterPanel.slideUp();
-    apis.postDashboardDailySummaryReport().then((resp) => {
+    apis.postDashboardDailySummaryReport(false).then((resp) => {
+      this.setState({summaryReport: resp.data.content, projectName: data.projectName})
+    }).catch(()=> {
+
+    });
+  }
+
+
+  handleFilterSubmit(data) {
+    //this.$filterPanel.slideUp();
+    apis.postDashboardDailySummaryReport(true).then((resp) => {
       this.setState({summaryReport: resp.data.content, projectName: data.projectName})
     }).catch(()=> {
 
@@ -75,7 +85,7 @@ export default class SummaryReport extends Component {
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
+            <FilterBar {...this.props} onSubmit={this.handleFilterSubmit.bind(this)} onChange={this.handleFilterChange.bind(this)}/>
             {userInstructions.clouddailysummary &&
             <Message dangerouslySetInnerHTML={{__html: summaryReport}}/>
             }

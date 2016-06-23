@@ -26,7 +26,7 @@ $.fn.api.settings.api = {
   'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
   'display project model': `${baseUrl}displayProjectModel`,
 
-  'userInstructions': `${localBaseUrl}static/userInstructions.json`,
+  'userInstructions': `${localBaseUrl}oldstatic/userInstructions.json`,
   'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
   'published detection': `${baseUrl}publishedDetection`,
   'post mortem': `${baseUrl}postMortem`,
@@ -137,22 +137,28 @@ export default {
       });
     });
   },
-  postDashboardDailySummaryReport (userName:String = store.get('userName'), token = store.get('token')) {
+  postDashboardDailySummaryReport (forceReload, userName:String = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
-      $.ajax({
-        type: 'POST',
-        url: $.fn.api.settings.api['dashboard dailysummaryreport'],
-        data: $.param({userName, token}),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+      let currentResp = store.get('dailyReportResponse');
+      if(!forceReload && currentResp){
+        resolve(currentResp);
+      } else {
+        $.ajax({
+          type: 'POST',
+          url: $.fn.api.settings.api['dashboard dailysummaryreport'],
+          data: $.param({userName, token}),
+          beforeSend: function (request) {
+            request.setRequestHeader("Accept", 'application/json');
+          }
+        }).done(function (resp) {
+          store.set('dailyReportResponse', resp);
+          resolve(resp);
+        }).fail(function (error) {
+          console.log(arguments);
+          console.log("Server Error", arguments);
+          reject(error);
+        });
+      }
     });
   },
   /**

@@ -108,7 +108,7 @@ class ProjectSummary extends BaseComponent {
           <div className="meta" style={{paddingBottom: 10}}>
             <span>{modelType} /</span>
             <span>{anomalyThreshold} /</span>
-            <span>{durationThreshold} mins</span>
+            <span>{durationThreshold} samples</span>
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
             {sdata && <SummaryChart data={sdata} />}

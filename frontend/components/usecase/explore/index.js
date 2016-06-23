@@ -92,19 +92,25 @@ export default class ListAll extends Component {
         <div style={{padding: 20}}>
           <div className="ui four column grid">
             <div className="wide column text-center" style={wrapperStyle}>
-              <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
-                <a style={linkStyle} href={`/usecase/list-some?system=Cassandra`}>Cassandra</a>
-              </div>
+              <Link to="/usecase/list-some?system=Cassandra" className="item text-white">
+                <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
+                  <span>Cassandra</span>
+                </div>
+              </Link>
             </div>
             <div className="wide column text-center" style={wrapperStyle}>
-              <div style={Object.assign({}, blockStyle, {backgroundColor: '#66ccff'})}>
-                <a style={linkStyle} href={`/usecase/list-some?system=Hadoop`}>Hadoop</a>
-              </div>
+              <Link to="/usecase/list-some?system=Hadoop" className="item text-white">
+                <div style={Object.assign({},blockStyle, {backgroundColor: '#66ccff'})}>
+                  <span>Hadoop</span>
+                </div>
+              </Link>
             </div>
             <div className="wide column text-center" style={wrapperStyle}>
-              <div style={Object.assign({}, blockStyle)}>
-                <a style={linkStyle} href={`/usecase/list-some?system=Other`}>Other</a>
-              </div>
+              <Link to="/usecase/list-some?system=Other" className="item text-white">
+                <div style={Object.assign({},blockStyle)}>
+                  <span>Other</span>
+                </div>
+              </Link>
             </div>
           </div>
         </div>
