@@ -52,6 +52,17 @@ class CustomProjects extends React.Component {
         </button>
         <table className="ui small table">
           <tbody>
+          <tr className="bold">
+            <td className="collapsing">
+              <div className="ui fitted">
+              </div>
+            </td>
+            <td>Project Name</td>
+            <td>Project Type</td>
+            <td>Monitoring Type</td>
+            <td>
+            </td>
+          </tr>
           {
             this.props.projects.map(({name, dataType, cloudType}, index)=> {
               return (
@@ -62,8 +73,8 @@ class CustomProjects extends React.Component {
                     </div>
                   </td>
                   <td>{name}</td>
-                  <td>{dataType}</td>
                   <td>{cloudType}</td>
+                  <td>Agent</td>
                   <td>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
                   </td>

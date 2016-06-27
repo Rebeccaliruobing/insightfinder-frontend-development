@@ -68,6 +68,14 @@ Console.Content = function(props) {
   )
 };
 
+Console.ContentNoPadding = function(props) {
+  let {className, ...others} = props;
+  var classes = classNames('content nopadding', className);
+  return (
+    <div className={classes} {...others}>{props.children}</div>
+  )
+};
+
 Console.Breadcrumb = function(props) {
   let {className, ...others} = props;
   var classes = classNames('ui breadcrumb', className);

@@ -43,6 +43,17 @@ class GoogleProjects extends React.Component {
         </button>
         <table className="ui small table">
           <tbody>
+          <tr className="bold">
+            <td className="collapsing">
+              <div className="ui fitted">
+              </div>
+            </td>
+            <td>Project Name</td>
+            <td>Instance Type</td>
+            <td>Monitoring Type</td>
+            <td>
+            </td>
+          </tr>
           {
             this.props.projects.map(({name, dataType, cloudType}, index)=> {
               return (

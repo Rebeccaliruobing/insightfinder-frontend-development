@@ -82,7 +82,7 @@ export default class ListAll extends Component {
     let system = this.props.location.query.system;
 
     return (
-      <Console.Content>
+      <Console.ContentNoPadding>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
             <ButtonGroup className="right floated basic icon">
@@ -107,7 +107,7 @@ export default class ListAll extends Component {
             {this.state.success && <LiveAnalysisCharts loading={false} data={this.state.data}/>}
           </div>
         </div>
-      </Console.Content>
+      </Console.ContentNoPadding>
     );
   }
 }

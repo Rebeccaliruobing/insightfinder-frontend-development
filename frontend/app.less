@@ -40,7 +40,7 @@
     > .logo {
       width: 160px;
       background: #ffffff;
-      border-bottom: thin solid #4183C4;
+      border-bottom: thin solid #2f88e1;
     }
   }
 }
@@ -49,6 +49,16 @@
 .ui.console > .navbar {
   z-index: 12;
   width:160px;
+}
+
+.ui.console > .wrapper > .content, 
+.ui.console > .content{
+  padding-left: 180px;
+}
+
+.ui.console > .wrapper > .content.nopadding, 
+.ui.console > .content.nopadding{
+  padding-left: 30px;
 }
 
 .ui.console > .wrapper > .navbar {
@@ -65,14 +75,14 @@
     background: #88bbee;
     color: #EEEEEE;
     font-size: 16px;
-    border-bottom: thin solid #4183C4;
+    border-bottom: thin solid #2f88e1;
   
     > .right.menu > .item,
     > .item {
       color: #FFFFFF;
       background: transparent;
       &.active {
-        background: #4183C4;
+        background: #2f88e1;
       }
     }
   }
@@ -218,6 +228,10 @@
 .rc-slider-mark-text {
   width: 80px !important;
   margin-left: -40px !important;
+}
+
+.date-picker td.day.disabled{
+  color: #888 !important;
 }
 
 // Cloud Page

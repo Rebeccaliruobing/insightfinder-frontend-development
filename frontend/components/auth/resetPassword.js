@@ -126,8 +126,9 @@ class ResetPassword extends BaseComponent {
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>Password</label>
-                <div className="ui input" style={{flex: 1}}>
+                <div className="ui input" style={{flex: 1}}>            
                   <input type="password" placeholder="password"
+                         title="Length >= 8, include at least one upper-case letter, one lower-case letter, one number and one special character from ~!@#$%^&*_+?:"
                          value={this.state['pass1']}
                          onChange={(e) => this.setState({error: '', pass1: e.target.value})}/>
                 </div>

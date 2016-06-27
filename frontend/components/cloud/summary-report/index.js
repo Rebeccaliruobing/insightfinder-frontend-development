@@ -9,7 +9,8 @@ import apis from '../../../apis';
 
 export default class SummaryReport extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object
   };
 
   constructor(props) {
@@ -33,6 +34,10 @@ export default class SummaryReport extends Component {
   componentDidMount() {
   }
 
+  handleRefresh(){
+    this.handleFilterSubmit(this.state.projectName);
+  }
+
   handleToggleFilterPanel() {
     this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
       this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
@@ -47,7 +52,6 @@ export default class SummaryReport extends Component {
 
     });
   }
-
 
   handleFilterSubmit(data) {
     //this.$filterPanel.slideUp();
@@ -68,6 +72,11 @@ export default class SummaryReport extends Component {
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
+            <ButtonGroup className="left floated">
+              <Button className="labeled icon " onClick={this.handleRefresh.bind(this)}>
+                <i className="icon refresh"/>Refresh
+              </Button>
+            </ButtonGroup>
             <ButtonGroup className="right floated basic icon">
               <Button onClick={this.handleToggleFilterPanel.bind(this)}>
                 <Popup position="bottom right">

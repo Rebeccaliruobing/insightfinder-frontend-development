@@ -76,7 +76,6 @@ var DateTimePicker = React.createClass({
                         }}/>
                     </table>
                 </div>
-                {timePicker}
             </div>
         );
 

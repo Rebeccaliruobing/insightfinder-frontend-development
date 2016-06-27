@@ -34,18 +34,39 @@ export default  class FilterBar extends Component {
       modelType: "Holistic",
       modelKey: undefined,
       projectType: undefined,
+      availableDataRanges:[],
+      isStationary:false,
       incidentList: []
     };
   }
 
   componentDidMount() {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+    if (projects.length > 0) {
+      this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+    }
+  }
+
+  parseDataRanges(str){
+    var ranges = [];
+    if(str===undefined || str==='[]'){
+      return ranges;
+    }
+    var parts = str.replace('[','').replace(']','').split(",");
+    $.each(parts,function(i,range){
+      var rangesplit = range.split("_");
+      ranges.push({
+        min:parseInt(rangesplit[0].trim()),
+        max:parseInt(rangesplit[1].trim())
+      })
+    });
+    return ranges;
   }
 
   handleProjectChange(value, projectName) {
-    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
+    let {projectString, incidentAllInfo, dataAllInfo, projectSettingsAllInfo} = this.context.dashboardUservalues;
     let project = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
+    let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
     let update = {projectName};
@@ -64,27 +85,13 @@ export default  class FilterBar extends Component {
         update.projectType = `${cloudType}/Agent`;
     }
 
-    // const incidentInfo = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
-    // const data = dataAllInfo.find((data)=>data.projectName == projectName);
-    // const dataCoverages = (data.dataCoverages || []);
-    // update.incidentList = ((incidentInfo && incidentInfo.incidentList) || []).map((incident)=> {
-    //   let [startTime, endTime, modelKey, pvalue, cvalue] = incident.split("_");
-    //   return {
-    //     startTime: moment(startTime).toDate(),
-    //     endTime: moment(endTime).toDate(),
-    //     modelKey,
-    //     pvalue,
-    //     cvalue,
-    //     modelType: "Holistic",
-    //     record: dataCoverages.find((coverage)=> coverage.indexOf(startTime) >= 0)
-    //   }
-    // });
+
     const incidentInfo = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
     const data = dataAllInfo.find((data)=>data.projectName == projectName);
     const dataCoverages = (data.dataCoverages || []);
     update.incidentList = dataCoverages.map((incident)=> {
       let [startTime, endTime] = incident.split(",");
-      let rec = incidentInfo.incidentList.find((inc)=> inc.indexOf(startTime) >= 0);
+      //let rec = incidentInfo.incidentList.find((inc)=> inc.indexOf(startTime) >= 0);
       return {
         startTime: moment(startTime).toDate(),
         endTime: moment(endTime).toDate(),
@@ -96,8 +103,10 @@ export default  class FilterBar extends Component {
       }
     });
 
-    update.minTime = Math.min.apply(Math, update.incidentList.map((incident)=>Math.min(incident.startTime, incident.endTime)));
-    update.maxTime = Math.max.apply(Math, update.incidentList.map((incident)=>Math.max(incident.startTime, incident.endTime)));
+    update.availableDataRanges = this.parseDataRanges(projectInfo.availableDataRanges);
+    update.isStationary = projectInfo.isStationary;
+    update.incident = null;
+    
     //debugger;
     this.setState(update);
   }
@@ -112,7 +121,7 @@ export default  class FilterBar extends Component {
 
   handleStartTimeChange(startTime) {
     this.setState({
-      startTime,
+      startTime:moment(startTime).startOf('day'),
       durationHours:''
     });
   }
@@ -120,8 +129,20 @@ export default  class FilterBar extends Component {
   handleEndTimeChange(endTime) {
     let {durationHours, cvalue} = this.state;
     this.setState({
-      startTime: moment(endTime).add(-durationHours, 'hour').toDate(),
-      endTime
+      durationHours:'',
+      endTime:moment(endTime).endOf('day')
+    });
+  }
+
+  handleModelStartTimeChange(startTime) {
+    this.setState({
+      modelStartTime:moment(startTime).startOf('day')
+    });
+  }
+
+  handleModelEndTimeChange(endTime) {
+    this.setState({
+      modelEndTime:moment(endTime).endOf('day')
     });
   }
 
@@ -131,6 +152,45 @@ export default  class FilterBar extends Component {
     }
   }
 
+  validateStartEnd(){
+    let {startTime, endTime, modelStartTime, modelEndTIme, isStationary, availableDataRanges} = this.state;
+    if(isStationary){
+      let startRange = availableDataRanges.find((item)=> 
+        moment(startTime).endOf('day')>=item.min && moment(startTime).startOf('day')<=item.max);
+      let endRange = availableDataRanges.find((item)=> 
+        moment(endTime).endOf('day')>=item.min && moment(endTime).startOf('day')<=item.max);
+      let modelStartRange = availableDataRanges.find((item)=> 
+        moment(modelStartTime).endOf('day')>=item.min && moment(modelStartTime).startOf('day')<=item.max);
+      let modelEndRange = availableDataRanges.find((item)=> 
+        moment(modelEndTime).endOf('day')>=item.min && moment(modelEndTime).startOf('day')<=item.max);
+      if(startRange === undefined){
+        alert('Incident Start not in available data range.');
+        return false;
+      }
+      if(endRange === undefined){
+        alert('Incident End not in available data range.');
+        return false;
+      }
+      if(modelStartRange === undefined){
+        alert('Model Start not in available data range.');
+        return false;
+      }
+      if(modelEndRange === undefined){
+        alert('Model End not in available data range.');
+        return false;
+      }
+      if(startRange != endRange){
+        alert('Incident Start and Incident End not in the same data range.');
+        return false;
+      }
+      if(modelStartRange != modelEndRange){
+        alert('Model Start and Model End not in the same data range.');
+        return false;
+      }
+    }
+    return true;
+  }
+
   handleClickIncident(incident) {
     return (e) => {
       let {startTime, endTime, modelKey, modelType, pvalue, cvalue} = incident;
@@ -138,8 +198,8 @@ export default  class FilterBar extends Component {
         incident,
         startTime,
         endTime,
-        modelStart:startTime,
-        modelEnd:endTime,
+        modelStartTime:startTime,
+        modelEndTime:endTime,
         pvalue,
         cvalue,
         modelKey,
@@ -149,7 +209,7 @@ export default  class FilterBar extends Component {
   }
 
   handleSubmit() {
-    this.props.onSubmit && this.props.onSubmit(this.state);
+    this.validateStartEnd() && this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
   handleRemoveRow() {
@@ -178,16 +238,29 @@ export default  class FilterBar extends Component {
       this.context.root.loadUserValues().then(()=> {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-          if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+          if (projects.length > 0) {
+            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+          }
         });
       })
     });
   }
 
   modelDateValidator(date) {
-    return true;
     let timestamp = date.toDate().getTime();
-    return timestamp >= this.state.minTime && timestamp <= this.state.maxTime;
+    let {isStationary, availableDataRanges} = this.state;
+    if(isStationary){
+      // check within data range
+      let hitRange = availableDataRanges.find((item)=> moment(timestamp).endOf('day') >= item.min 
+        && moment(timestamp).startOf('day') <= item.max);
+      return hitRange!=undefined;
+    } else {
+      // check within past 6 weeks
+      let nowd = new Date();
+      let max = moment(nowd);
+      let min = max -  3600000*24*7*6;
+      return moment(timestamp).endOf('day') >= min && moment(timestamp).startOf('day') <= max;
+    }
   }
 
   _incidentsRef(c) {
@@ -197,7 +270,7 @@ export default  class FilterBar extends Component {
   render() {
     const {
       projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList,
-      modelStart, modelEnd
+      modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
@@ -245,28 +318,30 @@ export default  class FilterBar extends Component {
         </div>
         <div className="four fields fill">
           <div className="field">
-            <label style={labelStyle}>Start Time</label>
+            <label style={labelStyle}>Incident Start</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} 
+              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} 
                               onChange={this.handleStartTimeChange.bind(this)}/>
             </div>
 
           </div>
 
           <div className="field">
-            <label style={labelStyle}>End Time</label>
+            <label style={labelStyle}>Incident End</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
+              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
                               onChange={this.handleEndTimeChange.bind(this)}/>
             </div>
           </div>
 
           <div className="field">
-            <label style={labelStyle}>End Time</label>
+            <label style={labelStyle}>Model Start</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelStart}
-                              onChange={this.handleModelTimeChange('modelStart')}/>
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelStartTime}
+                              onChange={this.handleModelStartTimeChange.bind(this)}/>
             </div>
           </div>
 
@@ -274,8 +349,8 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Model End</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelEnd}
-                              onChange={this.handleModelTimeChange('modelEnd')}/>
+                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelEndTime}
+                              onChange={this.handleModelEndTimeChange.bind(this)}/>
             </div>
           </div>
         </div>

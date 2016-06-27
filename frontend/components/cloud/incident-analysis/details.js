@@ -61,8 +61,8 @@ const ProjectDetails = class extends React.Component {
     const {projectName} = query;
     let {data, groupId, loading} = this.state;
     return (
-      //<LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateData()}/>
-      <LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
+      <LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateData()}/>
+      //<LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
     );
   }
 };

@@ -83,7 +83,11 @@ class DataParser {
     if (this.anomalyTexts) return;
     
     let arr = this.data['anomalyString'];
-    let hintMapping = this.hintMapping;
+    let rawHintMapping = this.data['hintMapping'];
+    let hintMapping = {};
+    if(rawHintMapping){
+      hintMapping = $.parseJSON(rawHintMapping);
+    }
     let anomalyTexts = [];
     let causalDataArray=[];
     let causalTypes = [];
@@ -157,7 +161,11 @@ class DataParser {
     if (this.anomalyConsolidatedTexts) return;
     
     let arr = this.data['anomalyConsolidatedString'];
-    let hintMapping = this.hintMapping;
+    let rawHintMapping = this.data['hintMapping'];
+    let hintMapping = {};
+    if(rawHintMapping){
+      hintMapping = $.parseJSON(rawHintMapping);
+    }
     let anomalyConsolidatedTexts = [];
     let causalDataArray=[];
     let causalTypes = [];

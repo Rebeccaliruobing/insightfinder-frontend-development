@@ -79,9 +79,6 @@ export default  class FilterBar extends Component {
             <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
         </div>
-        <div className="ui field">
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Load</Button>
-        </div>
       </div>
     )
   }
