@@ -7,6 +7,7 @@ require('script-loader!blueimp-file-upload');
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import cx from 'classnames';
 import {Modal} from '../../../artui/react';
 import store from 'store';
 
@@ -15,7 +16,9 @@ class GoogleProjectModal extends React.Component {
   constructor(props) {
     super(props);
     this._dropdown = null;
-    this.state = {};
+    this.state = {
+      loading: false
+    };
   }
 
   componentDidMount() {
@@ -34,7 +37,7 @@ class GoogleProjectModal extends React.Component {
     return (
       <Modal {...this.props} size="small" closable={false}>
         <div className="content">
-          <form className="ui form">
+          <form className={cx('ui form', {loading: this.state.loading})}>
             <div className="field">
               <label>Project Name</label>
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
@@ -88,15 +91,18 @@ class GoogleProjectModal extends React.Component {
       })
       .bind('fileuploadadd', function (e, data) {
       })
-      .bind('fileuploadprogress', function (e, data) {
+      .bind('fileuploadprogress', (e, data) =>{
         var progress = parseInt(data.loaded / data.total *
           100, 10);
+        this.setState({loading: true});
       })
       .bind('fileuploadfail', function (e, data) {
         var resp = data.response().jqXHR.responseJSON;
+        this.setState({loading: false});
       })
       .bind('fileuploaddone', (e, data) =>{
         var resp = data.response().jqXHR.responseJSON;
+        resp.loading = false;
         this.setState(resp);
       });
 
