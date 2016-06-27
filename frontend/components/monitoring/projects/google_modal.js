@@ -8,6 +8,7 @@ import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {Modal} from '../../../artui/react';
+import store from 'store';
 
 
 class GoogleProjectModal extends React.Component {
@@ -79,7 +80,12 @@ class GoogleProjectModal extends React.Component {
 
     $(ReactDOM.findDOMNode(r))
       .fileupload({
-        url: '/upload',
+        formData: {
+          userName: store.get('userName'),
+          token: store.get('token')
+        },
+        dataType: 'json',
+        url: 'https://insightfinderui.appspot.com/api/v1/cloudstorage',
         sequentialUploads: true,
       })
       .bind('fileuploadadd', function (e, data) {
