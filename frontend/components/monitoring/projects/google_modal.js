@@ -15,6 +15,7 @@ class GoogleProjectModal extends React.Component {
   constructor(props) {
     super(props);
     this._dropdown = null;
+    this.state = {};
   }
 
   componentDidMount() {
@@ -59,8 +60,9 @@ class GoogleProjectModal extends React.Component {
               <label>.p12 key file</label>
               <div className="ui button fileinput-button">
                 Upload .p12 key file
-                <input type="file" name="file" ref={this.fileUploadRef}/>
+                <input type="file" name="file" ref={::this.fileUploadRef}/>
               </div>
+              {this.state.filename && <span className="text-blue">{this.state.filename}</span>}
             </div>
           </form>
         </div>
@@ -80,12 +82,8 @@ class GoogleProjectModal extends React.Component {
 
     $(ReactDOM.findDOMNode(r))
       .fileupload({
-        formData: {
-          userName: store.get('userName'),
-          token: store.get('token')
-        },
         dataType: 'json',
-        url: 'https://insightfinderui.appspot.com/api/v1/cloudstorage',
+        url: `https://insightfinderui.appspot.com/api/v1/cloudstorage/${store.get('userName')}/${this.state.projectName}.p12`,
         sequentialUploads: true,
       })
       .bind('fileuploadadd', function (e, data) {
@@ -97,9 +95,9 @@ class GoogleProjectModal extends React.Component {
       .bind('fileuploadfail', function (e, data) {
         var resp = data.response().jqXHR.responseJSON;
       })
-      .bind('fileuploaddone', function (e, data) {
+      .bind('fileuploaddone', (e, data) =>{
         var resp = data.response().jqXHR.responseJSON;
-        ;
+        this.setState(resp);
       });
 
   }
