@@ -10,7 +10,7 @@ import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import {Modal} from '../../../artui/react';
 import store from 'store';
-
+import apis from '../../../apis';
 
 class GoogleProjectModal extends React.Component {
   constructor(props) {
@@ -30,7 +30,16 @@ class GoogleProjectModal extends React.Component {
   }
 
   handleSubmit() {
-    console.log(this.state);
+    let {projectName, projectId, projectType, filename} = this.state;
+    apis.postAddGoogleProject(projectName, projectId, projectType, filename).then((resp)=> {
+      if (resp.success) {
+        this.context.root.loadData();
+      } else {
+        console.error(resp.message);
+      }
+    }).catch((e)=> {
+      console.error(e);
+    });
   }
 
   render() {
@@ -54,10 +63,6 @@ class GoogleProjectModal extends React.Component {
                 <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
               </select>
-            </div>
-            <div className="field">
-              <label>Service Account Email</label>
-              <input type="text" name="service-account" onChange={(e)=>this.setState({serviceAccount: e.target.value})}/>
             </div>
             <div className="field">
               <label>.p12 key file</label>
@@ -86,21 +91,21 @@ class GoogleProjectModal extends React.Component {
     $(ReactDOM.findDOMNode(r))
       .fileupload({
         dataType: 'json',
-        url: `https://insightfinderui.appspot.com/api/v1/cloudstorage/${store.get('userName')}/${this.state.projectName}.p12`,
+        url: `${window.API_BASE_URL}cloudstorage/${store.get('userName')}/${this.state.projectName}.p12`,
         sequentialUploads: true,
       })
       .bind('fileuploadadd', function (e, data) {
       })
-      .bind('fileuploadprogress', (e, data) =>{
+      .bind('fileuploadprogress', (e, data) => {
         var progress = parseInt(data.loaded / data.total *
           100, 10);
         this.setState({loading: true});
       })
-      .bind('fileuploadfail', function (e, data) {
+      .bind('fileuploadfail', (e, data) =>{
         var resp = data.response().jqXHR.responseJSON;
         this.setState({loading: false});
       })
-      .bind('fileuploaddone', (e, data) =>{
+      .bind('fileuploaddone', (e, data) => {
         var resp = data.response().jqXHR.responseJSON;
         resp.loading = false;
         this.setState(resp);
