@@ -296,7 +296,7 @@ class LiveAnalysisCharts extends React.Component {
                 </Button>
                 <Button active={view === 'list'}
                         onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
-                  <i className="list layout icon"/>
+                  <i className="align justify icon"/>
                 </Button>
                 <Button active={view === 'grid'}
                         onClick={()=>this.setState({view:'grid', summarySelected:false,selectedGroupId: null})}>

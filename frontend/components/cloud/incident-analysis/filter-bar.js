@@ -32,7 +32,6 @@ export default  class FilterBar extends Component {
       cvalue: 5,
       durationHours: 24,
       modelType: "Holistic",
-      modelKey: undefined,
       projectType: undefined,
       availableDataRanges:[],
       isStationary:false,
@@ -85,24 +84,8 @@ export default  class FilterBar extends Component {
         update.projectType = `${cloudType}/Agent`;
     }
 
-
-    const incidentInfo = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
-    const data = dataAllInfo.find((data)=>data.projectName == projectName);
-    const dataCoverages = (data.dataCoverages || []);
-    update.incidentList = dataCoverages.map((incident)=> {
-      let [startTime, endTime] = incident.split(",");
-      //let rec = incidentInfo.incidentList.find((inc)=> inc.indexOf(startTime) >= 0);
-      return {
-        startTime: moment(startTime).toDate(),
-        endTime: moment(endTime).toDate(),
-        modelKey: '',
-        pvalue: 0.99,
-        cvalue: 5,
-        modelType: "Holistic",
-        record: null
-      }
-    });
-
+    let incidentListEntry = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
+    update.incidentList = (incidentListEntry || {}).incidentList || [];
     update.availableDataRanges = this.parseDataRanges(projectInfo.availableDataRanges);
     update.isStationary = projectInfo.isStationary;
     update.incident = null;
@@ -193,17 +176,22 @@ export default  class FilterBar extends Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {startTime, endTime, modelKey, modelType, pvalue, cvalue} = incident;
+      let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys} = incident;
+      let isd = moment(incidentStartTime);
+      let ied = moment(incidentEndTime);
+      let msd = moment(modelStartTime);
+      let med = moment(modelEndTime);
       this.setState({
         incident,
-        startTime,
-        endTime,
-        modelStartTime:startTime,
-        modelEndTime:endTime,
-        pvalue,
-        cvalue,
-        modelKey,
-        modelType
+        startTime:isd,
+        endTime:ied,
+        modelStartTime,
+        modelEndTime,
+        pvalue:pValue,
+        cvalue:cValue,
+        modelType,
+        holisticModelKeys,
+        splitModelKeys
       })
     }
   }
@@ -224,8 +212,7 @@ export default  class FilterBar extends Component {
           incident: undefined,
           startTime: undefined,
           endTime: undefined,
-          pvalue: undefined,
-          modelKey: undefined
+          pvalue: undefined
         }, this.handleRefresh.bind(this));
       } else {
         alert(resp.message);
@@ -269,7 +256,7 @@ export default  class FilterBar extends Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList,
+      projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelType, durationHours, incidentList,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -295,10 +282,6 @@ export default  class FilterBar extends Component {
             <ModelType value={modelType} text={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Model Key</label>
-            <div className="ui input">
-              <input type="text" readonly value={modelKey}/>
-            </div>
           </div>
         </div>
         <div className="four fields fill">
@@ -311,8 +294,6 @@ export default  class FilterBar extends Component {
             <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Duration (Hour)</label>
-            <DurationHour value={durationHours} onChange={this.handleDurationChange.bind(this)}/>
           </div>
           <div className="field"></div>
         </div>
@@ -367,14 +348,20 @@ export default  class FilterBar extends Component {
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
               {incidentList.map((incident)=> {
-                let {startTime, endTime, modelKey, modelType, pvalue, cvalue, record} = incident;
-                let bgColor = (incident.startTime == this.state.startTime) ? '#f1f1f1' : '#fff';
+                let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType} = incident;
+                let isd = moment(incidentStartTime);
+                let ied = moment(incidentEndTime);
+                let msd = moment(modelStartTime);
+                let med = moment(modelEndTime);
+                let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={startTime.getTime()} style={{'backgroundColor': bgColor}}>
+                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
                       <a className="header padding5">
-                        Start Time: {moment(startTime).toString()},
-                        End Time: {moment(endTime).toString()} {record && `(record)`}
+                        Incident: [{isd.format("YYYY-MM-DD HH:mm")}, 
+                         {ied.format("YYYY-MM-DD HH:mm")}], 
+                         model: [{msd.format("YYYY-MM-DD HH:mm")}, 
+                         {med.format("YYYY-MM-DD HH:mm")}], {modelType}
                       </a>
                     </div>
                   </div>

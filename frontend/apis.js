@@ -200,7 +200,7 @@ export default {
    * @param projectName
    * @returns {Promise}
    */
-  postPostMortem(projectName, pvalue, cvalue, modelType, modelKey, startTime, endTime, modelStart, modelEnd, userName = store.get('userName'), token = store.get('token')) {
+  postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -212,11 +212,10 @@ export default {
           cvalue,
           modelType,
           projectName,
-          modelKey,
           startTime,
           endTime,
-          modelStart,
-          modelEnd
+          modelStartTime,
+          modelEndTime
         }),
         beforeSend: function (request) {
           request.setRequestHeader("Accept", 'application/json');
