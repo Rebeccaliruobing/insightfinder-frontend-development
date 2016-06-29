@@ -72,11 +72,11 @@ export default  class FilterBar extends Component {
     update.modelType = "Holistic";
     switch (dataType) {
       case 'AWS':
-        update.projectType = "AWS/CloudWatch";
-        break;
+      case 'EC2':
+      case 'RDS':
+      case 'DynamoDB':
+        update.projectType = `${dataType}/CloudWatch`;
       case 'GAE':
-        update.projectType = `${dataType}/CloudMonitoring`;
-        break;
       case 'GCE':
         update.projectType = `${dataType}/CloudMonitoring`;
         break;
@@ -135,8 +135,8 @@ export default  class FilterBar extends Component {
     }
   }
 
-  validateStartEnd(){
-    let {startTime, endTime, modelStartTime, modelEndTIme, isStationary, availableDataRanges} = this.state;
+  validateStartEnd(data){
+    let {startTime, endTime, modelStartTime, modelEndTime, isStationary, availableDataRanges} = data;
     if(isStationary){
       let startRange = availableDataRanges.find((item)=> 
         moment(startTime).endOf('day')>=item.min && moment(startTime).startOf('day')<=item.max);
@@ -176,13 +176,14 @@ export default  class FilterBar extends Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys} = incident;
+      let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys} = incident;
       let isd = moment(incidentStartTime);
       let ied = moment(incidentEndTime);
       let msd = moment(modelStartTime);
       let med = moment(modelEndTime);
       this.setState({
         incident,
+        dataChunkName,
         startTime:isd,
         endTime:ied,
         modelStartTime,
@@ -197,22 +198,21 @@ export default  class FilterBar extends Component {
   }
 
   handleSubmit() {
-    this.validateStartEnd() && this.props.onSubmit && this.props.onSubmit(this.state);
+    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
   handleRemoveRow() {
-    let {projectName, startTime, endTime} = this.state;
-    startTime = startTime.getTime();
-    endTime = endTime.getTime();
-    apis.postJSONDashboardUserValues('deleterawdata', {
-      projectName, startTime, endTime,
+    let {projectName, dataChunkName, modelStartTime, modelEndTime, modelType} = this.state;
+    apis.postJSONDashboardUserValues('deleteincident', {
+      projectName, dataChunkName, modelStartTime, modelEndTime, modelType
     }).then((resp)=> {
       if (resp.success) {
         this.setState({
           incident: undefined,
           startTime: undefined,
           endTime: undefined,
-          pvalue: undefined
+          modelStartTime: undefined,
+          modelEndTime: undefined
         }, this.handleRefresh.bind(this));
       } else {
         alert(resp.message);
@@ -302,7 +302,7 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Incident Start</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} 
+                              dateTimeFormat='YYYY-MM-DD' value={startTime} 
                               onChange={this.handleStartTimeChange.bind(this)}/>
             </div>
 
@@ -312,7 +312,7 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Incident End</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
+                              dateTimeFormat='YYYY-MM-DD' value={endTime}
                               onChange={this.handleEndTimeChange.bind(this)}/>
             </div>
           </div>
@@ -321,7 +321,7 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Model Start</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelStartTime}
+                              dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
                               onChange={this.handleModelStartTimeChange.bind(this)}/>
             </div>
           </div>
@@ -330,7 +330,7 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Model End</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD HH:mm' value={modelEndTime}
+                              dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
                               onChange={this.handleModelEndTimeChange.bind(this)}/>
             </div>
           </div>
@@ -339,8 +339,8 @@ export default  class FilterBar extends Component {
         <div className="ui field">
           <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
 
-          <Button className="basic" onClick={this.handleRefresh.bind(this)}>refresh</Button>
-          {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
+          <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
+          {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
         </div>
 
         {incidentList.length > 0 && (

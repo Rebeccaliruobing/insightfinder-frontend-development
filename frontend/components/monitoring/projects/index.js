@@ -51,11 +51,12 @@ class Projects extends React.Component {
       ;
       switch (dataType) {
         case 'AWS':
+        case 'EC2':
+        case 'RDS':
+        case 'DynamoDB':
           projectGroupByType.AWS.push({name, dataType, cloudType});
           break;
         case 'GAE':
-          projectGroupByType.Google.push({name, dataType, cloudType});
-          break;
         case 'GCE':
           projectGroupByType.Google.push({name, dataType, cloudType});
           break;

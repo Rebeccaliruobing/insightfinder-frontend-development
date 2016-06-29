@@ -79,11 +79,11 @@ export default class ThresholdSettings extends React.Component {
     let projectType;
     switch (dataType) {
       case 'AWS':
-        projectType = "AWS/CloudWatch";
-        break;
+      case 'EC2':
+      case 'RDS':
+      case 'DynamoDB':
+        update.projectType = `${dataType}/CloudWatch`;
       case 'GAE':
-        projectType = `${dataType}/CloudMonitoring`;
-        break;
       case 'GCE':
         projectType = `${dataType}/CloudMonitoring`;
         break;

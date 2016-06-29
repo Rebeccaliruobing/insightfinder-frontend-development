@@ -41,11 +41,12 @@ export default  class FilterBar extends Component {
     let update = {projectName};
     switch (dataType) {
       case 'AWS':
-        update.projectType = "AWS/CloudWatch";
+      case 'EC2':
+      case 'RDS':
+      case 'DynamoDB':
+        update.projectType = `${dataType}/CloudWatch`;
         break;
       case 'GAE':
-        update.projectType = `${dataType}/CloudMonitoring`;
-        break;
       case 'GCE':
         update.projectType = `${dataType}/CloudMonitoring`;
         break;

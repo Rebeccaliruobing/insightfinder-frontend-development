@@ -357,6 +357,7 @@ class DataParser {
     
     this._parseAnomalyData();
     
+    if(this.data['detectionResults'] === undefined) return null;
     if (false && this.mode != 'holistic') return null;
     
     let alies = this.anomalies[0];

@@ -1,5 +1,6 @@
 import React from 'react';
 import CustomProjectModal from './custom_modal';
+import CustomProjectLicenseKeyModal from './custom_modal_licensekey';
 import apis from '../../../apis';
 
 
@@ -13,7 +14,9 @@ class CustomProjects extends React.Component {
     super(props);
 
     this.state = {
-      showModal: false
+      showModal: false,
+      showLicenseKeyModal: false,
+      licenseKeyMessage: ''
     };
   }
 
@@ -28,9 +31,16 @@ class CustomProjects extends React.Component {
 
   handleModalClose = () => this.setState({showModal: false});
 
+  handleRegisterSuccess(modal){
+    this.setState({
+      licenseKeyMessage: modal.message,
+      showLicenseKeyModal: true
+    });
+  }
+
   handleRemoveProject(projectName) {
     return (e) => {
-      if (!window.confirm("Confirm?")) return;
+      if (!window.confirm("Confirm deleting project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
           this.context.root.loadData();
@@ -58,7 +68,7 @@ class CustomProjects extends React.Component {
               </div>
             </td>
             <td>Project Name</td>
-            <td>Project Type</td>
+            <td>Instance Type</td>
             <td>Monitoring Type</td>
             <td>
             </td>
@@ -86,7 +96,11 @@ class CustomProjects extends React.Component {
         </table>
         {
           this.state.showModal &&
-          <CustomProjectModal onClose={this.handleModalClose}/>
+          <CustomProjectModal onClose={this.handleModalClose} onSubmit={this.handleRegisterSuccess.bind(this)}/>
+        }
+        {
+          this.state.showLicenseKeyModal &&
+          <CustomProjectLicenseKeyModal {...this.state} onClose={this.handleLicenseKeyModalClose}/>
         }
       </div>
     )

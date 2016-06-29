@@ -21,7 +21,7 @@ class GoogleProjects extends React.Component {
 
   handleRemoveProject(projectName) {
     return (e) => {
-      if (!window.confirm("Confirm?")) return;
+      if (!window.confirm("Confirm deleting project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
           this.context.root.loadData();

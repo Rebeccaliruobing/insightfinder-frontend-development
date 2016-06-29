@@ -52,11 +52,11 @@ export default  class FilterBar extends Component {
     update.modelType = "Holistic";
     switch (dataType) {
       case 'AWS':
-        update.projectType = "AWS/CloudWatch";
-        break;
+      case 'EC2':
+      case 'RDS':
+      case 'DynamoDB':
+        update.projectType = `${dataType}/CloudWatch`;
       case 'GAE':
-        update.projectType = `${dataType}/CloudMonitoring`;
-        break;
       case 'GCE':
         update.projectType = `${dataType}/CloudMonitoring`;
         break;

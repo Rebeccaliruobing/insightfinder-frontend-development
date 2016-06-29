@@ -149,13 +149,7 @@ export default  class FilterBar extends Component {
     return (
       <div className={cx('ui form', {loading: !!this.state.loading})}>
         <div className="ui grid">
-          <div className="five wide column">
-
-            <div className="field">
-              <label style={labelStyle}>{nameField || 'Project Name'}</label>
-              <input className="ui input" value={nameFieldValue} readonly/>
-            </div>
-
+          <div className="four wide column">
             <div className="field">
               <label style={labelStyle}>Anomaly Threshold</label>
               <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
@@ -163,20 +157,6 @@ export default  class FilterBar extends Component {
             <div className="field">
               <label style={labelStyle}>Duration Threshold</label>
               <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
-            </div>
-          </div>
-          <div className="five wide column">
-            <div className="field">
-              <label style={labelStyle}>Start Time</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readonly/>
-              </div>
-            </div>
-            <div className="field">
-              <label style={labelStyle}>End Time</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime} readonly/>
-              </div>
             </div>
           </div>
           <div className="six wide column">
@@ -230,7 +210,7 @@ export default  class FilterBar extends Component {
         <div className="ui grid">
           <div className="sixteen wide column">
             <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
-            <Button className="basic" onClick={this.handleRefresh}>refresh</Button>
+            <Button className="basic" onClick={this.handleRefresh}>Refresh</Button>
             {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
           </div>
 
