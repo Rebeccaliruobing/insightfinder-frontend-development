@@ -45,7 +45,7 @@ export default class RolloutCheck extends Component {
 
   handleData(data) {
     this.setState({data: data}, ()=> {
-      this.setHeatMap(1);
+      this.setHeatMap(_.keys(this.state.data.modelData)[1]);
     })
   }
 
@@ -75,10 +75,15 @@ export default class RolloutCheck extends Component {
           endTime: data.endTime
         };
 
+
+        let metricNames = "";
+        if (data.metricNameList && data.metricNameList != undefined) {
+          metricNames = `(${new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})`
+        }
         if (!groupId) {
-          title = <span>Holistic<br/>{startTime}-{endTime}</span>
+          title = <span>Holistic {metricNames}<br/>{startTime}-{endTime} </span>
         } else {
-          title = <span>Group {groupId}<br/>{startTime}-{endTime}</span>
+          title = <span>Group {groupId} {metricNames}<br/>{startTime}-{endTime}</span>
 
         }
 
@@ -239,11 +244,11 @@ export default class RolloutCheck extends Component {
                     <div>
                       <div style={{padding: '10px 0'}}>
                         <Dropdown keys={_.keys(this.state.data.modelData).length} mode="select"
-                                  value={this.state.groupId} onChange={(v)=>this.setHeatMap(v)}>
+                                  value={`Group ${this.state.groupId}`} onChange={(v)=>this.setHeatMap(v)}>
                           <i className="dropdown icon"/>
                           <div className="menu">
                             {_.keys(this.state.data.modelData).map((g)=> {
-                              return g && <div className="item" key={g} data-value={g}>Group {g}</div>
+                              return g > 0 && <div className="item" key={g} data-value={g}>Group {g}</div>
                             })}
                           </div>
                         </Dropdown>

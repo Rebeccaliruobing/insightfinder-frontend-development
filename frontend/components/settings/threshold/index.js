@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
-
+import store from 'store';
 
 import apis from '../../../apis';
 
@@ -123,7 +123,7 @@ export default class ThresholdSettings extends React.Component {
   }
 
   handleMetricSetting(index, name) {
-    return (e) =>{
+    return (e) => {
       let metricSettings = this.state.metricSettings;
       metricSettings[index][name] = e.target.value;
       this.setState({metricSettings});
@@ -194,6 +194,15 @@ export default class ThresholdSettings extends React.Component {
               </div>
               <div className="wide column">
                 <h3>Hint mapping file:</h3>
+                <div className="field">
+                  <label style={labelStyle}>Hint mapping file</label>
+                  <div className="ui button fileinput-button">
+                    Upload Hint mapping file
+                    <input type="file" name="file" ref={::this.fileUploadRef}/>
+                  </div>
+                  {this.state.projectHintMapFilename &&
+                  <span className="text-blue">{this.state.projectHintMapFilename}</span>}
+                </div>
               </div>
               <div className="wide column">
                 <Button className="blue" onClick={this.handleSaveProjectSetting.bind(this)}>Submit</Button>
@@ -211,13 +220,15 @@ export default class ThresholdSettings extends React.Component {
                 </tr>
                 </thead>
                 <tbody>
-                {metricSettings.map((setting, index)=>{
+                {metricSettings.map((setting, index)=> {
                   return (
                     <tr key={`${data.projectName}-${index}`}>
                       <td>{setting.smetric}</td>
                       <td><input value={setting.groupId} onChange={this.handleMetricSetting(index, 'groupId')}/></td>
-                      <td><input value={setting.thresholdAlert} onChange={this.handleMetricSetting(index, 'thresholdAlert')}/></td>
-                      <td><input value={setting.thresholdNoAlert} onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/></td>
+                      <td><input value={setting.thresholdAlert}
+                                 onChange={this.handleMetricSetting(index, 'thresholdAlert')}/></td>
+                      <td><input value={setting.thresholdNoAlert}
+                                 onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/></td>
                     </tr>
                   )
                 })}
@@ -231,6 +242,37 @@ export default class ThresholdSettings extends React.Component {
     );
   }
 
+
+  fileUploadRef(r) {
+
+    $(ReactDOM.findDOMNode(r))
+      .fileupload({
+        dataType: 'json',
+        url: `${window.API_BASE_URL}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/projectHintMapFilename`,
+        sequentialUploads: true,
+      })
+      .bind('fileuploadadd', (e, data) => {
+        this.setState({settingLoading: true});
+      })
+      .bind('fileuploadprogress', (e, data) => {
+        var progress = parseInt(data.loaded / data.total * 100, 10);
+        this.setState({settingLoading: true});
+      })
+      .bind('fileuploadfail', (e, data) => {
+        var resp = data.response().jqXHR.responseJSON;
+        this.setState({settingLoading: false});
+      })
+      .bind('fileuploaddone', (e, data) => {
+        var resp = data.response().jqXHR.responseJSON;
+        this.setState({
+          projectHintMapFilename: resp.filename,
+          data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
+          settingLoading: false
+        });
+      });
+
+  }
+
   handleSaveProjectSetting() {
     let {projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename,} = this.state.data;
     this.setState({settingLoading: true}, ()=> {
@@ -240,6 +282,7 @@ export default class ThresholdSettings extends React.Component {
       });
     });
   }
+
   handleSaveMetricSetting() {
     this.setState({uservaluesLoading: true}, ()=> {
       apis.postDashboardUserValues('updateprojsettings', {
