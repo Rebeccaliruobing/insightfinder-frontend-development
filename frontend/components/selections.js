@@ -1,5 +1,5 @@
 import React from 'react';
-import {Dropdown, Link} from '../artui/react';
+import {Dropdown, Link} from '../artui/react/index';
 import classNames from 'classnames';
 
 class ProjectSelection extends React.Component {

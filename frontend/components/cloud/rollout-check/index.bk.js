@@ -32,11 +32,7 @@ export default class RolloutCheck extends Component {
         endTime: moment(new Date()).toDate(),
         startTime: moment(new Date()).add(-7 * weeks, 'days')
       },
-      data: {},
-      tabStates: {
-        holistic: 'active',
-        split: ''
-      }
+      data: {}
     };
   }
 
@@ -45,61 +41,59 @@ export default class RolloutCheck extends Component {
 
   handleData(data) {
     this.setState({data: data}, ()=> {
-      this.setHeatMap(1);
+      this.setHeatMap(0, 0);
     })
   }
 
-  setHeatMap(groupId = 1) {
-    let modelData = this.state.data && this.state.data.modelData;
-    if (!modelData) return;
-    let holisticGroup, splitGroup;
-    let handleGroup = (group, groupId)=> {
-      return group.map((data, index)=> {
-        let dataArray = [];
-        let title
-          , startTime = data.startTime.substr(5, 11).replace("T", " ")
-          , endTime = data.endTime.substr(5, 11).replace("T", " ");
-        data.NASValues.forEach((line, index) => {
-          var lineArray = line.split(",");
-          var colIndex = lineArray.splice(0, 1);
-          dataArray.push({
-            colIndex: colIndex % 32,
-            rowIndex: parseInt(index / 32),
-            value: lineArray[lineArray.length - 2]
-          });
+  setHeatMap(dateIndex = 0) {
+    let {mapData, startTime, endTime} = this.state.data.modelData[dateIndex];
+    let groupIds = [];
+    if(mapData === undefined) return;
+    let maps = mapData.map((data, index)=> {
+      let dataArray = [];
+      data.NASValues.forEach((line, index) => {
+        var lineArray = line.split(",");
+        var colIndex = lineArray.splice(0, 1);
+        dataArray.push({
+          colIndex: colIndex % 32,
+          rowIndex: parseInt(index / 32),
+          value: lineArray[lineArray.length - 2]
         });
+      });
 
-        let params = {
-          projectName: this.state.data.projectName,
-          startTime: data.startTime,
-          endTime: data.endTime
-        };
+      let title, params = {
+        projectName: this.state.data.projectName,
+        startTime,
+        endTime
+      };
 
-        if (!groupId) {
-          title = <span>Holistic<br/>{startTime}-{endTime}</span>
-        } else {
-          title = <span>Group {groupId}<br/>{startTime}-{endTime}</span>
-
+      if (data.instanceName) {
+        title = data.instanceName;
+        params.instanceName = data.instanceName;
+      } else if (data.groupId + '' == '0') {
+        title = 'Holistic';
+        params.groupId = data.groupId;
+        groupIds.push(params.groupId);
+      } else {
+        let metricNames = "";
+        if (data.metricNameList && data.metricNameList != undefined) {
+          metricNames = `(${new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})`
         }
+        title = <span>{`Group ${data.groupId}`}{metricNames}</span>;
+        params.groupId = data.groupId;
+        groupIds.push(params.groupId);
+      }
+      return {
+        key: `${dateIndex}-${index}`,
+        duration: 120,
+        itemSize: 4,
+        title: title,
+        data: dataArray,
+        link: `/projectDataOnly?${$.param(params)}`
+      };
+    });
 
-        return {
-          key: `${groupId}-${index}`,
-          duration: 120,
-          itemSize: 4,
-          title: title,
-          data: dataArray,
-          link: `/projectDataOnly?${$.param(params)}`
-        };
-      })
-    };
-    if (modelData[0]) {
-      holisticGroup = handleGroup(modelData[0], 0)
-    }
-    if (modelData[groupId]) {
-      splitGroup = handleGroup(modelData[groupId], groupId)
-    }
-
-    this.setState({holisticGroup, splitGroup, groupId: groupId});
+    this.setState({heatMaps: maps, dateIndex, groupIds});
   }
 
   handleDateIndexChange(startIndex) {
@@ -128,19 +122,6 @@ export default class RolloutCheck extends Component {
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
           resp.data.modelData = resp.data.rolloutCheckModelKeyList;
-          let groups = {};
-          resp.data.modelData.forEach((dataArray)=> {
-            dataArray.mapData.forEach((data)=> {
-              if (!groups[data.groupId]) {
-                groups[data.groupId] = []
-              }
-              groups[data.groupId].push(Object.assign({}, data, {
-                startTime: dataArray.startTime,
-                endTime: dataArray.endTime
-              }));
-            });
-          });
-          resp.data.modelData = groups;
           this.handleData(resp.data);
         }
         this.setState({loading: false});
@@ -153,13 +134,13 @@ export default class RolloutCheck extends Component {
   renderSlider() {
 
     let data = this.state.data.modelData;
-    if (data === undefined) return;
+    if(data === undefined) return;
     let marks = data && data.map((item, index)=> `
       ${moment(item.startTime).format('MM-DD HH:mm')} \n
       ${moment(item.endTime).format('MM-DD HH:mm')}
     `).sort();
     if (!marks) return;
-    if (marks === undefined) return;
+    if(marks === undefined) return;
     const dateIndex = this.state.dateIndex;
     marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
     return (
@@ -171,17 +152,8 @@ export default class RolloutCheck extends Component {
     )
   }
 
-  selectTab(e, tab) {
-    var tabStates = this.state['tabStates'];
-    tabStates = _.mapValues(tabStates, function (val) {
-      return '';
-    });
-    tabStates[tab] = 'active';
-    this.setState({tabStates: tabStates});
-  }
-
   render() {
-    const {showAddPanel, tabStates} = this.state;
+    const {showAddPanel} = this.state;
     const {userInstructions} = this.context;
     const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
     return (
@@ -215,47 +187,17 @@ export default class RolloutCheck extends Component {
               (i.e. normal states) and the size of the red areas indicates the ranges of different metric
               values.
             </div>
-
-            <Console.Content>
-              <div className="ui main tiny container" ref={c => this._el = c}>
-                <div className="ui clearing vertical segment">
-
-                </div>
-                <div className="ui pointing secondary menu">
-                  <a className={tabStates['holistic'] + ' item'}
-                     onClick={(e) => this.selectTab(e, 'holistic')}>Holistic</a>
-                  <a className={tabStates['split'] + ' item'}
-                     onClick={(e) => this.selectTab(e, 'split')}>Split</a>
-                </div>
-                <div className={tabStates['holistic'] + ' ui tab '}>
-                  {tabStates['holistic'] === 'active' ? (
-                    <div className="ui four cards">
-                      {this.state.holisticGroup && this.state.holisticGroup.map((data,)=> <HeatMapCard {...data}/>)}
-                    </div>
-                  ) : null}
-                </div>
-                <div className={tabStates['split'] + ' ui tab '}>
-                  {tabStates['split'] === 'active' ? (
-                    <div>
-                      <div style={{padding: '10px 0'}}>
-                        <Dropdown keys={_.keys(this.state.data.modelData).length} mode="select"
-                                  value={this.state.groupId} onChange={(v)=>this.setHeatMap(v)}>
-                          <i className="dropdown icon"/>
-                          <div className="menu">
-                            {_.keys(this.state.data.modelData).map((g)=> {
-                              return g && <div className="item" key={g} data-value={g}>Group {g}</div>
-                            })}
-                          </div>
-                        </Dropdown>
-                      </div>
-                      <div className="ui four cards">
-                        {this.state.splitGroup && this.state.splitGroup.map((data,)=> <HeatMapCard {...data}/>)}
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </Console.Content>
+            {this.renderSlider()}
+            <div className="ui four cards">
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] == '0').map((data,)=> {
+                return <HeatMapCard {...data}/>
+              })}
+            </div>
+            <div className="ui four cards">
+              {this.state.heatMaps!=undefined && this.state.heatMaps.filter((item,index) => this.state.groupIds[index] != '0').map((data,)=> {
+                return <HeatMapCard {...data}/>
+              })}
+            </div>
           </div>
         </div>
       </Console.Content>
