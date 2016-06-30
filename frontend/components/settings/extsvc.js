@@ -22,12 +22,12 @@ export default class ExtSvc extends React.Component {
               </tr>
               </thead>
               <tbody>
-              {extServiceAllInfo.map((info=>(
-                <tr>
+              {extServiceAllInfo.map((info, index)=>(
+                <tr key={index}>
                   <td>{info.id}</td>
                   <td>{info.desc}</td>
                 </tr>
-              )))}
+              ))}
               </tbody>
             </table>
           </div>
