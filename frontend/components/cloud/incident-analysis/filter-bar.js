@@ -256,7 +256,7 @@ export default  class FilterBar extends Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelType, durationHours, incidentList,
+      projectName, incident, startTime, endTime, pvalue, cvalue, recorded, projectType, modelType, durationHours, incidentList,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -290,7 +290,7 @@ export default  class FilterBar extends Component {
             <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Duration Threshold (Minute)</label>
+            <label style={labelStyle}>Duration Threshold (Sample Number)</label>
             <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
           </div>
           <div className="field">
@@ -361,7 +361,7 @@ export default  class FilterBar extends Component {
                         Incident: [{isd.format("YYYY-MM-DD HH:mm")}, 
                          {ied.format("YYYY-MM-DD HH:mm")}], 
                          model: [{msd.format("YYYY-MM-DD HH:mm")}, 
-                         {med.format("YYYY-MM-DD HH:mm")}], {modelType}
+                         {med.format("YYYY-MM-DD HH:mm")}], {modelType} {recorded?"(recorded)":"(manual)"}
                       </a>
                     </div>
                   </div>

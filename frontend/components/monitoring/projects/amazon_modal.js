@@ -23,8 +23,8 @@ class AmazonProjectModal extends React.Component {
 
   handleSubmit() {
 
-    let {projectName, ec2Zone,rdsZone,dynamodbZone, access_key, secrete_key, email} = this.state;
-    apis.postAddAWSProject(projectName, ec2Zone,rdsZone,dynamodbZone, access_key, secrete_key, email).then((resp)=> {
+    let {projectName, zone, instanceType, access_key, secrete_key} = this.state;
+    apis.postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key).then((resp)=> {
       if(resp.success) {
         this.context.root.loadData();
       } else {
@@ -47,47 +47,27 @@ class AmazonProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>EC2 Availability Zone</label>
-              <select title="If you wish to monitor EC2 instances in your account, specify its Availability Zone." className="ui dropdown" onChange={(e)=>this.setState({ec2Zone: e.target.value})}>
-                <option className="item">None</option>
-                <option className="item" value="us-east-1">us-east-1</option>
-                <option className="item" value="us-west-1">us-west-1</option>
-                <option className="item" value="us-west-2">us-west-2</option>
-                <option className="item" value="ap-northeast-1">ap-northeast-1</option>
-                <option className="item" value="ap-southeast-1">ap-southeast-1</option>
-                <option className="item" value="ap-southeast-2">ap-southeast-2</option>
-                <option className="item" value="eu-central-1">eu-central-1</option>
-                <option className="item" value="eu-west-1">eu-west-1</option>
-                <option className="item" value="sa-east-1">sa-east-1</option>
+              <label>Instance Type</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({instanceType: e.target.value})}>
+                <option className="item"></option>
+                <option className="item" value='EC2'>EC2</option>
+                <option className="item" value='RDS'>RDS</option>
+                <option className="item" value='DynamoDB'>DynamoDB</option>
               </select>
             </div>
             <div className="field">
-              <label>RDS Availability Zone</label>
-              <select title="If you wish to monitor RDS in your account, specify its Availability Zone." className="ui dropdown" onChange={(e)=>this.setState({rdsZone: e.target.value})}>
-                <option className="item">None</option>
+              <label>Availability Zone</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
+                <option className="item"></option>
                 <option className="item" value="us-east-1">us-east-1</option>
                 <option className="item" value="us-west-1">us-west-1</option>
                 <option className="item" value="us-west-2">us-west-2</option>
+                <option className="item" value="eu-west-1">eu-west-1</option>
+                <option className="item" value="eu-central-1">eu-central-1</option>
                 <option className="item" value="ap-northeast-1">ap-northeast-1</option>
+                <option className="item" value="ap-northeast-2">ap-northeast-2</option>
                 <option className="item" value="ap-southeast-1">ap-southeast-1</option>
                 <option className="item" value="ap-southeast-2">ap-southeast-2</option>
-                <option className="item" value="eu-central-1">eu-central-1</option>
-                <option className="item" value="eu-west-1">eu-west-1</option>
-                <option className="item" value="sa-east-1">sa-east-1</option>
-              </select>
-            </div>
-            <div className="field">
-              <label>DynamoDB Availability Zone</label>
-              <select title="If you wish to monitor DynamoDB in your account, specify its Availability Zone." className="ui dropdown" onChange={(e)=>this.setState({dynamodbZone: e.target.value})}>
-                <option className="item">None</option>
-                <option className="item" value="us-east-1">us-east-1</option>
-                <option className="item" value="us-west-1">us-west-1</option>
-                <option className="item" value="us-west-2">us-west-2</option>
-                <option className="item" value="ap-northeast-1">ap-northeast-1</option>
-                <option className="item" value="ap-southeast-1">ap-southeast-1</option>
-                <option className="item" value="ap-southeast-2">ap-southeast-2</option>
-                <option className="item" value="eu-central-1">eu-central-1</option>
-                <option className="item" value="eu-west-1">eu-west-1</option>
                 <option className="item" value="sa-east-1">sa-east-1</option>
               </select>
             </div>

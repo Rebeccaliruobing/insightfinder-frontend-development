@@ -181,7 +181,7 @@ export default  class FilterBar extends Component {
             <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Duration Threshold (Minute)</label>
+            <label style={labelStyle}>Duration Threshold (Sample Number)</label>
             <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
           </div>
           <div className="field">

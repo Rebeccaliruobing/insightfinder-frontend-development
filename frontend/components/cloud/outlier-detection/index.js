@@ -70,7 +70,6 @@ export default class OutlierDetection extends Component {
           title = data.instanceName;
           params.instanceName = data.instanceName;
         } else {
-          title = `Metric Group ${data.groupId}`;
           params.groupId = groupId = data.groupId;
         }
 
@@ -108,6 +107,9 @@ export default class OutlierDetection extends Component {
     this.setState({loading: true}, () => {
       apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
         if (resp.success) {
+    this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+      this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
+    });
           let state = {};
           state.projectName = data.projectName;
           state.originData = Object.assign({}, resp.data);

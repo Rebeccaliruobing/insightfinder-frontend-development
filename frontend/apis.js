@@ -404,16 +404,15 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postAddAWSProject(projectName,ec2Zone,rdsZone,dynamodbZone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+  postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add aws project'],
         data: $.param({
-          projectName,
-          ec2Zone,
-          rdsZone,
-          dynamodbZone,
+          projectName, 
+          zone, 
+          instanceType,
           'access-key': access_key,
           'secrete-key': secrete_key,
           email,

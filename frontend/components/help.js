@@ -23,18 +23,18 @@ export default class Help extends React.Component {
             </div>
             <div className="column">
               <div className="card">
-                <i className="help circle icon"></i>
+                <i className="dashboard icon"></i>
                 <h3>Dashboard</h3>
                 <Link to="/cloud/monitoring" className="item">&bull; View realtime anomaly detection results.</Link>
                 <Link to="/cloud/incident-analysis" className="item">&bull; Triage historical incidents or view recorded incidents.</Link>
                 <Link to="/cloud/outlier-detection" className="item">&bull; Identify abnormal instances/hosts in outlier detection.</Link>
-                <Link to="/cloud/rollout-check" className="item">&bull; View system behavior change in software rollout check.</Link>
-                <Link to="/cloud/summary-report" className="item">&bull; View summary results in summary report</Link>
+                <Link to="/cloud/rollout-check" className="item">&bull; View system behavior change in behavior change detection.</Link>
+                <Link to="/cloud/summary-report" className="item">&bull; View summary results in summary report.</Link>
               </div>
             </div>
             <div className="column">
               <div className="card">
-                <i className="help circle icon"></i>
+                <i className="settings icon"></i>
                 <h3>Settings</h3>
                 <Link to="/settings/project-list" className="item">&bull; Add/remove cloud projects. </Link>
                 <Link to="/settings/threshold" className="item">&bull; Anomaly detection and metric threshold settings. </Link>
@@ -43,8 +43,8 @@ export default class Help extends React.Component {
             </div>
             <div className="column">
               <div className="card">
-                <i className="help circle icon"></i>
-                <h3>Examples</h3>
+                <i className="find icon"></i>
+                <h3>Benchmarks</h3>
                 <Link to="/usecase" className="item">You can find various anomaly benchmark data shared with you by either us or other InsightFinder users. We encourage everyone to share their anomaly benchmark data with the community. </Link>
               </div>
             </div>

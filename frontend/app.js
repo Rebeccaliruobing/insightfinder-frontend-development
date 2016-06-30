@@ -55,7 +55,7 @@ class App extends React.Component {
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/settings" className="item">Settings</Link>
-          <Link to="/usecase" className="item">Examples</Link>
+          <Link to="/usecase" className="item">Benchmarks</Link>
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
             <div className="ui right simple dropdown item">
