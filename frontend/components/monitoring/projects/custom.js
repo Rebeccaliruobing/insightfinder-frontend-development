@@ -63,29 +63,24 @@ class CustomProjects extends React.Component {
         <table className="ui small table">
           <tbody>
           <tr className="bold">
-            <td className="collapsing">
-              <div className="ui fitted">
-              </div>
-            </td>
-            <td>Project Name</td>
-            <td>Instance Type</td>
-            <td>Monitoring Type</td>
-            <td>
-            </td>
+            <td style={{width: '25%'}}>Project Name</td>
+            <td style={{width: '25%'}}>Instance Type</td>
+            <td style={{width: '25%'}}>Monitoring Type</td>
+            <td style={{width: '25%'}}></td>
           </tr>
           {
             this.props.projects.map(({name, dataType, cloudType}, index)=> {
+              if(cloudType==='FileReplay'){
+                cloudType='File';
+              }else if(cloudType==='PrivateCloud'){
+                cloudType='Private';
+              }
               return (
                 <tr key={index}>
-                  <td className="collapsing">
-                    <div className="ui fitted checkbox">
-                      <input type="checkbox"/><label></label>
-                    </div>
-                  </td>
-                  <td>{name}</td>
-                  <td>{cloudType}</td>
-                  <td>Agent</td>
-                  <td>
+                  <td style={{width: '25%'}}>{name}</td>
+                  <td style={{width: '25%'}}>{cloudType}</td>
+                  <td style={{width: '25%'}}>Agent</td>
+                  <td style={{width: '25%'}}>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
                   </td>
                 </tr>

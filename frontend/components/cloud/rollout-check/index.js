@@ -84,8 +84,15 @@ export default class RolloutCheck extends Component {
           title = <span>Holistic {metricNames}<br/>{startTime}-{endTime} </span>
         } else {
           title = <span>Group {groupId} {metricNames}<br/>{startTime}-{endTime}</span>
-
         }
+
+        if (data.instanceName) {
+          title = data.instanceName;
+          params.instanceName = data.instanceName;
+        } else {
+          params.groupId = data.groupId;
+        }
+
 
         return {
           key: `${groupId}-${index}`,
@@ -118,12 +125,16 @@ export default class RolloutCheck extends Component {
   }
 
   handleFilterChange(data) {
+    
     let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
     this.setState({loading: true}, () => {
       apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {
         if (resp.success) {
+    this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+      this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
+    });
 
           resp.data.originData = Object.assign({}, resp.data);
           resp.data.projectName = data.projectName;

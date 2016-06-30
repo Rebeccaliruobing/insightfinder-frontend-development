@@ -181,10 +181,9 @@ export default class ThresholdSettings extends React.Component {
                 </div>
               </div>
               <div className="wide column">
-                <h3>Sharing group: <span style={{fontSize: '0.6em', color: '#999'}}>(comma separated user names)</span>
+                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
                 </h3>
                 <div className="field">
-                  <label style={labelStyle}>Sharing Usernames</label>
                   <div className="ui input">
                     <input key={data.projectName} type="text" readonly
                            value={JSON.parse(data.sharedUsernames || "[]").join(",")}
@@ -195,7 +194,6 @@ export default class ThresholdSettings extends React.Component {
               <div className="wide column">
                 <h3>Hint mapping file:</h3>
                 <div className="field">
-                  <label style={labelStyle}>Hint mapping file</label>
                   <div className="ui button fileinput-button">
                     Upload Hint mapping file
                     <input type="file" name="file" ref={::this.fileUploadRef}/>

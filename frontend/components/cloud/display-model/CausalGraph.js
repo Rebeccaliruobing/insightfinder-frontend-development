@@ -78,7 +78,7 @@ export default class CausalGraph extends React.Component {
     this.state = {
       svg: {
         width: 900,
-        height: 300,
+        height: 500,
         style: {
           border: '1px solid #e0e0e0'
         }
@@ -88,7 +88,7 @@ export default class CausalGraph extends React.Component {
       selectRange: {},
       zoomRange: {
         x1: 0, y1: 0,
-        x2: 900, y2: 300,
+        x2: 900, y2: 500,
         zoomX: 1, zoomY: 1
       }
     }
@@ -297,7 +297,7 @@ export default class CausalGraph extends React.Component {
       this.setState({
         zoomRange: {
           x1: 0, y1: 0,
-          x2: 900, y2: 300,
+          x2: 900, y2: 500,
           zoomX: 1, zoomY: 1
         }
       })
@@ -308,7 +308,7 @@ export default class CausalGraph extends React.Component {
         <div className="relative" style={{display: 'flex'}}>
           <svg {...{
             width: 100,
-            height: 300,
+            height: 500,
             style: {
               // border: '1px solid #e0e0e0'
             }
@@ -364,7 +364,7 @@ export default class CausalGraph extends React.Component {
                   height={Math.abs(selectRange.y1 - selectRange.y2) || 0}
                   style={{fill:'blue',stroke:'blue',strokeWidth:2,fillOpacity:0.1,strokeOpacity:0.5}}/>
 
-            <rect x={800} y={0} width={100} height={300}
+            <rect x={800} y={0} width={100} height={500}
                   style={{fill:'white',stroke:'white',strokeWidth:2}}/>
             <rect x={0} y={svg.height - stageHeight / 4} width={900} height={stageHeight / 4}
                   style={{fill:'white',stroke:'white',strokeWidth:2}}/>

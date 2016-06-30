@@ -40,10 +40,10 @@ class DataParser {
       return "error";
     }
 
-    if(arr[0].groupId === "0"){
-      return "holistic";
-    } else {
+    if(this.data['modelType'] === 'Split'){
       return "split";
+    } else {
+      return "holistic";
     }
   }
 
@@ -159,7 +159,7 @@ class DataParser {
   _parseAnomalyConsolidatedText() {
     
     if (this.anomalyConsolidatedTexts) return;
-    
+    if(this.data['anomalyConsolidatedString'] === undefined) return;
     let arr = this.data['anomalyConsolidatedString'];
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
@@ -358,7 +358,6 @@ class DataParser {
     this._parseAnomalyData();
     
     if(this.data['detectionResults'] === undefined) return null;
-    if (false && this.mode != 'holistic') return null;
     
     let alies = this.anomalies[0];
     let annotations = [];

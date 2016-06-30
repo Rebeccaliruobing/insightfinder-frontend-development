@@ -266,7 +266,9 @@ class LiveAnalysisCharts extends React.Component {
       // Since componentWillUpdate is not called at initial time, so 
       // we need to parse the data
       this.dp = new DataParser(data);
-      this.dp.getSummaryData();
+      if (this.dp.mode != 'split') {
+        this.dp.getSummaryData();
+      }
       this.dp.getGroupsData();
     }
 

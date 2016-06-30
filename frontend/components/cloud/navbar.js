@@ -20,7 +20,7 @@ export default function (props) {
         </Link>
         <Link to="/cloud/rollout-check" className="item text-white">
           <i className="checkmark box icon"></i>
-          <span> Software Rollout Check</span>
+          <span> Behavior Change Detection</span>
         </Link>
         <Link to="/cloud/summary-report" className="item text-white">
           <i className="icon icon-report iconfont"></i>
