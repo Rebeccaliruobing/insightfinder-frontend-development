@@ -230,7 +230,11 @@ class LiveAnalysisCharts extends React.Component {
       <div className="ui grid">
         <div className="twelve wide column">
           {this.renderSummary()}
-          { groups.map((group) => {
+            { groups.sort(function(a, b) {
+              let aid = parseInt(a.id);
+              let bid = parseInt(b.id);
+              return +(aid > bid) || +(aid === bid) - 1;
+            }).map((group) => {
             return (
               <div key={group.id} className="detail-charts" style={{position:'relative'}}>
                 <span id={group.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>

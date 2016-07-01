@@ -11,8 +11,16 @@ export default class ExtSvc extends React.Component {
     let extServiceAllInfo = this.context.dashboardUservalues.extServiceAllInfo;
     return (
       <Console.Content>
+        <h4>PagerDuty Settings</h4>
+        <div className="text-muted">You can manage your alerts with your PagerDuty account. Click the button below to
+          integrate your account alerts with PagerDuty.
+        </div>
+        <a target="_blank"
+           href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=https://app.insightfinder.com/service-integration">
+          <img alt="Connect_button" src={pdSrc}/>
+        </a>
         <h4>Current external services</h4>
-        {extServiceAllInfo ? (
+        {extServiceAllInfo.length ? (
           <div>
             <table className="ui basic table">
               <thead>
@@ -35,14 +43,6 @@ export default class ExtSvc extends React.Component {
           <div className="text-muted">No external service registered.</div>
         )}
         <hr/>
-        <h4>PagerDuty Settings</h4>
-        <div className="text-muted">You can manage your alerts with your PagerDuty account. Click the button below to
-          integrate your account alerts with PagerDuty.
-        </div>
-        <a target="_blank"
-           href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=https://app.insightfinder.com/service-integration">
-          <img alt="Connect_button" src={pdSrc}/>
-        </a>
       </Console.Content>
     )
   }
