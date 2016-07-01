@@ -9,6 +9,7 @@ import {Dygraph} from '../../../artui/react/dataviz';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
+import ShareModal from './shareModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import Navbar from './navbar';
@@ -16,7 +17,7 @@ import {SummaryChart, DetailsChart} from './charts';
 
 class LiveAnalysisCharts extends React.Component {
 
-  static contextPropTypes = {
+  static contextTypes = {
     router: React.PropTypes.object
   };
 
@@ -45,7 +46,8 @@ class LiveAnalysisCharts extends React.Component {
       summarySelected: false,
       selectedAnnotation: null,
       showSettingModal: false,
-      showTenderModal: false
+      showTenderModal: false,
+      showShareModal: false
     };
   }
 
@@ -252,6 +254,14 @@ class LiveAnalysisCharts extends React.Component {
     )
   }
 
+  handleShare() {
+    this.setState({showShareModal: true});
+  }
+  handleShareSubmit(data) {
+    // TODO: 提交分享数据
+    console.log(data);
+  }
+
   render() {
 
     let {data, loading, onRefresh} = this.props;
@@ -289,6 +299,9 @@ class LiveAnalysisCharts extends React.Component {
                       onClick={() => this.setState({showTenderModal: true})}>
                 <i className="icon random"/>Causal Graph
               </Button>
+              <Button className="labeled icon" onClick={::this.handleShare}>
+                <i className="icon share alternate"/> Share
+              </Button>
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh
               </Button>
@@ -318,6 +331,11 @@ class LiveAnalysisCharts extends React.Component {
           { this.state.showTenderModal &&
           <TenderModal dataArray={dataArray} types={types}
                        onClose={() => this.setState({showTenderModal: false})}/>
+          }
+          { this.state.showShareModal &&
+          <ShareModal dataArray={dataArray} types={types}
+                      onSubmit={::this.handleShareSubmit}
+                      onClose={() => this.setState({showShareModal: false})}/>
           }
         </Console.Content>
       </Console.Wrapper>
