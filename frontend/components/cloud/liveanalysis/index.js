@@ -304,7 +304,7 @@ class LiveAnalysisCharts extends React.Component {
                 <i className="icon random"/>Causal Graph
               </Button>
               <Button className="labeled icon" onClick={::this.handleShare}>
-                <i className="icon share alternate"/> Share
+                <i className="icon share alternate"/> Publish
               </Button>
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh

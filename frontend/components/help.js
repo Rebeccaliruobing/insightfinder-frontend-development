@@ -4,7 +4,7 @@ import {Console, Link} from '../artui/react/index';
 export default class Help extends React.Component {
   render() {
     return (
-      <Console.Wrapper className="help-page">
+      <Console.Wrapper className="single-page">
         <div className="ui container">
           <div className="text-center" style={{padding: '0 50px 20px'}}>
             <h2>Welcome!</h2>
@@ -16,7 +16,7 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="help circle icon"></i>
                 <h3>How to get started?</h3>
-                <Link to="/settings/project-list" className="item">Step 1: Register your project in settings.</Link>
+                <Link to="/settings/project-list" className="item">Step 1: Register your project in settings. Choose from Insight Agent and/or AWS CloudWatch, Google Cloud Monitoring.</Link>
                 <Link to="/cloud/" className="item">Step 2: View anomaly detection and diagnosis results in Dashboard.</Link>
                 <Link to="/settings/threshold" className="item">Step 3: Configure your projects in settings.</Link>
               </div>
@@ -46,6 +46,15 @@ export default class Help extends React.Component {
                 <i className="find icon"></i>
                 <h3>Benchmarks</h3>
                 <Link to="/usecase" className="item">You can find various anomaly benchmark data shared with you by either us or other InsightFinder users. We encourage everyone to share their anomaly benchmark data with the community. </Link>
+              </div>
+            </div>
+            <div className="column">
+              <div className="card">
+                <i className="treatment icon"></i>
+                <h3>How to install Insight Agent?</h3>
+                <Link to="/account-info" className="item">Step 1: Retrieve your license key here if you forget.</Link>
+                <Link to="/help" className="item">Step 2: Select the agent(s) you want to install.</Link>
+                <Link to="/help" className="item">Step 3: Deploy one or multiple agents using our deployment code.</Link>
               </div>
             </div>
           </div>

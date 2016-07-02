@@ -19,6 +19,7 @@ import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import {Login, Signup, SignupStep2, ForgotPassword, ResetPassword, ForgotUsername} from './components/auth/index';
 import Help from './components/help';
+import AccountInfo from './components/account-info';
 
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
@@ -30,14 +31,6 @@ class App extends React.Component {
     dashboardUservalues: React.PropTypes.object,
     dashboardDailySummaryReport: React.PropTypes.object
   };
-
-  handleLogoff() {
-    store.remove('userInfo');
-    store.remove('userName');
-    store.remove('token');
-    // store.clear();
-    window.location.reload();
-  }
 
   render() {
     let {
@@ -58,16 +51,10 @@ class App extends React.Component {
           <Link to="/usecase" className="item">Benchmarks</Link>
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
-            <div className="ui right simple dropdown item">
-              <i className="user icon circular teal inverted"/>
-              {userInfo.userName}
-              <i className="dropdown icon"/>
-              <div className="menu">
-                <div className="item" onClick={this.handleLogoff.bind(this)}>
-                  <i className="icon power"/>Logout
-                </div>
-              </div>
-            </div>
+              <Link to="/account-info" className="item" title='Account Info'>
+                <i className="user icon circular teal inverted"/>
+                {userInfo.userName}
+              </Link>
           </div>
         </Console.Topbar>
         {!loading && this.props.children}
@@ -135,6 +122,7 @@ const routes = (
       {settingsRoute}
       {useCaseRoute}
       <Route component={Help} path="help"/>
+      <Route component={AccountInfo} path="account-info"/>
     </Route>
     <Route component={Login} path="/login"/>
     <Route component={Signup} path="/signup"/>
