@@ -12,7 +12,9 @@ class AmazonProjectModal extends React.Component {
   constructor(props) {
     super(props);
     this._dropdown = null;
-    this.state = {}
+    this.state = {
+      hasAgentData:false
+    }
   }
 
   componentDidMount() {
@@ -23,8 +25,8 @@ class AmazonProjectModal extends React.Component {
 
   handleSubmit() {
 
-    let {projectName, zone, instanceType, access_key, secrete_key} = this.state;
-    apis.postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key).then((resp)=> {
+    let {projectName, zone, instanceType, access_key, secrete_key, hasAgentData} = this.state;
+    apis.postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData).then((resp)=> {
       if(resp.success) {
         this.context.root.loadData();
       } else {
@@ -72,12 +74,19 @@ class AmazonProjectModal extends React.Component {
               </select>
             </div>
             <div className="field">
-              <label>AWS Access ID*</label>
+              <label>IAM Access Key ID*</label>
               <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
             </div>
             <div className="field">
               <label>Secret Access Key*</label>
               <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
+            </div>
+            <div className="inline field" style={{fontSize: 13}}>
+              <div className="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" 
+                       onChange={(e) => this.setState({hasAgentData: e.target.checked})} />
+                <label>Enable agent monitoring</label>
+              </div>
             </div>
           </form>
         </div>
@@ -89,6 +98,7 @@ class AmazonProjectModal extends React.Component {
             </div>
           </div>
         </div>
+        <div>* Fields encrypted for extra security protection.</div>
       </Modal>
     )
   }

@@ -42,26 +42,27 @@ class Projects extends React.Component {
 
     var tabStates = this.state['tabStates'];
     var userInstructions = this.context.userInstructions;
-    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
-
+    let {projectString, incidentAllInfo, dataAllInfo,projectSettingsAllInfo} = this.context.dashboardUservalues;
+    let projectInfoArray = projectSettingsAllInfo.map((s)=> [s.projectName,s.zone,s.agentDataEnabled]);
     let projectGroupByType = {'AWS': [], 'Google': [], 'custom': []};
 
     projectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
       let [name, dataType, cloudType] = project;
-      ;
+      let zone = projectInfoArray.find((pair)=>pair[0] == name)[1] || "N/A";
+      let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)[2] || false;
       switch (dataType) {
         case 'AWS':
         case 'EC2':
         case 'RDS':
         case 'DynamoDB':
-          projectGroupByType.AWS.push({name, dataType, cloudType});
+          projectGroupByType.AWS.push({name, dataType, cloudType,zone,agentDataEnabled});
           break;
         case 'GAE':
         case 'GCE':
-          projectGroupByType.Google.push({name, dataType, cloudType});
+          projectGroupByType.Google.push({name, dataType, cloudType,zone,agentDataEnabled});
           break;
         default:
-          projectGroupByType.custom.push({name, dataType, cloudType});
+          projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
       }
     });
 
