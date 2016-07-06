@@ -14,6 +14,7 @@ import ShareModal from './shareModal';
 import {GridColumns, DefaultView} from '../../storeKeys';
 import Navbar from './navbar';
 import {SummaryChart, DetailsChart} from './charts';
+import apis from '../../../apis';
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -262,8 +263,7 @@ class LiveAnalysisCharts extends React.Component {
     this.setState({showShareModal: true});
   }
   handleShareSubmit(data) {
-    // TODO: 提交分享数据
-    console.log(data);
+    apis.postDashboardUserValues(publishdata, data);
   }
 
   render() {
