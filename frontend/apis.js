@@ -404,7 +404,7 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+  postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -415,6 +415,7 @@ export default {
           instanceType,
           'access-key': access_key,
           'secrete-key': secrete_key,
+          hasAgentData, 
           email,
           userName,
           token
@@ -442,7 +443,7 @@ export default {
    * @returns {Promise}
    */
 
-  postAddGoogleProject(projectName, projectId, projectType, filename, userName = store.get('userName'), token = store.get('token')) {
+  postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -452,6 +453,8 @@ export default {
           'project-id': projectId,
           'project-type': projectType,
           'filename': filename,
+          'service-account': serviceAccount,
+          hasAgentData,
           userName,
           token
         }),

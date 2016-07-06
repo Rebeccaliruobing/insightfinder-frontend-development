@@ -44,19 +44,23 @@ class GoogleProjects extends React.Component {
         <table className="ui small table">
           <tbody>
           <tr className="bold">
-            <td style={{width: '25%'}}>Project Name</td>
-            <td style={{width: '25%'}}>Instance Type</td>
-            <td style={{width: '25%'}}>Monitoring Type</td>
-            <td style={{width: '25%'}}></td>
+            <td style={{width: '16%'}}>Project Name</td>
+            <td style={{width: '16%'}}>Instance Type</td>
+            <td style={{width: '16%'}}>Zone</td>
+            <td style={{width: '16%'}}>Monitoring Type</td>
+            <td style={{width: '16%'}}>Agent Data Enabled</td>
+            <td style={{width: '16%'}}></td>
           </tr>
           {
-            this.props.projects.map(({name, dataType, cloudType}, index)=> {
+            this.props.projects.map(({name, dataType, zone, cloudType, agentDataEnabled}, index)=> {
               return (
                 <tr key={index}>
-                  <td style={{width: '25%'}}>{name}</td>
-                  <td style={{width: '25%'}}>{dataType}</td>
-                  <td style={{width: '25%'}}>{cloudType}</td>
-                  <td style={{width: '25%'}}>
+                  <td style={{width: '16%'}}>{name}</td>
+                  <td style={{width: '16%'}}>{dataType}</td>
+                  <td style={{width: '16%'}}>{zone}</td>
+                  <td style={{width: '16%'}}>{cloudType}</td>
+                  <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled} readonly /></td>
+                  <td style={{width: '16%'}}>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
                   </td>
                 </tr>
