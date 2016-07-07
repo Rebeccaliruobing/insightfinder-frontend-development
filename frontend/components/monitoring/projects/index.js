@@ -19,12 +19,12 @@ class Projects extends React.Component {
     super(props);
     this.selectTab.bind(this);
     this._el = null;
-
+    let tabStates = ['custom','amazon','google'].indexOf(this.props.params.tabId);
     this.state = {
       tabStates: {
-        custom: 'active',
-        amazon: '',
-        google: ''
+        custom: [-1, 0].indexOf(tabStates)!=-1?'active':'',
+        amazon: tabStates == 1?'active':'',
+        google: tabStates == 2?'active':''
       }
     }
   }
@@ -35,6 +35,8 @@ class Projects extends React.Component {
       return '';
     });
     tabStates[tab] = 'active';
+    let pushTab = location.pathname.split('/').length ==3?'project-list/'+tab: tab;
+    history.pushState({title: tab},'detail',pushTab);
     this.setState({tabStates: tabStates});
   }
 
