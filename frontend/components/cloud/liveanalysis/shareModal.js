@@ -15,11 +15,11 @@ class ShareModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: undefined,
-      description: undefined,
+      name: '',
+      description: '',
       system: undefined,
-      ownerOnly: undefined,
-      sharedUsernames: undefined
+      ownerOnly: false,
+      sharedUsernames: ''
     };
   }
 

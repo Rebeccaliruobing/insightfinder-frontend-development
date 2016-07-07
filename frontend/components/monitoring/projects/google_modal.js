@@ -17,7 +17,8 @@ class GoogleProjectModal extends React.Component {
     super(props);
     this._dropdown = null;
     this.state = {
-      loading: false
+      loading: false,
+      hasAgentData:false
     };
   }
 
@@ -30,8 +31,8 @@ class GoogleProjectModal extends React.Component {
   }
 
   handleSubmit() {
-    let {projectName, projectId, projectType, filename} = this.state;
-    apis.postAddGoogleProject(projectName, projectId, projectType, filename).then((resp)=> {
+    let {projectName, projectId, projectType, serviceAccount, filename, hasAgentData} = this.state;
+    apis.postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData).then((resp)=> {
       if (resp.success) {
         this.context.root.loadData();
       } else {
@@ -55,7 +56,6 @@ class GoogleProjectModal extends React.Component {
               <label>Project ID</label>
               <input type="text" name="project_id" onChange={(e)=>this.setState({projectId: e.target.value})}/>
             </div>
-
             <div className="field">
               <label>Project Type</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({projectType: e.target.value})}>
@@ -65,12 +65,23 @@ class GoogleProjectModal extends React.Component {
               </select>
             </div>
             <div className="field">
-              <label>.p12 key file</label>
+              <label>Service Account *</label>
+              <input type="text" name="serviceAccount" onChange={(e)=>this.setState({serviceAccount: e.target.value})}/>
+            </div>
+            <div className="field">
+              <label>.p12 key file *</label>
               <div className="ui button fileinput-button">
                 Upload .p12 key file
                 <input type="file" name="file" ref={::this.fileUploadRef}/>
               </div>
               {this.state.filename && <span className="text-blue">{this.state.filename}</span>}
+            </div>
+            <div className="inline field" style={{fontSize: 13}}>
+              <div className="ui checkbox">
+                <input type="checkbox" tabindex="0" class="hidden" 
+                       onChange={(e) => this.setState({hasAgentData: e.target.checked})} />
+                <label>Enable agent monitoring</label>
+              </div>
             </div>
           </form>
         </div>
@@ -82,6 +93,7 @@ class GoogleProjectModal extends React.Component {
             </div>
           </div>
         </div>
+        <div>* Fields encrypted for extra security protection.</div>
       </Modal>
     )
   }

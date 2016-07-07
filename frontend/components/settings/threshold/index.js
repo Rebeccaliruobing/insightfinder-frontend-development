@@ -71,7 +71,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let {cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames} = project
+    let {cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames} = project;
 
     let projectStr = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
@@ -185,8 +185,8 @@ export default class ThresholdSettings extends React.Component {
                 </h3>
                 <div className="field">
                   <div className="ui input">
-                    <input key={data.projectName} type="text" readonly
-                           value={JSON.parse(data.sharedUsernames || "[]").join(",")}
+                    <input key={data.projectName} type="text"
+                           value={(data.sharedUsernames || '').replace('[','').replace(']','')}
                            onChange={this.handleSharingChange.bind(this)}/>
                   </div>
                 </div>

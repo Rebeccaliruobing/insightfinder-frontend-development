@@ -14,6 +14,7 @@ import ShareModal from './shareModal';
 import {GridColumns, DefaultView} from '../../storeKeys';
 import Navbar from './navbar';
 import {SummaryChart, DetailsChart} from './charts';
+import apis from '../../../apis';
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -89,6 +90,7 @@ class LiveAnalysisCharts extends React.Component {
 
     let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
+    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
 
     let {columns, selectedGroupId, instanceName} = this.state;
     let elems = [];
@@ -116,6 +118,7 @@ class LiveAnalysisCharts extends React.Component {
 
         let isSelectGroup = selectedGroupId == group.id;
         if (isSelectGroup) selectIndex = selectIndex + index;
+        let metrics = groupMetrics[parseInt(group.id)].join();
 
         elems.push((
           <div key={columns + group.id} className="ui card"
@@ -127,7 +130,7 @@ class LiveAnalysisCharts extends React.Component {
                 }
                }}>
             <div className="content">
-              <div className="header" style={{paddingBottom:8}}>{group.title}</div>
+              <div className="header" style={{paddingBottom:8}}>{group.title} ({metrics})</div>
               <SummaryChart data={group}/>
             </div>
             {isSelectGroup && selectArrow}
@@ -143,9 +146,10 @@ class LiveAnalysisCharts extends React.Component {
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
+              let metrics = groupMetrics[parseInt(selectedGroup.id)].join();
               ReactDOM.render((
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{summary.title}</h4>
+                    <h4 className="ui header">{selectedGroup.title} ({metrics})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
                        style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
@@ -223,8 +227,8 @@ class LiveAnalysisCharts extends React.Component {
 
   renderList() {
 
-
     let groups = this.dp ? this.dp.groupsData : [];
+    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
     let {listGraphZoomOpt} = this.state;
     return (
       <div className="ui grid">
@@ -235,10 +239,11 @@ class LiveAnalysisCharts extends React.Component {
               let bid = parseInt(b.id);
               return +(aid > bid) || +(aid === bid) - 1;
             }).map((group) => {
+            let metrics = groupMetrics[parseInt(group.id)].join();
             return (
               <div key={group.id} className="detail-charts" style={{position:'relative'}}>
                 <span id={group.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
-                <h4 className="ui header">{group.title}</h4>
+                <h4 className="ui header">{group.title} ({metrics})</h4>
                 <DetailsChart
                   data={group}
                   drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
@@ -262,8 +267,7 @@ class LiveAnalysisCharts extends React.Component {
     this.setState({showShareModal: true});
   }
   handleShareSubmit(data) {
-    // TODO: 提交分享数据
-    console.log(data);
+    apis.postDashboardUserValues('publishdata', data);
   }
 
   render() {
@@ -289,12 +293,12 @@ class LiveAnalysisCharts extends React.Component {
     let groupMetrics = this.dp ? this.dp.groupmetrics : null;
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;
     let types = this.dp ? this.dp.causalTypes : undefined;
+        // <Console.Navbar style={navbarStyle}>
+        //   <Navbar groupMetrics={groupMetrics}/>
+        // </Console.Navbar>
 
     return (
       <Console.Wrapper>
-        <Console.Navbar style={navbarStyle}>
-          <Navbar groupMetrics={groupMetrics}/>
-        </Console.Navbar>
         <Console.Content style={contentStyle} className={contentClass}>
           <div className="ui main tiny container" style={{minHeight:'100%'}}>
             {!loading &&
