@@ -63,8 +63,14 @@ export default  class FilterBar extends Component {
   }
 
   handleProjectChange(value, projectName) {
-    let {projectString, incidentAllInfo, dataAllInfo, projectSettingsAllInfo} = this.context.dashboardUservalues;
-    let project = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
+    let {projectString, sharedProjectString, incidentAllInfo, dataAllInfo, projectSettingsAllInfo} = this.context.dashboardUservalues;
+    let project = undefined;
+    if(projectString.length>0){
+      project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
+    }
+    if(sharedProjectString.length>0 && project==undefined){
+      project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0]+"@"+parts[3]) == projectName);
+    }
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
@@ -176,7 +182,7 @@ export default  class FilterBar extends Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys} = incident;
+      let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys, recorded} = incident;
       let isd = moment(incidentStartTime);
       let ied = moment(incidentEndTime);
       let msd = moment(modelStartTime);
@@ -191,6 +197,7 @@ export default  class FilterBar extends Component {
         pvalue:pValue,
         cvalue:cValue,
         modelType,
+        recorded,
         holisticModelKeys,
         splitModelKeys
       })
@@ -348,7 +355,7 @@ export default  class FilterBar extends Component {
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
               {incidentList.map((incident)=> {
-                let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType} = incident;
+                let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, recorded} = incident;
                 let isd = moment(incidentStartTime);
                 let ied = moment(incidentEndTime);
                 let msd = moment(modelStartTime);

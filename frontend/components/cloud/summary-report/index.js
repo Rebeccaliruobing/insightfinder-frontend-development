@@ -113,7 +113,7 @@ export default class SummaryReport extends Component {
     // TODO: 接口返回有误,修正后改回
 
     // true line
-    $(ReactDOM.findDOMNode(r)).find(`#dailysummary_${this.state.projectName}`).show();
+    $(ReactDOM.findDOMNode(r)).find(`#dailysummary_${this.state.projectName.replace('@','---')}`).show();
 
     // temp line
     // $(ReactDOM.findDOMNode(r)).find("[id^=dailysummary_]").show();

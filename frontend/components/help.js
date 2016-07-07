@@ -26,8 +26,8 @@ export default class Help extends React.Component {
                 <i className="help circle icon"></i>
                 <h3>How to install Insight Agent?</h3>
                 <Link to="/account-info" className="item">Step 1: Retrieve your license key here if you forget.</Link>
-                <Link to="/help" className="item">Step 2: Select the agent(s) you want to install.</Link>
-                <Link to="/help" className="item">Step 3: Deploy one or multiple agents using our deployment code.</Link>
+                <a href="https://github.com/insightfinder/InsightAgent/wiki" target="_blank" className="item">Step 2: Select the agent(s) you want to install.</a>
+                <a href="https://github.com/insightfinder/InsightAgent/wiki" target="_blank" className="item">Step 3: Deploy one or multiple agents using our deployment code.</a>
               </div>
             </div>
             <div className="column">

@@ -146,9 +146,10 @@ class LiveAnalysisCharts extends React.Component {
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
+              let metrics = groupMetrics[parseInt(selectedGroup.id)].join();
               ReactDOM.render((
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{summary.title}</h4>
+                    <h4 className="ui header">{selectedGroup.title} ({metrics})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
                        style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>

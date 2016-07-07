@@ -34,8 +34,14 @@ export default  class FilterBar extends Component {
   }
 
   handleProjectChange(value, projectName) {
-    let {projectString, incidentAllInfo, dataAllInfo} = this.context.dashboardUservalues;
-    let project = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
+    let {projectString, sharedProjectString} = this.context.dashboardUservalues;
+    let project = undefined;
+    if(projectString.length>0){
+      project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
+    }
+    if(sharedProjectString.length>0 && project==undefined){
+      project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0]+"@"+parts[3]) == projectName);
+    }
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
     let update = {projectName};
