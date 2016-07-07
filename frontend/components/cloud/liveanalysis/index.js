@@ -267,7 +267,7 @@ class LiveAnalysisCharts extends React.Component {
     this.setState({showShareModal: true});
   }
   handleShareSubmit(data) {
-    apis.postDashboardUserValues(publishdata, data);
+    apis.postDashboardUserValues('publishdata', data);
   }
 
   render() {
