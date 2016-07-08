@@ -35,6 +35,7 @@ export default class ThresholdSettings extends React.Component {
         startTime: moment(new Date()).add(-7 * weeks, 'days')
       },
       data: {},
+      sharedNames: '',
       metricSettings: []
     };
   }
@@ -73,16 +74,19 @@ export default class ThresholdSettings extends React.Component {
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
     let {cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames} = project;
 
-    let projectStr = projectString.split(',').map((s)=>s.split(":")).find(([name]) => name == projectName);
-    // 前三部分是名称，数据类型dataType和云类型cloudType
-    let [dataType, cloudType] = projectStr;
+    let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
+    // // 前三部分是名称，数据类型dataType和云类型cloudType
+    let dataType = projectStr ? projectStr[1] : null;
+    let cloudType = projectStr ? projectStr[2] : '';
+    
     let projectType;
     switch (dataType) {
       case 'AWS':
       case 'EC2':
       case 'RDS':
       case 'DynamoDB':
-        update.projectType = `${dataType}/CloudWatch`;
+        projectType = `${dataType}/CloudWatch`;
+        break;
       case 'GAE':
       case 'GCE':
         projectType = `${dataType}/CloudMonitoring`;
@@ -90,22 +94,25 @@ export default class ThresholdSettings extends React.Component {
       default:
         projectType = `${cloudType}/Agent`;
     }
-
+    
+    let data =  Object.assign({}, this.state.data, {
+      projectName,
+      projectType,
+      cvalue,
+      pvalue,
+      emailcvalue,
+      emailpvalue,
+      filtercvalue,
+      filterpvalue,
+      minAnomalyRatioFilter,
+      sharedUsernames
+    });
+    
     this.setState({
       metricSettings: metricSettings,
-      data: Object.assign({}, this.state.data, {
-        projectName,
-        projectType,
-        cvalue,
-        pvalue,
-        emailcvalue,
-        emailpvalue,
-        filtercvalue,
-        filterpvalue,
-        minAnomalyRatioFilter,
-        sharedUsernames
-      })
-    })
+      data: data,
+      sharedNames: (data.sharedUsernames || '').replace('[','').replace(']','')
+    });
   }
 
   handleValueChange(name) {
@@ -119,6 +126,7 @@ export default class ThresholdSettings extends React.Component {
   handleSharingChange(e) {
     let v = e.target.value;
     this.setState({
+      sharedNames: v,
       data: Object.assign({}, this.state.data, {sharingUsernames: JSON.stringify(v.split(","))})
     });
   }
@@ -133,8 +141,7 @@ export default class ThresholdSettings extends React.Component {
 
   render() {
     let labelStyle = {};
-    let data = this.state.data;
-    let metricSettings = this.state.metricSettings;
+    let {data, sharedNames, metricSettings} = this.state;
 
     return (
       <Console.Content>
@@ -187,7 +194,7 @@ export default class ThresholdSettings extends React.Component {
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
-                           value={(data.sharedUsernames || '').replace('[','').replace(']','')}
+                           value={sharedNames} 
                            onChange={this.handleSharingChange.bind(this)}/>
                   </div>
                 </div>
