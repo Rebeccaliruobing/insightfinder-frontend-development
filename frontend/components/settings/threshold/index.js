@@ -116,7 +116,8 @@ export default class ThresholdSettings extends React.Component {
     }
   }
 
-  handleSharingChange(v) {
+  handleSharingChange(e) {
+    let v = e.target.value;
     this.setState({
       data: Object.assign({}, this.state.data, {sharingUsernames: JSON.stringify(v.split(","))})
     });
