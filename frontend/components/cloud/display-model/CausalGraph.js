@@ -1,7 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DataLinks from '../../../mock/cloud/DataLinks';
-
 
 class Point {
   inLines = [];
@@ -70,7 +68,7 @@ class Line {
 
 export default class CausalGraph extends React.Component {
   defaultProps = {
-    data: DataLinks
+    data: ''
   };
 
   constructor(props) {

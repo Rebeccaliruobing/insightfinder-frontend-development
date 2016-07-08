@@ -10,8 +10,6 @@ import {Dygraph} from '../../../artui/react/dataviz';
 
 import apis from '../../../apis';
 
-import mockData from '../../../mock/cloud/OutlierDetection.json';
-
 import FilterBar from './filter-bar';
 
 

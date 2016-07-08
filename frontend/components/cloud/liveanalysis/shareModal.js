@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
 import store from 'store';
+import moment from 'moment';
 
 import {Modal, Dropdown} from '../../../artui/react/index';
 
@@ -24,7 +25,15 @@ class ShareModal extends React.Component {
   }
 
   handleSubmit() {
-    this.props.onSubmit && this.props.onSubmit(Object.assign({}, this.context.location.query, {metaData: this.state}));
+    let data = Object.assign({}, this.context.location.query, {metaData: this.state});
+    // Change the datetime format
+    data['startTime'] = new Date(data['startTime']);
+    data['endTime'] = new Date(data['endTime']);
+    data['modelStartTime'] = new Date(data['modelStartTime']);
+    data['modelEndTime'] = new Date(data['modelEndTime']);
+    
+    console.log(data);
+    this.props.onSubmit && this.props.onSubmit(data);
   }
 
   handleCancel() {
