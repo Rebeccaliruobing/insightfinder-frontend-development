@@ -11,7 +11,6 @@ const webpack = require('webpack');
 const currentDir = process.cwd();
 
 // Plugins
-const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
@@ -48,16 +47,10 @@ module.exports = merge({}, {
     new webpack.ProvidePlugin(settings.providePlugin),
 
     // 清空生成的文件
-    new CleanWebpackPlugin(['frontend/manifest-dev.json', 'static/'], {
+    new CleanWebpackPlugin(['static/'], {
       root: currentDir
     }),
 
-    // 生成后端使用assets文件的映射表
-    new AssetsManifestPlugin({
-      output: '../frontend/manifest-dev.json',
-      cdn: GetCdnManifest(settings._cdnModules) 
-    }),
-    
     // 定义变量，用于在js模块中进行判断
     new webpack.DefinePlugin({
       'process.env': {

@@ -11,7 +11,6 @@ const webpack = require('webpack');
 const currentDir = process.cwd();
 
 // Plugins
-const AssetsManifestPlugin = require('./assets-manifest-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackMd5Hash = require('webpack-md5-hash');
@@ -20,7 +19,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const settings = require('./common');
 const utils = require('./utils');
 const GetExternals = utils.GetExternals;
-const GetCdnManifest = utils.GetCdnManifest;
 
 module.exports = merge({}, {
   output: {
@@ -45,14 +43,8 @@ module.exports = merge({}, {
     // 使用变量时,自动装载对应模块.
     new webpack.ProvidePlugin(settings.providePlugin),
 
-    new CleanWebpackPlugin(['frontend/manifest.json', 'static/'], {
+    new CleanWebpackPlugin(['static/'], {
       root: currentDir
-    }),
-
-    // 生成后端使用assets文件的映射表
-    new AssetsManifestPlugin({
-      output: '../frontend/manifest.json',
-      cdn: GetCdnManifest(settings._cdnModules) 
     }),
 
     // 定义变量，用于在js模块中进行判断

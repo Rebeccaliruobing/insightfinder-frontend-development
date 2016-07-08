@@ -13,7 +13,6 @@ import 'moment';
 import 'store';
 
 import './artui';
-import './artui/i18n/zh-CN';
 import './artui/dataviz';
 import './apis';
 

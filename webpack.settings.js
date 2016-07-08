@@ -5,7 +5,6 @@
 module.exports = {
   entry: {
     commons: './commons',
-    assets: './assets',
     app: './app'
   },
   
