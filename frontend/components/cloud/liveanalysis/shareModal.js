@@ -25,14 +25,15 @@ class ShareModal extends React.Component {
   }
 
   handleSubmit() {
-    let data = Object.assign({}, this.context.location.query, {metaData: this.state});
-    // Change the datetime format
-    data['startTime'] = new Date(data['startTime']);
-    data['endTime'] = new Date(data['endTime']);
-    data['modelStartTime'] = new Date(data['modelStartTime']);
-    data['modelEndTime'] = new Date(data['modelEndTime']);
     
-    console.log(data);
+    let data = Object.assign({}, this.context.location.query, this.state);
+    
+    // Change the datetime format to epoch
+    data['startTime'] = new Date(data['startTime']).getTime();
+    data['endTime'] = new Date(data['endTime']).getTime();
+    data['modelStartTime'] = new Date(data['modelStartTime']).getTime();
+    data['modelEndTime'] = new Date(data['modelEndTime']).getTime();
+    
     this.props.onSubmit && this.props.onSubmit(data);
   }
 
