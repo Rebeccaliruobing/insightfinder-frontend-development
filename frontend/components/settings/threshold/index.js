@@ -35,7 +35,7 @@ export default class ThresholdSettings extends React.Component {
         startTime: moment(new Date()).add(-7 * weeks, 'days')
       },
       data: {},
-      sharedNames: '',
+      tempSharedUsernames: '',
       metricSettings: []
     };
   }
@@ -111,7 +111,7 @@ export default class ThresholdSettings extends React.Component {
     this.setState({
       metricSettings: metricSettings,
       data: data,
-      sharedNames: (data.sharedUsernames || '').replace('[','').replace(']','')
+      tempSharedUsernames: (data.sharedUsernames || '').replace('[','').replace(']','')
     });
   }
 
@@ -126,8 +126,8 @@ export default class ThresholdSettings extends React.Component {
   handleSharingChange(e) {
     let v = e.target.value;
     this.setState({
-      sharedNames: v,
-      data: Object.assign({}, this.state.data, {sharingUsernames: JSON.stringify(v.split(","))})
+      tempSharedUsernames: v,
+      data: Object.assign({}, this.state.data, {sharedUsernames: JSON.stringify(v.split(","))})
     });
   }
 
@@ -141,7 +141,7 @@ export default class ThresholdSettings extends React.Component {
 
   render() {
     let labelStyle = {};
-    let {data, sharedNames, metricSettings} = this.state;
+    let {data, tempSharedUsernames, metricSettings} = this.state;
 
     return (
       <Console.Content>
@@ -194,7 +194,7 @@ export default class ThresholdSettings extends React.Component {
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
-                           value={sharedNames} 
+                           value={tempSharedUsernames} 
                            onChange={this.handleSharingChange.bind(this)}/>
                   </div>
                 </div>
@@ -280,9 +280,10 @@ export default class ThresholdSettings extends React.Component {
   }
 
   handleSaveProjectSetting() {
-    let {projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename,} = this.state.data;
+    let {projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename,} = this.state.data;
+    let {tempSharedUsernames,data} = this.state;
     this.setState({settingLoading: true}, ()=> {
-      apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, shareUsernames, projectHintMapFilename).then((resp)=> {
+      apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
         console.log(resp);
         this.setState({settingLoading: false}, this.context.root.loadData)
       });
