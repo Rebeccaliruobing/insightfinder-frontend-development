@@ -1,13 +1,19 @@
 import store from 'store';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
-const localBaseUrl = '/';
 const DEBUG = false;
 
-// rest访问其他地址会导致跨域错误, 可安装chrome 插件
+//
+// When we run frontend on localhost python web server and connect api with different host,
+// Chrome will report cross-domain error, we need to install the chrome plugin to avoid it:
 // https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi
+//
 
-// TODO: [FIX] 返回的数据格式中success为字符串, 应为boolean类型.
+// We use two ways to call server side api: semantic ui api behavior & ajax.
+// Semantic-ui api behavior provides ui button integration, and ajax is easy to use.
+// http://semantic-ui.com/behaviors/api.html
+// TODO: Change to use one method to call server side api?
+
 $.fn.api.settings.successTest = function (response) {
   if (response && response.success && (response.success == true || response.success.toLowerCase() === 'true')) {
     return response.success

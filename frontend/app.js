@@ -2,22 +2,19 @@ import './app.less';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  Router, Route, browserHistory,
-  IndexRoute, IndexRedirect, Redirect
-} from 'react-router';
+import { Router, Route, browserHistory, IndexRoute, IndexRedirect, Redirect } from 'react-router';
 import store from 'store';
 
 import {Console, Link} from './artui/react';
 
-import {cloudRoute} from './components/cloud/index';
-import {settingsRoute} from './components/settings/index';
+import {authRoutes} from  './components/auth';
+import {cloudRoute} from './components/cloud';
+import {settingsRoute} from './components/settings';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
-import {Login, Signup, SignupStep2, ForgotPassword, ResetPassword, ForgotUsername} from './components/auth/index';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
 
@@ -62,16 +59,6 @@ class App extends React.Component {
     );
   }
 }
-
-const AuthApp = function (props) {
-  return (
-    <div className="auth ui middle center aligned container">
-      <div>
-        {props.children}
-      </div>
-    </div>
-  )
-};
 
 // Live Monitoring project detail page
 const liveMonitoringApp = function (props) {
@@ -124,38 +111,15 @@ const routes = (
       <Route component={Help} path="help"/>
       <Route component={AccountInfo} path="account-info"/>
     </Route>
-    <Route component={Login} path="/login"/>
-    <Route component={Signup} path="/signup"/>
-    <Route component={SignupStep2} path="/signup2"/>
-    <Route component={ForgotPassword} path="/forgotPassword"/>
-    <Route component={ResetPassword} path="/resetPassword"/>
-    <Route component={ForgotUsername} path="/forgotUsername"/>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
+    <Redirect from="*" to="/"/>
   </Router>
 );
 
-const authRoutes = (
-  <Router history={browserHistory}>
-    <Route path="/">
-      <IndexRedirect to="/login"/>
-      <Route component={Login} path="/login"/>
-      <Route component={Signup} path="/signup"/>
-      <Route component={SignupStep2} path="/signup2"/>
-      <Route component={ForgotPassword} path="/forgotPassword"/>
-      <Route component={ResetPassword} path="/resetPassword"/>
-      <Route component={ForgotUsername} path="/forgotUsername"/>
-      <Redirect from="*" to="/login"/>
-    </Route>
-  </Router>
-);
-
-
-console.log(routes);
-console.log(authRoutes);
-
+// TODO: Move loading data into App component, AppRoute is only used for authenticated check.
 class AppRoute extends React.Component {
   constructor(props) {
     super(props);
@@ -243,13 +207,8 @@ class AppRoute extends React.Component {
     });
   }
 
-
-  handleLoginSuccess(userinfo) {
-    store.set('userInfo', userinfo);
-    this.setState({userInfo: userinfo}, this.loadData.bind(this));
-  }
-
   isAuthenticated() {
+    // TODO: We need to check whether token is expired?
     return store.get('userName') && store.get('token');
   }
 
