@@ -344,7 +344,7 @@ class LiveAnalysisCharts extends React.Component {
                        onClose={() => this.setState({showTenderModal: false})}/>
           }
           { this.state.showShareModal &&
-          <ShareModal dataArray={dataArray} types={types}
+          <ShareModal dataArray={dataArray} types={types} dp={this.dp}
                       onSubmit={::this.handleShareSubmit}
                       onClose={() => this.setState({showShareModal: false})}/>
           }

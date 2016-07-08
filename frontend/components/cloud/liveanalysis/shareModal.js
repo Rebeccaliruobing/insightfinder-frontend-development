@@ -20,13 +20,17 @@ class ShareModal extends React.Component {
       description: '',
       system: undefined,
       ownerOnly: false,
-      sharedUsernames: ''
+      sharedUsernames: '',
+      showOther: false,
+      other: ''
     };
   }
 
   handleSubmit() {
     
-    let data = Object.assign({}, this.context.location.query, this.state);
+    let {name, description, system, showOther, other ,...rest} = this.state;
+    let data = Object.assign({}, this.context.location.query, rest);
+    let {dp} = this.props;
     
     // Change the datetime format to epoch
     data['startTime'] = new Date(data['startTime']).getTime();
@@ -34,15 +38,32 @@ class ShareModal extends React.Component {
     data['modelStartTime'] = new Date(data['modelStartTime']).getTime();
     data['modelEndTime'] = new Date(data['modelEndTime']).getTime();
     
+    data['metadata'] = {
+      name: name,
+      desc: description,
+      system: system == 'Other' ? other : system
+    };
+    
+    data['gmpairs'] = dp ? dp.gmpairs : null;
+    data['rawData'] = dp ? dp.data : null;
+    
     this.props.onSubmit && this.props.onSubmit(data);
   }
 
   handleCancel() {
     this.props.onCancel && this.props.onCancel();
   }
+  
+  handleSystemChange(v) {
+    this.setState({
+      system: v,
+      showOther: v == 'Other'
+    });
+  }
 
   render() {
-
+    let {showOther} = this.state;
+    
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="header">
@@ -52,23 +73,32 @@ class ShareModal extends React.Component {
           <form className="ui form">
             <div className="field">
               <label>Incident name/bug ID</label>
-              <input type="text" name="name" placeholder="name" value={this.state.name}
+              <input type="text" name="name" value={this.state.name}
                      onChange={(e) => this.setState({name: e.target.value})}/>
             </div>
             <div className="field">
               <label>Incident description</label>
-              <textarea type="text" name="name" placeholder="description" value={this.state.description}
+              <textarea type="text" name="name" value={this.state.description}
                         onChange={(e) => this.setState({description: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Special system</label>
-              <Dropdown mode="select" value={this.state.system} onChange={(v)=>this.setState({system: v})}>
+              <label>System</label>
+              <Dropdown mode="select" value={this.state.system} onChange={this.handleSystemChange.bind(this)}>
                 <i className="dropdown icon"/>
                 <div className="menu">
                   <div className="item" data-value="Cassandra">Cassandra</div>
+                  <div className="item" data-value="Hadoop">Hadoop</div>
+                  <div className="item" data-value="Other">Other</div>
                 </div>
               </Dropdown>
             </div>
+            {showOther &&
+            <div className="field">
+              <label>Other</label>
+              <input type="text" name="other" value={this.state.other}
+                     onChange={(e) => this.setState({other: e.target.value})}/>
+            </div>
+            }
             <div className="field">
               <input type="checkbox" value={this.state.ownerOnly}
                      onChange={(e) => this.setState({ownerOnly: e.target.checked})}/>

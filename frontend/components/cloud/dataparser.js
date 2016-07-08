@@ -23,6 +23,7 @@ class DataParser {
     this.groupsData = null;
     this.summaryData = null;
     this.groupmetrics = null;
+    this.gmpairs = null;
     
     this.mode = this._detectionModeAndParse();
   }
@@ -425,6 +426,7 @@ class DataParser {
         return idx === arr.indexOf(el);
       });
     });
+    this.gmpairs = gmpairs;
     this.groupmetrics = groupmetrics;
     
     this.groupsData = _.map(groups, grp => {
