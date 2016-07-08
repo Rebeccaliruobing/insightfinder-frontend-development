@@ -25,13 +25,14 @@ class LiveAnalysisCharts extends React.Component {
   static propTypes = {
     data: React.PropTypes.object,
     loading: React.PropTypes.bool,
+    enablePublish: React.PropTypes.bool,
     onRefresh: React.PropTypes.func
   };
 
   static defaultProps = {
     loading: true,
-    onRefresh: () => {
-    }
+    enablePublish: false,
+    onRefresh: () => {}
   };
 
   constructor(props) {
@@ -272,7 +273,7 @@ class LiveAnalysisCharts extends React.Component {
 
   render() {
 
-    let {data, loading, onRefresh} = this.props;
+    let {data, loading, onRefresh, enablePublish} = this.props;
     let {columns, view} = this.state;
 
     let isListView = view === 'list';
@@ -307,9 +308,11 @@ class LiveAnalysisCharts extends React.Component {
                       onClick={() => this.setState({showTenderModal: true})}>
                 <i className="icon random"/>Causal Graph
               </Button>
+              { enablePublish &&
               <Button className="labeled icon" onClick={::this.handleShare}>
                 <i className="icon share alternate"/> Publish
               </Button>
+              }
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh
               </Button>

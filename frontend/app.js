@@ -180,7 +180,12 @@ class AppRoute extends React.Component {
     });
   }
 
+  parseJson(data, defval={}) {
+    return !!data? JSON.parse(data) : defval;
+  }
+  
   loadUserValues() {
+    var self = this;
     return new Promise((resolve, reject) => {
       apis.postJSONDashboardUserValues().then((result)=> {
         let resp = result.data;
@@ -199,7 +204,7 @@ class AppRoute extends React.Component {
 
         resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
           return Object.assign({}, info, {
-            metaData: JSON.parse(info.metaData)
+            metaData: self.parseJson(info.metaData)
           });
         });
         this.setState({dashboardUservalues: resp}, ()=>resolve(this));
