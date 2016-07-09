@@ -2,7 +2,6 @@ import React from 'react';
 import GoogleProjectModal from './google_modal';
 import apis from '../../../apis';
 
-
 class GoogleProjects extends React.Component {
   static contextTypes = {
     root: React.PropTypes.object,
@@ -15,6 +14,14 @@ class GoogleProjects extends React.Component {
     this.state = {
       showModal: false
     };
+  }
+
+  componentDidMount() {
+    this.loadProjects()
+  }
+
+  loadProjects() {
+    //  TODO: load projects
   }
 
   handleModalClose = () => this.setState({showModal: false});

@@ -11,8 +11,13 @@ import cx from 'classnames';
 import {Modal} from '../../../artui/react';
 import store from 'store';
 import apis from '../../../apis';
+const baseUrl = window.API_BASE_URL || '/api/v1/';
 
 class GoogleProjectModal extends React.Component {
+  static contextTypes = {
+    root: React.PropTypes.object,
+  };
+  
   constructor(props) {
     super(props);
     this._dropdown = null;
@@ -36,7 +41,7 @@ class GoogleProjectModal extends React.Component {
       if (resp.success) {
         this.context.root.loadData();
       } else {
-        console.error(resp.message);
+        alert(resp.message);
       }
     }).catch((e)=> {
       console.error(e);
@@ -103,8 +108,9 @@ class GoogleProjectModal extends React.Component {
     $(ReactDOM.findDOMNode(r))
       .fileupload({
         dataType: 'json',
-        url: `${window.API_BASE_URL}cloudstorage/${store.get('userName')}/${this.state.projectName}.p12`,
+        url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.projectName}.p12`,
         sequentialUploads: true,
+        multipart: false,
       })
       .bind('fileuploadadd', function (e, data) {
       })

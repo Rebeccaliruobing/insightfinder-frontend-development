@@ -87,7 +87,10 @@ class DataParser {
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
     if(rawHintMapping){
-      hintMapping = $.parseJSON(rawHintMapping);
+      try{
+       hintMapping = $.parseJSON(rawHintMapping);
+      } catch (err){
+      }
     }
     let anomalyTexts = [];
     let causalDataArray=[];
@@ -165,7 +168,10 @@ class DataParser {
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
     if(rawHintMapping){
-      hintMapping = $.parseJSON(rawHintMapping);
+      try{
+       hintMapping = $.parseJSON(rawHintMapping);
+      } catch (err){
+      }
     }
     let anomalyConsolidatedTexts = [];
     let causalDataArray=[];

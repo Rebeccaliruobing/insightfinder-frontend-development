@@ -13,6 +13,8 @@ import {
   AnomalyThreshold,
 } from '../../selections';
 
+const baseUrl = window.API_BASE_URL || '/api/v1/';
+
 export default class ThresholdSettings extends React.Component {
   static contextTypes = {
     userInstructions: React.PropTypes.object,
@@ -254,8 +256,9 @@ export default class ThresholdSettings extends React.Component {
     $(ReactDOM.findDOMNode(r))
       .fileupload({
         dataType: 'json',
-        url: `${window.API_BASE_URL}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/projectHintMapFilename`,
+        url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/projectHintMapFilename`,
         sequentialUploads: true,
+        multipart: false,
       })
       .bind('fileuploadadd', (e, data) => {
         this.setState({settingLoading: true});

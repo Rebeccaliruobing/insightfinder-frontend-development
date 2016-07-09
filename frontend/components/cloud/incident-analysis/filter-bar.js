@@ -360,15 +360,19 @@ export default  class FilterBar extends Component {
                 let ied = moment(incidentEndTime);
                 let msd = moment(modelStartTime);
                 let med = moment(modelEndTime);
+                let isdstr = isd.format("YYYY-MM-DD HH:mm");
+                let iedstr = ied.format("YYYY-MM-DD HH:mm");
+                let msdstr = msd.format("YYYY-MM-DD HH:mm");
+                let medstr = med.format("YYYY-MM-DD HH:mm");
+                let recsuffix = recorded?"(recorded)":"(manual)";
+                let tooltipcontent = "["+isdstr+", "+iedstr+"}], model: [{"+msdstr+", "
+                  +medstr+"}], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5">
-                        Incident: [{isd.format("YYYY-MM-DD HH:mm")}, 
-                         {ied.format("YYYY-MM-DD HH:mm")}], 
-                         model: [{msd.format("YYYY-MM-DD HH:mm")}, 
-                         {med.format("YYYY-MM-DD HH:mm")}], {modelType} {recorded?"(recorded)":"(manual)"}
+                      <a className="header padding5" title={tooltipcontent}>
+                        Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
                   </div>

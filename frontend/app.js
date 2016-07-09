@@ -202,11 +202,13 @@ class AppRoute extends React.Component {
           });
         });
 
-        resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
-          return Object.assign({}, info, {
-            metaData: self.parseJson(info.metaData)
+        if(resp.publishedDataAllInfo){
+          resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
+            return Object.assign({}, info, {
+              metaData: self.parseJson(info.metaData)
+            });
           });
-        });
+        }
         this.setState({dashboardUservalues: resp}, ()=>resolve(this));
       });
     });
