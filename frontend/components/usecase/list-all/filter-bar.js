@@ -183,12 +183,15 @@ export default  class FilterBar extends Component {
                     }
                   }
 
-                  let sys = item.metaData.system.toLowerCase();
+                  let sys = item.metaData.system;
+                  if(sys==undefined){
+                    return;
+                  }
 
                   let shouldShow = true;
-                  if (system && ['cassandra', 'hadoop'].indexOf(system.toLowerCase()) >= 0 && system.toLowerCase() != sys) {
+                  if (system && ['Cassandra', 'Hadoop'].indexOf(system) >= 0 && system != sys) {
                     shouldShow = false
-                  } else if (system == 'Other' && ['cassandra', 'hadoop'].indexOf(sys) >= 0) {
+                  } else if (system == 'Other' && ['Cassandra', 'Hadoop'].indexOf(sys) >= 0) {
                     shouldShow = false
                   }
 

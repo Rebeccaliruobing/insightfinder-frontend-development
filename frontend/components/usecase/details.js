@@ -29,10 +29,10 @@ const ProjectDetails = class extends React.Component {
   updateData() {
 
     let {query} = this.props.location;
-    let {pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData} = query;
+    let {pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime} = query;
 
     this.setState({loading: true}, ()=> {
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=> {
+      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime).then((resp)=> {
         resp.loading = false;
         this.setState(resp);
       }).catch((err)=> {

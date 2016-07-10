@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import React from 'react';
+import cx from 'classnames';
 import store from 'store';
 import moment from 'moment';
 
@@ -22,7 +23,7 @@ class ShareModal extends React.Component {
       ownerOnly: false,
       sharedUsernames: '',
       showOther: false,
-      other: ''
+      other: 'Unknown'
     };
   }
 
@@ -38,14 +39,14 @@ class ShareModal extends React.Component {
     data['modelStartTime'] = new Date(data['modelStartTime']).getTime();
     data['modelEndTime'] = new Date(data['modelEndTime']).getTime();
     
-    data['metadata'] = {
+    data['metaData'] = JSON.stringify({
       name: name,
       desc: description,
       system: system == 'Other' ? other : system
-    };
+    });
     
-    data['gmpairs'] = dp ? dp.gmpairs : null;
-    data['rawData'] = dp ? dp.data : null;
+    data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
+    data['rawData'] = dp ? dp.data.data : null;
     
     this.props.onSubmit && this.props.onSubmit(data);
   }
@@ -63,7 +64,8 @@ class ShareModal extends React.Component {
 
   render() {
     let {showOther} = this.state;
-    
+    let disabled = !this.state.name || !this.state.description || !this.state.system;
+
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="header">
@@ -78,7 +80,7 @@ class ShareModal extends React.Component {
             </div>
             <div className="field">
               <label>Incident description</label>
-              <textarea type="text" name="name" value={this.state.description}
+              <textarea type="text" row="4" name="name" value={this.state.description}
                         onChange={(e) => this.setState({description: e.target.value})}/>
             </div>
             <div className="field">
@@ -91,14 +93,13 @@ class ShareModal extends React.Component {
                   <div className="item" data-value="Other">Other</div>
                 </div>
               </Dropdown>
-            </div>
             {showOther &&
-            <div className="field">
-              <label>Other</label>
+              <div className="item">
               <input type="text" name="other" value={this.state.other}
                      onChange={(e) => this.setState({other: e.target.value})}/>
-            </div>
+              </div>
             }
+            </div>
             <div className="field">
               <input type="checkbox" value={this.state.ownerOnly}
                      onChange={(e) => this.setState({ownerOnly: e.target.checked})}/>
@@ -114,7 +115,7 @@ class ShareModal extends React.Component {
         <div className="actions">
           <div className="ui button deny" onClick={this.handleCancel.bind(this)}>Cancel</div>
           <div className="ui button approve labeled">
-            <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
+            <div className={cx('ui button orange submit', {disabled:disabled})} onClick={this.handleSubmit.bind(this)}>
               Share data
             </div>
           </div>

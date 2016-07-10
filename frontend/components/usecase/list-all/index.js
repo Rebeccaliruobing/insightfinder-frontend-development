@@ -49,12 +49,12 @@ export default class ListAll extends Component {
 
   handleFilterChange(data) {
     let {cvalue, pvalue} = data;
-    let {modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData,} = data.activeItem;
+    let {modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime} = data.activeItem;
     metaData = JSON.stringify(metaData);
 
 
     window.open(`/useCaseDetails?${$.param(Object.assign({}, {
-      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData
+      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime
     }))}`, '_blank');
 
     // this.setState({loading: true}, ()=>{

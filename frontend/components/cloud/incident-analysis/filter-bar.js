@@ -365,8 +365,8 @@ export default  class FilterBar extends Component {
                 let msdstr = msd.format("YYYY-MM-DD HH:mm");
                 let medstr = med.format("YYYY-MM-DD HH:mm");
                 let recsuffix = recorded?"(recorded)":"(manual)";
-                let tooltipcontent = "["+isdstr+", "+iedstr+"}], model: [{"+msdstr+", "
-                  +medstr+"}], "+modelType+" "+recsuffix;
+                let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
+                  +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor}}>

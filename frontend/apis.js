@@ -339,7 +339,7 @@ export default {
    * @param token
    * @returns {Promise}
    */
-  postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, userName = store.get('userName'), token = store.get('token')) {
+  postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, userName = store.get('userName'), token = store.get('token')) {
     return new Promise(function (resolve, reject) {
       $.ajax({
         type: 'POST',
@@ -353,7 +353,9 @@ export default {
           modelType,
           fromUser,
           dataChunkName,
-          metaData,
+          metaData, 
+          modelStartTime, 
+          modelEndTime,
           userName,
           token
         }),
