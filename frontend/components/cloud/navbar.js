@@ -8,11 +8,11 @@ export default function (props) {
       <div className="ui vertical menu text icon-menu">
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="line chart icon"></i>
-          <span> Anomaly Detection</span>
+          <span> Live Analysis </span>
         </Link>
         <Link to="/cloud/incident-analysis" className="item text-white">
           <i className="zoom icon"></i>
-          <span> Triage</span>
+          <span> Incidnet Analysis </span>
         </Link>
         <Link to="/cloud/outlier-detection" className="item text-white">
           <i className="icon icon-icons01 iconfont "></i>

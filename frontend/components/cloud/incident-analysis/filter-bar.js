@@ -35,6 +35,7 @@ export default  class FilterBar extends Component {
       projectType: undefined,
       availableDataRanges:[],
       isStationary:false,
+      isExistentIncident: false,
       incidentList: []
     };
   }
@@ -97,12 +98,14 @@ export default  class FilterBar extends Component {
     update.incident = null;
     
     //debugger;
+    this.setState({isExistentIncident:false});
     this.setState(update);
   }
 
   handleDurationChange(durationHours) {
     let {endTime, cvalue} = this.state;
     this.setState({
+      isExistentIncident:false,
       durationHours,
       startTime: moment(endTime).add(-durationHours, 'hour').toDate()
     });
@@ -110,6 +113,7 @@ export default  class FilterBar extends Component {
 
   handleStartTimeChange(startTime) {
     this.setState({
+      isExistentIncident:false,
       startTime:moment(startTime).startOf('day'),
       durationHours:''
     });
@@ -118,6 +122,7 @@ export default  class FilterBar extends Component {
   handleEndTimeChange(endTime) {
     let {durationHours, cvalue} = this.state;
     this.setState({
+      isExistentIncident:false,
       durationHours:'',
       endTime:moment(endTime).endOf('day')
     });
@@ -125,18 +130,21 @@ export default  class FilterBar extends Component {
 
   handleModelStartTimeChange(startTime) {
     this.setState({
+      isExistentIncident:false,
       modelStartTime:moment(startTime).startOf('day')
     });
   }
 
   handleModelEndTimeChange(endTime) {
     this.setState({
+      isExistentIncident:false,
       modelEndTime:moment(endTime).endOf('day')
     });
   }
 
   handleModelTimeChange(timeType) {
     return (time)=> {
+      this.setState({isExistentIncident:false});
       this.setState(_.fromPairs([[timeType, time]]))
     }
   }
@@ -199,7 +207,8 @@ export default  class FilterBar extends Component {
         modelType,
         recorded,
         holisticModelKeys,
-        splitModelKeys
+        splitModelKeys,
+        isExistentIncident:true
       })
     }
   }
@@ -354,7 +363,17 @@ export default  class FilterBar extends Component {
           <div ref={this._incidentsRef} className="padding20" style={{border: '1px solid #e0e0e0'}}>
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
-              {incidentList.map((incident)=> {
+              {incidentList.sort(function(a, b) {
+                  let aisd = moment(a.incidentEndTime);
+                  let bisd = moment(b.incidentEndTime);
+                  if(aisd>bisd){
+                    return -1;
+                  } else if(aisd<bisd){
+                    return 1;
+                  } else {
+                    return 0;
+                  }
+                }).map((incident)=> {
                 let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, recorded} = incident;
                 let isd = moment(incidentStartTime);
                 let ied = moment(incidentEndTime);
