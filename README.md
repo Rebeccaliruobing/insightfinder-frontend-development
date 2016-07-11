@@ -88,18 +88,15 @@ settings, which is fast but hard to debug.
     
     
 
-### 变更事项
+### Code Structures
 
-1. 后端模板由前端webpack生成, server端不再写html
+	+ Template engine: [ejs](http://www.embeddedjs.com/)
+	+ Template directory: frontend/templates
+	+ Generated code directory: static/html
 
-	+ 模板引擎: [ejs](http://www.embeddedjs.com/)
-	+ 模板目录: frontend/templates
-	+ 生成目录: static/html
-	+ 生成开发模式目录: static/html
+	> Examples: 
 
-	> 示例: 
-
-		* webpack配置: webpack.base.config.js
+		* Webpack config: webpack.base.config.js
 
 		```
 				new HtmlWebpackPlugin({
@@ -110,7 +107,7 @@ settings, which is fast but hard to debug.
 		        })
 		```
 
-		* 模板: frontend/templates/index.ejs
+		* Template: frontend/templates/index.ejs
 
 	    ```
 	    	<!doctype html>
@@ -129,7 +126,7 @@ settings, which is fast but hard to debug.
 			</html>
 		```
 
-		* 生成文件(*自动生成): /static/html/index.html
+		* Generated code: /static/html/index.html
 
 		```
 			<!doctype html>
@@ -148,7 +145,7 @@ settings, which is fast but hard to debug.
 			</html>
 		```	
 
-		* 后端渲染: views.py:
+		* Backend rendering: views.py:
 
 		```
 			render_remplate('index.html')

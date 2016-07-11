@@ -7,12 +7,12 @@ export default function (props) {
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
         <Link to="/cloud/monitoring" className="item text-white">
-          <i className="line chart icon"/>
-          <span> Anomaly Detection</span>
+          <i className="line chart icon"></i>
+          <span> Live Analysis </span>
         </Link>
         <Link to="/cloud/incident-analysis" className="item text-white">
-          <i className="zoom icon"/>
-          <span> Triage</span>
+          <i className="zoom icon"></i>
+          <span> Incidnet Analysis </span>
         </Link>
         <Link to="/cloud/outlier-detection" className="item text-white">
           <i className="icon icon-icons01 iconfont "/>

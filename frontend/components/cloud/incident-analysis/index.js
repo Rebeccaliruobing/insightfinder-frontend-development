@@ -49,6 +49,7 @@ export default class IncidentDetection extends Component {
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelStartTime = moment(data.modelStartTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelEndTime = moment(data.modelEndTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let isExistentIncident = data.isExistentIncident;
     window.open(`/incidentAnalysis?${$.param(Object.assign({}, {
       startTime,
       endTime,
@@ -57,7 +58,8 @@ export default class IncidentDetection extends Component {
       cvalue,
       modelType,
       modelStartTime, 
-      modelEndTime
+      modelEndTime,
+      isExistentIncident
     }))}`, '_blank');
   }
 

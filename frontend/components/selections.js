@@ -31,6 +31,38 @@ class ProjectSelection extends React.Component {
   }
 }
 
+// exclude GCP and File Replay
+class InstanceProjectSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    projects = projects.filter((item,index) => (!(item.isStationary)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu"> 
+          {
+            projects.map((p) => {
+              return <div className="item" key={p.projectName}
+                          data-value={p.projectName}>{p.projectName}</div>
+            })
+          }
+        </div>
+      </Dropdown>
+    );
+  }
+}
+
+// exclude GCP and File Replay
 class LiveProjectSelection extends React.Component {
 
   static contextTypes = {
@@ -147,6 +179,7 @@ const DurationHour = (props) => {
 export {
   ProjectSelection,
   LiveProjectSelection,
+  InstanceProjectSelection,
   ModelType,
   AnomalyThreshold,
   DurationThreshold,
