@@ -89,7 +89,6 @@ class ProjectSummary extends BaseComponent {
       this.data = data;
     }
     let sdata = this.sdata;
-    
     return (
       <div className='ui card'
            onMouseEnter={() => this.setState({showCloser:true})}

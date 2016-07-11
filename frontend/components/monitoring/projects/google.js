@@ -66,7 +66,7 @@ class GoogleProjects extends React.Component {
                   <td style={{width: '16%'}}>{dataType}</td>
                   <td style={{width: '16%'}}>{zone}</td>
                   <td style={{width: '16%'}}>{cloudType}</td>
-                  <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled} readonly /></td>
+                  <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled} readOnly /></td>
                   <td style={{width: '16%'}}>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
                   </td>

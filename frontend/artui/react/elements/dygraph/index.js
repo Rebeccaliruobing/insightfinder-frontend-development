@@ -123,12 +123,20 @@ class Dygraph extends BaseComponent {
 
     if (this._dygraph) {
       const {known: updateAttrs, rest} = spreadDygraphProps(nextProps, false);
-      let {annotations, selection} = rest;
+      let {annotations, selection, highlights} = rest;
 
       // this._interactionProxy.target =
       //   updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
       // updateAttrs.interactionModel = this._interactionProxy;
-
+      updateAttrs.underlayCallback = (canvas, area, g)=> {
+        // If has highlights, set
+        if (highlights) {
+          highlights.forEach(o =>{
+            this._highlight_period(canvas, area, g, o.start, o.end, o.val);
+          });
+        }
+        this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);
+      };
       this._dygraph.updateOptions(updateAttrs);
       if (annotations) {
         this._dygraph.setAnnotations(annotations);
