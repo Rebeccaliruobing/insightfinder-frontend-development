@@ -15,15 +15,15 @@ export default function (props) {
           <span> Incidnet Analysis </span>
         </Link>
         <Link to="/cloud/outlier-detection" className="item text-white">
-          <i className="icon icon-icons01 iconfont "></i>
+          <i className="icon icon-icons01 iconfont "/>
           <span> Cluster Outlier Detection</span>
         </Link>
         <Link to="/cloud/rollout-check" className="item text-white">
-          <i className="checkmark box icon"></i>
+          <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>
         </Link>
         <Link to="/cloud/summary-report" className="item text-white">
-          <i className="icon icon-report iconfont"></i>
+          <i className="icon icon-report iconfont"/>
           <span> Summary Report</span>
         </Link>
       </div>
