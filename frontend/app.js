@@ -22,23 +22,108 @@ import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
 
 class App extends React.Component {
-  static contextTypes = {
+  
+  constructor(props) {
+    super(props);
+    
+    this.state = {
+      userInfo: store.get('userInfo'),
+      userName: store.get('userName'),
+      token: store.get('token'),
+      userInstructions: {},
+      dashboardUservalues: {},
+      dashboardDailySummaryReport: {}
+    }
+  }
+
+  static childContextTypes = {
     userInfo: React.PropTypes.object,
     userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
-    dashboardDailySummaryReport: React.PropTypes.object
+    dashboardDailySummaryReport: React.PropTypes.object,
+    root: React.PropTypes.object
   };
+
+  getChildContext() {
+    let {
+      userInfo,
+      userInstructions,
+      dashboardUservalues,
+      dashboardDailySummaryReport
+    } = this.state;
+    return {
+      userInfo,
+      userInstructions,
+      dashboardUservalues,
+      dashboardDailySummaryReport,
+      root: {
+        loadData: this.loadData.bind(this),
+        loadUserValues: this.loadUserValues.bind(this)
+      }
+    }
+  }
+  
+  componentDidMount() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.setState({
+      userInstructions: userInstructionJson,
+      dashboardUservalues: {},
+      dashboardDailySummaryReport: {}
+    }, ()=> {
+      // Load data only when user login
+      if (!(store.get('userName') && store.get('token'))) {
+        return;
+      }
+
+      this.loadUserValues();
+    });
+  }
+  
+  parseJson(data, defval={}) {
+    return !!data? JSON.parse(data) : defval;
+  }
+
+  loadUserValues() {
+    var self = this;
+    return new Promise((resolve, reject) => {
+      apis.postJSONDashboardUserValues().then((result)=> {
+        let resp = result.data;
+        resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
+        resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
+        resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
+        resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
+        resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
+        resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
+
+        resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
+          return Object.assign({}, info, {
+            metricSettings: JSON.parse(info.metricSettings)
+          });
+        });
+
+        if(resp.publishedDataAllInfo){
+          resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
+            return Object.assign({}, info, {
+              metaData: self.parseJson(info.metaData)
+            });
+          });
+        }
+        this.setState({dashboardUservalues: resp}, ()=>resolve(this));
+      });
+    });
+  }
 
   render() {
     let {
       userInfo,
       userInstructions,
       dashboardUservalues,
-      dashboardDailySummaryReport
-    } = this.context;
+    } = this.state;
 
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
-    //<Link to="/file" className="item">File Analysis</Link>
 
     return (
       <Console className={cx({'ui form loading': loading})}>
@@ -119,99 +204,9 @@ const routes = (
   </Router>
 );
 
-// TODO: Move loading data into App component, AppRoute is only used for authenticated check.
 class AppRoute extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      userInfo: store.get('userInfo'),
-      userName: store.get('userName'),
-      token: store.get('token'),
-      userInstructions: {},
-      dashboardUservalues: {},
-      dashboardDailySummaryReport: {}
-    }
-  }
-
-  static childContextTypes = {
-    userInfo: React.PropTypes.object,
-    userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object,
-    dashboardDailySummaryReport: React.PropTypes.object,
-    root: React.PropTypes.object
-  };
-
-  getChildContext() {
-    let {
-      userInfo,
-      userInstructions,
-      dashboardUservalues,
-      dashboardDailySummaryReport
-    } = this.state;
-    return {
-      userInfo,
-      userInstructions,
-      dashboardUservalues,
-      dashboardDailySummaryReport,
-      root: {
-        loadData: this.loadData.bind(this),
-        loadUserValues: this.loadUserValues.bind(this)
-      }
-    }
-  }
-
-  componentDidMount() {
-    this.loadData();
-  }
-
-  loadData() {
-    this.setState({
-      userInstructions: userInstructionJson,
-      dashboardUservalues: {},
-      dashboardDailySummaryReport: {}
-    }, ()=> {
-
-      // Load data only when user login
-      if (!(store.get('userName') && store.get('token'))) {
-        return;
-      }
-
-      this.loadUserValues();
-    });
-  }
-
-  parseJson(data, defval={}) {
-    return !!data? JSON.parse(data) : defval;
-  }
-  
-  loadUserValues() {
-    var self = this;
-    return new Promise((resolve, reject) => {
-      apis.postJSONDashboardUserValues().then((result)=> {
-        let resp = result.data;
-        resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
-        resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
-        resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
-        resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
-        resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
-        resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
-
-        resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
-          return Object.assign({}, info, {
-            metricSettings: JSON.parse(info.metricSettings)
-          });
-        });
-
-        if(resp.publishedDataAllInfo){
-          resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
-            return Object.assign({}, info, {
-              metaData: self.parseJson(info.metaData)
-            });
-          });
-        }
-        this.setState({dashboardUservalues: resp}, ()=>resolve(this));
-      });
-    });
   }
 
   isAuthenticated() {
