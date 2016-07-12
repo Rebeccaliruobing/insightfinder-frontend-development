@@ -87,7 +87,6 @@ class LiveMonitoring extends BaseComponent {
       alert('The project with same parameters already exist');
     } else {
       addedProjects.push(project);
-      
       store.set(this._skey, addedProjects);
       this.setState({addedProjects: addedProjects});
     }
@@ -98,7 +97,8 @@ class LiveMonitoring extends BaseComponent {
     _.remove(addedProjects, (p) => {
       return _.isEqual(p, project)
     });
-    
+    let storeName = project['projectName']+'_'+project['modelType']+'_'+project['anomalyThreshold']+'_'+project['durationThreshold'];
+    store.remove(storeName);
     store.set(this._skey, addedProjects);
     this.setState({addedProjects});
   }

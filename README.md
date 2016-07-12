@@ -28,7 +28,7 @@ For Ubuntu, we need to install [nodejs] and [npm].
 
 ### Install project dependencies
 
-The frontend codes use some 3rd party libraries, which is recorded in the package.json file. So to build the fronted code,
+The frontend codes use some 3rd party libraries, which is recorded in the package.json file. So to build the frontend code,
 we first need to install these libraries, and update the libraries if we update the files.
 
     1. Go to project root folder
@@ -62,7 +62,7 @@ After having installed pip, we need to install the python packages through pip.
     $ cd ~/dev/insightfinder/web
     
     2. Install python packages
-    $ pip =r requirements/local.txt
+    $ pip install -r requirements/local.txt
 
 For local development, we use [webpack dev-server](http://webpack.github.io/docs/webpack-dev-server.html)
 to build frontend code. Webpack dev-server will monitor the code files, and rebuild the codes automatically. To startup

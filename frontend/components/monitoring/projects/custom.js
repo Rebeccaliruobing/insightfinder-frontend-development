@@ -71,7 +71,7 @@ class CustomProjects extends React.Component {
             <td style={{width: '16%'}}></td>
           </tr>
           {
-            this.props.projects.map(({name, dataType, zone, cloudType}, index)=> {
+            this.props.projects.map(({name, dataType, zone, cloudType,flag}, index)=> {
               if(cloudType==='FileReplay'){
                 cloudType='File';
               }else if(cloudType==='PrivateCloud'){
@@ -85,7 +85,7 @@ class CustomProjects extends React.Component {
                   <td style={{width: '16%'}}>Agent</td>
                   <td style={{width: '16%'}}></td>
                   <td style={{width: '16%'}}>
-                    <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
+                    <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>{flag?"Unshare":"Remove"}</button>
                   </td>
                 </tr>
               )

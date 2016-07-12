@@ -62,7 +62,6 @@ class AmazonProjects extends React.Component {
 
     render() {
         let {projectsList} = this.state;
-        console.log(projectsList);
         return (
             <div className="ui attached">
                 <button className="ui small positive action button"
@@ -80,7 +79,7 @@ class AmazonProjects extends React.Component {
                         <td style={{width: '16%'}}></td>
                     </tr>
                     {
-                        projectsList.map(({name, dataType, zone, cloudType, agentDataEnabled}, index)=> {
+                        projectsList.map(({name, dataType, zone, cloudType, agentDataEnabled, flag}, index)=> {
                             return (
                                 <tr key={index}>
                                     <td style={{width: '16%'}}>{name}</td>
@@ -91,7 +90,7 @@ class AmazonProjects extends React.Component {
                                                                       readOnly/></td>
                                     <td style={{width: '16%'}}>
                                         <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>
-                                            Remove
+                                            {flag?"Unshare":"Remove"}
                                         </button>
                                     </td>
                                 </tr>

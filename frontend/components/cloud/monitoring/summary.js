@@ -60,7 +60,14 @@ class ProjectSummary extends BaseComponent {
         let update = {};
         if (resp.success) {
           update.data = resp.data;
-          store.set(key, resp.data);
+          let storeRespData = {
+            'anomalyConsolidatedString': resp.data.anomalyConsolidatedString,
+            'anomalyString': resp.data.anomalyString,
+            'detectionResults': resp.data.detectionResults,
+            'detectSuccess': resp.data.detectSuccess
+          };
+          console.log(resp.data);
+          store.set(key, storeRespData);
         } else {
           alert(resp.message);
         }

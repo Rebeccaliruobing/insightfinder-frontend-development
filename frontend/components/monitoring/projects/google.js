@@ -59,7 +59,7 @@ class GoogleProjects extends React.Component {
             <td style={{width: '16%'}}></td>
           </tr>
           {
-            this.props.projects.map(({name, dataType, zone, cloudType, agentDataEnabled}, index)=> {
+            this.props.projects.map(({name, dataType, zone, cloudType, agentDataEnabled, flag}, index)=> {
               return (
                 <tr key={index}>
                   <td style={{width: '16%'}}>{name}</td>
@@ -68,7 +68,7 @@ class GoogleProjects extends React.Component {
                   <td style={{width: '16%'}}>{cloudType}</td>
                   <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled} readOnly /></td>
                   <td style={{width: '16%'}}>
-                    <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>Remove</button>
+                    <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>{flag?"Unshare":"Remove"}</button>
                   </td>
                 </tr>
               )
