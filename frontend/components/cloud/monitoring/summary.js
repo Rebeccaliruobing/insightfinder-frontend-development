@@ -116,7 +116,7 @@ class ProjectSummary extends BaseComponent {
             <span>{durationThreshold} samples</span>
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
-            {sdata? <SummaryChart data={sdata} />: <span>Detection result temporarily unavailable!</span>}
+            {sdata? <SummaryChart data={sdata} />: <span>Model in training...</span>}
           </div>
         </div>
       </div>
