@@ -115,7 +115,11 @@ class LiveAnalysisCharts extends React.Component {
         selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
       }
 
-      groups.forEach((group, index) => {
+      groups.sort(function(a, b) {
+              let aid = parseInt(a.id);
+              let bid = parseInt(b.id);
+              return +(aid > bid) || +(aid === bid) - 1;
+            }).forEach((group, index) => {
 
         let isSelectGroup = selectedGroupId == group.id;
         if (isSelectGroup) selectIndex = selectIndex + index;

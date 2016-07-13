@@ -28,8 +28,9 @@ export default  class FilterBar extends Component {
     };
   }
   
-  componentDidMount() {
+  componentDidMount() {    
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    projects = projects.filter((item,index) => (!(item.isStationary)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
     if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
   }
 
