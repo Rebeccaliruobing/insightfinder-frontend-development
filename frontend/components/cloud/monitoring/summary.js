@@ -66,7 +66,6 @@ class ProjectSummary extends BaseComponent {
             'detectionResults': resp.data.detectionResults,
             'detectSuccess': resp.data.detectSuccess
           };
-          console.log(resp.data);
           store.set(key, storeRespData);
         } else {
           alert(resp.message);
@@ -117,7 +116,7 @@ class ProjectSummary extends BaseComponent {
             <span>{durationThreshold} samples</span>
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
-            {sdata && <SummaryChart data={sdata} />}
+            {sdata? <SummaryChart data={sdata} />: <span>Detection result temporarily unavailable!</span>}
           </div>
         </div>
       </div>
