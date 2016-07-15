@@ -26,9 +26,64 @@ class SignupStep2 extends BaseComponent {
 
   componentDidMount() {
     if (this._$el) {
+      var passForm = $("#form_pass1");
+      var passFormConfirm = $("#form_pass2");
+     
+      passForm.on("keyup blur", function() {
+          var passwd = $(this).val();
+          var passwdConfirm = passFormConfirm.val();
+          if (passwd.length < 8){
+              $("#form_pass1_error").text("Password must be at least 8 characters long");
+              $(this).addClass("invalid").removeClass("valid");
+          }
+          else if (!passwd.match(/[a-z]/)) {
+              $("#form_pass1_error").text("Password must have at least 1 lowercase letter");
+              $(this).addClass("invalid").removeClass("valid");
+          }
+          else if (!passwd.match(/[A-Z]/)) {
+              $("#form_pass1_error").text("Password must have at least 1 uppercase letter");
+              $(this).addClass("invalid").removeClass("valid");   
+          }
+          else if (!passwd.match(/[~!@#$%^&*_+?]/)) {
+              $("#form_pass1_error").text("Password must have at least 1 symbol from ~!@#$%^&*_+?");
+              $(this).addClass("invalid").removeClass("valid");           
+          }
+          else if (passwd != passwdConfirm && passwdConfirm != "") {
+              $("#form_pass2_error").text("Password confirmation must match password");
+              passFormConfirm.addClass("invalid").removeClass("valid");
+             
+              //form 1 is okay
+              $("#form_pass1_error").text("");
+              $(this).addClass("valid").removeClass("invalid");
+          }
+          else {
+              $("#form_pass1_error").text("");
+              $(this).addClass("valid").removeClass("invalid");
+          }
+      });
+             
+      passFormConfirm.on("keyup blur", function() {
+          var passwdConfirm = $(this).val();
+          var passwdOrig = passForm.val();
+         
+          if (passwdConfirm != passwdOrig) {
+              $("#form_pass2_error").text("Password confirmation must match password");
+              $(this).addClass("invalid").removeClass("valid");
+          }
+          else if (passwdConfirm !="") {
+              $("#form_pass2_error").text("");
+              $(this).addClass("valid").removeClass("invalid");
+          }
+      });       
+     
+      $(':required').one('blur keydown', function () {
+          $(this).addClass('touched');
+        });    
+
       this._$el.find('.ui.submit.button').api({
         action: 'signup2',
         method: 'POST',
+        /*
         beforeSend: (settings) => {
           this.setState({
             error: ''
@@ -72,6 +127,7 @@ class SignupStep2 extends BaseComponent {
           };
           return settings;
         },
+        */
         beforeXHR: function(xhr) {
           xhr.setRequestHeader ('accept', 'application/json');
           return xhr;
@@ -114,7 +170,8 @@ class SignupStep2 extends BaseComponent {
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" placeholder="Sign code"
                          value={this.state['signCode']}
-                         onChange={(e) => this.setState({error: '', signCode: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', signCode: e.target.value})}
+                         id="form_signcode" required/>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -122,15 +179,17 @@ class SignupStep2 extends BaseComponent {
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" placeholder="User name"
                          value={this.state['userName']}
-                         onChange={(e) => this.setState({error: '', userName: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', userName: e.target.value})}
+                         id="form_username" required/>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>Email</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="email"
+                  <input type="email" placeholder="email"
                          value={this.state['email']}
-                         onChange={(e) => this.setState({error: '', email: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', email: e.target.value})}
+                         id="form_email" required/>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -138,7 +197,8 @@ class SignupStep2 extends BaseComponent {
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" placeholder="first name"
                          value={this.state['fname']}
-                         onChange={(e) => this.setState({error: '', fname: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', fname: e.target.value})}
+                         id="form_fname" required/>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -146,7 +206,8 @@ class SignupStep2 extends BaseComponent {
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" placeholder="last name"
                          value={this.state['lname']}
-                         onChange={(e) => this.setState({error: '', lname: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', lname: e.target.value})}
+                         id="form_lname" required/>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -163,7 +224,9 @@ class SignupStep2 extends BaseComponent {
                   <input type="password" placeholder="password"
                          title="Length >= 8, include at least one upper-case letter, one lower-case letter, one number and one special character from ~!@#$%^&*_+?:"
                          value={this.state['pass1']}
-                         onChange={(e) => this.setState({error: '', pass1: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', pass1: e.target.value})}
+                         id="form_pass1"/>
+                  <span id="form_pass1_error"></span>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -171,7 +234,9 @@ class SignupStep2 extends BaseComponent {
                 <div className="ui input" style={{flex: 1}}>
                   <input type="password" placeholder="confirm password"
                          value={this.state['pass2']}
-                         onChange={(e) => this.setState({error: '', pass2: e.target.value})}/>
+                         onChange={(e) => this.setState({error: '', pass2: e.target.value})}
+                         id="form_pass2"/>
+                  <span id="form_pass2_error"></span>
                 </div>
               </div>
               <div className="field">
