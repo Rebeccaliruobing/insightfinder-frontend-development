@@ -12,6 +12,8 @@ import apis from '../../../apis';
 
 import FilterBar from './filter-bar';
 
+import moment from 'moment';
+
 
 export default class RolloutCheck extends Component {
   static contextTypes = {
@@ -55,10 +57,10 @@ export default class RolloutCheck extends Component {
     let holisticGroup, splitGroup;
     let handleGroup = (group, groupId)=> {
       return group.map((data, index)=> {
+        data.startTime = moment(data.startTime).format('MM-DD HH:mm');
+        data.endTime = moment(data.endTime).format('MM-DD HH:mm');
         let dataArray = [];
-        let title
-          , startTime = data.startTime.substr(5, 11).replace("T", " ")
-          , endTime = data.endTime.substr(5, 11).replace("T", " ");
+        let title, startTime =data.startTime, endTime = data.endTime;
         data.NASValues.forEach((line, index) => {
           var lineArray = line.split(",");
           var colIndex = lineArray.splice(0, 1);
@@ -81,9 +83,9 @@ export default class RolloutCheck extends Component {
           metricNames = `(${new Array(...new Set(data.metricNameList.map((m)=>m.split("[")[0]))).join(",")})`
         }
         if (!groupId) {
-          title = <span>Holistic {metricNames}<br/>{startTime}-{endTime} </span>
+          title = <span>Holistic {metricNames}<br/>{startTime} - {endTime} </span>
         } else {
-          title = <span>Group {groupId} {metricNames}<br/>{startTime}-{endTime}</span>
+          title = <span>Group {groupId} {metricNames}<br/>{startTime} - {endTime}</span>
         }
 
         if (data.instanceName) {
@@ -126,8 +128,8 @@ export default class RolloutCheck extends Component {
 
   handleFilterChange(data) {
     
-    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let startTime = moment(data.startTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let endTime = moment(data.endTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
     this.setState({loading: true}, () => {
       apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {

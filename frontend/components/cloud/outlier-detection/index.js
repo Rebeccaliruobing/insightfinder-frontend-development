@@ -46,6 +46,8 @@ export default class OutlierDetection extends Component {
   setHeatMap(dateIndex = 0) {
     let mark = this.state.marks[dateIndex];
     let [startTime, endTime] = mark.split("\n");
+    startTime = moment(startTime).format();
+    endTime = moment(endTime).format();
     let model = this.state.modelData.find((d)=>d.startTime == startTime);
     let maps = [];
     if (model) {
@@ -101,8 +103,8 @@ export default class OutlierDetection extends Component {
   }
 
   handleFilterChange(data) {
-    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let startTime = moment(data.startTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+    let endTime = moment(data.endTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
 
     this.setState({loading: true}, () => {
       apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
