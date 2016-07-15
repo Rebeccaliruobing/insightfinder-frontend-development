@@ -177,9 +177,9 @@ export default  class FilterBar extends Component {
                   var pubMode = "public";
                   if (item.ownerOnly != null && item.ownerOnly) {
                     if (item.sharedUsernames === '[]') {
-                      pubMode = "group";
-                    } else {
                       pubMode = "private";
+                    } else {
+                      pubMode = "group";
                     }
                   }
 

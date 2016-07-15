@@ -120,12 +120,6 @@ class LiveMonitoring extends BaseComponent {
                   <span className="ui mini popup">Expand & Close Add Panel</span>
                 </Popup>
               </Button>
-              <Button onClick={() => this.setState({showSettings: false})}>
-                <Popup position="bottom right">
-                  <i className="setting icon"/>
-                  <span className="ui mini popup">Layout Setting</span>
-                </Popup>
-              </Button>
             </ButtonGroup>
           </div>
 
@@ -138,7 +132,7 @@ class LiveMonitoring extends BaseComponent {
           </div>
 
           <div className="ui vertical segment">
-            <div className="ui three cards">
+            <div className="ui two cards">
               {addedProjects.map((p, index) => {
                 let key = p.projectName + p.modelType + 
                   p.anomalyThreshold.toString() + p.durationThreshold.toString();
