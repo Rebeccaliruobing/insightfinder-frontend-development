@@ -28,11 +28,7 @@ class SignupStep2 extends BaseComponent {
     if (this._$el) {
       var passForm = $("#form_pass1");
       var passFormConfirm = $("#form_pass2");
-
-      var fnameForm = $("#form_fname");
-      var lnameForm = $("#form_lname");
       var emailForm = $("#form_email");
-      var signcodeForm = $("#form_signcode");
 
       $(".required").on("keyup blur", function() {
           var input = $(this).val();
@@ -46,74 +42,98 @@ class SignupStep2 extends BaseComponent {
             $(this).parent().find("span").text("").removeClass("invalid");
             $(this).parent().find("i").removeClass("remove invalid placeholder").addClass("checkmark valid");
           }
-      });
+      }); //end general requirement
+
+      emailForm.on("keyup blur", function() {
+        var email = $(this).val();
+        var isError = false;
+        if (email == "") {
+          $("#form_email_error").text("Field Required");
+          isError = true;
+        }
+        else if (!email.match(/^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/)) {
+          $("#form_email_error").text("Invalid Email Address");
+          isError = true;
+        }
+
+        if (isError) {
+            $("#form_email_error").addClass("invalid");
+            $(this).addClass("invalid").removeClass("valid");
+            $("#icon_email").removeClass("checkmark valid placeholder");
+            $("#icon_email").addClass("remove icon invalid");
+        }
+        else {
+            $("#form_email_error").removeClass("invalid");
+            $("#form_email_error").text("");
+            $(this).addClass("valid").removeClass("invalid");
+            $("#icon_email").removeClass("remove invalid placeholder");
+            $("#icon_email").addClass("checkmark valid icon");
+        }
+
+      }); //end emailform
 
       passForm.on("keyup blur", function() {
-          var passwd = $(this).val();
-          var passwdConfirm = passFormConfirm.val();
-          var isError = false;
-          if (passwd.length < 8){
-              $("#form_pass1_error").text("Password must be at least 8 characters long");
-              isError = true;
-          }
-          else if (!passwd.match(/[a-z]/)) {
-              $("#form_pass1_error").text("Password must have at least 1 lowercase letter");
-              isError = true;
-          }
-          else if (!passwd.match(/[A-Z]/)) {
-              $("#form_pass1_error").text("Password must have at least 1 uppercase letter");
-              isError = true;
-          }
-          else if (!passwd.match(/[~!@#$%^&*_+?]/)) {
-              $("#form_pass1_error").text("Password must have at least 1 symbol from ~!@#$%^&*_+?");
-              isError = true;
-          }
-          else if (passwd != passwdConfirm && passwdConfirm != "") {
-              $("#form_pass2_error").text("Password confirmation must match password");
-              $("#icon_pass2").removeClass("checkmark valid");
-              $("#icon_pass2").addClass("remove icon invalid");
-              passFormConfirm.addClass("invalid").removeClass("valid");
-             
-              //form 1 is okay
-              isError = false;
-          }
-          if (isError) {
-              $("#form_pass1_error").addClass("invalid");
-              $(this).addClass("invalid").removeClass("valid");
-              $("#icon_pass1").removeClass("checkmark valid placeholder");
-              $("#icon_pass1").addClass("remove icon invalid");
-          }
-          else {
-              $("#form_pass1_error").removeClass("invalid");
-              $("#form_pass1_error").text("");
-              $(this).addClass("valid").removeClass("invalid");
-              $("#icon_pass1").removeClass("remove invalid placeholder");
-              $("#icon_pass1").addClass("checkmark valid icon");
-          }
-      });
+        var passwd = $(this).val();
+        var passwdConfirm = passFormConfirm.val();
+        var isError = false;
+        if (passwd.length < 8){
+            $("#form_pass1_error").text("Password must be at least 8 characters long");
+            isError = true;
+        }
+        else if (!passwd.match(/[a-z]/)) {
+            $("#form_pass1_error").text("Password must have at least 1 lowercase letter");
+            isError = true;
+        }
+        else if (!passwd.match(/[A-Z]/)) {
+            $("#form_pass1_error").text("Password must have at least 1 uppercase letter");
+            isError = true;
+        }
+        else if (!passwd.match(/[~!@#$%^&*_+?]/)) {
+            $("#form_pass1_error").text("Password must have at least 1 symbol from ~!@#$%^&*_+?");
+            isError = true;
+        }
+        else if (passwd != passwdConfirm && passwdConfirm != "") {
+            $("#form_pass2_error").text("Password confirmation must match password");
+            $("#icon_pass2").removeClass("checkmark valid");
+            $("#icon_pass2").addClass("remove icon invalid");
+            passFormConfirm.addClass("invalid").removeClass("valid");
+           
+            //form 1 is okay
+            isError = false;
+        }
+        if (isError) {
+            $("#form_pass1_error").addClass("invalid");
+            $(this).addClass("invalid").removeClass("valid");
+            $("#icon_pass1").removeClass("checkmark valid placeholder");
+            $("#icon_pass1").addClass("remove icon invalid");
+        }
+        else {
+            $("#form_pass1_error").removeClass("invalid");
+            $("#form_pass1_error").text("");
+            $(this).addClass("valid").removeClass("invalid");
+            $("#icon_pass1").removeClass("remove invalid placeholder");
+            $("#icon_pass1").addClass("checkmark valid icon");
+        }
+      }); //end passwordform
              
       passFormConfirm.on("keyup blur", function() {
-          var passwdConfirm = $(this).val();
-          var passwdOrig = passForm.val();
-         
-          if (passwdConfirm != passwdOrig) {
-              $("#form_pass2_error").text("Password confirmation must match password").addClass("invalid");
-              $(this).addClass("invalid").removeClass("valid");
-              $("#icon_pass2").removeClass("checkmark valid placeholder");
-              $("#icon_pass2").addClass("remove icon invalid");
-          }
-          else if (passwdConfirm !="") {
-              $("#form_pass2_error").text("").removeClass("invalid");
-              $(this).addClass("valid").removeClass("invalid");
-              $("#icon_pass2").removeClass("remove invalid placeholder");
-              $("#icon_pass2").addClass("checkmark valid icon");
-          }
-      });       
+        var passwdConfirm = $(this).val();
+        var passwdOrig = passForm.val();
+       
+        if (passwdConfirm != passwdOrig) {
+            $("#form_pass2_error").text("Password confirmation must match password").addClass("invalid");
+            $(this).addClass("invalid").removeClass("valid");
+            $("#icon_pass2").removeClass("checkmark valid placeholder");
+            $("#icon_pass2").addClass("remove icon invalid");
+        }
+        else if (passwdConfirm !="") {
+            $("#form_pass2_error").text("").removeClass("invalid");
+            $(this).addClass("valid").removeClass("invalid");
+            $("#icon_pass2").removeClass("remove invalid placeholder");
+            $("#icon_pass2").addClass("checkmark valid icon");
+        }
+      }); //end passwordconfirm form       
      
-      $('.required').one('blur keydown', function () {
-          $(this).addClass('touched');
-        });    
-
       this._$el.find('.ui.submit.button').api({
         action: 'signup2',
         method: 'POST',
@@ -184,7 +204,7 @@ class SignupStep2 extends BaseComponent {
                          onChange={(e) => this.setState({error: '', email: e.target.value})}
                          id="form_email" />
                   <i id="icon_email" className="placeholder checkmark icon"></i> 
-                  <span className="errorbox"></span>
+                  <span id="form_email_error" className="errorbox"></span>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
