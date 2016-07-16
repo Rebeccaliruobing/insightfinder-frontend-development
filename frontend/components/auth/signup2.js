@@ -173,6 +173,7 @@ class SignupStep2 extends BaseComponent {
           } else if ( pass1 != pass2) {
             //this.setState({error: "Please confirm password matches."});
             return false;
+          }
           let {error, signCode, ...rest} = this.state;
           settings.data = {
             'signup-code': signCode,
