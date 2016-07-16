@@ -155,7 +155,7 @@ class SignupStep2 extends BaseComponent {
             <div className="ui segment left aligned">
               <h4 className="ui header center aligned">Sign up</h4>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>Sign Code *</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>Sign Code</label>
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" className="required" placeholder="Sign code"
                          value={this.state['signCode']}
@@ -166,7 +166,7 @@ class SignupStep2 extends BaseComponent {
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>User Name *</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>User Name</label>
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" className="required" placeholder="User name"
                          value={this.state['userName']}
@@ -177,7 +177,7 @@ class SignupStep2 extends BaseComponent {
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>Email *</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>Email</label>
                 <div className="ui input" style={{flex: 1}}>
                   <input type="email" className="required" placeholder="Email"
                          value={this.state['email']}
@@ -188,7 +188,7 @@ class SignupStep2 extends BaseComponent {
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>First Name *</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>First Name</label>
                 <div className="ui input" style={{flex: 1}}>
                   <input type="text" className="required" placeholder="First Name"
                          value={this.state['fname']}
