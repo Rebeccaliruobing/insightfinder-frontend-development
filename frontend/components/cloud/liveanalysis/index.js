@@ -62,7 +62,7 @@ class LiveAnalysisCharts extends React.Component {
       let {data, loading, onRefresh, ...rest} = nextProps;
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
-      this.dp.getGroupsData();
+      this.dp.getGroupsDataTest();
     }
   }
 
@@ -244,11 +244,11 @@ class LiveAnalysisCharts extends React.Component {
               let bid = parseInt(b.id);
               return +(aid > bid) || +(aid === bid) - 1;
             }).map((group) => {
-            let metrics = groupMetrics[parseInt(group.id)].join();
+            let metrics = groupMetrics[parseInt(group.id)];
             return (
               <div key={group.id} className="detail-charts" style={{position:'relative'}}>
                 <span id={group.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
-                <h4 className="ui header">{group.title} ({metrics})</h4>
+                <h4 className="ui header">Metrics {metrics} (Group {group.groupId})</h4>
                 <DetailsChart
                   data={group}
                   drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
