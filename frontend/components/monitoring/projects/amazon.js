@@ -28,6 +28,7 @@ class AmazonProjects extends React.Component {
     loadApiRemoveProjects(projectName) {
         apis.postRemoveProject(projectName).then((resp)=> {
             if (resp.success) {
+                window.alert(resp.message);
                 this.context.root.loadData();
             } else {
                 alert(resp.message);

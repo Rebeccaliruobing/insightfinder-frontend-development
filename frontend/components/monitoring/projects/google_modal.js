@@ -39,6 +39,7 @@ class GoogleProjectModal extends React.Component {
     let {projectName, projectId, projectType, serviceAccount, filename, hasAgentData} = this.state;
     apis.postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData).then((resp)=> {
       if (resp.success) {
+        window.alert(resp.message);
         this.context.root.loadData();
       } else {
         alert(resp.message);

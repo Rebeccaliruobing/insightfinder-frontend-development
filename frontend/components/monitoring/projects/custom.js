@@ -43,6 +43,7 @@ class CustomProjects extends React.Component {
       if (!window.confirm("Confirm deleting project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
+          window.alert(resp.message);
           this.context.root.loadData();
         } else {
           alert(resp.message);
