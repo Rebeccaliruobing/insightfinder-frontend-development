@@ -29,10 +29,53 @@
   transform: translate(0px, -30%);
 }
 
+.auth .errorbox {
+  visibility: hidden;
+  position:absolute;
+  background-color: white;
+  margin-left: 10px;
+  margin-top: 2px;
+  padding: 3px;
+  white-space: nowrap;
+  box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
+  border: 1px solid rgba(34, 36, 38, 0.15);
+}
+.auth .errorbox.invalid {
+  visibility: visible;
+  color: red;
+}
+
+.auth i {
+  margin-top: 7px;
+  padding-left: 7px;
+}
+.auth i.placeholder {
+  visibility: hidden;
+}
+.auth i.invalid {
+  color: red;
+}
+.auth i.valid {
+  color: green;
+}
+
+.auth .ui.form input.invalid {
+  border: 1px red solid;
+}
+.auth .ui.form input.valid {
+  border: 1px green solid;
+}
+
 .main.ui.container {
   width: auto !important;
   margin-left: @2spacer !important;
   margin-right: @2spacer !important;
+}
+
+.ui.list {
+  > .item .incident-item:hover {
+    font-size: 1.2em;
+  }
 }
 
 .text-white {

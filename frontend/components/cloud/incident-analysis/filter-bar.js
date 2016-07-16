@@ -390,7 +390,7 @@ export default  class FilterBar extends Component {
                 return (
                   <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5" title={tooltipcontent}>
+                      <a className="header padding5 incident-item" title={tooltipcontent}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
