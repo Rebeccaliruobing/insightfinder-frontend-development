@@ -28,37 +28,71 @@ class SignupStep2 extends BaseComponent {
     if (this._$el) {
       var passForm = $("#form_pass1");
       var passFormConfirm = $("#form_pass2");
-     
+
+      var fnameForm = $("#form_fname");
+      var lnameForm = $("#form_lname");
+      var emailForm = $("#form_email");
+      var signcodeForm = $("#form_signcode");
+
+      $(".required").on("keyup blur", function() {
+          var input = $(this).val();
+          if (input == "") {
+            $(this).parent().find("span").text("required");
+            $(this).parent().find("i").removeClass("checkmark");
+            $(this).parent().find("i").addClass("remove icon");
+          }
+          else {
+            $(this).parent().find("span").text("");
+            $(this).parent().find("i").removeClass("remove");
+            $(this).parent().find("i").addClass("checkmark");
+          }
+      }
+
+
+
       passForm.on("keyup blur", function() {
           var passwd = $(this).val();
           var passwdConfirm = passFormConfirm.val();
           if (passwd.length < 8){
               $("#form_pass1_error").text("Password must be at least 8 characters long");
               $(this).addClass("invalid").removeClass("valid");
+              $("#icon_pass1").removeClass("checkmark");
+              $("#icon_pass1").addClass("remove icon");
           }
           else if (!passwd.match(/[a-z]/)) {
               $("#form_pass1_error").text("Password must have at least 1 lowercase letter");
               $(this).addClass("invalid").removeClass("valid");
+              $("#icon_pass1").removeClass("checkmark");
+              $("#icon_pass1").addClass("remove icon");
           }
           else if (!passwd.match(/[A-Z]/)) {
               $("#form_pass1_error").text("Password must have at least 1 uppercase letter");
               $(this).addClass("invalid").removeClass("valid");   
+              $("#icon_pass1").removeClass("checkmark");
+              $("#icon_pass1").addClass("remove icon");
           }
           else if (!passwd.match(/[~!@#$%^&*_+?]/)) {
               $("#form_pass1_error").text("Password must have at least 1 symbol from ~!@#$%^&*_+?");
               $(this).addClass("invalid").removeClass("valid");           
+              $("#icon_pass1").removeClass("checkmark");
+              $("#icon_pass1").addClass("remove icon");
           }
           else if (passwd != passwdConfirm && passwdConfirm != "") {
               $("#form_pass2_error").text("Password confirmation must match password");
+              $("#icon_pass2").removeClass("checkmark");
               passFormConfirm.addClass("invalid").removeClass("valid");
              
               //form 1 is okay
               $("#form_pass1_error").text("");
               $(this).addClass("valid").removeClass("invalid");
+              $("#icon_pass1").removeClass("remove");
+              $("#icon_pass1").addClass("checkmark icon");
           }
           else {
               $("#form_pass1_error").text("");
               $(this).addClass("valid").removeClass("invalid");
+              $("#icon_pass1").removeClass("remove");
+              $("#icon_pass1").addClass("checkmark icon");
           }
       });
              
@@ -69,10 +103,14 @@ class SignupStep2 extends BaseComponent {
           if (passwdConfirm != passwdOrig) {
               $("#form_pass2_error").text("Password confirmation must match password");
               $(this).addClass("invalid").removeClass("valid");
+              $("#icon_pass2").removeClass("checkmark");
+              $("#icon_pass2").addClass("remove icon");
           }
           else if (passwdConfirm !="") {
               $("#form_pass2_error").text("");
               $(this).addClass("valid").removeClass("invalid");
+              $("#icon_pass2").removeClass("remove");
+              $("#icon_pass2").addClass("checkmark icon");
           }
       });       
      
@@ -83,51 +121,6 @@ class SignupStep2 extends BaseComponent {
       this._$el.find('.ui.submit.button').api({
         action: 'signup2',
         method: 'POST',
-        /*
-        beforeSend: (settings) => {
-          this.setState({
-            error: ''
-          });
-          
-          let email = this.state['email'];
-          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          if (!re.test(email)) {
-            this.setState({
-              error: 'Please input correct email address.'
-            });
-            return false;
-          }
-
-          let pass1 = this.state['pass1'];
-          let pass2 = this.state['pass2'];
-          if (pass1.length < 8){
-            this.setState({error: "Please confirm password is at least 8 characters long."});
-            return false;
-          } else if (null === pass1.match(/[0-9]/g)){
-            this.setState({error: "Please confirm password contains number."});
-            return false;
-          } else if (null === pass1.match(/[A-Z]/g)){
-            this.setState({error: "Please confirm password contains upper-case letter."});
-            return false;
-          } else if (null === pass1.match(/[a-z]/g)){
-            this.setState({error: "Please confirm password contains lower-case letter."});
-            return false;
-          } else if (null === pass1.match(/[~!@#$%^&*_+?:]/g)){
-            this.setState({error: "Please confirm password contains special character."});
-            return false;
-          } else if ( pass1 != pass2) {
-            this.setState({error: "Please confirm password matches."});
-            return false;
-          }
-
-          let {error, signCode, ...rest} = this.state;
-          settings.data = {
-            'signup-code': signCode,
-            ...rest
-          };
-          return settings;
-        },
-        */
         beforeXHR: function(xhr) {
           xhr.setRequestHeader ('accept', 'application/json');
           return xhr;
@@ -168,46 +161,51 @@ class SignupStep2 extends BaseComponent {
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>Sign Code</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="Sign code"
+                  <input type="text" class="required" placeholder="Sign code"
                          value={this.state['signCode']}
                          onChange={(e) => this.setState({error: '', signCode: e.target.value})}
-                         id="form_signcode" required/>
+                         id="form_signcode"/>
+                  <i id="icon_signcode"></i> 
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>User Name</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="User name"
+                  <input type="text" class="required" placeholder="User name"
                          value={this.state['userName']}
                          onChange={(e) => this.setState({error: '', userName: e.target.value})}
-                         id="form_username" required/>
+                         id="form_username" />
+                  <i id="icon_username"></i> 
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>Email</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="email" placeholder="email"
+                  <input type="email" class="required" placeholder="email"
                          value={this.state['email']}
                          onChange={(e) => this.setState({error: '', email: e.target.value})}
-                         id="form_email" required/>
+                         id="form_email" />
+                  <i id="icon_email"></i> 
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>First Name</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="first name"
+                  <input type="text" class="required" placeholder="first name"
                          value={this.state['fname']}
                          onChange={(e) => this.setState({error: '', fname: e.target.value})}
-                         id="form_fname" required/>
+                         id="form_fname" />
+                  <i id="icon_fname"></i> 
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
                 <label style={{width: '120px', lineHeight: '32px'}}>Last Name</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="last name"
+                  <input type="text" class="required" placeholder="last name"
                          value={this.state['lname']}
                          onChange={(e) => this.setState({error: '', lname: e.target.value})}
-                         id="form_lname" required/>
+                         id="form_lname" />
+                  <i id="icon_lname"></i> 
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
@@ -226,6 +224,7 @@ class SignupStep2 extends BaseComponent {
                          value={this.state['pass1']}
                          onChange={(e) => this.setState({error: '', pass1: e.target.value})}
                          id="form_pass1"/>
+                  <i id="icon_pass1"></i> 
                   <span id="form_pass1_error"></span>
                 </div>
               </div>
@@ -236,6 +235,7 @@ class SignupStep2 extends BaseComponent {
                          value={this.state['pass2']}
                          onChange={(e) => this.setState({error: '', pass2: e.target.value})}
                          id="form_pass2"/>
+                  <i id="icon_pass2"></i> 
                   <span id="form_pass2_error"></span>
                 </div>
               </div>
