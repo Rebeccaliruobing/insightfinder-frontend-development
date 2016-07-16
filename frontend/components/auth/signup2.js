@@ -25,6 +25,7 @@ class SignupStep2 extends BaseComponent {
   }
 
   componentDidMount() {
+    var errorPresentInForm = false;
     if (this._$el) {
       var passForm = $("#form_pass1");
       var passFormConfirm = $("#form_pass2");
@@ -137,6 +138,48 @@ class SignupStep2 extends BaseComponent {
       this._$el.find('.ui.submit.button').api({
         action: 'signup2',
         method: 'POST',
+        beforeSend: (settings) => {
+          this.setState({
+            error: ''
+          });
+          
+          let email = this.state['email'];
+          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (!re.test(email)) {
+            /*
+            this.setState({
+              error: 'Please input correct email address.'
+            });
+            */
+            return false;
+          }
+          let pass1 = this.state['pass1'];
+          let pass2 = this.state['pass2'];
+          if (pass1.length < 8){
+            //this.setState({error: "Please confirm password is at least 8 characters long."});
+            return false;
+          } else if (null === pass1.match(/[0-9]/g)){
+            //this.setState({error: "Please confirm password contains number."});
+            return false;
+          } else if (null === pass1.match(/[A-Z]/g)){
+            //this.setState({error: "Please confirm password contains upper-case letter."});
+            return false;
+          } else if (null === pass1.match(/[a-z]/g)){
+            //this.setState({error: "Please confirm password contains lower-case letter."});
+            return false;
+          } else if (null === pass1.match(/[~!@#$%^&*_+?:]/g)){
+            this.setState({error: "Please confirm password contains special character."});
+            return false;
+          } else if ( pass1 != pass2) {
+            //this.setState({error: "Please confirm password matches."});
+            return false;
+          let {error, signCode, ...rest} = this.state;
+          settings.data = {
+            'signup-code': signCode,
+            ...rest
+          };
+          return settings;
+        },
         beforeXHR: function(xhr) {
           xhr.setRequestHeader ('accept', 'application/json');
           return xhr;
@@ -268,7 +311,6 @@ class SignupStep2 extends BaseComponent {
             </div>
           </form>
         </div>
-        //error boxes
       </div>
     )
   }
