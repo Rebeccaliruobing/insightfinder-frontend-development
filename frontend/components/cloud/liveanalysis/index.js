@@ -123,7 +123,7 @@ class LiveAnalysisCharts extends React.Component {
 
         let isSelectGroup = selectedGroupId == group.id;
         if (isSelectGroup) selectIndex = selectIndex + index;
-        let metrics = groupMetrics[parseInt(group.id)].join();
+        let metrics = groupMetrics[parseInt(group.id)];
 
         elems.push((
           <div key={columns + group.id} className="ui card"
@@ -135,7 +135,7 @@ class LiveAnalysisCharts extends React.Component {
                 }
                }}>
             <div className="content">
-              <div className="header" style={{paddingBottom:8}}>{group.title} ({metrics})</div>
+              <div className="header" style={{paddingBottom:8}}>Metrics {metrics} (Group {group.groupId})</div>
               <SummaryChart data={group}/>
             </div>
             {isSelectGroup && selectArrow}
@@ -151,10 +151,11 @@ class LiveAnalysisCharts extends React.Component {
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
-              let metrics = groupMetrics[parseInt(selectedGroup.id)].join();
+
+              let metrics = groupMetrics[parseInt(selectedGroupId)];
               ReactDOM.render((
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{selectedGroup.title} ({metrics})</h4>
+                    <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
                        style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
