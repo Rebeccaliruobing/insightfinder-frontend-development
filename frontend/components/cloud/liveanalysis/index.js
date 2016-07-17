@@ -123,7 +123,7 @@ class LiveAnalysisCharts extends React.Component {
 
         let isSelectGroup = selectedGroupId == group.id;
         if (isSelectGroup) selectIndex = selectIndex + index;
-        let metrics = groupMetrics[parseInt(group.id)].join();
+        let metrics = groupMetrics[parseInt(group.id)];
 
         elems.push((
           <div key={columns + group.id} className="ui card"
@@ -135,7 +135,7 @@ class LiveAnalysisCharts extends React.Component {
                 }
                }}>
             <div className="content">
-              <div className="header" style={{paddingBottom:8}}>{group.title} ({metrics})</div>
+              <div className="header" style={{paddingBottom:8}}>Metrics {metrics} (Group {group.groupId})</div>
               <SummaryChart data={group}/>
             </div>
             {isSelectGroup && selectArrow}
@@ -151,10 +151,11 @@ class LiveAnalysisCharts extends React.Component {
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
-              let metrics = groupMetrics[parseInt(selectedGroup.id)].join();
+
+              let metrics = groupMetrics[parseInt(selectedGroupId)];
               ReactDOM.render((
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{selectedGroup.title} ({metrics})</h4>
+                    <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
                        style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
@@ -171,14 +172,11 @@ class LiveAnalysisCharts extends React.Component {
     return (
 
       <div className="ui grid">
-        <div className="twelve wide column">
+        <div className="sixteen wide column">
           <div className={cx('ui', columns, 'cards')}>
             {!instanceName && this.renderSummary()}
             {elems}
           </div>
-        </div>
-        <div className="four wide column">
-          {this.renderAnnotation()}
         </div>
       </div>
     );
@@ -219,7 +217,6 @@ class LiveAnalysisCharts extends React.Component {
         <h4 className="ui header">{summary.title}</h4>
         <DetailsChart
           data={summary}
-          onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
           drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
           // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
           // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
@@ -237,7 +234,7 @@ class LiveAnalysisCharts extends React.Component {
     let {listGraphZoomOpt} = this.state;
     return (
       <div className="ui grid">
-        <div className="twelve wide column">
+        <div className="sixteen wide column">
           {this.renderSummary()}
             { groups.sort(function(a, b) {
               let aid = parseInt(a.id);
@@ -261,9 +258,6 @@ class LiveAnalysisCharts extends React.Component {
             )
           })}
         </div>
-        <div className="four wide column">
-          {this.renderAnnotation()}
-        </div>
       </div>
     )
   }
@@ -281,8 +275,7 @@ class LiveAnalysisCharts extends React.Component {
     let {columns, view} = this.state;
 
     let isListView = view === 'list';
-    let navbarStyle = isListView ? {} : {display: 'none'};
-    let contentStyle = isListView ? {} : {paddingLeft: 0};
+    let contentStyle = {paddingLeft: 0};
     let contentClass = loading ? 'ui form loading' : '';
 
     if (data && !this.dp) {
