@@ -171,14 +171,11 @@ class LiveAnalysisCharts extends React.Component {
     return (
 
       <div className="ui grid">
-        <div className="twelve wide column">
+        <div className="sixteen wide column">
           <div className={cx('ui', columns, 'cards')}>
             {!instanceName && this.renderSummary()}
             {elems}
           </div>
-        </div>
-        <div className="four wide column">
-          {this.renderAnnotation()}
         </div>
       </div>
     );
@@ -219,7 +216,6 @@ class LiveAnalysisCharts extends React.Component {
         <h4 className="ui header">{summary.title}</h4>
         <DetailsChart
           data={summary}
-          onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
           drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
           // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
           // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
@@ -237,7 +233,7 @@ class LiveAnalysisCharts extends React.Component {
     let {listGraphZoomOpt} = this.state;
     return (
       <div className="ui grid">
-        <div className="twelve wide column">
+        <div className="sixteen wide column">
           {this.renderSummary()}
             { groups.sort(function(a, b) {
               let aid = parseInt(a.id);
@@ -261,9 +257,6 @@ class LiveAnalysisCharts extends React.Component {
             )
           })}
         </div>
-        <div className="four wide column">
-          {this.renderAnnotation()}
-        </div>
       </div>
     )
   }
@@ -281,8 +274,7 @@ class LiveAnalysisCharts extends React.Component {
     let {columns, view} = this.state;
 
     let isListView = view === 'list';
-    let navbarStyle = isListView ? {} : {display: 'none'};
-    let contentStyle = isListView ? {} : {paddingLeft: 0};
+    let contentStyle = {paddingLeft: 0};
     let contentClass = loading ? 'ui form loading' : '';
 
     if (data && !this.dp) {
