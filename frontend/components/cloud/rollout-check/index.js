@@ -86,6 +86,14 @@ export default class RolloutCheck extends Component {
           title = <span>Group {groupId} {metricNames}<br/>{startTime}-{endTime}</span>
         }
 
+        if (!groupId) {
+          params.pvalue = this.state.data.pvalue;
+          params.cvalue = this.state.data.cvalue;
+          params.isExistentIncident = true;
+          params.modelType = "Holistic";
+          params.modelStartTime = params.startTime;
+          params.modelEndTime = params.endTime;
+        }
         if (data.instanceName) {
           title = data.instanceName;
           params.instanceName = data.instanceName;
@@ -156,6 +164,9 @@ export default class RolloutCheck extends Component {
           resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
           resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
           resp.data.modelData = resp.data.rolloutCheckModelKeyList;
+          
+          resp.data.pvalue = data.pvalue;
+          resp.data.cvalue = data.cvalue;
           let groups = {};
           resp.data.modelData.forEach((dataArray)=> {
             dataArray.mapData.forEach((data)=> {

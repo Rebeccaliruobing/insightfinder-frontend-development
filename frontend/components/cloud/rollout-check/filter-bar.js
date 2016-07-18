@@ -7,6 +7,8 @@ import {
   ProjectSelection,
   ModelType,
   WindowWithWeek,
+  AnomalyThreshold,
+  DurationThreshold,
 } from '../../selections';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
@@ -22,6 +24,8 @@ export default  class FilterBar extends Component {
     this.state = {
       projectName: undefined,
       projectType: undefined,
+      pvalue: 0.99,
+      cvalue: 5,
       weeks: '1',
       startTime: moment().add(-1, 'w').toDate(),
       endTime: moment().toDate()
@@ -74,7 +78,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, startTime, endTime, projectType} = this.state;
+    const {projectName, startTime, endTime, projectType, pvalue, cvalue} = this.state;
     const labelStyle = {};
 
     return (
@@ -105,6 +109,20 @@ export default  class FilterBar extends Component {
                               onChange={this.handleEndTimeChange.bind(this)}/>
             </div>
           </div>
+        </div>
+
+        <div className="four fields fill">
+          <div className="field">
+            <label style={labelStyle}>Anomaly Threshold</label>
+            <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+          </div>
+          <div className="field">
+            <label style={labelStyle}>Duration Threshold (Sample Number)</label>
+            <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+          </div>
+          <div className="field">
+          </div>
+          <div className="field"></div>
         </div>
 
         <div className="ui field">
