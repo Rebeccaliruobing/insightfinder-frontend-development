@@ -32,7 +32,7 @@ export default  class FilterBar extends Component {
   }
 
   componentDidMount() {
-
+    this.handleRefresh();
   }
 
   handleSelectItem(item) {
