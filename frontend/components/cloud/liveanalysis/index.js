@@ -116,8 +116,8 @@ class LiveAnalysisCharts extends React.Component {
       }
 
       groups.sort(function(a, b) {
-              let aid = parseInt(a.id);
-              let bid = parseInt(b.id);
+              let aid = parseInt(a.groupId);
+              let bid = parseInt(b.groupId);
               return +(aid > bid) || +(aid === bid) - 1;
             }).forEach((group, index) => {
 
@@ -237,8 +237,8 @@ class LiveAnalysisCharts extends React.Component {
         <div className="sixteen wide column">
           {this.renderSummary()}
             { groups.sort(function(a, b) {
-              let aid = parseInt(a.id);
-              let bid = parseInt(b.id);
+              let aid = parseInt(a.groupId);
+              let bid = parseInt(b.groupId);
               return +(aid > bid) || +(aid === bid) - 1;
             }).map((group) => {
             let metrics = groupMetrics[parseInt(group.id)];
