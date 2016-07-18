@@ -219,9 +219,10 @@ export default  class FilterBar extends Component {
   }
 
   handleRemoveRow() {
-    let {projectName, dataChunkName, modelStartTime, modelEndTime, modelType} = this.state;
+    let {projectName, dataChunkName, modelStartTime, modelEndTime, modelType, incident} = this.state;
+    let incidentKey = incident.incidentKey;
     apis.postJSONDashboardUserValues('deleteincident', {
-      projectName, dataChunkName, modelStartTime, modelEndTime, modelType
+      projectName, dataChunkName, modelStartTime, modelEndTime, modelType, incidentKey
     }).then((resp)=> {
       if (resp.success) {
         this.setState({
