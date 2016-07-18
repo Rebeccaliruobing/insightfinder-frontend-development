@@ -41,6 +41,7 @@ export default  class FilterBar extends Component {
   }
 
   componentDidMount() {
+    this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
