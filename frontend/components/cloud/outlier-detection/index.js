@@ -46,8 +46,6 @@ export default class OutlierDetection extends Component {
   setHeatMap(dateIndex = 0) {
     let mark = this.state.marks[dateIndex];
     let [startTime, endTime] = mark.split("\n");
-    startTime = moment(startTime).format();
-    endTime = moment(endTime).format();
     let model = this.state.modelData.find((d)=>d.startTime == startTime);
     let maps = [];
     if (model) {

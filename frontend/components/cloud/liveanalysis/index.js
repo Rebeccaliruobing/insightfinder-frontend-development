@@ -135,7 +135,7 @@ class LiveAnalysisCharts extends React.Component {
                 }
                }}>
             <div className="content">
-              <div className="header" style={{paddingBottom:8}}>Metrics {metrics} (Group {group.groupId})</div>
+              <div className="header" style={{paddingBottom:8}}>Metric {metrics} (Group {group.groupId})</div>
               <SummaryChart data={group}/>
             </div>
             {isSelectGroup && selectArrow}
@@ -245,7 +245,7 @@ class LiveAnalysisCharts extends React.Component {
             return (
               <div key={group.id} className="detail-charts" style={{position:'relative'}}>
                 <span id={group.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
-                <h4 className="ui header">Metrics {metrics} (Group {group.groupId})</h4>
+                <h4 className="ui header">Metric {metrics} (Group {group.groupId})</h4>
                 <DetailsChart
                   data={group}
                   drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}

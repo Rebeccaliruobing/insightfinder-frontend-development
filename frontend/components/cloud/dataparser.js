@@ -24,6 +24,7 @@ class DataParser {
     this.summaryData = null;
     this.groupmetrics = null;
     this.gmpairs = null;
+    this.neuronMap = null;
 
     this.mode = this._detectionModeAndParse();
   }
@@ -256,6 +257,7 @@ class DataParser {
 
       let self = this;
       let arr = this.data['detectionResults'];
+      let nidMap = {};
 
       _.each(arr, function (a, i) {
         var atext = (arr.length === 1) ? anomalyTexts[0] : anomalyTexts[i];
@@ -270,8 +272,8 @@ class DataParser {
               }
             });
           } else {
+            var ts = parseInt(items[0]);
             if ($.isNumeric(items[1])) {
-              var ts = parseInt(items[0]);
               var val = parseFloat(items[1]);
               alies.push({
                 groupId: a.groupId,
@@ -282,11 +284,19 @@ class DataParser {
                 metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : []
               });
             }
+            if(items[2] && $.isNumeric(items[2])){
+              var nid = parseInt(items[2]);
+              if(!nidMap[nid]){
+                nidMap[nid] = [];
+              }
+              nidMap[nid].push(ts);
+            }
           }
         });
         anomalies[a.groupId] = alies
       });
       this.anomalies = anomalies;
+      this.nidMap = nidMap;
     }
   }
 
@@ -537,12 +547,10 @@ class DataParser {
       if (mode === "holistic") {
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];
-        _.each(thismetrs, function (item, itemNo) {
-          var thisalies = rawalies.filter(function (ra, rai) {
-            return (ra.metrs.indexOf(item) != -1);
-          });
-          alies = alies.concat(thisalies);
+        var thisalies = rawalies.filter(function (ra, rai) {
+          return (ra.metrs.indexOf(thismetrs) != -1);
         });
+        alies = thisalies;
         alies = alies.filter(function (el, index, arr) {
           return index === arr.indexOf(el);
         });
