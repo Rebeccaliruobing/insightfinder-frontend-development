@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
+import _ from 'lodash';
 import store from 'store';
 import {Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message} from '../../../artui/react';
 import FilterBar from './filter-bar';
@@ -23,6 +24,24 @@ export default class RenderSummaryReport extends Component {
 
     render() {
         let {summaryData, userName, createDate} = this.state;
+        let instanceListNumber = {};
+        let instanceValue = [];
+        let instanceList = _.keyBy(summaryData['metricStats'], function(o){return o['Instance']});
+        _.forEach(instanceList, function (value,key) {
+            instanceListNumber[key] = (_.partition(summaryData['metricStats'], function(o){return o['Instance'] == key})[0]).length;
+        });
+        instanceList = [];
+        let instanceKeys = Object.keys(instanceListNumber);
+        (instanceKeys).map(function (value,index) {
+            let num = 0;
+            for(let j=0;j<index;j++){
+                num+=instanceListNumber[instanceKeys[j]];
+            }
+            instanceList.push(num);
+        });
+        _.forEach(instanceListNumber, function (value,key) {
+            instanceValue.push(value);
+        });
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>
@@ -77,11 +96,17 @@ export default class RenderSummaryReport extends Component {
                                     </td>
                                 </tr>
                                 {(summaryData['metricStats'] || []).map(function (value,index) {
+                                    let showNumber = instanceList.indexOf(index);
+                                    console.log(showNumber!=-1);
                                     return(
                                         <tr key={index}>
-                                            <td>
+                                            {showNumber!=-1?
+                                            <td rowSpan={instanceValue[showNumber]}>
                                                 {value['Instance']}
-                                            </td>
+                                            </td>:
+                                                ""
+                                            }
+
                                             <td>
                                                 {value['Metric']}
                                             </td>
