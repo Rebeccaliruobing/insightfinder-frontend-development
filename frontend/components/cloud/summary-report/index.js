@@ -24,6 +24,7 @@ export default class RenderSummaryReport extends Component {
 
     render() {
         let {summaryData, userName, createDate} = this.state;
+        let hasSummary = summaryData['anomalyDetails'].length;
         let instanceListNumber = {};
         let instanceValue = [];
         let instanceList = _.keyBy(summaryData['metricStats'], function(o){return o['Instance']});
@@ -42,17 +43,17 @@ export default class RenderSummaryReport extends Component {
         _.forEach(instanceListNumber, function (value,key) {
             instanceValue.push(value);
         });
+
+                // <div style={{'marginBottom': '16px'}}>
+                //     <span>Dear customer {userName}</span>
+                // </div>
+                // <div>
+                //     <div><span>Here is the summary report about your projects:</span></div>
+                //     <div><span>Time: {createDate}</span></div>
+                // </div>
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>
-                    <span>Dear customer {userName}</span>
-                </div>
-                <div>
-                    <div><span>Here is the summary report about your projects:</span></div>
-                    <div><span>Time: {createDate}</span></div>
-                </div>
-                <div style={{'marginBottom': '16px'}}>
-                    <div><span>GAE Project gae2</span></div>
                     <div>Anomaly number time series: [{(summaryData.anomalyNumList || []).map(function (value, index) {
                         return value + (index == summaryData.anomalyNumList.length - 1 ? "" : ", ")
                     })}]
@@ -139,10 +140,11 @@ export default class RenderSummaryReport extends Component {
                             <span>Number of anomalies in the past 24 hours: {summaryData['anomalyCount'] || 0}</span>
                         </div>
                     </div>
+                    {hasSummary && 
                     <div style={{'marginTop': '16px'}}>
                         <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img src='/oldstatic/color-map-normal.png' /></span></div>
                         <div>
-                            <table className="metric-table">
+                            <table className="anomaly-table">
                                 <tbody>
                                     <tr>
                                         <td>
@@ -185,35 +187,7 @@ export default class RenderSummaryReport extends Component {
                             </table>
                         </div>
                     </div>
-                    <div style={{'marginTop': '24px'}}>
-                        <div><span>Anomaly details in the past 24 hours:</span></div>
-                        <div>
-                            <table className="metric-table" style={{'width': '50%'}}>
-                                <tbody>
-                                    <tr>
-                                        <td style={{'width': '10%'}}>
-                                            ID
-                                        </td>
-                                        <td>
-                                            Details
-                                        </td>
-                                    </tr>
-                                {(summaryData['anomalyDetails'] || []).map(function (value,index) {
-                                    return(
-                                        <tr key={index}>
-                                            <td>
-                                                {value['ID']}
-                                            </td>
-                                            <td>
-                                                {value['Details']}
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         )

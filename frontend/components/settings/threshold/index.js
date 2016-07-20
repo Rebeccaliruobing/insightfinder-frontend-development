@@ -154,7 +154,7 @@ export default class ThresholdSettings extends React.Component {
             <div className={cx('ui grid two columns form', {'loading': !!this.state.settingLoading})}>
 
               <div className="wide column">
-                <h3>Daily Report Alerts</h3>
+                <h3>Real-time Report Alerts</h3>
                 <div className="field">
                   <label style={labelStyle}>Project Name</label>
                   <ProjectSelection key={data.projectName} value={data.projectName}
@@ -172,7 +172,7 @@ export default class ThresholdSettings extends React.Component {
                 </div>
               </div>
               <div className="wide column">
-                <h3>Real-time Alerts</h3>
+                <h3>Email Alerts</h3>
                 <div className="field">
                   <label style={labelStyle}>Project Type</label>
                   <div className="ui input">

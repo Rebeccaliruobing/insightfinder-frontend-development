@@ -102,9 +102,11 @@ class ModelType extends React.Component{
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
         <div className="menu">
-          <div className="item" data-value="Holistic">Holistic</div>
-          <div className="item" data-value="Split">Split</div>
+          <div className="item" data-value="Holistic">Multivariate</div>
+          <div className="item" data-value="HolisticCP">Multivariate with Change Point Detection</div>
+          <div className="item" data-value="Split">Univariate</div>
           <div className="item" data-value="Hybrid">Hybrid</div>
+          <div className="item" data-value="DBScan">Clustering (DBScan)</div>
         </div>
       </Dropdown>
     );

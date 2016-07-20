@@ -5,6 +5,7 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
 import LiveAnalysisCharts from '../liveanalysis/index'
+import LogAnalysisCharts from '../loganalysis/index'
 import {ChartsRefreshInterval} from '../../storeKeys';
 
 
@@ -81,9 +82,7 @@ const ProjectDetails = class extends React.Component {
           </div>
         </div>
       </Console.Topbar>
-      <LiveAnalysisCharts {...query} enableComments={true} enablePublish={true} data={data} loading={loading} 
-                                     onRefresh={() => this.updateData()}/>
-      //<LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
+      <LiveAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} onRefresh={() => this.updateData()}/>
     </Console>
     );
   }
