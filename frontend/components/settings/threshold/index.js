@@ -176,7 +176,7 @@ export default class ThresholdSettings extends React.Component {
                 <div className="field">
                   <label style={labelStyle}>Project Type</label>
                   <div className="ui input">
-                    <input type="text" readonly value={data.projectType}/>
+                    <input type="text" readOnly value={data.projectType}/>
                   </div>
                 </div>
                 <div className="field">
@@ -252,7 +252,6 @@ export default class ThresholdSettings extends React.Component {
 
 
   fileUploadRef(r) {
-
     $(ReactDOM.findDOMNode(r))
       .fileupload({
         dataType: 'json',
@@ -274,7 +273,7 @@ export default class ThresholdSettings extends React.Component {
       .bind('fileuploaddone', (e, data) => {
         var resp = data.response().jqXHR.responseJSON;
         this.setState({
-          projectHintMapFilename: resp.filename,
+          projectHintMapFilename: data['data']['name'],
           data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
           settingLoading: false
         });
