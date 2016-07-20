@@ -10,13 +10,9 @@ export default function (props) {
           <i className="line chart icon"></i>
           <span> Real-time Alert </span>
         </Link>
-        <Link to="/cloud/summary-report" className="item text-white">
-          <i className="icon icon-report iconfont"/>
-          <span> Insight Summary </span>
-        </Link>
         <Link to="/cloud/incident-analysis" className="item text-white">
           <i className="zoom icon"></i>
-          <span> Incidnet Triage </span>
+          <span> Incident Triage </span>
         </Link>
         <Link to="/cloud/outlier-detection" className="item text-white">
           <i className="icon icon-icons01 iconfont "/>
@@ -25,6 +21,10 @@ export default function (props) {
         <Link to="/cloud/rollout-check" className="item text-white">
           <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>
+        </Link>
+        <Link to="/cloud/summary-report" className="item text-white">
+          <i className="icon icon-report iconfont"/>
+          <span> Insight Summary </span>
         </Link>
       </div>
     </Console.Navbar>

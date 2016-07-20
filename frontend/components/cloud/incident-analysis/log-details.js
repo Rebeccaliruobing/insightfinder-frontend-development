@@ -4,11 +4,11 @@ import ReactTimeout from 'react-timeout'
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
-import LiveAnalysisCharts from '../liveanalysis/index'
+import LogAnalysisCharts from '../loganalysis/index'
 import {ChartsRefreshInterval} from '../../storeKeys';
 
 
-const IncidentDetails = class extends React.Component {
+const ProjectLogDetails = class extends React.Component {
 
   static propTypes = {
     updateData: React.PropTypes.func
@@ -20,7 +20,6 @@ const IncidentDetails = class extends React.Component {
     this.state = {
       view: 'four',
       viewText: 4,
-      loading: false,
       loading: false,
       selectedGroup: ''
     }
@@ -82,10 +81,10 @@ const IncidentDetails = class extends React.Component {
           </div>
         </div>
       </Console.Topbar>
-      <LiveAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} onRefresh={() => this.updateData()}/>
+      <LogAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} onRefresh={() => this.updateData()}/>
     </Console>
     );
   }
 };
 
-export default ReactTimeout(IncidentDetails);
+export default ReactTimeout(ProjectLogDetails);

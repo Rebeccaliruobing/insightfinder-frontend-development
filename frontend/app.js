@@ -13,6 +13,7 @@ import {settingsRoute} from './components/settings';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
+import IncidentLogDetails from './components/cloud/incident-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import Help from './components/help';
@@ -164,6 +165,17 @@ const incidentAnalysisApp = function (props) {
   );
 };
 
+// Incident Analysis Details Log 
+const incidentLogAnalysisApp = function (props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <IncidentLogDetails location={location} params={params}/>
+    </Console>
+  );
+};
+
 // project Data Only Details
 const projectDataOnlyApp = function (props) {
   let {location, params} = props;
@@ -199,6 +211,7 @@ const routes = (
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
+    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
     <Redirect from="*" to="/"/>
   </Router>

@@ -214,6 +214,10 @@ export default  class FilterBar extends Component {
     }
   }
 
+  handleLogSubmit(){
+    this.validateStartEnd(this.state) && this.props.onLogSubmit && this.props.onLogSubmit(this.state);
+  }
+
   handleSubmit() {
     this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
   }
@@ -355,7 +359,8 @@ export default  class FilterBar extends Component {
         </div>
 
         <div className="ui field">
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Submit</Button>
+          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
+          <Button className="orange" onClick={this.handleLogSubmit.bind(this)}>Log Analysis</Button>
 
           <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
           {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
