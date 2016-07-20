@@ -59,7 +59,7 @@ class CommentsModal extends React.Component {
           </div>
           <form className="ui reply form">
             <div className="field">
-              <textarea/>
+              <textarea rows="4"/>
             </div>
           </form>
         </div>
