@@ -1,0 +1,29 @@
+.event-table {
+  border: 2px solid black;
+  width: 90%;
+  td{
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+    text-align: center;
+  }
+  tr {
+    &:nth-child(1) {
+      border-top: none;
+      font-weight: bold;
+      td{
+        &:nth-child(1){
+          width: 10%;
+        }
+        &:nth-child(2){
+          width: 10%;
+        }
+        &:nth-child(3){
+          width: 60%;
+        }
+        &:nth-child(4){
+          width: 20%;
+        }
+      }
+    }
+  }
+}

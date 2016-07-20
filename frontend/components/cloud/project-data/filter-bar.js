@@ -32,6 +32,7 @@ export default  class FilterBar extends Component {
       cvalue: 5,
       durationHours: 6,
       modelType: "Holistic",
+      modelTypeText: "Multivariate",
       modelKey: undefined,
       projectType: undefined,
       incidentList: []
@@ -145,7 +146,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, durationHours, incidentList} = this.state;
+    const {projectName, incident, startTime, endTime, pvalue, cvalue, projectType, modelKey, modelType, modelTypeText, durationHours, incidentList} = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
 
@@ -166,7 +167,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType value={modelType} text={modelType} onChange={(value, text)=> this.setState({modelType: value})}/>
+            <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Model Key</label>

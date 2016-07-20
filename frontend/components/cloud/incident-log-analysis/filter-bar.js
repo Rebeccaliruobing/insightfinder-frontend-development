@@ -32,7 +32,7 @@ export default  class FilterBar extends Component {
       cvalue: 5,
       durationHours: 24,
       modelType: "Holistic",
-      modelTypeText: "Multivariate",
+      modelTypeText: 'Multivariate',
       projectType: undefined,
       availableDataRanges:[],
       isStationary:false,
@@ -360,7 +360,7 @@ export default  class FilterBar extends Component {
         </div>
 
         <div className="ui field">
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
+          <Button className="orange" onClick={this.handleLogSubmit.bind(this)}>Log Analysis</Button>
           <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
           {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
         </div>

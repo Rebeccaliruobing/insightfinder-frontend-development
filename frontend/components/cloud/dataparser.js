@@ -24,7 +24,8 @@ class DataParser {
     this.summaryData = null;
     this.groupmetrics = null;
     this.gmpairs = null;
-    this.neuronMap = null;
+    this.nidMap = null;
+    this.logEventArr = null;
 
     this.mode = this._detectionModeAndParse();
   }
@@ -242,6 +243,12 @@ class DataParser {
     this.causalDataArray = causalDataArray;
     this.causalTypes = causalTypes;
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
+  }
+
+  parseLogAnalysisData(){
+    if(this.data['eventJsonArr']){
+      this.logEventArr = this.data['eventJsonArr'];
+    }
   }
 
   _parseAnomalyData() {

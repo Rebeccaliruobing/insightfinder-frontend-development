@@ -21,6 +21,7 @@ export default  class FilterBar extends Component {
       projectName: undefined,
       projectType: undefined,
       modelType: 'Holistic',
+      modelTypeText: 'Multivariate',
       anomalyThreshold: 0.99,
       durationThreshold: 5
     };
@@ -75,7 +76,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType} = this.state;
+    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType, modelTypeText} = this.state;
     const labelStyle = {};
     const submitStyle = cx(
       'orange', {
@@ -96,7 +97,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: value})}/>
+            <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Anomaly Threshold</label>

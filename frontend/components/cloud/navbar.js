@@ -26,6 +26,10 @@ export default function (props) {
           <i className="icon icon-report iconfont"/>
           <span> Insight Summary </span>
         </Link>
+        <Link to="/cloud/incident-log-analysis" className="item text-white">
+          <i className="zoom icon"></i>
+          <span> Log Analysis (beta) </span>
+        </Link>
       </div>
     </Console.Navbar>
   )

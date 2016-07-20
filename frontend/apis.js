@@ -38,6 +38,7 @@ $.fn.api.settings.api = {
     'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
     'published detection': `${baseUrl}publishedDetection`,
     'post mortem': `${baseUrl}postMortem`,
+    'log analysis': `${baseUrl}logAnalysis`,
     'add custom project': `${baseUrl}add-custom-project`,
     'add aws project': `${baseUrl}add-amazon-project`,
     'add google project': `${baseUrl}add-google-project`,
@@ -208,7 +209,7 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-        postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -243,7 +244,7 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-        postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+    postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -254,6 +255,36 @@ export default {
                     pvalue,
                     cvalue,
                     modelType,
+                    projectName,
+                    startTime,
+                    endTime,
+                    modelStartTime,
+                    modelEndTime,
+                    isExistentIncident
+                }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    postLogAnalysis(projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['log analysis'],
+                data: $.param({
+                    userName,
+                    token,
+                    pvalue,
+                    cvalue,
                     projectName,
                     startTime,
                     endTime,

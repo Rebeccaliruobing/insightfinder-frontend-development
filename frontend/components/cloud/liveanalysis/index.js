@@ -42,8 +42,8 @@ class LiveAnalysisCharts extends React.Component {
 
     this.state = {
       instanceName: false,
-      view: (store.get(DefaultView, 'list')).toLowerCase(),
-      columns: (store.get(GridColumns, 'four')).toLowerCase(),
+      view: (store.get(DefaultView, 'grid')).toLowerCase(),
+      columns: (store.get(GridColumns, 'two')).toLowerCase(),
       selectedGroupId: undefined,
       summarySelected: false,
       selectedAnnotation: null,
@@ -278,10 +278,8 @@ class LiveAnalysisCharts extends React.Component {
       // Since componentWillUpdate is not called at initial time, so 
       // we need to parse the data
       this.dp = new DataParser(data);
-      if (this.dp.mode != 'split') {
-        this.dp.getSummaryData();
-      }
-      this.dp.getGroupsData();
+      this.dp.getSummaryData();
+      //this.dp.getGroupsData();
     }
 
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;

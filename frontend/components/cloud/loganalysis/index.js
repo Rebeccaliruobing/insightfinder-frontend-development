@@ -8,6 +8,7 @@ import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../.
 import {Dygraph} from '../../../artui/react/dataviz';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
+import "./logevent.less";
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import Navbar from './navbar';
@@ -59,6 +60,7 @@ class LogAnalysisCharts extends React.Component {
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
       this.dp.getGroupsDataTest();
+      this.dp.parseLogAnalysisData();
     }
   }
 
@@ -95,29 +97,35 @@ class LogAnalysisCharts extends React.Component {
                 // )
   renderNidMapTable(){
     if (!this.dp) return;
-    let nidMap = this.dp ? this.dp.nidMap : undefined;
+    let nidMap = this.dp.nidMap;
     let nidArray = [];
+    let idx = 1;
     for (var key in nidMap) {
-      nidArray.push({key:key, value:nidMap[key]});
+      nidArray.push({index:idx, key:key, value:nidMap[key]});
+      idx++;
     }
+    let logEventArr = this.dp.logEventArr;
+
     if(nidMap){
       return (
         <div>
-          <table className="metric-table">
+          <table className="event-table">
             <tbody>
               <tr>
                 <td>Group ID</td>
+                <td>Timestamp</td>
                 <td>Events</td>
                 <td>Anomaly</td>
               </tr>
-              {nidArray.map((nid, inid) => {
-                // let nidvalue = nid.value.join(',');
-                let nidvalue = nid.value;
+              {logEventArr.map((event, iEvent) => {
+                let iGroup = _.find(nidArray, n => n.key == event.nid).index;
+                let timestamp = moment(event.timestamp).utc().format("YYYY-MM-DD HH:mm");
                 return (
-                      <tr key={inid+1}>
-                        <td>Group {inid+1}</td>
-                        <td>{nidvalue}</td>
-                        <td></td>
+                      <tr key={iEvent}>
+                        <td>Group {iGroup}</td>
+                        <td>{timestamp}</td>
+                        <td>{event.rawData}</td>
+                        <td>{event.anomaly}</td>
                       </tr>
                 )
               })}              

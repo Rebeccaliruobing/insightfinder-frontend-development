@@ -6,6 +6,7 @@ import Navbar from './navbar';
 
 import LiveMonitoring from './monitoring';
 import IncidentAnalysis from './incident-analysis';
+import IncidentLogAnalysis from './incident-log-analysis';
 import OutlierDetection from './outlier-detection';
 import RolloutCheck from './rollout-check';
 import SummaryReport from './summary-report';
@@ -27,6 +28,7 @@ export const cloudRoute = (
       <IndexRedirect to="monitoring" />
       <Route component={LiveMonitoring} path="monitoring" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
+      <Route component={IncidentLogAnalysis} path="incident-log-analysis" />
       <Route component={OutlierDetection} path="outlier-detection" />
       <Route component={RolloutCheck} path="rollout-check" />
       <Route component={SummaryReport} path="summary-report" />

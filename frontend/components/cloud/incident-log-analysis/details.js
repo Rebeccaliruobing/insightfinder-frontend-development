@@ -4,11 +4,11 @@ import ReactTimeout from 'react-timeout'
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
-import LogAnalysisCharts from '../loganalysis/index'
+import LiveAnalysisCharts from '../liveanalysis/index'
 import {ChartsRefreshInterval} from '../../storeKeys';
 
 
-const ProjectLogDetails = class extends React.Component {
+const IncidentDetails = class extends React.Component {
 
   static propTypes = {
     updateData: React.PropTypes.func
@@ -21,6 +21,7 @@ const ProjectLogDetails = class extends React.Component {
       view: 'four',
       viewText: 4,
       loading: false,
+      loading: false,
       selectedGroup: ''
     }
   }
@@ -32,10 +33,10 @@ const ProjectLogDetails = class extends React.Component {
   updateData() {
 
     let {query} = this.props.location;
-    let {projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
+    let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
     this.setState({loading: true}, ()=> {
-      apis.postLogAnalysis(projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident)
+      apis.postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident)
         .then(resp => {
           let update = {};
           if (resp.success) {
@@ -81,10 +82,12 @@ const ProjectLogDetails = class extends React.Component {
           </div>
         </div>
       </Console.Topbar>
-      <LogAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} onRefresh={() => this.updateData()}/>
+      <LiveAnalysisCharts {...query} enableComments={true} enablePublish={true} data={data} 
+                                     loading={loading} 
+                                     onRefresh={() => this.updateData()}/>
     </Console>
     );
   }
 };
 
-export default ReactTimeout(ProjectLogDetails);
+export default ReactTimeout(IncidentDetails);
