@@ -96,7 +96,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} onChange={(value, text)=> this.setState({modelType: value})}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Anomaly Threshold</label>

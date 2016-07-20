@@ -297,7 +297,7 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType value={modelType} text={modelType} onChange={(value, text)=> this.setState({modelType: text})}/>
+            <ModelType value={modelType} text={modelType} onChange={(value, text)=> this.setState({modelType: value})}/>
           </div>
           <div className="field">
           </div>

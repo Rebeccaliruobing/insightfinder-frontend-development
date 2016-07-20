@@ -103,7 +103,7 @@ class ModelType extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Multivariate</div>
-          <div className="item" data-value="HolisticCP">Multivariate with Change Point Detection</div>
+          <div className="item" data-value="HolisticCP">Multivariate + Filtering</div>
           <div className="item" data-value="Split">Univariate</div>
           <div className="item" data-value="Hybrid">Hybrid</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
