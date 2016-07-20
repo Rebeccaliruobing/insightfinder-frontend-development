@@ -266,7 +266,8 @@ export default class SummaryReport extends Component {
         if (loading) {
             return (
                 <Console.Content>
-                    loading
+                    <div className="ui form loading" style={{'marginTop': '36px'}}>
+                    </div>
                 </Console.Content>
             )
         }
