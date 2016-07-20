@@ -1,5 +1,6 @@
 import React from 'react';
 import {Dygraph} from '../../../artui/react/dataviz';
+import moment from 'moment'
 import pureRender from 'pure-render-decorator';
 
 
@@ -53,9 +54,12 @@ export class DetailsChart extends React.Component {
     // Destroy popup if exists.
     if (anno && anno.div) {
       var $p = $(anno.div);
+      var title = moment(parseInt(anno.x)).format("YYYY-MM-DD HH:mm");
       // Popup will get the content from the DOM title attribute.
       $p.popup({
-        on: 'click'
+        on: 'click',
+        title: title,
+        content: anno.text
       });
       $p.popup('show');
     }
