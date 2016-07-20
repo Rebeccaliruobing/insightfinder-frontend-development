@@ -81,7 +81,7 @@ const ProjectDetails = class extends React.Component {
           </div>
         </div>
       </Console.Topbar>
-      <LiveAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} 
+      <LiveAnalysisCharts {...query} enableComments={true} enablePublish={true} data={data} loading={loading} 
                                      onRefresh={() => this.updateData()}/>
       //<LiveAnalysisCharts groupId={groupId} projectName={projectName} data={data} loading={loading}/>
     </Console>

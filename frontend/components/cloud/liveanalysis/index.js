@@ -10,9 +10,9 @@ import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
 import ShareModal from './shareModal';
+import CommentsModal from './commentsModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
-import Navbar from './navbar';
 import {SummaryChart, DetailsChart} from './charts';
 import apis from '../../../apis';
 
@@ -49,7 +49,8 @@ class LiveAnalysisCharts extends React.Component {
       selectedAnnotation: null,
       showSettingModal: false,
       showTenderModal: false,
-      showShareModal: false
+      showShareModal: false,
+      showComments: false
     };
   }
 
@@ -147,7 +148,9 @@ class LiveAnalysisCharts extends React.Component {
       selectIndex = selectIndex + rowCount - rowIndex;
       if (selectedGroup) {
         elems = elems.slice(0, selectIndex).concat([(
-          <div key={'expand'} ref={(c)=>{
+          <div key={'expand'}
+               style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative'}}
+               ref={(c)=>{
             let $c = $(ReactDOM.findDOMNode(c));
             $c.slideDown('fast', ()=>{
               $(window.document).scrollTop($c.offset().top);
@@ -158,17 +161,15 @@ class LiveAnalysisCharts extends React.Component {
                     <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
-                       style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
+                       style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}/>
                   </div>
               ), c)
-            })
-          }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative'}}>
-
-          </div>
+            });
+          }} />
         )]).concat(elems.slice(selectIndex));
       }
-
     }
+    
     return (
 
       <div className="ui grid">
@@ -218,9 +219,6 @@ class LiveAnalysisCharts extends React.Component {
         <DetailsChart
           data={summary}
           drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
-          // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-          // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
-          // selection={listGraphSelection}
           {...this.state.listGraphZoomOpt}
         />
       </div>
@@ -249,9 +247,6 @@ class LiveAnalysisCharts extends React.Component {
                 <DetailsChart
                   data={group}
                   drawCallback={(g) => this.setState({listGraphZoomOpt: {dateWindow: g.xAxisRange()}})}
-                  // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-                  // onUnhighlight={() => this.setState({listGraphSelection: undefined })}
-                  // selection={listGraphSelection}
                   {...listGraphZoomOpt}
                 />
               </div>
@@ -265,13 +260,14 @@ class LiveAnalysisCharts extends React.Component {
   handleShare() {
     this.setState({showShareModal: true});
   }
+  
   handleShareSubmit(data) {
     apis.postDashboardUserValues('publishdata', data);
   }
-
+  
   render() {
 
-    let {data, loading, onRefresh, enablePublish} = this.props;
+    let {data, loading, onRefresh, enablePublish, enableComments} = this.props;
     let {columns, view} = this.state;
 
     let isListView = view === 'list';
@@ -288,12 +284,8 @@ class LiveAnalysisCharts extends React.Component {
       this.dp.getGroupsData();
     }
 
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
     let dataArray = this.dp ? this.dp.causalDataArray : undefined;
     let types = this.dp ? this.dp.causalTypes : undefined;
-        // <Console.Navbar style={navbarStyle}>
-        //   <Navbar groupMetrics={groupMetrics}/>
-        // </Console.Navbar>
 
     return (
       <Console.Wrapper>
@@ -308,6 +300,12 @@ class LiveAnalysisCharts extends React.Component {
               { enablePublish &&
               <Button className="labeled icon" onClick={::this.handleShare}>
                 <i className="icon share alternate"/> Publish
+              </Button>
+              }
+              { enableComments &&
+              <Button className="labeled icon"
+                      onClick={() => this.setState({showComments: true})} >
+                <i className="icon comments"/> Comments
               </Button>
               }
               <Button className="labeled icon" onClick={() => onRefresh()}>
@@ -344,6 +342,10 @@ class LiveAnalysisCharts extends React.Component {
           <ShareModal dataArray={dataArray} types={types} dp={this.dp}
                       onSubmit={::this.handleShareSubmit}
                       onClose={() => this.setState({showShareModal: false})}/>
+          }
+          { this.state.showComments &&
+          <CommentsModal dataArray={dataArray} types={types} dp={this.dp}
+                      onClose={() => this.setState({showComments: false})}/>
           }
         </Console.Content>
       </Console.Wrapper>
