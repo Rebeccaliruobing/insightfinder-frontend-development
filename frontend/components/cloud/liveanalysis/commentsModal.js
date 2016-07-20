@@ -2,7 +2,7 @@ import $ from 'jquery';
 import React from 'react';
 import cx from 'classnames';
 import moment from 'moment';
-
+import store from 'store';
 
 import {Modal, Dropdown} from '../../../artui/react/index';
 
@@ -11,7 +11,7 @@ class CommentsModal extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.object,
-    location: React.PropTypes.object
+    location: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -19,7 +19,7 @@ class CommentsModal extends React.Component {
     this.state = {
       comments: [
         // {user: 'Guest', commentsTime: new Date(), content: 'The CPU is high'},
-        // {user: 'Guest', commentsTime: new Date(), content: 'The network issue is fixed'},
+        {user: store.get('userName'), commentsTime: new Date(), content: 'This result is interesting.'},
       ]
     };
     
@@ -47,11 +47,13 @@ class CommentsModal extends React.Component {
               return(
                 <div key={idx} className="comment">
                   <div className="content">
-                    <a className="author">{c.user}</a>
-                    <div className="metadata">
-                      <span className="date">{moment(c.commentsTime).utc().format('YYYY-MM-DD HH:mm')}</span>
-                    </div>
                     <div class="text">{c.content}</div>
+                    <div style={{textAlign: 'right'}}>
+                      <a className="author">{c.user}</a>
+                      <div className="metadata">
+                        <span className="date">{moment(c.commentsTime).utc().format('YYYY-MM-DD HH:mm')}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )
@@ -59,7 +61,7 @@ class CommentsModal extends React.Component {
           </div>
           <form className="ui reply form">
             <div className="field">
-              <textarea/>
+              <textarea rows="4"/>
             </div>
           </form>
         </div>

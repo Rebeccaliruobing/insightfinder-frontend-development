@@ -31,6 +31,7 @@ const Modal = class Modal extends React.Component {
           inverted: this.props['dimmer'] === 'inverted',
           blurring: this.props['dimmer'] === 'blurring',
           transition: this.props['transition'],
+          duration: 0,
           onHidden: () => { this.props.onClose(); },
           onCancel: () => { this.props.onCancel(); },
           onOK: () => { this.props.onOK(); }
