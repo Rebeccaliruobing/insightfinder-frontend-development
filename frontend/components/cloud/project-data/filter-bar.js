@@ -32,7 +32,7 @@ export default  class FilterBar extends Component {
       cvalue: 5,
       durationHours: 6,
       modelType: "Holistic",
-      modelTypeText: "Multivariate",
+      modelTypeText: "Holistic",
       modelKey: undefined,
       projectType: undefined,
       incidentList: []

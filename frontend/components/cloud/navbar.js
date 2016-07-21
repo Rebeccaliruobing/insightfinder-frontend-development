@@ -27,7 +27,7 @@ export default function (props) {
           <span> Insight Summary </span>
         </Link>
         <Link to="/cloud/incident-log-analysis" className="item text-white">
-          <i className="zoom icon"></i>
+          <i className="file text icon"></i>
           <span> Log Analysis (beta) </span>
         </Link>
       </div>

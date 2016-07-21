@@ -21,7 +21,7 @@ export default  class FilterBar extends Component {
       projectName: undefined,
       projectType: undefined,
       modelType: 'Holistic',
-      modelTypeText: 'Multivariate',
+      modelTypeText: 'Holistic',
       anomalyThreshold: 0.99,
       durationThreshold: 5
     };
