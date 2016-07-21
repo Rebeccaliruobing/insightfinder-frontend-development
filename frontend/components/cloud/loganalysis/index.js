@@ -47,6 +47,10 @@ class LogAnalysisCharts extends React.Component {
       summarySelected: false,
       selectedAnnotation: null,
       showSettingModal: false,
+      tabStates: {
+          event: 'active',
+          vector: ''
+      }
     };
   }
 
@@ -83,20 +87,41 @@ class LogAnalysisCharts extends React.Component {
     )
   }
 
-                // let nidvalue = nid.value;
-                // return (
-                //   {nidvalue.map((ts,its) =>{
-                //     return (
-                //       <tr key={inid+1}>
-                //         <td>Group {inid+1}</td>
-                //         <td>{ts}</td>
-                //         <td></td>
-                //       </tr>
-                //     )
-                //   })}
-                // )
-  renderNidMapTable(){
+  renderVectorMapTable(){
     if (!this.dp) return;
+    let vectorMap = this.dp.vectorMap;
+    let vectorArr = [];
+    for (var key in vectorMap) {
+      vectorArr.push({key:key, value:vectorMap[key]});
+    }
+    if(vectorArr){
+      return (
+        <div>
+          <table className="vector-table">
+            <tbody>
+              <tr>
+                <td>Vector#</td>
+                <td>Frequent Episode</td>
+              </tr>
+              {vectorArr.map((vector, i) => {
+                return (
+                  <tr key={i}>
+                    <td>{vector.key}</td>
+                    <td>{vector.value}</td>
+                  </tr>
+                )
+              })}              
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  }
+
+  renderEventTable(){
+    if (!this.dp) return;
+    let anomalies = this.dp.anomalies["0"];
+    let vectorMap = this.dp.vectorMap;
     let nidMap = this.dp.nidMap;
     let nidArray = [];
     let idx = 1;
@@ -105,8 +130,28 @@ class LogAnalysisCharts extends React.Component {
       idx++;
     }
     let logEventArr = this.dp.logEventArr;
+    let weightVectors = this.dp.weightVectors;
 
-    if(nidMap){
+    let neuronListNumber = {};
+    let neuronValue = [];
+    let neuronList = _.keyBy(logEventArr, function(o){return o['nid']});
+    _.forEach(neuronList, function (value,key) {
+        neuronListNumber[key] = (_.partition(logEventArr, function(o){return o['nid'] == key})[0]).length;
+    });
+    neuronList = [];
+    let neuronKeys = Object.keys(neuronListNumber);
+    (neuronKeys).map(function (value,index) {
+        let num = 0;
+        for(let j=0;j<index;j++){
+            num+=neuronListNumber[neuronKeys[j]];
+        }
+        neuronList.push(num);
+    });
+    _.forEach(neuronListNumber, function (value,key) {
+        neuronValue.push(value);
+    });
+
+    if(logEventArr){
       return (
         <div>
           <table className="event-table">
@@ -118,14 +163,30 @@ class LogAnalysisCharts extends React.Component {
                 <td>Anomaly</td>
               </tr>
               {logEventArr.map((event, iEvent) => {
+                let showNumber = neuronList.indexOf(iEvent);
                 let iGroup = _.find(nidArray, n => n.key == event.nid).index;
-                let timestamp = moment(event.timestamp).utc().format("YYYY-MM-DD HH:mm");
+                let realAnomalies = _.filter(anomalies, a => a.val>0);
+                let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
+                let nAnomaly = realAnomalies.indexOf(anomaly)+1;
+                let nAnomalyStr = "";
+                if(nAnomaly){
+                  nAnomalyStr = "Anomaly: "+ nAnomaly;
+                }
+                let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+                let featuresArr = weightVectors[event['nid']].map((e,i)=>{return {FE:vectorMap[e.index],weight:e.value}});
                 return (
                       <tr key={iEvent}>
-                        <td>Group {iGroup}</td>
+                        {showNumber!=-1?
+                        <td rowSpan={neuronValue[showNumber]}>
+                            Group {iGroup} <br />
+                            Number of Anomaly: {neuronValue[iGroup-1]} <br />
+                            Features: {JSON.stringify(featuresArr)}
+                        </td>:
+                            ""
+                        }
                         <td>{timestamp}</td>
                         <td>{event.rawData}</td>
-                        <td>{event.anomaly}</td>
+                        <td>{event.anomaly}<br />{nAnomalyStr}</td>
                       </tr>
                 )
               })}              
@@ -252,16 +313,40 @@ class LogAnalysisCharts extends React.Component {
     )
   }
 
-  renderList() {
+  selectTab(e, tab) {
+      var tabStates = this.state['tabStates'];
+      tabStates = _.mapValues(tabStates, function (val) {
+          return '';
+      });
+      tabStates[tab] = 'active';
+      this.setState({tabStates: tabStates});
+  }
 
+  renderList() {
+    let self = this;
     let groups = this.dp ? this.dp.groupsData : [];
     let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-    let {listGraphZoomOpt} = this.state;
+    let {listGraphZoomOpt, tabStates} = this.state;
     return (
       <div className="ui grid">
         <div className="sixteen wide column">
           {this.renderSummary()}
-          {this.renderNidMapTable()}
+           <div className="ui pointing secondary menu">
+               <a className={tabStates['event'] + ' item'}
+                  onClick={(e) => this.selectTab(e, 'event')}>Event Log</a>
+               <a className={tabStates['vector'] + ' item'}
+                  onClick={(e) => this.selectTab(e, 'vector')}>Frequent Episodes</a>
+           </div>
+           <div className={tabStates['event'] + ' ui tab '}>
+              {tabStates['event'] === 'active' ? (
+                self.renderEventTable()
+              ) : null}
+           </div>
+           <div className={tabStates['vector'] + ' ui tab '}>
+              {tabStates['vector'] === 'active' ? (
+                self.renderVectorMapTable()
+              ) : null}
+           </div>
         </div>
       </div>
     )

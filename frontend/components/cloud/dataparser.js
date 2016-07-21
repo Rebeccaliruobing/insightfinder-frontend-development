@@ -26,6 +26,7 @@ class DataParser {
     this.gmpairs = null;
     this.nidMap = null;
     this.logEventArr = null;
+    this.vectorMap = null;
 
     this.mode = this._detectionModeAndParse();
   }
@@ -249,6 +250,12 @@ class DataParser {
     if(this.data['eventJsonArr']){
       this.logEventArr = this.data['eventJsonArr'];
     }
+    if(this.data['vectorMapStr']){
+      this.vectorMap = $.parseJSON(this.data['vectorMapStr']);
+    }
+    if(this.data['weightVectors']){
+      this.weightVectors = this.data['weightVectors'];
+    }
   }
 
   _parseAnomalyData() {
@@ -467,8 +474,8 @@ class DataParser {
 
       let sname = ['datetime'];
 
-      // For highlight bar
-      if (mode === "holistic") {
+      // For highlight bar, use holistic mode for all modeltype
+      if (true || mode === "holistic") {
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];
         _.each(thismetrs, function (item, itemNo) {
@@ -550,8 +557,9 @@ class DataParser {
       let sdata = [];
       let sname = ['datetime'];
       let sId = [];
-      // For highlight bar
-      if (mode === "holistic") {
+      // For highlight bar, use holistic mode for all modeltype
+      if (true || mode === "holistic") {
+        //var rawalies = anomalies["0"];
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];
         var thisalies = rawalies.filter(function (ra, rai) {

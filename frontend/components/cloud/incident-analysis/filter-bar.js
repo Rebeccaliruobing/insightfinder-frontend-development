@@ -32,7 +32,7 @@ export default  class FilterBar extends Component {
       cvalue: 5,
       durationHours: 24,
       modelType: "Holistic",
-      modelTypeText: "Multivariate",
+      modelTypeText: "Holistic",
       projectType: undefined,
       availableDataRanges:[],
       isStationary:false,
