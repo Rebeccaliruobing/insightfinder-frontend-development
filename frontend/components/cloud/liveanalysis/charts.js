@@ -1,18 +1,12 @@
 import React from 'react';
 import {Dygraph} from '../../../artui/react/dataviz';
 import moment from 'moment'
-import pureRender from 'pure-render-decorator';
+import shallowCompare from 'react-addons-shallow-compare';
 
+export class SummaryChart extends React.Component {
 
-// @pureRender
-export
-class SummaryChart extends React.Component {
-
-  shouldComponentUpdate(nextProps, extState) {
-    return nextProps.data !== this.props.data ||
-      nextProps.dateWindow !== this.props.dateWindow ||
-      nextProps.selection !== this.props.selection ||
-      nextProps.valueRange !== this.props.valueRange;
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
   }
 
   render() {
