@@ -11,6 +11,12 @@
     <% for (var css in htmlWebpackPlugin.files.chunks.app.css) { %>
     <link href="<%= htmlWebpackPlugin.files.chunks.app.css[css] %>" rel="stylesheet">
     <% } %>
+    <script>
+        window.API_BASE_URL =
+//                'https://insightfinderui.appspot.com/api/v1/'; // Test
+//                'https://insightfindergae.appspot.com/api/v1'; // Stage
+                'https://app.insightfinder.com/api/v1/'; // Prod
+    </script>
 </head>
 <body>
 <script src="<%= htmlWebpackPlugin.files.chunks.commons.entry %>" charset="utf-8"></script>
