@@ -109,7 +109,6 @@ export default class ThresholdSettings extends React.Component {
       minAnomalyRatioFilter,
       sharedUsernames
     });
-    
     this.setState({
       metricSettings: metricSettings,
       data: data,
@@ -144,7 +143,6 @@ export default class ThresholdSettings extends React.Component {
   render() {
     let labelStyle = {};
     let {data, tempSharedUsernames, metricSettings} = this.state;
-
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -209,7 +207,7 @@ export default class ThresholdSettings extends React.Component {
                     <input type="file" name="file" ref={::this.fileUploadRef}/>
                   </div>
                   {this.state.projectHintMapFilename &&
-                  <span className="text-blue">{this.state.projectHintMapFilename}</span>}
+                  <span className="text-blue" id="productName">{this.state.projectHintMapFilename}</span>}
                 </div>
               </div>
               <div className="wide column">
@@ -257,10 +255,10 @@ export default class ThresholdSettings extends React.Component {
         dataType: 'json',
         url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/projectHintMapFilename`,
         sequentialUploads: true,
-        multipart: false,
+        multipart: false
       })
       .bind('fileuploadadd', (e, data) => {
-        this.setState({settingLoading: true});
+        this.setState({settingLoading: true, projectName: data.files[0]['name']});
       })
       .bind('fileuploadprogress', (e, data) => {
         var progress = parseInt(data.loaded / data.total * 100, 10);
@@ -298,7 +296,6 @@ export default class ThresholdSettings extends React.Component {
         projectName: this.state.data.projectName,
         projectSettings: JSON.stringify(this.state.metricSettings)
       }).then((resp)=> {
-        console.log(resp);
         this.setState({uservaluesLoading: false}, this.context.root.loadData)
       });
     });
