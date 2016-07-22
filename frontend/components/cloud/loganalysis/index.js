@@ -87,6 +87,45 @@ class LogAnalysisCharts extends React.Component {
     )
   }
 
+  renderWordCountTable(){
+    if (!this.dp) return;
+    let wordCountArr = this.dp.wordCountArr;
+    if(wordCountArr){
+      return (
+        <div>
+          <table className="vector-table">
+            <tbody>
+              <tr>
+                <td>Frequent Episode</td>
+                <td>Count</td>
+              </tr>
+              {wordCountArr.sort(function(a, b) {
+                // reverse ordering
+                let aid = parseInt(a.count);
+                let bid = parseInt(b.count);
+                if(aid<bid){
+                  return 1;
+                } else if(aid>bid){
+                  return -1;
+                }else{
+                  return 0;
+                }
+              }).map((word, i) => {
+                let cleanWord = word.pattern.replace(/"/g,"");
+                return (
+                  <tr key={i}>
+                    <td>{cleanWord}</td>
+                    <td>{word.count}</td>
+                  </tr>
+                )
+              })}              
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  }
+
   renderEpisodeMapTable(){
     if (!this.dp) return;
     let episodeMapArr = this.dp.episodeMapArr;
@@ -111,7 +150,7 @@ class LogAnalysisCharts extends React.Component {
                   return 0;
                 }
               }).map((episode, i) => {
-                let cleanEpisode = episode.episode.replace(/"/g,"");
+                let cleanEpisode = episode.pattern.replace(/"/g,"");
                 return (
                   <tr key={i}>
                     <td>{cleanEpisode}</td>
@@ -132,7 +171,7 @@ class LogAnalysisCharts extends React.Component {
     let episodeMap = {};
     let episodeMapArr = this.dp.episodeMapArr;
     _.forEach(episodeMapArr, function (episode, iEpisode)  {
-      episodeMap[parseInt(episode.index)] = episode.episode;
+      episodeMap[parseInt(episode.index)] = episode.pattern;
     });
     let nidMap = this.dp.nidMap;
     let nidArray = [];
@@ -346,17 +385,24 @@ class LogAnalysisCharts extends React.Component {
            <div className="ui pointing secondary menu">
                <a className={tabStates['event'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
-               <a className={tabStates['vector'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'vector')}>Frequent Episodes</a>
+               <a className={tabStates['episode'] + ' item'}
+                  onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episodes</a>
+               <a className={tabStates['word'] + ' item'}
+                  onClick={(e) => this.selectTab(e, 'word')}>Word Count</a>
            </div>
            <div className={tabStates['event'] + ' ui tab '}>
               {tabStates['event'] === 'active' ? (
                 self.renderEventTable()
               ) : null}
            </div>
-           <div className={tabStates['vector'] + ' ui tab '}>
-              {tabStates['vector'] === 'active' ? (
+           <div className={tabStates['episode'] + ' ui tab '}>
+              {tabStates['episode'] === 'active' ? (
                 self.renderEpisodeMapTable()
+              ) : null}
+           </div>
+           <div className={tabStates['word'] + ' ui tab '}>
+              {tabStates['word'] === 'active' ? (
+                self.renderWordCountTable()
               ) : null}
            </div>
         </div>

@@ -254,6 +254,9 @@ class DataParser {
     if(this.data['episodeMapArr']){
       this.episodeMapArr = this.data['episodeMapArr'];
     }
+    if(this.data['wordCountArr']){
+      this.wordCountArr = this.data['wordCountArr'];
+    }
     if(this.data['weightVectors']){
       this.weightVectors = this.data['weightVectors'];
     }
@@ -476,7 +479,7 @@ class DataParser {
       let sname = ['datetime'];
 
       // For highlight bar, use holistic mode for all modeltype
-      if (true || mode === "holistic") {
+      if (mode === "holistic") {
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];
         _.each(thismetrs, function (item, itemNo) {
@@ -559,7 +562,7 @@ class DataParser {
       let sname = ['datetime'];
       let sId = [];
       // For highlight bar, use holistic mode for all modeltype
-      if (true || mode === "holistic") {
+      if (mode === "holistic") {
         //var rawalies = anomalies["0"];
         var rawalies = anomalies["0"];
         var thismetrs = groupmetrics[grp];
