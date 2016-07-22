@@ -11,10 +11,10 @@ class TenderModal extends React.Component {
   }
 
   render() {
-    let {dataArray, types} = this.props;
+    let {dataArray, types, ...rest} = this.props;
     if (dataArray && types) {
       return (
-        <Modal {...this.props} size="big" closable={true}>
+        <Modal {...rest} size="big" closable={true}>
           <div className="content">
             <CausalGraph dataArray={dataArray} types={types}/>
           </div>
