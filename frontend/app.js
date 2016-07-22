@@ -22,6 +22,8 @@ import AccountInfo from './components/account-info';
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
 
+import 'react-addons-perf';
+
 class App extends React.Component {
   
   constructor(props) {

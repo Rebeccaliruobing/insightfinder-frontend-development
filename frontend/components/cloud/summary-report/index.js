@@ -8,42 +8,67 @@ import {Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message} from 
 import FilterBar from './filter-bar';
 import apis from '../../../apis';
 import "./summaryReport.less";
+import ReactD3 from 'react-d3-components';
+var BarChart = ReactD3.BarChart;
+
 export default class RenderSummaryReport extends Component {
     constructor(props) {
         super(props);
+        let today = new Date();
         this.state = {
             summaryData: this.props.summaryData || {},
             createDate: this.props.createDate || "",
-            userName: store.get('userName')
+            userName: store.get('userName'),
+            barChartList: (_.slice(this.props.summaryData.anomalyNumList,0,30) || []).map(function (value,index) {
+                today = new Date(moment(today).subtract(1, 'days'));
+                let month = today.getMonth()+1;
+                let day = today.getDate();
+                return  {x: day+"/"+month, y: value}
+            })
         };
     }
 
     componentDidMount() {
+    }
 
+    rand(min, max, num) {
+        var rtn = [];
+        while (rtn.length < num) {
+            rtn.push((Math.random() * (max - min)) + min);
+        }
+        return rtn;
     }
 
     render() {
-        let {summaryData, userName, createDate} = this.state;
+        let {summaryData, userName, createDate,barChartList} = this.state;
         let hasSummary = summaryData['anomalyDetails'].length;
         let instanceListNumber = {};
         let instanceValue = [];
-        let instanceList = _.keyBy(summaryData['metricStats'], function(o){return o['Instance']});
-        _.forEach(instanceList, function (value,key) {
-            instanceListNumber[key] = (_.partition(summaryData['metricStats'], function(o){return o['Instance'] == key})[0]).length;
+        let instanceList = _.keyBy(summaryData['metricStats'], function (o) {
+            return o['Instance']
+        });
+        _.forEach(instanceList, function (value, key) {
+            instanceListNumber[key] = (_.partition(summaryData['metricStats'], function (o) {
+                return o['Instance'] == key
+            })[0]).length;
         });
         instanceList = [];
         let instanceKeys = Object.keys(instanceListNumber);
-        (instanceKeys).map(function (value,index) {
+        (instanceKeys).map(function (value, index) {
             let num = 0;
-            for(let j=0;j<index;j++){
-                num+=instanceListNumber[instanceKeys[j]];
+            for (let j = 0; j < index; j++) {
+                num += instanceListNumber[instanceKeys[j]];
             }
             instanceList.push(num);
         });
-        _.forEach(instanceListNumber, function (value,key) {
+        _.forEach(instanceListNumber, function (value, key) {
             instanceValue.push(value);
         });
 
+        var data = [{
+            label: 'Anomaly number time series',
+            values: barChartList
+        }];
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>
@@ -52,112 +77,115 @@ export default class RenderSummaryReport extends Component {
                     })}]
                     </div>
                 </div>
+                <BarChart data={data} width={1200} height={300} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>
+
                 <div>
                     <div>
-                        <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length} metrics</span>
+                        <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length}
+                            metrics</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src={summaryData['metricTableColormap']}/>
                     </div>
                     <div>
                         <table className="metric-table">
                             <tbody>
-                                <tr>
-                                    <td>
-                                        Instance
-                                    </td>
-                                    <td>
-                                        Metric
-                                    </td>
-                                    <td>
-                                        Uptime
-                                    </td>
-                                    <td>
-                                        Min
-                                    </td>
-                                    <td>
-                                        Max
-                                    </td>
-                                    <td>
-                                        Avg
-                                    </td>
-                                    <td>
-                                        Std
-                                    </td>
-                                    <td>
-                                        Anomaly Relevance Score
-                                    </td>
-                                    <td>
-                                        Status
-                                    </td>
-                                </tr>
-                                {(summaryData['metricStats'] || []).map(function (value,index) {
-                                    let showNumber = instanceList.indexOf(index);
-                                    console.log(showNumber!=-1);
-                                    return(
-                                        <tr key={index}>
-                                            {showNumber!=-1?
+                            <tr>
+                                <td>
+                                    Instance
+                                </td>
+                                <td>
+                                    Metric
+                                </td>
+                                <td>
+                                    Uptime
+                                </td>
+                                <td>
+                                    Min
+                                </td>
+                                <td>
+                                    Max
+                                </td>
+                                <td>
+                                    Avg
+                                </td>
+                                <td>
+                                    Std
+                                </td>
+                                <td>
+                                    Anomaly Relevance Score
+                                </td>
+                                <td>
+                                    Status
+                                </td>
+                            </tr>
+                            {(summaryData['metricStats'] || []).map(function (value, index) {
+                                let showNumber = instanceList.indexOf(index);
+                                return (
+                                    <tr key={index}>
+                                        {showNumber != -1 ?
                                             <td rowSpan={instanceValue[showNumber]}>
                                                 {value['Instance']}
-                                            </td>:
-                                                ""
-                                            }
+                                            </td> :
+                                            null
+                                        }
 
-                                            <td>
-                                                {value['Metric']}
-                                            </td>
-                                            <td>
-                                                {value['Uptime']}
-                                            </td>
-                                            <td>
-                                                {value['Min']}
-                                            </td>
-                                            <td>
-                                                {value['Max']}
-                                            </td>
-                                            <td>
-                                                {value['Avg']}
-                                            </td>
-                                            <td>
-                                                {value['Stddev']}
-                                            </td>
-                                            <td>
-                                                {value['Anomaly Relevance Score']}
-                                            </td>
-                                            <td style={{'backgroundColor': value['Status']}}>
-                                            </td>
-                                        </tr>
-                                    )
-                                })}
+                                        <td>
+                                            {value['Metric']}
+                                        </td>
+                                        <td>
+                                            {value['Uptime']}
+                                        </td>
+                                        <td>
+                                            {value['Min']}
+                                        </td>
+                                        <td>
+                                            {value['Max']}
+                                        </td>
+                                        <td>
+                                            {value['Avg']}
+                                        </td>
+                                        <td>
+                                            {value['Stddev']}
+                                        </td>
+                                        <td>
+                                            {value['Anomaly Relevance Score']}
+                                        </td>
+                                        <td style={{'backgroundColor': value['Status']}}>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                             </tbody>
                         </table>
                         <div>
                             <span>Number of anomalies in the past 24 hours: {summaryData['anomalyCount'] || 0}</span>
                         </div>
                     </div>
-                    {hasSummary && 
+                    {hasSummary &&
                     <div style={{'marginTop': '16px'}}>
-                        <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img src='/oldstatic/color-map-normal.png' /></span></div>
+                        <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img
+                            src='/oldstatic/color-map-normal.png'/></span></div>
                         <div>
                             <table className="anomaly-table">
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            ID
-                                        </td>
-                                        <td>
-                                            Start Time
-                                        </td>
-                                        <td>
-                                            Duration (min)
-                                        </td>
-                                        <td>
-                                            Avg Anomaly Degree
-                                        </td>
-                                        <td>
-                                            Status
-                                        </td>
-                                    </tr>
-                                {(summaryData['anomalySummary'] || []).map(function (value,index) {
-                                    return(
+                                <tr>
+                                    <td>
+                                        ID
+                                    </td>
+                                    <td>
+                                        Start Time
+                                    </td>
+                                    <td>
+                                        Duration (min)
+                                    </td>
+                                    <td>
+                                        Avg Anomaly Degree
+                                    </td>
+                                    <td>
+                                        Status
+                                    </td>
+                                </tr>
+                                {(summaryData['anomalySummary'] || []).map(function (value, index) {
+                                    return (
                                         <tr key={index}>
                                             <td>
                                                 {value['ID']}

@@ -162,7 +162,7 @@ class Dygraph extends BaseComponent {
 
   render() {
     let {known, rest} = spreadDygraphProps(this.props, false);
-    let {tag, className, style, ...others} =  rest;
+    let {tag, className, style, annotations, highlights, ...others} =  rest;
 
     let classes = classNames('ui', className, 'graph');
     style = Object.assign(style || {}, {});

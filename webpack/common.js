@@ -39,6 +39,9 @@ module.exports = merge({}, {
     }, {
       test: /\.json$/, loader: 'json'
     } , {
+      test: require.resolve("react-addons-perf"),
+      loader: "expose?Perf" 
+    },{
       test: /\.css$/,
       loader: ExtractTextPlugin.extract(
         'style', 'css?' + JSON.stringify({discardComments: {removeAll: true}}))

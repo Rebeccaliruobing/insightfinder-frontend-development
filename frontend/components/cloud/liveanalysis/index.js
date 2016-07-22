@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import store from 'store';
 import moment from 'moment';
+import shallowCompare from 'react-addons-shallow-compare';
+
 
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../../artui/react';
 import {Dygraph} from '../../../artui/react/dataviz';
@@ -54,6 +56,10 @@ class LiveAnalysisCharts extends React.Component {
     };
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+  
   componentWillUpdate(nextProps, nextState) {
     // let instanceName = this.props.location.query.instanceName;
     if (this.props.data !== nextProps.data && nextProps.data) {
@@ -181,32 +187,6 @@ class LiveAnalysisCharts extends React.Component {
         </div>
       </div>
     );
-  }
-
-  renderAnnotation() {
-    let {selectedAnnotation} = this.state;
-    if (selectedAnnotation) {
-      let {shortText, x, text} = selectedAnnotation;
-      return (
-        <Accordion className="ui styled fluid accordion" exclusive={true}>
-          <div className="title">
-            <i className="dropdown icon"/>
-            {shortText}: {moment(parseInt(x)).format("YYYY-MM-DD HH:mm")}
-          </div>
-          <div className="active content">
-            {text}
-            <form className="ui reply form">
-              <div className="field">
-                <textarea rows="3"/>
-              </div>
-              <div className="ui blue labeled submit icon button">
-                <i className="icon edit"/> Add Comments
-              </div>
-            </form>
-          </div>
-        </Accordion>
-      )
-    }
   }
 
   renderSummary() {
