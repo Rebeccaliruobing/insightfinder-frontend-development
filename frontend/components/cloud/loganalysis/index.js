@@ -87,27 +87,35 @@ class LogAnalysisCharts extends React.Component {
     )
   }
 
-  renderVectorMapTable(){
+  renderEpisodeMapTable(){
     if (!this.dp) return;
-    let vectorMap = this.dp.vectorMap;
-    let vectorArr = [];
-    for (var key in vectorMap) {
-      vectorArr.push({key:key, value:vectorMap[key]});
-    }
-    if(vectorArr){
+    let episodeMapArr = this.dp.episodeMapArr;
+    if(episodeMapArr){
       return (
         <div>
           <table className="vector-table">
             <tbody>
               <tr>
-                <td>Vector#</td>
                 <td>Frequent Episode</td>
+                <td>Count</td>
               </tr>
-              {vectorArr.map((vector, i) => {
+              {episodeMapArr.sort(function(a, b) {
+                // reverse ordering
+                let aid = parseInt(a.count);
+                let bid = parseInt(b.count);
+                if(aid<bid){
+                  return 1;
+                } else if(aid>bid){
+                  return -1;
+                }else{
+                  return 0;
+                }
+              }).map((episode, i) => {
+                let cleanEpisode = episode.episode.replace(/"/g,"");
                 return (
                   <tr key={i}>
-                    <td>{vector.key}</td>
-                    <td>{vector.value}</td>
+                    <td>{cleanEpisode}</td>
+                    <td>{episode.count}</td>
                   </tr>
                 )
               })}              
@@ -121,7 +129,11 @@ class LogAnalysisCharts extends React.Component {
   renderEventTable(){
     if (!this.dp) return;
     let anomalies = this.dp.anomalies["0"];
-    let vectorMap = this.dp.vectorMap;
+    let episodeMap = {};
+    let episodeMapArr = this.dp.episodeMapArr;
+    _.forEach(episodeMapArr, function (episode, iEpisode)  {
+      episodeMap[parseInt(episode.index)] = episode.episode;
+    });
     let nidMap = this.dp.nidMap;
     let nidArray = [];
     let idx = 1;
@@ -170,10 +182,10 @@ class LogAnalysisCharts extends React.Component {
                 let nAnomaly = realAnomalies.indexOf(anomaly)+1;
                 let nAnomalyStr = "";
                 if(nAnomaly){
-                  nAnomalyStr = "Anomaly: "+ nAnomaly;
+                  nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let featuresArr = weightVectors[event['nid']].map((e,i)=>{return {FE:vectorMap[e.index],weight:e.value}});
+                let featuresArr = weightVectors[event['nid']].map((e,i)=>{return episodeMap[e.index].replace(/"/g,"")});
                 return (
                       <tr key={iEvent}>
                         {showNumber!=-1?
@@ -279,8 +291,8 @@ class LogAnalysisCharts extends React.Component {
           </div>
         )]).concat(elems.slice(selectIndex));
       }
-
     }
+
     return (
 
       <div className="ui grid">
@@ -333,7 +345,7 @@ class LogAnalysisCharts extends React.Component {
           {this.renderSummary()}
            <div className="ui pointing secondary menu">
                <a className={tabStates['event'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'event')}>Event Log</a>
+                  onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
                <a className={tabStates['vector'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'vector')}>Frequent Episodes</a>
            </div>
@@ -344,7 +356,7 @@ class LogAnalysisCharts extends React.Component {
            </div>
            <div className={tabStates['vector'] + ' ui tab '}>
               {tabStates['vector'] === 'active' ? (
-                self.renderVectorMapTable()
+                self.renderEpisodeMapTable()
               ) : null}
            </div>
         </div>

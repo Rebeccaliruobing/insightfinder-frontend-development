@@ -31,6 +31,37 @@ class ProjectSelection extends React.Component {
   }
 }
 
+// include only and File Replay
+class FileReplayProjectSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    projects = projects.filter((item,index) => item.isStationary);
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu"> 
+          {
+            projects.map((p) => {
+              return <div className="item" key={p.projectName}
+                          data-value={p.projectName}>{p.projectName}</div>
+            })
+          }
+        </div>
+      </Dropdown>
+    );
+  }
+}
+
 // exclude GCP and File Replay
 class InstanceProjectSelection extends React.Component {
 
@@ -182,6 +213,7 @@ export {
   ProjectSelection,
   LiveProjectSelection,
   InstanceProjectSelection,
+  FileReplayProjectSelection,
   ModelType,
   AnomalyThreshold,
   DurationThreshold,

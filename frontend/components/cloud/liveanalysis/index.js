@@ -158,7 +158,7 @@ class LiveAnalysisCharts extends React.Component {
               let metrics = groupMetrics[parseInt(selectedGroupId)];
               ReactDOM.render((
                   <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
+                    <h4 className="ui header">{metrics} (Group {selectedGroup.groupId})</h4>
                     <DetailsChart data={selectedGroup} />
                     <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
                        style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}/>

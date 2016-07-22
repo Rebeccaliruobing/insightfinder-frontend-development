@@ -44,13 +44,6 @@ export default class RenderSummaryReport extends Component {
             instanceValue.push(value);
         });
 
-                // <div style={{'marginBottom': '16px'}}>
-                //     <span>Dear customer {userName}</span>
-                // </div>
-                // <div>
-                //     <div><span>Here is the summary report about your projects:</span></div>
-                //     <div><span>Time: {createDate}</span></div>
-                // </div>
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>

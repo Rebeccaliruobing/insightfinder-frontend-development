@@ -153,6 +153,14 @@ export default  class FilterBar extends Component {
 
   validateStartEnd(data){
     let {startTime, endTime, modelStartTime, modelEndTime, isStationary, availableDataRanges} = data;
+    if(startTime == endTime){
+      alert('Incident start/end times need to be initialized.');
+      return false;
+    }
+    if(modelStartTime == modelEndTime){
+      alert('Model start/end times need to be initialized.');
+      return false;
+    }
     if(isStationary){
       let startRange = availableDataRanges.find((item)=> 
         moment(startTime).endOf('day')>=item.min && moment(startTime).startOf('day')<=item.max);

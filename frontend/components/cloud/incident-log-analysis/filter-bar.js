@@ -6,7 +6,7 @@ import store from 'store';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  ProjectSelection,
+  FileReplayProjectSelection,
   ModelType,
   DurationHour,
   AnomalyThreshold,
@@ -44,6 +44,7 @@ export default  class FilterBar extends Component {
   componentDidMount() {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    projects = projects.filter((item,index) => item.isStationary);
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
@@ -153,6 +154,14 @@ export default  class FilterBar extends Component {
 
   validateStartEnd(data){
     let {startTime, endTime, modelStartTime, modelEndTime, isStationary, availableDataRanges} = data;
+    if(startTime == endTime){
+      alert('Incident start/end times need to be initialized.');
+      return false;
+    }
+    if(modelStartTime == modelEndTime){
+      alert('Model start/end times need to be initialized.');
+      return false;
+    }
     if(isStationary){
       let startRange = availableDataRanges.find((item)=> 
         moment(startTime).endOf('day')>=item.min && moment(startTime).startOf('day')<=item.max);
@@ -248,6 +257,7 @@ export default  class FilterBar extends Component {
       this.context.root.loadUserValues().then(()=> {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+          projects = projects.filter((item,index) => item.isStationary);
           if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName, projects[0].projectName);
           }
@@ -292,7 +302,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
-            <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <FileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>

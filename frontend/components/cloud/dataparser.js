@@ -26,14 +26,14 @@ class DataParser {
     this.gmpairs = null;
     this.nidMap = null;
     this.logEventArr = null;
-    this.vectorMap = null;
+    this.episodeMapArr = null;
 
     this.mode = this._detectionModeAndParse();
   }
 
   _detectionModeAndParse() {
     var arr = this.data['anomalyString'];
-    if (!arr) return 'split';
+    if (!arr) return 'holistic';
     if (arr.length === 0) {
       return "error";
     }
@@ -45,7 +45,8 @@ class DataParser {
     }
 
     if (this.data['modelType'] === 'Split') {
-      return "split";
+      return "holistic";
+      //return "split";
     } else {
       return "holistic";
     }
@@ -250,8 +251,8 @@ class DataParser {
     if(this.data['eventJsonArr']){
       this.logEventArr = this.data['eventJsonArr'];
     }
-    if(this.data['vectorMapStr']){
-      this.vectorMap = $.parseJSON(this.data['vectorMapStr']);
+    if(this.data['episodeMapArr']){
+      this.episodeMapArr = this.data['episodeMapArr'];
     }
     if(this.data['weightVectors']){
       this.weightVectors = this.data['weightVectors'];

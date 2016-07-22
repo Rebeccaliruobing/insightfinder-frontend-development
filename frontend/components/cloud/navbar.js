@@ -24,7 +24,7 @@ export default function (props) {
         </Link>
         <Link to="/cloud/summary-report" className="item text-white">
           <i className="icon icon-report iconfont"/>
-          <span> Insight Summary </span>
+          <span> Summary Report </span>
         </Link>
         <Link to="/cloud/incident-log-analysis" className="item text-white">
           <i className="file text icon"></i>
