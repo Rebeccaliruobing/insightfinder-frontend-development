@@ -34,7 +34,7 @@ const Popup = class extends React.Component {
   }
 
   render() {
-    let {tag, children, ...others} = this.props;
+    let {tag, children, position, ...others} = this.props;
     
     return React.createElement(tag, {
       ref: c => this._$el = $(c),

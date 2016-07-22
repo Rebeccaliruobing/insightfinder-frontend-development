@@ -80,10 +80,11 @@ var DateTimePicker = React.createClass({
         );
 
         if (this.props.inputMode) {
+            let {dateValidator, dateTimeFormat, weekStart, time, dateFormat, ...rest} = this.props;
             return React.createElement(
                 'div',
                 {className: 'date-picker-wrapper'},
-                React.createElement('input', Object.assign({}, this.props, {
+                React.createElement('input', Object.assign({}, rest, {
                     type: 'text',
                     onClick: this._handleInputClick,
                     value: this._getFormattedCurrentValue(),

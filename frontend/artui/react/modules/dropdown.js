@@ -30,7 +30,6 @@ class Dropdown extends BaseComponent {
     searchable: PropTypes.bool,
     multiple: PropTypes.bool,
     
-    inline: PropTypes.bool,
     useLabels: PropTypes.bool
   };
 
@@ -46,8 +45,7 @@ class Dropdown extends BaseComponent {
     iconPosition: 'right',
     
     searchable: false,
-    multiple: false,
-    inline: false
+    multiple: false
   };
   
   constructor(props) {

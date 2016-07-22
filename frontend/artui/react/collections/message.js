@@ -51,11 +51,11 @@ class Message extends React.Component {
     let {tag, className, 
       closable, onClose, 
       autoDismiss, dismissTimeout,
-      children, ...others} = this.props;
+      children, style, ...others} = this.props;
     return React.createElement(tag, {
       ref: c => this._$el = $(c),
       className: classNames('ui', className, 'message'),
-      ...others
+      style: style,
     }, children);
   }
 };
