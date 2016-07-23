@@ -23,7 +23,7 @@ export default class RenderSummaryReport extends Component {
                 today = new Date(moment(today).subtract(1, 'days'));
                 let month = today.getMonth()+1;
                 let day = today.getDate();
-                return  {x: day+"/"+month, y: value}
+                return  {x: month+"/"+day, y: value}
             })
         };
     }
@@ -332,7 +332,7 @@ export default class SummaryReport extends Component {
 
                     <div key={Date.now()} className="ui vertical segment">
                         {summaryData?<RenderSummaryReport summaryData={summaryData} createDate={createDate}/>:
-                            <div>Report unavailable!</div>
+                            <div>Report unavailable</div>
                         }
                     </div>
                 </div>
