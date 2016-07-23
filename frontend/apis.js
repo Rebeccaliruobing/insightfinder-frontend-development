@@ -163,10 +163,10 @@ export default {
             }
         });
     },
-    postDashboardDailySummaryReportNew (userName:String = store.get('userName'), token = store.get('token')) {
+    postDashboardDailySummaryReportNew (forceReload, userName:String = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             let currentResp = store.get('dailyReportResponseNew');
-            if (currentResp) {
+            if (!forceReload && currentResp) {
                 resolve(currentResp);
             } else {
                 $.ajax({
