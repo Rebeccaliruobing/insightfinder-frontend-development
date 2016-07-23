@@ -45,8 +45,7 @@ class DataParser {
     }
 
     if (this.data['modelType'] === 'Split') {
-      return "holistic";
-      //return "split";
+      return "split";
     } else {
       return "holistic";
     }
@@ -481,18 +480,22 @@ class DataParser {
       // For highlight bar, use holistic mode for all modeltype
       if (mode === "holistic") {
         var rawalies = anomalies["0"];
-        var thismetrs = groupmetrics[grp];
-        _.each(thismetrs, function (item, itemNo) {
-          var thisalies = rawalies.filter(function (ra, rai) {
-            return (ra.metrs.indexOf(item) != -1);
+        if(rawalies!=undefined){
+          var thismetrs = groupmetrics[grp];
+          _.each(thismetrs, function (item, itemNo) {
+            var thisalies = rawalies.filter(function (ra, rai) {
+              return (ra.metrs.indexOf(item) != -1);
+            });
+            alies = alies.concat(thisalies);
           });
-          alies = alies.concat(thisalies);
-        });
-        alies = alies.filter(function (el, index, arr) {
-          return index === arr.indexOf(el);
-        });
+          alies = alies.filter(function (el, index, arr) {
+            return index === arr.indexOf(el);
+          });
+        }
       } else if (mode === "split") {
-        alies = anomalies[grp];
+        if(anomalies[grp]!=undefined){
+          alies = anomalies[grp];
+        }
       }
 
       let highlights = _.map(alies, a => {
@@ -565,16 +568,20 @@ class DataParser {
       if (mode === "holistic") {
         //var rawalies = anomalies["0"];
         var rawalies = anomalies["0"];
-        var thismetrs = groupmetrics[grp];
-        var thisalies = rawalies.filter(function (ra, rai) {
-          return (ra.metrs.indexOf(thismetrs) != -1);
-        });
-        alies = thisalies;
-        alies = alies.filter(function (el, index, arr) {
-          return index === arr.indexOf(el);
-        });
+        if(rawalies!=undefined){
+          var thismetrs = groupmetrics[grp];
+          var thisalies = rawalies.filter(function (ra, rai) {
+            return (ra.metrs.indexOf(thismetrs) != -1);
+          });
+          alies = thisalies;
+          alies = alies.filter(function (el, index, arr) {
+            return index === arr.indexOf(el);
+          });
+        }
       } else if (mode === "split") {
-        alies = anomalies[grp];
+        if(anomalies[grp]!=undefined){
+          alies = anomalies[grp];
+        }
       }
       let highlights = _.map(alies, a => {
         return {
@@ -595,7 +602,7 @@ class DataParser {
           }
         })
       });
-      var unit = metricUnitMap[groupmetrics[grp][0]];
+      var unit = metricUnitMap[value];
       return {
         id: grp,
         div_id: 'metric_group_' + sId[0],
