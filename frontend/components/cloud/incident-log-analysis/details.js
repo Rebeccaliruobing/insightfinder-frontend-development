@@ -47,7 +47,7 @@ const IncidentDetails = class extends React.Component {
           update.loading = false;
           this.setState(update);
           if (refreshInterval > 0) {
-            this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
+            // this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
           }
         })
         .catch(msg=> {

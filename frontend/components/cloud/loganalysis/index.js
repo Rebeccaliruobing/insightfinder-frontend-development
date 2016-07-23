@@ -173,49 +173,43 @@ class LogAnalysisCharts extends React.Component {
     _.forEach(episodeMapArr, function (episode, iEpisode)  {
       episodeMap[parseInt(episode.index)] = episode.pattern;
     });
-    let nidMap = this.dp.nidMap;
-    let nidArray = [];
-    let idx = 1;
-    for (var key in nidMap) {
-      nidArray.push({index:idx, key:key, value:nidMap[key]});
-      idx++;
-    }
     let logEventArr = this.dp.logEventArr;
     let weightVectors = this.dp.weightVectors;
 
     let neuronListNumber = {};
     let neuronValue = [];
-    let neuronList = _.keyBy(logEventArr, function(o){return o['nid']});
+    let nidList = _.map(logEventArr, function(o){return o['nid']});
+    let neuronList = nidList.filter(function (el, index, arr) { return index === arr.indexOf(el)});
+    
     _.forEach(neuronList, function (value,key) {
-        neuronListNumber[key] = (_.partition(logEventArr, function(o){return o['nid'] == key})[0]).length;
+        neuronListNumber[value] = (_.partition(logEventArr, function(o){return o['nid'] == value})[0]).length;
     });
+    let neuronIdList = neuronList;
     neuronList = [];
-    let neuronKeys = Object.keys(neuronListNumber);
-    (neuronKeys).map(function (value,index) {
+    neuronIdList.map(function (value,index) {
         let num = 0;
         for(let j=0;j<index;j++){
-            num+=neuronListNumber[neuronKeys[j]];
+            num+=neuronListNumber[neuronIdList[j]];
         }
         neuronList.push(num);
-    });
-    _.forEach(neuronListNumber, function (value,key) {
-        neuronValue.push(value);
+        neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
     if(logEventArr){
       return (
         <div>
+          <div class="ui header">Number of clusters: {neuronValue.length}</div>
           <table className="event-table">
             <tbody>
               <tr>
-                <td>Group ID</td>
-                <td>Timestamp</td>
-                <td>Events</td>
+                <td>Cluster ID</td>
+                <td>Time</td>
+                <td>Event</td>
                 <td>Anomaly</td>
               </tr>
               {logEventArr.map((event, iEvent) => {
                 let showNumber = neuronList.indexOf(iEvent);
-                let iGroup = _.find(nidArray, n => n.key == event.nid).index;
+                let iGroup = neuronIdList.indexOf(event.nid)+1;
                 let realAnomalies = _.filter(anomalies, a => a.val>0);
                 let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
                 let nAnomaly = realAnomalies.indexOf(anomaly)+1;
@@ -224,16 +218,21 @@ class LogAnalysisCharts extends React.Component {
                   nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let featuresArr = weightVectors[event['nid']].map((e,i)=>{return episodeMap[e.index].replace(/"/g,"")});
+                let featuresArr = weightVectors[event['nid']].map((e,i)=>{
+                    let ret = episodeMap[e.index];
+                    if(ret!=undefined){
+                      ret = ret.replace(/"/g,"");
+                    }
+                    return ret});
                 return (
                       <tr key={iEvent}>
                         {showNumber!=-1?
                         <td rowSpan={neuronValue[showNumber]}>
-                            Group {iGroup} <br />
-                            Number of Anomaly: {neuronValue[iGroup-1]} <br />
+                            Cluser {iGroup} <br />
+                            Number of events: {neuronValue[iGroup-1]} <br />
                             Features: {JSON.stringify(featuresArr)}
                         </td>:
-                            ""
+                          ""
                         }
                         <td>{timestamp}</td>
                         <td>{event.rawData}</td>
