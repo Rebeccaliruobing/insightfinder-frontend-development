@@ -67,7 +67,7 @@ export default class RenderSummaryReport extends Component {
 
         var data = [{
             label: 'Anomaly number time series',
-            values: barChartList
+            values: _.reverse(barChartList)
         }];
         return (
             <div>

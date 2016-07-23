@@ -25,7 +25,8 @@ class AmazonProjects extends React.Component {
         //  TODO: load projects
     }
 
-    loadApiRemoveProjects(projectName) {
+    loadApiRemoveProjects(e,projectName) {
+        $(e.target).addClass('loading');
         apis.postRemoveProject(projectName).then((resp)=> {
             if (resp.success) {
                 window.alert(resp.message);
@@ -52,7 +53,8 @@ class AmazonProjects extends React.Component {
             //        removeProject.push(value);
             //    }
             //});
-            self.loadApiRemoveProjects(projectName);
+            self.loadApiRemoveProjects(e,projectName);
+            $(e.target).removeClass('loading');
             //if (removeProject.length != projectsList.length) {
             //    this.setState({'projectsList': removeProject}, function () {
             //        self.loadApiRemoveProjects(projectName);
@@ -66,7 +68,7 @@ class AmazonProjects extends React.Component {
         return (
             <div className="ui attached">
                 <button className="ui small positive action button"
-                        onClick={(e) => this.setState({showModal: true})}>
+                        onClick={(e) => {this.setState({showModal: true});$(e.target).addClass('loading');}}>
                     <i className="icon plus"></i>Register
                 </button>
                 <table className="ui small table">
