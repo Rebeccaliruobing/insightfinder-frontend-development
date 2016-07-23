@@ -129,9 +129,6 @@ export default class RolloutCheck extends Component {
 
         let startTime = moment(data.startTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
         let endTime = moment(data.endTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-        //let startTime = data.startTime;
-        //let endTime = data.endTime;
-        console.log(startTime,endTime);
         this.setState({loading: true}, () => {
             apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {
                 if (resp.success) {
