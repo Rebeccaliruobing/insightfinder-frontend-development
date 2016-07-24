@@ -36,13 +36,9 @@ export class DataChart extends React.Component {
 
   @autobind
   handleAnnotationClick(anno) {
-
-    // TODO: [FIX] Popup sometimes doesn't show.
-    // Destroy popup if exists.
     if (anno && anno.div) {
       var $p = $(anno.div);
       var title = moment(parseInt(anno.x)).format("YYYY-MM-DD HH:mm");
-      // Popup will get the content from the DOM title attribute.
       $p.popup({
         on: 'click',
         title: title,
