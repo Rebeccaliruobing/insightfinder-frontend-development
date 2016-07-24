@@ -36,13 +36,9 @@ export class DataChart extends React.Component {
 
   @autobind
   handleAnnotationClick(anno) {
-
-    // TODO: [FIX] Popup sometimes doesn't show.
-    // Destroy popup if exists.
     if (anno && anno.div) {
       var $p = $(anno.div);
       var title = moment(parseInt(anno.x)).format("YYYY-MM-DD HH:mm");
-      // Popup will get the content from the DOM title attribute.
       $p.popup({
         on: 'click',
         title: title,
@@ -193,11 +189,11 @@ export class DataGroupCharts extends React.Component {
 
               elems.push(
                 <div key={'detail_' + rowId} style={{
-                  width: '100%', background: 'rgb(51, 51, 51)', padding: 30,
+                  width: '100%', background: 'rgb(51, 51, 51)', padding: '30px 13px',
                   position: 'relative'
                 }
                 }>
-                  <div style={{ width: '100%', backgroundColor: '#fff' }}>
+                  <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
                     <h4 className="ui header">Metric {selectedGroup.metrics} (Group {selectedGroup.groupId})</h4>
                     <DataChart
                       enableAnnotations={true} data={selectedGroup}

@@ -27,13 +27,13 @@ export default  class FilterBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      projectName: undefined,
+      projectName: '',
       pvalue: 0.99,
       cvalue: 5,
       durationHours: 24,
       modelType: "Holistic",
       modelTypeText: 'Holistic',
-      projectType: undefined,
+      projectType: '',
       availableDataRanges:[],
       isStationary:false,
       isExistentIncident: false,
@@ -307,7 +307,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Project Type</label>
             <div className="ui input">
-              <input type="text" readonly value={projectType}/>
+              <input type="text" readOnly={true} value={projectType}/>
             </div>
           </div>
           <div className="field">

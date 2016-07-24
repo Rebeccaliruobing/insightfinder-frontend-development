@@ -1,11 +1,9 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import cx from 'classnames';
 import store from 'store';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
 
-import {Console, ButtonGroup, Button, Link, Dropdown} from '../../../artui/react';
+import {Console, ButtonGroup, Button } from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
@@ -13,8 +11,7 @@ import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
-import {SummaryChart, DetailsChart} from './charts';
-import {DataChart, DataSummaryChart, DataGroupCharts} from '../../share/charts';
+import {DataSummaryChart, DataGroupCharts} from '../../share/charts';
 
 
 class LiveAnalysisCharts extends React.Component {
@@ -48,7 +45,6 @@ class LiveAnalysisCharts extends React.Component {
       view: (store.get(DefaultView, 'grid')).toLowerCase(),
       columns: (store.get(GridColumns, 'two')).toLowerCase(),
       selectedGroupId: undefined,
-      selectedGroupIndex: void 0,
       selectedAnnotation: null,
       showSettingModal: false,
       showTenderModal: false,
@@ -61,172 +57,17 @@ class LiveAnalysisCharts extends React.Component {
     return shallowCompare(this, nextProps, nextState);
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    // let instanceName = this.props.location.query.instanceName;
-    if (this.props.data !== nextProps.data && nextProps.data) {
-      // if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
-      //   this.setState({'selectedGroupId': nextProps.groupId, view: 'grid', instanceName});
-      // }
-      let { data, loading, onRefresh, ...rest } = nextProps;
-      this.dp = new DataParser(data, rest);
-      this.dp.getSummaryData();
-      this.dp.getGroupsDataTest();
-    }
-  }
-
-  renderGrid() {
-
-    if (!this.dp) return;
-
-    let groups = this.dp.groupsData;
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-
-    let { columns, selectedGroupId, instanceName } = this.state;
-    let elems = [];
-    let selectIndex = 0;
-    let selectArrow = <div style={{
-      position: 'absolute',
-      width: 20,
-      height: 20,
-      background: '#333',
-      transform: 'rotate(45deg)',
-      left: '50%',
-      bottom: '-25px',
-      marginLeft: -3
-    }}></div>;
-
-    if (groups) {
-      let rowCount = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
-      let groupsData, selectedGroup;
-      if (this.dp) {
-        groupsData = this.dp.getGroupsData();
-        selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
-      }
-
-      groups.sort(function (a, b) {
-        let aid = parseInt(a.groupId);
-        let bid = parseInt(b.groupId);
-        return +(aid > bid) || +(aid === bid) - 1;
-      }).forEach((group, index) => {
-
-        let isSelectGroup = selectedGroupId == group.id;
-        if (isSelectGroup) selectIndex = selectIndex + index;
-        let metrics = groupMetrics[parseInt(group.id)];
-
-        elems.push((
-          <div key={columns + group.id} className="ui card"
-               onClick={() => {
-                 if (this.state.selectedGroupId == group.id) {
-                   this.setState({ selectedGroupId: void 0 });
-                 } else {
-                   this.setState({ selectedGroupId: group.id })
-                 }
-               }}>
-            <div className="content">
-              <div className="header" style={{ paddingBottom: 8 }}>Metric {metrics} (Group {group.groupId})</div>
-              <SummaryChart data={group}/>
-            </div>
-            {isSelectGroup && selectArrow}
-          </div>
-        ));
-      });
-
-      let rowIndex = selectIndex % rowCount;
-      selectIndex = selectIndex + rowCount - rowIndex;
-      if (selectedGroup) {
-        elems = elems.slice(0, selectIndex).concat([(
-          <div key={'expand'}
-               style={{ width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative' }}
-               ref={(c)=> {
-                 let $c = $(ReactDOM.findDOMNode(c));
-                 $c.slideDown('fast', ()=> {
-                   $(window.document).scrollTop($c.offset().top);
-
-                   let metrics = groupMetrics[parseInt(selectedGroupId)];
-                   ReactDOM.render((
-                     <div key={selectedGroup.id} style={{ width: '100%', backgroundColor: '#fff' }}>
-                       <h4 className="ui header">{metrics} (Group {selectedGroup.groupId})</h4>
-                       <DetailsChart data={selectedGroup}/>
-                       <i onClick={()=>this.setState({ selectedGroupId: void 0 })} className="close icon"
-                          style={{ position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer' }}/>
-                     </div>
-                   ), c)
-                 });
-               }}/>
-        )]).concat(elems.slice(selectIndex));
-      }
-    }
-
-    return (
-
-      <div className="ui grid">
-        <div className="sixteen wide column">
-          <div className={cx('ui', columns, 'cards')}>
-            {!instanceName && this.renderSummary()}
-            {elems}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  renderSummary() {
-    let summary = this.dp ? this.dp.summaryData : undefined;
-    if (!summary) return;
-    return (
-      <div key={summary.id} className="detail-charts" style={{ width: '100%' }}>
-        <span id={summary.div_id} style={{ position: 'absolute', top: -100, visibility: 'hidden' }}/>
-        <h4 className="ui header">{summary.title}</h4>
-        <DetailsChart
-          data={summary}
-          drawCallback={(g) => this.setState({ listGraphZoomOpt: { dateWindow: g.xAxisRange() } })}
-          {...this.state.listGraphZoomOpt}
-        />
-      </div>
-    )
-  }
-
-  renderList() {
-
-    let groups = this.dp ? this.dp.groupsData : [];
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-    let { listGraphZoomOpt } = this.state;
-    return (
-      <div className="ui grid">
-        <div className="sixteen wide column">
-          {this.renderSummary()}
-          { groups.sort(function (a, b) {
-            let aid = parseInt(a.groupId);
-            let bid = parseInt(b.groupId);
-            return +(aid > bid) || +(aid === bid) - 1;
-          }).map((group) => {
-            let metrics = groupMetrics[parseInt(group.id)];
-            return (
-              <div key={group.id} className="detail-charts" style={{ position: 'relative' }}>
-                <span id={group.div_id} style={{ position: 'absolute', top: -100, visibility: 'hidden' }}/>
-                <h4 className="ui header">Metric {metrics} (Group {group.groupId})</h4>
-                <DetailsChart
-                  data={group}
-                  drawCallback={(g) => this.setState({ listGraphZoomOpt: { dateWindow: g.xAxisRange() } })}
-                  {...listGraphZoomOpt}
-                />
-              </div>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
   calculateData() {
 
     // Cache the data, and recalculate it if changed.
-    let data = this.props.data;
+    let { data, loading, onRefresh, ...rest } = this.props;
 
     if (this._data !== data && !!data) {
-      this.dp = new DataParser(data);
+      this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
-      this.dp.getGroupsData();
+
+      // FIXME: getGroupsData vs getGroupsDataTest?
+      this.dp.getGroupsDataTest();
 
       // Sort the grouped data
       this.summary = this.dp.summaryData;
@@ -236,9 +77,6 @@ class LiveAnalysisCharts extends React.Component {
       this.groupMetrics = this.dp.groupmetrics || null;
       this._data = data;
     }
-
-    // Postprocess the group data.
-    this.visibleGroups = this.groups;
   }
 
   @autobind
@@ -249,14 +87,14 @@ class LiveAnalysisCharts extends React.Component {
   render() {
 
     const { loading, onRefresh, enablePublish, enableComments } = this.props;
-    const { view, columns, selectedGroupIndex } = this.state;
+    const { view, columns} = this.state;
 
     this.calculateData();
 
     const summary = this.summary;
     const dataArray = this.causalDataArray;
     const types = this.causalTypes;
-    const groups = this.visibleGroups;
+    const groups = this.groups;
 
     return (
       <Console.Wrapper>
@@ -285,11 +123,11 @@ class LiveAnalysisCharts extends React.Component {
                   <i className="icon setting"/>
                 </Button>
                 <Button active={view === 'list'}
-                        onClick={()=>this.setState({ view: 'list', selectedGroupIndex: null })}>
+                        onClick={()=>this.setState({ view: 'list' })}>
                   <i className="align justify icon"/>
                 </Button>
                 <Button active={view === 'grid'}
-                        onClick={()=>this.setState({ view: 'grid', selectedGroupIndex: null })}>
+                        onClick={()=>this.setState({ view: 'grid' })}>
                   <i className="grid layout icon"/>
                 </Button>
               </ButtonGroup>
