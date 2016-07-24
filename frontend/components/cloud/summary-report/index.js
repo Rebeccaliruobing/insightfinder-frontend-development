@@ -46,7 +46,14 @@ export default class RenderSummaryReport extends Component {
 
     render() {
         let {summaryData, userName, createDate,barChartList,anomalyNumList} = this.state;
-        let hasSummary = summaryData['anomalyDetails'].length;
+        let hasSummary;
+        if(summaryData['anomalyDetails'].length){
+            hasSummary = true;
+        }
+        let hasMetrics;
+        if(summaryData['metricStats'].length){
+            hasMetrics = true;
+        }
         let instanceListNumber = {};
         let instanceValue = [];
         let instanceList = _.keyBy(summaryData['metricStats'], function (o) {
@@ -83,14 +90,17 @@ export default class RenderSummaryReport extends Component {
                     })}]
                     </div>
                 </div>
-                {barChartList.length == 0?null:<BarChart data={data} width={1000} height={200} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
+                {barChartList.length == 0?null:<BarChart data={data} width={400} height={125} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
 
                 <div>
+                    {hasMetrics && 
                     <div>
                         <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length}
-                            metrics</span>
+                             metrics</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src={summaryData['metricTableColormap']}/>
                     </div>
+                    }
+                    {hasMetrics && 
                     <div>
                         <table className="metric-table">
                             <tbody>
@@ -166,6 +176,7 @@ export default class RenderSummaryReport extends Component {
                             <span>Number of anomalies in the past 24 hours: {summaryData['anomalyCount'] || 0}</span>
                         </div>
                     </div>
+                    }
                     {hasSummary &&
                     <div style={{'marginTop': '16px'}}>
                         <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img
