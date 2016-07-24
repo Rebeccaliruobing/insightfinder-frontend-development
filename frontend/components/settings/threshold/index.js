@@ -174,7 +174,7 @@ export default class ThresholdSettings extends React.Component {
                 <div className="field">
                   <label style={labelStyle}>Project Type</label>
                   <div className="ui input">
-                    <input type="text" readOnly value={data.projectType}/>
+                    <input type="text" readOnly={true} value={data.projectType}/>
                   </div>
                 </div>
                 <div className="field">

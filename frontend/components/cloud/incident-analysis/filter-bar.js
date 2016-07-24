@@ -305,7 +305,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Project Type</label>
             <div className="ui input">
-              <input type="text" readOnly value={projectType}/>
+              <input type="text" readOnly={true} value={projectType}/>
             </div>
           </div>
           <div className="field">
