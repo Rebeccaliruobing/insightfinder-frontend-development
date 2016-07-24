@@ -28,7 +28,7 @@ module.exports = merge({}, {
       loader: 'babel',
       include: [sourceDir],
       query: {
-        presets: ['es2015', 'stage-0', 'stage-1', 'stage-2', 'stage-3', 'react'],
+        presets: ['es2015', 'stage-0', 'react'],
         // plugins: ['transform-runtime'],
         plugins: ['transform-decorators-legacy' ],
         compact: true,

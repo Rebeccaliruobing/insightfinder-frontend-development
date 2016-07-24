@@ -16,7 +16,6 @@ import CommentsModal from './commentsModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import {SummaryChart, DetailsChart} from './charts';
-import apis from '../../../apis';
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -73,30 +72,10 @@ class LiveAnalysisCharts extends React.Component {
     }
   }
 
-  renderSummaryDetail(summary) {
-    return (
-      <div id="summary">
-        <h4 className="ui header">Analysis Summary</h4>
-        <Dygraph key="summary" className="live monitoring summary" data={summary.series}
-                 ylabel="Anomaly Degree"
-                 labels={['X', 'Y1']}
-                 axisLabelWidth={35}
-                 style={{width: '100%', height: '200px'}}
-                 highlightCircleSize={2} strokeWidth={3}
-                 labelsDivStyles={{padding: '4px', margin:'15px'}}
-                 highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                 annotations={summary.annotations}
-                 onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
-                 highlights={summary.highlights}/>
-      </div>
-    )
-  }
-
   renderGrid() {
 
     if (!this.dp) return;
 
-    let summary = this.dp.summaryData;
     let groups = this.dp.groupsData;
     let groupMetrics = this.dp ? this.dp.groupmetrics : null;
 
@@ -240,11 +219,7 @@ class LiveAnalysisCharts extends React.Component {
   handleShare() {
     this.setState({showShareModal: true});
   }
-  
-  handleShareSubmit(data) {
-    apis.postDashboardUserValues('publishdata', data);
-  }
-  
+
   render() {
 
     let {data, loading, onRefresh, enablePublish, enableComments} = this.props;
@@ -309,6 +284,7 @@ class LiveAnalysisCharts extends React.Component {
               {!loading && isListView && this.renderList()}
             </div>
           </div>
+
           { this.state.showSettingModal &&
           <SettingModal onClose={() => this.setState({showSettingModal: false})}/>
           }
@@ -318,13 +294,13 @@ class LiveAnalysisCharts extends React.Component {
           }
           { this.state.showShareModal &&
           <ShareModal dataArray={dataArray} types={types} dp={this.dp}
-                      onSubmit={::this.handleShareSubmit}
                       onClose={() => this.setState({showShareModal: false})}/>
           }
           { this.state.showComments &&
           <CommentsModal dataArray={dataArray} types={types} dp={this.dp}
                       onClose={() => this.setState({showComments: false})}/>
           }
+
         </Console.Content>
       </Console.Wrapper>
     )
