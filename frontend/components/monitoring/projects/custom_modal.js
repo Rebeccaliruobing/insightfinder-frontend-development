@@ -46,7 +46,7 @@ class CustomProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Project Type (Optional)</label>
+              <label>Project Type</label>
 
               <select className="ui dropdown" onChange={(e)=>this.setState({projectCloudType: e.target.value})}>
                 <option className="item">Project Type</option>
@@ -59,7 +59,7 @@ class CustomProjectModal extends React.Component {
 
             </div>
             <div className="field">
-              <label>Sampling Interval (Optional)</label>
+              <label>Sampling Interval</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
                 <option className="item">Sampling Interval</option>
                 <option className="item" value="1">1 minute</option>
