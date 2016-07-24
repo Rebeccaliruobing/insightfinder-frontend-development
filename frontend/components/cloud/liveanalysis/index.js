@@ -60,7 +60,7 @@ class LiveAnalysisCharts extends React.Component {
   calculateData() {
 
     // Cache the data, and recalculate it if changed.
-    let { data, loading, onRefresh, ...rest } = nextProps;
+    let { data, loading, onRefresh, ...rest } = this.props;
 
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
