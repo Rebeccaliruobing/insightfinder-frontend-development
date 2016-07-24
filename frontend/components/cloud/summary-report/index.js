@@ -15,11 +15,16 @@ export default class RenderSummaryReport extends Component {
     constructor(props) {
         super(props);
         let today = new Date();
+        let anomalyNumList = _.slice(this.props.summaryData.anomalyNumList,0,30);
+        for (let i=anomalyNumList.length;i<7;i++){
+            anomalyNumList.push(0);
+        }
         this.state = {
             summaryData: this.props.summaryData || {},
             createDate: this.props.createDate || "",
             userName: store.get('userName'),
-            barChartList: (_.slice(this.props.summaryData.anomalyNumList,0,30) || []).map(function (value,index) {
+            anomalyNumList: anomalyNumList,
+            barChartList: anomalyNumList.map(function (value,index) {
                 today = new Date(moment(today).subtract(1, 'days'));
                 let month = today.getMonth()+1;
                 let day = today.getDate();
@@ -40,7 +45,7 @@ export default class RenderSummaryReport extends Component {
     }
 
     render() {
-        let {summaryData, userName, createDate,barChartList} = this.state;
+        let {summaryData, userName, createDate,barChartList,anomalyNumList} = this.state;
         let hasSummary = summaryData['anomalyDetails'].length;
         let instanceListNumber = {};
         let instanceValue = [];
@@ -69,15 +74,16 @@ export default class RenderSummaryReport extends Component {
             label: 'Anomaly number time series',
             values: _.reverse(barChartList)
         }];
+        anomalyNumList = _.reverse(anomalyNumList);
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>
-                    <div>Anomaly number time series: [{(summaryData.anomalyNumList || []).map(function (value, index) {
-                        return value + (index == summaryData.anomalyNumList.length - 1 ? "" : ", ")
+                    <div>Anomaly number time series: [{(anomalyNumList || []).map(function (value, index) {
+                        return value + (index == anomalyNumList.length - 1 ? "" : ", ")
                     })}]
                     </div>
                 </div>
-                {barChartList.length == 0?null:<BarChart data={data} width={1200} height={300} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
+                {barChartList.length == 0?null:<BarChart data={data} width={1000} height={200} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
 
                 <div>
                     <div>
