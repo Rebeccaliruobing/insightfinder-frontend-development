@@ -223,14 +223,23 @@ class LogAnalysisCharts extends React.Component {
                     if(ret!=undefined){
                       ret = ret.replace(/"/g,"");
                     }
-                    return ret});
+                    return ret
+                });
+                let featureString = "";
+                let numFeatures = 10;
+                if(featuresArr.length<10){
+                  numFeatures = featuresArr.length;
+                }
+                for(let i = 0;i<numFeatures;i++){
+                  featureString += "<br />["+featuresArr[i]+"]";
+                }
                 return (
                       <tr key={iEvent}>
                         {showNumber!=-1?
                         <td rowSpan={neuronValue[showNumber]}>
                             Cluser {iGroup} <br />
                             Number of events: {neuronValue[iGroup-1]} <br />
-                            Features: {JSON.stringify(featuresArr)}
+                            Features: {featureString}
                         </td>:
                           ""
                         }

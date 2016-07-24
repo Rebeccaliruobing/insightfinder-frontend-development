@@ -23,7 +23,9 @@ export default  class FilterBar extends Component {
       modelType: 'Holistic',
       modelTypeText: 'Holistic',
       anomalyThreshold: 0.99,
-      durationThreshold: 5
+      durationThreshold: 5,
+      minPts: 5,
+      epsilon: 1
     };
   }
 
@@ -66,8 +68,13 @@ export default  class FilterBar extends Component {
 
   handleSubmit() {
     //this.props.onSubmit && this.props.onSubmit(this.state);
-    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType} = this.state;
-    var url = '/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
+    const {projectName, anomalyThreshold, durationThreshold,minPts,epsilon,projectType, modelType} = this.state;
+    var url;
+    if(modelType=='DBScan'){
+      url = '/liveMonitoring?anomalyThreshold='+minPts+'&durationThreshold='+epsilon+'&modelType='+modelType+'&projectName='+projectName;
+    } else {
+      url = '/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
+    }
     window.open(url,'_blank');
   }
   
@@ -76,7 +83,7 @@ export default  class FilterBar extends Component {
   }
 
   render() {
-    const {projectName, anomalyThreshold, durationThreshold, projectType, modelType, modelTypeText} = this.state;
+    let {projectName, anomalyThreshold, durationThreshold, minPts,epsilon,projectType, modelType, modelTypeText} = this.state;
     const labelStyle = {};
     const submitStyle = cx(
       'orange', {
@@ -99,14 +106,28 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Model Type</label>
             <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
-          <div className="field">
-            <label style={labelStyle}>Anomaly Threshold</label>
-            <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
-          </div>
-          <div className="field">
-            <label style={labelStyle}>Duration Threshold</label>
-            <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
-          </div>
+          {modelType == 'DBScan'?
+            <div className="field">
+              <label style={labelStyle}>MinPts</label>
+              <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({minPts:e.target.value})}/>
+            </div>
+            :
+            <div className="field">
+              <label style={labelStyle}>Anomaly Threshold</label>
+              <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
+            </div>
+          }
+          {modelType == 'DBScan'?
+            <div className="field">
+              <label style={labelStyle}>Epsilon</label>
+              <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
+            </div>
+            :
+            <div className="field">
+              <label style={labelStyle}>Duration Threshold</label>
+              <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
+            </div>
+          }
           <div className="field">
             <Button className={submitStyle} style={{marginTop: 20}}
                     onClick={this.handleAdd.bind(this)}>Add</Button>
