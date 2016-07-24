@@ -612,6 +612,7 @@ class DataParser {
         sdata: sdata,
         sname: sname,
         unit: unit || '',
+        metrics: groupmetrics[grp],
         highlights: highlights,
         annotations: undefined
       };

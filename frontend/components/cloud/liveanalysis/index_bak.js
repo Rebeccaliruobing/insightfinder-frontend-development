@@ -79,7 +79,8 @@ class LiveAnalysisCharts extends React.Component {
     let { columns, selectedGroupId, instanceName } = this.state;
     let elems = [];
     let selectIndex = 0;
-    let selectArrow = <div style={{
+    let selectArrow =
+      <div style={{
       position: 'absolute',
       width: 20,
       height: 20,
@@ -139,7 +140,8 @@ class LiveAnalysisCharts extends React.Component {
 
                    let metrics = groupMetrics[parseInt(selectedGroupId)];
                    ReactDOM.render((
-                     <div key={selectedGroup.id} style={{ width: '100%', backgroundColor: '#fff' }}>
+                     <div key={selectedGroup.id}
+                          style={{ width: '100%', backgroundColor: '#fff' }}>
                        <h4 className="ui header">{metrics} (Group {selectedGroup.groupId})</h4>
                        <DetailsChart data={selectedGroup}/>
                        <i onClick={()=>this.setState({ selectedGroupId: void 0 })} className="close icon"
