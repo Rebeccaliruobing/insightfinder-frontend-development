@@ -3,9 +3,8 @@ import ReactDOM from 'react-dom';
 import cx from 'classnames';
 import store from 'store';
 import shallowCompare from 'react-addons-shallow-compare';
-import {autobind} from 'core-decorators';
 
-import {Console, ButtonGroup, Button, Link, Dropdown} from '../../../artui/react';
+import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
@@ -14,8 +13,6 @@ import CommentsModal from './commentsModal';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import {SummaryChart, DetailsChart} from './charts';
-import {DataChart, DataSummaryChart, DataGroupCharts} from '../../share/charts';
-
 
 class LiveAnalysisCharts extends React.Component {
 
@@ -40,7 +37,6 @@ class LiveAnalysisCharts extends React.Component {
   constructor(props) {
 
     super(props);
-
     this.dp = null;
 
     this.state = {
@@ -48,7 +44,6 @@ class LiveAnalysisCharts extends React.Component {
       view: (store.get(DefaultView, 'grid')).toLowerCase(),
       columns: (store.get(GridColumns, 'two')).toLowerCase(),
       selectedGroupId: undefined,
-      selectedGroupIndex: void 0,
       selectedAnnotation: null,
       showSettingModal: false,
       showTenderModal: false,
@@ -218,65 +213,47 @@ class LiveAnalysisCharts extends React.Component {
     )
   }
 
-  calculateData() {
-
-    // Cache the data, and recalculate it if changed.
-    let data = this.props.data;
-
-    if (this._data !== data && !!data) {
-      this.dp = new DataParser(data);
-      this.dp.getSummaryData();
-      this.dp.getGroupsData();
-
-      // Sort the grouped data
-      this.summary = this.dp.summaryData;
-      this.causalDataArray = this.dp.causalDataArray;
-      this.causalTypes = this.dp.causalTypes;
-      this.groups = this.dp.groupsData || [];
-      this.groupMetrics = this.dp.groupmetrics || null;
-      this._data = data;
-    }
-
-    // Postprocess the group data.
-    this.visibleGroups = this.groups;
-  }
-
-  @autobind
-  handleDateWindowSync(dateWindow) {
-    this.setState({ chartDateWindow: dateWindow });
-  }
-
   render() {
 
-    const { loading, onRefresh, enablePublish, enableComments } = this.props;
-    const { view, columns, selectedGroupIndex } = this.state;
+    let { data, loading, onRefresh, enablePublish, enableComments } = this.props;
+    let { view } = this.state;
 
-    this.calculateData();
+    let isListView = view === 'list';
+    let contentClass = loading ? 'ui form loading' : '';
 
-    const summary = this.summary;
-    const dataArray = this.causalDataArray;
-    const types = this.causalTypes;
-    const groups = this.visibleGroups;
+    if (data && !this.dp) {
+      // Since componentWillUpdate is not called at initial time, so
+      // we need to parse the data
+      this.dp = new DataParser(data);
+      this.dp.getSummaryData();
+      //this.dp.getGroupsData();
+    }
+
+    let dataArray = this.dp ? this.dp.causalDataArray : undefined;
+    let types = this.dp ? this.dp.causalTypes : undefined;
 
     return (
       <Console.Wrapper>
-        <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
-          <div className="ui main tiny container"
-               style={{ minHeight: '100%', display: loading && 'none' }}
-          >
+        <Console.Content style={{ paddingLeft: 0 }} className={contentClass}>
+          <div className="ui main tiny container" style={{ minHeight: '100%' }}>
+            {!loading &&
             <div className="ui vertical segment">
               <Button className="orange labeled icon"
                       onClick={() => this.setState({ showTenderModal: true })}>
                 <i className="icon random"/>Causal Graph
               </Button>
-              <Button className="labeled icon" style={{ display: !enablePublish && 'none' }}
+              { enablePublish &&
+              <Button className="labeled icon"
                       onClick={()=> this.setState({ showShareModal: true })}>
-                <i className="icon share alternate"/>Publish
+                <i className="icon share alternate"/> Publish
               </Button>
-              <Button className="labeled icon" style={{ display: !enableComments && 'none' }}
+              }
+              { enableComments &&
+              <Button className="labeled icon"
                       onClick={() => this.setState({ showComments: true })}>
-                <i className="icon comments"/>Comments
+                <i className="icon comments"/> Comments
               </Button>
+              }
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh
               </Button>
@@ -285,37 +262,19 @@ class LiveAnalysisCharts extends React.Component {
                   <i className="icon setting"/>
                 </Button>
                 <Button active={view === 'list'}
-                        onClick={()=>this.setState({ view: 'list', selectedGroupIndex: null })}>
+                        onClick={()=>this.setState({ view: 'list', selectedGroupId: null })}>
                   <i className="align justify icon"/>
                 </Button>
                 <Button active={view === 'grid'}
-                        onClick={()=>this.setState({ view: 'grid', selectedGroupIndex: null })}>
+                        onClick={()=>this.setState({ view: 'grid', selectedGroupId: null })}>
                   <i className="grid layout icon"/>
                 </Button>
               </ButtonGroup>
             </div>
+            }
             <div className="ui vertical segment">
-              <div className="ui grid">
-
-                {!!summary &&
-                <DataSummaryChart
-                  key="summary_chart"
-                  summary={summary}
-                  onDateWindowChange={this.handleDateWindowSync}
-                  dateWindow={this.state['chartDateWindow']}
-                />
-                }
-
-                {!!groups &&
-                <DataGroupCharts
-                  key={view + '_group_charts'}
-                  groups={groups} view={view} columns={columns}
-                  onDateWindowChange={this.handleDateWindowSync}
-                  dateWindow={this.state['chartDateWindow']}
-                />
-                }
-
-              </div>
+              {!loading && !isListView && this.renderGrid()}
+              {!loading && isListView && this.renderList()}
             </div>
           </div>
 
@@ -334,6 +293,7 @@ class LiveAnalysisCharts extends React.Component {
           <CommentsModal dataArray={dataArray} types={types} dp={this.dp}
                          onClose={() => this.setState({ showComments: false })}/>
           }
+
         </Console.Content>
       </Console.Wrapper>
     )
