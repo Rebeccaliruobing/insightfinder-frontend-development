@@ -23,7 +23,7 @@ export default class RenderSummaryReport extends Component {
                 today = new Date(moment(today).subtract(1, 'days'));
                 let month = today.getMonth()+1;
                 let day = today.getDate();
-                return  {x: day+"/"+month, y: value}
+                return  {x: month+"/"+day, y: value}
             })
         };
     }
@@ -67,7 +67,7 @@ export default class RenderSummaryReport extends Component {
 
         var data = [{
             label: 'Anomaly number time series',
-            values: barChartList
+            values: _.reverse(barChartList)
         }];
         return (
             <div>
@@ -77,7 +77,7 @@ export default class RenderSummaryReport extends Component {
                     })}]
                     </div>
                 </div>
-                <BarChart data={data} width={1200} height={300} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>
+                {barChartList.length == 0?null:<BarChart data={data} width={1200} height={300} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
 
                 <div>
                     <div>
@@ -229,7 +229,7 @@ export default class SummaryReport extends Component {
             timeIndex: 0,
             summaryReport: '',
             showAddPanel: true,
-            filterBar: {projectName: 'appAWS'},
+            filterBar: {projectName: ''},
             loading: true,
             params: {
                 projects: [],
@@ -241,18 +241,22 @@ export default class SummaryReport extends Component {
     }
 
     componentDidMount() {
+        this.handleGetSummaryData(false);
+    }
+
+    handleRefresh() {
+        $('#loadingRefresh').addClass('loading');
+        this.handleGetSummaryData(true);
+    }
+    handleGetSummaryData(forceReload){
         let self = this;
-        apis.postDashboardDailySummaryReportNew().then((resp) => {
+        apis.postDashboardDailySummaryReportNew(forceReload).then((resp) => {
+            $('#loadingRefresh').removeClass('loading');
             resp.data.loading = false;
             self.setState(resp.data);
         }).catch(()=> {
         });
     }
-
-    handleRefresh() {
-        this.handleFilterSubmit(this.state.projectName);
-    }
-
     handleToggleFilterPanel() {
         this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
             this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
@@ -298,7 +302,7 @@ export default class SummaryReport extends Component {
                 <div className="ui main tiny container" ref={c => this._el = c}>
                     <div className="ui clearing vertical segment">
                         <ButtonGroup className="left floated">
-                            <Button className="labeled icon " onClick={this.handleRefresh.bind(this)}>
+                            <Button id="loadingRefresh" className="labeled icon" onClick={this.handleRefresh.bind(this)}>
                                 <i className="icon refresh"/>Refresh
                             </Button>
                         </ButtonGroup>
@@ -327,7 +331,9 @@ export default class SummaryReport extends Component {
                     </div>
 
                     <div key={Date.now()} className="ui vertical segment">
-                        <RenderSummaryReport summaryData={summaryData} createDate={createDate}/>
+                        {summaryData?<RenderSummaryReport summaryData={summaryData} createDate={createDate}/>:
+                            <div>Report unavailable</div>
+                        }
                     </div>
                 </div>
             </Console.Content>
