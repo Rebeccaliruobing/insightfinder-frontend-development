@@ -260,9 +260,6 @@ class DataParser {
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
     }
-    if(this.data['weightVectors']){
-      this.weightVectors = this.data['weightVectors'];
-    }
   }
 
   _parseAnomalyData() {

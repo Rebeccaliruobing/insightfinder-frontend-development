@@ -248,10 +248,6 @@ export default  class FilterBar extends Component {
     this.validateStartEnd(this.state) && this.props.onLogSubmit && this.props.onLogSubmit(this.state);
   }
 
-  handleSubmit() {
-    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
-  }
-
   handleRemoveRow() {
     let {projectName, dataChunkName, modelStartTime, modelEndTime, modelType, incident} = this.state;
     let incidentKey = incident.incidentKey;

@@ -174,7 +174,6 @@ class LogAnalysisCharts extends React.Component {
       episodeMap[parseInt(episode.index)] = episode.pattern;
     });
     let logEventArr = this.dp.logEventArr;
-    let weightVectors = this.dp.weightVectors;
 
     let neuronListNumber = {};
     let neuronValue = [];
@@ -198,7 +197,7 @@ class LogAnalysisCharts extends React.Component {
     if(logEventArr){
       return (
         <div>
-          <div class="ui header">Number of clusters: {neuronValue.length}</div>
+          <div class="ui header">Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}</div>
           <table className="event-table">
             <tbody>
               <tr>
@@ -218,30 +217,9 @@ class LogAnalysisCharts extends React.Component {
                   nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let featuresArr = [];
-                if(event['nid']!=-1){
-                  featuresArr = weightVectors[event['nid']].map((e,i)=>{
-                    let ret = episodeMap[e.index];
-                    if(ret!=undefined){
-                      ret = ret.replace(/"/g,"");
-                    }
-                    return ret
-                  });
-                }
-                let featureString = "";
-                if(event['nid']==-1){
-                  featureString = "Anomaly cluster";
-                } else {
-                  let numFeatures = 10;
-                  if(featuresArr.length<10){
-                    numFeatures = featuresArr.length;
-                  }
-                  for(let i = 0;i<numFeatures;i++){
-                    if(i>0){
-                      featureString += ", ";
-                    }
-                    featureString += "["+featuresArr[i]+"]";
-                  }
+                let isAnomaly = "";
+                if(event.nid==-1){
+                  isAnomaly = "Anomaly Cluster"
                 }
                 return (
                   <tr key={iEvent}>
@@ -249,7 +227,7 @@ class LogAnalysisCharts extends React.Component {
                     <td rowSpan={neuronValue[showNumber]}>
                         Cluser {iGroup} <br />
                         Number of events: {neuronValue[iGroup-1]} <br />
-                        Features: {featureString}
+                        {isAnomaly}
                     </td>:
                       ""
                     }
