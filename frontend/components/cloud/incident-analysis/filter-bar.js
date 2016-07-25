@@ -218,6 +218,7 @@ export default  class FilterBar extends Component {
           epsilon:pValue,
           minPts:cValue,
           modelType,
+          modelTypeText: modelType,
           recorded,
           holisticModelKeys,
           splitModelKeys,
@@ -234,6 +235,7 @@ export default  class FilterBar extends Component {
           pvalue:pValue,
           cvalue:cValue,
           modelType,
+          modelTypeText: modelType,
           recorded,
           holisticModelKeys,
           splitModelKeys,
@@ -247,9 +249,9 @@ export default  class FilterBar extends Component {
     this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
-  handleRemoveRow() {
-    let {projectName, dataChunkName, modelStartTime, modelEndTime, modelType, incident} = this.state;
-    let incidentKey = incident.incidentKey;
+  handleRemoveRow(incident){
+    let {projectName} = this.state;
+    let {dataChunkName, modelStartTime, modelEndTime, modelType, recorded,incidentKey} = incident;
     apis.postJSONDashboardUserValues('deleteincident', {
       projectName, dataChunkName, modelStartTime, modelEndTime, modelType, incidentKey
     }).then((resp)=> {
@@ -259,14 +261,16 @@ export default  class FilterBar extends Component {
           startTime: undefined,
           endTime: undefined,
           modelStartTime: undefined,
-          modelEndTime: undefined
+          modelEndTime: undefined,
+          isExistentIncident: true,
+          modelType: modelType,
+          recorded: recorded
         }, this.handleRefresh.bind(this));
       } else {
         alert(resp.message);
       }
     })
   }
-
   handleRefresh() {
     this.setState({loading: true}, ()=> {
       this.context.root.loadUserValues().then(()=> {
@@ -308,103 +312,58 @@ export default  class FilterBar extends Component {
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
-
+    let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
     return (
-      <div className={cx('ui form', {loading: !!this.state.loading})}>
-        <div className="four fields fill">
-          <div className="field">
+      <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
+        <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
+          <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Name</label>
             <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
-          <div className="field">
+          <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Type</label>
             <div className="ui input">
               <input type="text" readOnly={true} value={projectType}/>
             </div>
           </div>
-          <div className="field">
+          <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Model Type</label>
             <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
-          <div className="field">
-          </div>
-        </div>
-        <div className="four fields fill">
           {modelType == 'DBScan'?
-            <div className="field">
+            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>MinPts</label>
               <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({minPts:e.target.value})}/>
             </div>
             :
-            <div className="field">
+            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>Anomaly Threshold</label>
               <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
             </div>
           }
           {modelType == 'DBScan'?
-            <div className="field">
+            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>Epsilon</label>
               <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
             </div>
             :
-            <div className="field">
+            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>Duration Threshold (Sample Number)</label>
               <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
             </div>
           }
-          <div className="field">
-          </div>
-          <div className="field"></div>
-        </div>
-        <div className="four fields fill">
-          <div className="field">
-            <label style={labelStyle}>Incident Start</label>
-            <div className="ui input">
-              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={startTime} 
-                              onChange={this.handleStartTimeChange.bind(this)}/>
-            </div>
 
-          </div>
-
-          <div className="field">
-            <label style={labelStyle}>Incident End</label>
-            <div className="ui input">
-              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={endTime}
-                              onChange={this.handleEndTimeChange.bind(this)}/>
-            </div>
-          </div>
-
-          <div className="field">
-            <label style={labelStyle}>Model Start</label>
-            <div className="ui input">
-              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
-                              onChange={this.handleModelStartTimeChange.bind(this)}/>
-            </div>
-          </div>
-
-          <div className="field">
-            <label style={labelStyle}>Model End</label>
-            <div className="ui input">
-              <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
-                              onChange={this.handleModelEndTimeChange.bind(this)}/>
-            </div>
-          </div>
-        </div>
-
-        <div className="ui field">
+        <div className="ui field" style={{'width': '100%'}}>
           <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
           <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
-          {incident && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
         </div>
-
+          <div className="field">
+          </div>
+        </div>
         {incidentList.length > 0 && (
-          <div ref={this._incidentsRef} className="padding20" style={{border: '1px solid #e0e0e0'}}>
+          <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
             <div className="ui middle aligned divided list padding10"
                  style={{maxHeight: 200, overflow: 'auto'}}>
               {incidentList.sort(function(a, b) {
@@ -432,10 +391,11 @@ export default  class FilterBar extends Component {
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor}}>
+                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent}>
+                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
+                        <Button className="basic" style={{'height': '24px','lineHeight': '7px'}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                       </a>
                     </div>
                   </div>
@@ -444,6 +404,49 @@ export default  class FilterBar extends Component {
             </div>
           </div>
         )}
+        <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
+          <div style={{'width': '100%','display': 'flex'}}>
+            <div className="field" style={{'width': '50%'}}>
+              <label style={labelStyle}>Incident Start</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={startTime}
+                                onChange={this.handleStartTimeChange.bind(this)}/>
+              </div>
+
+            </div>
+            <div className="field">
+              <label style={labelStyle}>Incident End</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={endTime}
+                                onChange={this.handleEndTimeChange.bind(this)}/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px'}}>
+            <div className="field" style={{'width': '50%'}}>
+              <label style={labelStyle}>Model Start</label>
+              <div className="ui input" style={{'zIndex': 0}}>
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
+                                onChange={this.handleModelStartTimeChange.bind(this)}/>
+              </div>
+            </div>
+
+            <div className="field">
+              <label style={labelStyle}>Model End</label>
+              <div className="ui input" style={{'zIndex': 0}}>
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
+                                onChange={this.handleModelEndTimeChange.bind(this)}/>
+              </div>
+            </div>
+        </div>
+
+
+
       </div>
     )
   }
