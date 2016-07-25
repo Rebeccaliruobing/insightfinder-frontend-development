@@ -135,7 +135,7 @@ class LogAnalysisCharts extends React.Component {
           <table className="vector-table">
             <tbody>
               <tr>
-                <td>Frequent Episode</td>
+                <td>Word Count</td>
                 <td>Count</td>
               </tr>
               {episodeMapArr.sort(function(a, b) {
@@ -382,9 +382,9 @@ class LogAnalysisCharts extends React.Component {
                <a className={tabStates['event'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
                <a className={tabStates['episode'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episodes</a>
+                  onClick={(e) => this.selectTab(e, 'episode')}>Word Count</a>
                <a className={tabStates['word'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'word')}>Word Count</a>
+                  onClick={(e) => this.selectTab(e, 'word')}>Frequent Episodes</a>
            </div>
            <div className={tabStates['event'] + ' ui tab '}>
               {tabStates['event'] === 'active' ? (
