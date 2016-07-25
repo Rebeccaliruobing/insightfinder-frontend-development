@@ -391,13 +391,13 @@ export default  class FilterBar extends Component {
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px'}}>
+                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
                       <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
-                        <Button className="basic" style={{'height': '24px','lineHeight': '7px'}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                       </a>
                     </div>
+                    <Button className="basic" style={{'top': '5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
