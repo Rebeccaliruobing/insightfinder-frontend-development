@@ -376,7 +376,7 @@ export default  class FilterBar extends Component {
                   } else {
                     return 0;
                   }
-                }).map((incident)=> {
+                }).map((incident,index)=> {
                 let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, recorded} = incident;
                 let isd = moment(incidentStartTime);
                 let ied = moment(incidentEndTime);
@@ -397,7 +397,7 @@ export default  class FilterBar extends Component {
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="basic" style={{'top': '5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="basic" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
