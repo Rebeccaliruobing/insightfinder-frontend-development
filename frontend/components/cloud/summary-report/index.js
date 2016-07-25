@@ -16,8 +16,10 @@ export default class RenderSummaryReport extends Component {
         super(props);
         let today = new Date();
         let anomalyNumList = _.slice(this.props.summaryData.anomalyNumList,0,30);
-        for (let i=anomalyNumList.length;i<7;i++){
-            anomalyNumList.push(0);
+        if(anomalyNumList.length>0&&anomalyNumList.length<7){
+            for (let i=anomalyNumList.length;i<7;i++){
+                anomalyNumList.push(0);
+            }
         }
         this.state = {
             summaryData: this.props.summaryData || {},
@@ -90,7 +92,7 @@ export default class RenderSummaryReport extends Component {
                     })}]
                     </div>
                 </div>
-                {barChartList.length == 0?null:<BarChart data={data} width={400} height={125} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
+                {barChartList.length == 0?null:<BarChart data={data} width={400} height={150} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
 
                 <div>
                     {hasMetrics && 

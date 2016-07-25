@@ -190,6 +190,8 @@ const WindowWithWeek = (props) => {
         <div className="item">4</div>
         <div className="item">12</div>
         <div className="item">52</div>
+        <div className="item">100</div>
+        <div className="item">200</div>
       </div>
     </Dropdown>
   )
