@@ -218,23 +218,30 @@ class LogAnalysisCharts extends React.Component {
                   nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let featuresArr = weightVectors[event['nid']].map((e,i)=>{
+                let featuresArr = [];
+                if(event['nid']!=-1){
+                  featuresArr = weightVectors[event['nid']].map((e,i)=>{
                     let ret = episodeMap[e.index];
                     if(ret!=undefined){
                       ret = ret.replace(/"/g,"");
                     }
                     return ret
-                });
-                let featureString = "";
-                let numFeatures = 10;
-                if(featuresArr.length<10){
-                  numFeatures = featuresArr.length;
+                  });
                 }
-                for(let i = 0;i<numFeatures;i++){
-                  if(i>0){
-                    featureString += ", ";
+                let featureString = "";
+                if(event['nid']==-1){
+                  featureString = "Anomaly cluster";
+                } else {
+                  let numFeatures = 10;
+                  if(featuresArr.length<10){
+                    numFeatures = featuresArr.length;
                   }
-                  featureString += "["+featuresArr[i]+"]";
+                  for(let i = 0;i<numFeatures;i++){
+                    if(i>0){
+                      featureString += ", ";
+                    }
+                    featureString += "["+featuresArr[i]+"]";
+                  }
                 }
                 return (
                   <tr key={iEvent}>
