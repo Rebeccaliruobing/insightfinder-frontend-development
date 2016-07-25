@@ -30,6 +30,8 @@ export default  class FilterBar extends Component {
       projectName: '',
       pvalue: 0.99,
       cvalue: 5,
+      minPts: 5,
+      epsilon: 1.0,
       durationHours: 24,
       modelType: "Holistic",
       modelTypeText: 'Holistic',
@@ -206,21 +208,39 @@ export default  class FilterBar extends Component {
       let ied = moment(incidentEndTime);
       let msd = moment(modelStartTime);
       let med = moment(modelEndTime);
-      this.setState({
-        incident,
-        dataChunkName,
-        startTime:isd,
-        endTime:ied,
-        modelStartTime,
-        modelEndTime,
-        pvalue:pValue,
-        cvalue:cValue,
-        modelType,
-        recorded,
-        holisticModelKeys,
-        splitModelKeys,
-        isExistentIncident:true
-      })
+      if(modelType=='DBScan'){
+        this.setState({
+          incident,
+          dataChunkName,
+          startTime:isd,
+          endTime:ied,
+          modelStartTime,
+          modelEndTime,
+          epsilon:pValue,
+          minPts:cValue,
+          modelType,
+          recorded,
+          holisticModelKeys,
+          splitModelKeys,
+          isExistentIncident:true
+        })        
+      } else {
+        this.setState({
+          incident,
+          dataChunkName,
+          startTime:isd,
+          endTime:ied,
+          modelStartTime,
+          modelEndTime,
+          pvalue:pValue,
+          cvalue:cValue,
+          modelType,
+          recorded,
+          holisticModelKeys,
+          splitModelKeys,
+          isExistentIncident:true
+        })
+      }        
     }
   }
 
@@ -289,7 +309,7 @@ export default  class FilterBar extends Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, pvalue, cvalue, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
+      projectName, incident, startTime, endTime, pvalue, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -318,14 +338,28 @@ export default  class FilterBar extends Component {
           </div>
         </div>
         <div className="four fields fill">
-          <div className="field">
-            <label style={labelStyle}>Anomaly Threshold</label>
-            <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
-          </div>
-          <div className="field">
-            <label style={labelStyle}>Duration Threshold (Sample Number)</label>
-            <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
-          </div>
+          {modelType == 'DBScan'?
+            <div className="field">
+              <label style={labelStyle}>MinPts</label>
+              <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({minPts:e.target.value})}/>
+            </div>
+            :
+            <div className="field">
+              <label style={labelStyle}>Anomaly Threshold</label>
+              <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+            </div>
+          }
+          {modelType == 'DBScan'?
+            <div className="field">
+              <label style={labelStyle}>Epsilon</label>
+              <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
+            </div>
+            :
+            <div className="field">
+              <label style={labelStyle}>Duration Threshold (Sample Number)</label>
+              <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+            </div>
+          }
           <div className="field">
           </div>
           <div className="field"></div>

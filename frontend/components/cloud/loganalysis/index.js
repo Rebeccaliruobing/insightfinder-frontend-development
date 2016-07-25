@@ -231,22 +231,25 @@ class LogAnalysisCharts extends React.Component {
                   numFeatures = featuresArr.length;
                 }
                 for(let i = 0;i<numFeatures;i++){
-                  featureString += "<br />["+featuresArr[i]+"]";
+                  if(i>0){
+                    featureString += ", ";
+                  }
+                  featureString += "["+featuresArr[i]+"]";
                 }
                 return (
-                      <tr key={iEvent}>
-                        {showNumber!=-1?
-                        <td rowSpan={neuronValue[showNumber]}>
-                            Cluser {iGroup} <br />
-                            Number of events: {neuronValue[iGroup-1]} <br />
-                            Features: {featureString}
-                        </td>:
-                          ""
-                        }
-                        <td>{timestamp}</td>
-                        <td>{event.rawData}</td>
-                        <td>{event.anomaly}<br />{nAnomalyStr}</td>
-                      </tr>
+                  <tr key={iEvent}>
+                    {showNumber!=-1?
+                    <td rowSpan={neuronValue[showNumber]}>
+                        Cluser {iGroup} <br />
+                        Number of events: {neuronValue[iGroup-1]} <br />
+                        Features: {featureString}
+                    </td>:
+                      ""
+                    }
+                    <td>{timestamp}</td>
+                    <td>{event.rawData}</td>
+                    <td>{event.anomaly}<br />{nAnomalyStr}</td>
+                  </tr>
                 )
               })}              
             </tbody>

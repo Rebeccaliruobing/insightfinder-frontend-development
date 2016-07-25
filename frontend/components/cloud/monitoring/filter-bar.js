@@ -25,7 +25,7 @@ export default  class FilterBar extends Component {
       anomalyThreshold: 0.99,
       durationThreshold: 5,
       minPts: 5,
-      epsilon: 1
+      epsilon: 1.0
     };
   }
 
@@ -71,7 +71,7 @@ export default  class FilterBar extends Component {
     const {projectName, anomalyThreshold, durationThreshold,minPts,epsilon,projectType, modelType} = this.state;
     var url;
     if(modelType=='DBScan'){
-      url = '/liveMonitoring?anomalyThreshold='+minPts+'&durationThreshold='+epsilon+'&modelType='+modelType+'&projectName='+projectName;
+      url = '/liveMonitoring?anomalyThreshold='+epsilon+'&durationThreshold='+minPts+'&modelType='+modelType+'&projectName='+projectName;
     } else {
       url = '/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
     }
