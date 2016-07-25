@@ -39,8 +39,14 @@ export default  class FilterBar extends Component {
       availableDataRanges:[],
       isStationary:false,
       isExistentIncident: false,
-      incidentList: []
+      incidentList: [],
+      modelTypeTextMap: {}
     };
+    this.state.modelTypeTextMap["Holistic"]= "Holistic";
+    this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
+    this.state.modelTypeTextMap["Split"]= "Split";
+    this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
+    this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
   }
 
   componentDidMount() {
@@ -81,6 +87,7 @@ export default  class FilterBar extends Component {
     let [name, dataType, cloudType] = project;
     let update = {projectName};
     update.modelType = "Holistic";
+    update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
       case 'AWS':
       case 'EC2':
@@ -218,7 +225,7 @@ export default  class FilterBar extends Component {
           epsilon:pValue,
           minPts:cValue,
           modelType,
-          modelTypeText: modelType,
+          modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
@@ -235,7 +242,7 @@ export default  class FilterBar extends Component {
           pvalue:pValue,
           cvalue:cValue,
           modelType,
-          modelTypeText: modelType,
+          modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
@@ -264,6 +271,7 @@ export default  class FilterBar extends Component {
           modelEndTime: undefined,
           isExistentIncident: true,
           modelType: modelType,
+          modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded: recorded
         }, this.handleRefresh.bind(this));
       } else {
@@ -271,6 +279,7 @@ export default  class FilterBar extends Component {
       }
     })
   }
+
   handleRefresh() {
     this.setState({loading: true}, ()=> {
       this.context.root.loadUserValues().then(()=> {
@@ -444,9 +453,6 @@ export default  class FilterBar extends Component {
               </div>
             </div>
         </div>
-
-
-
       </div>
     )
   }

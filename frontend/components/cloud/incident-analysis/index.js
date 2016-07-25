@@ -51,8 +51,8 @@ export default class IncidentDetection extends Component {
     let modelEndTime = moment(data.modelEndTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let isExistentIncident = data.isExistentIncident;
     if(modelType=='DBScan'){
-      pvalue = minPts;
-      cvalue = epsilon;
+      pvalue = epsilon;
+      cvalue = minPts;
     }
     window.open(`/incidentAnalysis?${$.param(Object.assign({}, {
       startTime,
