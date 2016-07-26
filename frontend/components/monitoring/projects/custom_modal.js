@@ -12,6 +12,9 @@ class CustomProjectModal extends React.Component {
   constructor(props) {
     super(props);
     this._dropdown = null;
+    this.state = {
+      projectCloudType:""
+    };
   }
 
   componentDidMount() {
@@ -41,6 +44,8 @@ class CustomProjectModal extends React.Component {
   }
 
   render() {
+    let {projectCloudType} = this.state;
+    let disabledInterval=(projectCloudType=="LogFile");
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="content">
@@ -58,13 +63,14 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
                 <option className="item" value="PrivateCloud">Private Cloud</option>
-                <option className="item" value="FileReplay">File Replay</option>
+                <option className="item" value="MetricFile">Metric File</option>
+                <option className="item" value="LogFile">Log File</option>
               </select>
 
             </div>
             <div className="field">
               <label>Sampling Interval</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
+              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})} disabled={disabledInterval}>
                 <option className="item">Sampling Interval</option>
                 <option className="item" value="1">1 minute</option>
                 <option className="item" value="5">5 minutes</option>
