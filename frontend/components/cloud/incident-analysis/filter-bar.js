@@ -422,25 +422,26 @@ export default  class FilterBar extends Component {
                                 dateTimeFormat='YYYY-MM-DD' value={startTime}
                                 onChange={this.handleStartTimeChange.bind(this)}/>
               </div>
+            </div>
 
-            </div>
             <div className="field">
-              <label style={labelStyle}>Incident End</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                dateTimeFormat='YYYY-MM-DD' value={endTime}
-                                onChange={this.handleEndTimeChange.bind(this)}/>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px'}}>
-            <div className="field" style={{'width': '50%'}}>
               <label style={labelStyle}>Model Start</label>
               <div className="ui input" style={{'zIndex': 0}}>
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
                                 onChange={this.handleModelStartTimeChange.bind(this)}/>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px'}}>
+          <div style={{'width': '100%','display': 'flex'}}>
+            <div className="field" style={{'width': '50%'}}>
+              <label style={labelStyle}>Incident End</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={endTime}
+                                onChange={this.handleEndTimeChange.bind(this)}/>
               </div>
             </div>
 
@@ -452,6 +453,7 @@ export default  class FilterBar extends Component {
                                 onChange={this.handleModelEndTimeChange.bind(this)}/>
               </div>
             </div>
+          </div>
         </div>
       </div>
     )
