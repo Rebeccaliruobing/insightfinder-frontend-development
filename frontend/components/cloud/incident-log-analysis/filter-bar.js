@@ -373,11 +373,10 @@ export default  class FilterBar extends Component {
           <div className="field">
           </div>
         </div>
-        {incidentList.length > 0 && (
           <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
             <div className="ui middle aligned divided list padding10"
-                 style={{maxHeight: 200, overflow: 'auto'}}>
-              {incidentList.sort(function(a, b) {
+                 style={{height: 200, overflow: 'auto'}}>
+              {incidentList.length > 0 && incidentList.sort(function(a, b) {
                   let aisd = moment(a.incidentEndTime);
                   let bisd = moment(b.incidentEndTime);
                   if(aisd>bisd){
@@ -414,7 +413,6 @@ export default  class FilterBar extends Component {
               })}
             </div>
           </div>
-        )}
         <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
             <div className="field" style={{'width': '50%'}}>
