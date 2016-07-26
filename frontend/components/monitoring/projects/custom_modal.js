@@ -22,6 +22,10 @@ class CustomProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectCloudType, samplingInterval} = this.state;
+    if(/[\s_:@,]/g.test(projectName)){
+      alert("Project name cannot contain _ : @ , or space.");
+      return false;
+    }
     apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
