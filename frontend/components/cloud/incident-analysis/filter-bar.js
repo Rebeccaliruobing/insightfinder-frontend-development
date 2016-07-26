@@ -406,7 +406,7 @@ export default  class FilterBar extends Component {
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="basic" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}

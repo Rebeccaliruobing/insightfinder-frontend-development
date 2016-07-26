@@ -164,7 +164,7 @@ export default  class FilterBar extends Component {
   validateStartEnd(data){
     let {startTime, endTime, modelStartTime, modelEndTime, isStationary, availableDataRanges} = data;
     if(startTime == endTime){
-      alert('Incident start/end times need to be initialized.');
+      alert('Log start/end times need to be initialized.');
       return false;
     }
     if(modelStartTime == modelEndTime){
@@ -181,11 +181,11 @@ export default  class FilterBar extends Component {
       let modelEndRange = availableDataRanges.find((item)=> 
         moment(modelEndTime).endOf('day')>=item.min && moment(modelEndTime).startOf('day')<=item.max);
       if(startRange === undefined){
-        alert('Incident Start not in available data range.');
+        alert('Log Start not in available data range.');
         return false;
       }
       if(endRange === undefined){
-        alert('Incident End not in available data range.');
+        alert('Log End not in available data range.');
         return false;
       }
       if(modelStartRange === undefined){
@@ -197,7 +197,7 @@ export default  class FilterBar extends Component {
         return false;
       }
       if(startRange != endRange){
-        alert('Incident Start and Incident End not in the same data range.');
+        alert('Log Start and Log End not in the same data range.');
         return false;
       }
       if(modelStartRange != modelEndRange){
@@ -367,7 +367,7 @@ export default  class FilterBar extends Component {
           }
 
         <div className="ui field" style={{'width': '100%'}}>
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
+          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Log Analysis</Button>
           <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
         </div>
           <div className="field">
@@ -408,7 +408,7 @@ export default  class FilterBar extends Component {
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="basic" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
@@ -418,7 +418,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
             <div className="field" style={{'width': '50%'}}>
-              <label style={labelStyle}>Incident Start</label>
+              <label style={labelStyle}>Log Start</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={startTime}
@@ -439,7 +439,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
             <div className="field" style={{'width': '50%'}}>
-              <label style={labelStyle}>Incident End</label>
+              <label style={labelStyle}>Log End</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
