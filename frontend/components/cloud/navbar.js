@@ -1,11 +1,20 @@
 import React from 'react';
 import {Console, Accordion, Link, IndexLink} from '../../artui/react/index';
+import store from 'store';
 
 export default function (props) {
   // <Link to="/cloud/display-model" className="item">Display Model</Link>
+  console.log(['admin','guest'].indexOf(store.get('userName')));
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
+        {['admin','guest'].indexOf(store.get('userName'))!=-1?
+          <Link to="/cloud/insight-report" className="item text-white">
+            <i className="zoom icon"></i>
+            <span> Insight Report </span>
+          </Link>
+            :null
+        }
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="line chart icon"></i>
           <span> Real-time Alert </span>

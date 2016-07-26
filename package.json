@@ -66,6 +66,7 @@
     "pure-render-decorator": "^1.1.1",
     "rc-slider": "^3.8.0",
     "react": "^15.2.1",
+    "echarts-for-react": "^1.1.2",
     "react-addons-perf": "^15.2.1",
     "react-addons-pure-render-mixin": "^15.2.1",
     "react-addons-shallow-compare": "^15.2.1",
