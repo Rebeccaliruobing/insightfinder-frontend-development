@@ -32,10 +32,10 @@ const ProjectLogDetails = class extends React.Component {
   updateData() {
 
     let {query} = this.props.location;
-    let {projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
+    let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
     this.setState({loading: true}, ()=> {
-      apis.postLogAnalysis(projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident)
+      apis.postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident)
         .then(resp => {
           let update = {};
           if (resp.success) {
@@ -46,7 +46,7 @@ const ProjectLogDetails = class extends React.Component {
           update.loading = false;
           this.setState(update);
           if (refreshInterval > 0) {
-            this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
+            // this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
           }
         })
         .catch(msg=> {

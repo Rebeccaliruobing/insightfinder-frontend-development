@@ -42,35 +42,18 @@ export default class IncidentDetection extends Component {
     })
   }
 
-  handleLogFilterChange(data) {
+  handleFilterSubmit(data) {
 
-    let {projectName, pvalue, cvalue, modelType} = data;
+    let {projectName, pvalue, cvalue, minPts, epsilon, modelType} = data;
     let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelStartTime = moment(data.modelStartTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelEndTime = moment(data.modelEndTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let isExistentIncident = data.isExistentIncident;
-    window.open(`/incidentLogAnalysis?${$.param(Object.assign({}, {
-      startTime,
-      endTime,
-      projectName,
-      pvalue,
-      cvalue,
-      modelType,
-      modelStartTime, 
-      modelEndTime,
-      isExistentIncident
-    }))}`, '_blank');
-  }
-
-  handleFilterChange(data) {
-
-    let {projectName, pvalue, cvalue, modelType} = data;
-    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let modelStartTime = moment(data.modelStartTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let modelEndTime = moment(data.modelEndTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let isExistentIncident = data.isExistentIncident;
+    if(modelType=='DBScan'){
+      pvalue = epsilon;
+      cvalue = minPts;
+    }
     window.open(`/incidentAnalysis?${$.param(Object.assign({}, {
       startTime,
       endTime,
@@ -111,7 +94,7 @@ export default class IncidentDetection extends Component {
             <i className="close link icon" style={{float:'right', marginTop: '-10px'}}
                onClick={this.handleToggleFilterPanel.bind(this)}/>
 
-            <FilterBar {...this.props} onSubmit={this.handleFilterChange.bind(this)} onLogSubmit={this.handleLogFilterChange.bind(this)}/>
+            <FilterBar {...this.props} onSubmit={this.handleFilterSubmit.bind(this)} />
             <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}/>
           </div>
 

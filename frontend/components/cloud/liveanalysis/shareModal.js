@@ -5,7 +5,7 @@ import store from 'store';
 import moment from 'moment';
 
 import {Modal, Dropdown} from '../../../artui/react/index';
-
+import apis from '../../../apis';
 
 class ShareModal extends React.Component {
 
@@ -25,6 +25,8 @@ class ShareModal extends React.Component {
       showOther: false,
       other: 'Unknown'
     };
+
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit() {
@@ -47,8 +49,8 @@ class ShareModal extends React.Component {
     
     data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
     data['rawData'] = dp ? dp.data.data : null;
-    
-    this.props.onSubmit && this.props.onSubmit(data);
+
+    apis.postDashboardUserValues('publishdata', data);
   }
 
   handleCancel() {
@@ -115,7 +117,8 @@ class ShareModal extends React.Component {
         <div className="actions">
           <div className="ui button deny" onClick={this.handleCancel.bind(this)}>Cancel</div>
           <div className="ui button approve labeled">
-            <div className={cx('ui button orange submit', {disabled:disabled})} onClick={this.handleSubmit.bind(this)}>
+            <div className={cx('ui button orange submit', {disabled:disabled})}
+                 onClick={this.handleSubmit}>
               Share data
             </div>
           </div>

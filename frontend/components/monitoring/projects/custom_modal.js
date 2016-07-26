@@ -12,6 +12,9 @@ class CustomProjectModal extends React.Component {
   constructor(props) {
     super(props);
     this._dropdown = null;
+    this.state = {
+      projectCloudType:""
+    };
   }
 
   componentDidMount() {
@@ -22,6 +25,10 @@ class CustomProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectCloudType, samplingInterval} = this.state;
+    if(/[\s_:@,]/g.test(projectName)){
+      alert("Project name cannot contain _ : @ , or space.");
+      return false;
+    }
     apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
@@ -37,6 +44,8 @@ class CustomProjectModal extends React.Component {
   }
 
   render() {
+    let {projectCloudType} = this.state;
+    let disabledInterval=(projectCloudType=="LogFile");
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="content">
@@ -46,7 +55,7 @@ class CustomProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Project Type (Optional)</label>
+              <label>Project Type</label>
 
               <select className="ui dropdown" onChange={(e)=>this.setState({projectCloudType: e.target.value})}>
                 <option className="item">Project Type</option>
@@ -54,13 +63,14 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
                 <option className="item" value="PrivateCloud">Private Cloud</option>
-                <option className="item" value="FileReplay">File Replay</option>
+                <option className="item" value="MetricFile">Metric File</option>
+                <option className="item" value="LogFile">Log File</option>
               </select>
 
             </div>
             <div className="field">
-              <label>Sampling Interval (Optional)</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
+              <label>Sampling Interval</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})} disabled={disabledInterval}>
                 <option className="item">Sampling Interval</option>
                 <option className="item" value="1">1 minute</option>
                 <option className="item" value="5">5 minutes</option>

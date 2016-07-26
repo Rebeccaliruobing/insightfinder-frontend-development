@@ -13,7 +13,7 @@ import {settingsRoute} from './components/settings';
 import {useCaseRoute} from './components/usecase/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
-import IncidentLogDetails from './components/cloud/incident-analysis/log-details';
+import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import Help from './components/help';

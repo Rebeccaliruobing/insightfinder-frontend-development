@@ -63,11 +63,11 @@ export default class RolloutCheck extends Component {
                 let title, startTime = data.startTime, endTime = data.endTime;
                 data.NASValues.forEach((line, index) => {
                     var lineArray = line.split(",");
-                    var colIndex = lineArray.splice(0, 1);
+                    var colIndex = lineArray[0];
                     dataArray.push({
                         colIndex: colIndex % 32,
                         rowIndex: parseInt(index / 32),
-                        value: lineArray[lineArray.length - 2]
+                        value: lineArray[1]
                     });
                 });
 
@@ -140,9 +140,6 @@ export default class RolloutCheck extends Component {
                     resp.data.projectName = data.projectName;
 
                     resp.data.rolloutCheckModelKeyList = JSON.parse(resp.data.rolloutCheckModelKeyList);
-                    resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
-                    resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
-                    resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
                     resp.data.modelData = resp.data.rolloutCheckModelKeyList;
                     let groups = {};
                     resp.data.modelData.forEach((dataArray)=> {

@@ -135,7 +135,7 @@ class LogAnalysisCharts extends React.Component {
           <table className="vector-table">
             <tbody>
               <tr>
-                <td>Frequent Episode</td>
+                <td>Word Count</td>
                 <td>Count</td>
               </tr>
               {episodeMapArr.sort(function(a, b) {
@@ -174,7 +174,6 @@ class LogAnalysisCharts extends React.Component {
       episodeMap[parseInt(episode.index)] = episode.pattern;
     });
     let logEventArr = this.dp.logEventArr;
-    let weightVectors = this.dp.weightVectors;
 
     let neuronListNumber = {};
     let neuronValue = [];
@@ -198,7 +197,7 @@ class LogAnalysisCharts extends React.Component {
     if(logEventArr){
       return (
         <div>
-          <div class="ui header">Number of clusters: {neuronValue.length}</div>
+          <div class="ui header">Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}</div>
           <table className="event-table">
             <tbody>
               <tr>
@@ -218,26 +217,24 @@ class LogAnalysisCharts extends React.Component {
                   nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let featuresArr = weightVectors[event['nid']].map((e,i)=>{
-                    let ret = episodeMap[e.index];
-                    if(ret!=undefined){
-                      ret = ret.replace(/"/g,"");
-                    }
-                    return ret});
+                let isAnomaly = "";
+                if(event.nid==-1){
+                  isAnomaly = "Anomaly Cluster"
+                }
                 return (
-                      <tr key={iEvent}>
-                        {showNumber!=-1?
-                        <td rowSpan={neuronValue[showNumber]}>
-                            Cluser {iGroup} <br />
-                            Number of events: {neuronValue[iGroup-1]} <br />
-                            Features: {JSON.stringify(featuresArr)}
-                        </td>:
-                          ""
-                        }
-                        <td>{timestamp}</td>
-                        <td>{event.rawData}</td>
-                        <td>{event.anomaly}<br />{nAnomalyStr}</td>
-                      </tr>
+                  <tr key={iEvent}>
+                    {showNumber!=-1?
+                    <td rowSpan={neuronValue[showNumber]}>
+                        Cluser {iGroup} <br />
+                        Number of events: {neuronValue[iGroup-1]} <br />
+                        {isAnomaly}
+                    </td>:
+                      ""
+                    }
+                    <td>{timestamp}</td>
+                    <td>{event.rawData}</td>
+                    <td>{event.anomaly}<br />{nAnomalyStr}</td>
+                  </tr>
                 )
               })}              
             </tbody>
@@ -385,9 +382,9 @@ class LogAnalysisCharts extends React.Component {
                <a className={tabStates['event'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
                <a className={tabStates['episode'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episodes</a>
+                  onClick={(e) => this.selectTab(e, 'episode')}>Word Count</a>
                <a className={tabStates['word'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'word')}>Word Count</a>
+                  onClick={(e) => this.selectTab(e, 'word')}>Frequent Episodes</a>
            </div>
            <div className={tabStates['event'] + ' ui tab '}>
               {tabStates['event'] === 'active' ? (

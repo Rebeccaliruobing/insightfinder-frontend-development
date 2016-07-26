@@ -37,6 +37,10 @@ class GoogleProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectId, projectType, serviceAccount, filename, hasAgentData} = this.state;
+    if(/[\s_:@,]/g.test(projectName)){
+      alert("Project name cannot contain _ : @ , or space.");
+      return false;
+    }
     apis.postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData).then((resp)=> {
       if (resp.success) {
         window.alert(resp.message);
