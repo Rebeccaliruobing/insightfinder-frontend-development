@@ -5,26 +5,32 @@ import {
 } from '../../../artui/react';
 import ReactEcharts from 'echarts-for-react';
 const PieTickChart = React.createClass({
+    getInitialState: function () {
+      return {
+          title: this.props.title || "None",
+          name: this.props.name || "Name"
+      }
+    },
     getOption: function () {
+        let {title,name} = this.state;
         var option = {
             title: {
-                text: 'test',
-                subtext: 'test-to-test',
+                text: title,
                 x: 'center'
             },
             calculable: true,
             series: [
                 {
-                    name: '访问来源',
+                    name: name,
                     type: 'pie',
                     radius: '55%',
                     center: ['50%', '60%'],
                     data: [
-                        {value: 335, name: '直接访问'},
-                        {value: 310, name: '邮件营销'},
-                        {value: 234, name: '联盟广告'},
-                        {value: 135, name: '视频广告'},
-                        {value: 1548, name: '搜索引擎'}
+                        {value: 335, name: name+"1"},
+                        {value: 310, name: name+'2'},
+                        {value: 234, name: name+'3'},
+                        {value: 135, name: name+'4'},
+                        {value: 1548, name: name+'5'}
                     ]
                 }
             ]
@@ -35,7 +41,7 @@ const PieTickChart = React.createClass({
         return (
             <ReactEcharts
                 option={this.getOption()}
-                style={{height: '300px', width: '100%'}}
+                style={{height: '300px', width: '50%'}}
                 className='echarts-for-echarts'
                 theme='my_theme'/>
 
@@ -88,7 +94,7 @@ const BarChart = React.createClass({
         return (
             <ReactEcharts
                 option={this.getOption()}
-                style={{height: '300px', width: '100%'}}
+                style={{height: '300px', width: '50%'}}
                 className='echarts-for-echarts'
                 theme='my_theme'/>
 
@@ -126,14 +132,16 @@ const PieChart = React.createClass({
             legend: {
                 x: 'center',
                 y: 'bottom',
+                itemGap: 100,
+                textStyle:{fontWeight:'bold',fontSize:'20'},
                 data: [
-                    'Host', 'Facebook', 'Youtube', 'google'
+                    'Host', 'Avg # of VMs', 'Avg # of Containers', 'Avg Metric Uptime'
                 ]
             },
             series: [
                 {
                     type: 'pie',
-                    center: ['20%', '40%'],
+                    center: ['17%', '40%'],
                     radius: [80, 105],
                     x: '0%',
                     itemStyle: labelFromatter,
@@ -143,32 +151,32 @@ const PieChart = React.createClass({
                 },
                 {
                     type: 'pie',
-                    center: ['40%', '40%'],
+                    center: ['35%', '40%'],
                     radius: [80, 105],
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
-                        {name: 'Facebook', value: 46, itemStyle: labelBottom}
+                        {name: 'Avg # of VMs', value: 46, itemStyle: labelBottom}
                     ]
                 },
                 {
                     type: 'pie',
-                    center: ['60%', '40%'],
+                    center: ['55%', '40%'],
                     radius: [80, 105],
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
-                        {name: 'Youtube', value: 46, itemStyle: labelBottom}
+                        {name: 'Avg # of Containers', value: 46, itemStyle: labelBottom}
                     ]
                 },
                 {
                     type: 'pie',
-                    center: ['80%', '40%'],
+                    center: ['75%', '40%'],
                     radius: [80, 105],
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
-                        {name: 'google', value: 46, itemStyle: labelBottom}
+                        {name: 'Avg Metric Uptime', value: 46, itemStyle: labelBottom}
                     ]
                 }
             ]
@@ -198,12 +206,30 @@ class InsightReport extends BaseComponent {
     render() {
         return (
             <Console.Content>
+                <div><h3>Basic Stats</h3></div>
                 <PieChart />
-                <BarChart />
-                <BarChart />
-                <BarChart />
-                <BarChart />
-                <PieTickChart />
+                <div><h3>Anoamlies</h3></div>
+                <div style={{'display': 'flex'}}>
+                    <BarChart />
+                    <BarChart />
+                </div>
+                <div style={{'display': 'flex'}}>
+                    <BarChart />
+                    <BarChart />
+                </div>
+                <div style={{'display': 'flex'}}>
+                    <BarChart />
+                    <BarChart />
+                </div>
+                <div><h3>Anomaly Source</h3></div>
+                <div style={{'display': 'flex'}}>
+                    <PieTickChart title="Anomaly Frequency by Metric" name="Metric"/>
+                    <PieTickChart title="Anomaly Frequency by Instance" name="Instance"/>
+                </div>
+                <div style={{'display': 'flex'}}>
+                    <PieTickChart title="Anomaly Degree by Metric" name="Metric"/>
+                    <PieTickChart title="Anomaly Degree by Instance" name="Instance"/>
+                </div>
             </Console.Content>
         )
     }
