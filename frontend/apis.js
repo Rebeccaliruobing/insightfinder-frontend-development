@@ -36,6 +36,7 @@ $.fn.api.settings.api = {
     'display project model': `${baseUrl}displayProjectModel`,
 
     'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
+    'insight report': `${baseUrl}insightReport`,
     'published detection': `${baseUrl}publishedDetection`,
     'post mortem': `${baseUrl}postMortem`,
     'log analysis': `${baseUrl}logAnalysis`,
@@ -198,6 +199,36 @@ export default {
                 });
             }
         });
+    },
+    postInsightReport(userName=store.get('userName'), token=store.get('token')){
+        return new Promise(function (resolve,reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['insight report'],
+                data: $.param({userName, token}),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("accept", 'application/json');
+                }
+            }).done(function (resp) {
+                var reportData = {'createDate': new Date()};
+                _.forEach(resp.data, function (value, key) {
+                    key = key.split(':');
+                    if (key.length == 3) {
+                        reportData[key[0] + "@" + key[2]] = value;
+                    }
+                    else {
+                        reportData[key[0]] = value;
+                    }
+                });
+                resp['data'] = reportData;
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            })
+        })
     },
     /**
      *

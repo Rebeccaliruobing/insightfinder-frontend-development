@@ -92,18 +92,18 @@ export default  class FilterBar extends Component {
             <label style={labelStyle}>Project Type</label>
             <div style={{paddingTop:'0.5em', paddingLeft:'1em'}}>{projectType}</div>
           </div>
-          <div className="field">
+
+          <div className="field" style={{'display': 'none'}}>
             <label style={labelStyle}>Window (Week)</label>
             <WindowWithWeek value={this.state.weeks} onChange={(value, text)=> this.setState({weeks: text}, ()=>this.handleEndTimeChange(endTime))}/>
           </div>
-          <div className="field">
+          <div className="field" style={{'display': 'none'}}>
             <label style={labelStyle}>Start Time</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readO
-                              nly/>
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readOnly/>
             </div>
           </div>
-          <div className="field">
+          <div className="field" style={{'display': 'none'}}>
             <label style={labelStyle}>End Time</label>
             <div className="ui input">
               <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
@@ -111,7 +111,6 @@ export default  class FilterBar extends Component {
             </div>
           </div>
         </div>
-
 
         <div className="ui field">
           <Button className={cx('orange', {'loading': this.props.loading})}
@@ -122,16 +121,3 @@ export default  class FilterBar extends Component {
   }
 }
 
-        // <div className="four fields fill">
-        //   <div className="field">
-        //     <label style={labelStyle}>Anomaly Threshold</label>
-        //     <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
-        //   </div>
-        //   <div className="field">
-        //     <label style={labelStyle}>Duration Threshold (Sample Number)</label>
-        //     <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
-        //   </div>
-        //   <div className="field">
-        //   </div>
-        //   <div className="field"></div>
-        // </div>
