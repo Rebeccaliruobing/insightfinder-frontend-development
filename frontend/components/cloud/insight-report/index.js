@@ -33,7 +33,7 @@ class PieTickChart extends React.Component {
                 {
                     name: name,
                     type: 'pie',
-                    radius: '55%',
+                    radius: '100%',
                     center: ['50%', '60%'],
                     data: _.keysIn(seriesData).map(function (value, index) {
                         return {value: seriesData[value], name: value}
@@ -45,30 +45,44 @@ class PieTickChart extends React.Component {
     }
 
     render() {
-        return (
-            <ReactEcharts
-                option={this.getOption()}
-                style={{height: '300px', width: '50%'}}
-                className='echarts-for-echarts'
-                theme='my_theme'/>
+        let {data} = this.props;
+        let seriesData = JSON.parse(data);
+        console.log((_.keysIn(seriesData)).length);
+        if ((_.keysIn(seriesData)).length == 0) {
+            return (
+                <div>
+                    1
+                </div>
+            )
+        }
+        else {
+            return (
+                <ReactEcharts
+                    option={this.getOption()}
+                    style={{height: '300px', width: '50%'}}
+                    className='echarts-for-echarts'
+                    theme='my_theme'/>
 
-        )
+            )
+        }
     }
 }
 class BarChart extends React.Component {
     static propTypes = {
         title: React.PropTypes.string,
         pieChartStyle: React.PropTypes.object,
-        data: React.PropTypes.string
+        data: React.PropTypes.object,
+        useData: React.PropTypes.bool
     };
     static defaultProps = {
         title: 'Title',
         pieChartStyle: {},
-        data: {}
+        data: {},
+        useData: false
     };
 
     getOption() {
-        let {title,data} = this.props;
+        let {title,data,useData} = this.props;
         let optionData = {
             title: {
                 text: title
@@ -89,7 +103,7 @@ class BarChart extends React.Component {
             xAxis: [
                 {
                     type: 'category',
-                    data: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    data: useData?_.keysIn(data):['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                     axisTick: {
                         alignWithLabel: true
                     }
@@ -105,7 +119,11 @@ class BarChart extends React.Component {
                     //name: '直接访问',
                     type: 'bar',
                     barWidth: '60%',
-                    data: [
+                    data:
+                        useData?_.keysIn(data).map(function (value,index) {
+                            return data[value]
+                        }):
+                        [
                         data['Sunday'] || 0,
                         data['Monday'] || 0,
                         data['Tuesday'] || 0,
@@ -134,37 +152,25 @@ class BarChart extends React.Component {
 }
 class PieChart extends React.Component {
     static propTypes = {
+        data: React.PropTypes.string,
+        colorChart: React.PropTypes.string,
         pieChartStyle: React.PropTypes.object,
-        data: React.PropTypes.string
+        dataValue: React.PropTypes.string
     };
     static defaultProps = {
+        dataValue: '',
         pieChartStyle: {},
-        data: {}
+        colorChart: '',
+        data: ""
     };
 
     getOption() {
-        let {data} = this.props;
-        let centerBase = -5;
-        let legendData = _.keysIn(data).map(function (value, index) {
-            let baseLegend = {};
-            if (value == 'Host') {
-                baseLegend[value] = data[value];
-                return baseLegend;
-            }
-            else if (value == "AvgMetricUptime") {
-                baseLegend['Avg Metric Uptime'] = data[value];
-                return baseLegend;
-            }
-            else if (value.indexOf('NumberOf') != -1) {
-                baseLegend["Avg # of " + value.split("NumberOf")[1]] = data[value];
-                return baseLegend;
-            }
-        });
+        let {data,dataValue,colorChart} = this.props;
         var labelFromatter = {
             normal: {
                 label: {
                     formatter: function (params) {
-                        return 100 - params.value
+                        return params.value
                     },
                     textStyle: {
                         baseline: 'top',
@@ -175,7 +181,7 @@ class PieChart extends React.Component {
         };
         var labelBottom = {
             normal: {
-                color: '#e5cf0d',
+                color: colorChart,
                 label: {
                     show: true,
                     position: 'center'
@@ -191,36 +197,20 @@ class PieChart extends React.Component {
                 y: 'bottom',
                 itemGap: 50,
                 textStyle: {fontWeight: 'bold', fontSize: '25'},
-                data: _.keysIn(data).map(function (value, index) {
-                    console.log(value);
-                    if (value == 'Host') {
-                        return value;
-                    }
-                    else if (value == "AvgMetricUptime") {
-                        return "Avg Metric Uptime";
-                    }
-                    else if (value.indexOf('NumberOf') != -1) {
-                        return "Avg # of " + value.split("NumberOf")[1];
-                    }
-                })
+                data: [data]
             },
-            series: _.keysIn(data).map(function (value, index) {
-                centerBase = centerBase + 20;
-                return {
+            series: [
+                {
                     type: 'pie',
-                    center: [centerBase + '%', '40%'],
-                    radius: [80, 105],
+                    center: ['47%', '40%'],
+                    radius: [60, 85],
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
-                        {
-                            name: value="Host"?value:(value == "AvgMetricUptime"?"Avg Metric Uptime":"Avg # of " + value.split("NumberOf")[1]),
-                            value: value == "AvgMetricUptime"?'111':data[value].toString(),
-                            itemStyle: labelBottom
-                        }
+                        {name: data, value: dataValue, itemStyle: labelBottom}
                     ]
                 }
-            })
+            ]
         };
         return option;
     }
@@ -229,7 +219,7 @@ class PieChart extends React.Component {
         return (
             <ReactEcharts
                 option={this.getOption()}
-                style={{height: '300px', width: '100%'}}
+                style={{height: '300px', width: '25%'}}
                 className='echarts-for-echarts'
                 theme='my_theme'/>
         )
@@ -283,8 +273,8 @@ class InsightReport extends BaseComponent {
     }
 
     render() {
-        let pieChartLeft = {'marginLeft': '30px', 'height': '280px', 'width': '40%', 'float': 'left'};
-        let pieChartRight = {'marginRight': '30px', 'height': '280px', 'width': '40%', 'float': 'right'};
+        let pieChartLeft = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
+        let pieChartRight = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
         const {showAddPanel,projectName,detailData,loadingIndex} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
@@ -313,27 +303,46 @@ class InsightReport extends BaseComponent {
                             <FilterBar loading={this.state.loading} {...this.props}
                                        onSubmit={this.handleFilterChange.bind(this)}/>
                         </div>
-                        <div><h3>Basic Stats</h3></div>
-                        <PieChart data={chartsData['basicProjectStats']}/>
+                        <div style={{'display': 'flex'}}>
+                            <div><h3>Basic Stats</h3></div>
+                            {_.keys(chartsData['basicProjectStats']).map(function (value, index) {
+                                let name = "";
+                                if (value == 'Host') {
+                                    name = "Host";
+                                }
+                                else if (value == "AvgMetricUptime") {
+                                    name = "Avg Metric Uptime";
+                                }
+                                else if (value.indexOf('NumberOf') != -1) {
+                                    name = "Avg # of " + value.split("NumberOf")[1];
+                                }
+                                return <PieChart key={index} colorChart="#e5cf0d" data={name}
+                                                 dataValue={(chartsData['basicProjectStats'][value]).toString()}/>
+                            })}
+                        </div>
 
                         <div><h3>Anoamlies</h3></div>
                         <div style={{'display': 'inline-block','width': '100%'}}>
                             <BarChart title="Anomaly Count by Day" pieChartStyle={pieChartLeft}
-                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}/>
-                            <BarChart title="Anomaly Count by Day-Of-Week" pieChartStyle={pieChartRight}
-                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}/>
+                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDay']} useData={true}/>
+
+                            <BarChart title="Avg Anomaly Duration by Day" pieChartStyle={pieChartLeft}
+                                      data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']} useData={true}/>
+
+                            <BarChart title="Avg Anomaly Degree by Day" pieChartStyle={pieChartLeft}
+                                      data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']} useData={true}/>
+
                         </div>
                         <div style={{'display': 'inline-block','width': '100%'}}>
-                            <BarChart title="Avg Anomaly Duration by Day" pieChartStyle={pieChartLeft}
-                                      data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}/>
                             <BarChart title="Avg Anomaly Duration by Day-Of-Week" pieChartStyle={pieChartRight}
                                       data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}/>
-                        </div>
-                        <div style={{'display': 'inline-block','width': '100%'}}>
-                            <BarChart title="Avg Anomaly Degree by Day" pieChartStyle={pieChartLeft}
-                                      data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}/>
+
+                            <BarChart title="Anomaly Count by Day-Of-Week" pieChartStyle={pieChartRight}
+                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}/>
+
                             <BarChart title="Avg Anomaly Degree by Day-Of-Week" pieChartStyle={pieChartRight}
                                       data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}/>
+
                         </div>
                         <div><h3>Anomaly Source</h3></div>
                         <div style={{'display': 'flex'}}>
