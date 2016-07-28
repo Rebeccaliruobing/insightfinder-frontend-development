@@ -1,6 +1,6 @@
 import React from 'react';
 import {Console, Dropdown, Accordion, Message} from '../../artui/react/index';
-import pdSrc from './images/pd-connect.png';
+//import pdSrc from './images/pd-connect.png';
 
 export default class ExtSvc extends React.Component {
   static contextTypes = {
@@ -9,6 +9,8 @@ export default class ExtSvc extends React.Component {
 
   render() {
     let extServiceAllInfo = this.context.dashboardUservalues.extServiceAllInfo;
+    let pagerDutyImg = 'https://pagerduty.com/assets/pd_connect_button.png';
+    let slackImg = 'https://a.slack-edge.com/ae57/img/slack_api_logo.png';
     return (
       <Console.Content>
         <h4>PagerDuty Settings</h4>
@@ -16,10 +18,19 @@ export default class ExtSvc extends React.Component {
           integrate your account alerts with PagerDuty.
         </div>
         <a target="_blank"
-           href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=https://app.insightfinder.com/service-integration">
-          <img alt="Connect_button" src={pdSrc}/>
+           href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=http://localhost:8888/service-integration">
+          <img alt="Connect_button" height='40px' src={pagerDutyImg}/>
         </a>
-        <h4>Current external services</h4>
+        <hr />
+        <h4>Slack Integration</h4>
+        <div className="text-muted">Register your Incoming WebHook from Slack to integrate your account alerts with Slack. 
+        </div>
+        <a target="_blank"
+           href="">
+          <img alt="Connect_button" height='40px' src={slackImg}/>
+        </a>
+        <hr />
+        <h4>Current External Services</h4>
         {extServiceAllInfo.length ? (
           <div>
             <table className="ui basic table">

@@ -373,6 +373,7 @@ export default  class FilterBar extends Component {
           <div className="field">
           </div>
         </div>
+          <div className="ui header">List of Logs</div>
           <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
             <div className="ui middle aligned divided list padding10"
                  style={{height: 200, overflow: 'auto'}}>
@@ -401,7 +402,7 @@ export default  class FilterBar extends Component {
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
+                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
                       <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
@@ -434,7 +435,7 @@ export default  class FilterBar extends Component {
             </div>
           </div>
         </div>
-        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px 0 0 0'}}>
+        <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
             <div className="field" style={{'width': '50%'}}>
               <label style={labelStyle}>Log End</label>
