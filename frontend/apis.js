@@ -123,13 +123,14 @@ export default {
         });
     },
 
-    postDashboardUserValuesMapArr (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
+    postDashboardUserValuesMapArr (operation:String = 'display', projectName, selectedIndexArr, userName:String = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['dashboard uservalues'],
-                data: $.param({userName, token, operation, ...other}),
+                data: $.param({userName, token, operation, projectName,selectedIndexArr}),
                 beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                     request.setRequestHeader("Accept", 'application/json');
                 }
             }).done(function (resp) {
