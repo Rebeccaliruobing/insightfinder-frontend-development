@@ -260,6 +260,9 @@ class DataParser {
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
     }
+    if(this.data['clusterTopPatternArr']){
+      this.clusterTopPatternArr = this.data['clusterTopPatternArr'];
+    }
   }
 
   _parseAnomalyData() {

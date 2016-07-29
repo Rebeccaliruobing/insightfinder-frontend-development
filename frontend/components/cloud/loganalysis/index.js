@@ -41,8 +41,6 @@ class LogAnalysisCharts extends React.Component {
 
     this.state = {
       instanceName: false,
-      view: (store.get(DefaultView, 'list')).toLowerCase(),
-      columns: (store.get(GridColumns, 'four')).toLowerCase(),
       selectedGroupId: undefined,
       summarySelected: false,
       selectedAnnotation: null,
@@ -168,13 +166,14 @@ class LogAnalysisCharts extends React.Component {
   renderEventTable(){
     if (!this.dp) return;
     let anomalies = this.dp.anomalies["0"];
+    // FIXME: add wordmap here
     let episodeMap = {};
     let episodeMapArr = this.dp.episodeMapArr;
     _.forEach(episodeMapArr, function (episode, iEpisode)  {
       episodeMap[parseInt(episode.index)] = episode.pattern;
     });
     let logEventArr = this.dp.logEventArr;
-
+    let clusterTopPatternArr = this.dp.clusterTopPatternArr;
     let neuronListNumber = {};
     let neuronValue = [];
     let nidList = _.map(logEventArr, function(o){return o['nid']});
@@ -213,13 +212,16 @@ class LogAnalysisCharts extends React.Component {
                 let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
                 let nAnomaly = realAnomalies.indexOf(anomaly)+1;
                 let nAnomalyStr = "";
+                let topKPatterns = "";
                 if(nAnomaly){
                   nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
                 }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
                 let isAnomaly = "";
                 if(event.nid==-1){
-                  isAnomaly = "Anomaly Cluster"
+                  isAnomaly = "Anomaly Cluster";
+                }else{
+                  topKPatterns = _.find(clusterTopPatternArr, p => p.nid == event.nid).topK;
                 }
                 return (
                   <tr key={iEvent}>
@@ -227,7 +229,8 @@ class LogAnalysisCharts extends React.Component {
                     <td rowSpan={neuronValue[showNumber]}>
                         Cluser {iGroup} <br />
                         Number of events: {neuronValue[iGroup-1]} <br />
-                        {isAnomaly}
+                        {isAnomaly} <br />
+                        {topKPatterns}
                     </td>:
                       ""
                     }
@@ -242,103 +245,6 @@ class LogAnalysisCharts extends React.Component {
         </div>
       )
     }
-  }
-
-  renderGrid() {
-
-    if (!this.dp) return;
-
-    let summary = this.dp.summaryData;
-    let groups = this.dp.groupsData;
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-
-    let {columns, selectedGroupId, instanceName} = this.state;
-    let elems = [];
-    let selectIndex = 0;
-    let selectArrow = <div style={{
-      position: 'absolute',
-      width: 20,
-      height: 20,
-      background: '#333',
-      transform: 'rotate(45deg)',
-      left: '50%',
-      bottom: '-25px',
-      marginLeft: -3
-    }}></div>;
-
-    if (groups) {
-      let rowCount = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
-      let groupsData, selectedGroup;
-      if (this.dp) {
-        groupsData = this.dp.getGroupsData();
-        selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
-      }
-
-      groups.sort(function(a, b) {
-              let aid = parseInt(a.groupId);
-              let bid = parseInt(b.groupId);
-              return +(aid > bid) || +(aid === bid) - 1;
-            }).forEach((group, index) => {
-
-        let isSelectGroup = selectedGroupId == group.id;
-        if (isSelectGroup) selectIndex = selectIndex + index;
-        let metrics = groupMetrics[parseInt(group.id)];
-
-        elems.push((
-          <div key={columns + group.id} className="ui card"
-               onClick={() => {
-                if (this.state.selectedGroupId == group.id) {
-                  this.setState({selectedGroupId: void 0});
-                } else {
-                  this.setState({selectedGroupId: group.id, summarySelected:false})
-                }
-               }}>
-            <div className="content">
-              <div className="header" style={{paddingBottom:8}}>Metric {metrics} (Group {group.groupId})</div>
-              <SummaryChart data={group}/>
-            </div>
-            {isSelectGroup && selectArrow}
-          </div>
-        ));
-      });
-
-      let rowIndex = selectIndex % rowCount;
-      selectIndex = selectIndex + rowCount - rowIndex;
-      if (selectedGroup) {
-        elems = elems.slice(0, selectIndex).concat([(
-          <div key={'expand'} ref={(c)=>{
-            let $c = $(ReactDOM.findDOMNode(c));
-            $c.slideDown('fast', ()=>{
-              $(window.document).scrollTop($c.offset().top);
-
-              let metrics = groupMetrics[parseInt(selectedGroupId)];
-              ReactDOM.render((
-                  <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
-                    <DetailsChart data={selectedGroup} />
-                    <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
-                       style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
-                  </div>
-              ), c)
-            })
-          }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative'}}>
-
-          </div>
-        )]).concat(elems.slice(selectIndex));
-      }
-    }
-
-    return (
-
-      <div className="ui grid">
-        <div className="sixteen wide column">
-          <div className={cx('ui', columns, 'cards')}>
-            {!instanceName && this.renderSummary()}
-            {elems}
-          </div>
-        </div>
-      </div>
-    );
   }
 
   renderSummary() {
@@ -409,9 +315,7 @@ class LogAnalysisCharts extends React.Component {
   render() {
 
     let {data, loading, onRefresh, enablePublish} = this.props;
-    let {columns, view} = this.state;
 
-    let isListView = view === 'list';
     let contentStyle = {paddingLeft: 0};
     let contentClass = loading ? 'ui form loading' : '';
 
@@ -441,24 +345,10 @@ class LogAnalysisCharts extends React.Component {
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh
               </Button>
-              <ButtonGroup className="right floated basic icon">
-                <Button onClick={()=> this.setState({showSettingModal: true})}>
-                  <i className="icon setting"/>
-                </Button>
-                <Button active={view === 'list'}
-                        onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
-                  <i className="align justify icon"/>
-                </Button>
-                <Button active={view === 'grid'}
-                        onClick={()=>this.setState({view:'grid', summarySelected:false,selectedGroupId: null})}>
-                  <i className="grid layout icon"/>
-                </Button>
-              </ButtonGroup>
             </div>
             }
             <div className="ui vertical segment">
-              {!isListView && this.renderGrid()}
-              {!loading && isListView && this.renderList()}
+              {!loading && this.renderList()}
             </div>
           </div>
           { this.state.showSettingModal &&

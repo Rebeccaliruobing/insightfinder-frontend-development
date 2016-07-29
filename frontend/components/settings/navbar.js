@@ -9,10 +9,10 @@ export default function (props) {
           <i className="edit icon"></i> <span> Register Project</span>
         </Link>
         <Link to="/settings/threshold" className="item">
-          <i className="icon iconfont icon-threshold "></i> <span>Threshold Settings</span>
+          <i className="icon iconfont icon-threshold "></i> <span>Project Settings</span>
         </Link>
         <Link to="/settings/extsvc" className="item">
-          <i className="icon iconfont icon-puzzlepiece1 "></i> <span>PagerDuty Integration</span>
+          <i className="icon iconfont icon-puzzlepiece1 "></i> <span>External Service</span>
         </Link>
       </div>
     </Console.Navbar>

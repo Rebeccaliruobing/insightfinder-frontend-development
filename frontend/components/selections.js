@@ -134,6 +134,7 @@ class LogModelType extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="Split">Split</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
         </div>
       </Dropdown>

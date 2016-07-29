@@ -426,20 +426,20 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>Model Start</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
-                                onChange={this.handleModelStartTimeChange.bind(this)}/>
-              </div>
-            </div>
-
-            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Log End</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
                                 onChange={this.handleEndTimeChange.bind(this)}/>
+              </div>
+            </div>
+
+            <div className="field" style={{'width': '25%'}}>
+              <label style={labelStyle}>Model Start</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
+                                onChange={this.handleModelStartTimeChange.bind(this)}/>
               </div>
             </div>
 

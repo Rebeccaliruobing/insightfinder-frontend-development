@@ -91,10 +91,6 @@ export default class RenderSummaryReport extends Component {
                         return value + (index == anomalyNumList.length - 1 ? "" : ", ")
                     })}]
                     </div>
-                </div>
-                {barChartList.length == 0?null:<BarChart data={data} width={400} height={150} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
-
-                <div>
                     {hasMetrics && 
                     <div>
                         <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length}
