@@ -325,7 +325,7 @@ export default {
         });
     },
 
-    postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+    postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -341,7 +341,8 @@ export default {
                     endTime,
                     modelStartTime,
                     modelEndTime,
-                    isExistentIncident
+                    isExistentIncident, 
+                    operation
                 }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');

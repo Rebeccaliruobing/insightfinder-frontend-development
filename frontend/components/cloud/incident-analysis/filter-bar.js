@@ -372,6 +372,7 @@ export default  class FilterBar extends Component {
           </div>
         </div>
           <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
+            <div className="ui header">List of Incidents</div>
             <div className="ui middle aligned divided list padding10"
                  style={{height: 200, overflow: 'auto'}}>
               {incidentList.length > 0 && incidentList.sort(function(a, b) {
@@ -413,7 +414,7 @@ export default  class FilterBar extends Component {
           </div>
         <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
-            <div className="field" style={{'width': '50%'}}>
+            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Incident Start</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
@@ -422,19 +423,16 @@ export default  class FilterBar extends Component {
               </div>
             </div>
 
-            <div className="field">
+            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Model Start</label>
-              <div className="ui input" style={{'zIndex': 0}}>
+              <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
                                 onChange={this.handleModelStartTimeChange.bind(this)}/>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px'}}>
-          <div style={{'width': '100%','display': 'flex'}}>
-            <div className="field" style={{'width': '50%'}}>
+
+            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Incident End</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
@@ -443,9 +441,9 @@ export default  class FilterBar extends Component {
               </div>
             </div>
 
-            <div className="field">
+            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Model End</label>
-              <div className="ui input" style={{'zIndex': 0}}>
+              <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
                                 onChange={this.handleModelEndTimeChange.bind(this)}/>

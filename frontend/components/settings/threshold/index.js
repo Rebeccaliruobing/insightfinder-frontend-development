@@ -125,7 +125,7 @@ export default class ThresholdSettings extends React.Component {
 
     getLogAnalysisList(projectName, project) {
         let self = this;
-        apis.postLogAnalysis(projectName, project['pvalue'], project['cvalue'], 'Holistic', "2016-01-01T05:00:00.000Z", "2016-01-02T05:00:00.000Z", "2016-01-01T05:00:00.000Z", "2016-01-02T05:00:00.000Z", true).then((resp)=> {
+        apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
             self.setState({
                 logAnalysisList: resp.data['episodeMapArr'],
                 loading: false
@@ -178,9 +178,14 @@ export default class ThresholdSettings extends React.Component {
         }
     }
 
-    render() {
+    render() {        
         let labelStyle = {};
         let {data, tempSharedUsernames, loading, metricSettings,logAnalysisList,indexLoading} = this.state;
+        let {dashboardUservalues} = this.context;
+        let {projectModelAllInfo, projectSettingsAllInfo, projectString} = dashboardUservalues;
+        let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
+        let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
+        let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
         let self = this;
         return (
             <Console.Content className={loading?"ui form loading":""}>
@@ -260,7 +265,9 @@ export default class ThresholdSettings extends React.Component {
                                         onClick={this.handleSaveProjectSetting.bind(this)}>Submit</Button>
                             </div>
                         </div>
+                        <br /><hr />
                         <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})}>
+                          {!isLogProject && <div class="ui">
                             <h3>Metric Settings (Optional)</h3>
                             <table className="ui celled table">
                                 <thead>
@@ -290,9 +297,8 @@ export default class ThresholdSettings extends React.Component {
                                 </tbody>
                             </table>
                             <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Submit</Button>
-                            <br />
-                            <br />
-
+                          </div>}
+                          {isLogProject && <div class="ui">
                             <h3>Episode and Word Selection</h3>
                             <Button className={indexLoading?"loading blue":"blue"} onClick={this.handleSaveMapArrSetting.bind(this)}>Submit</Button>
                             <table className="ui celled table">
@@ -301,7 +307,7 @@ export default class ThresholdSettings extends React.Component {
                                     <th>Index</th>
                                     <th>Pattern</th>
                                     <th>Count</th>
-                                    <th><input type="checkbox" id="checkAll" defaultChecked="true"
+                                    <th><input type="checkbox" id="checkAll" defaultChecked="false"
                                                onChange={(e)=>self.setCheckboxAll(e)}/></th>
                                 </tr>
                                 </thead>
@@ -313,13 +319,14 @@ export default class ThresholdSettings extends React.Component {
                                             <td>{value['pattern']}</td>
                                             <td>{value['count']}</td>
                                             <td><input type="checkbox" data-id={value['index']} name="indexCheck"
-                                                       defaultChecked="true"
+                                                       value={value['selected']}
                                                        onChange={(e)=>self.getIndexNumber(value['index'],e)}/></td>
                                         </tr>
                                     )
                                 })}
                                 </tbody>
                             </table>
+                          </div>}
                         </div>
                     </div>
                 </div>
@@ -332,7 +339,7 @@ export default class ThresholdSettings extends React.Component {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
                 dataType: 'json',
-                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/projectHintMapFilename`,
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/wordMap.csv`,
                 sequentialUploads: true,
                 multipart: false
             })
