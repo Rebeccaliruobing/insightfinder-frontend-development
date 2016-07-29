@@ -36,6 +36,7 @@ $.fn.api.settings.api = {
     'display project model': `${baseUrl}displayProjectModel`,
 
     'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
+    'insight report': `${baseUrl}insightReport`,
     'published detection': `${baseUrl}publishedDetection`,
     'post mortem': `${baseUrl}postMortem`,
     'log analysis': `${baseUrl}logAnalysis`,
@@ -121,6 +122,26 @@ export default {
             requestPost('dashboard uservalues', {userName, token, operation, ...other}, resolve, reject);
         });
     },
+
+    postDashboardUserValuesMapArr (operation:String = 'display', projectName, selectedIndexArr, userName:String = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['dashboard uservalues'],
+                data: $.param({userName, token, operation, projectName,selectedIndexArr}),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
     postJSONDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
@@ -199,6 +220,36 @@ export default {
             }
         });
     },
+    postInsightReport(userName=store.get('userName'), token=store.get('token')){
+        return new Promise(function (resolve,reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['insight report'],
+                data: $.param({userName, token}),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("accept", 'application/json');
+                }
+            }).done(function (resp) {
+                var reportData = {'createDate': new Date()};
+                _.forEach(resp.data, function (value, key) {
+                    key = key.split(':');
+                    if (key.length == 3) {
+                        reportData[key[0] + "@" + key[2]] = value;
+                    }
+                    else {
+                        reportData[key[0]] = value;
+                    }
+                });
+                resp['data'] = reportData;
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            })
+        })
+    },
     /**
      *
      * @param userName
@@ -275,7 +326,7 @@ export default {
         });
     },
 
-    postLogAnalysis(projectName, pvalue, cvalue, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+    postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -285,12 +336,14 @@ export default {
                     token,
                     pvalue,
                     cvalue,
+                    modelType,
                     projectName,
                     startTime,
                     endTime,
                     modelStartTime,
                     modelEndTime,
-                    isExistentIncident
+                    isExistentIncident, 
+                    operation
                 }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');

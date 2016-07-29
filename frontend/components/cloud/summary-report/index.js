@@ -15,11 +15,18 @@ export default class RenderSummaryReport extends Component {
     constructor(props) {
         super(props);
         let today = new Date();
+        let anomalyNumList = _.slice(this.props.summaryData.anomalyNumList,0,30);
+        if(anomalyNumList.length>0&&anomalyNumList.length<7){
+            for (let i=anomalyNumList.length;i<7;i++){
+                anomalyNumList.push(0);
+            }
+        }
         this.state = {
             summaryData: this.props.summaryData || {},
             createDate: this.props.createDate || "",
             userName: store.get('userName'),
-            barChartList: (_.slice(this.props.summaryData.anomalyNumList,0,30) || []).map(function (value,index) {
+            anomalyNumList: anomalyNumList,
+            barChartList: anomalyNumList.map(function (value,index) {
                 today = new Date(moment(today).subtract(1, 'days'));
                 let month = today.getMonth()+1;
                 let day = today.getDate();
@@ -40,8 +47,15 @@ export default class RenderSummaryReport extends Component {
     }
 
     render() {
-        let {summaryData, userName, createDate,barChartList} = this.state;
-        let hasSummary = summaryData['anomalyDetails'].length;
+        let {summaryData, userName, createDate,barChartList,anomalyNumList} = this.state;
+        let hasSummary;
+        if(summaryData['anomalyDetails'].length){
+            hasSummary = true;
+        }
+        let hasMetrics;
+        if(summaryData['metricStats'].length){
+            hasMetrics = true;
+        }
         let instanceListNumber = {};
         let instanceValue = [];
         let instanceList = _.keyBy(summaryData['metricStats'], function (o) {
@@ -69,22 +83,26 @@ export default class RenderSummaryReport extends Component {
             label: 'Anomaly number time series',
             values: _.reverse(barChartList)
         }];
+        anomalyNumList = _.reverse(anomalyNumList);
         return (
             <div>
                 <div style={{'marginBottom': '16px'}}>
-                    <div>Anomaly number time series: [{(summaryData.anomalyNumList || []).map(function (value, index) {
-                        return value + (index == summaryData.anomalyNumList.length - 1 ? "" : ", ")
+                    <div>Anomaly number time series: [{(anomalyNumList || []).map(function (value, index) {
+                        return value + (index == anomalyNumList.length - 1 ? "" : ", ")
                     })}]
                     </div>
                 </div>
-                {barChartList.length == 0?null:<BarChart data={data} width={1200} height={300} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
+                {barChartList.length == 0?null:<BarChart data={data} width={400} height={150} margin={{top: 10, bottom: 50, left: 50, right: 10}}/>}
 
                 <div>
+                    {hasMetrics && 
                     <div>
                         <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length}
-                            metrics</span>
+                             metrics</span>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src={summaryData['metricTableColormap']}/>
                     </div>
+                    }
+                    {hasMetrics && 
                     <div>
                         <table className="metric-table">
                             <tbody>
@@ -160,6 +178,7 @@ export default class RenderSummaryReport extends Component {
                             <span>Number of anomalies in the past 24 hours: {summaryData['anomalyCount'] || 0}</span>
                         </div>
                     </div>
+                    }
                     {hasSummary &&
                     <div style={{'marginTop': '16px'}}>
                         <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img

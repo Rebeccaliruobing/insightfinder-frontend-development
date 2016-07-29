@@ -24,8 +24,11 @@ class AmazonProjectModal extends React.Component {
   }
 
   handleSubmit() {
-
     let {projectName, zone, instanceType, access_key, secrete_key, hasAgentData} = this.state;
+    if(/[\s_:@,]/g.test(projectName)){
+      alert("Project name cannot contain _ : @ , or space.");
+      return false;
+    }
     apis.postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);

@@ -183,7 +183,7 @@ export default class CausalGraph extends React.Component {
     y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
     return (
-      <circle ref={(c)=>point.component = c} key={point.id} class="node" r={(isHover ? 8 : 5)}
+      <circle ref={(c)=>point.component = c} key={point.id} className="node" r={(isHover ? 8 : 5)}
               cx={x} cy={y} fill="rgb(255, 127, 14)"
               style={{strokeWidth: 1, stroke: isHover ? 'rgb(255, 127, 14)' : '#fff', cursor: 'pointer'}}
               onMouseEnter={()=>this.highLightPoint(point)}
@@ -241,7 +241,9 @@ export default class CausalGraph extends React.Component {
       var currentList = s.split(" ");
       list.unshift(currentList.pop());
 
-      return [currentList.join(" ")].concat(this.getWrapText(list.join(" "), maxLength));
+      // FIXME: What'is logical of this code!!!!
+      return [currentList.join(" ")];
+      // return [currentList.join(" ")].concat(this.getWrapText(list.join(" "), maxLength));
 
     } else {
       return [text]

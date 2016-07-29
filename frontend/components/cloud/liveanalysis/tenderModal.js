@@ -1,13 +1,13 @@
 import React from 'react';
+import shallowCompare from 'react-addons-shallow-compare';
 import CausalGraph from '../display-model/CausalGraph'
 
 import {Modal} from '../../../artui/react';
 
 class TenderModal extends React.Component {
 
-  shouldComponentUpdate(nextProps, extState) {
-    return nextProps.dataArray !== this.props.dataArray ||
-      nextProps.types !== this.props.types;
+  shouldComponentUpdate(nextProps, nextStatee) {
+    return shallowCompare(this, nextProps, nextState);
   }
 
   render() {

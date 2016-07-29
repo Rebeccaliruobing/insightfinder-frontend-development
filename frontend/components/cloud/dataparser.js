@@ -45,7 +45,11 @@ class DataParser {
     }
 
     if (this.data['modelType'] === 'Split') {
-      return "split";
+      //return "split";
+      // this is after we unified returned anomaly string 
+      // and result string to be only in group 0 
+      // for all model types
+      return "holistic";
     } else {
       return "holistic";
     }
@@ -255,9 +259,6 @@ class DataParser {
     }
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
-    }
-    if(this.data['weightVectors']){
-      this.weightVectors = this.data['weightVectors'];
     }
   }
 
@@ -527,6 +528,7 @@ class DataParser {
         sdata: sdata,
         sname: sname,
         unit: unit || '',
+        metrics: groupmetrics[grp],
         highlights: highlights,
         annotations: undefined
       };
@@ -611,6 +613,7 @@ class DataParser {
         sdata: sdata,
         sname: sname,
         unit: unit || '',
+        metrics: groupmetrics[grp],
         highlights: highlights,
         annotations: undefined
       };

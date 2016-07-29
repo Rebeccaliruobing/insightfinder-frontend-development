@@ -90,7 +90,7 @@ class AmazonProjects extends React.Component {
                                     <td style={{width: '16%'}}>{zone}</td>
                                     <td style={{width: '16%'}}>{cloudType}</td>
                                     <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled}
-                                                                      readOnly/></td>
+                                                                      readOnly={true}/></td>
                                     <td style={{width: '16%'}}>
                                         <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>
                                             {flag?"Unshare":"Remove"}
