@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
+import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
 import store from 'store';
 
 import apis from '../../../apis';
@@ -85,7 +85,6 @@ export default class ThresholdSettings extends React.Component {
         let cloudType = projectStr ? projectStr[2] : '';
         let projectType;
         let self = this;
-        console.log(project, projectSetting);
         switch (dataType) {
             case 'AWS':
             case 'EC2':
@@ -159,7 +158,6 @@ export default class ThresholdSettings extends React.Component {
 
     getIndexNumber(index, e) {
         let {logAnalysisList} = this.state;
-        console.log(index);
         if (!e.target.checked) {
             $('#checkAll').prop('checked', false);
         }
@@ -169,7 +167,6 @@ export default class ThresholdSettings extends React.Component {
     }
 
     setCheckboxAll(e) {
-        console.log(e.target.checked);
         if (e.target.checked) {
             $('input[name="indexCheck"]').prop("checked", true);
         }
@@ -363,7 +360,6 @@ export default class ThresholdSettings extends React.Component {
         let {tempSharedUsernames,data} = this.state;
         this.setState({settingLoading: true}, ()=> {
             apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
-                console.log(resp);
                 this.setState({settingLoading: false}, this.context.root.loadData)
             });
         });
@@ -374,13 +370,13 @@ export default class ThresholdSettings extends React.Component {
         $('input[name="indexCheck"]:checked').each(function () {
             selectedIndexArr.push($(this).data('id'));
         });
-        console.log(selectedIndexArr);
         this.setState({indexLoading: true}, ()=> {
-            apis.postDashboardUserValuesMapArr('updatefrequencyvector', {
-                projectName: this.state.data.projectName,
-                selectedIndexArr: selectedIndexArr
-            }).then((resp)=> {
-                this.setState({indexLoading: false});
+            apis.postDashboardUserValuesMapArr('updatefrequencyvector', this.state.data.projectName,JSON.stringify(selectedIndexArr)
+            ).then((resp)=> {
+                    if(resp.success){
+                        Alert("success");
+                    }
+                        this.setState({indexLoading: false});
             });
         });
 
