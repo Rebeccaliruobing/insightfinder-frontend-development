@@ -41,7 +41,12 @@ export default class ThresholdSettings extends React.Component {
             data: {},
             tempSharedUsernames: '',
             metricSettings: [],
-            logAnalysisList: []
+            episodeList: [],
+            wordList: [],
+            tabStates: {
+                episode: 'active',
+                word: ''
+            }
         };
     }
 
@@ -58,6 +63,15 @@ export default class ThresholdSettings extends React.Component {
         if (projectNames.length > 0) {
             this.handleProjectChange(projectNames[0]);
         }
+    }
+
+    selectTab(e, tab) {
+        var tabStates = this.state['tabStates'];
+        tabStates = _.mapValues(tabStates, function (val) {
+            return '';
+        });
+        tabStates[tab] = 'active';
+        this.setState({tabStates: tabStates});
     }
 
     handleToggleFilterPanel() {
@@ -126,7 +140,8 @@ export default class ThresholdSettings extends React.Component {
         let self = this;
         apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
             self.setState({
-                logAnalysisList: resp.data['episodeMapArr'],
+                episodeList: resp.data['episodeMapArr'],
+                wordList: resp.data['wordCountArr'],
                 loading: false
             });
         });
@@ -156,13 +171,23 @@ export default class ThresholdSettings extends React.Component {
         }
     }
 
-    getIndexNumber(index, e) {
-        let {logAnalysisList} = this.state;
+    getEpisodeIndexNumber(index, e) {
+        let {episodeList,wordList} = this.state;
         if (!e.target.checked) {
             $('#checkAll').prop('checked', false);
         }
         else {
-            $('input[name="indexCheck"]:checked').size() == logAnalysisList.length ? $('#checkAll').prop('checked', true) : "";
+            $('input[name="indexCheck"]:checked').size() == episodeList.length ? $('#checkAll').prop('checked', true) : "";
+        }
+    }
+
+    getWordIndexNumber(index, e) {
+        let {episodeList,wordList} = this.state;
+        if (!e.target.checked) {
+            $('#checkAll').prop('checked', false);
+        }
+        else {
+            $('input[name="indexCheck"]:checked').size() == wordList.length ? $('#checkAll').prop('checked', true) : "";
         }
     }
 
@@ -177,7 +202,7 @@ export default class ThresholdSettings extends React.Component {
 
     render() {        
         let labelStyle = {};
-        let {data, tempSharedUsernames, loading, metricSettings,logAnalysisList,indexLoading} = this.state;
+        let {data, tempSharedUsernames, loading, metricSettings,episodeList,wordList,indexLoading,tabStates} = this.state;
         let {dashboardUservalues} = this.context;
         let {projectModelAllInfo, projectSettingsAllInfo, projectString} = dashboardUservalues;
         let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
@@ -298,6 +323,13 @@ export default class ThresholdSettings extends React.Component {
                           {isLogProject && <div class="ui">
                             <h3>Episode and Word Selection</h3>
                             <Button className={indexLoading?"loading blue":"blue"} onClick={this.handleSaveMapArrSetting.bind(this)}>Submit</Button>
+                            <div className="ui pointing secondary menu">
+                                <a className={tabStates['episode'] + ' item'}
+                                   onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episode List</a>
+                                <a className={tabStates['word'] + ' item'}
+                                   onClick={(e) => this.selectTab(e, 'word')}>Word List</a>
+                            </div>
+                            <div className={tabStates['episode'] + ' ui tab '}>
                             <table className="ui celled table">
                                 <thead>
                                 <tr>
@@ -309,20 +341,48 @@ export default class ThresholdSettings extends React.Component {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {logAnalysisList.map((value, index)=> {
+                                {episodeList.map((value, index)=> {
                                     return (
                                         <tr key={`${data.projectName}-${index}-1`}>
                                             <td>{value['index']}</td>
                                             <td>{value['pattern']}</td>
                                             <td>{value['count']}</td>
                                             <td><input type="checkbox" data-id={value['index']} name="indexCheck"
-                                                       value={value['selected']}
-                                                       onChange={(e)=>self.getIndexNumber(value['index'],e)}/></td>
+                                                       defaultChecked={value['selected']}
+                                                       onChange={(e)=>self.getEpisodeIndexNumber(value['index'],e)}/></td>
                                         </tr>
                                     )
                                 })}
                                 </tbody>
                             </table>
+                            </div>
+                            <div className={tabStates['word'] + ' ui tab '}>
+                            <table className="ui celled table">
+                                <thead>
+                                <tr>
+                                    <th>Index</th>
+                                    <th>Word</th>
+                                    <th>Count</th>
+                                    <th><input type="checkbox" id="checkAll" defaultChecked="false"
+                                               onChange={(e)=>self.setCheckboxAll(e)}/></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {wordList.map((value, index)=> {
+                                    return (
+                                        <tr key={`${data.projectName}-${index}-1`}>
+                                            <td>{value['index']}</td>
+                                            <td>{value['pattern']}</td>
+                                            <td>{value['count']}</td>
+                                            <td><input type="checkbox" data-id={value['index']} name="indexCheck"
+                                                       defaultChecked={value['selected']}
+                                                       onChange={(e)=>self.getEpisodeIndexNumber(value['index'],e)}/></td>
+                                        </tr>
+                                    )
+                                })}
+                                </tbody>
+                            </table>
+                            </div>
                           </div>}
                         </div>
                     </div>
@@ -381,9 +441,9 @@ export default class ThresholdSettings extends React.Component {
             apis.postDashboardUserValuesMapArr('updatefrequencyvector', this.state.data.projectName,JSON.stringify(selectedIndexArr)
             ).then((resp)=> {
                     if(resp.success){
-                        Alert("success");
+                        window.alert("success");
                     }
-                        this.setState({indexLoading: false});
+                    this.setState({indexLoading: false});
             });
         });
 
