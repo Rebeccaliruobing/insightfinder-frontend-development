@@ -299,7 +299,7 @@ export default class ThresholdSettings extends React.Component {
                         </div>
                         <br /><hr />
                         <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})}>
-                          {!isLogProject && <div class="ui">
+                          {!isLogProject && <div className="ui">
                             <h3>Metric Settings (Optional)</h3>
                             <table className="ui celled table">
                                 <thead>
@@ -330,7 +330,7 @@ export default class ThresholdSettings extends React.Component {
                             </table>
                             <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Submit</Button>
                           </div>}
-                          {isLogProject && <div class="ui">
+                          {isLogProject && <div className="ui">
                             <h3>Episode and Word Selection</h3>
                             <Button className={indexLoading?"loading blue":"blue"} onClick={this.handleSaveMapArrSetting.bind(this)}>Submit</Button>
                             <div className="ui pointing secondary menu">
