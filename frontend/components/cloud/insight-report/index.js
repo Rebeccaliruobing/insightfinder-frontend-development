@@ -25,6 +25,7 @@ class PieTickChart extends React.Component {
         let {title,name,data} = this.props;
         let seriesData = JSON.parse(data);
         var optionData = {
+            color:['#00448a','#0580b9','#28c6b9','#84e6f1','#dddddd'],
             title: {
                 text: title,
                 x: 'center'
