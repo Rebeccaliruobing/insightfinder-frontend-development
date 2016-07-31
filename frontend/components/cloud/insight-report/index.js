@@ -219,7 +219,7 @@ class PieChart extends React.Component {
 
     render() {
         return (
-            <div style={{'width': '25%'}}>
+            <div style={{'width': '25%','margin': '0 auto'}}>
             <ReactEcharts
                 option={this.getOption()}
                 style={{height: '300px', width: '100%'}}
