@@ -120,7 +120,8 @@ class BarChart extends React.Component {
             ],
             yAxis: [
                 {
-                    type: 'value'
+                    type: 'value',
+                    splitLine: 'none'   // 不显示y轴的线
                 }
             ],
             series: [
