@@ -260,8 +260,11 @@ class DataParser {
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
     }
-    if(this.data['clusterTopPatternArr']){
-      this.clusterTopPatternArr = this.data['clusterTopPatternArr'];
+    if(this.data['clusterTopEpisodeArr']){
+      this.clusterTopEpisodeArr = this.data['clusterTopEpisodeArr'];
+    }
+    if(this.data['clusterTopWordArr']){
+      this.clusterTopWordArr = this.data['clusterTopWordArr'];
     }
   }
 

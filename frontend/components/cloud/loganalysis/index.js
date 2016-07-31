@@ -163,17 +163,70 @@ class LogAnalysisCharts extends React.Component {
     }
   }
 
+  renderAnomalyTable(){
+    if (!this.dp) return;
+    let anomalies = this.dp.anomalies["0"];
+    let logEventArr = this.dp.logEventArr;
+    let neuronListNumber = {};
+    let neuronValue = [];
+    let nidList = _.map(logEventArr, function(o){return o['nid']});
+    let neuronList = nidList.filter(function (el, index, arr) { return index === arr.indexOf(el)});
+    _.forEach(neuronList, function (value,key) {
+        neuronListNumber[value] = (_.partition(logEventArr, function(o){return o['nid'] == value})[0]).length;
+    });
+    let neuronIdList = neuronList;
+    neuronList = [];
+    neuronIdList.map(function (value,index) {
+        let num = 0;
+        for(let j=0;j<index;j++){
+            num+=neuronListNumber[neuronIdList[j]];
+        }
+        neuronList.push(num);
+        neuronValue.push(neuronListNumber[neuronIdList[index]]);
+    });
+    logEventArr = logEventArr.filter(function (el, index, arr) { return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3)||(el.nid == -1) });
+
+    if(logEventArr){
+      return (
+        <div>
+          <div class="ui header">Number of anomalies: {logEventArr.length}</div>
+          <table className="event-table">
+            <tbody>
+              <tr>
+                <td>Time</td>
+                <td>Event</td>
+                <td>Anomaly</td>
+              </tr>
+              {logEventArr.map((event, iEvent) => {
+                let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+                let anomalyString = event.anomaly;
+                if(anomalyString == 'Normal'){
+                  // from small cluster, show frequency
+                  anomalyString = '';
+                }
+                return (
+                  <tr key={iEvent}>
+                    <td>{timestamp}</td>
+                    <td>{event.rawData}</td>
+                    <td>{event.anomaly}</td>
+                  </tr>
+                )
+              })}              
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  }
+
   renderEventTable(){
     if (!this.dp) return;
     let anomalies = this.dp.anomalies["0"];
-    // FIXME: add wordmap here
-    let episodeMap = {};
     let episodeMapArr = this.dp.episodeMapArr;
-    _.forEach(episodeMapArr, function (episode, iEpisode)  {
-      episodeMap[parseInt(episode.index)] = episode.pattern;
-    });
     let logEventArr = this.dp.logEventArr;
-    let clusterTopPatternArr = this.dp.clusterTopPatternArr;
+    logEventArr = logEventArr.filter(function (el, index, arr) { return el.nid != -1 });
+    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
+    let clusterTopWordArr = this.dp.clusterTopWordArr;
     let neuronListNumber = {};
     let neuronValue = [];
     let nidList = _.map(logEventArr, function(o){return o['nid']});
@@ -183,6 +236,28 @@ class LogAnalysisCharts extends React.Component {
         neuronListNumber[value] = (_.partition(logEventArr, function(o){return o['nid'] == value})[0]).length;
     });
     let neuronIdList = neuronList;
+    neuronList = [];
+    neuronIdList.map(function (value,index) {
+        let num = 0;
+        for(let j=0;j<index;j++){
+            num+=neuronListNumber[neuronIdList[j]];
+        }
+        neuronList.push(num);
+        neuronValue.push(neuronListNumber[neuronIdList[index]]);
+    });
+
+    // filter out anomaly and small cluster and run again
+    let newLogEventArr = logEventArr.filter(function (el, index, arr) { return (neuronValue[neuronIdList.indexOf(el.nid)] > 3) });
+    logEventArr = newLogEventArr;
+    neuronListNumber = {};
+    neuronValue = [];
+    nidList = _.map(logEventArr, function(o){return o['nid']});
+    neuronList = nidList.filter(function (el, index, arr) { return index === arr.indexOf(el)});
+    
+    _.forEach(neuronList, function (value,key) {
+        neuronListNumber[value] = (_.partition(logEventArr, function(o){return o['nid'] == value})[0]).length;
+    });
+    neuronIdList = neuronList;
     neuronList = [];
     neuronIdList.map(function (value,index) {
         let num = 0;
@@ -203,7 +278,6 @@ class LogAnalysisCharts extends React.Component {
                 <td>Cluster ID</td>
                 <td>Time</td>
                 <td>Event</td>
-                <td>Anomaly</td>
               </tr>
               {logEventArr.map((event, iEvent) => {
                 let showNumber = neuronList.indexOf(iEvent);
@@ -211,17 +285,16 @@ class LogAnalysisCharts extends React.Component {
                 let realAnomalies = _.filter(anomalies, a => a.val>0);
                 let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
                 let nAnomaly = realAnomalies.indexOf(anomaly)+1;
-                let nAnomalyStr = "";
-                let topKPatterns = "";
-                if(nAnomaly){
-                  nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
-                }
+                let topKEpisodes = "";
+                let topKWords = "";
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let isAnomaly = "";
-                if(event.nid==-1){
-                  isAnomaly = "Anomaly Cluster";
-                }else{
-                  topKPatterns = _.find(clusterTopPatternArr, p => p.nid == event.nid).topK;
+                topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
+                if(topKEpisodes.length>0){
+                  topKEpisodes="Top frequent episodes: " + topKEpisodes;
+                }
+                topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+                if(topKWords.length>0){
+                  topKWords="Top words: " + topKWords;
                 }
                 return (
                   <tr key={iEvent}>
@@ -229,14 +302,13 @@ class LogAnalysisCharts extends React.Component {
                     <td rowSpan={neuronValue[showNumber]}>
                         Cluster {iGroup} <br />
                         Number of events: {neuronValue[iGroup-1]} <br />
-                        {isAnomaly} <br />
-                        {topKPatterns}
+                        {topKWords} <br />
+                        {topKEpisodes}
                     </td>:
                       ""
                     }
                     <td>{timestamp}</td>
                     <td>{event.rawData}</td>
-                    <td>{event.anomaly}<br />{nAnomalyStr}</td>
                   </tr>
                 )
               })}              
@@ -287,24 +359,17 @@ class LogAnalysisCharts extends React.Component {
            <div className="ui pointing secondary menu">
                <a className={tabStates['event'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
-               <a className={tabStates['episode'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episodes</a>
-               <a className={tabStates['word'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'word')}>Word Count</a>
+               <a className={tabStates['anomaly'] + ' item'}
+                  onClick={(e) => this.selectTab(e, 'anomaly')}>Anomaly List</a>
            </div>
            <div className={tabStates['event'] + ' ui tab '}>
               {tabStates['event'] === 'active' ? (
                 self.renderEventTable()
               ) : null}
            </div>
-           <div className={tabStates['episode'] + ' ui tab '}>
-              {tabStates['episode'] === 'active' ? (
-                self.renderEpisodeMapTable()
-              ) : null}
-           </div>
-           <div className={tabStates['word'] + ' ui tab '}>
-              {tabStates['word'] === 'active' ? (
-                self.renderWordCountTable()
+           <div className={tabStates['anomaly'] + ' ui tab '}>
+              {tabStates['anomaly'] === 'active' ? (
+                self.renderAnomalyTable()
               ) : null}
            </div>
         </div>
