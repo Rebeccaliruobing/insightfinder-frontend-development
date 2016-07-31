@@ -39,8 +39,9 @@ class EventTableGroup extends React.Component {
   @autobind
   handleHighlight(word) {
     return () => {
+      const current = this.state.selectedWords;
       this.setState({
-        selectedWords: word,
+        selectedWords: word === current ? '' : word,
       });
     }
   }
@@ -49,7 +50,7 @@ class EventTableGroup extends React.Component {
   highlightKWord(rawData) {
     const word = this.state.selectedWords;
     if (!!word) {
-      var regex = new RegExp( '(' + word + ')', 'mgi' );
+      var regex = new RegExp( '\\b(' + word + ')\\b', 'mgi' );
       return rawData.replace(regex, '<span class="highlight">$1</span>');
     }
 
