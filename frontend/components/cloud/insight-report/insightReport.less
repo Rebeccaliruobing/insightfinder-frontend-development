@@ -1,7 +1,7 @@
 .insight-basic-stats {
   border-bottom: 1px solid #666666;
   padding-bottom: 30px;
-  h3{
+  h3 {
     margin-top: 40px;
   }
   .insight-basic-charts {
@@ -10,13 +10,14 @@
     display: flex;
   }
 }
-.insight-basic-top{
-    text-align: center;
-    h3{
-      font-size: 40px;
-      margin-bottom: 25px;
-    }
+
+.insight-basic-top {
+  text-align: center;
+  h3 {
+    font-size: 40px;
+    margin-bottom: 25px;
   }
+}
 
 .insight-anomalies {
   display: inline-block;
@@ -33,7 +34,28 @@
   border-bottom: 1px solid #666666;
   padding-bottom: 30px;
 }
-.insight-pieTick-base{
+
+.insight-pieTick-base {
   .insight-barchart-base;
   border-bottom: none;
+}
+
+.anomaly-source-h3 {
+  color: #3398db;
+  font-family: Arial;
+}
+
+.circle-charts {
+  float: left;
+  border-radius: 50%;
+  border: 1px dashed #3398db;
+  height: 300px;
+  width: 300px;
+  position: relative;
+  margin-left: 270px;
+  .circle-absolute {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+  }
 }

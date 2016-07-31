@@ -25,7 +25,7 @@ class PieTickChart extends React.Component {
         let {title,name,data} = this.props;
         let seriesData = JSON.parse(data);
         var optionData = {
-            color:['#00448a','#0580b9','#28c6b9','#84e6f1','#dddddd'],
+            color:['#00448a','#0580b9','#28c6b9','#84e6f1','#dddddd','00bfdb','57b43b'],
             title: {
                 text: title,
                 x: 'center'
@@ -51,8 +51,12 @@ class PieTickChart extends React.Component {
         let seriesData = JSON.parse(data);
         if ((_.keysIn(seriesData)).length == 0) {
             return (
-                <div>
-                    1
+                <div style={{'height': '300px',width: '40%'}}>
+                    <div className="circle-charts">
+                        <div className="circle-absolute">
+                            No Anomaly
+                        </div>
+                    </div>
                 </div>
             )
         }
@@ -88,7 +92,9 @@ class BarChart extends React.Component {
         let {title,data,useData,colorChart} = this.props;
         let optionData = {
             title: {
-                text: title
+                text: title,
+                x: 'center',
+                y: 'bottom'
             },
             color: [colorChart],
             tooltip: {
@@ -100,7 +106,7 @@ class BarChart extends React.Component {
             grid: {
                 left: '3%',
                 right: '4%',
-                bottom: '3%',
+                bottom: '15%',
                 containLabel: true
             },
             xAxis: [
@@ -168,7 +174,7 @@ class PieChart extends React.Component {
 
     getOption() {
         let {data,dataValue,colorChart} = this.props;
-        let fontSize = (dataValue.length > 2 ? 70 - dataValue.length * 2 : 70) + '';
+        let fontSize = (dataValue.length > 2 ? 70 - dataValue.length * 6 : 70) + '';
         var labelFromatter = {
             normal: {
                 label: {
@@ -199,7 +205,7 @@ class PieChart extends React.Component {
                 x: 'center',
                 y: 'bottom',
                 itemGap: 50,
-                textStyle: {fontWeight: 'bold', fontSize: '25'},
+                textStyle: {fontWeight: 'bold', fontSize: '15'},
                 data: [data]
             },
             series: [
@@ -286,10 +292,9 @@ class InsightReport extends BaseComponent {
             this.setState({loading: false,projectName: data['projectName']});
         });
     }
-
     render() {
-        let pieChartLeft = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
-        let pieChartRight = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
+        let pieChartLeft = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
+        let pieChartRight = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
         const {showAddPanel,projectName,detailData,loadingIndex,tabStates} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
@@ -327,6 +332,9 @@ class InsightReport extends BaseComponent {
                                         if (value == 'Host') {
                                             name = "Host";
                                         }
+                                        else if(value == "NumberOfInstances"){
+                                            name = "Instances";
+                                        }
                                         else if (value == "AvgMetricUptime") {
                                             name = "Avg Metric Uptime";
                                             dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed(0)).toString()+"%");
@@ -340,40 +348,55 @@ class InsightReport extends BaseComponent {
                                 </div>
                             </div>
                             <div className="insight-barchart-base">
-                                  <div className="insight-anomalies">
-                                    <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
-                                              data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
-                                              colorChart="#3398DB"
-                                              useData={true}/>
-
-                                    <BarChart title="Avg Duration" pieChartStyle={pieChartLeft}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
-                                              colorChart="#00bfdb"
-                                              useData={true}/>
-
-                                    <BarChart title="Avg Degree" pieChartStyle={pieChartLeft}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
-                                              colorChart="#57b43b"
-                                              useData={true}/>
-
+                                  <div className="ui pointing secondary menu">
+                                    <a className={tabStates['date'] + ' item'}
+                                       onClick={(e) => this.selectTab(e, 'date')}>By Date</a>
+                                    <a className={tabStates['dow'] + ' item'}
+                                       onClick={(e) => this.selectTab(e, 'dow')}>By Day-of-Week</a>
                                   </div>
-                                  <div className="insight-anomalies">
-                                    <BarChart title="Anomaly Count" pieChartStyle={pieChartRight}
-                                              data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}
-                                              colorChart="#3398DB"/>
 
-                                    <BarChart title="Avg Duration" pieChartStyle={pieChartRight}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
-                                              colorChart="#00bfdb"/>
+                                  <div className={tabStates['date'] + ' ui tab '}>
+                                    {tabStates['date'] === 'active' ?
+                                        <div className="insight-anomalies">
+                                            <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
+                                                      colorChart="#3398DB"
+                                                      useData={true}/>
 
-                                    <BarChart title="Avg Degree" pieChartStyle={pieChartRight}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}
-                                              colorChart="#57b43b"/>
+                                            <BarChart title="Avg Duration" pieChartStyle={pieChartLeft}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
+                                                      colorChart="#00bfdb"
+                                                      useData={true}/>
 
+                                            <BarChart title="Avg Degree" pieChartStyle={pieChartLeft}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
+                                                      colorChart="#57b43b"
+                                                      useData={true}/>
+                                      </div>
+                                        : null}
                                   </div>
+                                <div className={tabStates['dow'] + ' ui tab '}>
+                                    {tabStates['dow'] === 'active' ?
+                                          <div className="insight-anomalies">
+                                            <BarChart title="Anomaly Count" pieChartStyle={pieChartRight}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}
+                                                      colorChart="#3398DB"/>
+
+                                            <BarChart title="Avg Duration" pieChartStyle={pieChartRight}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
+                                                      colorChart="#00bfdb"/>
+
+                                            <BarChart title="Avg Degree" pieChartStyle={pieChartRight}
+                                                      data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}
+                                                      colorChart="#57b43b"/>
+
+                                          </div>
+                                        : null}
+                                  </div>
+
                             </div>
                             <div className="insight-pieTick-base">
-                                <div className="insight-basic-top"><h3>Anomaly Source</h3></div>
+                                <div className="insight-basic-top"><h3 className="anomaly-source-h3">Anomaly Source</h3></div>
                                 <div className="insight-anomaly-source">
                                     <PieTickChart title="Metric Attribution (frequency)" name="Metric"
                                                   data={chartsData['anomalySources']['countByMetric']}/>
