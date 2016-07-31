@@ -167,6 +167,8 @@ class LogAnalysisCharts extends React.Component {
     if (!this.dp) return;
     let anomalies = this.dp.anomalies["0"];
     let logEventArr = this.dp.logEventArr;
+    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
+    let clusterTopWordArr = this.dp.clusterTopWordArr;
     let neuronListNumber = {};
     let neuronValue = [];
     let nidList = _.map(logEventArr, function(o){return o['nid']});
@@ -195,20 +197,42 @@ class LogAnalysisCharts extends React.Component {
               <tr>
                 <td>Time</td>
                 <td>Event</td>
-                <td>Anomaly</td>
+                <td>Anomaly Hint</td>
               </tr>
               {logEventArr.map((event, iEvent) => {
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
                 let anomalyString = event.anomaly;
+                let topKEpisodes = "";
+                let topKWords = "";
+                let pos = 0;
                 if(anomalyString == 'Normal'){
-                  // from small cluster, show frequency
-                  anomalyString = '';
+                  anomalyString = "";
+                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
+                  if(topKEpisodes.length>0){
+                    var entries = topKEpisodes.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if(pos!=-1){
+                        anomalyString += entry.substring(0,pos) + ' ';
+                      }
+                    });
+                  }
+                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+                  if(topKWords.length>0){
+                    var entries = topKWords.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if(pos!=-1){
+                        anomalyString += entry.substring(0,pos) + ' ';
+                      }
+                    });
+                  }
                 }
                 return (
                   <tr key={iEvent}>
                     <td>{timestamp}</td>
                     <td>{event.rawData}</td>
-                    <td>{event.anomaly}</td>
+                    <td>{anomalyString}</td>
                   </tr>
                 )
               })}              
