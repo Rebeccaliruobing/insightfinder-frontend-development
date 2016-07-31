@@ -201,13 +201,6 @@ class PieChart extends React.Component {
             }
         };
         var option = {
-            legend: {
-                x: 'center',
-                y: 'bottom',
-                itemGap: 50,
-                textStyle: {fontWeight: 'bold', fontSize: '15'},
-                data: [data]
-            },
             series: [
                 {
                     type: 'pie',
@@ -226,11 +219,16 @@ class PieChart extends React.Component {
 
     render() {
         return (
+            <div style={{'width': '25%'}}>
             <ReactEcharts
                 option={this.getOption()}
-                style={{height: '300px', width: '25%'}}
+                style={{height: '300px', width: '100%'}}
                 className='echarts-for-echarts'
                 theme='my_theme'/>
+                <div style={{'textAlign': 'center'}}>
+                    <span style={{'color':this.props.colorChart,'fontSize': '25px','fontWeight': 'bold'}}>{this.props.data}</span>
+                </div>
+            </div>
         )
     }
 }
