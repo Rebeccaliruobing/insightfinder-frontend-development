@@ -227,7 +227,7 @@ class LogAnalysisCharts extends React.Component {
                   <tr key={iEvent}>
                     {showNumber!=-1?
                     <td rowSpan={neuronValue[showNumber]}>
-                        Cluser {iGroup} <br />
+                        Cluster {iGroup} <br />
                         Number of events: {neuronValue[iGroup-1]} <br />
                         {isAnomaly} <br />
                         {topKPatterns}

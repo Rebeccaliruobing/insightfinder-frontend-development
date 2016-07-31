@@ -240,8 +240,21 @@ class InsightReport extends BaseComponent {
             showAddPanel: true,
             loadingIndex: true,
             projectName: undefined,
-            detailData: {}
+            detailData: {},
+            tabStates: {
+                date: 'active',
+                dow: ''
+            }
         };
+    }
+
+    selectTab(e, tab) {
+        var tabStates = this.state['tabStates'];
+        tabStates = _.mapValues(tabStates, function (val) {
+            return '';
+        });
+        tabStates[tab] = 'active';
+        this.setState({tabStates: tabStates});
     }
 
     handleToggleFilterPanel() {
@@ -277,7 +290,7 @@ class InsightReport extends BaseComponent {
     render() {
         let pieChartLeft = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
         let pieChartRight = {'marginLeft': '10px', 'height': '200px', 'width': '32%', 'float': 'left'};
-        const {showAddPanel,projectName,detailData,loadingIndex} = this.state;
+        const {showAddPanel,projectName,detailData,loadingIndex,tabStates} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
         return (
@@ -307,8 +320,7 @@ class InsightReport extends BaseComponent {
                         {chartsData?
                         <div>
                             <div className="insight-basic-stats">
-                                <div className="ingight-basic-top"><h3>Basic Stats</h3></div>
-                                <div className="ingight-basic-charts">
+                                <div className="insight-basic-charts">
                                     {_.keys(chartsData['basicProjectStats']).map(function (value, index) {
                                         let name = "";
                                         let dataValue = (chartsData['basicProjectStats'][value]).toString();
@@ -317,62 +329,61 @@ class InsightReport extends BaseComponent {
                                         }
                                         else if (value == "AvgMetricUptime") {
                                             name = "Avg Metric Uptime";
-                                            dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed()).toString()).substr(0,2);
+                                            dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed(0)).toString()+"%");
                                         }
                                         else if (value.indexOf('NumberOf') != -1) {
                                             name = "Avg # of " + value.split("NumberOf")[1];
                                         }
-                                        return <PieChart key={index} colorChart="#e5cf0d" data={name}
+                                        return <PieChart key={index} colorChart="#3398DB" data={name}
                                                          dataValue={dataValue}/>
                                     })}
                                 </div>
                             </div>
                             <div className="insight-barchart-base">
-                                <div className="ingight-basic-top"><h3>Anoamlies</h3></div>
-                                <div className="insight-anomlies">
-                                    <BarChart title="Anomaly Count by Day" pieChartStyle={pieChartLeft}
+                                  <div className="insight-anomalies">
+                                    <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
                                               data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
                                               colorChart="#3398DB"
                                               useData={true}/>
 
-                                    <BarChart title="Avg Anomaly Duration by Day" pieChartStyle={pieChartLeft}
+                                    <BarChart title="Avg Duration" pieChartStyle={pieChartLeft}
                                               data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
-                                              colorChart="#3398DB"
+                                              colorChart="#00bfdb"
                                               useData={true}/>
 
-                                    <BarChart title="Avg Anomaly Degree by Day" pieChartStyle={pieChartLeft}
+                                    <BarChart title="Avg Degree" pieChartStyle={pieChartLeft}
                                               data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
-                                              colorChart="#3398DB"
+                                              colorChart="#57b43b"
                                               useData={true}/>
 
-                                </div>
-                                <div className="insight-anomlies">
-                                    <BarChart title="Avg Anomaly Duration by Day-Of-Week" pieChartStyle={pieChartRight}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
-                                              colorChart="#3398DB"/>
-
-                                    <BarChart title="Anomaly Count by Day-Of-Week" pieChartStyle={pieChartRight}
+                                  </div>
+                                  <div className="insight-anomalies">
+                                    <BarChart title="Anomaly Count" pieChartStyle={pieChartRight}
                                               data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}
                                               colorChart="#3398DB"/>
 
-                                    <BarChart title="Avg Anomaly Degree by Day-Of-Week" pieChartStyle={pieChartRight}
-                                              data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}
-                                              colorChart="#3398DB"/>
+                                    <BarChart title="Avg Duration" pieChartStyle={pieChartRight}
+                                              data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
+                                              colorChart="#00bfdb"/>
 
-                                </div>
+                                    <BarChart title="Avg Degree" pieChartStyle={pieChartRight}
+                                              data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}
+                                              colorChart="#57b43b"/>
+
+                                  </div>
                             </div>
                             <div className="insight-pieTick-base">
-                                <div className="ingight-basic-top"><h3>Anomaly Source</h3></div>
+                                <div className="insight-basic-top"><h3>Anomaly Source</h3></div>
                                 <div className="insight-anomaly-source">
-                                    <PieTickChart title="Anomaly Frequency by Metric" name="Metric"
+                                    <PieTickChart title="Metric Attribution (frequency)" name="Metric"
                                                   data={chartsData['anomalySources']['countByMetric']}/>
-                                    <PieTickChart title="Anomaly Frequency by Instance" name="Instance"
+                                    <PieTickChart title="Instance Attribution (frequency)" name="Instance"
                                                   data={chartsData['anomalySources']['countByInstance']}/>
                                 </div>
                                 <div className="insight-anomaly-source">
-                                    <PieTickChart title="Anomaly Degree by Metric" name="Metric"
+                                    <PieTickChart title="Metric Attribution (degree)" name="Metric"
                                                   data={chartsData['anomalySources']['degreeByMetric']}/>
-                                    <PieTickChart title="Anomaly Degree by Instance" name="Instance"
+                                    <PieTickChart title="Instance Attribution (degree)" name="Instance"
                                                   data={chartsData['anomalySources']['degreeByInstance']}/>
                                 </div>
                             </div>

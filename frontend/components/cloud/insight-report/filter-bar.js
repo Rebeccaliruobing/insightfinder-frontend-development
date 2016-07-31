@@ -4,7 +4,7 @@ import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  ProjectSelection,
+  LiveProjectSelection,
   ModelType,
   WindowWithWeek,
   AnomalyThreshold,
@@ -86,7 +86,7 @@ export default  class FilterBar extends Component {
         <div className="five fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
-            <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <LiveProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>
