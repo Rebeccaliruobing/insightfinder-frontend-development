@@ -61,7 +61,6 @@ class LiveAnalysisCharts extends React.Component {
 
     // Cache the data, and recalculate it if changed.
     let { data, loading, onRefresh, ...rest } = this.props;
-
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
@@ -76,6 +75,13 @@ class LiveAnalysisCharts extends React.Component {
       this.groups = this.dp.groupsData || [];
       this.groupMetrics = this.dp.groupmetrics || null;
       this._data = data;
+      this.periodString = data.periodString.split(",").map(function (value,index) {
+            if(index%2 == 1){
+              if(Number.parseInt(value)!=-1){
+                return Number.parseInt(value);
+              }
+            }
+          });
     }
   }
 
@@ -95,7 +101,7 @@ class LiveAnalysisCharts extends React.Component {
     const dataArray = this.causalDataArray;
     const types = this.causalTypes;
     const groups = this.groups;
-
+    const periodString = _.compact(this.periodString);
     return (
       <Console.Wrapper>
         <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -147,6 +153,7 @@ class LiveAnalysisCharts extends React.Component {
                 {!!groups &&
                 <DataGroupCharts
                   key={view + '_group_charts'}
+                  period={periodString}
                   groups={groups} view={view} columns={columns}
                   onDateWindowChange={this.handleDateWindowSync}
                   dateWindow={this.state['chartDateWindow']}

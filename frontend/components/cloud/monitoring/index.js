@@ -106,7 +106,7 @@ class LiveMonitoring extends BaseComponent {
   render() {
     const {addedProjects, showAddPanel, showSettings} = this.state;
     const userInstructions = this.context.userInstructions;
-    
+
     const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
 
     return (
