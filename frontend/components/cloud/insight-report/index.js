@@ -26,6 +26,7 @@ class PieTickChart extends React.Component {
         let {title,name,data} = this.props;
         let seriesData = JSON.parse(data);
         var optionData = {
+            // FIXME: add 11 colors here
             color:['#C13100','#CC6600','#FF9900','#C74C00','#E68000'],
             title: {
                 text: title,
@@ -386,7 +387,7 @@ class InsightReport extends BaseComponent {
                                             if(value == "NumberOfInstances"){
                                                 name = "Num of Instances";
                                             } else if (value == "NumberOfContainers") {
-                                                name = "Avg Num of Containers";
+                                                name = "Num of Containers";
                                             } else if (value == "NumberOfMetrics") {
                                                 name = "Num of Metrics";
                                             } else if (value == "AvgMetricUptime") {

@@ -388,7 +388,8 @@ class LogAnalysisCharts extends React.Component {
                 let topKEpisodes = "";
                 let topKWords = "";
                 let pos = 0;
-                if(anomalyString == 'Normal'){
+                let clusterFeature = "";
+                if(anomalyString == undefined){
                   anomalyString = "";
                   topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
                   if(topKEpisodes.length>0){
@@ -416,6 +417,7 @@ class LogAnalysisCharts extends React.Component {
                     <td>{timestamp}</td>
                     <td>{event.rawData}</td>
                     <td>{anomalyString}</td>
+                    <td>{clusterFeature}</td>
                   </tr>
                 )
               })}              

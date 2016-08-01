@@ -28,7 +28,7 @@ export default  class FilterBar extends Component {
     super(props);
     this.state = {
       projectName: '',
-      pvalue: 0.95,
+      pvalue: 0.99,
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
@@ -90,7 +90,7 @@ export default  class FilterBar extends Component {
       projectName,
       modelType: 'Holistic',
       modelTypeText: 'Holistic',
-      pvalue: 0.95,
+      pvalue: 0.9,
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0

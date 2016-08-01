@@ -166,7 +166,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {period.length!=0?<span title={periodList}>{group.metrics+' (Period: '+JSON.stringify(period)+')'}</span>:group.metrics}</h4>
+                  <h4 className="ui header">Metric {period.length!=0?<span title={periodList}>{group.metrics+' (period list: '+JSON.stringify(period)+')'}</span>:group.metrics}</h4>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}

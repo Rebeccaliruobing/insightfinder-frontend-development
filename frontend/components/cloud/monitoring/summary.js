@@ -99,7 +99,7 @@ class ProjectSummary extends BaseComponent {
 
     if (data && this.data !== data) {
       this.sdata = new DataParser(data).getSummaryData();
-      this.data = data;
+      data = this.data;
     }
     let periodLength = (_.compact(data.periodString)).length;
     let sdata = this.sdata;
