@@ -164,7 +164,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {group.metrics} (Group {group.groupId})</h4>
+                  <h4 className="ui header">Metric {group.metrics}</h4>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
@@ -194,7 +194,7 @@ export class DataGroupCharts extends React.Component {
                 }
                 }>
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-                    <h4 className="ui header">Metric {selectedGroup.metrics} (Group {selectedGroup.groupId})</h4>
+                    <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
                       enableAnnotations={true} data={selectedGroup}
                     />
