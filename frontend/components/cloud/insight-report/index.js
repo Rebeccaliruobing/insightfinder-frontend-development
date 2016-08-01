@@ -25,7 +25,7 @@ class PieTickChart extends React.Component {
         let {title,name,data} = this.props;
         let seriesData = JSON.parse(data);
         var optionData = {
-            color:['#00448a','#0580b9','#28c6b9','#84e6f1','#dddddd','00bfdb','57b43b'],
+            color:['#FF9900','#FFCC00','#CC6600','#C13100'],
             title: {
                 text: title,
                 x: 'center'
@@ -330,16 +330,15 @@ class InsightReport extends BaseComponent {
                                         let dataValue = (chartsData['basicProjectStats'][value]).toString();
                                         if (value == 'Host') {
                                             name = "Host";
-                                        }
-                                        else if(value == "NumberOfInstances"){
-                                            name = "Instances";
-                                        }
-                                        else if (value == "AvgMetricUptime") {
+                                        } else if(value == "NumberOfInstances"){
+                                            name = "Instance(s)";
+                                        } else if (value == "NumberOfAnomalies24Hr") {
+                                            name = "Anomalies in Past 24Hr";
+                                        } else if (value == "AvgMetricUptime") {
                                             name = "Avg Metric Uptime";
-                                            dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed(0)).toString()+"%");
-                                        }
-                                        else if (value.indexOf('NumberOf') != -1) {
-                                            name = "Avg # of " + value.split("NumberOf")[1];
+                                            dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed(1)).toString()+"%");
+                                        } else if (value.indexOf('NumberOf') != -1) {
+                                            name = "Avg Number of " + value.split("NumberOf")[1];
                                         }
                                         return <PieChart key={index} colorChart="#3398DB" data={name}
                                                          dataValue={dataValue}/>
@@ -359,17 +358,17 @@ class InsightReport extends BaseComponent {
                                         <div className="insight-anomalies">
                                             <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
-                                                      colorChart="#3398DB"
+                                                      colorChart="#FF9900"
                                                       useData={true}/>
 
-                                            <BarChart title="Avg Duration" pieChartStyle={pieChartLeft}
+                                            <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
-                                                      colorChart="#00bfdb"
+                                                      colorChart="#FFCC00"
                                                       useData={true}/>
 
-                                            <BarChart title="Avg Degree" pieChartStyle={pieChartLeft}
+                                            <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
-                                                      colorChart="#57b43b"
+                                                      colorChart="#FFFF66"
                                                       useData={true}/>
                                       </div>
                                         : null}
@@ -379,15 +378,15 @@ class InsightReport extends BaseComponent {
                                           <div className="insight-anomalies">
                                             <BarChart title="Anomaly Count" pieChartStyle={pieChartRight}
                                                       data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}
-                                                      colorChart="#3398DB"/>
+                                                      colorChart="#FF9900"/>
 
                                             <BarChart title="Avg Duration" pieChartStyle={pieChartRight}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
-                                                      colorChart="#00bfdb"/>
+                                                      colorChart="#FFCC00"/>
 
                                             <BarChart title="Avg Degree" pieChartStyle={pieChartRight}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDegreeByDayOfWeek']}
-                                                      colorChart="#57b43b"/>
+                                                      colorChart="#FFFF66"/>
 
                                           </div>
                                         : null}
