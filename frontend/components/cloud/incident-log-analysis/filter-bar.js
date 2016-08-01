@@ -6,7 +6,7 @@ import store from 'store';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  FileReplayProjectSelection,
+  LogFileReplayProjectSelection,
   LogModelType,
   DurationHour,
   AnomalyThreshold,
@@ -28,8 +28,8 @@ export default  class FilterBar extends Component {
     super(props);
     this.state = {
       projectName: '',
-      pvalue: 0.99,
-      cvalue: 5,
+      pvalue: 0.95,
+      cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
       durationHours: 24,
@@ -52,7 +52,7 @@ export default  class FilterBar extends Component {
   componentDidMount() {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.isStationary);
+    projects = projects.filter((item,index) =>  item.fileProjectType == 0);
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
@@ -86,7 +86,15 @@ export default  class FilterBar extends Component {
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      pvalue: 0.95,
+      cvalue: 1,
+      minPts: 5,
+      epsilon: 1.0
+    };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
@@ -286,7 +294,7 @@ export default  class FilterBar extends Component {
       this.context.root.loadUserValues().then(()=> {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-          projects = projects.filter((item,index) => item.isStationary);
+          projects = projects.filter((item,index) =>  item.fileProjectType == 0);
           if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName, projects[0].projectName);
           }
@@ -331,7 +339,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Name</label>
-            <FileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <LogFileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Type</label>

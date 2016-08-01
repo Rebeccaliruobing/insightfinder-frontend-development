@@ -300,6 +300,7 @@ class InsightReport extends BaseComponent {
         const {showAddPanel,projectName,detailData,loadingIndex,tabStates} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
+        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgMetricUptime"];
         return (
             <Console.Content className={loadingIndex?"ui form loading":""}>
                 {loadingIndex ? null :
@@ -328,23 +329,26 @@ class InsightReport extends BaseComponent {
                         <div>
                             <div className="insight-basic-stats">
                                 <div className="insight-basic-charts">
-                                    {_.keys(chartsData['basicProjectStats']).map(function (value, index) {
+                                    {basicStatsKeys.map(function (value, index) {
                                         let name = "";
-                                        let dataValue = (chartsData['basicProjectStats'][value]).toString();
-                                        if (value == 'Host') {
-                                            name = "Host";
-                                        } else if(value == "NumberOfInstances"){
-                                            name = "Num of Instances";
-                                        } else if (value == "NumberOfContainers") {
-                                            name = "Avg Num of Containers";
-                                        } else if (value == "NumberOfMetrics") {
-                                            name = "Num of Metrics";
-                                        } else if (value == "AvgMetricUptime") {
-                                            name = "Avg Metric Uptime";
-                                            dataValue = (((chartsData['basicProjectStats'][value] * 100).toFixed(1)).toString()+"%");
-                                        }
-                                        return <PieChart key={index} colorChart="#3398DB" data={name}
+                                        let dataItem = chartsData['basicProjectStats'][value];
+                                        if(dataItem==undefined){
+                                            return null;
+                                        } else {
+                                            let dataValue = dataItem.toString();
+                                            if(value == "NumberOfInstances"){
+                                                name = "Num of Instances";
+                                            } else if (value == "NumberOfContainers") {
+                                                name = "Avg Num of Containers";
+                                            } else if (value == "NumberOfMetrics") {
+                                                name = "Num of Metrics";
+                                            } else if (value == "AvgMetricUptime") {
+                                                name = "Avg Metric Uptime";
+                                                dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
+                                            }
+                                            return <PieChart key={index} colorChart="#3398DB" data={name}
                                                          dataValue={dataValue}/>
+                                        }
                                     })}
                                 </div>
                             </div>
@@ -383,7 +387,7 @@ class InsightReport extends BaseComponent {
                                                       data={chartsData['anomalyTimeseries']['AnomalyCountByDayOfWeek']}
                                                       colorChart="#C13100"/>
 
-                                            <BarChart title="Avg Duration" pieChartStyle={pieChartRight}
+                                            <BarChart title="Avg Duration (min)" pieChartStyle={pieChartRight}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDurationByDayOfWeek']}
                                                       colorChart="#CC6600"/>
 

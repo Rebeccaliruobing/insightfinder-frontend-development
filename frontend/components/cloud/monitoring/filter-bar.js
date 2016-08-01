@@ -49,7 +49,15 @@ export default  class FilterBar extends Component {
     
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      anomalyThreshold: 0.99,
+      durationThreshold: 5,
+      minPts: 5,
+      epsilon: 1.0
+    };
     switch (dataType) {
       case 'AWS':
       case 'EC2':

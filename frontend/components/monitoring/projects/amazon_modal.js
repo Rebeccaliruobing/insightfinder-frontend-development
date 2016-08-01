@@ -85,13 +85,6 @@ class AmazonProjectModal extends React.Component {
               <label>Secret Access Key*</label>
               <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
             </div>
-            <div className="inline field" style={{fontSize: 13}}>
-              <div className="ui checkbox">
-                <input type="checkbox" tabIndex="0"
-                       onChange={(e) => this.setState({hasAgentData: e.target.checked})} />
-                <label>Enable agent monitoring</label>
-              </div>
-            </div>
           </form>
         </div>
         <div className="actions">

@@ -85,7 +85,15 @@ export default  class FilterBar extends Component {
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      anomalyThreshold: 0.99,
+      durationThreshold: 5,
+      minPts: 5,
+      epsilon: 1.0
+    };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {

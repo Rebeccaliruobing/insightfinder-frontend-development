@@ -10,7 +10,7 @@ export default function (props) {
       <div className="ui vertical menu text icon-menu">
         {['admin','guest'].indexOf(store.get('userName'))!=-1?
           <Link to="/cloud/insight-report" className="item text-white">
-            <i className="zoom icon"></i>
+            <i className="bar chart icon"></i>
             <span> Insight Report </span>
           </Link>
             :null
