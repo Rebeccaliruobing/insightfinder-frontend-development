@@ -4,7 +4,6 @@ import store from 'store';
 
 export default function (props) {
   // <Link to="/cloud/display-model" className="item">Display Model</Link>
-  console.log(['admin','guest'].indexOf(store.get('userName')));
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
