@@ -8,6 +8,7 @@ import _ from 'lodash';
 import apis from '../../../apis';
 import FilterBar from './filter-bar';
 import './insightReport.less';
+import moment from 'moment';
 
 class PieTickChart extends React.Component {
     static propTypes = {
@@ -35,7 +36,7 @@ class PieTickChart extends React.Component {
                 {
                     name: name,
                     type: 'pie',
-                    radius: '80%',
+                    radius: '73%',
                     center: ['50%', '60%'],
                     data: _.keysIn(seriesData).map(function (value, index) {
                         return {value: seriesData[value], name: value}
@@ -67,7 +68,7 @@ class PieTickChart extends React.Component {
             return (
                 <ReactEcharts
                     option={this.getOption()}
-                    style={{height: '300px', width: '50%'}}
+                    style={{height: '350px', width: '50%'}}
                     className='echarts-for-echarts'
                     theme='my_theme'/>
 
@@ -90,9 +91,36 @@ class BarChart extends React.Component {
         useData: false,
         colorChart: '#3398DB'
     };
-
+    setDate(data){
+        let theDate = new Date(data);
+        let m = theDate.getMonth()+1;
+        let d = theDate.getDate();
+        m = m>9?m:'0'+m;
+        d = d>9?d:'0'+d;
+        return m+'/'+ d;
+    }
+    setDateAdd(data){
+        let theDate = new Date(data);
+        let m = theDate.getMonth()+1;
+        let d = theDate.getDate();
+        let y = theDate.getFullYear();
+        m = m>9?m:'0'+m;
+        d = d>9?d:'0'+d;
+        return y+ m + d;
+    }
     getOption() {
         let {title,data,useData,colorChart} = this.props;
+        let momentDateListSort = undefined;
+        let momentDateList = undefined;
+        let self = this;
+        if(useData){
+            momentDateList = _.keysIn(data).map(function (value,index) {
+                return moment(value, "YYYYMMDD").format();
+            });
+            momentDateListSort = momentDateList.sort(function (v1,v2) {
+                return (new Date(v1)).getTime() - (new Date(v2)).getTime()
+            });
+        }
         let optionData = {
             title: {
                 text: title,
@@ -115,7 +143,9 @@ class BarChart extends React.Component {
             xAxis: [
                 {
                     type: 'category',
-                    data: useData ? _.keysIn(data) : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                    data: useData ? momentDateListSort.map(function (value,index) {
+                        return self.setDate(value)
+                    }) : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                     axisTick: {
                         alignWithLabel: true
                     }
@@ -132,8 +162,8 @@ class BarChart extends React.Component {
                     //name: '直接访问',
                     type: 'bar',
                     barWidth: '60%',
-                    data: useData ? _.keysIn(data).map(function (value, index) {
-                        return data[value]
+                    data: useData ? momentDateListSort.map(function (value, index) {
+                        return data[self.setDateAdd(value)]
                     }) :
                         [
                             data['Sunday'] || 0,
@@ -278,7 +308,7 @@ class InsightReport extends BaseComponent {
     }
 
     getData(projectName = undefined) {
-        apis.postInsightReport().then((resp)=> {
+        apis.postInsightReport(false).then((resp)=> {
             this.setState({projectName: projectName, loadingIndex: false, detailData: resp.data});
         });
     }
@@ -294,6 +324,18 @@ class InsightReport extends BaseComponent {
             this.setState({loading: false,projectName: data['projectName']});
         });
     }
+    handleRefresh() {
+        $('#loadingRefresh').addClass('loading');
+        this.handleGetSummaryData(true);
+    }
+    handleGetSummaryData(forceReload){
+        let self = this;
+        apis.postInsightReport(forceReload).then((resp) => {
+            $('#loadingRefresh').removeClass('loading');
+            self.setState({loading: false,detailData: resp.data});
+        }).catch(()=> {
+        });
+    }
     render() {
         let pieChartLeft = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
         let pieChartRight = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
@@ -305,6 +347,11 @@ class InsightReport extends BaseComponent {
                 {loadingIndex ? null :
                     <div className="ui main tiny container loading" ref={c => this._el = c}>
                         <div className="ui clearing vertical segment">
+                            <ButtonGroup className="left floated">
+                            <Button id="loadingRefresh" className="labeled icon" onClick={this.handleRefresh.bind(this)}>
+                                <i className="icon refresh"/>Refresh
+                            </Button>
+                        </ButtonGroup>
                             <ButtonGroup className="right floated basic icon">
                                 <Button onClick={this.handleToggleFilterPanel.bind(this)}>
                                     <Popup position="bottom right">

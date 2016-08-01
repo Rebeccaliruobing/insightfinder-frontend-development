@@ -220,34 +220,41 @@ export default {
             }
         });
     },
-    postInsightReport(userName=store.get('userName'), token=store.get('token')){
+    postInsightReport(forceReload,userName=store.get('userName'), token=store.get('token')){
         return new Promise(function (resolve,reject) {
-            $.ajax({
-                type: 'POST',
-                url: $.fn.api.settings.api['insight report'],
-                data: $.param({userName, token}),
-                beforeSend: function (request) {
-                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-                    request.setRequestHeader("accept", 'application/json');
-                }
-            }).done(function (resp) {
-                var reportData = {'createDate': new Date()};
-                _.forEach(resp.data, function (value, key) {
-                    key = key.split(':');
-                    if (key.length == 3) {
-                        reportData[key[0] + "@" + key[2]] = value;
+            let currentResp = store.get('insightReportData');
+            if (!forceReload && currentResp) {
+                resolve(currentResp);
+            }
+            else{
+                $.ajax({
+                    type: 'POST',
+                    url: $.fn.api.settings.api['insight report'],
+                    data: $.param({userName, token}),
+                    beforeSend: function (request) {
+                        request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                        request.setRequestHeader("accept", 'application/json');
                     }
-                    else {
-                        reportData[key[0]] = value;
-                    }
-                });
-                resp['data'] = reportData;
-                resolve(resp);
-            }).fail(function (error) {
-                console.log(arguments);
-                console.log("Server Error", arguments);
-                reject(error);
-            })
+                }).done(function (resp) {
+                    var reportData = {'createDate': new Date()};
+                    _.forEach(resp.data, function (value, key) {
+                        key = key.split(':');
+                        if (key.length == 3) {
+                            reportData[key[0] + "@" + key[2]] = value;
+                        }
+                        else {
+                            reportData[key[0]] = value;
+                        }
+                    });
+                    resp['data'] = reportData;
+                    store.set('insightReportData', resp);
+                    resolve(resp);
+                }).fail(function (error) {
+                    console.log(arguments);
+                    console.log("Server Error", arguments);
+                    reject(error);
+                })
+        }
         })
     },
     /**
