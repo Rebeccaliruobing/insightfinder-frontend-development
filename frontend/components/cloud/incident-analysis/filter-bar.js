@@ -328,6 +328,7 @@ export default  class FilterBar extends Component {
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
+    const selectedIncident = incident;
     const labelStyle = {};
     let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
@@ -406,15 +407,19 @@ export default  class FilterBar extends Component {
                 let recsuffix = recorded?"(recorded)":"(manual)";
                 let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
                   +medstr+"], "+modelType+" "+recsuffix;
+                let selected = incident === selectedIncident;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
+                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                       style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
+                      <a className={"header padding5 incident-item " + (selected ? 'selected' : '')}
+                         title={tooltipcontent}
+                         style={{'minWidth': '574px'}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="ui padding10 mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
