@@ -331,6 +331,7 @@ export default  class FilterBar extends Component {
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
+    const selectedIncident = incident;
     let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
@@ -406,13 +407,18 @@ export default  class FilterBar extends Component {
                 let msdstr = msd.format("YYYY-MM-DD HH:mm");
                 let medstr = med.format("YYYY-MM-DD HH:mm");
                 let recsuffix = recorded?"(recorded)":"(manual)";
+                let selected = incident === selectedIncident;
                 let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
+                  <div className={"item " + (selected ? 'selected' : '')}
+                       key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                       style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
+                      <a className="header padding5 incident-item"
+                         title={tooltipcontent}
+                         style={{'minWidth': '574px', paddingLeft: 10}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
