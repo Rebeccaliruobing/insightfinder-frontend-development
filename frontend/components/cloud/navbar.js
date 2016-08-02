@@ -22,11 +22,7 @@ export default function (props) {
           <i className="zoom icon"></i>
           <span> Incident Triage </span>
         </Link>
-        <Link to="/cloud/outlier-detection" className="item text-white">
-          <i className="icon icon-icons01 iconfont "/>
-          <span> Cluster Outlier Detection</span>
-        </Link>
-        <Link to="/cloud/rollout-check" className="item text-white">
+        <Link to="/cloud/behavior-change-detection" className="item text-white">
           <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>
         </Link>
