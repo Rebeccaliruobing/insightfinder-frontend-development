@@ -26,7 +26,7 @@ export class Cloud extends React.Component {
 
 export const cloudRoute = (
     <Route component={Cloud} path="cloud">
-      <IndexRedirect to="monitoring" />
+      <IndexRedirect to="insight-report" />
       <Route component={InsightReport} path="insight-report" />
       <Route component={LiveMonitoring} path="monitoring" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
