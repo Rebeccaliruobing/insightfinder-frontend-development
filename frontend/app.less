@@ -79,9 +79,19 @@
 }
 
 .ui.list {
-  > .item .incident-item.selected,
-  > .item .incident-item:hover {
-    font-size: 1.2em;
+  > .incident.item {
+    &.selected:before {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 38px;
+      background-color: #F2711C;
+      top: 0;
+    }
+
+    &:hover {
+      background-color: rgba(0,0,0, 0.05) !important;
+    }
   }
 }
 
