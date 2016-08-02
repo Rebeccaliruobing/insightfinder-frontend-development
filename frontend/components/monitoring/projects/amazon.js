@@ -42,6 +42,8 @@ class AmazonProjects extends React.Component {
 
     handleModalClose = () => this.setState({showModal: false});
 
+    handleModalCancel = () => $('#btn-register').removeClass('loading');
+
     handleRemoveProject(projectName) {
         let {projectsList}= this.state;
         let self = this;
@@ -67,7 +69,7 @@ class AmazonProjects extends React.Component {
         let {projectsList} = this.state;
         return (
             <div className="ui attached">
-                <button className="ui small positive action button"
+                <button id="btn-register" className="ui small positive action button"
                         onClick={(e) => {this.setState({showModal: true});$(e.target).addClass('loading');}}>
                     <i className="icon plus"></i>Register
                 </button>
@@ -101,7 +103,7 @@ class AmazonProjects extends React.Component {
                 </table>
                 {
                     this.state.showModal &&
-                    <AmazonProjectModal onClose={this.handleModalClose}/>
+                    <AmazonProjectModal onClose={this.handleModalClose} onCancel={this.handleModalCancel}/>
                 }
             </div>
         )
