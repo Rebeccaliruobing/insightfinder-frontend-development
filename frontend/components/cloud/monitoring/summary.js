@@ -58,20 +58,20 @@ class ProjectSummary extends BaseComponent {
       .then(resp => {
         let update = {};
         if (resp.success) {
-          resp.data.periodString = resp.data.periodString.split(",").map(function (value,index) {
-            if(index%2 == 1){
-              if(Number.parseInt(value)!=-1){
-                return value;
-              }
-            }
-          });
+          // resp.data.periodString = resp.data.periodString.split(",").map(function (value,index) {
+          //   if(index%2 == 1){
+          //     if(Number.parseInt(value)!=-1){
+          //       return value;
+          //     }
+          //   }
+          // });
           update.data = resp.data;
           let storeRespData = {
             'anomalyConsolidatedString': resp.data.anomalyConsolidatedString,
             'anomalyString': resp.data.anomalyString,
             'detectionResults': resp.data.detectionResults,
             'detectSuccess': resp.data.detectSuccess,
-            'periodString': resp.data.periodString
+            // 'periodString': resp.data.periodString
           };
           store.set(key, storeRespData);
         } else {
@@ -101,7 +101,7 @@ class ProjectSummary extends BaseComponent {
       this.sdata = new DataParser(data).getSummaryData();
       data = this.data;
     }
-    let periodLength = (_.compact(data.periodString)).length;
+    let periodLength = 0;//(_.compact(data.periodString)).length;
     let sdata = this.sdata;
     return (
       <div className='ui card'

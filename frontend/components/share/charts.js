@@ -125,7 +125,9 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, period} = this.props;
+    //const { groups, view, columns, period} = this.props;
+    let period = [];
+    const { groups, view, columns} = this.props;
     const { selectedIndex } = this.state;
 
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
