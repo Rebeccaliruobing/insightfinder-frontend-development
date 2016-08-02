@@ -4,6 +4,7 @@ import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
 import {
+  ModelType,
   AnomalyThreshold,
   DurationThreshold,
 } from '../../selections';
@@ -23,11 +24,21 @@ export default  class FilterBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      anomalyThreshold: 0.99,
-      durationThreshold: 5,
+      pvalue: 0.99,
+      cvalue: 5,
+      minPts: 5,
+      epsilon: 1.0,
       startTime: moment().add(-1, 'w').toDate(),
-      endTime: moment().toDate()
+      endTime: moment().toDate(),
+      modelType: "Holistic",
+      modelTypeText: "Holistic",
+      modelTypeTextMap: {}
     };
+    this.state.modelTypeTextMap["Holistic"]= "Holistic";
+    this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
+    this.state.modelTypeTextMap["Split"]= "Split";
+    this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
+    this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
     this.handleRefresh = this.handleRefresh.bind(this);
   }
 
@@ -41,7 +52,75 @@ export default  class FilterBar extends Component {
 
       let nameField = item.modelName ? 'Model Name' : 'Project Name';
       let nameFieldName = item.modelName ? 'modelName' : 'projectName';
+      let startTime= moment(startTime).toDate(),
+      let endTime= moment(endTime).toDate(),
+      let cvalue= parseInt(item.cvalue),
+      let pvalue= parseFloat(item.pvalue),
+      let minPts= parseInt(item.cvalue),
+      let epsilon= parseFloat(item.pvalue),
       let nameFieldValue = item[nameFieldName];
+      let modelType = item.modelType;
+      let modelTypeText = this.state.modelTypeTextMap[modelType];
+      if(modelType=='DBScan'){
+        this.setState({
+          incident,
+          dataChunkName,
+          startTime:isd,
+          endTime:ied,
+          modelStartTime,
+          modelEndTime,
+          epsilon:pValue,
+          minPts:cValue,
+          modelType,
+          modelTypeText: this.state.modelTypeTextMap[modelType],
+          recorded,
+          holisticModelKeys,
+          splitModelKeys,
+          isExistentIncident:true
+        }, ()=> {
+          let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
+          apis.postJSONDashboardUserValues('getpubdatasettings', {
+            fromUser, dataChunkName, modelKey, projectName, modelName, modelType
+          }).then((resp)=>{
+            if (resp.success) {
+              resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
+              this.setState(resp.data);
+            }else {
+              alert(resp.message);
+            }
+          });
+        })
+      } else {
+        this.setState({
+          incident,
+          dataChunkName,
+          startTime:isd,
+          endTime:ied,
+          modelStartTime,
+          modelEndTime,
+          pvalue:pValue,
+          cvalue:cValue,
+          modelType,
+          modelTypeText: this.state.modelTypeTextMap[modelType],
+          recorded,
+          holisticModelKeys,
+          splitModelKeys,
+          isExistentIncident:true
+        }, ()=> {
+          let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
+          apis.postJSONDashboardUserValues('getpubdatasettings', {
+            fromUser, dataChunkName, modelKey, projectName, modelName, modelType
+          }).then((resp)=>{
+            if (resp.success) {
+              resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
+              this.setState(resp.data);
+            }else {
+              alert(resp.message);
+            }
+          });
+        })
+      }
+
       this.setState({
         nameField,
         nameFieldName,
@@ -50,21 +129,11 @@ export default  class FilterBar extends Component {
         endTime: moment(endTime).toDate(),
         cvalue: parseInt(item.cvalue),
         pvalue: parseFloat(item.pvalue),
+        minPts: parseInt(item.cvalue),
+        epsilon: parseFloat(item.pvalue),
         activeItem: item,
         description: item.metaData.desc
-      }, ()=> {
-        let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
-        apis.postJSONDashboardUserValues('getpubdatasettings', {
-          fromUser, dataChunkName, modelKey, projectName, modelName, modelType
-        }).then((resp)=>{
-          if (resp.success) {
-            resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
-            this.setState(resp.data);
-          }else {
-            alert(resp.message);
-          }
-        });
-      })
+      
     }
   }
   handleMetricSetting(index, name) {
@@ -140,8 +209,17 @@ export default  class FilterBar extends Component {
     this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
+            // <div className="field">
+            //   <label style={labelStyle}>Anomaly Threshold</label>
+            //   <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+            // </div>
+            // <div className="field">
+            //   <label style={labelStyle}>Duration Threshold</label>
+            //   <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+            // </div>
+
   render() {
-    const {startTime, endTime, description, cvalue, pvalue, nameField, nameFieldValue, activeItem, metricSettings} = this.state;
+    const {startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
@@ -150,14 +228,33 @@ export default  class FilterBar extends Component {
       <div className={cx('ui form', {loading: !!this.state.loading})}>
         <div className="ui grid">
           <div className="four wide column">
-            <div className="field">
-              <label style={labelStyle}>Anomaly Threshold</label>
-              <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+
+            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+              <label style={labelStyle}>Model Type</label>
+              <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
             </div>
-            <div className="field">
-              <label style={labelStyle}>Duration Threshold</label>
-              <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
-            </div>
+            {modelType == 'DBScan'?
+              <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                <label style={labelStyle}>MinPts</label>
+                <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({minPts:e.target.value})}/>
+              </div>
+              :
+              <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                <label style={labelStyle}>Anomaly Threshold</label>
+                <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+              </div>
+            }
+            {modelType == 'DBScan'?
+              <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                <label style={labelStyle}>Epsilon</label>
+                <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
+              </div>
+              :
+              <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                <label style={labelStyle}>Duration Threshold (Sample Number)</label>
+                <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+              </div>
+            }
           </div>
           <div className="six wide column">
 
@@ -214,7 +311,7 @@ export default  class FilterBar extends Component {
           <div className="sixteen wide column">
             <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
             <Button className="basic" onClick={this.handleRefresh}>Refresh</Button>
-            {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>remove</Button>}
+            {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
           </div>
 
 

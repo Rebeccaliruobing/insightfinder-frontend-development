@@ -7,13 +7,10 @@ export default function (props) {
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
-        {['admin','guest'].indexOf(store.get('userName'))!=-1?
-          <Link to="/cloud/insight-report" className="item text-white">
-            <i className="bar chart icon"></i>
-            <span> Insight Report </span>
-          </Link>
-            :null
-        }
+        <Link to="/cloud/insight-report" className="item text-white">
+          <i className="bar chart icon"></i>
+          <span> Insight Report </span>
+        </Link>
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="line chart icon"></i>
           <span> Real-time Alert </span>
