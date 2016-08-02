@@ -410,7 +410,7 @@ export default  class FilterBar extends Component {
                 let selected = incident === selectedIncident;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className={"incident item " + (selected ? 'selected' : '')}
+                  <div className={"item " + (selected ? 'selected' : '')}
                        key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
                        style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
