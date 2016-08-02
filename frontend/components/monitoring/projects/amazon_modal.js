@@ -44,6 +44,7 @@ class AmazonProjectModal extends React.Component {
   }
 
   render() {
+    let self = this;
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="content">
@@ -88,7 +89,7 @@ class AmazonProjectModal extends React.Component {
           </form>
         </div>
         <div className="actions">
-          <div className="ui button deny">Cancel</div>
+          <div className="ui button deny" onClick={()=>self.props.onCancel()}>Cancel</div>
           <div className="ui button approve labeled">
             <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
               <i className="save icon"/>Register
