@@ -1,9 +1,10 @@
 import React from 'react';
 import store from 'store';
+import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
 
-import {Console, ButtonGroup, Button } from '../../../artui/react';
+import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
@@ -74,14 +75,19 @@ class LiveAnalysisCharts extends React.Component {
       this.causalTypes = this.dp.causalTypes;
       this.groups = this.dp.groupsData || [];
       this.groupMetrics = this.dp.groupmetrics || null;
-      this._data = data;
-      this.periodString = data.periodString.split(",").map(function (value,index) {
-            if(index%2 == 1){
-              if(Number.parseInt(value)!=-1){
+      if (data.periodString) {
+        this.periodString = _.compact(
+          data.periodString.split(",").map(function (value, index) {
+            if (index % 2 == 1) {
+              if (Number.parseInt(value) != -1) {
                 return Number.parseInt(value);
               }
             }
-          });
+          }));
+      } else {
+        this.periodString = null;
+      }
+      this._data = data;
     }
   }
 
@@ -93,7 +99,7 @@ class LiveAnalysisCharts extends React.Component {
   render() {
 
     const { loading, onRefresh, enablePublish, enableComments } = this.props;
-    const { view, columns} = this.state;
+    const { view, columns } = this.state;
 
     this.calculateData();
 
@@ -101,7 +107,8 @@ class LiveAnalysisCharts extends React.Component {
     const dataArray = this.causalDataArray;
     const types = this.causalTypes;
     const groups = this.groups;
-    const periodString = _.compact(this.periodString);
+    const periodString = this.periodString;
+
     return (
       <Console.Wrapper>
         <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
