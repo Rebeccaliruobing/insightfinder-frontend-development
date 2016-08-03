@@ -27,7 +27,8 @@ class PieTickChart extends React.Component {
         let seriesData = JSON.parse(data);
         var optionData = {
             // FIXME: add 11 colors here
-            color:['#990033', '#CC0000','#640621', '#FF3C3C', '#C13100','#CC6600','#FF9900','#FF6600','#C74C00','#FFCC00','#E68000'],
+            //color:['#990033', '#CC0000','#C15000', '#FF3C3C', '#C13100','#CC6600','#FF9900','#FF6600','#C74C00','#FFCC00','#E68000'],
+            color:['#CC0000', '#CC3300','#CC6600','#CC9900', '#CCAA00', '#990000','#993300','#996600','#999900','#AA6600','#AA9900'],
             title: {
                 text: title,
                 x: 'center'
@@ -342,7 +343,7 @@ class InsightReport extends BaseComponent {
         const {showAddPanel,projectName,detailData,loadingIndex,tabStates} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
-        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgMetricUptime"];
+        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime"];
         return (
             <Console.Content className={loadingIndex?"ui form loading":""}>
                 {loadingIndex ? null :
@@ -389,7 +390,7 @@ class InsightReport extends BaseComponent {
                                                 name = "Num of Containers";
                                             } else if (value == "NumberOfMetrics") {
                                                 name = "Num of Metrics";
-                                            } else if (value == "AvgMetricUptime") {
+                                            } else if (value == "AvgInstanceUptime") {
                                                 name = "Avg Instance Uptime";
                                                 dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                             }
