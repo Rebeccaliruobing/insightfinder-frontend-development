@@ -110,7 +110,7 @@ class BarChart extends React.Component {
         return y+ m + d;
     }
     getOption() {
-        let {title,data,useData,colorChart} = this.props;
+        let {title,data,useData,colorChart, option} = this.props;
         let momentDateListSort = undefined;
         let momentDateList = undefined;
         let self = this;
@@ -178,7 +178,7 @@ class BarChart extends React.Component {
                 }
             ]
         };
-        return optionData;
+        return _.merge(optionData, option);
     }
 
     render() {
@@ -412,16 +412,19 @@ class InsightReport extends BaseComponent {
                                         <div className="insight-anomalies">
                                             <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
+                                                      option={{title: {y: 'top'}}}
                                                       colorChart="#C13100"
                                                       useData={true}/>
 
                                             <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
+                                                      option={{title: {y: 'top'}}}
                                                       colorChart="#CC6600"
                                                       useData={true}/>
 
                                             <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
                                                       data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
+                                                      option={{title: {y: 'top'}}}
                                                       colorChart="#FF9900"
                                                       useData={true}/>
                                       </div>
