@@ -111,8 +111,8 @@ class ProjectSummary extends BaseComponent {
           <div className="header">Summary: {projectName}</div>
           <div className="meta" style={{paddingBottom: 10}}>
             <span>{modelType} /</span>
-            <span>{pvalue} /</span>
-            <span>{cvalue} samples</span>
+            <span>{(modelType === 'DBScan' ? 'minPts ' : '') + pvalue + ' /'}</span>
+            <span>{(modelType === 'DBScan' ? 'epsilon ' : '') + cvalue + ' samples'}</span>
             {periodLength!=0?<span> / Periodicity detected</span>:null}
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
