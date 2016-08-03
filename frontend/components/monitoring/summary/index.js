@@ -20,7 +20,6 @@ class Summary extends React.Component {
     if (this._el) {
       $(this._el).find('.ui.dropdown').dropdown({
         onChange: (value, text, $selectedItem) => {
-          console.log(value);
           this.setState({
             selectProjects: _.compact(value.split(','))
           });

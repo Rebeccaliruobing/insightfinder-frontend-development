@@ -1,12 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import store from 'store';
-import cx from 'classnames';
 import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
 import {
-  BaseComponent, Console, ButtonGroup, Button, Popup, Modal,
-  Dropdown, Accordion, Message
+  BaseComponent, Console, ButtonGroup, Button, Popup, Modal, Dropdown, Message
 } from '../../../artui/react';
 
 import ProjectSummary from './summary';
@@ -62,7 +60,7 @@ class LiveMonitoring extends BaseComponent {
     super(props);
 
     this._el = null;
-    this._skey = store.get('userName') + '_cloud_monitoring_addedProject';
+    this._skey = store.get('userName') + '_real_time_alert_addedProject';
     this.state = {
       showAddPanel: true,
       addedProjects: store.has(this._skey) ? store.get(this._skey) : []
@@ -97,7 +95,8 @@ class LiveMonitoring extends BaseComponent {
     _.remove(addedProjects, (p) => {
       return _.isEqual(p, project)
     });
-    let storeName = project['projectName']+'_'+project['modelType']+'_'+project['anomalyThreshold']+'_'+project['durationThreshold'];
+    let storeName = project['projectName'] + '_' + project['modelType'] + '_' +
+      project['pvalue'] + '_' + project['cvalue'];
     store.remove(storeName);
     store.set(this._skey, addedProjects);
     this.setState({addedProjects});
@@ -135,7 +134,7 @@ class LiveMonitoring extends BaseComponent {
             <div className="ui three cards">
               {addedProjects.map((p, index) => {
                 let key = p.projectName + p.modelType + 
-                  p.anomalyThreshold.toString() + p.durationThreshold.toString();
+                  p.pvalue.toString() + p.cvalue.toString();
                 return <ProjectSummary {...p} key={key}
                                        onClose={() => this.handleProjectRemove(p)} />
               })}

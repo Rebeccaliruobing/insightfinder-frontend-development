@@ -27,7 +27,7 @@ class PieTickChart extends React.Component {
         let seriesData = JSON.parse(data);
         var optionData = {
             // FIXME: add 11 colors here
-            color:['#C13100','#CC6600','#FF9900','#C74C00','#E68000'],
+            color:['#990033', '#CC0000','#640621', '#FF3C3C', '#C13100','#CC6600','#FF9900','#FF6600','#C74C00','#FFCC00','#E68000'],
             title: {
                 text: title,
                 x: 'center'
@@ -189,7 +189,6 @@ class BarChart extends React.Component {
                 style={pieChartStyle}
                 className='echarts-for-echarts'
                 theme='my_theme'/>
-
         )
     }
 }
@@ -223,7 +222,7 @@ class PieChart extends React.Component {
                 }
             }
         };
-        var labelBottom = {
+        var labelStyle = {
             normal: {
                 color: colorChart,
                 label: {
@@ -239,12 +238,12 @@ class PieChart extends React.Component {
             series: [
                 {
                     type: 'pie',
-                    center: ['47%', '40%'],
+                    center: ['50%', '50%'],
                     radius: [60, 85],
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
-                        {name: data, value: dataValue, itemStyle: labelBottom}
+                        {name: data, value: dataValue, itemStyle: labelStyle}
                     ]
                 }
             ]
@@ -255,14 +254,14 @@ class PieChart extends React.Component {
     render() {
         return (
             <div style={{'width': '25%','margin': '0 auto'}}>
-            <ReactEcharts
-                option={this.getOption()}
-                style={{height: '300px', width: '100%'}}
-                className='echarts-for-echarts'
-                theme='my_theme'/>
                 <div style={{'textAlign': 'center'}}>
-                    <span style={{'color':this.props.colorChart,'fontSize': '25px','fontWeight': 'bold'}}>{this.props.data}</span>
+                    <span style={{'color':this.props.colorChart,'fontSize': '20px','fontWeight': 'bold'}}>{this.props.data}</span>
                 </div>
+                <ReactEcharts
+                    option={this.getOption()}
+                    style={{height: '200px', width: '100%'}}
+                    className='echarts-for-echarts'
+                    theme='my_theme'/>
             </div>
         )
     }
@@ -316,7 +315,7 @@ class InsightReport extends BaseComponent {
 
     handleData(data) {
         this.setState({data: data}, ()=> {
-            console.log(data);
+            // console.log(data);
         })
     }
 
@@ -391,7 +390,7 @@ class InsightReport extends BaseComponent {
                                             } else if (value == "NumberOfMetrics") {
                                                 name = "Num of Metrics";
                                             } else if (value == "AvgMetricUptime") {
-                                                name = "Avg Metric Uptime";
+                                                name = "Avg Instance Uptime";
                                                 dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                             }
                                             return <PieChart key={index} colorChart="#3398DB" data={name}

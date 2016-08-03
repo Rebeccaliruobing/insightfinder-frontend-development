@@ -31,22 +31,22 @@ export default  class FilterBar extends Component {
 
   componentDidMount() {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => !(item.isStationary));
+    projects = projects.filter((item, index) => !(item.isStationary));
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
   }
 
   handleProjectChange(value, projectName) {
-    let {projectString, sharedProjectString} = this.context.dashboardUservalues;
+    let { projectString, sharedProjectString } = this.context.dashboardUservalues;
     let project = undefined;
-    if(projectString.length>0){
+    if (projectString.length > 0) {
       project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
     }
-    if(sharedProjectString.length>0 && project==undefined){
-      project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0]+"@"+parts[3]) == projectName);
+    if (sharedProjectString.length > 0 && project == undefined) {
+      project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0] + "@" + parts[3]) == projectName);
     }
-    
+
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
     let update = {
@@ -75,23 +75,30 @@ export default  class FilterBar extends Component {
   }
 
   handleSubmit() {
-    //this.props.onSubmit && this.props.onSubmit(this.state);
-    const {projectName, anomalyThreshold, durationThreshold,minPts,epsilon,projectType, modelType} = this.state;
+    const { projectName, anomalyThreshold, durationThreshold, minPts, epsilon, modelType } = this.state;
     var url;
-    if(modelType=='DBScan'){
-      url = '/liveMonitoring?anomalyThreshold='+epsilon+'&durationThreshold='+minPts+'&modelType='+modelType+'&projectName='+projectName;
+    if (modelType === 'DBScan') {
+      url = '/liveMonitoring?pvalue=' + epsilon + '&cvalue=' + minPts +
+        '&modelType=' + modelType + '&projectName=' + projectName;
     } else {
-      url = '/liveMonitoring?anomalyThreshold='+anomalyThreshold+'&durationThreshold='+durationThreshold+'&modelType='+modelType+'&projectName='+projectName;
+      url = '/liveMonitoring?pvalue=' + anomalyThreshold + '&cvalue=' + durationThreshold +
+        '&modelType=' + modelType + '&projectName=' + projectName;
     }
-    window.open(url,'_blank');
+    window.open(url, '_blank');
   }
-  
+
   handleAdd() {
-    this.props.onSubmit && this.props.onSubmit(this.state);
+    const { modelType, anomalyThreshold, durationThreshold, minPts, epsilon, ...rest} = this.state;
+    this.props.onSubmit && this.props.onSubmit({
+      pvalue: modelType === 'DBScan' ? minPts : anomalyThreshold,
+      cvalue: modelType === 'DBScan' ? epsilon : durationThreshold,
+      modelType,
+      ...rest
+    });
   }
 
   render() {
-    let {projectName, anomalyThreshold, durationThreshold, minPts,epsilon,projectType, modelType, modelTypeText} = this.state;
+    let { projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
     const labelStyle = {};
     const submitStyle = cx(
       'orange', {
@@ -108,38 +115,39 @@ export default  class FilterBar extends Component {
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>
-            <div style={{paddingTop:'0.5em', paddingLeft:'1em'}}>{projectType}</div>
+            <div style={{ paddingTop: '0.5em', paddingLeft: '1em' }}>{projectType}</div>
           </div>
           <div className="field">
             <label style={labelStyle}>Model Type</label>
-            <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
+            <ModelType value={modelType} text={modelTypeText}
+                       onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
           </div>
-          {modelType == 'DBScan'?
+          {modelType == 'DBScan' ?
             <div className="field">
               <label style={labelStyle}>MinPts</label>
-              <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({minPts:e.target.value})}/>
+              <input type="text" defaultValue={minPts} onBlur={(e)=>this.setState({ minPts: e.target.value })}/>
             </div>
             :
             <div className="field">
               <label style={labelStyle}>Anomaly Threshold</label>
-              <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({anomalyThreshold: v})}/>
+              <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({ anomalyThreshold: v })}/>
             </div>
           }
-          {modelType == 'DBScan'?
+          {modelType == 'DBScan' ?
             <div className="field">
               <label style={labelStyle}>Epsilon</label>
-              <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
+              <input type="text" defaultValue={epsilon} onBlur={(e)=>this.setState({ epsilon: e.target.value })}/>
             </div>
             :
             <div className="field">
               <label style={labelStyle}>Duration Threshold</label>
-              <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({durationThreshold: t})}/>
+              <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({ durationThreshold: t })}/>
             </div>
           }
           <div className="field">
-            <Button className={submitStyle} style={{marginTop: 20}}
+            <Button className={submitStyle} style={{ marginTop: 20 }}
                     onClick={this.handleAdd.bind(this)}>Add</Button>
-            <Button className={submitStyle} style={{marginTop: 20}}
+            <Button className={submitStyle} style={{ marginTop: 20 }}
                     onClick={this.handleSubmit.bind(this)}>Submit</Button>
           </div>
         </div>
