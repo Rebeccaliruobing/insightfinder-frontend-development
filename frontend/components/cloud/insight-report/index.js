@@ -125,8 +125,8 @@ class BarChart extends React.Component {
         let optionData = {
             title: {
                 text: title,
-                x: 'center',
-                y: 'bottom'
+                x: 'center'
+                //y: 'bottom'    title到底部
             },
             color: [colorChart],
             tooltip: {
@@ -138,7 +138,7 @@ class BarChart extends React.Component {
             grid: {
                 left: '3%',
                 right: '4%',
-                bottom: '15%',
+                bottom: '3%',    // 15% title是到底部
                 containLabel: true
             },
             xAxis: [
