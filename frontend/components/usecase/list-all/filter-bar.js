@@ -49,34 +49,29 @@ export default  class FilterBar extends Component {
   handleSelectItem(item) {
     return (e)=> {
       let [startTime, endTime] = /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z)/g.exec(item.dataChunkName);
+      startTime= moment(startTime).toDate();
+      endTime= moment(endTime).toDate();
 
       let nameField = item.modelName ? 'Model Name' : 'Project Name';
       let nameFieldName = item.modelName ? 'modelName' : 'projectName';
-      let startTime= moment(startTime).toDate(),
-      let endTime= moment(endTime).toDate(),
-      let cvalue= parseInt(item.cvalue),
-      let pvalue= parseFloat(item.pvalue),
-      let minPts= parseInt(item.cvalue),
-      let epsilon= parseFloat(item.pvalue),
       let nameFieldValue = item[nameFieldName];
       let modelType = item.modelType;
       let modelTypeText = this.state.modelTypeTextMap[modelType];
       if(modelType=='DBScan'){
+        let minPts= parseInt(item.cvalue);
+        let epsilon= parseFloat(item.pvalue);
         this.setState({
-          incident,
-          dataChunkName,
-          startTime:isd,
-          endTime:ied,
-          modelStartTime,
-          modelEndTime,
-          epsilon:pValue,
-          minPts:cValue,
+          nameField,
+          nameFieldName,
+          nameFieldValue,
+          startTime,
+          endTime,
+          minPts,
+          epsilon,
+          activeItem: item,
+          description: item.metaData.desc,
           modelType,
-          modelTypeText: this.state.modelTypeTextMap[modelType],
-          recorded,
-          holisticModelKeys,
-          splitModelKeys,
-          isExistentIncident:true
+          modelTypeText
         }, ()=> {
           let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
           apis.postJSONDashboardUserValues('getpubdatasettings', {
@@ -91,21 +86,20 @@ export default  class FilterBar extends Component {
           });
         })
       } else {
+        let cvalue= parseInt(item.cvalue);
+        let pvalue= parseFloat(item.pvalue);
         this.setState({
-          incident,
-          dataChunkName,
-          startTime:isd,
-          endTime:ied,
-          modelStartTime,
-          modelEndTime,
-          pvalue:pValue,
-          cvalue:cValue,
+          nameField,
+          nameFieldName,
+          nameFieldValue,
+          startTime,
+          endTime,
+          pvalue,
+          cvalue,
+          activeItem: item,
+          description: item.metaData.desc,
           modelType,
-          modelTypeText: this.state.modelTypeTextMap[modelType],
-          recorded,
-          holisticModelKeys,
-          splitModelKeys,
-          isExistentIncident:true
+          modelTypeText
         }, ()=> {
           let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = item;
           apis.postJSONDashboardUserValues('getpubdatasettings', {
@@ -120,20 +114,6 @@ export default  class FilterBar extends Component {
           });
         })
       }
-
-      this.setState({
-        nameField,
-        nameFieldName,
-        nameFieldValue,
-        startTime: moment(startTime).toDate(),
-        endTime: moment(endTime).toDate(),
-        cvalue: parseInt(item.cvalue),
-        pvalue: parseFloat(item.pvalue),
-        minPts: parseInt(item.cvalue),
-        epsilon: parseFloat(item.pvalue),
-        activeItem: item,
-        description: item.metaData.desc
-      
     }
   }
   handleMetricSetting(index, name) {
@@ -260,7 +240,7 @@ export default  class FilterBar extends Component {
 
             <div className="field">
               <label style={labelStyle}>Incident Description</label>
-              <textarea className="ui input" value={description} name="description" style={{height: '8em'}}
+              <textarea className="ui input" value={description} name="description" style={{height: '12em'}}
                         readonly></textarea>
             </div>
           </div>

@@ -315,7 +315,7 @@ class InsightReport extends BaseComponent {
 
     handleData(data) {
         this.setState({data: data}, ()=> {
-            console.log(data);
+            // console.log(data);
         })
     }
 
@@ -390,7 +390,7 @@ class InsightReport extends BaseComponent {
                                             } else if (value == "NumberOfMetrics") {
                                                 name = "Num of Metrics";
                                             } else if (value == "AvgMetricUptime") {
-                                                name = "Avg Metric Uptime";
+                                                name = "Avg Instance Uptime";
                                                 dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                             }
                                             return <PieChart key={index} colorChart="#3398DB" data={name}
