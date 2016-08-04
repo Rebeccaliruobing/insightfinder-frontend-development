@@ -260,6 +260,12 @@ class DataParser {
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
     }
+    if(this.data['clusterTopEpisodeArr']){
+      this.clusterTopEpisodeArr = this.data['clusterTopEpisodeArr'];
+    }
+    if(this.data['clusterTopWordArr']){
+      this.clusterTopWordArr = this.data['clusterTopWordArr'];
+    }
   }
 
   _parseAnomalyData() {
@@ -379,7 +385,6 @@ class DataParser {
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
             if (soptions[seriesNo - 1] == null) {
-              console.log("seriesNo-1:", seriesNo - 1, "so len:", soptions.length)
             }
             soptions[seriesNo - 1].data.push([ts, parseFloat(item)]);
           }
@@ -436,7 +441,6 @@ class DataParser {
       highlights: highlights,
       annotations: annotations
     };
-    console.log(this.summaryData);
     return this.summaryData;
   }
 
@@ -533,7 +537,6 @@ class DataParser {
         annotations: undefined
       };
     });
-    console.log(this.groupsData);
     return this.groupsData;
   }
 

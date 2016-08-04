@@ -128,7 +128,7 @@ export default {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['dashboard uservalues'],
-                data: $.param({userName, token, operation, projectName,selectedIndexArr}),
+                data: $.param({userName, token, operation, projectName, selectedIndexArr}),
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                     request.setRequestHeader("Accept", 'application/json');
@@ -185,9 +185,10 @@ export default {
         });
     },
     postDashboardDailySummaryReportNew (forceReload, userName:String = store.get('userName'), token = store.get('token')) {
+        let self = this;
         return new Promise(function (resolve, reject) {
             let currentResp = store.get('dailyReportResponseNew');
-            if (!forceReload && currentResp) {
+            if (!forceReload && currentResp && !self.timeFromNow(currentResp['data']['createDate'])) {
                 resolve(currentResp);
             } else {
                 $.ajax({
@@ -220,34 +221,69 @@ export default {
             }
         });
     },
-    postInsightReport(userName=store.get('userName'), token=store.get('token')){
-        return new Promise(function (resolve,reject) {
-            $.ajax({
-                type: 'POST',
-                url: $.fn.api.settings.api['insight report'],
-                data: $.param({userName, token}),
-                beforeSend: function (request) {
-                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-                    request.setRequestHeader("accept", 'application/json');
-                }
-            }).done(function (resp) {
-                var reportData = {'createDate': new Date()};
-                _.forEach(resp.data, function (value, key) {
-                    key = key.split(':');
-                    if (key.length == 3) {
-                        reportData[key[0] + "@" + key[2]] = value;
+    timeFromNow(ms){
+        let now = new Date().getTime();
+        ms = new Date(ms).getTime();
+        let diffValue = now - ms;
+        let result = '';
+        var minute = 1000 * 60,
+            hour = minute * 60,
+            day = hour * 24,
+            halfamonth = day * 15,
+            month = day * 30,
+            year = month * 12,
+
+            _year = diffValue / year,
+            _month = diffValue / month,
+            _week = diffValue / (7 * day),
+            _day = diffValue / day,
+            _hour = diffValue / hour,
+            _min = diffValue / minute;
+
+        if (_year >= 1) {result = parseInt(_year) + "年前"; return true;}
+        else if (_month >= 1) {result = parseInt(_month) + "个月前";return true;}
+        else if (_week >= 1) {result = parseInt(_week) + "周前";return true;}
+        else if (_day >= 1) {result = parseInt(_day) + "天前"; return true;}
+        else if (_hour >= 1) {result = parseInt(_hour) + "个小时前"; return _hour>23}
+        else if (_min >= 1) {result = parseInt(_min) + "分钟前"; return false;}
+        else {result = "刚刚"; return false;}
+    },
+    postInsightReport(forceReload, userName = store.get('userName'), token = store.get('token')){
+        let self = this;
+        return new Promise(function (resolve, reject) {
+            let currentResp = store.get('insightReportData');
+            if (!forceReload && currentResp && !self.timeFromNow(currentResp['data']['createDate'])) {
+                resolve(currentResp);
+            }
+            else {
+                $.ajax({
+                    type: 'POST',
+                    url: $.fn.api.settings.api['insight report'],
+                    data: $.param({userName, token}),
+                    beforeSend: function (request) {
+                        request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                        request.setRequestHeader("accept", 'application/json');
                     }
-                    else {
-                        reportData[key[0]] = value;
-                    }
-                });
-                resp['data'] = reportData;
-                resolve(resp);
-            }).fail(function (error) {
-                console.log(arguments);
-                console.log("Server Error", arguments);
-                reject(error);
-            })
+                }).done(function (resp) {
+                    var reportData = {'createDate': new Date()};
+                    _.forEach(resp.data, function (value, key) {
+                        key = key.split(':');
+                        if (key.length == 3) {
+                            reportData[key[0] + "@" + key[2]] = value;
+                        }
+                        else {
+                            reportData[key[0]] = value;
+                        }
+                    });
+                    resp['data'] = reportData;
+                    store.set('insightReportData', resp);
+                    resolve(resp);
+                }).fail(function (error) {
+                    console.log(arguments);
+                    console.log("Server Error", arguments);
+                    reject(error);
+                })
+            }
         })
     },
     /**
@@ -260,7 +296,7 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
+        postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -295,7 +331,7 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-    postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+        postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -342,7 +378,7 @@ export default {
                     endTime,
                     modelStartTime,
                     modelEndTime,
-                    isExistentIncident, 
+                    isExistentIncident,
                     operation
                 }),
                 beforeSend: function (request) {

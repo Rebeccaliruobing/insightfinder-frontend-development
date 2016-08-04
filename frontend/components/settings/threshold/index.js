@@ -5,6 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
 import store from 'store';
 
+import "./threshold.less";
 import apis from '../../../apis';
 
 import {
@@ -82,7 +83,6 @@ export default class ThresholdSettings extends React.Component {
 
     handleFilterChange(data) {
         this.$filterPanel.slideUp();
-        console.log(JSON.stringify(data));
     }
 
     handleProjectChange(projectName) {
@@ -174,29 +174,38 @@ export default class ThresholdSettings extends React.Component {
     getEpisodeIndexNumber(index, e) {
         let {episodeList,wordList} = this.state;
         if (!e.target.checked) {
-            $('#checkAll').prop('checked', false);
+            $('#checkAllEpisode').prop('checked', false);
         }
         else {
-            $('input[name="indexCheck"]:checked').size() == episodeList.length ? $('#checkAll').prop('checked', true) : "";
+            $('input[name="indexCheckEpisode"]:checked').size() == episodeList.length ? $('#checkAllEpisode').prop('checked', true) : "";
         }
     }
 
     getWordIndexNumber(index, e) {
         let {episodeList,wordList} = this.state;
         if (!e.target.checked) {
-            $('#checkAll').prop('checked', false);
+            $('#checkAllWord').prop('checked', false);
         }
         else {
-            $('input[name="indexCheck"]:checked').size() == wordList.length ? $('#checkAll').prop('checked', true) : "";
+            $('input[name="indexCheckWord"]:checked').size() == wordList.length ? $('#checkAllWord').prop('checked', true) : "";
         }
     }
 
-    setCheckboxAll(e) {
+    setCheckboxAllEpisode(e) {
         if (e.target.checked) {
-            $('input[name="indexCheck"]').prop("checked", true);
+            $('input[name="indexCheckEpisode"]').prop("checked", true);
         }
         else {
-            $('input[name="indexCheck"]').prop("checked", false);
+            $('input[name="indexCheckEpisode"]').prop("checked", false);
+        }
+    }
+
+    setCheckboxAllWord(e) {
+        if (e.target.checked) {
+            $('input[name="indexCheckWord"]').prop("checked", true);
+        }
+        else {
+            $('input[name="indexCheckWord"]').prop("checked", false);
         }
     }
 
@@ -225,18 +234,18 @@ export default class ThresholdSettings extends React.Component {
                                     <ProjectSelection key={data.projectName} value={data.projectName}
                                                       onChange={this.handleProjectChange.bind(this)}/>
                                 </div>
-                                <div className="field">
+                                {!isLogProject && <div className="field">
                                     <label style={labelStyle}>Anomaly Threshold</label>
                                     <AnomalyThreshold key={data.projectName} value={data.pvalue}
                                                       onChange={this.handleValueChange('pvalue')}/>
-                                </div>
-                                <div className="field">
+                                </div>}
+                                {!isLogProject && <div className="field">
                                     <label style={labelStyle}>Duration Threshold</label>
                                     <DurationThreshold key={data.projectName} value={data.cvalue}
                                                        onChange={this.handleValueChange('cvalue')}/>
-                                </div>
+                                </div>}
                             </div>
-                            <div className="wide column">
+                            {!isLogProject && <div className="wide column">
                                 <h3>Email Alerts</h3>
 
                                 <div className="field">
@@ -256,8 +265,8 @@ export default class ThresholdSettings extends React.Component {
                                     <DurationThreshold key={data.projectName} value={data.emailcvalue}
                                                        onChange={this.handleValueChange('emailcvalue')}/>
                                 </div>
-                            </div>
-                            <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
                                 <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
                                 </h3>
 
@@ -268,8 +277,8 @@ export default class ThresholdSettings extends React.Component {
                                                onChange={this.handleSharingChange.bind(this)}/>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
                                 <h3>Hint mapping file:</h3>
 
                                 <div className="field">
@@ -281,15 +290,15 @@ export default class ThresholdSettings extends React.Component {
                                     <span className="text-blue"
                                           id="productName">{this.state.projectHintMapFilename}</span>}
                                 </div>
-                            </div>
-                            <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
                                 <Button className="blue"
                                         onClick={this.handleSaveProjectSetting.bind(this)}>Submit</Button>
-                            </div>
+                            </div>}
                         </div>
                         <br /><hr />
                         <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})}>
-                          {!isLogProject && <div class="ui">
+                          {!isLogProject && <div className="ui">
                             <h3>Metric Settings (Optional)</h3>
                             <table className="ui celled table">
                                 <thead>
@@ -320,7 +329,7 @@ export default class ThresholdSettings extends React.Component {
                             </table>
                             <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Submit</Button>
                           </div>}
-                          {isLogProject && <div class="ui">
+                          {isLogProject && <div className="ui">
                             <h3>Episode and Word Selection</h3>
                             <Button className={indexLoading?"loading blue":"blue"} onClick={this.handleSaveMapArrSetting.bind(this)}>Submit</Button>
                             <div className="ui pointing secondary menu">
@@ -330,24 +339,22 @@ export default class ThresholdSettings extends React.Component {
                                    onClick={(e) => this.selectTab(e, 'word')}>Word List</a>
                             </div>
                             <div className={tabStates['episode'] + ' ui tab '}>
-                            <table className="ui celled table">
+                            <table className="episode-table ui celled table">
                                 <thead>
                                 <tr>
-                                    <th>Index</th>
                                     <th>Pattern</th>
                                     <th>Count</th>
-                                    <th><input type="checkbox" id="checkAll" defaultChecked="false"
-                                               onChange={(e)=>self.setCheckboxAll(e)}/></th>
+                                    <th><input type="checkbox" id="checkAllEpisode" defaultChecked="false"
+                                               onChange={(e)=>self.setCheckboxAllEpisode(e)}/>Interesting</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {episodeList.map((value, index)=> {
+                                {episodeList.slice(0,200).map((value, index)=> {
                                     return (
                                         <tr key={`${data.projectName}-${index}-1`}>
-                                            <td>{value['index']}</td>
                                             <td>{value['pattern']}</td>
                                             <td>{value['count']}</td>
-                                            <td><input type="checkbox" data-id={value['index']} name="indexCheck"
+                                            <td><input type="checkbox" data-id={value['index']} name="indexCheckEpisode"
                                                        defaultChecked={value['selected']}
                                                        onChange={(e)=>self.getEpisodeIndexNumber(value['index'],e)}/></td>
                                         </tr>
@@ -357,24 +364,22 @@ export default class ThresholdSettings extends React.Component {
                             </table>
                             </div>
                             <div className={tabStates['word'] + ' ui tab '}>
-                            <table className="ui celled table">
+                            <table className="word-table ui celled table">
                                 <thead>
                                 <tr>
-                                    <th>Index</th>
                                     <th>Word</th>
                                     <th>Count</th>
-                                    <th><input type="checkbox" id="checkAll" defaultChecked="false"
-                                               onChange={(e)=>self.setCheckboxAll(e)}/></th>
+                                    <th><input type="checkbox" id="checkAllWord" defaultChecked="false"
+                                               onChange={(e)=>self.setCheckboxAllWord(e)}/>Interesting</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {wordList.map((value, index)=> {
+                                {wordList.slice(0,200).map((value, index)=> {
                                     return (
                                         <tr key={`${data.projectName}-${index}-1`}>
-                                            <td>{value['index']}</td>
                                             <td>{value['pattern']}</td>
                                             <td>{value['count']}</td>
-                                            <td><input type="checkbox" data-id={value['index']} name="indexCheck"
+                                            <td><input type="checkbox" data-id={value['index']} name="indexCheckWord"
                                                        defaultChecked={value['selected']}
                                                        onChange={(e)=>self.getEpisodeIndexNumber(value['index'],e)}/></td>
                                         </tr>
@@ -385,6 +390,25 @@ export default class ThresholdSettings extends React.Component {
                             </div>
                           </div>}
                         </div>
+                        <br /><hr />
+                        {isLogProject && <div className="wide column">
+                            <div className="wide column">
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
+                                </h3>
+
+                                <div className="field">
+                                    <div className="ui input">
+                                        <input key={data.projectName} type="text"
+                                               value={tempSharedUsernames}
+                                               onChange={this.handleSharingChange.bind(this)}/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="wide column">
+                                <Button className="blue"
+                                        onClick={this.handleSaveProjectSetting.bind(this)}>Submit</Button>
+                            </div>
+                        </div>}
                     </div>
                 </div>
             </Console.Content>
@@ -434,14 +458,17 @@ export default class ThresholdSettings extends React.Component {
 
     handleSaveMapArrSetting() {
         let selectedIndexArr = [];
-        $('input[name="indexCheck"]:checked').each(function () {
+        $('input[name="indexCheckEpisode"]:checked').each(function () {
+            selectedIndexArr.push($(this).data('id'));
+        });
+        $('input[name="indexCheckWord"]:checked').each(function () {
             selectedIndexArr.push($(this).data('id'));
         });
         this.setState({indexLoading: true}, ()=> {
             apis.postDashboardUserValuesMapArr('updatefrequencyvector', this.state.data.projectName,JSON.stringify(selectedIndexArr)
             ).then((resp)=> {
                     if(resp.success){
-                        window.alert("success");
+                        window.alert("Interesting patterns updated.");
                     }
                     this.setState({indexLoading: false});
             });

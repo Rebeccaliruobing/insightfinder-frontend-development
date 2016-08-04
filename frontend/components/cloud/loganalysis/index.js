@@ -1,19 +1,107 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import cx from 'classnames';
-import store from 'store';
 import moment from 'moment';
-
+import shallowCompare from 'react-addons-shallow-compare';
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown, Tab} from '../../../artui/react';
-import {Dygraph} from '../../../artui/react/dataviz';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import "./logevent.less";
+import {autobind} from 'core-decorators';
 
-import {GridColumns, DefaultView} from '../../storeKeys';
-import Navbar from './navbar';
-import {SummaryChart, DetailsChart} from '../liveanalysis/charts';
-import apis from '../../../apis';
+import {DataSummaryChart} from '../../share/charts';
+
+class EventTableGroup extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedWords: '',
+    };
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+
+  parseTopWords(wordsStr) {
+    let ret = [];
+    let words = wordsStr ? wordsStr.split(',') : [];
+    _.forEach(words, (w_str) => {
+      let match = w_str.match(/'(.*)'.*\((\d*)\)*/);
+      // The second and third match contains the words and count.
+      if (match && match.length >= 3) {
+        ret.push([match[1], match[2]]);
+      }
+    });
+
+    return ret;
+  }
+
+  @autobind
+  handleHighlight(word) {
+    return () => {
+      const current = this.state.selectedWords;
+      this.setState({
+        selectedWords: word === current ? '' : word,
+      });
+    }
+  }
+
+  @autobind
+  highlightKWord(rawData) {
+    const word = this.state.selectedWords;
+    if (!!word) {
+      var regex = new RegExp( '\\b(' + word + ')\\b', 'mgi' );
+      return rawData.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    return rawData;
+  }
+
+  render() {
+    let group = this.props.groupData;
+    let data = group.data;
+    let rows = [];
+    let topKEpisodes = group.topKEpisodes.length > 0
+      ? "Top frequent episodes: " + group.topKEpisodes : "";
+
+    let topKWords = this.parseTopWords(group.topKWords);
+
+    for (let i = 1; i < data.length; ++i) {
+      let timestamp = data[i][0];
+      let rawData = data[i][1];
+      rows.push((<tr key={i}>
+        <td>{timestamp}</td>
+        <td dangerouslySetInnerHTML={{__html: this.highlightKWord(rawData)}} />
+      </tr>));
+    }
+
+    return (
+      <tbody>
+      <tr key="0">
+        <td rowSpan={group.rowSpan}>
+          Cluster {group.iGroup} <br />
+          Number of events: {group.nEvents} <br />
+          {topKWords.length > 0 ? "Top words: " : ""}
+          {
+            _.map(topKWords, (kword, index) => {
+              const word = kword[0];
+              const count = kword[1];
+              return <span style={{cursor: 'pointer', color: 'blue'}}
+                key={index}
+                onClick={this.handleHighlight(word)}>'{word}'({count}),</span>
+            })
+          }
+          <br />
+          {topKEpisodes}
+        </td>
+        <td>{data[0][0]}</td>
+        <td dangerouslySetInnerHTML={{__html: this.highlightKWord(data[0][1])}} />
+      </tr>
+      {rows}
+      </tbody>
+    );
+  }
+}
 
 class LogAnalysisCharts extends React.Component {
 
@@ -31,7 +119,8 @@ class LogAnalysisCharts extends React.Component {
   static defaultProps = {
     loading: true,
     enablePublish: false,
-    onRefresh: () => {}
+    onRefresh: () => {
+    }
   };
 
   constructor(props) {
@@ -41,199 +130,294 @@ class LogAnalysisCharts extends React.Component {
 
     this.state = {
       instanceName: false,
-      view: (store.get(DefaultView, 'list')).toLowerCase(),
-      columns: (store.get(GridColumns, 'four')).toLowerCase(),
       selectedGroupId: undefined,
       summarySelected: false,
       selectedAnnotation: null,
       showSettingModal: false,
       tabStates: {
-          event: 'active',
-          vector: ''
+        event: 'active',
+        vector: ''
       }
     };
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    // let instanceName = this.props.location.query.instanceName;
-    if (this.props.data !== nextProps.data && nextProps.data) {
-      // if (this.state.selectedGroupId != nextProps.groupId && nextProps.groupId) {
-      //   this.setState({'selectedGroupId': nextProps.groupId, view: 'grid', instanceName});
-      // }
-      let {data, loading, onRefresh, ...rest} = nextProps;
+  shouldComponentUpdate(nextProps, nextState) {
+    return shallowCompare(this, nextProps, nextState);
+  }
+
+  calculateData() {
+    // Cache the data, and recalculate it if changed.
+    let { data, loading, onRefresh, ...rest } = this.props;
+
+    if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
       this.dp.getGroupsDataTest();
       this.dp.parseLogAnalysisData();
+      this.calculateEventTableData();
+
+      // Sort the grouped data
+      this.summary = this.dp.summaryData;
+      this._data = data;
     }
   }
 
-  renderSummaryDetail(summary) {
-    return (
-      <div id="summary">
-        <h4 className="ui header">Analysis Summary</h4>
-        <Dygraph key="summary" className="live monitoring summary" data={summary.series}
-                 ylabel="Anomaly Degree"
-                 labels={['X', 'Y1']}
-                 axisLabelWidth={35}
-                 style={{width: '100%', height: '200px'}}
-                 highlightCircleSize={2} strokeWidth={3}
-                 labelsDivStyles={{padding: '4px', margin:'15px'}}
-                 highlightSeriesOpts={{strokeWidth: 3, strokeBorderWidth: 1, highlightCircleSize: 5}}
-                 annotations={summary.annotations}
-                 onAnnotationClick={(a) => this.setState({selectedAnnotation: a})}
-                 highlights={summary.highlights}/>
-      </div>
-    )
-  }
+  calculateEventTableData() {
 
-  renderWordCountTable(){
-    if (!this.dp) return;
-    let wordCountArr = this.dp.wordCountArr;
-    if(wordCountArr){
-      return (
-        <div>
-          <table className="vector-table">
-            <tbody>
-              <tr>
-                <td>Frequent Episode</td>
-                <td>Count</td>
-              </tr>
-              {wordCountArr.sort(function(a, b) {
-                // reverse ordering
-                let aid = parseInt(a.count);
-                let bid = parseInt(b.count);
-                if(aid<bid){
-                  return 1;
-                } else if(aid>bid){
-                  return -1;
-                }else{
-                  return 0;
-                }
-              }).map((word, i) => {
-                let cleanWord = word.pattern.replace(/"/g,"");
-                return (
-                  <tr key={i}>
-                    <td>{cleanWord}</td>
-                    <td>{word.count}</td>
-                  </tr>
-                )
-              })}              
-            </tbody>
-          </table>
-        </div>
-      )
-    }
-  }
-
-  renderEpisodeMapTable(){
-    if (!this.dp) return;
-    let episodeMapArr = this.dp.episodeMapArr;
-    if(episodeMapArr){
-      return (
-        <div>
-          <table className="vector-table">
-            <tbody>
-              <tr>
-                <td>Word Count</td>
-                <td>Count</td>
-              </tr>
-              {episodeMapArr.sort(function(a, b) {
-                // reverse ordering
-                let aid = parseInt(a.count);
-                let bid = parseInt(b.count);
-                if(aid<bid){
-                  return 1;
-                } else if(aid>bid){
-                  return -1;
-                }else{
-                  return 0;
-                }
-              }).map((episode, i) => {
-                let cleanEpisode = episode.pattern.replace(/"/g,"");
-                return (
-                  <tr key={i}>
-                    <td>{cleanEpisode}</td>
-                    <td>{episode.count}</td>
-                  </tr>
-                )
-              })}              
-            </tbody>
-          </table>
-        </div>
-      )
-    }
-  }
-
-  renderEventTable(){
-    if (!this.dp) return;
     let anomalies = this.dp.anomalies["0"];
-    let episodeMap = {};
     let episodeMapArr = this.dp.episodeMapArr;
-    _.forEach(episodeMapArr, function (episode, iEpisode)  {
-      episodeMap[parseInt(episode.index)] = episode.pattern;
-    });
     let logEventArr = this.dp.logEventArr;
-
+    logEventArr = logEventArr.filter(function (el, index, arr) {
+      return el.nid != -1
+    });
+    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
+    let clusterTopWordArr = this.dp.clusterTopWordArr;
     let neuronListNumber = {};
     let neuronValue = [];
-    let nidList = _.map(logEventArr, function(o){return o['nid']});
-    let neuronList = nidList.filter(function (el, index, arr) { return index === arr.indexOf(el)});
-    
-    _.forEach(neuronList, function (value,key) {
-        neuronListNumber[value] = (_.partition(logEventArr, function(o){return o['nid'] == value})[0]).length;
+    let nidList = _.map(logEventArr, function (o) {
+      return o['nid']
+    });
+    let neuronList = nidList.filter(function (el, index, arr) {
+      return index === arr.indexOf(el)
+    });
+
+    _.forEach(neuronList, function (value, key) {
+      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
+        return o['nid'] == value
+      })[0]).length;
     });
     let neuronIdList = neuronList;
     neuronList = [];
-    neuronIdList.map(function (value,index) {
-        let num = 0;
-        for(let j=0;j<index;j++){
-            num+=neuronListNumber[neuronIdList[j]];
-        }
-        neuronList.push(num);
-        neuronValue.push(neuronListNumber[neuronIdList[index]]);
+    neuronIdList.map(function (value, index) {
+      let num = 0;
+      for (let j = 0; j < index; j++) {
+        num += neuronListNumber[neuronIdList[j]];
+      }
+      neuronList.push(num);
+      neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
-    if(logEventArr){
+    // filter out anomaly and small cluster and run again
+    let newLogEventArr = logEventArr.filter(function (el, index, arr) {
+      return (neuronValue[neuronIdList.indexOf(el.nid)] > 3)
+    });
+    logEventArr = newLogEventArr;
+    neuronListNumber = {};
+    neuronValue = [];
+    nidList = _.map(logEventArr, function (o) {
+      return o['nid']
+    });
+    neuronList = nidList.filter(function (el, index, arr) {
+      return index === arr.indexOf(el)
+    });
+
+    _.forEach(neuronList, function (value, key) {
+      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
+        return o['nid'] == value
+      })[0]).length;
+    });
+    neuronIdList = neuronList;
+    neuronList = [];
+    neuronIdList.map(function (value, index) {
+      let num = 0;
+      for (let j = 0; j < index; j++) {
+        num += neuronListNumber[neuronIdList[j]];
+      }
+      neuronList.push(num);
+      neuronValue.push(neuronListNumber[neuronIdList[index]]);
+    });
+
+    let eventTableData = [];
+    // let realAnomalies = _.filter(anomalies, a => a.val > 0);
+    let groupData;
+
+    logEventArr.map((event, iEvent) => {
+      let showNumber = neuronList.indexOf(iEvent);
+      let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+
+      // Find a new group.
+      if (showNumber != -1) {
+        groupData = {};
+        let iGroup = neuronIdList.indexOf(event.nid) + 1;
+        groupData.iGroup = iGroup;
+        groupData.rowSpan = neuronValue[showNumber];
+        groupData.nEvents = neuronValue[iGroup - 1];
+
+        // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
+        // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
+        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
+        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+        groupData.data = [[timestamp, event.rawData]];
+        eventTableData.push(groupData);
+      } else {
+        groupData.data.push([timestamp, event.rawData]);
+      }
+    });
+
+
+    this.logEventArr = logEventArr;
+    this.neuronValue = neuronValue;
+    this.eventTableData = eventTableData;
+  }
+
+  renderWordCountTable() {
+    if (!this.dp) return;
+    let wordCountArr = this.dp.wordCountArr;
+    if (wordCountArr) {
       return (
         <div>
-          <div class="ui header">Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}</div>
+          <table className="vector-table">
+            <tbody>
+            <tr>
+              <td>Word</td>
+              <td>Count</td>
+            </tr>
+            {wordCountArr.sort(function (a, b) {
+              // reverse ordering
+              let aid = parseInt(a.count);
+              let bid = parseInt(b.count);
+              if (aid < bid) {
+                return 1;
+              } else if (aid > bid) {
+                return -1;
+              } else {
+                return 0;
+              }
+            }).map((word, i) => {
+              let cleanWord = word.pattern.replace(/"/g, "");
+              return (
+                <tr key={i}>
+                  <td>{cleanWord}</td>
+                  <td>{word.count}</td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  }
+
+  renderEpisodeMapTable() {
+    if (!this.dp) return;
+    let episodeMapArr = this.dp.episodeMapArr;
+    if (episodeMapArr) {
+      return (
+        <div>
+          <table className="vector-table">
+            <tbody>
+            <tr>
+              <td>Frequent Episode</td>
+              <td>Count</td>
+            </tr>
+            {episodeMapArr.sort(function (a, b) {
+              // reverse ordering
+              let aid = parseInt(a.count);
+              let bid = parseInt(b.count);
+              if (aid < bid) {
+                return 1;
+              } else if (aid > bid) {
+                return -1;
+              } else {
+                return 0;
+              }
+            }).map((episode, i) => {
+              let cleanEpisode = episode.pattern.replace(/"/g, "");
+              return (
+                <tr key={i}>
+                  <td>{cleanEpisode}</td>
+                  <td>{episode.count}</td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  }
+
+  renderAnomalyTable() {
+    if (!this.dp) return;
+    let anomalies = this.dp.anomalies["0"];
+    let logEventArr = this.dp.logEventArr;
+    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
+    let clusterTopWordArr = this.dp.clusterTopWordArr;
+    let neuronListNumber = {};
+    let neuronValue = [];
+    let nidList = _.map(logEventArr, function (o) {
+      return o['nid']
+    });
+    let neuronList = nidList.filter(function (el, index, arr) {
+      return index === arr.indexOf(el)
+    });
+    _.forEach(neuronList, function (value, key) {
+      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
+        return o['nid'] == value
+      })[0]).length;
+    });
+    let neuronIdList = neuronList;
+    neuronList = [];
+    neuronIdList.map(function (value, index) {
+      let num = 0;
+      for (let j = 0; j < index; j++) {
+        num += neuronListNumber[neuronIdList[j]];
+      }
+      neuronList.push(num);
+      neuronValue.push(neuronListNumber[neuronIdList[index]]);
+    });
+    logEventArr = logEventArr.filter(function (el, index, arr) {
+      return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3) || (el.nid == -1)
+    });
+
+    if (logEventArr) {
+      return (
+        <div>
+          <div className="ui header">Number of anomalies: {logEventArr.length}</div>
           <table className="event-table">
             <tbody>
               <tr>
-                <td>Cluster ID</td>
                 <td>Time</td>
                 <td>Event</td>
-                <td>Anomaly</td>
+                <td>Anomaly Hint</td>
               </tr>
               {logEventArr.map((event, iEvent) => {
-                let showNumber = neuronList.indexOf(iEvent);
-                let iGroup = neuronIdList.indexOf(event.nid)+1;
-                let realAnomalies = _.filter(anomalies, a => a.val>0);
-                let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
-                let nAnomaly = realAnomalies.indexOf(anomaly)+1;
-                let nAnomalyStr = "";
-                if(nAnomaly){
-                  nAnomalyStr = "Anomaly ID: ["+ nAnomaly + "]";
-                }
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let isAnomaly = "";
-                if(event.nid==-1){
-                  isAnomaly = "Anomaly Cluster"
+                let anomalyString = event.anomaly;
+                let topKEpisodes = "";
+                let topKWords = "";
+                let pos = 0;
+                let clusterFeature = "";
+                if(anomalyString == undefined){
+                  anomalyString = "";
+                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
+                  if(topKEpisodes.length>0){
+                    var entries = topKEpisodes.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if(pos!=-1){
+                        anomalyString += entry.substring(0,pos) + ' ';
+                      }
+                    });
+                  }
+                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+                  if(topKWords.length>0){
+                    var entries = topKWords.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if(pos!=-1){
+                        anomalyString += entry.substring(0,pos) + ' ';
+                      }
+                    });
+                  }
                 }
                 return (
                   <tr key={iEvent}>
-                    {showNumber!=-1?
-                    <td rowSpan={neuronValue[showNumber]}>
-                        Cluser {iGroup} <br />
-                        Number of events: {neuronValue[iGroup-1]} <br />
-                        {isAnomaly}
-                    </td>:
-                      ""
-                    }
                     <td>{timestamp}</td>
                     <td>{event.rawData}</td>
-                    <td>{event.anomaly}<br />{nAnomalyStr}</td>
+                    <td>{anomalyString}</td>
+                    <td>{clusterFeature}</td>
                   </tr>
                 )
               })}              
@@ -244,163 +428,73 @@ class LogAnalysisCharts extends React.Component {
     }
   }
 
-  renderGrid() {
+  renderEventTable() {
 
-    if (!this.dp) return;
+    const logEventArr = this.logEventArr;
+    const neuronValue = this.neuronValue;
+    const eventTableData = this.eventTableData;
 
-    let summary = this.dp.summaryData;
-    let groups = this.dp.groupsData;
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-
-    let {columns, selectedGroupId, instanceName} = this.state;
-    let elems = [];
-    let selectIndex = 0;
-    let selectArrow = <div style={{
-      position: 'absolute',
-      width: 20,
-      height: 20,
-      background: '#333',
-      transform: 'rotate(45deg)',
-      left: '50%',
-      bottom: '-25px',
-      marginLeft: -3
-    }}></div>;
-
-    if (groups) {
-      let rowCount = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
-      let groupsData, selectedGroup;
-      if (this.dp) {
-        groupsData = this.dp.getGroupsData();
-        selectedGroup = _.find(groupsData, g => g.id == selectedGroupId);
-      }
-
-      groups.sort(function(a, b) {
-              let aid = parseInt(a.groupId);
-              let bid = parseInt(b.groupId);
-              return +(aid > bid) || +(aid === bid) - 1;
-            }).forEach((group, index) => {
-
-        let isSelectGroup = selectedGroupId == group.id;
-        if (isSelectGroup) selectIndex = selectIndex + index;
-        let metrics = groupMetrics[parseInt(group.id)];
-
-        elems.push((
-          <div key={columns + group.id} className="ui card"
-               onClick={() => {
-                if (this.state.selectedGroupId == group.id) {
-                  this.setState({selectedGroupId: void 0});
-                } else {
-                  this.setState({selectedGroupId: group.id, summarySelected:false})
-                }
-               }}>
-            <div className="content">
-              <div className="header" style={{paddingBottom:8}}>Metric {metrics} (Group {group.groupId})</div>
-              <SummaryChart data={group}/>
-            </div>
-            {isSelectGroup && selectArrow}
+    if (logEventArr) {
+      return (
+        <div>
+          <div className="ui header">
+            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
           </div>
-        ));
-      });
-
-      let rowIndex = selectIndex % rowCount;
-      selectIndex = selectIndex + rowCount - rowIndex;
-      if (selectedGroup) {
-        elems = elems.slice(0, selectIndex).concat([(
-          <div key={'expand'} ref={(c)=>{
-            let $c = $(ReactDOM.findDOMNode(c));
-            $c.slideDown('fast', ()=>{
-              $(window.document).scrollTop($c.offset().top);
-
-              let metrics = groupMetrics[parseInt(selectedGroupId)];
-              ReactDOM.render((
-                  <div key={selectedGroup.id} style={{width: '100%', backgroundColor: '#fff'}}>
-                    <h4 className="ui header">{metrics} (Group {selectedGroupId}})</h4>
-                    <DetailsChart data={selectedGroup} />
-                    <i onClick={()=>this.setState({selectedGroupId: void 0})} className="close icon"
-                       style={{position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer'}}></i>
-                  </div>
-              ), c)
-            })
-          }} style={{width: '100%', backgroundColor: '#333', padding: 50, display: 'none', position: 'relative'}}>
-
-          </div>
-        )]).concat(elems.slice(selectIndex));
-      }
-    }
-
-    return (
-
-      <div className="ui grid">
-        <div className="sixteen wide column">
-          <div className={cx('ui', columns, 'cards')}>
-            {!instanceName && this.renderSummary()}
-            {elems}
-          </div>
+          <table className="event-table">
+            <thead>
+            <tr>
+              <td>Cluster ID</td>
+              <td>Time</td>
+              <td>Event</td>
+            </tr>
+            </thead>
+            {eventTableData.map((group, iGroup) => {
+              return (
+                <EventTableGroup key={iGroup} groupData={group} />
+              );
+            })}
+          </table>
         </div>
-      </div>
-    );
-  }
-
-  renderSummary() {
-    let summary = this.dp ? this.dp.summaryData : undefined;
-    if (!summary) return;
-    return (
-      <div key={summary.id} className="detail-charts" style={{width: '100%'}}>
-        <span id={summary.div_id} style={{position:'absolute', top: -100, visibility:'hidden'}}/>
-        <h4 className="ui header">{summary.title}</h4>
-        <DetailsChart
-          data={summary}
-          drawCallback={(g) => this.setState({listGraphZoomOpt: { dateWindow: g.xAxisRange() }})}
-          // onHighlight={(e, x, points, row, sname) => this.setState({listGraphSelection: { x: x, seriesName: sname }})}
-          // onUnhighlight={() => this.setState({listGraphSelection: undefined})}
-          // selection={listGraphSelection}
-          {...this.state.listGraphZoomOpt}
-        />
-      </div>
-    )
+      )
+    }
   }
 
   selectTab(e, tab) {
-      var tabStates = this.state['tabStates'];
-      tabStates = _.mapValues(tabStates, function (val) {
-          return '';
-      });
-      tabStates[tab] = 'active';
-      this.setState({tabStates: tabStates});
+    var tabStates = this.state['tabStates'];
+    tabStates = _.mapValues(tabStates, function (val) {
+      return '';
+    });
+    tabStates[tab] = 'active';
+    this.setState({ tabStates: tabStates });
   }
 
   renderList() {
     let self = this;
-    let groups = this.dp ? this.dp.groupsData : [];
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-    let {listGraphZoomOpt, tabStates} = this.state;
+    let { tabStates } = this.state;
+    const summary = this.summary;
+
     return (
       <div className="ui grid">
+        {!!summary &&
+        <DataSummaryChart key="summary_chart" summary={summary}/>
+        }
         <div className="sixteen wide column">
-          {this.renderSummary()}
-           <div className="ui pointing secondary menu">
-               <a className={tabStates['event'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
-               <a className={tabStates['episode'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'episode')}>Word Count</a>
-               <a className={tabStates['word'] + ' item'}
-                  onClick={(e) => this.selectTab(e, 'word')}>Frequent Episodes</a>
-           </div>
-           <div className={tabStates['event'] + ' ui tab '}>
-              {tabStates['event'] === 'active' ? (
-                self.renderEventTable()
-              ) : null}
-           </div>
-           <div className={tabStates['episode'] + ' ui tab '}>
-              {tabStates['episode'] === 'active' ? (
-                self.renderEpisodeMapTable()
-              ) : null}
-           </div>
-           <div className={tabStates['word'] + ' ui tab '}>
-              {tabStates['word'] === 'active' ? (
-                self.renderWordCountTable()
-              ) : null}
-           </div>
+          <div className="ui pointing secondary menu">
+            <a className={tabStates['event'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
+            <a className={tabStates['anomaly'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'anomaly')}>Anomaly List</a>
+          </div>
+          <div className={tabStates['event'] + ' ui tab '}>
+            {tabStates['event'] === 'active' ? (
+              self.renderEventTable()
+            ) : null}
+          </div>
+          <div className={tabStates['anomaly'] + ' ui tab '}>
+            {tabStates['anomaly'] === 'active' ? (
+              self.renderAnomalyTable()
+            ) : null}
+          </div>
         </div>
       </div>
     )
@@ -408,61 +502,30 @@ class LogAnalysisCharts extends React.Component {
 
   render() {
 
-    let {data, loading, onRefresh, enablePublish} = this.props;
-    let {columns, view} = this.state;
+    let { loading, onRefresh } = this.props;
 
-    let isListView = view === 'list';
-    let contentStyle = {paddingLeft: 0};
+    let contentStyle = { paddingLeft: 0 };
     let contentClass = loading ? 'ui form loading' : '';
 
-    if (data && !this.dp) {
-      // Since componentWillUpdate is not called at initial time, so 
-      // we need to parse the data
-      this.dp = new DataParser(data);
-      if (this.dp.mode != 'split') {
-        this.dp.getSummaryData();
-      }
-      this.dp.getGroupsData();
-    }
-
-    let groupMetrics = this.dp ? this.dp.groupmetrics : null;
-    let dataArray = this.dp ? this.dp.causalDataArray : undefined;
-    let types = this.dp ? this.dp.causalTypes : undefined;
-        // <Console.Navbar style={navbarStyle}>
-        //   <Navbar groupMetrics={groupMetrics}/>
-        // </Console.Navbar>
+    this.calculateData();
 
     return (
       <Console.Wrapper>
         <Console.Content style={contentStyle} className={contentClass}>
-          <div className="ui main tiny container" style={{minHeight:'100%'}}>
+          <div className="ui main tiny container" style={{ minHeight: '100%' }}>
             {!loading &&
             <div className="ui vertical segment">
               <Button className="labeled icon" onClick={() => onRefresh()}>
                 <i className="icon refresh"/>Refresh
               </Button>
-              <ButtonGroup className="right floated basic icon">
-                <Button onClick={()=> this.setState({showSettingModal: true})}>
-                  <i className="icon setting"/>
-                </Button>
-                <Button active={view === 'list'}
-                        onClick={()=>this.setState({view:'list', summarySelected:false,selectedGroupId: null})}>
-                  <i className="align justify icon"/>
-                </Button>
-                <Button active={view === 'grid'}
-                        onClick={()=>this.setState({view:'grid', summarySelected:false,selectedGroupId: null})}>
-                  <i className="grid layout icon"/>
-                </Button>
-              </ButtonGroup>
             </div>
             }
             <div className="ui vertical segment">
-              {!isListView && this.renderGrid()}
-              {!loading && isListView && this.renderList()}
+              {!loading && this.renderList()}
             </div>
           </div>
           { this.state.showSettingModal &&
-          <SettingModal onClose={() => this.setState({showSettingModal: false})}/>
+          <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
           }
         </Console.Content>
       </Console.Wrapper>

@@ -32,7 +32,7 @@ class ProjectSelection extends React.Component {
 }
 
 // include only and File Replay
-class FileReplayProjectSelection extends React.Component {
+class LogFileReplayProjectSelection extends React.Component {
 
   static contextTypes = {
     dashboardUservalues: React.PropTypes.object
@@ -45,7 +45,7 @@ class FileReplayProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.isStationary);
+    projects = projects.filter((item,index) => item.fileProjectType == 0);
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -232,7 +232,7 @@ export {
   ProjectSelection,
   LiveProjectSelection,
   InstanceProjectSelection,
-  FileReplayProjectSelection,
+  LogFileReplayProjectSelection,
   ModelType,
   LogModelType,
   AnomalyThreshold,

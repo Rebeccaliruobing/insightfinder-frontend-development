@@ -85,7 +85,15 @@ export default  class FilterBar extends Component {
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      anomalyThreshold: 0.99,
+      durationThreshold: 5,
+      minPts: 5,
+      epsilon: 1.0
+    };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
@@ -320,6 +328,7 @@ export default  class FilterBar extends Component {
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
+    const selectedIncident = incident;
     const labelStyle = {};
     let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
@@ -398,15 +407,20 @@ export default  class FilterBar extends Component {
                 let recsuffix = recorded?"(recorded)":"(manual)";
                 let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
                   +medstr+"], "+modelType+" "+recsuffix;
+                let selected = incident === selectedIncident;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
+                  <div className={"item " + (selected ? 'selected' : '')}
+                       key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                       style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
+                      <a className="header padding5 incident-item"
+                         title={tooltipcontent}
+                         style={{'minWidth': '574px', paddingTop: 9, paddingLeft: 10}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="ui padding10 mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
@@ -424,20 +438,20 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>Model Start</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
-                                onChange={this.handleModelStartTimeChange.bind(this)}/>
-              </div>
-            </div>
-
-            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Incident End</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
                                 onChange={this.handleEndTimeChange.bind(this)}/>
+              </div>
+            </div>
+
+            <div className="field" style={{'width': '25%'}}>
+              <label style={labelStyle}>Model Start</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
+                                onChange={this.handleModelStartTimeChange.bind(this)}/>
               </div>
             </div>
 

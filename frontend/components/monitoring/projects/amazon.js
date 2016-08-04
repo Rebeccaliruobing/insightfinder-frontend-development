@@ -42,6 +42,8 @@ class AmazonProjects extends React.Component {
 
     handleModalClose = () => this.setState({showModal: false});
 
+    handleModalCancel = () => $('#btn-register').removeClass('loading');
+
     handleRemoveProject(projectName) {
         let {projectsList}= this.state;
         let self = this;
@@ -67,7 +69,7 @@ class AmazonProjects extends React.Component {
         let {projectsList} = this.state;
         return (
             <div className="ui attached">
-                <button className="ui small positive action button"
+                <button id="btn-register" className="ui small positive action button"
                         onClick={(e) => {this.setState({showModal: true});$(e.target).addClass('loading');}}>
                     <i className="icon plus"></i>Register
                 </button>
@@ -78,7 +80,6 @@ class AmazonProjects extends React.Component {
                         <td style={{width: '16%'}}>Instance Type</td>
                         <td style={{width: '16%'}}>Zone</td>
                         <td style={{width: '16%'}}>Monitoring Type</td>
-                        <td style={{width: '16%'}}>Agent Data Enabled</td>
                         <td style={{width: '16%'}}></td>
                     </tr>
                     {
@@ -89,8 +90,6 @@ class AmazonProjects extends React.Component {
                                     <td style={{width: '16%'}}>{dataType}</td>
                                     <td style={{width: '16%'}}>{zone}</td>
                                     <td style={{width: '16%'}}>{cloudType}</td>
-                                    <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled}
-                                                                      readOnly={true}/></td>
                                     <td style={{width: '16%'}}>
                                         <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>
                                             {flag?"Unshare":"Remove"}
@@ -104,7 +103,7 @@ class AmazonProjects extends React.Component {
                 </table>
                 {
                     this.state.showModal &&
-                    <AmazonProjectModal onClose={this.handleModalClose}/>
+                    <AmazonProjectModal onClose={this.handleModalClose} onCancel={this.handleModalCancel}/>
                 }
             </div>
         )

@@ -1,9 +1,7 @@
 import React from 'react';
-import cx from 'classnames';
 import ReactTimeout from 'react-timeout'
 import store from 'store';
 import {BaseComponent, PropTypes, Table, Link} from '../../../artui/react';
-import {Dygraph} from '../../../artui/react/dataviz';
 import apis from '../../../apis';
 import DataParser from '../dataparser';
 import {SummaryChart} from '../liveanalysis/charts';
@@ -34,37 +32,34 @@ class ProjectSummary extends BaseComponent {
   }
 
   componentDidMount() {
-    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
-    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
-    let data = store.get(key, null);
-    
-    if (!data) {
-      this.updateLiveAnalysis();
-    }
-  }
-  
-  componentWillUnmount() {
-    // this.props.clearTimeout(this.timeout);
+    this.updateLiveAnalysis();
   }
 
   updateLiveAnalysis() {
 
-    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
-    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
+    let {projectName, modelType, pvalue, cvalue} = this.props;
+    let key = `${projectName}_${modelType}_${pvalue}_${cvalue}`;
     
     // this.props.clearTimeout(this.timeout);
     this.setState({loading: true});
-    
-    apis.postLiveAnalysis(projectName, modelType, anomalyThreshold, durationThreshold)
+    apis.postLiveAnalysis(projectName, modelType, pvalue, cvalue)
       .then(resp => {
         let update = {};
         if (resp.success) {
+           resp.data.periodString = resp.data.periodString?resp.data.periodString.split(",").map(function (value,index) {
+             if(index%2 == 1){
+               if(Number.parseInt(value)!=-1){
+                 return value;
+               }
+             }
+           }):[];
           update.data = resp.data;
           let storeRespData = {
             'anomalyConsolidatedString': resp.data.anomalyConsolidatedString,
             'anomalyString': resp.data.anomalyString,
             'detectionResults': resp.data.detectionResults,
-            'detectSuccess': resp.data.detectSuccess
+            'detectSuccess': resp.data.detectSuccess,
+            'periodString': resp.data.periodString
           };
           store.set(key, storeRespData);
         } else {
@@ -80,20 +75,24 @@ class ProjectSummary extends BaseComponent {
         console.error(msg);
       });
   }
-  
   render() {
-    let {projectName, modelType, anomalyThreshold, durationThreshold} = this.props;
-    let query = {projectName, modelType, anomalyThreshold, durationThreshold};
+    let {projectName, modelType, pvalue, cvalue} = this.props;
+    let query = {projectName, modelType, pvalue, cvalue};
     let {loading, showCloser, data} = this.state;
     let loadStyle = loading ? 'ui form loading':'';
     
-    let key = `${projectName}_${modelType}_${anomalyThreshold}_${durationThreshold}`;
+    let key = `${projectName}_${modelType}_${pvalue}_${cvalue}`;
     data = data || store.get(key, null);
-
     if (data && this.data !== data) {
       this.sdata = new DataParser(data).getSummaryData();
-      this.data = data;
+      data = this.data;
     }
+    let periodData = data?data.periodString.map(function (value, index) {
+        if(value!=false){
+          return value;
+        }
+    }):[];
+    let periodLength = periodData.length;
     let sdata = this.sdata;
     return (
       <div className='ui card'
@@ -112,8 +111,9 @@ class ProjectSummary extends BaseComponent {
           <div className="header">Summary: {projectName}</div>
           <div className="meta" style={{paddingBottom: 10}}>
             <span>{modelType} /</span>
-            <span>{anomalyThreshold} /</span>
-            <span>{durationThreshold} samples</span>
+            <span>{(modelType === 'DBScan' ? 'minPts ' : '') + pvalue + ' /'}</span>
+            <span>{(modelType === 'DBScan' ? 'epsilon ' : '') + cvalue + ' samples'}</span>
+            {periodLength!=0?<span> / Periodicity detected</span>:null}
           </div>
           <div className={loadStyle} style={{height: '150px'}}>
             {sdata? <SummaryChart data={sdata} />: <span>Model in training...</span>}

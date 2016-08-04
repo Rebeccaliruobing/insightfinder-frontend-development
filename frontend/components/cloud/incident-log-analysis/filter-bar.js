@@ -6,7 +6,7 @@ import store from 'store';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  FileReplayProjectSelection,
+  LogFileReplayProjectSelection,
   LogModelType,
   DurationHour,
   AnomalyThreshold,
@@ -29,7 +29,7 @@ export default  class FilterBar extends Component {
     this.state = {
       projectName: '',
       pvalue: 0.99,
-      cvalue: 5,
+      cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
       durationHours: 24,
@@ -52,7 +52,7 @@ export default  class FilterBar extends Component {
   componentDidMount() {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.isStationary);
+    projects = projects.filter((item,index) =>  item.fileProjectType == 0);
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
@@ -86,7 +86,15 @@ export default  class FilterBar extends Component {
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      pvalue: 0.9,
+      cvalue: 1,
+      minPts: 5,
+      epsilon: 1.0
+    };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
@@ -286,7 +294,7 @@ export default  class FilterBar extends Component {
       this.context.root.loadUserValues().then(()=> {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-          projects = projects.filter((item,index) => item.isStationary);
+          projects = projects.filter((item,index) =>  item.fileProjectType == 0);
           if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName, projects[0].projectName);
           }
@@ -323,6 +331,7 @@ export default  class FilterBar extends Component {
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
+    const selectedIncident = incident;
     let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
@@ -331,7 +340,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Name</label>
-            <FileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <LogFileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <label style={labelStyle}>Project Type</label>
@@ -398,13 +407,18 @@ export default  class FilterBar extends Component {
                 let msdstr = msd.format("YYYY-MM-DD HH:mm");
                 let medstr = med.format("YYYY-MM-DD HH:mm");
                 let recsuffix = recorded?"(recorded)":"(manual)";
+                let selected = incident === selectedIncident;
                 let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
+                  <div className={"item " + (selected ? 'selected' : '')}
+                       key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                       style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
+                      <a className="header padding5 incident-item"
+                         title={tooltipcontent}
+                         style={{'minWidth': '574px', paddingLeft: 10}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
@@ -426,20 +440,20 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>Model Start</label>
-              <div className="ui input">
-                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
-                                onChange={this.handleModelStartTimeChange.bind(this)}/>
-              </div>
-            </div>
-
-            <div className="field" style={{'width': '25%'}}>
               <label style={labelStyle}>Log End</label>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
                                 onChange={this.handleEndTimeChange.bind(this)}/>
+              </div>
+            </div>
+
+            <div className="field" style={{'width': '25%'}}>
+              <label style={labelStyle}>Model Start</label>
+              <div className="ui input">
+                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
+                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
+                                onChange={this.handleModelStartTimeChange.bind(this)}/>
               </div>
             </div>
 

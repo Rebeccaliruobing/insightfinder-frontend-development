@@ -4,7 +4,7 @@ import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  ProjectSelection,
+  LiveProjectSelection,
   ModelType,
   WindowWithWeek,
   AnomalyThreshold,
@@ -62,7 +62,7 @@ export default  class FilterBar extends Component {
       default:
         update.projectType = `${cloudType}/Agent`;
     }
-    this.setState(update);
+    this.setState(update,()=>{this.handleSubmit()});
   }
 
   handleEndTimeChange(endTime) {
@@ -86,7 +86,7 @@ export default  class FilterBar extends Component {
         <div className="five fields fill">
           <div className="field">
             <label style={labelStyle}>Project Name</label>
-            <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <LiveProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
             <label style={labelStyle}>Project Type</label>
@@ -110,11 +110,6 @@ export default  class FilterBar extends Component {
                               onChange={this.handleEndTimeChange.bind(this)}/>
             </div>
           </div>
-        </div>
-
-        <div className="ui field">
-          <Button className={cx('orange', {'loading': this.props.loading})}
-                  onClick={this.handleSubmit.bind(this)}>Submit</Button>
         </div>
       </div>
     )
