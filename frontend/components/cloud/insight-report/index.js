@@ -283,6 +283,10 @@ class InsightReport extends BaseComponent {
             tabStates: {
                 date: 'active',
                 dow: ''
+            },
+            tabStatesBasic: {
+                latest: 'active',
+                history: ''
             }
         };
     }
@@ -294,6 +298,15 @@ class InsightReport extends BaseComponent {
         });
         tabStates[tab] = 'active';
         this.setState({tabStates: tabStates});
+    }
+
+    selectTabBasic(e, tab) {
+        var tabStates = this.state['tabStatesBasic'];
+        tabStates = _.mapValues(tabStates, function (val) {
+            return '';
+        });
+        tabStates[tab] = 'active';
+        this.setState({tabStatesBasic: tabStates});
     }
 
     handleToggleFilterPanel() {
@@ -338,9 +351,10 @@ class InsightReport extends BaseComponent {
         });
     }
     render() {
+        let pieChartTop = {'height': '250px', 'width': '24%', 'margin': '0 auto'};
         let pieChartLeft = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
         let pieChartRight = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
-        const {showAddPanel,projectName,detailData,loadingIndex,tabStates} = this.state;
+        const {showAddPanel,projectName,detailData,loadingIndex,tabStates,tabStatesBasic} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
         let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime"];
@@ -376,61 +390,101 @@ class InsightReport extends BaseComponent {
                         {chartsData?
                         <div>
                             <div className="insight-basic-stats">
-                                <div className="insight-basic-charts">
-                                    {basicStatsKeys.map(function (value, index) {
-                                        let name = "";
-                                        let dataItem = chartsData['basicProjectStats'][value];
-                                        if(dataItem==undefined){
-                                            return null;
-                                        } else {
-                                            let dataValue = dataItem.toString();
-                                            if(value == "NumberOfInstances"){
-                                                name = "Num of Instances";
-                                            } else if (value == "NumberOfContainers") {
-                                                name = "Num of Containers";
-                                            } else if (value == "NumberOfMetrics") {
-                                                name = "Num of Metrics";
-                                            } else if (value == "AvgInstanceUptime") {
-                                                name = "Avg Instance Uptime";
-                                                dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
+                                    <div className="ui pointing secondary menu">
+                                      <a className={tabStatesBasic['latest'] + ' item'}
+                                         onClick={(e) => this.selectTabBasic(e, 'latest')}>Latest</a>
+                                      <a className={tabStatesBasic['history'] + ' item'}
+                                         onClick={(e) => this.selectTabBasic(e, 'history')}>History</a>
+                                    </div>
+                                    <div className={tabStatesBasic['latest'] + ' ui tab '}>
+                                      {tabStatesBasic['latest'] === 'active' ?
+                                      <div className="insight-basic-charts">
+                                        {basicStatsKeys.map(function (value, index) {
+                                            let name = "";
+                                            let dataItem = chartsData['basicProjectStats'][value];
+                                            if(dataItem==undefined){
+                                                return null;
+                                            } else {
+                                                let dataValue = dataItem.toString();
+                                                if(value == "NumberOfInstances"){
+                                                    name = "Num of Instances";
+                                                } else if (value == "NumberOfContainers") {
+                                                    name = "Num of Containers";
+                                                } else if (value == "NumberOfMetrics") {
+                                                    name = "Num of Metrics";
+                                                } else if (value == "AvgInstanceUptime") {
+                                                    name = "Avg Instance Uptime";
+                                                    dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
+                                                }
+                                                return <PieChart key={index} colorChart="#3398DB" data={name}
+                                                             dataValue={dataValue}/>
                                             }
-                                            return <PieChart key={index} colorChart="#3398DB" data={name}
-                                                         dataValue={dataValue}/>
-                                        }
-                                    })}
-                                </div>
-                            </div>
-                            <div className="insight-barchart-base">
-                                  <div className="ui pointing secondary menu">
-                                    <a className={tabStates['date'] + ' item'}
-                                       onClick={(e) => this.selectTab(e, 'date')}>By Date</a>
-                                    <a className={tabStates['dow'] + ' item'}
-                                       onClick={(e) => this.selectTab(e, 'dow')}>By Day-of-Week</a>
-                                  </div>
-
-                                  <div className={tabStates['date'] + ' ui tab '}>
-                                    {tabStates['date'] === 'active' ?
-                                        <div className="insight-anomalies">
-                                            <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
-                                                      data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
-                                                      option={{title: {y: 'top'}}}
-                                                      colorChart="#C13100"
-                                                      useData={true}/>
-
-                                            <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
-                                                      data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
-                                                      option={{title: {y: 'top'}}}
-                                                      colorChart="#CC6600"
-                                                      useData={true}/>
-
-                                            <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
-                                                      data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
-                                                      option={{title: {y: 'top'}}}
-                                                      colorChart="#FF9900"
-                                                      useData={true}/>
+                                        })}
                                       </div>
-                                        : null}
-                                  </div>
+                                      : null}
+                                    </div>
+                                    <div className={tabStatesBasic['history'] + ' ui tab '}>
+                                      {tabStatesBasic['history'] === 'active' ?
+                                      <div className="insight-basic-charts">
+                                        {basicStatsKeys.map(function (value, index) {
+                                            let name = "";
+                                            let dataItem = chartsData['basicProjectStats'][value];
+                                            if(dataItem==undefined){
+                                                return null;
+                                            } else {
+                                                if(value == "NumberOfInstances"){
+                                                    name = "Num of Instances";
+                                                } else if (value == "NumberOfContainers") {
+                                                    name = "Num of Containers";
+                                                } else if (value == "NumberOfMetrics") {
+                                                    name = "Num of Metrics";
+                                                } else if (value == "AvgInstanceUptime") {
+                                                    name = "Avg Instance Uptime";
+                                                }
+                                                return (<BarChart title={name}  pieChartStyle={pieChartTop}
+                                                    data={chartsData['basicProjectStatsTimeseries'][value]}
+                                                    option={{title: {y: 'top'}}}
+                                                    colorChart="#3398DB"
+                                                    useData={true}/>)
+                                            }
+                                        })}
+                                      </div>
+                                      : null}
+                                    </div>
+                                
+                            </div>
+
+                            <div className="insight-barchart-base">
+                                <div className="ui pointing secondary menu">
+                                  <a className={tabStates['date'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'date')}>By Date</a>
+                                  <a className={tabStates['dow'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'dow')}>By Day-of-Week</a>
+                                </div>
+
+                                <div className={tabStates['date'] + ' ui tab '}>
+                                  {tabStates['date'] === 'active' ?
+                                      <div className="insight-anomalies">
+                                          <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
+                                                    data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
+                                                    option={{title: {y: 'top'}}}
+                                                    colorChart="#C13100"
+                                                    useData={true}/>
+
+                                          <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
+                                                    data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
+                                                    option={{title: {y: 'top'}}}
+                                                    colorChart="#CC6600"
+                                                    useData={true}/>
+
+                                          <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
+                                                    data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
+                                                    option={{title: {y: 'top'}}}
+                                                    colorChart="#FF9900"
+                                                    useData={true}/>
+                                    </div>
+                                      : null}
+                                </div>
                                 <div className={tabStates['dow'] + ' ui tab '}>
                                     {tabStates['dow'] === 'active' ?
                                           <div className="insight-anomalies">
@@ -451,6 +505,7 @@ class InsightReport extends BaseComponent {
                                   </div>
 
                             </div>
+
                             <div className="insight-pieTick-base">
                                 <div className="insight-anomaly-source">
                                     <PieTickChart title="Metric Attribution (by frequency)" name="Metric"

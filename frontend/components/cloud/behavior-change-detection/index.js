@@ -97,20 +97,20 @@ export default class BehaviorChangeDetection extends Component {
                             <a className={tabStates['metric'] + ' item'}
                                onClick={(e) => this.selectTab(e, 'metric')}>By Metric</a>
                             <a className={tabStates['instance'] + ' item'}
-                               onClick={(e) => this.selectTab(e, 'instance')}> By Instance</a>
+                               onClick={(e) => this.selectTab(e, 'instance')}>By Instance</a>
                         </div>
 
                         <div className={tabStates['metric'] + ' ui tab '}>
                             {tabStates['metric'] === 'active' ?
                                 <div>
-                                    <OutlierDetection />
+                                    <RolloutCheck />
                                 </div>
                                 : null}
                         </div>
                         <div className={tabStates['instance'] + ' ui tab '}>
                             {tabStates['instance'] === 'active' ?
                                 <div>
-                                    <RolloutCheck />
+                                    <OutlierDetection />
                                 </div>
                                 : null}
                         </div>
