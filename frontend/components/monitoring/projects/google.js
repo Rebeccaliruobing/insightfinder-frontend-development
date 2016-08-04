@@ -28,7 +28,7 @@ class GoogleProjects extends React.Component {
 
   handleRemoveProject(projectName) {
     return (e) => {
-      if (!window.confirm("Confirm deleting project?")) return;
+      if (!window.confirm("Delete this project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
           window.alert(resp.message);

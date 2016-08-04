@@ -70,13 +70,13 @@ export default class BehaviorChangeDetection extends Component {
         const {showAddPanel, tabStates} = this.state;
         const {userInstructions} = this.context;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
-
+        // onClick={this.handleToggleFilterPanel.bind(this)}
         return (
             <Console.Content>
                 <div className="ui main tiny container" ref={c => this._el = c}>
                     <div className="ui clearing vertical segment">
                         <ButtonGroup className="right floated basic icon">
-                            <Button onClick={this.handleToggleFilterPanel.bind(this)}>
+                            <Button>
                                 <Popup position="bottom right">
                                     <i className={panelIconStyle}/>
                                     <span className="ui mini popup">Expand & Close</span>

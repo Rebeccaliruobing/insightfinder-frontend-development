@@ -48,7 +48,7 @@ class AmazonProjects extends React.Component {
         let {projectsList}= this.state;
         let self = this;
         return (e) => {
-            if (!window.confirm("Confirm deleting project?")) return;
+            if (!window.confirm("Delete this project?")) return;
             let removeProject = [];
             //(projectsList || []).map(function (value, index) {
             //    if (value['name'] != projectName) {
