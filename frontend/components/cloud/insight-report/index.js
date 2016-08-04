@@ -424,7 +424,7 @@ class InsightReport extends BaseComponent {
                                       : null}
                                     </div>
                                     <div className={tabStatesBasic['history'] + ' ui tab '}>
-                                      {tabStatesBasic['history'] === 'active' ?
+                                      {tabStatesBasic['history'] === 'active' && chartsData['basicProjectStatsTimeseries'] ?
                                       <div className="insight-basic-charts">
                                         {basicStatsKeys.map(function (value, index) {
                                             let name = "";

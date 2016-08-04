@@ -7,13 +7,13 @@ export default function (props) {
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
-        <Link to="/cloud/insight-report" className="item text-white">
-          <i className="bar chart icon"></i>
-          <span> Insight Report </span>
-        </Link>
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="line chart icon"></i>
           <span> Real-time Alert </span>
+        </Link>
+        <Link to="/cloud/insight-report" className="item text-white">
+          <i className="bar chart icon"></i>
+          <span> Insight Report </span>
         </Link>
         <Link to="/cloud/incident-analysis" className="item text-white">
           <i className="zoom icon"></i>
