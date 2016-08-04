@@ -69,7 +69,7 @@ export class DataChart extends React.Component {
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
-        axisLabelWidth={35}
+        axisLabelWidth={45}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
