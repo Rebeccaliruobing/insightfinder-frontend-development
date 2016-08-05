@@ -19,7 +19,7 @@ export default class ExtSvc extends React.Component {
             integrate your account alerts with PagerDuty.
           </div>
           <a target="_blank"
-             href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=http://localhost:8888/service-integration">
+             href="https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=https://insightfindergae.appspot.com/settings/extsvc">
             <img alt="Connect_button" height='40px' src={pagerDutyImg}/>
           </a>
           <hr />

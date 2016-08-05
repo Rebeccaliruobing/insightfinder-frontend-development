@@ -351,13 +351,13 @@ class InsightReport extends BaseComponent {
         });
     }
     render() {
-        let pieChartTop = {'height': '250px', 'width': '24%', 'margin': '0 auto'};
+        let pieChartTop = {'height': '250px', 'width': '20%', 'margin': '0 auto'};
         let pieChartLeft = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
         let pieChartRight = {'marginLeft': '10px', 'height': '250px', 'width': '32%', 'float': 'left'};
         const {showAddPanel,projectName,detailData,loadingIndex,tabStates,tabStatesBasic} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
-        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime"];
+        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
         return (
             <Console.Content className={loadingIndex?"ui form loading":""}>
                 {loadingIndex ? null :
@@ -412,6 +412,9 @@ class InsightReport extends BaseComponent {
                                                     name = "Num of Containers";
                                                 } else if (value == "NumberOfMetrics") {
                                                     name = "Num of Metrics";
+                                                } else if (value == "BillingEstimate") {
+                                                    name = "Estimated Daily Cost";
+                                                    dataValue = ("$"+(dataItem.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
                                                     name = "Avg Instance Uptime";
                                                     dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
@@ -438,6 +441,8 @@ class InsightReport extends BaseComponent {
                                                     name = "Num of Containers";
                                                 } else if (value == "NumberOfMetrics") {
                                                     name = "Num of Metrics";
+                                                } else if (value == "BillingEstimate") {
+                                                    name = "Estimated Daily Cost";
                                                 } else if (value == "AvgInstanceUptime") {
                                                     name = "Avg Instance Uptime";
                                                 }

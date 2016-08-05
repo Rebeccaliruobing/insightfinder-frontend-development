@@ -132,9 +132,9 @@ export default class RolloutCheck extends Component {
         this.setState({loading: true}, () => {
             apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {
                 if (resp.success) {
-                    this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
-                        this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
-                    });
+                    // this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+                    //     this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
+                    // });
 
                     resp.data.originData = Object.assign({}, resp.data);
                     resp.data.projectName = data.projectName;
