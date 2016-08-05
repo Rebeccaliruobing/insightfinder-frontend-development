@@ -276,9 +276,10 @@ export default  class FilterBar extends Component {
                       <tr key={index} onClick={this.handleSelectItem(item)} className={cx({
                         'active': item == this.state.activeItem
                       })}>
-                        <td>System: {item.metaData.system}, incident name/bug ID: {item.metaData.name},
-                          owner: {item.fromUser},
-                          sharing mode: {pubMode}</td>
+                        <td>Incident name/bug ID: {item.metaData.name},
+                          Owner: {item.fromUser},
+                          Sharing mode: {pubMode}, 
+                          System: {item.metaData.system} </td>
                       </tr>
                     )
                 })}
