@@ -5,10 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
   ProjectSelection,
-  ModelType,
   WindowWithWeek,
-  AnomalyThreshold,
-  DurationThreshold,
 } from '../../selections';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
@@ -99,8 +96,7 @@ export default  class FilterBar extends Component {
           <div className="field">
             <label style={labelStyle}>Start Time</label>
             <div className="ui input">
-              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readO
-                              nly/>
+              <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime} readOnly={true} />
             </div>
           </div>
           <div className="field">

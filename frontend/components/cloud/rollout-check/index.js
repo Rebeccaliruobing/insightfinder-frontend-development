@@ -1,19 +1,15 @@
 import React, {Component} from 'react';
-import store from 'store';
+import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
-import RcSlider from '../../ui/rc-slider';
 import HeatMapCard from '../../ui/heat-map-card';
+import moment from 'moment';
+import {autobind} from 'core-decorators';
 import {
-    Modal, Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message
+    Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message
 } from '../../../artui/react/index';
-import {Dygraph} from '../../../artui/react/dataviz';
 
 import apis from '../../../apis';
-
 import FilterBar from './filter-bar';
-
-import moment from 'moment';
-
 
 export default class RolloutCheck extends Component {
     static contextTypes = {
@@ -24,10 +20,11 @@ export default class RolloutCheck extends Component {
         super(props);
         let weeks = 1;
         this.state = {
-            view: 'chart',
-            dateIndex: 0,
-            timeIndex: 0,
             showAddPanel: true,
+            tabStates: {
+                holistic: 'active',
+                split: ''
+            },
             params: {
                 projects: [],
                 weeks: weeks,
@@ -35,18 +32,11 @@ export default class RolloutCheck extends Component {
                 startTime: moment(new Date()).add(-7 * weeks, 'days')
             },
             data: {},
-            tabStates: {
-                holistic: 'active',
-                split: ''
-            }
         };
     }
 
-    componentDidMount() {
-    }
-
     handleData(data) {
-        this.setState({data: data}, ()=> {
+        this.setState({ data: data }, ()=> {
             this.setHeatMap(_.keys(this.state.data.modelData)[1]);
         })
     }
@@ -112,30 +102,24 @@ export default class RolloutCheck extends Component {
             splitGroup = handleGroup(modelData[groupId], groupId)
         }
 
-        this.setState({holisticGroup, splitGroup, groupId: groupId});
+        this.setState({ holisticGroup, splitGroup, groupId: groupId });
     }
 
-    handleDateIndexChange(startIndex) {
-        return (value) => this.setHeatMap(parseInt(value + startIndex))
-    }
-
+    @autobind
     handleToggleFilterPanel() {
-        this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
+        this.setState({ showAddPanel: !this.state.showAddPanel }, ()=> {
             this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
         })
     }
 
+    @autobind
     handleFilterChange(data) {
 
         let startTime = moment(data.startTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
         let endTime = moment(data.endTime).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-        this.setState({loading: true}, () => {
+        this.setState({ loading: true }, () => {
             apis.postCloudRolloutCheck(startTime, endTime, data.projectName, 'cloudrollout').then((resp)=> {
                 if (resp.success) {
-                    // this.setState({showAddPanel: !this.state.showAddPanel}, ()=> {
-                    //     this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
-                    // });
-
                     resp.data.originData = Object.assign({}, resp.data);
                     resp.data.projectName = data.projectName;
 
@@ -156,33 +140,11 @@ export default class RolloutCheck extends Component {
                     resp.data.modelData = groups;
                     this.handleData(resp.data);
                 }
-                this.setState({loading: false});
+                this.setState({ loading: false });
             }).catch(()=> {
-                this.setState({loading: false});
+                this.setState({ loading: false });
             })
         });
-    }
-
-    renderSlider() {
-
-        let data = this.state.data.modelData;
-        if (data === undefined) return;
-        let marks = data && data.map((item, index)=> `
-      ${moment(item.startTime).format('MM-DD HH:mm')} \n
-      ${moment(item.endTime).format('MM-DD HH:mm')}
-    `).sort();
-        if (!marks) return;
-        if (marks === undefined) return;
-        const dateIndex = this.state.dateIndex;
-        marks = marks.map((mark, index)=> !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark : '');
-        return (
-            <div className="padding40">
-                {this.state.data && (
-                    <RcSlider onChange={this.handleDateIndexChange(0)} max={marks.length - 1} value={dateIndex}
-                              marks={marks}/>
-                )}
-            </div>
-        )
     }
 
     selectTab(e, tab) {
@@ -191,7 +153,7 @@ export default class RolloutCheck extends Component {
             return '';
         });
         tabStates[tab] = 'active';
-        this.setState({tabStates: tabStates});
+        this.setState({ tabStates: tabStates });
     }
 
     getMericName(metricNameList) {
@@ -204,18 +166,25 @@ export default class RolloutCheck extends Component {
 
     render() {
         const self = this;
-        const {showAddPanel, tabStates} = this.state;
-        const {userInstructions} = this.context;
+        const { showAddPanel, tabStates } = this.state;
+        const { userInstructions } = this.context;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         return (
             <Console.Content>
-                <div className="ui main tiny container" ref={c => this._el = c}>
-
+                <div className="ui main tiny container">
+                    <ButtonGroup className="right floated basic icon"
+                                 style={{ position: 'absolute', top: 10, right: 0 }}>
+                        <Button onClick={this.handleToggleFilterPanel}>
+                            <i className={panelIconStyle}/>
+                        </Button>
+                    </ButtonGroup>
                     <div className="ui vertical segment filterPanel"
                          ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
+                        <i className="close link icon" style={{ float: 'right', marginTop: '-10px' }}
+                           onClick={this.handleToggleFilterPanel}/>
                         <FilterBar loading={this.state.loading} {...this.props}
-                                   onSubmit={this.handleFilterChange.bind(this)}/>
-                        <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudrollout}}/>
+                                   onSubmit={this.handleFilterChange}/>
+                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.cloudrollout }}/>
                     </div>
 
                     <div className="ui vertical segment">
@@ -239,20 +208,21 @@ export default class RolloutCheck extends Component {
                                 <div className={tabStates['holistic'] + ' ui tab '}>
                                     {tabStates['holistic'] === 'active' ? (
                                         <div className="ui four cards">
-                                            {this.state.holisticGroup && this.state.holisticGroup.map((data,)=> <HeatMapCard {...data}/>)}
+                                            {this.state.holisticGroup && this.state.holisticGroup.map((data,)=>
+                                                <HeatMapCard {...data}/>)}
                                         </div>
                                     ) : null}
                                 </div>
                                 <div className={tabStates['split'] + ' ui tab '}>
                                     {tabStates['split'] === 'active' ? (
                                         <div>
-                                            <div style={{padding: '10px 0'}}>
+                                            <div style={{ padding: '10px 0' }}>
                                                 <Dropdown keys={_.keys(this.state.data.modelData).length} mode="select"
                                                           value={`Group ${this.state.groupId || ""} ${this.getMericName(this.state.data.modelData[this.state.groupId || ""][0]['metricNameList'])}`}
                                                           onChange={(v)=>this.setHeatMap(v)}>
                                                     <i className="dropdown icon"/>
 
-                                                    <div className="menu" style={{'minWidth': '300px'}}>
+                                                    <div className="menu" style={{ 'minWidth': '300px' }}>
                                                         {_.keys(this.state.data.modelData).map((g)=> {
                                                             return g > 0 &&
                                                                 <div className="item" key={g} data-value={g}>
@@ -262,7 +232,8 @@ export default class RolloutCheck extends Component {
                                                 </Dropdown>
                                             </div>
                                             <div className="ui four cards">
-                                                {this.state.splitGroup && this.state.splitGroup.map((data,)=> <HeatMapCard {...data}/>)}
+                                                {this.state.splitGroup && this.state.splitGroup.map((data,)=>
+                                                    <HeatMapCard {...data}/>)}
                                             </div>
                                         </div>
                                     ) : null}
