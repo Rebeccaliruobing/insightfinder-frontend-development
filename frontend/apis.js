@@ -1,7 +1,7 @@
 import store from 'store';
 import _ from 'lodash';
 const baseUrl = window.API_BASE_URL || '/api/v1/';
-const DEBUG = false;
+import parseCloudRollout from './data/parseCloudRollout';
 
 //
 // When we run frontend on localhost python web server and connect api with different host,
@@ -12,10 +12,10 @@ const DEBUG = false;
 // We use two ways to call server side api: semantic ui api behavior & ajax.
 // Semantic-ui api behavior provides ui button integration, and ajax is easy to use.
 // http://semantic-ui.com/behaviors/api.html
-// TODO: Change to use one method to call server side api?
 
 $.fn.api.settings.successTest = function (response) {
-    if (response && response.success && (response.success == true || response.success.toLowerCase() === 'true')) {
+    if (response && response.success && (response.success == true ||
+        response.success.toLowerCase() === 'true')) {
         return response.success
     }
     return false;
@@ -102,33 +102,36 @@ let requestPost = function (action, data, resolve, reject) {
  UploadUpdate,
  UploadDetection,
  */
-export default {
+const apis = {
 
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
-            requestPost('login', {userName, password}, resolve, reject);
-        });
-    },
-    /**
-     *
-     * @param userName
-     * @param other
-     * @param token
-     * @param operation
-     * @returns {Promise}
-     */
-        postDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
-        return new Promise(function (resolve, reject) {
-            requestPost('dashboard uservalues', {userName, token, operation, ...other}, resolve, reject);
+            requestPost('login', { userName, password }, resolve, reject);
         });
     },
 
-    postDashboardUserValuesMapArr (operation:String = 'display', projectName, selectedIndexArr, userName:String = store.get('userName'), token = store.get('token')) {
+    postDashboardUserValues (operation = 'display',
+                             other,
+                             userName = store.get('userName'),
+                             token = store.get('token')) {
+        return new Promise((resolve, reject) => {
+            requestPost('dashboard uservalues',
+                { userName, token, operation, ...other },
+                resolve,
+                reject);
+        });
+    },
+
+    postDashboardUserValuesMapArr (operation = 'display',
+                                   projectName,
+                                   selectedIndexArr,
+                                   userName = store.get('userName'),
+                                   token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['dashboard uservalues'],
-                data: $.param({userName, token, operation, projectName, selectedIndexArr}),
+                data: $.param({ userName, token, operation, projectName, selectedIndexArr }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                     request.setRequestHeader("Accept", 'application/json');
@@ -142,12 +145,16 @@ export default {
             });
         });
     },
-    postJSONDashboardUserValues (operation:String = 'display', other, userName:String = store.get('userName'), token = store.get('token')) {
+
+    postJSONDashboardUserValues (operation = 'display',
+                                 other,
+                                 userName = store.get('userName'),
+                                 token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['dashboard uservalues'],
-                data: $.param({userName, token, operation, ...other}),
+                data: $.param({ userName, token, operation, ...other }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -160,7 +167,10 @@ export default {
             });
         });
     },
-    postDashboardDailySummaryReport (forceReload, userName:String = store.get('userName'), token = store.get('token')) {
+
+    postDashboardDailySummaryReport (forceReload,
+                                     userName = store.get('userName'),
+                                     token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             let currentResp = store.get('dailyReportResponse');
             if (!forceReload && currentResp) {
@@ -169,7 +179,7 @@ export default {
                 $.ajax({
                     type: 'POST',
                     url: $.fn.api.settings.api['dashboard dailysummaryreport'],
-                    data: $.param({userName, token}),
+                    data: $.param({ userName, token }),
                     beforeSend: function (request) {
                         request.setRequestHeader("Accept", 'application/json');
                     }
@@ -184,7 +194,10 @@ export default {
             }
         });
     },
-    postDashboardDailySummaryReportNew (forceReload, userName:String = store.get('userName'), token = store.get('token')) {
+
+    postDashboardDailySummaryReportNew (forceReload,
+                                        userName = store.get('userName'),
+                                        token = store.get('token')) {
         let self = this;
         return new Promise(function (resolve, reject) {
             let currentResp = store.get('dailyReportResponseNew');
@@ -194,13 +207,13 @@ export default {
                 $.ajax({
                     type: 'POST',
                     url: $.fn.api.settings.api['dashboard dailysummaryreport'],
-                    data: $.param({userName, token}),
+                    data: $.param({ userName, token }),
                     beforeSend: function (request) {
                         request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                         request.setRequestHeader("accept", 'application/json');
                     }
                 }).done(function (resp) {
-                    var reportData = {'createDate': new Date()};
+                    var reportData = { 'createDate': new Date() };
                     _.forEach(resp.data, function (value, key) {
                         key = key.split(':');
                         if (key.length == 3) {
@@ -240,13 +253,34 @@ export default {
             _hour = diffValue / hour,
             _min = diffValue / minute;
 
-        if (_year >= 1) {result = parseInt(_year) + "年前"; return true;}
-        else if (_month >= 1) {result = parseInt(_month) + "个月前";return true;}
-        else if (_week >= 1) {result = parseInt(_week) + "周前";return true;}
-        else if (_day >= 1) {result = parseInt(_day) + "天前"; return true;}
-        else if (_hour >= 1) {result = parseInt(_hour) + "个小时前"; return _hour>23}
-        else if (_min >= 1) {result = parseInt(_min) + "分钟前"; return false;}
-        else {result = "刚刚"; return false;}
+        if (_year >= 1) {
+            result = parseInt(_year) + "年前";
+            return true;
+        }
+        else if (_month >= 1) {
+            result = parseInt(_month) + "个月前";
+            return true;
+        }
+        else if (_week >= 1) {
+            result = parseInt(_week) + "周前";
+            return true;
+        }
+        else if (_day >= 1) {
+            result = parseInt(_day) + "天前";
+            return true;
+        }
+        else if (_hour >= 1) {
+            result = parseInt(_hour) + "个小时前";
+            return _hour > 23
+        }
+        else if (_min >= 1) {
+            result = parseInt(_min) + "分钟前";
+            return false;
+        }
+        else {
+            result = "刚刚";
+            return false;
+        }
     },
     postInsightReport(forceReload, userName = store.get('userName'), token = store.get('token')){
         let self = this;
@@ -259,13 +293,13 @@ export default {
                 $.ajax({
                     type: 'POST',
                     url: $.fn.api.settings.api['insight report'],
-                    data: $.param({userName, token}),
+                    data: $.param({ userName, token }),
                     beforeSend: function (request) {
                         request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
                         request.setRequestHeader("accept", 'application/json');
                     }
                 }).done(function (resp) {
-                    var reportData = {'createDate': new Date()};
+                    var reportData = { 'createDate': new Date() };
                     _.forEach(resp.data, function (value, key) {
                         key = key.split(':');
                         if (key.length == 3) {
@@ -296,12 +330,12 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-        postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['live analysis'],
-                data: $.param({userName, token, pvalue, cvalue, modelType, projectName}),
+                data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -331,7 +365,7 @@ export default {
      * @param projectName
      * @returns {Promise}
      */
-        postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+    postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -404,12 +438,12 @@ export default {
      * @param origin
      * @returns {Promise}
      */
-        postCloudOutlierDetection(startTime, endTime, projectName, origin = 'cloudoutlier', userName = store.get('userName'), token = store.get('token'),) {
+    postCloudOutlierDetection(startTime, endTime, projectName, origin = 'cloudoutlier', userName = store.get('userName'), token = store.get('token'),) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['cloud outlier detection'],
-                data: $.param({startTime, endTime, projectName, origin, userName, token}),
+                data: $.param({ startTime, endTime, projectName, origin, userName, token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -423,27 +457,20 @@ export default {
         });
     },
 
-    /**
-     *
-     * @param userName
-     * @param token
-     * @param startTime
-     * @param endTime
-     * @param projectName
-     * @param origin
-     * @returns {Promise}
-     */
-        postCloudRolloutCheck(startTime, endTime, projectName, origin = 'cloudrollout', userName = store.get('userName'), token = store.get('token')) {
+    postCloudRolloutCheck(startTime, endTime,
+                          projectName, origin = 'cloudrollout',
+                          userName = store.get('userName'),
+                          token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['cloud rollout check'],
-                data: $.param({startTime, endTime, projectName, origin, userName, token}),
+                data: $.param({ startTime, endTime, projectName, origin, userName, token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
             }).done(function (resp) {
-                resolve(resp);
+                resolve(parseCloudRollout(projectName, startTime, endTime, resp));
             }).fail(function (error) {
                 console.log(arguments);
                 console.log("Server Error", arguments);
@@ -461,12 +488,12 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postDisplayProjectModel(startTime, endTime, projectName, origin = 'clouddisplay', userName = store.get('userName'), token = store.get('token')) {
+    postDisplayProjectModel(startTime, endTime, projectName, origin = 'clouddisplay', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['display project model'],
-                data: $.param({startTime, endTime, projectName, origin, userName, token}),
+                data: $.param({ startTime, endTime, projectName, origin, userName, token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -496,7 +523,7 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, userName = store.get('userName'), token = store.get('token')) {
+    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -539,12 +566,12 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postAddCustomProject(projectName, projectCloudType, samplingInterval, email = '', userName = store.get('userName'), token = store.get('token')) {
+    postAddCustomProject(projectName, projectCloudType, samplingInterval, email = '', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['add custom project'],
-                data: $.param({projectName, projectCloudType, samplingInterval, email, userName, token}),
+                data: $.param({ projectName, projectCloudType, samplingInterval, email, userName, token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -569,7 +596,7 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
+    postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -608,7 +635,7 @@ export default {
      * @returns {Promise}
      */
 
-        postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData, userName = store.get('userName'), token = store.get('token')) {
+    postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -642,12 +669,12 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postRemoveProject(projectName, userName = store.get('userName'), token = store.get('token')) {
+    postRemoveProject(projectName, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['remove project'],
-                data: $.param({projectName, userName, token}),
+                data: $.param({ projectName, userName, token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -676,7 +703,7 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+    postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -718,13 +745,8 @@ export default {
      * @param token
      * @returns {Promise}
      */
-        postProjectData(projectName, startTime, endTime, groupId, instanceName, userName = store.get('userName'), token = store.get('token')) {
+    postProjectData(projectName, startTime, endTime, groupId, instanceName, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
-            // if(DEBUG && store.get('postProjectData')) originResolve(store.get('postProjectData'));
-            // let resolve = function (resp) {
-            //   if(DEBUG) store.set('postProjectData', resp);
-            //   return originResolve
-            // };
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['project data'],
@@ -749,5 +771,6 @@ export default {
             });
         });
     },
-
 };
+
+export default apis;
