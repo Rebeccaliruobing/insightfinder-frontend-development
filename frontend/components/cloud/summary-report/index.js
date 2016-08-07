@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {autobind} from 'core-decorators';
+import moment from 'moment';
 import _ from 'lodash';
 import {Console, ButtonGroup, Button, Popup} from '../../../artui/react';
 import FilterBar from './filter-bar';
@@ -10,19 +11,22 @@ const colorMapLow = require('../../../images/color-map-low.png');
 
 class RenderSummaryReport extends Component {
 
+    static contextTypes = {
+        dashboardUservalues: React.PropTypes.object,
+    };
+
     constructor(props) {
         super(props);
 
         this.summary = null;
-        this.anomalyDetails = [];
         this.metricStats = [];
+        this.anomalySummary = [];
+        this.instances = {};
+        this.anomalyNumList = [];
     }
 
-    calculateData(summary) {
+    calculateData(projectName, summary) {
         if (this.summary != summary && summary) {
-
-            console.log(summary);
-
             // Append 0 if list is less than 7 items.
             let anomalyNumList = _.slice(summary.anomalyNumList, 0, 30);
             if (anomalyNumList.length > 0 && anomalyNumList.length < 7) {
@@ -43,13 +47,48 @@ class RenderSummaryReport extends Component {
                 instances[name].push(stat);
             });
             this.instances = instances;
+
+            // Get the incident for the summary
+            let {incidentAllInfo} = this.context.dashboardUservalues;
+            let incidentListEntry = (incidentAllInfo || []).find((item)=>item.projectName == projectName);
+            let incidentList = (incidentListEntry || {}).incidentList || [];
+
+            _.forEach(this.anomalySummary, (s) => {
+                const stime = moment(s['Start Time']);
+                let matchInst;
+                _.forEach(incidentList, inst => {
+                    const instSTime = moment(inst.incidentStartTime);
+                    const instETime = moment(inst.incidentEndTime);
+                    // FIXME: stime is GMT, stime, etime is java time, GMT will add timezone.
+                    if (stime.isBetween(instSTime, instETime)) {
+                        matchInst = inst;
+                    }
+                });
+
+                if (matchInst)  {
+                    console.log(matchInst);
+                    const params = {
+                        projectName,
+                        startTime: matchInst.incidentStartTime,
+                        endTime: matchInst.incidentEndTime,
+                        pvalue: matchInst.pvalue,
+                        cvalue: matchInst.cvalue,
+                        modelType: matchInst.modelType,
+                        modelStartTime: matchInst.modelStartTime,
+                        modelEndTime: matchInst.modelEndTime,
+                        isExistentIncident: true,
+                    };
+                    s.link = `/incidentAnalysis?${$.param(params)}`
+                }
+            });
+
             this.summary = summary;
         }
     }
 
     render() {
-        const { summaryData } = this.props;
-        this.calculateData(summaryData);
+        const { projectName, summaryData } = this.props;
+        this.calculateData(projectName, summaryData);
 
         const hasMetrics = this.metricStats.length > 0;
         const hasSummary = this.anomalySummary.length > 0;
@@ -134,20 +173,16 @@ class RenderSummaryReport extends Component {
                                 <tbody>
                                 {this.anomalySummary.map((value, index) => (
                                     <tr key={index}>
+                                        <td>{value['ID']}</td>
                                         <td>
-                                            {value['ID']}
+                                            {value.link ?
+                                                <a target="_blank" href={value.link}>{value['Start Time']}</a> :
+                                                value['Start Time']
+                                            }
                                         </td>
-                                        <td>
-                                            {value['Start Time']}
-                                        </td>
-                                        <td>
-                                            {value['Duration (min)']}
-                                        </td>
-                                        <td>
-                                            {value['Avg Anomaly Degree']}
-                                        </td>
-                                        <td style={{ 'backgroundColor': value['Status'] }}>
-                                        </td>
+                                        <td>{value['Duration (min)']}</td>
+                                        <td>{value['Avg Anomaly Degree']}</td>
+                                        <td style={{ 'backgroundColor': value['Status'] }}/>
                                     </tr>
                                     )
                                 )}
@@ -250,7 +285,9 @@ export default class SummaryReport extends Component {
 
                     <div key={Date.now()} className="ui vertical segment">
                         {summaryData ?
-                            <RenderSummaryReport summaryData={summaryData} createDate={createDate}/> :
+                            <RenderSummaryReport summaryData={summaryData}
+                                                 projectName={this.state.filterBar.projectName}
+                                                 createDate={createDate}/> :
                             <div>Report unavailable</div>
                         }
                     </div>
