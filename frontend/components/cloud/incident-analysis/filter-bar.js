@@ -53,7 +53,7 @@ export default  class FilterBar extends Component {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     if (projects.length > 0) {
-      this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+      this.handleProjectChange(projects[0].projectName);
     }
   }
 
@@ -73,7 +73,7 @@ export default  class FilterBar extends Component {
     return ranges;
   }
 
-  handleProjectChange(value, projectName) {
+  handleProjectChange(projectName) {
     let {projectString, sharedProjectString, incidentAllInfo, dataAllInfo, projectSettingsAllInfo} = this.context.dashboardUservalues;
     let project = undefined;
     if(projectString.length>0){
@@ -294,7 +294,7 @@ export default  class FilterBar extends Component {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
           if (projects.length > 0) {
-            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+            this.handleProjectChange(this.state.projectName);
           }
         });
       })

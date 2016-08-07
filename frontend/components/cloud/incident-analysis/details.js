@@ -64,7 +64,7 @@ const IncidentDetails = class extends React.Component {
     if (projectName === '') {
       projectName = modelName;
     }
-    
+    let syscallResults = this.state.data?this.state.data['syscallResults']:undefined;
     return (
     <Console>
       <Console.Topbar logo={require('../../../images/logo.png')}>
@@ -84,7 +84,8 @@ const IncidentDetails = class extends React.Component {
       </Console.Topbar>
       <LiveAnalysisCharts {...query} enableComments={true} enablePublish={true} data={data} 
                                      loading={loading} 
-                                     onRefresh={() => this.updateData()}/>
+                                     onRefresh={() => this.updateData()}
+                                      debugData={syscallResults}/>
     </Console>
     );
   }

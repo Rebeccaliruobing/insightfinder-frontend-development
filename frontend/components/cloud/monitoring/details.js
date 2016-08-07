@@ -62,7 +62,7 @@ const ProjectDetails = class extends React.Component {
     const { projectName, pvalue, cvalue, modelType } = query;
 
     let { loading, data } = this.state;
-
+    let debugData = undefined;
     const title = modelType === 'DBScan' ?
       `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
       `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</b>.`
@@ -70,7 +70,6 @@ const ProjectDetails = class extends React.Component {
       `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
       `with model type <b>${modelType}</b>, anomaly threshold <b>${pvalue}</b>, duration threshold: <b>${cvalue}</b>.`
       ;
-
     return (
       <Console>
         <Console.Topbar logo={require('../../../images/logo.png')}>
@@ -85,7 +84,7 @@ const ProjectDetails = class extends React.Component {
             </div>
           </div>
         </Console.Topbar>
-        <LiveAnalysisCharts {...query} data={data} loading={loading} onRefresh={() => this.updateLiveAnalysis()}/>
+        <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData} onRefresh={() => this.updateLiveAnalysis()}/>
       </Console>
     )
   }
