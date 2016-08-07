@@ -1,200 +1,156 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import moment from 'moment';
 import {autobind} from 'core-decorators';
 import _ from 'lodash';
-import {Console, ButtonGroup, Button, Popup, Message} from '../../../artui/react';
+import {Console, ButtonGroup, Button, Popup} from '../../../artui/react';
 import FilterBar from './filter-bar';
 import apis from '../../../apis';
 import "./summaryReport.less";
 const colorMapLow = require('../../../images/color-map-low.png');
 
-export default class RenderSummaryReport extends Component {
+class RenderSummaryReport extends Component {
+
     constructor(props) {
         super(props);
-        let today = new Date();
-        let anomalyNumList = _.slice(this.props.summaryData.anomalyNumList, 0, 30);
-        if (anomalyNumList.length > 0 && anomalyNumList.length < 7) {
-            for (let i = anomalyNumList.length; i < 7; i++) {
-                anomalyNumList.push(0);
+
+        this.summary = null;
+        this.anomalyDetails = [];
+        this.metricStats = [];
+    }
+
+    calculateData(summary) {
+        if (this.summary != summary && summary) {
+
+            console.log(summary);
+
+            // Append 0 if list is less than 7 items.
+            let anomalyNumList = _.slice(summary.anomalyNumList, 0, 30);
+            if (anomalyNumList.length > 0 && anomalyNumList.length < 7) {
+                for (let i = anomalyNumList.length; i < 7; i++) {
+                    anomalyNumList.push(0);
+                }
             }
+            this.anomalyNumList = _.reverse(anomalyNumList);
+            this.metricStats = summary.metricStats || [];
+            this.anomalySummary = summary.anomalySummary || [];
+
+            const instances = {};
+            _.forEach(summary.metricStats, stat => {
+                const name = stat['Instance'];
+                if (!instances[name]) {
+                    instances[name] = [];
+                }
+                instances[name].push(stat);
+            });
+            this.instances = instances;
+            this.summary = summary;
         }
-        this.state = {
-            summaryData: this.props.summaryData || {},
-            createDate: this.props.createDate || "",
-            anomalyNumList: anomalyNumList,
-            barChartList: anomalyNumList.map(function (value, index) {
-                today = new Date(moment(today).subtract(1, 'days'));
-                let month = today.getMonth() + 1;
-                let day = today.getDate();
-                return { x: month + "/" + day, y: value }
-            })
-        };
     }
 
     render() {
-        let { summaryData, barChartList, anomalyNumList } = this.state;
-        let hasSummary;
-        if (summaryData['anomalyDetails'].length) {
-            hasSummary = true;
-        }
-        let hasMetrics;
-        if (summaryData['metricStats'].length) {
-            hasMetrics = true;
-        }
-        let instanceListNumber = {};
-        let instanceValue = [];
-        let instanceList = _.keyBy(summaryData['metricStats'], function (o) {
-            return o['Instance']
-        });
-        _.forEach(instanceList, function (value, key) {
-            instanceListNumber[key] = (_.partition(summaryData['metricStats'], function (o) {
-                return o['Instance'] == key
-            })[0]).length;
-        });
-        instanceList = [];
-        let instanceKeys = Object.keys(instanceListNumber);
-        (instanceKeys).map(function (value, index) {
-            let num = 0;
-            for (let j = 0; j < index; j++) {
-                num += instanceListNumber[instanceKeys[j]];
-            }
-            instanceList.push(num);
-        });
-        _.forEach(instanceListNumber, function (value, key) {
-            instanceValue.push(value);
-        });
+        const { summaryData } = this.props;
+        this.calculateData(summaryData);
 
-        var data = [{
-            label: 'Anomaly number time series',
-            values: _.reverse(barChartList)
-        }];
-        anomalyNumList = _.reverse(anomalyNumList);
+        const hasMetrics = this.metricStats.length > 0;
+        const hasSummary = this.anomalySummary.length > 0;
+        let currentInstance;
+
         return (
             <div>
                 <div style={{ 'marginBottom': '16px' }}>
-                    <div>Anomaly number time series: [{(anomalyNumList || []).map(function (value, index) {
-                        return value + (index == anomalyNumList.length - 1 ? "" : ", ")
-                    })}]
-                    </div>
+                    <div>Anomaly number time series: [{this.anomalyNumList.join(',')}]</div>
                     {hasMetrics &&
                     <div>
-                        <span>Basic metric value statistics for {(summaryData['metricStats'] || []).length}
-                            metrics</span>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src={summaryData['metricTableColormap']}/>
+                        <span style={{marginRight: 20}}>
+                            Basic metric value statistics for {this.metricStats.length} metrics
+                        </span>
+                        <img src={colorMapLow} />
                     </div>
                     }
                     {hasMetrics &&
                     <div>
                         <table className="metric-table">
-                            <tbody>
+                            <thead>
                             <tr>
-                                <td>
-                                    Instance
-                                </td>
-                                <td>
-                                    Metric
-                                </td>
-                                <td>
-                                    Uptime
-                                </td>
-                                <td>
-                                    Min
-                                </td>
-                                <td>
-                                    Max
-                                </td>
-                                <td>
-                                    Avg
-                                </td>
-                                <td>
-                                    Std
-                                </td>
-                                <td>
-                                    Anomaly Relevance Score
-                                </td>
-                                <td>
-                                    Status
-                                </td>
+                                <th>Instance</th>
+                                <th>Metric</th>
+                                <th>Uptime</th>
+                                <th>Min</th>
+                                <th>Max</th>
+                                <th>Avg</th>
+                                <th>Std</th>
+                                <th>Anomaly Relevance Score</th>
+                                <th>Status</th>
                             </tr>
-                            {(summaryData['metricStats'] || []).map(function (value, index) {
-                                let showNumber = instanceList.indexOf(index);
-                                return (
-                                    <tr key={index}>
-                                        {showNumber != -1 ?
-                                            <td rowSpan={instanceValue[showNumber]}>
-                                                {value['Instance']}
-                                            </td> :
-                                            null
-                                        }
-
-                                        <td>
-                                            {value['Metric']}
-                                        </td>
-                                        <td>
-                                            {value['Uptime']}
-                                        </td>
-                                        <td>
-                                            {value['Min']}
-                                        </td>
-                                        <td>
-                                            {value['Max']}
-                                        </td>
-                                        <td>
-                                            {value['Avg']}
-                                        </td>
-                                        <td>
-                                            {value['Stddev']}
-                                        </td>
-                                        <td>
-                                            {value['Anomaly Relevance Score']}
-                                        </td>
-                                        <td style={{ 'backgroundColor': value['Status'] }}>
-                                        </td>
-                                    </tr>
-                                )
+                            </thead>
+                            <tbody>
+                            {
+                                this.metricStats.map((stat, index) => {
+                                    const name = stat['Instance'];
+                                    const ret = (
+                                        <tr key={index}>
+                                            {name !== currentInstance &&
+                                            <td rowSpan={this.instances[name].length}>{name}</td>
+                                            }
+                                            <td>{stat['Metric']}</td>
+                                            <td>{stat['Uptime']}</td>
+                                            <td>{stat['Min']}</td>
+                                            <td>{stat['Max']}</td>
+                                            <td>{stat['Avg']}</td>
+                                            <td>{stat['Stddev']}</td>
+                                            <td>{stat['Anomaly Relevance Score']}</td>
+                                            <td style={{ 'backgroundColor': stat['Status'] }}/>
+                                        </tr>
+                                    );
+                                    currentInstance = name;
+                                    return ret;
                             })}
                             </tbody>
                         </table>
                         <div>
-                            <span>Number of anomalies in the past 24 hours: {summaryData['anomalyCount'] || 0}</span>
+                            <span>
+                                Number of anomalies in the past 24 hours: {this.summary.anomalyCount || 0}
+                            </span>
                         </div>
                     </div>
                     }
                     {hasSummary &&
                     <div style={{ 'marginTop': '16px' }}>
-                        <div><span>Anomaly summary in the past 24 hours: &nbsp;&nbsp;&nbsp;<img
-                            src={colorMapLow}/></span></div>
+                        <div>
+                            <span style={{marginRight: 20}}>Anomaly summary in the past 24 hours:</span>
+                            <img src={colorMapLow}/>
+                        </div>
                         <div>
                             <table className="anomaly-table">
-                                <tbody>
+                                <thead>
                                 <tr>
-                                    <td>ID</td>
-                                    <td>Start Time</td>
-                                    <td>Duration (min)</td>
-                                    <td>Avg Anomaly Degree</td>
-                                    <td>Status</td>
+                                    <th>ID</th>
+                                    <th>Start Time</th>
+                                    <th>Duration (min)</th>
+                                    <th>Avg Anomaly Degree</th>
+                                    <th>Status</th>
                                 </tr>
-                                {(summaryData['anomalySummary'] || []).map(function (value, index) {
-                                    return (
-                                        <tr key={index}>
-                                            <td>
-                                                {value['ID']}
-                                            </td>
-                                            <td>
-                                                {value['Start Time']}
-                                            </td>
-                                            <td>
-                                                {value['Duration (min)']}
-                                            </td>
-                                            <td>
-                                                {value['Avg Anomaly Degree']}
-                                            </td>
-                                            <td style={{ 'backgroundColor': value['Status'] }}>
-                                            </td>
-                                        </tr>
+                                </thead>
+                                <tbody>
+                                {this.anomalySummary.map((value, index) => (
+                                    <tr key={index}>
+                                        <td>
+                                            {value['ID']}
+                                        </td>
+                                        <td>
+                                            {value['Start Time']}
+                                        </td>
+                                        <td>
+                                            {value['Duration (min)']}
+                                        </td>
+                                        <td>
+                                            {value['Avg Anomaly Degree']}
+                                        </td>
+                                        <td style={{ 'backgroundColor': value['Status'] }}>
+                                        </td>
+                                    </tr>
                                     )
-                                })}
+                                )}
                                 </tbody>
                             </table>
                         </div>
@@ -205,11 +161,11 @@ export default class RenderSummaryReport extends Component {
         )
     }
 }
+
 export default class SummaryReport extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            summaryReport: '',
             showAddPanel: true,
             filterBar: { projectName: '' },
             loading: true,
@@ -235,36 +191,26 @@ export default class SummaryReport extends Component {
         });
     }
 
+    @autobind
     handleToggleFilterPanel() {
         this.setState({ showAddPanel: !this.state.showAddPanel }, ()=> {
             this.state.showAddPanel ? this.$filterPanel.slideDown() : this.$filterPanel.slideUp()
         })
     }
 
+    @autobind
     handleFilterChange(data) {
-        //this.$filterPanel.slideUp();
-        //apis.postDashboardDailySummaryReport(false).then((resp) => {
-        //  this.setState({summaryReport: resp.data.content, projectName: data.projectName})
-        //}).catch(()=> {
-        //
-        //});
         this.setState({ filterBar: data });
     }
 
+    @autobind
     handleFilterSubmit(data) {
         this.setState({ filterBar: data });
-        //apis.postDashboardDailySummaryReport(true).then((resp) => {
-        //  this.setState({summaryReport: resp.data.content, projectName: data.projectName})
-        //}).catch(()=> {
-        //
-        //});
     }
 
     render() {
         const { loading, showAddPanel, createDate } = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
-        var summaryReport = this.state.summaryReport;
-        summaryReport = summaryReport.split("<\/th>").join("").split("<\/td>").join("");
         if (loading) {
             return (
                 <Console.Content>
@@ -291,24 +237,20 @@ export default class SummaryReport extends Component {
                                     <span className="ui mini popup">Expand & Close</span>
                                 </Popup>
                             </Button>
-                            <Button>
-                                <i className="setting icon"/>
-                            </Button>
                         </ButtonGroup>
                     </div>
 
                     <div className="ui vertical segment filterPanel"
                          ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
                         <i className="close link icon" style={{ float: 'right', marginTop: '-10px' }}
-                           onClick={this.handleToggleFilterPanel.bind(this)}/>
-                        <FilterBar {...this.props} onSubmit={this.handleFilterSubmit.bind(this)}
-                                   onChange={this.handleFilterChange.bind(this)}/>
-                        <Message dangerouslySetInnerHTML={{ __html: summaryReport }}/>
-                        }
+                           onClick={this.handleToggleFilterPanel}/>
+                        <FilterBar {...this.props} onSubmit={this.handleFilterSubmit}
+                                   onChange={this.handleFilterChange}/>
                     </div>
 
                     <div key={Date.now()} className="ui vertical segment">
-                        {summaryData ? <RenderSummaryReport summaryData={summaryData} createDate={createDate}/> :
+                        {summaryData ?
+                            <RenderSummaryReport summaryData={summaryData} createDate={createDate}/> :
                             <div>Report unavailable</div>
                         }
                     </div>
@@ -316,15 +258,5 @@ export default class SummaryReport extends Component {
             </Console.Content>
         );
 
-    }
-
-    summaryRef(r) {
-        // TODO: 接口返回有误,修正后改回
-        // true line
-        let productName = this.state.projectName && this.state.projectName.replace('@', '---');
-        $(ReactDOM.findDOMNode(r)).find(`#dailysummary_${productName}`).show();
-
-        // temp line
-        // $(ReactDOM.findDOMNode(r)).find("[id^=dailysummary_]").show();
     }
 }
