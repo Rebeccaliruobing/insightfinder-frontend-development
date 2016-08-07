@@ -46,8 +46,8 @@ const parseCloudRollout = (projectName, startTime, endTime, resp) => {
     let groupsData = {};
     modelKeyList.forEach((model)=> {
 
-        const startTime = moment(model.startTime).format('MM-DD HH:mm');
-        const endTime = moment(model.endTime).format('MM-DD HH:mm');
+        const startTime = model.startTime;
+        const endTime = model.endTime;
 
         // Group the data by group_id.
         model.mapData.forEach((data)=> {
@@ -70,11 +70,13 @@ const parseCloudRollout = (projectName, startTime, endTime, resp) => {
                 groupsData[groupId].metricNames = names.join(',');
             }
             const metricNames = groupsData[groupId].metricNames;
+            const startTimeText = moment(startTime).format('MM-DD HH:mm');
+            const endTimeText = moment(endTime).format('MM-DD HH:mm');
             let title;
             if (!groupId) {
-                title = <span>Holistic {metricNames}<br/>{startTime} - {endTime} </span>
+                title = <span>Holistic {metricNames}<br/>{startTimeText} - {endTimeText} </span>
             } else {
-                title = <span>Group {groupId} {metricNames}<br/>{startTime} - {endTime}</span>
+                title = <span>Group {groupId} {metricNames}<br/>{startTimeText} - {endTimeText}</span>
             }
 
             let params = {
