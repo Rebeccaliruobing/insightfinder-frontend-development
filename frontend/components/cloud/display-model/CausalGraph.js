@@ -70,7 +70,7 @@ export default class CausalGraph extends React.Component {
         state.points = [];
         state.lines = [];
 
-        let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
+        let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
         let lastPoints = [];
 
@@ -144,7 +144,7 @@ export default class CausalGraph extends React.Component {
         });
     }
 
-    renderPoint(point) {
+    renderPoint(point, index) {
         let isHover = false;
 
         let { x, y } = point;
@@ -154,7 +154,7 @@ export default class CausalGraph extends React.Component {
         y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
         return (
-            <circle ref={(c)=>point.component = c} key={point.id} className="node" r={(isHover ? 8 : 5)}
+            <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={(isHover ? 8 : 5)}
                     cx={x} cy={y} fill="rgb(255, 127, 14)"
                     style={{ strokeWidth: 1, stroke: isHover ? 'rgb(255, 127, 14)' : '#fff', cursor: 'pointer' }}
                     onMouseEnter={()=>this.highLightPoint(point)}
@@ -164,11 +164,8 @@ export default class CausalGraph extends React.Component {
         );
     }
 
-    renderLine(line) {
-
-
+    renderLine(line, index) {
         let zoomRange = this.state.zoomRange;
-
         let { x: x1, y: y1 } = line.fromPoint;
         let { x: x2, y: y2 } = line.toPoint;
 
@@ -182,9 +179,8 @@ export default class CausalGraph extends React.Component {
             stroke: '#999',
             cursor: 'pointer'
         };
-
         return (
-            <g key={line.id}>
+            <g key={line.id + index}>
                 <line ref={(c)=>line.component = c}
                       x1={x1} y1={y1} x2={x2} y2={y2} style={style}
                       onMouseEnter={()=>this.highLightLine(line, 'blue')}
@@ -195,6 +191,8 @@ export default class CausalGraph extends React.Component {
     }
 
     getWrapText(text, maxLength) {
+        return text.split(' ');
+        /*
         if (text.length > maxLength && text.split(" ").length > 0) {
             var s = '';
             var list = text.split(" ");
@@ -219,17 +217,18 @@ export default class CausalGraph extends React.Component {
         } else {
             return [text]
         }
+        */
     }
 
     handleMouseDown(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 100;
+        layerX = layerX - 140;
         this.setState({ selectRange: Object.assign({}, this.state.selectRange, { x1: layerX, y1: layerY }) })
     }
 
     handleMouseMove(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 100;
+        layerX = layerX - 140;
         let selectRange = this.state.selectRange;
         selectRange.x2 = layerX;
         selectRange.y2 = layerY;
@@ -243,7 +242,7 @@ export default class CausalGraph extends React.Component {
 
     handleMouseUp(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 100;
+        layerX = layerX - 140;
         let svg = this.state.svg;
         let selectRange = this.state.selectRange;
         selectRange.x2 = layerX;
@@ -273,18 +272,17 @@ export default class CausalGraph extends React.Component {
         let { dataArray, types } = this.props;
         let { svg, points, lines, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
-        let stageWidth = (svg.width - 100) / Math.max(dataArray.length, 1);
-        console.log(types);
+        let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
         return (
             <div>
                 <span className="ui button mini green" onClick={this.reset}>Reset</span><br/>
                 <div className="relative" style={{ display: 'flex' }}>
-                    <svg {...{ width: 100, height: 500, }}>
+                    <svg {...{ width: 140, height: 500, }}>
                         {types.map((type, index)=> {
                             var y = stageHeight * index + stageHeight * 0.5;
                             y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
                             return this.getWrapText(type.split("_").join(" "), 16).map((text, i)=>
-                                <text className="no-select" key={`${type}-text=${i}`}
+                                <text fontSize="12" className="no-select" key={`${type}-text=${i}`}
                                       x={0} y={y + i * 15 - 5}>{text}</text>
                             )
                         })}
@@ -312,7 +310,7 @@ export default class CausalGraph extends React.Component {
                         {types.map((type, index)=> {
                             var y = stageHeight * index + stageHeight * 0.5;
                             y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
-                            return <line key={type} x1={0} y1={y} x2={svg.width - 100} y2={y}
+                            return <line key={type} x1={0} y1={y} x2={svg.width - 140} y2={y}
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
                         })}
                         {dataArray.map(([record, ...records], i) => {
@@ -339,7 +337,7 @@ export default class CausalGraph extends React.Component {
                                   strokeOpacity: 0.5
                               }}/>
 
-                        <rect x={800} y={0} width={100} height={500}
+                        <rect x={800} y={0} width={140} height={500}
                               style={{ fill: 'white', stroke: 'white', strokeWidth: 2 }}/>
                         <rect x={0} y={svg.height - stageHeight / 4} width={900} height={stageHeight / 4}
                               style={{ fill: 'white', stroke: 'white', strokeWidth: 2 }}/>
