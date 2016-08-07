@@ -8,6 +8,7 @@ import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
 import TenderModal from './tenderModal';
+import SettingDebug from './debug';
 import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
 
@@ -50,7 +51,8 @@ class LiveAnalysisCharts extends React.Component {
             showSettingModal: false,
             showTenderModal: false,
             showShareModal: false,
-            showComments: false
+            showComments: false,
+            showDebug: false
         };
     }
 
@@ -101,7 +103,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        const { loading, onRefresh, enablePublish, enableComments } = this.props;
+        const { loading, onRefresh, enablePublish, enableComments , debugData} = this.props;
         const { view, columns } = this.state;
 
         this.calculateData();
@@ -121,6 +123,10 @@ class LiveAnalysisCharts extends React.Component {
                             <Button className="orange labeled icon"
                                     onClick={() => this.setState({ showTenderModal: true })}>
                                 <i className="icon random"/>Causal Graph
+                            </Button>
+                            <Button className="orange labeled icon"
+                                    onClick={() => this.setState({ showDebug: true })}>
+                                <i className="icon random"/>Syscall Results
                             </Button>
                             <Button className="labeled icon" style={{ display: !enablePublish && 'none' }}
                                     onClick={()=> this.setState({ showShareModal: true })}>
@@ -175,6 +181,9 @@ class LiveAnalysisCharts extends React.Component {
 
                     { this.state.showSettingModal &&
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
+                    }
+                    { this.state.showDebug &&
+                    <SettingDebug dataArray={debugData} onClose={() => this.setState({ showDebug: false })}/>
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}

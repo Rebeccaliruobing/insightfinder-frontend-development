@@ -5,7 +5,7 @@ import {Route, IndexRedirect} from 'react-router';
 import Navbar from './navbar';
 
 import LiveMonitoring from './monitoring';
-import InsightReport from './insight-report';
+import {InsightReport} from './insight-report';
 import IncidentAnalysis from './incident-analysis';
 import IncidentLogAnalysis from './incident-log-analysis';
 import OutlierDetection from './outlier-detection';

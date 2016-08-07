@@ -198,17 +198,20 @@ class PieChart extends React.Component {
         data: React.PropTypes.string,
         colorChart: React.PropTypes.string,
         pieChartStyle: React.PropTypes.object,
+        pieChartCanvasStyle: React.PropTypes.object,
         dataValue: React.PropTypes.string
     };
     static defaultProps = {
         dataValue: '',
         pieChartStyle: {},
+        pieChartCanvasStyle: {height: '200px', width: '100%'},
         colorChart: '',
-        data: ""
+        data: "",
+        radius: [60, 85]
     };
 
     getOption() {
-        let {data,dataValue,colorChart} = this.props;
+        let {data,dataValue,colorChart,radius} = this.props;
         let fontSize = (dataValue.length > 2 ? 70 - dataValue.length * 6 : 70) + '';
         var labelFromatter = {
             normal: {
@@ -236,11 +239,12 @@ class PieChart extends React.Component {
             }
         };
         var option = {
+            animation: false,
             series: [
                 {
                     type: 'pie',
                     center: ['50%', '50%'],
-                    radius: [60, 85],
+                    radius: radius,
                     x: '0%',
                     itemStyle: labelFromatter,
                     data: [
@@ -260,7 +264,7 @@ class PieChart extends React.Component {
                 </div>
                 <ReactEcharts
                     option={this.getOption()}
-                    style={{height: '200px', width: '100%'}}
+                    style={this.props.pieChartCanvasStyle}
                     className='echarts-for-echarts'
                     theme='my_theme'/>
             </div>
@@ -419,7 +423,8 @@ class InsightReport extends BaseComponent {
                                                     name = "Avg Instance Uptime";
                                                     dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                                 }
-                                                return <PieChart key={index} colorChart="#3398DB" data={name}
+                                                let radius = [60,85];
+                                                return <PieChart key={index} radius={radius} colorChart="#3398DB" data={name}
                                                              dataValue={dataValue}/>
                                             }
                                         })}
@@ -537,4 +542,4 @@ class InsightReport extends BaseComponent {
         )
     }
 }
-export default InsightReport;
+export {InsightReport, PieChart};
