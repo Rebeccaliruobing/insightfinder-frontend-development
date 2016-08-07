@@ -62,7 +62,7 @@ const ProjectDetails = class extends React.Component {
     const { projectName, pvalue, cvalue, modelType } = query;
 
     let { loading, data } = this.state;
-    let debugData = {"totalNumThread":115,"impactFactor":0.41739130434782606,"numAffectedThread":48};
+    let debugData = undefined;
     const title = modelType === 'DBScan' ?
       `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
       `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</b>.`

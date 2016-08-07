@@ -14,7 +14,7 @@ class SettingModal extends React.Component {
       columns: store.get(GridColumns),
       defaultView: store.get(DefaultView)
     };
-    
+
     this.columnMap = {
       two: 2,
       three: 3,
@@ -40,7 +40,7 @@ class SettingModal extends React.Component {
       store.set(GridColumns, columns);
       changed = true;
     }
-    
+
     if (changed) {
       window.location.reload();
     }
@@ -48,12 +48,12 @@ class SettingModal extends React.Component {
 
   render() {
     let {refreshInterval, columns, defaultView} = this.state;
-    let refreshIntervalText = 
+    let refreshIntervalText =
       refreshInterval && parseInt(refreshInterval) === 0 ? 'Manually': refreshInterval;
     let columnText = columns ? this.columnMap[columns] : columns;
-    
+
     return (
-      <Modal {...this.props} size="mini" closable={false}>
+      <Modal {...this.props} size="mini" closable={false} >
         <div className="content">
           <form className="ui form">
             <div className="field">

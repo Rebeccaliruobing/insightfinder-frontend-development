@@ -113,6 +113,7 @@ class LiveAnalysisCharts extends React.Component {
         const types = this.causalTypes;
         const groups = this.groups;
         const periodString = this.periodString;
+        console.log(debugData);
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -125,7 +126,7 @@ class LiveAnalysisCharts extends React.Component {
                                 <i className="icon random"/>Causal Graph
                             </Button>
                             <Button className="orange labeled icon"
-                                    onClick={() => this.setState({ showDebug: true })}>
+                                    onClick={() => this.setState({ showDebug: true })} style={{display: debugData?'':'none'}}>
                                 <i className="icon random"/>Syscall Results
                             </Button>
                             <Button className="labeled icon" style={{ display: !enablePublish && 'none' }}
