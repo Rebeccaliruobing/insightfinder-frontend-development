@@ -103,7 +103,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        const { loading, onRefresh, enablePublish, enableComments , debugData} = this.props;
+        const { loading, onRefresh, enablePublish, enableComments, debugData} = this.props;
         const { view, columns } = this.state;
 
         this.calculateData();
@@ -113,7 +113,9 @@ class LiveAnalysisCharts extends React.Component {
         const types = this.causalTypes;
         const groups = this.groups;
         const periodString = this.periodString;
-        console.log(debugData);
+        let settingData = debugData;
+        settingData = (_.keysIn(debugData)).length == 0?undefined: debugData;
+        console.log(settingData);
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -126,7 +128,7 @@ class LiveAnalysisCharts extends React.Component {
                                 <i className="icon random"/>Causal Graph
                             </Button>
                             <Button className="orange labeled icon"
-                                    onClick={() => this.setState({ showDebug: true })} style={{display: debugData?'':'none'}}>
+                                    onClick={() => this.setState({ showDebug: true })} style={{display: settingData?'':'none'}}>
                                 <i className="icon random"/>Syscall Results
                             </Button>
                             <Button className="labeled icon" style={{ display: !enablePublish && 'none' }}
@@ -184,7 +186,7 @@ class LiveAnalysisCharts extends React.Component {
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
                     }
                     { this.state.showDebug &&
-                    <SettingDebug dataArray={debugData} onClose={() => this.setState({ showDebug: false })}/>
+                    <SettingDebug dataArray={settingData} onClose={() => this.setState({ showDebug: false })}/>
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}

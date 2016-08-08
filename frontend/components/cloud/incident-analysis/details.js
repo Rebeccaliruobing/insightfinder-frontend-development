@@ -64,7 +64,7 @@ const IncidentDetails = class extends React.Component {
     if (projectName === '') {
       projectName = modelName;
     }
-    let syscallResults = this.state.data?this.state.data['syscallResults']:undefined;
+    let syscallResults = this.state.data?this.state.data['syscallResults']:{};
     return (
     <Console>
       <Console.Topbar logo={require('../../../images/logo.png')}>

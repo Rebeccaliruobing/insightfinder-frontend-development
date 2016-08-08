@@ -7,33 +7,36 @@ import {PieChart} from '../insight-report';
 
 class SettingDebug extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {
-    };
-  }
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
 
-  render() {
-    let {dataArray, ...rest} = this.props;
-    let pieChartCanvasStyle = {height: '200px', width: '200px'};
-    console.log(dataArray);
-    return (
-      <Modal {...rest} size="big" closable={true}>
-        <div className="content">
-            <div style={{'width': '100%','display': 'flex'}}>
-                {_.keysIn(dataArray).map(function (value,index) {
-                    console.log(value);
-                    let dataValue = dataArray[value];
-                    if(value == "impactFactor"){
-                        dataValue = ((dataArray[value] * 100).toFixed(1)).toString()+"%";
-                    }
-                    return (<PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={[50,75]} key={index} colorChart="#3398DB" data={value} dataValue={dataValue.toString()} />);
-                })}
-            </div>
-        </div>
-      </Modal>
-    )
-  }
+    render() {
+        let {dataArray, ...rest} = this.props;
+        let pieChartCanvasStyle = {height: '200px', width: '200px'};
+        console.log(dataArray);
+        return (
+            <Modal {...rest} size="big" closable={true}>
+                {
+                    dataArray ? <div className="content">
+                        <div style={{'width': '100%','display': 'flex'}}>
+                            {_.keysIn(dataArray).map(function (value, index) {
+                                console.log(value);
+                                let dataValue = dataArray[value];
+                                if (value == "impactFactor") {
+                                    dataValue = ((dataArray[value] * 100).toFixed(1)).toString() + "%";
+                                }
+                                return (<PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={[50,75]} key={index}
+                                                  colorChart="#3398DB" data={value} dataValue={dataValue.toString()}/>);
+                            })}
+                        </div>
+                    </div> : <span>No Data</span>
+                }
+
+            </Modal>
+        )
+    }
 }
 
 export default SettingDebug;
