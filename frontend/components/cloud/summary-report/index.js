@@ -54,7 +54,7 @@ class RenderSummaryReport extends Component {
             let incidentList = (incidentListEntry || {}).incidentList || [];
 
             _.forEach(this.anomalySummary, (s) => {
-                const stime = moment(s['Start Time']);
+                const stime = moment.utc(s['Start Time']);
                 let matchInst;
                 _.forEach(incidentList, inst => {
                     const instSTime = moment(inst.incidentStartTime);
@@ -66,7 +66,6 @@ class RenderSummaryReport extends Component {
                 });
 
                 if (matchInst)  {
-                    console.log(matchInst);
                     const params = {
                         projectName,
                         startTime: matchInst.incidentStartTime,
