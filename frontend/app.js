@@ -11,6 +11,7 @@ import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
 import {settingsRoute} from './components/settings';
 import {useCaseRoute} from './components/usecase/index';
+import {fileTabsRoute} from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
@@ -132,6 +133,7 @@ class App extends React.Component {
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/settings" className="item">Settings</Link>
           <Link to="/usecase" className="item">Benchmarks</Link>
+          <Link to="/filetabs" className="item">File Analysis</Link>
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
               <Link to="/account-info" className="item" title='Account Info'>
@@ -205,6 +207,7 @@ const routes = (
       {cloudRoute}
       {settingsRoute}
       {useCaseRoute}
+      {fileTabsRoute}
       <Route component={Help} path="help"/>
       <Route component={AccountInfo} path="account-info"/>
     </Route>
