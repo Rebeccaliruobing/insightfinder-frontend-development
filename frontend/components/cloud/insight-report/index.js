@@ -199,19 +199,22 @@ class PieChart extends React.Component {
         colorChart: React.PropTypes.string,
         pieChartStyle: React.PropTypes.object,
         pieChartCanvasStyle: React.PropTypes.object,
+        titleStyle: React.PropTypes.object,
         dataValue: React.PropTypes.string
     };
     static defaultProps = {
         dataValue: '',
         pieChartStyle: {},
         pieChartCanvasStyle: {height: '200px', width: '100%'},
+        titleStyle: {'width': '25%','margin': '0 auto'},
         colorChart: '',
         data: "",
-        radius: [60, 85]
+        radius: [60, 85],
+        optionCenterStyle: ['50%', '50%']
     };
 
     getOption() {
-        let {data,dataValue,colorChart,radius} = this.props;
+        let {data,dataValue,colorChart,radius,optionCenterStyle} = this.props;
         let fontSize = (dataValue.length > 2 ? 70 - dataValue.length * 6 : 70) + '';
         var labelFromatter = {
             normal: {
@@ -243,7 +246,7 @@ class PieChart extends React.Component {
             series: [
                 {
                     type: 'pie',
-                    center: ['50%', '50%'],
+                    center: optionCenterStyle,
                     radius: radius,
                     x: '0%',
                     itemStyle: labelFromatter,
@@ -258,7 +261,7 @@ class PieChart extends React.Component {
 
     render() {
         return (
-            <div style={{'width': '25%','margin': '0 auto'}}>
+            <div style={this.props.titleStyle}>
                 <div style={{'textAlign': 'center'}}>
                     <span style={{'color':this.props.colorChart,'fontSize': '20px','fontWeight': 'bold'}}>{this.props.data}</span>
                 </div>

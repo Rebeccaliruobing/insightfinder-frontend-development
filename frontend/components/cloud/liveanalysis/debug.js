@@ -14,7 +14,9 @@ class SettingDebug extends React.Component {
 
     render() {
         let {dataArray, ...rest} = this.props;
-        let pieChartCanvasStyle = {height: '200px', width: '200px'};
+        let pieChartCanvasStyle = {height: '200px', width: '230px'};
+        let titleStyle = {'width': '27%','margin': '0 auto'};
+        let optionCenterStyle = ['65%', '50%'];
         console.log(dataArray);
         return (
             <Modal {...rest} size="big" closable={true}>
@@ -23,12 +25,20 @@ class SettingDebug extends React.Component {
                         <div style={{'width': '100%','display': 'flex'}}>
                             {_.keysIn(dataArray).map(function (value, index) {
                                 console.log(value);
+
                                 let dataValue = dataArray[value];
                                 if (value == "impactFactor") {
                                     dataValue = ((dataArray[value] * 100).toFixed(1)).toString() + "%";
+                                    value = "Fault Impact Scope";
                                 }
-                                return (<PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={[50,75]} key={index}
-                                                  colorChart="#3398DB" data={value} dataValue={dataValue.toString()}/>);
+                                else if(value == "totalNumThread"){
+                                    value = "Number of All Threads";
+                                }
+                                else if(value == "numAffectedThread"){
+                                    value = "Number of Affected Threads";
+                                }
+                                return (<PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={[55,80]} key={index}
+                                                  optionCenterStyle={optionCenterStyle} colorChart="#3398DB" titleStyle={titleStyle} data={value} dataValue={dataValue.toString()}/>);
                             })}
                         </div>
                     </div> : <span>No Data</span>
@@ -40,3 +50,5 @@ class SettingDebug extends React.Component {
 }
 
 export default SettingDebug;
+//Number of Affected Threads 对应 numAffectedThread in json
+//Fault Impact Scope 对应 impactFactor in json

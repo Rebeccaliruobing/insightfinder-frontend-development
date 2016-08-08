@@ -115,6 +115,11 @@ class LiveAnalysisCharts extends React.Component {
         const periodString = this.periodString;
         let settingData = debugData;
         settingData = (_.keysIn(debugData)).length == 0?undefined: debugData;
+        settingData = {
+      "totalNumThread": 29,
+      "numAffectedThread": 15,
+      "impactFactor": 0.5172413793103449
+    };
         console.log(settingData);
         return (
             <Console.Wrapper>
