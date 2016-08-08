@@ -6,7 +6,7 @@ import {Modal} from '../../../artui/react';
 
 class TenderModal extends React.Component {
 
-  shouldComponentUpdate(nextProps, nextStatee) {
+  shouldComponentUpdate(nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState);
   }
 

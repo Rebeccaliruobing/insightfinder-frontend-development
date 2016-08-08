@@ -1,92 +1,72 @@
 import React, {Component} from 'react';
-import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
-
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
-import {
-  LiveProjectSelection,
-  ModelType,
-  WindowWithWeek,
-} from '../../selections';
-
-import DateTimePicker from "../../ui/datetimepicker/index";
+import {LiveProjectSelection} from '../../selections';
 
 export default  class FilterBar extends Component {
-  static contextTypes = {
-    userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      projectName: undefined,
-      projectType: undefined,
-      weeks: '1',
-      startTime: moment().toDate(),
-      endTime: moment().add(-1, 'w').toDate()
+    static contextTypes = {
+        dashboardUservalues: React.PropTypes.object
     };
-  }
 
-  componentDidMount() {
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => !(item.isStationary));
-    if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
-  }
-
-  handleProjectChange(value, projectName) {
-    let {projectString, sharedProjectString} = this.context.dashboardUservalues;
-    let project = undefined;
-    if(projectString.length>0){
-      project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
+    constructor(props) {
+        super(props);
+        this.state = {
+            projectName: undefined,
+            projectType: undefined,
+        };
     }
-    if(sharedProjectString.length>0 && project==undefined){
-      project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0]+"@"+parts[3]) == projectName);
+
+    componentDidMount() {
+        let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+        projects = projects.filter((item, index) => !(item.isStationary));
+        if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
-    // 前三部分是名称，数据类型dataType和云类型cloudType
-    let [name, dataType, cloudType] = project;
-    let update = {projectName};
-    switch (dataType) {
-      case 'AWS':
-      case 'EC2':
-      case 'RDS':
-      case 'DynamoDB':
-        update.projectType = `${dataType}/CloudWatch`;
-      case 'GAE':
-      case 'GCE':
-        update.projectType = `${dataType}/CloudMonitoring`;
-        break;
-      default:
-        update.projectType = `${cloudType}/Agent`;
+
+    handleProjectChange(value, projectName) {
+        let { projectString, sharedProjectString } = this.context.dashboardUservalues;
+        let project = undefined;
+        if (projectString.length > 0) {
+            project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
+        }
+        if (sharedProjectString.length > 0 && project == undefined) {
+            project = sharedProjectString.split(',').map((s)=>s.split(":")).find((parts) => (parts[0] + "@" + parts[3]) == projectName);
+        }
+        // 前三部分是名称，数据类型dataType和云类型cloudType
+        let [name, dataType, cloudType] = project;
+        let update = { projectName };
+        switch (dataType) {
+            case 'AWS':
+            case 'EC2':
+            case 'RDS':
+            case 'DynamoDB':
+                update.projectType = `${dataType}/CloudWatch`;
+            case 'GAE':
+            case 'GCE':
+                update.projectType = `${dataType}/CloudMonitoring`;
+                break;
+            default:
+                update.projectType = `${cloudType}/Agent`;
+        }
+        this.setState(update, ()=>this.props.onChange && this.props.onChange(this.state));
     }
-    this.setState(update,()=>this.props.onChange && this.props.onChange(this.state));
-  }
 
-  handleEndTimeChange(endTime) {
-    let {weeks} = this.state;
-    this.setState({
-      startTime: moment(endTime).add(-weeks, 'w').toDate(),
-      endTime
-    })
-  }
+    handleSubmit() {
+        this.props.onSubmit && this.props.onSubmit(this.state);
+    }
 
-  handleSubmit() {
-    this.props.onSubmit && this.props.onSubmit(this.state);
-  }
+    render() {
+        const { projectName } = this.state;
+        const labelStyle = {};
 
-  render() {
-    const {projectName, startTime, endTime, projectType} = this.state;
-    const labelStyle = {};
-
-    return (
-      <div className="ui form">
-        <div className="four fields fill">
-          <div className="field">
-            <label style={labelStyle}>Project Name</label>
-            <LiveProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
-          </div>
-        </div>
-      </div>
-    )
-  }
+        return (
+            <div className="ui form">
+                <div className="four fields fill">
+                    <div className="field">
+                        <label style={labelStyle}>Project Name</label>
+                        <LiveProjectSelection value={projectName}
+                                              onChange={this.handleProjectChange.bind(this)}/>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 }

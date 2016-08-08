@@ -111,6 +111,7 @@ class DataParser {
         if (a.anomalies != "") {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
+            if (!line || line === '') return;
             var items = line.split(',');
 
             //prepare causality chart data
@@ -163,7 +164,6 @@ class DataParser {
         anomalyTexts.push(atext);
       });
     }
-
     this.causalDataArray = causalDataArray;
     this.causalTypes = causalTypes;
     this.anomalyTexts = anomalyTexts;
@@ -192,6 +192,7 @@ class DataParser {
         if (a.anomaliesConsolidated) {
           var lines = a.anomaliesConsolidated.split('\\n');
           _.each(lines, function (line, lineNo) {
+            if (!line || line === '') return;
             var items = line.split(',');
 
             //prepare causality chart data
