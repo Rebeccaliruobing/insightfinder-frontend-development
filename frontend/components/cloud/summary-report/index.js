@@ -57,8 +57,8 @@ class RenderSummaryReport extends Component {
                 const stime = moment.utc(s['Start Time']);
                 let matchInst;
                 _.forEach(incidentList, inst => {
-                    const instSTime = moment(inst.incidentStartTime);
-                    const instETime = moment(inst.incidentEndTime);
+                    const instSTime = moment.utc(inst.incidentStartTime);
+                    const instETime = moment.utc(inst.incidentEndTime);
                     // FIXME: stime is GMT, stime, etime is java time, GMT will add timezone.
                     if (stime.isBetween(instSTime, instETime)) {
                         matchInst = inst;
