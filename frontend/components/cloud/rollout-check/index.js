@@ -163,7 +163,8 @@ export default class RolloutCheck extends Component {
         const { activeTab, data, selectedGroupId } = this.state;
         const selectedGroup = data.modelData[selectedGroupId];
         const splitGroups = _.omit(data.modelData, 0);
-
+        let selectedGroupList = [];
+        let selectedGroupListTwo = [];
         return (
             <div className="ui main tiny container">
                 <div className="ui pointing secondary menu">
@@ -176,9 +177,12 @@ export default class RolloutCheck extends Component {
                     { activeTab === 'holistic' && selectedGroup && (
                         <div className="ui four cards">
                             {
-                                selectedGroup.data.map((data, index) =>
-                                    <HeatMapCard key={`${selectedGroupId}-${index}`} {...data} />
-                                )
+                                selectedGroup.data.map(function (data,index) {
+                                    if(selectedGroupList.indexOf(data['link']) == -1){
+                                        selectedGroupList.push(data['link']);
+                                        return <HeatMapCard key={`${selectedGroupId}-${index}`} {...data} />
+                                    }
+                                })
                             }
                         </div>
                     )}
@@ -205,9 +209,12 @@ export default class RolloutCheck extends Component {
                     { activeTab === 'split' && selectedGroup && (
                         <div className="ui four cards">
                             {
-                                selectedGroup.data.map((data, index) =>
-                                    <HeatMapCard key={`${selectedGroupId}-${index}`} {...data} />
-                                )
+                                selectedGroup.data.map(function (data, index) {
+                                    if(selectedGroupListTwo.indexOf(data['link']) == -1){
+                                        selectedGroupListTwo.push(data['link']);
+                                        return <HeatMapCard key={`${selectedGroupId}-${index}`} {...data} />
+                                    }
+                                })
                             }
                         </div>
                     )}

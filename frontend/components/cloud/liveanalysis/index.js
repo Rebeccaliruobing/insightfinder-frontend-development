@@ -113,7 +113,7 @@ class LiveAnalysisCharts extends React.Component {
         const types = this.causalTypes;
         const groups = this.groups;
         const periodString = this.periodString;
-        let settingData = debugData;
+        let settingData = (_.keysIn(debugData)).length == 0?undefined: debugData;
         console.log(settingData);
         return (
             <Console.Wrapper>

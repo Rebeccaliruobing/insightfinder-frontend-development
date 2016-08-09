@@ -8,23 +8,23 @@ export default function (props) {
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
         <Link to="/filetabs/fileNewModel" className="item text-white">
-          <i className="line chart icon"></i>
+          <i className="add circle icon"></i>
           <span> Create Model </span>
         </Link>
         <Link to="/filetabs/filedetection" className="item text-white">
-          <i className="bar chart icon"></i>
+          <i className="line chart icon"></i>
           <span> Detect Anomalies </span>
         </Link>
         <Link to="/filetabs/fileupdatemodel" className="item text-white">
-          <i className="zoom icon"></i>
+          <i className="refresh icon"></i>
           <span> Update Model </span>
         </Link>
         <Link to="/filetabs/filedisplaymodel" className="item text-white">
-          <i className="checkmark box icon"/>
+          <i className="photo icon"></i>
           <span> Display Model </span>
         </Link>
         <Link to="/filetabs/fileupload" className="item text-white">
-          <i className="icon icon-report iconfont"/>
+          <i className="area chart icon"></i>
           <span> Visualize Data </span>
         </Link>
       </div>
