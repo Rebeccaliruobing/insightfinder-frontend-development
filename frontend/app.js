@@ -126,14 +126,13 @@ class App extends React.Component {
     } = this.state;
 
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
-
     return (
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/settings" className="item">Settings</Link>
           <Link to="/usecase" className="item">Benchmarks</Link>
-          <Link to="/filetabs" className="item">File Analysis</Link>
+          {['admin','guest'].indexOf(store.get('userName'))!=-1?<Link to="/filetabs" className="item">File Analysis</Link>:null}
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
               <Link to="/account-info" className="item" title='Account Info'>
