@@ -22,7 +22,7 @@ export class FileTabs extends React.Component {
 
 export const fileTabsRoute = (
   <Route component={FileTabs} path="filetabs">
-    <IndexRoute component={FileNewModel}/>
+    <IndexRedirect to="fileNewModel" />
     <Route path="fileNewModel" component={FileNewModel}/>
     <Route path="filedetection" component={FileDetection}/>
     <Route path="fileupdatemodel" component={FileUpdateModel}/>
