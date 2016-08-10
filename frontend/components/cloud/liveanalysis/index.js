@@ -103,7 +103,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        const { loading, onRefresh, enablePublish, enableComments, debugData} = this.props;
+        const { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
         const { view, columns } = this.state;
 
         this.calculateData();
@@ -113,7 +113,7 @@ class LiveAnalysisCharts extends React.Component {
         const types = this.causalTypes;
         const groups = this.groups;
         const periodString = this.periodString;
-        let settingData = (_.keysIn(debugData)).length == 0?undefined: debugData;
+        let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         console.log(settingData);
         return (
             <Console.Wrapper>
@@ -185,7 +185,7 @@ class LiveAnalysisCharts extends React.Component {
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
                     }
                     { this.state.showDebug &&
-                    <SettingDebug dataArray={settingData} onClose={() => this.setState({ showDebug: false })}/>
+                    <SettingDebug timeMockup={timeMockup} freqMockup={freqMockup} dataArray={debugData} onClose={() => this.setState({ showDebug: false })}/>
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}
