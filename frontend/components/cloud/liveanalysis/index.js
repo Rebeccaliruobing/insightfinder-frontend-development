@@ -103,9 +103,11 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        const { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
+        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
         const { view, columns } = this.state;
-
+        debugData = debugData || [];
+        timeMockup = timeMockup || [];
+        freqMockup = freqMockup || [];
         this.calculateData();
 
         const summary = this.summary;
@@ -114,7 +116,6 @@ class LiveAnalysisCharts extends React.Component {
         const groups = this.groups;
         const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
-        console.log(settingData);
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
