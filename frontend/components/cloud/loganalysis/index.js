@@ -245,8 +245,10 @@ class LogAnalysisCharts extends React.Component {
 
         // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
         // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
-        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
-        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
+        groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
+        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
+        groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
         groupData.data = [[timestamp, event.rawData]];
         eventTableData.push(groupData);
       } else {
@@ -391,7 +393,8 @@ class LogAnalysisCharts extends React.Component {
                 let clusterFeature = "";
                 if(anomalyString == undefined){
                   anomalyString = "";
-                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid).topK;
+                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
+                  topKEpisodes = topKEpisodes?topKEpisodes.topK:[];
                   if(topKEpisodes.length>0){
                     var entries = topKEpisodes.split(',');
                     _.each(entries, function (entry, ie) {
@@ -401,7 +404,8 @@ class LogAnalysisCharts extends React.Component {
                       }
                     });
                   }
-                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid).topK;
+                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
+                  topKWords = topKWords?topKWords.topK: [];
                   if(topKWords.length>0){
                     var entries = topKWords.split(',');
                     _.each(entries, function (entry, ie) {
