@@ -4,6 +4,7 @@ import {
 }                           from '../../../artui/react/index';
 import {
     LiveProjectSelection,
+    ModelNameSelection,
     ModelType,
     DurationThreshold,
     AnomalyThreshold
@@ -21,6 +22,8 @@ export default class FileDetection extends Component {
         super(props);
         this.state = {
             projectName: undefined,
+            modelString: undefined,
+            inputDurationThreshold: undefined,
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
@@ -33,12 +36,17 @@ export default class FileDetection extends Component {
 
     componentDidMount() {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+        let modelString = (this.context.dashboardUservalues || {}).modelString || [];
         projects = projects.filter((item, index) => !(item.isStationary));
-        if (projects.length > 0) {
-            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
-        }
+        this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
+            if (projects.length > 0) {
+                this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+            }
+        });
     }
-
+    handleDurationThreshold(e){
+        this.setState({inputDurationThreshold: e.target.value});
+    }
     handleProjectChange(value, projectName) {
         let { projectString, sharedProjectString } = this.context.dashboardUservalues;
         let project = undefined;
@@ -75,13 +83,16 @@ export default class FileDetection extends Component {
         }
         this.setState(update);
     }
-
-    handleSubmit(e){
+    handleModleString(value){
+        this.setState({modelString: value});
+    }
+    handleSubmit(e) {
         console.log('submit');
     }
+
     render() {
         let {userInstructions} = this.context;
-        let { projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
             <Console.Content>
@@ -95,8 +106,8 @@ export default class FileDetection extends Component {
                             <div className="four fields fill">
                                 <div className="field">
                                     <label>Model Name</label>
-                                    <LiveProjectSelection value={projectName}
-                                                          onChange={this.handleProjectChange.bind(this)}/>
+                                    <ModelNameSelection value={modelString}
+                                                        onChange={this.handleModleString.bind(this)}/>
                                 </div>
                                 <div className="field">
                                     <label>Model Type</label>
@@ -125,8 +136,10 @@ export default class FileDetection extends Component {
                                     :
                                     <div className="field">
                                         <label style={labelStyle}>Duration Threshold</label>
-                                        <DurationThreshold value={durationThreshold}
-                                                           onChange={(v, t)=>this.setState({ durationThreshold: t })}/>
+                                        <div className="ui input">
+                                            <input type="text"
+                                                   onChange={(e)=>this.handleDurationThreshold(e)}/>
+                                        </div>
                                     </div>
                                 }
                             </div>

@@ -64,6 +64,8 @@ const IncidentDetails = class extends React.Component {
             projectName = modelName;
         }
         let syscallResults = this.state.data ? this.state.data['syscallResults'] : {};
+        let timeFunctionList = this.state.data ? this.state.data['timeFunctionList'] : {};
+        let freqFunctionList = this.state.data ? this.state.data['freqFunctionList'] : {};
         let timeMockup = [{"rank": 1, "functionName": 'unixd_setup_child'},
             {"rank": 2, "functionName": 'set_signals'},
             {"rank": 3, "functionName": 'ap_is_recursion_limit_exceeded'},
@@ -84,6 +86,7 @@ const IncidentDetails = class extends React.Component {
             {"rank": 8, "functionName": "asis_handler"},
             {"rank": 9, "functionName": "handle_map_file"},
             {"rank": 10, "functionName": "regex_cleanup"}];
+        console.log(syscallResults,timeFunctionList,freqFunctionList);
         return (
             <Console>
                 <Console.Topbar logo={require('../../../images/logo.png')}>

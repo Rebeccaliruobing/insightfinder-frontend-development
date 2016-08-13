@@ -124,7 +124,8 @@ export default class OutlierDetection extends Component {
 
     renderSlider() {
         let marks = this.state.marks;
-        if (!marks && marks.length == 0) return;
+        console.log(marks);
+        if (!marks && marks.length == 0 || (_.keysIn(marks)).length == 0) return;
 
         const dateIndex = this.state.dateIndex;
 
@@ -162,7 +163,6 @@ export default class OutlierDetection extends Component {
                            onClick={this.handleToggleFilterPanel}/>
                         <FilterBar loading={this.state.loading} {...this.props}
                                    onSubmit={this.handleFilterChange.bind(this)}/>
-                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.cloudoutlier }}/>
                     </div>
                     <div className="ui vertical segment">
                         <div className="ui info message">

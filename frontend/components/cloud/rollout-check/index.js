@@ -242,7 +242,7 @@ export default class RolloutCheck extends Component {
                            onClick={this.handleToggleFilterPanel}/>
                         <FilterBar loading={loading} {...this.props}
                                    onSubmit={this.handleFilterChange}/>
-                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.cloudrollout }}/>
+
                     </div>
                     {data &&
                     <div className="ui vertical segment">

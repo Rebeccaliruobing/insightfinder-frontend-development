@@ -15,12 +15,13 @@ export default class FileNewModel extends Component {
         super(props);
         this.state = {
             submitLoading: false,
-            loading: false
+            loading: false,
+            inputModelName: undefined
         };
     }
 
     handleSharingChange(e) {
-        console.log(111);
+        this.setState({inputModelName: e.target.value});
     }
     handleSubmit(e){
         console.log('submit');
@@ -59,8 +60,7 @@ export default class FileNewModel extends Component {
 
                                         <div className="ui input">
                                             <input type="text"
-                                                   value=""
-                                                   onChange={this.handleSharingChange.bind(this)}/>
+                                                   onChange={(e)=>this.handleSharingChange(e)}/>
                                         </div>
                                     </div>
                                 </div>

@@ -124,6 +124,36 @@ class LiveProjectSelection extends React.Component {
   }
 }
 
+class ModelNameSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+  constructor(props){
+    super(props);
+  }
+  render(){
+
+    let modelString = (this.context.dashboardUservalues || {}).modelString || [];
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              (modelString.split(',') || []).map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {value}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
 class LogModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -231,6 +261,7 @@ const DurationHour = (props) => {
 export {
   ProjectSelection,
   LiveProjectSelection,
+  ModelNameSelection,
   InstanceProjectSelection,
   LogFileReplayProjectSelection,
   ModelType,

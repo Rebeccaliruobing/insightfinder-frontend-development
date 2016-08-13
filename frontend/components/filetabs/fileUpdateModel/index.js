@@ -4,6 +4,7 @@ import {
 }                           from '../../../artui/react/index';
 import {
     LiveProjectSelection,
+    ModelNameSelection,
     ModelType,
     DurationThreshold,
     AnomalyThreshold
@@ -21,6 +22,7 @@ export default class FileUpdateModel extends Component {
         super(props);
         this.state = {
             projectName: undefined,
+            modelString: undefined,
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
@@ -33,10 +35,13 @@ export default class FileUpdateModel extends Component {
 
     componentDidMount() {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+        let modelString = (this.context.dashboardUservalues || {}).modelString || [];
         projects = projects.filter((item, index) => !(item.isStationary));
-        if (projects.length > 0) {
-            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
-        }
+        this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
+            if (projects.length > 0) {
+                this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+            }
+        });
     }
 
     handleProjectChange(value, projectName) {
@@ -75,13 +80,16 @@ export default class FileUpdateModel extends Component {
         }
         this.setState(update);
     }
+    handleModleString(value){
+        this.setState({modelString: value});
+    }
 
     handleSubmit(e){
         console.log('submit');
     }
     render() {
         let {userInstructions} = this.context;
-        let { projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
             <Console.Content>
@@ -112,8 +120,8 @@ export default class FileUpdateModel extends Component {
                                 </div>
                                 <div className="field">
                                     <label>Model Name</label>
-                                    <LiveProjectSelection value={projectName}
-                                                          onChange={this.handleProjectChange.bind(this)}/>
+                                    <ModelNameSelection value={modelString}
+                                                        onChange={this.handleModleString.bind(this)}/>
                                 </div>
                                 <div className="field">
                                     <label>Operation Options</label>
