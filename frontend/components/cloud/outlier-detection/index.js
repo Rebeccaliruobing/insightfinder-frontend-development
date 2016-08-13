@@ -124,7 +124,7 @@ export default class OutlierDetection extends Component {
 
     renderSlider() {
         let marks = this.state.marks;
-        if (!marks && marks.length == 0) return;
+        if (!marks || !(marks.length) || marks.length == 0) return;
 
         const dateIndex = this.state.dateIndex;
 

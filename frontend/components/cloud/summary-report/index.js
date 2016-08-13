@@ -96,7 +96,6 @@ class RenderSummaryReport extends Component {
         return (
             <div>
                 <div style={{ 'marginBottom': '16px' }}>
-                    <div>Anomaly number time series: [{this.anomalyNumList.join(',')}]</div>
                     {hasMetrics &&
                     <div>
                         <span style={{marginRight: 20}}>
