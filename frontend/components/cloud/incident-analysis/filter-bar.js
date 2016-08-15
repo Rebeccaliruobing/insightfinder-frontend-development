@@ -42,7 +42,12 @@ export default  class FilterBar extends Component {
             isStationary: false,
             isExistentIncident: false,
             incidentList: [],
-            modelTypeTextMap: {}
+            modelTypeTextMap: {},
+            tabStates: {
+                recorded: 'active',
+                manual: ''
+            },
+            dataFlag: 'recorded'
         };
         this.state.modelTypeTextMap["Holistic"] = "Holistic";
         this.state.modelTypeTextMap["HolisticCP"] = "Holistic + Filtering";
@@ -57,6 +62,15 @@ export default  class FilterBar extends Component {
         if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName);
         }
+    }
+
+    selectTab(e, tab) {
+        var tabStates = this.state['tabStates'];
+        tabStates = _.mapValues(tabStates, function (val) {
+            return '';
+        });
+        tabStates[tab] = 'active';
+        this.setState({tabStates: tabStates, dataFlag: tab});
     }
 
     parseDataRanges(str) {
@@ -327,218 +341,177 @@ export default  class FilterBar extends Component {
     render() {
         const {
             projectName, incident, startTime, endTime, pvalue, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
-            modelStartTime, modelEndTime
+            modelStartTime, modelEndTime,tabStates,dataFlag
             } = this.state;
         const {dashboardUservalues} = this.context;
         const selectedIncident = incident;
         const labelStyle = {};
         let self = this;
         if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
-
         return (
-            <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
-                <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
-                    <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                        <label style={labelStyle}>
-                            Project Name&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">pick a nickname for your
-                                cloud project.
-                            </div>
-                        </label>
-                        <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
-                    </div>
-                    <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                        <label style={labelStyle}>
-                            Project Type&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">cloud type associated with
-                                this project.
-                            </div>
-                        </label>
-
-                        <div className="ui input">
-                            <input type="text" readOnly={true} value={projectType}/>
-                        </div>
-                    </div>
-                    <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                        <label style={labelStyle}>
-                            Model Type&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">choose between the Holistic
-                                model type that uses a single model induced from all metrics, and the Split model type
-                                that uses a group of models, each induced from one metric.
-                            </div>
-                        </label>
-                        <ModelType value={modelType} text={modelTypeText}
-                                   onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
-                    </div>
-                    {modelType == 'DBScan' ?
-                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                            <label style={labelStyle}>MinPts</label>
-                            <input type="text" defaultValue={minPts}
-                                   onBlur={(e)=>this.setState({minPts:e.target.value})}/>
-                        </div>
-                        :
-                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                            <label style={labelStyle}>
-                                Anomaly Threshold&nbsp;
-
-                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                                <div className="ui custom popup center right transition hidden">choose a number in [0,1)
-                                    to configure the sensitivity of your anomaly detection tool. Lower values detect a
-                                    larger variety of anomalies.
-                                </div>
-                            </label>
-                            <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
-                        </div>
-                    }
-                    {modelType == 'DBScan' ?
-                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                            <label style={labelStyle}>Epsilon</label>
-                            <input type="text" defaultValue={epsilon}
-                                   onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
-                        </div>
-                        :
-                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-                            <label style={labelStyle}>
-                                Duration Threshold (Sample Number)&nbsp;
-                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-
-                                <div className="ui custom popup center right transition hidden">number of minutes of
-                                    continuous anomalies to trigger an alert.
-                                </div>
-                            </label>
-                            <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
-                        </div>
-                    }
-
-                    <div className="ui field" style={{'width': '100%'}}>
-                        <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
-                        <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
-                    </div>
-                    <div className="field">
-                    </div>
+            <div>
+                <div className="ui pointing secondary menu" style={{'marginBottom': '24px'}}>
+                    <a className={tabStates['recorded'] + ' item'}
+                       onClick={(e) => this.selectTab(e, 'recorded')}>Recorded</a>
+                    <a className={tabStates['manual'] + ' item'}
+                       onClick={(e) => this.selectTab(e, 'manual')}>Manual</a>
                 </div>
-                <div ref={this._incidentsRef} className="padding10"
-                     style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
-                    <div className="ui header">List of Incidents</div>
-                    <div className="ui middle aligned divided list padding10"
-                         style={{height: 200, overflow: 'auto'}}>
-                        {incidentList.length > 0 && incidentList.sort(function (a, b) {
-                            let aisd = moment(a.incidentEndTime);
-                            let bisd = moment(b.incidentEndTime);
-                            if (aisd > bisd) {
-                                return -1;
-                            } else if (aisd < bisd) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
-                        }).map((incident, index)=> {
-                            let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, recorded} = incident;
-                            let isd = moment(incidentStartTime);
-                            let ied = moment(incidentEndTime);
-                            let msd = moment(modelStartTime);
-                            let med = moment(modelEndTime);
-                            let isdstr = isd.format("YYYY-MM-DD HH:mm");
-                            let iedstr = ied.format("YYYY-MM-DD HH:mm");
-                            let msdstr = msd.format("YYYY-MM-DD HH:mm");
-                            let medstr = med.format("YYYY-MM-DD HH:mm");
-                            let recsuffix = recorded ? "(recorded)" : "(manual)";
-                            let tooltipcontent = "Incident: [" + isdstr + ", " + iedstr + "], model: [" + msdstr + ", "
-                                + medstr + "], " + modelType + " " + recsuffix;
-                            let selected = incident === selectedIncident;
-                            let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
-                            return (
-                                <div className={"item " + (selected ? 'selected' : '')}
-                                     key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
-                                     style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
-                                    <div className="content" onClick={this.handleClickIncident(incident)}>
-                                        <a className="header padding5 incident-item"
-                                           title={tooltipcontent}
-                                           style={{'minWidth': '574px', paddingTop: 9, paddingLeft: 10}}>
-                                            Incident: [{isdstr}, {iedstr}] {recsuffix}
-                                        </a>
+                <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
+                    <div className="four fields fill"
+                         style={{'float': 'left','display': 'inline-block','width': '33%'}}>
+                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                            <WaringButton labelStyle={labelStyle} labelTitle="Project Name"
+                                          labelSpan="pick a nickname for your cloud project."/>
+                            <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+                        </div>
+                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                            <WaringButton labelStyle={labelStyle} labelTitle="Project Type"
+                                          labelSpan="cloud type associated with this project."/>
+
+                            <div className="ui input">
+                                <input type="text" readOnly={true} value={projectType}/>
+                            </div>
+                        </div>
+                        <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                            <WaringButton labelStyle={labelStyle} labelTitle="Model Type"
+                                          labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
+                            <ModelType value={modelType} text={modelTypeText}
+                                       onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
+                        </div>
+                        {modelType == 'DBScan' ?
+                            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                                <label style={labelStyle}>MinPts</label>
+                                <input type="text" defaultValue={minPts}
+                                       onBlur={(e)=>this.setState({minPts:e.target.value})}/>
+                            </div>
+                            :
+                            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold"
+                                              labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
+                                <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+                            </div>
+                        }
+                        {modelType == 'DBScan' ?
+                            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                                <label style={labelStyle}>Epsilon</label>
+                                <input type="text" defaultValue={epsilon}
+                                       onBlur={(e)=>this.setState({epsilon:e.target.value})}/>
+                            </div>
+                            :
+                            <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold (Sample Number)"
+                                              labelSpan="number of minutes of continuous anomalies to trigger an alert."/>
+                                <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+                            </div>
+                        }
+
+                        <div className="ui field" style={{'width': '100%'}}>
+                            <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
+                            <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
+                        </div>
+                        <div className="field">
+                        </div>
+                    </div>
+                    <div ref={this._incidentsRef} className="padding10"
+                         style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
+                        <div className="ui header">List of Incidents</div>
+                        <div className="ui middle aligned divided list padding10"
+                             style={{height: 200, overflow: 'auto'}}>
+                            {incidentList.length > 0 && incidentList.sort(function (a, b) {
+                                let aisd = moment(a.incidentEndTime);
+                                let bisd = moment(b.incidentEndTime);
+                                if (aisd > bisd) {
+                                    return -1;
+                                } else if (aisd < bisd) {
+                                    return 1;
+                                } else {
+                                    return 0;
+                                }
+                            }).map((incident, index)=> {
+                                let {incidentStartTime, incidentEndTime, modelStartTime, modelEndTime, modelType, recorded} = incident;
+                                let isd = moment(incidentStartTime);
+                                let ied = moment(incidentEndTime);
+                                let msd = moment(modelStartTime);
+                                let med = moment(modelEndTime);
+                                let isdstr = isd.format("YYYY-MM-DD HH:mm");
+                                let iedstr = ied.format("YYYY-MM-DD HH:mm");
+                                let msdstr = msd.format("YYYY-MM-DD HH:mm");
+                                let medstr = med.format("YYYY-MM-DD HH:mm");
+                                let recsuffix = recorded ? "(recorded)" : "(manual)";
+                                let incidentFlag = recorded ? "recorded" : "manual";
+                                let tooltipcontent = "Incident: [" + isdstr + ", " + iedstr + "], model: [" + msdstr + ", "
+                                    + medstr + "], " + modelType + " " + recsuffix;
+                                let selected = incident === selectedIncident;
+                                let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
+                                if(incidentFlag == dataFlag){
+                                 return (
+                                    <div className={"item " + (selected ? 'selected' : '')}
+                                         key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                                         style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
+                                        <div className="content" onClick={this.handleClickIncident(incident)}>
+                                            <a className="header padding5 incident-item"
+                                               title={tooltipcontent}
+                                               style={{'minWidth': '574px', paddingTop: 9, paddingLeft: 10}}>
+                                                Incident: [{isdstr}, {iedstr}] {recsuffix}
+                                            </a>
+                                        </div>
+                                        <Button className="ui padding10 mini red button"
+                                                style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}}
+                                                onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                                     </div>
-                                    <Button className="ui padding10 mini red button"
-                                            style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}}
-                                            onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
-                                </div>
-                            )
-                        })}
+                                )
+                                }
+                            })}
+                        </div>
                     </div>
-                </div>
-                <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
-                    <div style={{'width': '100%','display': 'flex'}}>
-                        <div className="field" style={{'width': '25%'}}>
-                            <label style={labelStyle}>
-                                Incident Start&nbsp;
+                    <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
+                        <div style={{'width': '100%','display': 'flex'}}>
+                            <div className="field" style={{'width': '25%'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Incident Start"
+                                              labelSpan="user specified analysis period."/>
 
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">
-                                 user specified analysis period.
-                            </div>
-                            </label>
-
-                            <div className="ui input">
-                                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                                dateTimeFormat='YYYY-MM-DD' value={startTime}
-                                                onChange={this.handleStartTimeChange.bind(this)}/>
-                            </div>
-                        </div>
-
-                        <div className="field" style={{'width': '25%'}}>
-                            <label style={labelStyle}>
-                                Incident End&nbsp;
-
-                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                                <div className="ui custom popup center right transition hidden">
-                                     user specified analysis period.
+                                <div className="ui input">
+                                    <DateTimePicker className='ui input'
+                                                    dateValidator={this.modelDateValidator.bind(this)}
+                                                    dateTimeFormat='YYYY-MM-DD' value={startTime}
+                                                    onChange={this.handleStartTimeChange.bind(this)}/>
                                 </div>
-                            </label>
-
-                            <div className="ui input">
-                                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                                dateTimeFormat='YYYY-MM-DD' value={endTime}
-                                                onChange={this.handleEndTimeChange.bind(this)}/>
                             </div>
-                        </div>
 
-                        <div className="field" style={{'width': '25%'}}>
-                            <label style={labelStyle}>
-                                Model Start&nbsp;
+                            <div className="field" style={{'width': '25%'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Incident End"
+                                              labelSpan="user specified analysis period."/>
 
-                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                                <div className="ui custom popup center right transition hidden">
-                                     user specified analysis period.
+                                <div className="ui input">
+                                    <DateTimePicker className='ui input'
+                                                    dateValidator={this.modelDateValidator.bind(this)}
+                                                    dateTimeFormat='YYYY-MM-DD' value={endTime}
+                                                    onChange={this.handleEndTimeChange.bind(this)}/>
                                 </div>
-                            </label>
-
-                            <div className="ui input">
-                                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                                dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
-                                                onChange={this.handleModelStartTimeChange.bind(this)}/>
                             </div>
-                        </div>
 
-                        <div className="field" style={{'width': '25%'}}>
-                            <label style={labelStyle}>
-                                Model End&nbsp;
+                            <div className="field" style={{'width': '25%'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Model Start"
+                                              labelSpan="user specified analysis period."/>
 
-                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                                <div className="ui custom popup center right transition hidden">
-                                     user specified analysis period.
+                                <div className="ui input">
+                                    <DateTimePicker className='ui input'
+                                                    dateValidator={this.modelDateValidator.bind(this)}
+                                                    dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
+                                                    onChange={this.handleModelStartTimeChange.bind(this)}/>
                                 </div>
-                            </label>
+                            </div>
 
-                            <div className="ui input">
-                                <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
-                                                dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
-                                                onChange={this.handleModelEndTimeChange.bind(this)}/>
+                            <div className="field" style={{'width': '25%'}}>
+                                <WaringButton labelStyle={labelStyle} labelTitle="Model End"
+                                              labelSpan="user specified analysis period."/>
+
+                                <div className="ui input">
+                                    <DateTimePicker className='ui input'
+                                                    dateValidator={this.modelDateValidator.bind(this)}
+                                                    dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
+                                                    onChange={this.handleModelEndTimeChange.bind(this)}/>
+                                </div>
                             </div>
                         </div>
                     </div>
