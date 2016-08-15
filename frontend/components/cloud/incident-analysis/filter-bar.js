@@ -348,7 +348,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             Project Name&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">pick a nickname for your
                                 cloud project.
                             </div>
@@ -359,7 +359,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             Project Type&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">cloud type associated with
                                 this project.
                             </div>
@@ -373,7 +373,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             Model Type&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">choose between the Holistic
                                 model type that uses a single model induced from all metrics, and the Split model type
                                 that uses a group of models, each induced from one metric.
@@ -393,7 +393,7 @@ export default  class FilterBar extends Component {
                             <label style={labelStyle}>
                                 Anomaly Threshold&nbsp;
 
-                                <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                                 <div className="ui custom popup center right transition hidden">choose a number in [0,1)
                                     to configure the sensitivity of your anomaly detection tool. Lower values detect a
                                     larger variety of anomalies.
@@ -412,7 +412,7 @@ export default  class FilterBar extends Component {
                         <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
                             <label style={labelStyle}>
                                 Duration Threshold (Sample Number)&nbsp;
-                                <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
 
                                 <div className="ui custom popup center right transition hidden">number of minutes of
                                     continuous anomalies to trigger an alert.
@@ -484,7 +484,7 @@ export default  class FilterBar extends Component {
                             <label style={labelStyle}>
                                 Incident Start&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">
                                  user specified analysis period.
                             </div>
@@ -501,7 +501,7 @@ export default  class FilterBar extends Component {
                             <label style={labelStyle}>
                                 Incident End&nbsp;
 
-                                <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                                 <div className="ui custom popup center right transition hidden">
                                      user specified analysis period.
                                 </div>
@@ -518,7 +518,7 @@ export default  class FilterBar extends Component {
                             <label style={labelStyle}>
                                 Model Start&nbsp;
 
-                                <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                                 <div className="ui custom popup center right transition hidden">
                                      user specified analysis period.
                                 </div>
@@ -535,7 +535,7 @@ export default  class FilterBar extends Component {
                             <label style={labelStyle}>
                                 Model End&nbsp;
 
-                                <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                                 <div className="ui custom popup center right transition hidden">
                                      user specified analysis period.
                                 </div>

@@ -93,7 +93,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             Project Name&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">nickname of your cloud project.
                             </div>
                         </label>
@@ -113,7 +113,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             Start Time&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">models falling into user specified window are loaded.
                             </div>
                         </label>
@@ -126,7 +126,7 @@ export default  class FilterBar extends Component {
                         <label style={labelStyle}>
                             End Time&nbsp;
 
-                            <i className="custom button help circle icon" style={{'cursor': 'pointer'}}></i>
+                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
                             <div className="ui custom popup center right transition hidden">models falling into user specified window are loaded.
                             </div>
                         </label>
