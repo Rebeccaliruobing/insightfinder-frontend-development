@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Link, IndexLink} from 'react-router';
 import {LiveProjectSelection} from '../../selections';
+import WaringButton from '../monitoring/waringButton';
 
 export default  class FilterBar extends Component {
     static contextTypes = {
@@ -61,7 +62,7 @@ export default  class FilterBar extends Component {
             <div className="ui form">
                 <div className="four fields fill">
                     <div className="field">
-                        <label style={labelStyle}>Project Name</label>
+                        <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="nickname of your cloud project."/>
                         <LiveProjectSelection value={projectName}
                                               onChange={this.handleProjectChange.bind(this)}/>
                     </div>

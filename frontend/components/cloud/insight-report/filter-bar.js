@@ -12,6 +12,8 @@ import {
 } from '../../selections';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
+
 
 export default  class FilterBar extends Component {
   static contextTypes = {
@@ -85,11 +87,11 @@ export default  class FilterBar extends Component {
       <div className="ui form">
         <div className="five fields fill">
           <div className="field">
-            <label style={labelStyle}>Project Name</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="nickname of your cloud project."/>
             <LiveProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Project Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
             <div style={{paddingTop:'0.5em', paddingLeft:'1em'}}>{projectType}</div>
           </div>
 

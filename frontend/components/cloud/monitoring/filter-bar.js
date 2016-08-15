@@ -8,6 +8,7 @@ import {
   DurationThreshold,
   AnomalyThreshold
 } from '../../selections';
+import WaringButton from './waringButton';
 
 export default  class FilterBar extends Component {
   static contextTypes = {
@@ -110,15 +111,15 @@ export default  class FilterBar extends Component {
       <div className="ui form">
         <div className="six fields fill">
           <div className="field">
-            <label style={labelStyle}>Project Name</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="nickname of your cloud project."/>
             <LiveProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Project Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
             <div style={{ paddingTop: '0.5em', paddingLeft: '1em' }}>{projectType}</div>
           </div>
           <div className="field">
-            <label style={labelStyle}>Model Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Model Type" labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
             <ModelType value={modelType} text={modelTypeText}
                        onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
           </div>
@@ -129,7 +130,7 @@ export default  class FilterBar extends Component {
             </div>
             :
             <div className="field">
-              <label style={labelStyle}>Anomaly Threshold</label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold" labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
               <AnomalyThreshold value={anomalyThreshold} onChange={(v, t)=>this.setState({ anomalyThreshold: v })}/>
             </div>
           }
@@ -140,7 +141,7 @@ export default  class FilterBar extends Component {
             </div>
             :
             <div className="field">
-              <label style={labelStyle}>Duration Threshold</label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold" labelSpan="number of minutes of continuous anomalies to trigger an alert."/>
               <DurationThreshold value={durationThreshold} onChange={(v, t)=>this.setState({ durationThreshold: t })}/>
             </div>
           }

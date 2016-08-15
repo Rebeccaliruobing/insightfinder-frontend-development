@@ -16,6 +16,8 @@ import {
 import apis from '../../../apis';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
+
 
 export default  class FilterBar extends Component {
     static contextTypes = {
@@ -55,14 +57,6 @@ export default  class FilterBar extends Component {
         if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName);
         }
-    }
-
-    componentDidUpdate() {
-        $('.custom.button')
-            .popup({
-                popup: $('.custom.popup'),
-                on: 'click'
-            });
     }
 
     parseDataRanges(str) {

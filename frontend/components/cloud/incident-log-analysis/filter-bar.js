@@ -16,6 +16,8 @@ import {
 import apis from '../../../apis';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
+
 
 export default  class FilterBar extends Component {
   static contextTypes = {
@@ -57,14 +59,6 @@ export default  class FilterBar extends Component {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
   }
-    componentDidUpdate() {
-        $('.custom.button')
-            .popup({
-                popup: $('.custom.popup'),
-                on: 'click'
-            });
-    }
-
   parseDataRanges(str){
     var ranges = [];
     if(str===undefined || str==='[]'){
@@ -346,39 +340,17 @@ export default  class FilterBar extends Component {
       <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
         <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>
-              Project Name&nbsp;
-
-              <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-              <div className="ui custom popup center right transition hidden">pick a nickname for your
-                  cloud project.
-              </div>
-            </label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="pick a nickname for your cloud project."/>
             <LogFileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>
-              Project Type&nbsp;
-
-              <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-              <div className="ui custom popup center right transition hidden">cloud type associated with
-                  this project.
-              </div>
-            </label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
             <div className="ui input">
               <input type="text" readOnly={true} value={projectType}/>
             </div>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>
-              Model Type&nbsp;
-
-              <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-              <div className="ui custom popup center right transition hidden">choose between the Holistic
-                  model type that uses a single model induced from all metrics, and the Split model type
-                  that uses a group of models, each induced from one metric.
-              </div>
-            </label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Model Type" labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
             <LogModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
           {modelType == 'DBScan'?
@@ -388,15 +360,7 @@ export default  class FilterBar extends Component {
             </div>
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-              <label style={labelStyle}>
-                Anomaly Threshold&nbsp;
-
-                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                <div className="ui custom popup center right transition hidden">choose a number in [0,1)
-                    to configure the sensitivity of your anomaly detection tool. Lower values detect a
-                    larger variety of anomalies.
-                </div>
-              </label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold" labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
               <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
             </div>
           }
@@ -468,14 +432,7 @@ export default  class FilterBar extends Component {
         <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>
-                Log Start&nbsp;
-
-                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                <div className="ui custom popup center right transition hidden">
-                     user specified analysis period.
-                </div>
-              </label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Log Start" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={startTime}
@@ -484,14 +441,7 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>
-                Log End&nbsp;
-
-                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                <div className="ui custom popup center right transition hidden">
-                     user specified analysis period.
-                </div>
-              </label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Log End" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
@@ -500,14 +450,7 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>
-                Model Start&nbsp;
-
-                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                <div className="ui custom popup center right transition hidden">
-                     user specified analysis period.
-                </div>
-              </label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Model Start" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
@@ -516,14 +459,7 @@ export default  class FilterBar extends Component {
             </div>
 
             <div className="field" style={{'width': '25%'}}>
-              <label style={labelStyle}>
-                Model End&nbsp;
-
-                <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                <div className="ui custom popup center right transition hidden">
-                     user specified analysis period.
-                </div>
-              </label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Model End" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelEndTime}

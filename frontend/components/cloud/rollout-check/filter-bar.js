@@ -5,6 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Button} from '../../../artui/react';
 import {ProjectSelection, WindowWithWeek} from '../../selections';
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
 
 export default  class FilterBar extends Component {
     static contextTypes = {
@@ -26,15 +27,6 @@ export default  class FilterBar extends Component {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
         if (projects.length > 0) this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
-
-    componentDidUpdate() {
-        $('.custom.button')
-            .popup({
-                popup: $('.custom.popup'),
-                on: 'click'
-            });
-    }
-
     @autobind
     handleProjectChange(value, projectName) {
         let { projectString, sharedProjectString } = this.context.dashboardUservalues;
@@ -90,17 +82,11 @@ export default  class FilterBar extends Component {
             <div className="ui form">
                 <div className="five fields fill">
                     <div className="field">
-                        <label style={labelStyle}>
-                            Project Name&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">nickname of your cloud project.
-                            </div>
-                        </label>
+                        <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="nickname of your cloud project."/>
                         <ProjectSelection value={projectName} onChange={this.handleProjectChange}/>
                     </div>
                     <div className="field">
-                        <label style={labelStyle}>Project Type</label>
+                        <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
                         <div style={{ paddingTop: '0.5em', paddingLeft: '1em' }}>{projectType}</div>
                     </div>
                     <div className="field">
@@ -110,26 +96,14 @@ export default  class FilterBar extends Component {
                                             this.setState({ weeks: text }, ()=>this.handleEndTimeChange(endTime))}/>
                     </div>
                     <div className="field">
-                        <label style={labelStyle}>
-                            Start Time&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">models falling into user specified window are loaded.
-                            </div>
-                        </label>
+                        <WaringButton labelStyle={labelStyle} labelTitle="Start Time" labelSpan="models falling into user specified window are loaded."/>
                         <div className="ui input">
                             <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={startTime}
                                             readOnly={true}/>
                         </div>
                     </div>
                     <div className="field">
-                        <label style={labelStyle}>
-                            End Time&nbsp;
-
-                            <i className="custom button warning circle icon" style={{'cursor': 'pointer','color': '#88bbee'}}></i>
-                            <div className="ui custom popup center right transition hidden">models falling into user specified window are loaded.
-                            </div>
-                        </label>
+                        <WaringButton labelStyle={labelStyle} labelTitle="End Time" labelSpan="models falling into user specified window are loaded."/>
                         <div className="ui input">
                             <DateTimePicker className='ui input' dateTimeFormat='YYYY-MM-DD HH:mm' value={endTime}
                                             onChange={this.handleEndTimeChange}/>
