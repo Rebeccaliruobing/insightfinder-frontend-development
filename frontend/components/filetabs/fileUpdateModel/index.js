@@ -10,6 +10,9 @@ import {
     AnomalyThreshold
 } from '../../selections';
 import store from 'store';
+import apis from '../../../apis';
+import WaringButton from '../../cloud/monitoring/waringButton';
+
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
 export default class FileUpdateModel extends Component {
@@ -29,7 +32,11 @@ export default class FileUpdateModel extends Component {
             anomalyThreshold: 0.99,
             durationThreshold: 5,
             minPts: 5,
-            epsilon: 1.0
+            epsilon: 1.0,
+            submitLoading: false,
+            loading: false,
+            trainingData: 'updateTraining',
+            optionalFilterData: 'updateFilter'
         }
     }
 
@@ -85,14 +92,34 @@ export default class FileUpdateModel extends Component {
     }
 
     handleSubmit(e){
-        console.log('submit');
+        let {modelString,trainingData,optionalFilterData,trainingDataShow,optionalFilterDataShow,modelType} = this.state;
+        let filename = trainingDataShow?trainingData:undefined;
+        let filenameFilter = optionalFilterDataShow?optionalFilterData:undefined;
+        let modelName = modelString;
+        let operation = modelType;
+        this.setState({'submitLoading': true},()=>{
+            apis.postUploadUpdate(operation, filenameFilter, modelName,filename).then((resp)=>{
+                if(resp.success){
+                    alert('success');
+                    console.log(resp);
+                }
+                else{
+                    alert(resp.message);
+                }
+                this.setState({'submitLoading': false});
+            }).catch((resp)=>{
+                console.log(resp);
+                alert(resp.statusText);
+                this.setState({'submitLoading': false});
+            });
+        });
     }
     render() {
         let {userInstructions} = this.context;
-        let { modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { loading, modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
-            <Console.Content>
+            <Console.Content className={loading?"ui form loading":""}>
                 <div className="ui main tiny container">
                     <div className="ui clearing vertical segment">
                     </div>
@@ -107,24 +134,26 @@ export default class FileUpdateModel extends Component {
 
                                     <div className="ui button fileinput-button">
                                         Training Data
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
+                                        <input type="file" name="file" ref={::this.fileUploadTrainingData}/>
                                     </div>
+                                    {this.state.trainingDataShow?<span className="text-blue">{this.state.filename}</span>: null}
                                 </div>
                                 <div className="field">
-                                    <label>Optional Filter Data</label>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Optional Filter Data" labelSpan="anomaly result can be used to advise training process by excluding these known anomalous datapoints. Find detailed information and sample data here."/>
 
                                     <div className="ui button fileinput-button">
                                         Optional Filter Data
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
+                                        <input type="file" name="file" ref={::this.fileUploadOptionalFilterData}/>
                                     </div>
+                                    {this.state.optionalFilterDataShow?<span className="text-blue">{this.state.filename}</span>:null}
                                 </div>
                                 <div className="field">
-                                    <label>Model Name</label>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
                                     <ModelNameSelection value={modelString}
                                                         onChange={this.handleModleString.bind(this)}/>
                                 </div>
                                 <div className="field">
-                                    <label>Operation Options</label>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Operation Options" labelSpan="1. Update: update existing models with new training data 2.Revert: undo the previous model update 3.Delete: remove the model from your tool"/>
                                     <ModelType value={modelType} text={modelTypeText}
                                                onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
                                 </div>
@@ -135,7 +164,6 @@ export default class FileUpdateModel extends Component {
                                         onClick={this.handleSubmit.bind(this)}>Submit</Button>
                             </div>
                         </div>
-                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.fileupdatemodel }}/>
                     </div>
                 </div>
 
@@ -143,32 +171,50 @@ export default class FileUpdateModel extends Component {
         );
     }
 
-    fileUploadRef(r) {
+    fileUploadTrainingData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
                 dataType: 'json',
-                url: `${baseUrl}cloudstorage/${store.get('userName')}/`,
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.trainingData}`,
                 sequentialUploads: true,
                 multipart: false
             })
             .bind('fileuploadadd', (e, data) => {
-                this.setState({settingLoading: true, projectName: data.files[0]['name']});
             })
             .bind('fileuploadprogress', (e, data) => {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                this.setState({settingLoading: true});
+                this.setState({loading: true});
             })
             .bind('fileuploadfail', (e, data) => {
-                var resp = data.response().jqXHR.responseJSON;
-                this.setState({settingLoading: false});
+                this.setState({loading: false});
             })
             .bind('fileuploaddone', (e, data) => {
                 var resp = data.response().jqXHR.responseJSON;
-                this.setState({
-                    projectHintMapFilename: data['data']['name'],
-                    data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
-                    settingLoading: false
-                });
+                resp.loading = false;
+                resp.trainingDataShow = true;
+                this.setState(resp);
+            });
+    }
+    fileUploadOptionalFilterData(r) {
+        $(ReactDOM.findDOMNode(r))
+            .fileupload({
+                dataType: 'json',
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.optionalFilterData}`,
+                sequentialUploads: true,
+                multipart: false
+            })
+            .bind('fileuploadadd', (e, data) => {
+            })
+            .bind('fileuploadprogress', (e, data) => {
+                this.setState({loading: true});
+            })
+            .bind('fileuploadfail', (e, data) => {
+                this.setState({loading: false});
+            })
+            .bind('fileuploaddone', (e, data) => {
+                var resp = data.response().jqXHR.responseJSON;
+                resp.loading = false;
+                resp.optionalFilterDataShow = true;
+                this.setState(resp);
             });
     }
 }

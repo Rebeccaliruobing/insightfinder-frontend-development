@@ -10,6 +10,9 @@ import {
     AnomalyThreshold
 } from '../../selections';
 import store from 'store';
+import apis from '../../../apis';
+import WaringButton from '../../cloud/monitoring/waringButton';
+
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
 export default class FileDisplayModel extends Component {
@@ -29,6 +32,8 @@ export default class FileDisplayModel extends Component {
             anomalyThreshold: 0.99,
             durationThreshold: 5,
             minPts: 5,
+            submitLoading: false,
+            loading: false,
             epsilon: 1.0
         }
     }
@@ -85,7 +90,23 @@ export default class FileDisplayModel extends Component {
     }
 
     handleSubmit(e){
-        console.log('submit');
+        let {modelString, modelType} = this.state;
+        console.log(modelString,modelType);
+        this.setState({'submitLoading': true},()=>{
+            apis.postUploadDisplay(modelType, modelString).then((resp)=>{
+                if(resp.success){
+                    alert('success');
+                }
+                else{
+                    alert(resp.message);
+                }
+                this.setState({'submitLoading': false});
+            }).catch((resp)=>{
+                console.log(resp);
+                alert(resp.statusText);
+                this.setState({'submitLoading': false});
+            });
+        });
     }
     render() {
         let { modelString, modelType, modelTypeText } = this.state;
@@ -101,7 +122,7 @@ export default class FileDisplayModel extends Component {
 
                             <div className="six fields fill">
                                 <div className="field">
-                                    <label>Model Name</label>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
                                     <ModelNameSelection value={modelString}
                                                         onChange={this.handleModleString.bind(this)}/>
                                 </div>

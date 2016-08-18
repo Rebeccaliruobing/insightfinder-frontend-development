@@ -5,30 +5,52 @@ import {
 import store from 'store';
 
 
+import apis from '../../../apis';
+import WaringButton from '../../cloud/monitoring/waringButton';
+
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
 export default class FileUpload extends Component {
     static contextTypes = {
         userInstructions: React.PropTypes.object
     };
+
     constructor(props) {
         super(props);
         this.state = {
             submitLoading: false,
+            visualizationData: 'visualizationData',
             loading: false
         };
     }
 
-    handleSharingChange(e) {
-        console.log(111);
+    handleSubmit(e) {
+        let {visualizationData,optionalFilterDataShow} = this.state;
+        let filename = optionalFilterDataShow?visualizationData:undefined;
+        this.setState({'submitLoading': true}, ()=> {
+            apis.postUploadVisualization(filename).then((resp)=> {
+                if (resp.success) {
+                    alert('success');
+                    console.log(resp);
+                }
+                else {
+                    alert(resp.message);
+                }
+                this.setState({'submitLoading': false});
+            }).catch((resp)=>{
+                console.log(resp);
+                alert(resp.statusText);
+                this.setState({'submitLoading': false});
+            });
+        });
     }
-    handleSubmit(e){
-        console.log('submit');
-    }
+
     render() {
         let {userInstructions} = this.context;
+        let {loading} = this.state;
+        let labelStyle = {};
         return (
-            <Console.Content>
+            <Console.Content className={loading?"ui form loading":""}>
                 <div className="ui main tiny container">
                     <div className="ui clearing vertical segment">
                     </div>
@@ -39,12 +61,15 @@ export default class FileUpload extends Component {
 
                                 <div className="three fields fill">
                                     <div className="field">
-                                        <label>Choose file for visualization</label>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Choose file for visualization"
+                                                      labelSpan="You can opt to upload and store your data in our system."/>
 
                                         <div className="ui button fileinput-button">
                                             Choose file for visualization
                                             <input type="file" name="file" ref={::this.fileUploadRef}/>
                                         </div>
+                                        {this.state.optionalFilterDataShow ?
+                                            <span className="text-blue">{this.state.filename}</span> : null}
                                     </div>
                                 </div>
                                 <div className="ui field">
@@ -53,7 +78,6 @@ export default class FileUpload extends Component {
                                 </div>
                             </div>
                         </div>
-                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.fileupload }}/>
                     </div>
                 </div>
             </Console.Content>
@@ -64,29 +88,23 @@ export default class FileUpload extends Component {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
                 dataType: 'json',
-                url: `${baseUrl}cloudstorage/${store.get('userName')}/`,
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.visualizationData}`,
                 sequentialUploads: true,
                 multipart: false
             })
             .bind('fileuploadadd', (e, data) => {
-                this.setState({settingLoading: true, projectName: data.files[0]['name']});
             })
             .bind('fileuploadprogress', (e, data) => {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                this.setState({settingLoading: true});
+                this.setState({loading: true});
             })
             .bind('fileuploadfail', (e, data) => {
-                var resp = data.response().jqXHR.responseJSON;
-                this.setState({settingLoading: false});
+                this.setState({loading: false});
             })
             .bind('fileuploaddone', (e, data) => {
                 var resp = data.response().jqXHR.responseJSON;
-                this.setState({
-                    projectHintMapFilename: data['data']['name'],
-                    data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
-                    settingLoading: false
-                });
+                resp.loading = false;
+                resp.optionalFilterDataShow = true;
+                this.setState(resp);
             });
-
     }
 }

@@ -45,7 +45,13 @@ $.fn.api.settings.api = {
     'add google project': `${baseUrl}add-google-project`,
     'remove project': `${baseUrl}remove-project`,
     'project setting': `${baseUrl}emailAlertSetting`,
-    'project data': `${baseUrl}projectData`
+    'project data': `${baseUrl}projectData`,
+
+    'upload detection': `${baseUrl}upload-detection`,
+    'upload visualization': `${baseUrl}upload-visualization`,
+    'upload update': `${baseUrl}upload-update`,
+    'upload training': `${baseUrl}upload-training`,
+    'upload display': `${baseUrl}upload-display`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -585,6 +591,7 @@ const apis = {
         });
     },
 
+
     /**
      *
      * @param projectName
@@ -771,6 +778,153 @@ const apis = {
             });
         });
     },
+
+     /**
+     *
+     * @param cvalue
+     * @param pvalue
+     * @param modelType
+     * @param modelName
+     * @param filename
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postUploadDetection(cvalue, pvalue, modelType, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['upload detection'],
+                data: $.param({ userName, token, filename, modelName, modelType, pvalue, cvalue }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+     /**
+     *
+     * @param filename
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postUploadVisualization(filename, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['upload visualization'],
+                data: $.param({ userName, token, filename }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+     /**
+     *
+     * @param operation
+     * @param filenameFilter
+     * @param modelName
+     * @param filename
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postUploadUpdate(operation, filenameFilter, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['upload update'],
+                data: $.param({ userName, token, filename,operation, filenameFilter, modelName }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+     /**
+     *
+     * @param filenameFilter
+     * @param modelName
+     * @param filename
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postUploadTraining(filenameFilter, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
+        let param = filenameFilter?{ userName, token, filename, filenameFilter, modelName }:{ userName, token, filename, modelName };
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['upload training'],
+                data: $.param(param),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+     /**
+     *
+     * @param modelType
+     * @param modelName
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postUploadDisplay(modelType, modelName, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['upload display'],
+                data: $.param({ userName, token, modelName, modelType }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    }
 };
 
 export default apis;

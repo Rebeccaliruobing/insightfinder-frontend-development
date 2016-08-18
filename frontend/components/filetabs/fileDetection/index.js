@@ -10,6 +10,9 @@ import {
     AnomalyThreshold
 } from '../../selections';
 import store from 'store';
+import apis from '../../../apis';
+import WaringButton from '../../cloud/monitoring/waringButton';
+
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
 export default class FileDetection extends Component {
@@ -27,6 +30,9 @@ export default class FileDetection extends Component {
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
+            TestingData: 'TestingData',
+            submitLoading: false,
+            loading: false,
             anomalyThreshold: 0.99,
             durationThreshold: 5,
             minPts: 5,
@@ -44,9 +50,11 @@ export default class FileDetection extends Component {
             }
         });
     }
-    handleDurationThreshold(e){
+
+    handleDurationThreshold(e) {
         this.setState({inputDurationThreshold: e.target.value});
     }
+
     handleProjectChange(value, projectName) {
         let { projectString, sharedProjectString } = this.context.dashboardUservalues;
         let project = undefined;
@@ -83,19 +91,41 @@ export default class FileDetection extends Component {
         }
         this.setState(update);
     }
-    handleModleString(value){
+
+    handleModleString(value) {
         this.setState({modelString: value});
     }
+
     handleSubmit(e) {
-        console.log('submit');
+        let {modelString,modelType,anomalyThreshold,inputDurationThreshold,TestingData} = this.state;
+        let cvalue = inputDurationThreshold;
+        let pvalue = anomalyThreshold;
+        let modelName = modelString;
+        let filename = TestingData;
+        this.setState({'submitLoading': true},()=>{
+            apis.postUploadDetection(cvalue, pvalue,modelType,modelName,filename).then((resp)=>{
+                if(resp.success){
+                    alert('success');
+                }
+                else{
+                    alert(resp.message);
+                }
+                this.setState({'submitLoading': false});
+            }).catch((resp)=>{
+                console.log(resp);
+                alert(resp.statusText);
+                this.setState({'submitLoading': false});
+            });
+        });
+        console.log(modelString, modelType, anomalyThreshold, inputDurationThreshold, TestingData);
     }
 
     render() {
         let {userInstructions} = this.context;
-        let { modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { loading, modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
-            <Console.Content>
+            <Console.Content className={loading?"ui form loading":""}>
                 <div className="ui main tiny container">
                     <div className="ui clearing vertical segment">
                     </div>
@@ -105,7 +135,7 @@ export default class FileDetection extends Component {
 
                             <div className="four fields fill">
                                 <div className="field">
-                                    <label>Model Name</label>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
                                     <ModelNameSelection value={modelString}
                                                         onChange={this.handleModleString.bind(this)}/>
                                 </div>
@@ -122,7 +152,8 @@ export default class FileDetection extends Component {
                                     </div>
                                     :
                                     <div className="field">
-                                        <label style={labelStyle}>Anomaly Threshold</label>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold"
+                                                      labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
                                         <AnomalyThreshold value={anomalyThreshold}
                                                           onChange={(v, t)=>this.setState({ anomalyThreshold: v })}/>
                                     </div>
@@ -135,7 +166,9 @@ export default class FileDetection extends Component {
                                     </div>
                                     :
                                     <div className="field">
-                                        <label style={labelStyle}>Duration Threshold</label>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold"
+                                                      labelSpan="number of continuous anomalies to trigger an alert."/>
+
                                         <div className="ui input">
                                             <input type="text"
                                                    onChange={(e)=>this.handleDurationThreshold(e)}/>
@@ -151,14 +184,8 @@ export default class FileDetection extends Component {
                                         Testing Data
                                         <input type="file" name="file" ref={::this.fileUploadRef}/>
                                     </div>
-                                </div>
-                                <div className="field">
-                                    <label>Mapping Data</label>
-
-                                    <div className="ui button fileinput-button">
-                                        Mapping Data
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
-                                    </div>
+                                    {this.state.testDataShow ?
+                                        <span className="text-blue">{this.state.filename}</span> : null}
                                 </div>
                             </div>
 
@@ -167,7 +194,6 @@ export default class FileDetection extends Component {
                                         onClick={this.handleSubmit.bind(this)}>Submit</Button>
                             </div>
                         </div>
-                        <Message dangerouslySetInnerHTML={{ __html: userInstructions.filedetection }}/>
                     </div>
                 </div>
 
@@ -179,28 +205,23 @@ export default class FileDetection extends Component {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
                 dataType: 'json',
-                url: `${baseUrl}cloudstorage/${store.get('userName')}/`,
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.TestingData}`,
                 sequentialUploads: true,
                 multipart: false
             })
             .bind('fileuploadadd', (e, data) => {
-                this.setState({settingLoading: true, projectName: data.files[0]['name']});
             })
             .bind('fileuploadprogress', (e, data) => {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                this.setState({settingLoading: true});
+                this.setState({loading: true});
             })
             .bind('fileuploadfail', (e, data) => {
-                var resp = data.response().jqXHR.responseJSON;
-                this.setState({settingLoading: false});
+                this.setState({loading: false});
             })
             .bind('fileuploaddone', (e, data) => {
                 var resp = data.response().jqXHR.responseJSON;
-                this.setState({
-                    projectHintMapFilename: data['data']['name'],
-                    data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
-                    settingLoading: false
-                });
+                resp.loading = false;
+                resp.testDataShow = true;
+                this.setState(resp);
             });
     }
 }
