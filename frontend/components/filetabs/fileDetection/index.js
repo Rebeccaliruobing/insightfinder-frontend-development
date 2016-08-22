@@ -26,7 +26,7 @@ export default class FileDetection extends Component {
         this.state = {
             projectName: undefined,
             modelString: undefined,
-            inputDurationThreshold: undefined,
+            inputDurationThreshold: 5,
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
@@ -44,7 +44,7 @@ export default class FileDetection extends Component {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
         let modelString = (this.context.dashboardUservalues || {}).modelString || [];
         projects = projects.filter((item, index) => !(item.isStationary));
-        this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
+        this.setState({'modelString': ((modelString.split(',') || [])[0]).split('(')[0]}, ()=> {
             if (projects.length > 0) {
                 this.handleProjectChange(projects[0].projectName, projects[0].projectName);
             }
@@ -122,7 +122,7 @@ export default class FileDetection extends Component {
 
     render() {
         let {userInstructions} = this.context;
-        let { loading, modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { inputDurationThreshold, loading, modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
             <Console.Content className={loading?"ui form loading":""}>
@@ -169,9 +169,8 @@ export default class FileDetection extends Component {
                                         <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold"
                                                       labelSpan="number of continuous anomalies to trigger an alert."/>
 
-                                        <div className="ui input">
-                                            <input type="text"
-                                                   onChange={(e)=>this.handleDurationThreshold(e)}/>
+                                        <div className="ui input" style={{'paddingLeft': '10px'}}>
+                                            <DurationThreshold value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
                                         </div>
                                     </div>
                                 }

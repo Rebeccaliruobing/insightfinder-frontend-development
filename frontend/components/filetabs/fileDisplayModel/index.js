@@ -42,7 +42,7 @@ export default class FileDisplayModel extends Component {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
         let modelString = (this.context.dashboardUservalues || {}).modelString || [];
         projects = projects.filter((item, index) => !(item.isStationary));
-        this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
+        this.setState({'modelString': ((modelString.split(',') || [])[0]).split('(')[0]}, ()=> {
             if (projects.length > 0) {
                 this.handleProjectChange(projects[0].projectName, projects[0].projectName);
             }

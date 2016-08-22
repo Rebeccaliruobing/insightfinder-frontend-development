@@ -6,6 +6,7 @@ import {
     LiveProjectSelection,
     ModelNameSelection,
     ModelType,
+    OperationOptionsSelect,
     DurationThreshold,
     AnomalyThreshold
 } from '../../selections';
@@ -44,7 +45,7 @@ export default class FileUpdateModel extends Component {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
         let modelString = (this.context.dashboardUservalues || {}).modelString || [];
         projects = projects.filter((item, index) => !(item.isStationary));
-        this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
+        this.setState({'modelString': ((modelString.split(',') || [])[0]).split('(')[0]}, ()=> {
             if (projects.length > 0) {
                 this.handleProjectChange(projects[0].projectName, projects[0].projectName);
             }
@@ -90,7 +91,9 @@ export default class FileUpdateModel extends Component {
     handleModleString(value){
         this.setState({modelString: value});
     }
-
+    handleOperationOptions(value){
+        this.setState({modelType: value});
+    }
     handleSubmit(e){
         let {modelString,trainingData,optionalFilterData,trainingDataShow,optionalFilterDataShow,modelType} = this.state;
         let filename = trainingDataShow?trainingData:undefined;
@@ -154,8 +157,8 @@ export default class FileUpdateModel extends Component {
                                 </div>
                                 <div className="field">
                                     <WaringButton labelStyle={labelStyle} labelTitle="Operation Options" labelSpan="1. Update: update existing models with new training data 2.Revert: undo the previous model update 3.Delete: remove the model from your tool"/>
-                                    <ModelType value={modelType} text={modelTypeText}
-                                               onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
+                                    <OperationOptionsSelect value={'update'}
+                                               onChange={this.handleOperationOptions.bind(this)}/>
                                 </div>
                             </div>
 

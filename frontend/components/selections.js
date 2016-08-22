@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dropdown, Link} from '../artui/react/index';
 import classNames from 'classnames';
+import _ from "lodash";
 
 class ProjectSelection extends React.Component {
 
@@ -132,15 +133,42 @@ class ModelNameSelection extends React.Component {
   constructor(props){
     super(props);
   }
+  splitModelString(model){
+    let result = model.split(',').map(function (value,index) {
+        return value.split('(')[0]
+    });
+    return _.uniq(result)
+  }
   render(){
-
-    let modelString = (this.context.dashboardUservalues || {}).modelString || [];
+    let modelString = this.splitModelString((this.context.dashboardUservalues || {}).modelString || []);
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
           <div className="menu">
             {
-              (modelString.split(',') || []).map(function (value,index) {
+              (modelString || []).map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {value}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
+class OperationOptionsSelect extends React.Component {
+  render(){
+    let selectOption = ['update','revert','delete'];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
                 return (
                     <div className="item" key={index} data-value={value}>
                       {value}
@@ -261,6 +289,7 @@ const DurationHour = (props) => {
 export {
   ProjectSelection,
   LiveProjectSelection,
+  OperationOptionsSelect,
   ModelNameSelection,
   InstanceProjectSelection,
   LogFileReplayProjectSelection,

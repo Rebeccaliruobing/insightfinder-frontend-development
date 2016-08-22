@@ -80,15 +80,15 @@ export default class FileNewModel extends Component {
         this.setState({inputModelName: e.target.value});
     }
 
-    handleModleString(value){
-        this.setState({modelString: value});
+    handleModleString(e){
+        this.setState({modelString: e.target.value});
     }
 
     handleSubmit(e){
-        let {modelString,trainingData,optionalFilterData,trainingDataShow,optionalFilterDataShow} = this.state;
+        let {inputModelName,trainingData,optionalFilterData,trainingDataShow,optionalFilterDataShow} = this.state;
         let filename = trainingDataShow?trainingData:undefined;
         let filenameFilter = optionalFilterDataShow?optionalFilterData:undefined;
-        let modelName = modelString;
+        let modelName = inputModelName;
         this.setState({'submitLoading': true},()=>{
             apis.postUploadTraining(filenameFilter, modelName,filename).then((resp)=>{
                 if(resp.success){
@@ -140,8 +140,8 @@ export default class FileNewModel extends Component {
                                     <div className="field">
                                         <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
                                         <div className="ui input">
-                                            <ModelNameSelection value={modelString}
-                                                            onChange={this.handleModleString.bind(this)}/>
+                                            <input type="text"
+                                                   onChange={(e)=>this.handleSharingChange(e)}/>
                                         </div>
                                     </div>
                                 </div>
