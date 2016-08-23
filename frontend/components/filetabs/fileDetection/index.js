@@ -170,7 +170,7 @@ export default class FileDetection extends Component {
                                                       labelSpan="number of continuous anomalies to trigger an alert."/>
 
                                         <div className="ui input" style={{'paddingLeft': '10px'}}>
-                                            <DurationThreshold value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
+                                            <DurationThreshold style={{'width': '140px'}} value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
                                         </div>
                                     </div>
                                 }

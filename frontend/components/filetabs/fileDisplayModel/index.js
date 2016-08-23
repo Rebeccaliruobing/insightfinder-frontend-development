@@ -11,6 +11,7 @@ import {
 } from '../../selections';
 import store from 'store';
 import apis from '../../../apis';
+import HeatMapCard from '../../ui/heat-map-card';
 import WaringButton from '../../cloud/monitoring/waringButton';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
@@ -23,7 +24,9 @@ export default class FileDisplayModel extends Component {
 
     constructor(props) {
         super(props);
+        let weeks = 1;
         this.state = {
+            heatMaps: [],
             projectName: undefined,
             projectType: undefined,
             modelString: undefined,
@@ -34,6 +37,12 @@ export default class FileDisplayModel extends Component {
             minPts: 5,
             submitLoading: false,
             loading: false,
+            params: {
+                projects: [],
+                weeks: weeks,
+                endTime: moment(new Date()).toDate(),
+                startTime: moment(new Date()).add(-7 * weeks, 'days')
+            },
             epsilon: 1.0
         }
     }
@@ -85,32 +94,66 @@ export default class FileDisplayModel extends Component {
         }
         this.setState(update);
     }
-    handleModleString(value){
+
+    handleModleString(value) {
         this.setState({modelString: value});
     }
 
-    handleSubmit(e){
+    handleSubmit(e) {
         let {modelString, modelType} = this.state;
-        console.log(modelString,modelType);
-        this.setState({'submitLoading': true},()=>{
-            apis.postUploadDisplay(modelType, modelString).then((resp)=>{
-                if(resp.success){
-                    alert('success');
+        this.setState({'submitLoading': true}, ()=> {
+            apis.postUploadDisplay(modelType, modelString).then((resp)=> {
+                if (resp.success) {
+                    let dateIndex = 0;
+                    let maps = JSON.parse(resp.data.modelData).map((data, index)=> {
+                        let dataArray = [];
+                        data.NASValues.forEach((line, index) => {
+                            var lineArray = line.split(",");
+                            var colIndex = lineArray[0];
+                            dataArray.push({
+                                colIndex: colIndex % 32,
+                                rowIndex: parseInt(index / 32),
+                                value: lineArray[1]
+                            });
+                        });
+
+                        let title, groupId, params = {
+                            projectName: this.state.projectName
+                        };
+                        if (data.instanceName) {
+                            title = data.instanceName;
+                            params.instanceName = data.instanceName;
+                        } else {
+                            params.groupId = groupId = data.groupId;
+                        }
+
+                        return {
+                            key: `${dateIndex}-${index}`,
+                            duration: 120,
+                            itemSize: 4,
+                            title,
+                            data: dataArray,
+                            link: `/projectDataOnly?${$.param(params)}`
+                        }
+                    });
+                    this.setState({'submitLoading': false, 'heatMaps': maps});
                 }
-                else{
+                else {
                     alert(resp.message);
+                    this.setState({'submitLoading': false});
                 }
-                this.setState({'submitLoading': false});
-            }).catch((resp)=>{
+            }).catch((resp)=> {
                 console.log(resp);
                 alert(resp.statusText);
                 this.setState({'submitLoading': false});
             });
         });
     }
+
     render() {
-        let { modelString, modelType, modelTypeText } = this.state;
+        let { modelString, modelType, modelTypeText, heatMaps } = this.state;
         const labelStyle = {};
+        console.log(heatMaps);
         return (
             <Console.Content>
                 <div className="ui main tiny container">
@@ -122,7 +165,8 @@ export default class FileDisplayModel extends Component {
 
                             <div className="six fields fill">
                                 <div className="field">
-                                    <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
+                                    <WaringButton labelStyle={labelStyle} labelTitle="Model Name"
+                                                  labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
                                     <ModelNameSelection value={modelString}
                                                         onChange={this.handleModleString.bind(this)}/>
                                 </div>
@@ -139,6 +183,9 @@ export default class FileDisplayModel extends Component {
                             </div>
                         </div>
                     </div>
+                        <div className="ui four cards">
+                            {this.state.heatMaps.map((heatObj)=><HeatMapCard {...heatObj}/>)}
+                        </div>
                 </div>
 
             </Console.Content>

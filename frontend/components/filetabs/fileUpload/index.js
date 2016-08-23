@@ -25,24 +25,10 @@ export default class FileUpload extends Component {
     }
 
     handleSubmit(e) {
-        let {visualizationData,optionalFilterDataShow} = this.state;
+        let {loading,visualizationData,optionalFilterDataShow} = this.state;
         let filename = optionalFilterDataShow?visualizationData:undefined;
-        this.setState({'submitLoading': true}, ()=> {
-            apis.postUploadVisualization(filename).then((resp)=> {
-                if (resp.success) {
-                    alert('success');
-                    console.log(resp);
-                }
-                else {
-                    alert(resp.message);
-                }
-                this.setState({'submitLoading': false});
-            }).catch((resp)=>{
-                console.log(resp);
-                alert(resp.statusText);
-                this.setState({'submitLoading': false});
-            });
-        });
+        let url = '/filesMonitoring?filename=' + filename;
+        window.open(url, '_blank');
     }
 
     render() {

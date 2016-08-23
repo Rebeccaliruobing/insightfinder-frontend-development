@@ -16,6 +16,8 @@ import WaringButton from '../../cloud/monitoring/waringButton';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
+//   只提示成功或失败，并不显示其他信息
+
 export default class FileUpdateModel extends Component {
     static contextTypes = {
         userInstructions: React.PropTypes.object,

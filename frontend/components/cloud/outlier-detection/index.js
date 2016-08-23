@@ -102,6 +102,7 @@ export default class OutlierDetection extends Component {
             apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
                 if (resp.success) {
                     let state = {};
+                    console.log(resp.data);
                     state.projectName = data.projectName;
                     state.originData = Object.assign({}, resp.data);
                     state.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);

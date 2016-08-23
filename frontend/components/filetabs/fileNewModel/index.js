@@ -11,11 +11,14 @@ import WaringButton from '../../cloud/monitoring/waringButton';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
 
+//   只提示成功或失败，并不显示其他信息
+
 export default class FileNewModel extends Component {
     static contextTypes = {
         userInstructions: React.PropTypes.object,
         dashboardUservalues: React.PropTypes.object
     };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -80,32 +83,33 @@ export default class FileNewModel extends Component {
         this.setState({inputModelName: e.target.value});
     }
 
-    handleModleString(e){
+    handleModleString(e) {
         this.setState({modelString: e.target.value});
     }
 
-    handleSubmit(e){
+    handleSubmit(e) {
         let {inputModelName,trainingData,optionalFilterData,trainingDataShow,optionalFilterDataShow} = this.state;
-        let filename = trainingDataShow?trainingData:undefined;
-        let filenameFilter = optionalFilterDataShow?optionalFilterData:undefined;
+        let filename = trainingDataShow ? trainingData : undefined;
+        let filenameFilter = optionalFilterDataShow ? optionalFilterData : undefined;
         let modelName = inputModelName;
-        this.setState({'submitLoading': true},()=>{
-            apis.postUploadTraining(filenameFilter, modelName,filename).then((resp)=>{
-                if(resp.success){
+        this.setState({'submitLoading': true}, ()=> {
+            apis.postUploadTraining(filenameFilter, modelName, filename).then((resp)=> {
+                if (resp.success) {
                     alert('success');
                     console.log(resp);
                 }
-                else{
+                else {
                     alert(resp.message);
                 }
                 this.setState({'submitLoading': false});
-            }).catch((resp)=>{
+            }).catch((resp)=> {
                 console.log(resp);
                 alert(resp.statusText);
                 this.setState({'submitLoading': false});
             });
         });
     }
+
     render() {
         let {userInstructions} = this.context;
         let {modelString, loading} = this.state;
@@ -122,23 +126,31 @@ export default class FileNewModel extends Component {
 
                                 <div className="three fields fill">
                                     <div className="field">
-                                        <WaringButton labelStyle={labelStyle} labelTitle="Training Data" labelSpan="input file should be in Comma Separated Value (CSV) format. Find detailed information on sample data here."/>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Training Data"
+                                                      labelSpan="input file should be in Comma Separated Value (CSV) format. Find detailed information on sample data here."/>
+
                                         <div className="ui button fileinput-button">
                                             Training Data
                                             <input type="file" name="file" ref={::this.fileUploadTrainingData}/>
                                         </div>
-                                        {this.state.trainingDataShow?<span className="text-blue">{this.state.filename}</span>: null}
+                                        {this.state.trainingDataShow ?
+                                            <span className="text-blue">{this.state.filename}</span> : null}
                                     </div>
                                     <div className="field">
-                                        <WaringButton labelStyle={labelStyle} labelTitle="Optional Filter Data" labelSpan="anomaly result can be used to advise training process by excluding these known anomalous datapoints. Find detailed information on sample data here."/>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Optional Filter Data"
+                                                      labelSpan="anomaly result can be used to advise training process by excluding these known anomalous datapoints. Find detailed information on sample data here."/>
+
                                         <div className="ui button fileinput-button">
                                             Optional Filter Data
                                             <input type="file" name="file" ref={::this.fileUploadOptionalFilterData}/>
                                         </div>
-                                        {this.state.optionalFilterDataShow?<span className="text-blue">{this.state.filename}</span>:null}
+                                        {this.state.optionalFilterDataShow ?
+                                            <span className="text-blue">{this.state.filename}</span> : null}
                                     </div>
                                     <div className="field">
-                                        <WaringButton labelStyle={labelStyle} labelTitle="Model Name" labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
+                                        <WaringButton labelStyle={labelStyle} labelTitle="Model Name"
+                                                      labelSpan="choose your model and model type. A model can have two model types: the Holistic model type uses a single model induced from all metrics, and the Split model type uses a group of models, each induced from one metric."/>
+
                                         <div className="ui input">
                                             <input type="text"
                                                    onChange={(e)=>this.handleSharingChange(e)}/>
@@ -180,6 +192,7 @@ export default class FileNewModel extends Component {
                 this.setState(resp);
             });
     }
+
     fileUploadOptionalFilterData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
