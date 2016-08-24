@@ -105,7 +105,9 @@ export default class FileDetection extends Component {
         this.setState({'submitLoading': true},()=>{
             apis.postUploadDetection(cvalue, pvalue,modelType,modelName,filename).then((resp)=>{
                 if(resp.success){
-                    alert('success');
+                    //alert('success');
+                    let url = '/filesMonitoring?filename=' + filename;
+                    window.open(url, '_blank');
                 }
                 else{
                     alert(resp.message);
