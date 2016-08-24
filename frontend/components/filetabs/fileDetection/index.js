@@ -106,7 +106,7 @@ export default class FileDetection extends Component {
             apis.postUploadDetection(cvalue, pvalue,modelType,modelName,filename).then((resp)=>{
                 if(resp.success){
                     //alert('success');
-                    let url = '/incidentAnalysis?filename=' + filename+"&pvalue="+resp['data']['pvalue']+"&cvalue="+resp['data']['cvalue']+"&modelType="+resp['data']['modelType']+"&isExistentIncident=true";
+                    let url = '/incidentAnalysis?filename=' + filename+"&pvalue="+resp['data']['pvalue']+"&cvalue="+resp['data']['cvalue']+"&modelType="+resp['data']['modelType'];
                     window.open(url, '_blank');
                 }
                 else{
