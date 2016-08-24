@@ -106,7 +106,7 @@ export default class FileDetection extends Component {
             apis.postUploadDetection(cvalue, pvalue,modelType,modelName,filename).then((resp)=>{
                 if(resp.success){
                     //alert('success');
-                    let url = '/filesMonitoring?filename=' + filename;
+                    let url = '/incidentAnalysis?filename=' + filename+"&pvalue="+resp['data']['pvalue']+"&cvalue="+resp['data']['cvalue']+"&modelType="+resp['data']['modelType']+"&isExistentIncident=true";
                     window.open(url, '_blank');
                 }
                 else{
@@ -172,7 +172,7 @@ export default class FileDetection extends Component {
                                                       labelSpan="number of continuous anomalies to trigger an alert."/>
 
                                         <div className="ui input" style={{'paddingLeft': '10px'}}>
-                                            <DurationThreshold style={{'width': '140px'}} value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
+                                            <DurationThreshold style={{'width': '100%'}} value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
                                         </div>
                                     </div>
                                 }

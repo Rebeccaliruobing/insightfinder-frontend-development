@@ -6,6 +6,7 @@ import {
     LiveProjectSelection,
     ModelNameSelection,
     ModelType,
+    ModelTypeSimple,
     DurationThreshold,
     AnomalyThreshold
 } from '../../selections';
@@ -172,7 +173,7 @@ export default class FileDisplayModel extends Component {
                                 </div>
                                 <div className="field">
                                     <label>Model Type</label>
-                                    <ModelType value={modelType} text={modelTypeText}
+                                    <ModelTypeSimple value={modelType} text={modelTypeText}
                                                onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
                                 </div>
                             </div>
