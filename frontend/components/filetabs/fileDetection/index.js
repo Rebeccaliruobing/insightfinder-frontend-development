@@ -102,24 +102,8 @@ export default class FileDetection extends Component {
         let pvalue = anomalyThreshold;
         let modelName = modelString;
         let filename = TestingData;
-        this.setState({'submitLoading': true},()=>{
-            apis.postUploadDetection(cvalue, pvalue,modelType,modelName,filename).then((resp)=>{
-                if(resp.success){
-                    //alert('success');
-                    let url = '/filesdetectionMonitoring?filename=' + filename+"&pvalue="+resp['data']['pvalue']+"&cvalue="+resp['data']['cvalue']+"&modelType="+resp['data']['modelType']+"&modelName="+resp['data']['modelName'];
-                    window.open(url, '_blank');
-                }
-                else{
-                    alert(resp.message);
-                }
-                this.setState({'submitLoading': false});
-            }).catch((resp)=>{
-                console.log(resp);
-                alert(resp.statusText);
-                this.setState({'submitLoading': false});
-            });
-        });
-        console.log(modelString, modelType, anomalyThreshold, inputDurationThreshold, TestingData);
+        let url = '/filesdetectionMonitoring?filename=' + filename+"&pvalue="+pvalue+"&cvalue="+cvalue+"&modelType="+modelType+"&modelName="+modelName;
+        window.open(url, '_blank');
     }
 
     render() {

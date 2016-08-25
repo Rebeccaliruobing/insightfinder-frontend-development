@@ -125,15 +125,18 @@ export default class OutlierDetection extends Component {
 
     renderSlider() {
         let marks = this.state.marks;
-        console.log(marks);
         if (!marks && marks.length == 0 || (_.keysIn(marks)).length == 0) return;
 
         const dateIndex = this.state.dateIndex;
 
         marks = marks.map((mark, index)=> {
-            return !(index % Math.max(parseInt(marks.length / 10), 1)) ? mark.split("\n").map((date)=>date.substring(5, 16).split("T").join(" ")).join("\n") : ''
+            return !(index % Math.max(parseInt(marks.length / 10), 1)) ?
+                mark.split("\n").map((date)=>{
+                    return moment(moment(date).utc()['_d']).format('MM-DD HH:mm')+" "
+                }).join("\n")
+                : ''
         });
-
+        console.log(marks);
         return (
             <div className="padding40">
                 {this.state.data && (

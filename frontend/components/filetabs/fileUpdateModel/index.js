@@ -105,8 +105,7 @@ export default class FileUpdateModel extends Component {
         this.setState({'submitLoading': true},()=>{
             apis.postUploadUpdate(operation, filenameFilter, modelName,filename).then((resp)=>{
                 if(resp.success){
-                    alert('success');
-                    console.log(resp);
+                    window.location.reload();
                 }
                 else{
                     alert(resp.message);
