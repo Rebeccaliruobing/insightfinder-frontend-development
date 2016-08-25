@@ -14,6 +14,7 @@ import {useCaseRoute} from './components/usecase/index';
 import {fileTabsRoute} from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import FileDetails from './components/cloud/monitoring/files';
+import FileDetectionDetails from './components/cloud/monitoring/filedetection';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
@@ -164,6 +165,14 @@ const FilesMonitoringApp = function (props) {
   );
 };
 
+
+const FilesDetectionMonitoringApp = function (props) {
+  let {location, params} = props;
+  return (
+    <FileDetectionDetails location={location} params={params}/>
+  );
+};
+
 // Incident Analysis Details
 const incidentAnalysisApp = function (props) {
   let {location, params} = props;
@@ -221,6 +230,7 @@ const routes = (
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={FilesMonitoringApp} path="/filesMonitoring"/>
+    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring"/>
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
