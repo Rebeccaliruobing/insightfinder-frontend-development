@@ -233,7 +233,7 @@ export default  class FilterBar extends Component {
 
     handleClickIncident(incident) {
         return (e) => {
-            let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys, recorded} = incident;
+            let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys, recorded, incidentKey} = incident;
             let isd = moment(incidentStartTime);
             let ied = moment(incidentEndTime);
             let msd = moment(modelStartTime);
@@ -253,6 +253,7 @@ export default  class FilterBar extends Component {
                     recorded,
                     holisticModelKeys,
                     splitModelKeys,
+                    incidentKey,
                     isExistentIncident: true
                 })
             } else {
@@ -270,6 +271,7 @@ export default  class FilterBar extends Component {
                     recorded,
                     holisticModelKeys,
                     splitModelKeys,
+                    incidentKey,
                     isExistentIncident: true
                 })
             }
