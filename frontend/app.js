@@ -11,7 +11,10 @@ import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
 import {settingsRoute} from './components/settings';
 import {useCaseRoute} from './components/usecase/index';
+import {fileTabsRoute} from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
+import FileDetails from './components/cloud/monitoring/files';
+import FileDetectionDetails from './components/cloud/monitoring/filedetection';
 import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
@@ -125,13 +128,13 @@ class App extends React.Component {
     } = this.state;
 
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
-
     return (
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/settings" className="item">Settings</Link>
           <Link to="/usecase" className="item">Benchmarks</Link>
+          {['admin','guest'].indexOf(store.get('userName'))!=-1?<Link to="/filetabs" className="item">File Analysis</Link>:null}
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
               <Link to="/account-info" className="item" title='Account Info'>
@@ -151,6 +154,22 @@ const liveMonitoringApp = function (props) {
   let {location, params} = props;
   return (
     <ProjectDetails location={location} params={params}/>
+  );
+};
+
+// Live Monitoring project detail page
+const FilesMonitoringApp = function (props) {
+  let {location, params} = props;
+  return (
+    <FileDetails location={location} params={params}/>
+  );
+};
+
+
+const FilesDetectionMonitoringApp = function (props) {
+  let {location, params} = props;
+  return (
+    <FileDetectionDetails location={location} params={params}/>
   );
 };
 
@@ -205,10 +224,13 @@ const routes = (
       {cloudRoute}
       {settingsRoute}
       {useCaseRoute}
+      {fileTabsRoute}
       <Route component={Help} path="help"/>
       <Route component={AccountInfo} path="account-info"/>
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
+    <Route component={FilesMonitoringApp} path="/filesMonitoring"/>
+    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring"/>
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>

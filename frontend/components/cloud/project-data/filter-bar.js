@@ -16,6 +16,8 @@ import {
 import apis from '../../../apis';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
+
 
 export default  class FilterBar extends Component {
   static contextTypes = {
@@ -156,17 +158,17 @@ export default  class FilterBar extends Component {
       <div className={cx('ui form', {loading: !!this.state.loading})}>
         <div className="four fields fill">
           <div className="field">
-            <label style={labelStyle}>Project Name</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="nickname of your cloud project."/>
             <ProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Project Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
             <div className="ui input">
               <input type="text" readonly value={projectType}/>
             </div>
           </div>
           <div className="field">
-            <label style={labelStyle}>Model Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Model Type" labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
             <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
           <div className="field">
@@ -178,11 +180,11 @@ export default  class FilterBar extends Component {
         </div>
         <div className="four fields fill">
           <div className="field">
-            <label style={labelStyle}>Anomaly Threshold</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold" labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
             <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
           </div>
           <div className="field">
-            <label style={labelStyle}>Duration Threshold (Sample Number)</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold (Sample Number)" labelSpan="number of continuous anomalies to trigger an alert."/>
             <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
           </div>
           <div className="field">

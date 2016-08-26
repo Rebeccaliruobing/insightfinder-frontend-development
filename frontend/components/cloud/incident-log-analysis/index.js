@@ -94,7 +94,7 @@ export default class IncidentDetection extends Component {
                onClick={this.handleToggleFilterPanel.bind(this)}/>
 
             <FilterBar {...this.props} onSubmit={this.handleLogFilterSubmit.bind(this)}/>
-            <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}/>
+
           </div>
 
           <div className="ui vertical segment">

@@ -19,7 +19,7 @@ class Projects extends React.Component {
     super(props);
     this.selectTab.bind(this);
     this._el = null;
-    let tabStates = ['custom','amazon','google'].indexOf(this.props.params.tabId);
+    let tabStates = ["custom","amazon","google"].indexOf(_.last(location.pathname.split('/')));
     this.state = {
       tabStates: {
         custom: [-1, 0].indexOf(tabStates)!=-1?'active':'',
@@ -99,7 +99,7 @@ class Projects extends React.Component {
 
     this.projectList(projectString,projectGroupByType,projectInfoArray);
     this.sharedProjectList(sharedProjectString,projectGroupByType,projectInfoArray);
-
+    console.log(_.last(location.pathname.split('/')));
     return (
       <Console.Content>
         <div className="ui main tiny container" ref={c => this._el = c}>

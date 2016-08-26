@@ -44,12 +44,11 @@ export default class IncidentDetection extends Component {
 
   handleFilterSubmit(data) {
 
-    let {projectName, pvalue, cvalue, minPts, epsilon, modelType} = data;
+    let {projectName, pvalue, cvalue, minPts, epsilon, modelType, isExistentIncident, incidentKey} = data;
     let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelStartTime = moment(data.modelStartTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelEndTime = moment(data.modelEndTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let isExistentIncident = data.isExistentIncident;
     if(modelType=='DBScan'){
       pvalue = epsilon;
       cvalue = minPts;
@@ -63,6 +62,7 @@ export default class IncidentDetection extends Component {
       modelType,
       modelStartTime, 
       modelEndTime,
+      incidentKey,
       isExistentIncident
     }))}`, '_blank');
   }
@@ -95,7 +95,6 @@ export default class IncidentDetection extends Component {
                onClick={this.handleToggleFilterPanel.bind(this)}/>
 
             <FilterBar {...this.props} onSubmit={this.handleFilterSubmit.bind(this)} />
-            <Message dangerouslySetInnerHTML={{__html: userInstructions.cloudincident}}/>
           </div>
 
           <div className="ui vertical segment">

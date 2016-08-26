@@ -6,7 +6,7 @@ import store from 'store';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
-  FileReplayProjectSelection,
+  LogFileReplayProjectSelection,
   LogModelType,
   DurationHour,
   AnomalyThreshold,
@@ -16,6 +16,8 @@ import {
 import apis from '../../../apis';
 
 import DateTimePicker from "../../ui/datetimepicker/index";
+import WaringButton from '../monitoring/waringButton';
+
 
 export default  class FilterBar extends Component {
   static contextTypes = {
@@ -29,7 +31,7 @@ export default  class FilterBar extends Component {
     this.state = {
       projectName: '',
       pvalue: 0.99,
-      cvalue: 5,
+      cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
       durationHours: 24,
@@ -52,12 +54,11 @@ export default  class FilterBar extends Component {
   componentDidMount() {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.isStationary);
+    projects = projects.filter((item,index) =>  item.fileProjectType == 0);
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     }
   }
-
   parseDataRanges(str){
     var ranges = [];
     if(str===undefined || str==='[]'){
@@ -86,7 +87,15 @@ export default  class FilterBar extends Component {
     let projectInfo = ((this.context.dashboardUservalues || {}).projectSettingsAllInfo || []).find((item)=>item.projectName == projectName);
     // 前三部分是名称，数据类型dataType和云类型cloudType
     let [name, dataType, cloudType] = project;
-    let update = {projectName};
+    let update = {
+      projectName,
+      modelType: 'Holistic',
+      modelTypeText: 'Holistic',
+      pvalue: 0.9,
+      cvalue: 1,
+      minPts: 5,
+      epsilon: 1.0
+    };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
@@ -164,7 +173,7 @@ export default  class FilterBar extends Component {
   validateStartEnd(data){
     let {startTime, endTime, modelStartTime, modelEndTime, isStationary, availableDataRanges} = data;
     if(startTime == endTime){
-      alert('Incident start/end times need to be initialized.');
+      alert('Log start/end times need to be initialized.');
       return false;
     }
     if(modelStartTime == modelEndTime){
@@ -181,11 +190,11 @@ export default  class FilterBar extends Component {
       let modelEndRange = availableDataRanges.find((item)=> 
         moment(modelEndTime).endOf('day')>=item.min && moment(modelEndTime).startOf('day')<=item.max);
       if(startRange === undefined){
-        alert('Incident Start not in available data range.');
+        alert('Log Start not in available data range.');
         return false;
       }
       if(endRange === undefined){
-        alert('Incident End not in available data range.');
+        alert('Log End not in available data range.');
         return false;
       }
       if(modelStartRange === undefined){
@@ -197,7 +206,7 @@ export default  class FilterBar extends Component {
         return false;
       }
       if(startRange != endRange){
-        alert('Incident Start and Incident End not in the same data range.');
+        alert('Log Start and Log End not in the same data range.');
         return false;
       }
       if(modelStartRange != modelEndRange){
@@ -286,7 +295,7 @@ export default  class FilterBar extends Component {
       this.context.root.loadUserValues().then(()=> {
         this.setState({loading: false}, ()=> {
           let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-          projects = projects.filter((item,index) => item.isStationary);
+          projects = projects.filter((item,index) =>  item.fileProjectType == 0);
           if (projects.length > 0) {
             this.handleProjectChange(projects[0].projectName, projects[0].projectName);
           }
@@ -323,6 +332,7 @@ export default  class FilterBar extends Component {
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
+    const selectedIncident = incident;
     let self = this;
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
@@ -330,17 +340,17 @@ export default  class FilterBar extends Component {
       <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
         <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>Project Name</label>
-            <FileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="pick a nickname for your cloud project."/>
+            <LogFileReplayProjectSelection value={projectName} onChange={this.handleProjectChange.bind(this)}/>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>Project Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Project Type" labelSpan="cloud type associated with this project."/>
             <div className="ui input">
               <input type="text" readOnly={true} value={projectType}/>
             </div>
           </div>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-            <label style={labelStyle}>Model Type</label>
+            <WaringButton labelStyle={labelStyle} labelTitle="Model Type" labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
             <LogModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
           </div>
           {modelType == 'DBScan'?
@@ -350,7 +360,7 @@ export default  class FilterBar extends Component {
             </div>
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-              <label style={labelStyle}>Anomaly Threshold</label>
+              <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold" labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
               <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
             </div>
           }
@@ -366,18 +376,18 @@ export default  class FilterBar extends Component {
             </div>
           }
 
-        <div className="ui field" style={{'width': '100%'}}>
-          <Button className="orange" onClick={this.handleSubmit.bind(this)}>Incident Analysis</Button>
-          <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
-        </div>
+          <div className="ui field" style={{'width': '100%'}}>
+            <Button className="orange" onClick={this.handleSubmit.bind(this)}>Log Analysis</Button>
+            <Button className="basic" onClick={this.handleRefresh.bind(this)}>Refresh</Button>
+          </div>
           <div className="field">
           </div>
         </div>
-        {incidentList.length > 0 && (
           <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
+            <div className="ui header">List of Logs</div>
             <div className="ui middle aligned divided list padding10"
-                 style={{maxHeight: 200, overflow: 'auto'}}>
-              {incidentList.sort(function(a, b) {
+                 style={{height: 200, overflow: 'auto'}}>
+              {incidentList.length > 0 && incidentList.sort(function(a, b) {
                   let aisd = moment(a.incidentEndTime);
                   let bisd = moment(b.incidentEndTime);
                   if(aisd>bisd){
@@ -398,62 +408,65 @@ export default  class FilterBar extends Component {
                 let msdstr = msd.format("YYYY-MM-DD HH:mm");
                 let medstr = med.format("YYYY-MM-DD HH:mm");
                 let recsuffix = recorded?"(recorded)":"(manual)";
+                let selected = incident === selectedIncident;
                 let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
                   +medstr+"], "+modelType+" "+recsuffix;
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
-                  <div className="item" key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType} style={{'backgroundColor': bgColor,'height':'38px','position': 'relative'}}>
+                  <div className={"item " + (selected ? 'selected' : '')}
+                       key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
+                       style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
-                      <a className="header padding5 incident-item" title={tooltipcontent} style={{'minWidth': '574px'}}>
+                      <a className="header padding5 incident-item"
+                         title={tooltipcontent}
+                         style={{'minWidth': '574px', paddingLeft: 10}}>
                         Incident: [{isdstr}, {iedstr}] {recsuffix}
                       </a>
                     </div>
-                    <Button className="basic" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
+                    <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>
                   </div>
                 )
               })}
             </div>
           </div>
-        )}
         <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
           <div style={{'width': '100%','display': 'flex'}}>
-            <div className="field" style={{'width': '50%'}}>
-              <label style={labelStyle}>Incident Start</label>
+            <div className="field" style={{'width': '25%'}}>
+              <WaringButton labelStyle={labelStyle} labelTitle="Log Start" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={startTime}
                                 onChange={this.handleStartTimeChange.bind(this)}/>
               </div>
-
             </div>
-            <div className="field">
-              <label style={labelStyle}>Incident End</label>
+
+            <div className="field" style={{'width': '25%'}}>
+              <WaringButton labelStyle={labelStyle} labelTitle="Log End" labelSpan="user specified analysis period."/>
               <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={endTime}
                                 onChange={this.handleEndTimeChange.bind(this)}/>
               </div>
             </div>
-          </div>
-        </div>
-        <div className="four fields fill" style={{'float': 'right','width': '65%','marginTop': '16px'}}>
-            <div className="field" style={{'width': '50%'}}>
-              <label style={labelStyle}>Model Start</label>
-              <div className="ui input" style={{'zIndex': 0}}>
+
+            <div className="field" style={{'width': '25%'}}>
+              <WaringButton labelStyle={labelStyle} labelTitle="Model Start" labelSpan="user specified analysis period."/>
+              <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelStartTime}
                                 onChange={this.handleModelStartTimeChange.bind(this)}/>
               </div>
             </div>
 
-            <div className="field">
-              <label style={labelStyle}>Model End</label>
-              <div className="ui input" style={{'zIndex': 0}}>
+            <div className="field" style={{'width': '25%'}}>
+              <WaringButton labelStyle={labelStyle} labelTitle="Model End" labelSpan="user specified analysis period."/>
+              <div className="ui input">
                 <DateTimePicker className='ui input' dateValidator={this.modelDateValidator.bind(this)}
                                 dateTimeFormat='YYYY-MM-DD' value={modelEndTime}
                                 onChange={this.handleModelEndTimeChange.bind(this)}/>
               </div>
             </div>
+          </div>
         </div>
       </div>
     )

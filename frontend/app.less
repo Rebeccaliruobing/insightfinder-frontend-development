@@ -33,7 +33,7 @@
   visibility: hidden;
   position:absolute;
   background-color: white;
-  margin-left: 10px;
+  left: 245px;
   margin-top: 2px;
   padding: 3px;
   white-space: nowrap;
@@ -79,8 +79,19 @@
 }
 
 .ui.list {
-  > .item .incident-item:hover {
-    font-size: 1.2em;
+  > .item {
+    &.selected:before {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 100%;
+      background-color: #F2711C;
+      top: 0;
+    }
+
+    &:hover {
+      background-color: rgba(0,0,0, 0.05) !important;
+    }
   }
 }
 
@@ -404,5 +415,12 @@
 }
 
 .dygraph-legend {
-  top: -45px !important;
+  top: -48px !important;
+
+  & > span {
+    display: none !important;
+  }
+  & > span.highlight {
+    display: block !important;
+  }
 }

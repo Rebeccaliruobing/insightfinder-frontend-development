@@ -35,7 +35,13 @@ class SignupStep2 extends BaseComponent {
           var input = $(this).val();
           if (input == "") {
             $(this).addClass("invalid").removeClass("valid");
-            $(this).parent().find("span").text("Field Required").addClass("invalid");
+            let errorCode = $(this).parent().find("span").text("Field Required");
+            errorCode.addClass("invalid");
+            if(errorCode.hasClass("invalid")){
+                $(errorCode).on('click', function (e) {
+                    errorCode.removeClass('invalid');
+                });
+            }
             $(this).parent().find("i").removeClass("checkmark valid placeholder").addClass("remove invalid icon");
           }
           else {
@@ -104,6 +110,10 @@ class SignupStep2 extends BaseComponent {
         }
         if (isError) {
             $("#form_pass1_error").addClass("invalid");
+
+            $("#form_pass1_error").on('click', function (e) {
+                $("#form_pass1_error").removeClass('invalid');
+            });
             $(this).addClass("invalid").removeClass("valid");
             $("#icon_pass1").removeClass("checkmark valid placeholder");
             $("#icon_pass1").addClass("remove icon invalid");
@@ -123,6 +133,9 @@ class SignupStep2 extends BaseComponent {
        
         if (passwdConfirm != passwdOrig) {
             $("#form_pass2_error").text("Password confirmation must match password").addClass("invalid");
+            $("#form_pass2_error").on('click', function (e) {
+                $("#form_pass2_error").removeClass('invalid');
+            });
             $(this).addClass("invalid").removeClass("valid");
             $("#icon_pass2").removeClass("checkmark valid placeholder");
             $("#icon_pass2").addClass("remove icon invalid");

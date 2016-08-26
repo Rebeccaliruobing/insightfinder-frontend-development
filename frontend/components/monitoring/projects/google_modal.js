@@ -67,9 +67,9 @@ class GoogleProjectModal extends React.Component {
               <input type="text" name="project_id" onChange={(e)=>this.setState({projectId: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Project Type</label>
+              <label>Instance Type</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({projectType: e.target.value})}>
-                <option className="item">Project Type</option>
+                <option className="item">Instance Type</option>
                 <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
               </select>
@@ -85,13 +85,6 @@ class GoogleProjectModal extends React.Component {
                 <input type="file" name="file" ref={::this.fileUploadRef}/>
               </div>
               {this.state.filename && <span className="text-blue">{this.state.filename}</span>}
-            </div>
-            <div className="inline field" style={{fontSize: 13}}>
-              <div className="ui checkbox">
-                <input type="checkbox" tabIndex="0"
-                       onChange={(e) => this.setState({hasAgentData: e.target.checked})} />
-                <label>Enable agent monitoring</label>
-              </div>
             </div>
           </form>
         </div>

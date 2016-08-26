@@ -28,7 +28,7 @@ class GoogleProjects extends React.Component {
 
   handleRemoveProject(projectName) {
     return (e) => {
-      if (!window.confirm("Confirm deleting project?")) return;
+      if (!window.confirm("Delete this project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
           window.alert(resp.message);
@@ -56,7 +56,6 @@ class GoogleProjects extends React.Component {
             <td style={{width: '16%'}}>Instance Type</td>
             <td style={{width: '16%'}}>Zone</td>
             <td style={{width: '16%'}}>Monitoring Type</td>
-            <td style={{width: '16%'}}>Agent Data Enabled</td>
             <td style={{width: '16%'}}></td>
           </tr>
           {
@@ -67,7 +66,6 @@ class GoogleProjects extends React.Component {
                   <td style={{width: '16%'}}>{dataType}</td>
                   <td style={{width: '16%'}}>{zone}</td>
                   <td style={{width: '16%'}}>{cloudType}</td>
-                  <td style={{width: '16%'}}><input type="checkbox" checked={agentDataEnabled} readOnly={true} /></td>
                   <td style={{width: '16%'}}>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>{flag?"Unshare":"Remove"}</button>
                   </td>

@@ -55,16 +55,15 @@ class CustomProjectModal extends React.Component {
               <input type="text" name="name" onChange={(e)=>this.setState({projectName: e.target.value})}/>
             </div>
             <div className="field">
-              <label>Project Type</label>
+              <label>Instance Type</label>
 
               <select className="ui dropdown" onChange={(e)=>this.setState({projectCloudType: e.target.value})}>
-                <option className="item">Project Type</option>
+                <option className="item">Instance Type</option>
                 <option className="item" value="AWS">AWS</option>
-                <option className="item" value="GAE">GAE</option>
                 <option className="item" value="GCE">GCE</option>
                 <option className="item" value="PrivateCloud">Private Cloud</option>
-                <option className="item" value="MetricFile">Metric File</option>
-                <option className="item" value="LogFile">Log File</option>
+                <option className="item" value="MetricFile">Metric File Replay</option>
+                <option className="item" value="LogFile">Log File Replay</option>
               </select>
 
             </div>

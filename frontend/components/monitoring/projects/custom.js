@@ -40,7 +40,7 @@ class CustomProjects extends React.Component {
 
   handleRemoveProject(projectName) {
     return (e) => {
-      if (!window.confirm("Confirm deleting project?")) return;
+      if (!window.confirm("Delete this project?")) return;
       apis.postRemoveProject(projectName).then((resp)=> {
         if(resp.success) {
           window.alert(resp.message);
@@ -69,7 +69,6 @@ class CustomProjects extends React.Component {
             <td style={{width: '16%'}}>Zone</td>
             <td style={{width: '16%'}}>Monitoring Type</td>
             <td style={{width: '16%'}}></td>
-            <td style={{width: '16%'}}></td>
           </tr>
           {
             this.props.projects.map(({name, dataType, zone, cloudType,flag}, index)=> {
@@ -84,7 +83,6 @@ class CustomProjects extends React.Component {
                   <td style={{width: '16%'}}>{cloudType}</td>
                   <td style={{width: '16%'}}>{zone}</td>
                   <td style={{width: '16%'}}>Agent</td>
-                  <td style={{width: '16%'}}></td>
                   <td style={{width: '16%'}}>
                     <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>{flag?"Unshare":"Remove"}</button>
                   </td>

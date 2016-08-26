@@ -69,7 +69,7 @@ export class DataChart extends React.Component {
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
-        axisLabelWidth={35}
+        axisLabelWidth={45}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
@@ -125,9 +125,9 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, } = this.props;
+    //const { groups, view, columns, period} = this.props;
+    const { groups, view, columns, period} = this.props;
     const { selectedIndex } = this.state;
-
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
     const isListView = view === 'list';
     const syncDateWindow = isListView;
@@ -137,7 +137,7 @@ export class DataGroupCharts extends React.Component {
     const selected = selectedIndex !== undefined;
     const selectedGroup = selected ? groups[selectedIndex] : null;
     const selectedRowId = selected ? Math.floor(selectedIndex / colSize) : void 0;
-
+    const periodData = period || {};
     return (
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
@@ -152,7 +152,11 @@ export class DataGroupCharts extends React.Component {
 
             let elems = [];
             const idx = index;
-
+            const periodKeys = _.keysIn(periodData);
+            const periodList = _.compact(periodKeys.map(function (value,index) {
+                if(value == group.metrics)
+                  return value+': '+ periodData[value];
+            }));
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
                    onClick={() => {
@@ -164,7 +168,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {group.metrics} (Group {group.groupId})</h4>
+                  <h4 className="ui header">Metric {periodData[group.metrics]?<span title={periodList}>{group.metrics+' (period list: '+periodData[group.metrics]+')'}</span>:group.metrics}</h4>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
@@ -194,7 +198,7 @@ export class DataGroupCharts extends React.Component {
                 }
                 }>
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-                    <h4 className="ui header">Metric {selectedGroup.metrics} (Group {selectedGroup.groupId})</h4>
+                    <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
                       enableAnnotations={true} data={selectedGroup}
                     />

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Dropdown, Link} from '../artui/react/index';
 import classNames from 'classnames';
+import _ from "lodash";
 
 class ProjectSelection extends React.Component {
 
@@ -32,7 +33,7 @@ class ProjectSelection extends React.Component {
 }
 
 // include only and File Replay
-class FileReplayProjectSelection extends React.Component {
+class LogFileReplayProjectSelection extends React.Component {
 
   static contextTypes = {
     dashboardUservalues: React.PropTypes.object
@@ -45,7 +46,7 @@ class FileReplayProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.isStationary);
+    projects = projects.filter((item,index) => item.fileProjectType == 0);
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -124,6 +125,63 @@ class LiveProjectSelection extends React.Component {
   }
 }
 
+class ModelNameSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+  constructor(props){
+    super(props);
+  }
+  splitModelString(model){
+    let result = model.split(',').map(function (value,index) {
+        return value.split('(')[0]
+    });
+    return _.uniq(result)
+  }
+  render(){
+    let modelString = this.splitModelString((this.context.dashboardUservalues || {}).modelString || []);
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              (modelString || []).map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {value}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
+class OperationOptionsSelect extends React.Component {
+  render(){
+    let selectOption = ['update','revert','delete'];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {value}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
 class LogModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -155,6 +213,23 @@ class ModelType extends React.Component{
           <div className="item" data-value="Split">Split</div>
           <div className="item" data-value="Hybrid">Hybrid</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
+class ModelTypeSimple extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="Split">Split</div>
         </div>
       </Dropdown>
     );
@@ -231,10 +306,13 @@ const DurationHour = (props) => {
 export {
   ProjectSelection,
   LiveProjectSelection,
+  OperationOptionsSelect,
+  ModelNameSelection,
   InstanceProjectSelection,
-  FileReplayProjectSelection,
+  LogFileReplayProjectSelection,
   ModelType,
   LogModelType,
+  ModelTypeSimple,
   AnomalyThreshold,
   DurationThreshold,
   WindowWithWeek,
