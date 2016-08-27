@@ -358,7 +358,7 @@ export default  class FilterBar extends Component {
                     <a className={tabStates['manual'] + ' item'}
                        onClick={(e) => this.selectTab(e, 'manual')}>Manual</a>
                 </div>
-                <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
+                <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block','width': '75%'}}>
                     <div className="four fields fill"
                          style={{'float': 'left','display': 'inline-block','width': '33%'}}>
                         <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
@@ -466,7 +466,7 @@ export default  class FilterBar extends Component {
                             })}
                         </div>
                     </div>
-                    <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0'}}>
+                    <div className="four fields fill" style={{'float': 'right','width': '64%','margin': '16px 0 0 0', display: tabStates.recorded == 'active'?'none':''}}>
                         <div style={{'width': '100%','display': 'flex'}}>
                             <div className="field" style={{'width': '25%'}}>
                                 <WaringButton labelStyle={labelStyle} labelTitle="Incident Start"
