@@ -11,6 +11,7 @@ const HotMapCharts = React.createClass({
         let anomalyHeatmapJson = this.props['anomalyHeatmapJson'];
         let heatMapX = instanceMetricJson['instances'].split(',');
         let heatMapY = instanceMetricJson['metrics'].split(',');
+        let filterMapList = instanceMetricJson['newInstances'].split(',');
         let flagShow = true;
         if (anomalyHeatmapJson['_maxAnomalyRatio']) {
             flagShow = true;
@@ -19,24 +20,46 @@ const HotMapCharts = React.createClass({
             flagShow = false;
         }
         heatMapX[0] = (heatMapX[0].split('['))[1];
-        heatMapX[heatMapX.length - 1] = $.trim((heatMapX[heatMapX.length - 1].split(']'))[0]);
+        heatMapX[heatMapX.length - 1] = (heatMapX[heatMapX.length - 1].split(']'))[0];
         heatMapY[0] = (heatMapY[0].split('['))[1];
-        heatMapY[heatMapY.length - 1] = $.trim((heatMapY[heatMapY.length - 1].split(']'))[0]);
+        heatMapY[heatMapY.length - 1] = (heatMapY[heatMapY.length - 1].split(']'))[0];
+        filterMapList[0] = (filterMapList[0].split('['))[1];
+        filterMapList[filterMapList.length - 1] = (filterMapList[filterMapList.length - 1].split(']'))[0];
+        heatMapX = heatMapX.map(function (value,index) {
+            return $.trim(value);
+        });
+        heatMapY = heatMapY.map(function (value,index) {
+            return $.trim(value);
+        });
+        filterMapList = filterMapList.map(function (value,index) {
+            return $.trim(value);
+        });
         var hours = heatMapY;
         var days = heatMapX;
-        var maxMap = 0.01;
+        var maxMap = 10;
         var minMap = 0.01;
         let showData = [];
-        console.log(hours, days);
-        for(let i=0;i<days.length;i++){
-            for(let j=0;j<hours.length;j++){
-                let anomaly = anomalyHeatmapJson[days[i]]?anomalyHeatmapJson[days[i]][$.trim(hours[j])]:0.01;
-                let anomalyData = anomaly?anomaly:0.01;
-                anomalyData>maxMap?maxMap = anomalyData: null;
-                showData.push([i,j,anomalyData]);
+        console.log(hours, days, filterMapList);
+        for (let i = 0; i < days.length; i++) {
+            let newInstanceFlag = filterMapList.indexOf(days[i]);
+            let missFlag = anomalyHeatmapJson[days[i]]['_missingFlag'];
+            missFlag = missFlag == true;
+            for (let j = 0; j < hours.length; j++) {
+                let anomalyData = 0.01;
+                if (newInstanceFlag!=-1) {
+                    anomalyData = 2;
+                }
+                else if(missFlag){
+                    anomalyData = 0;
+                }
+                else {
+                    let anomaly = anomalyHeatmapJson[days[i]] ? anomalyHeatmapJson[days[i]][hours[j]] : 0.01;
+                    anomalyData = anomaly ? anomaly : 0.01;
+                    anomalyData > maxMap ? maxMap = anomalyData : null;
+                }
+                showData.push([i, j, anomalyData]);
             }
         }
-        console.log(showData);
         var data = showData;
 
         data = data.map(function (item) {
@@ -56,7 +79,7 @@ const HotMapCharts = React.createClass({
                 type: 'category',
                 data: hours,
                 splitArea: {
-                    show: true
+                    show: false
                 }
             },
             yAxis: {
@@ -69,7 +92,7 @@ const HotMapCharts = React.createClass({
             visualMap: {
                 min: minMap,
                 max: maxMap,
-                color: ['#ff0000', '#ffff00','#00ff00'],
+                color: ['#ff0000', '#ffff00', '#00ff00'],
                 calculable: true,
                 orient: 'horizontal',
                 left: 'center',
