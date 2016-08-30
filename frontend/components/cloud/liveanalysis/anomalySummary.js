@@ -19,26 +19,24 @@ const HotMapCharts = React.createClass({
             flagShow = false;
         }
         heatMapX[0] = (heatMapX[0].split('['))[1];
-        heatMapX[heatMapX.length - 1] = (heatMapX[heatMapX.length - 1].split(']'))[0];
+        heatMapX[heatMapX.length - 1] = $.trim((heatMapX[heatMapX.length - 1].split(']'))[0]);
         heatMapY[0] = (heatMapY[0].split('['))[1];
-        heatMapY[heatMapY.length - 1] = (heatMapY[heatMapY.length - 1].split(']'))[0];
+        heatMapY[heatMapY.length - 1] = $.trim((heatMapY[heatMapY.length - 1].split(']'))[0]);
         var hours = heatMapY;
         var days = heatMapX;
+        var maxMap = 0.01;
+        var minMap = 0.01;
         let showData = [];
         console.log(hours, days);
         for(let i=0;i<days.length;i++){
             for(let j=0;j<hours.length;j++){
-                if(flagShow){
-                    showData.push([i,j,0]);
-                }
-                else{
-                    let anomaly = anomalyHeatmapJson[days[i]]?anomalyHeatmapJson[days[i]][hours[j]]:0;
-                    showData.push([i,j,anomaly]);
-                }
+                let anomaly = anomalyHeatmapJson[days[i]]?anomalyHeatmapJson[days[i]][$.trim(hours[j])]:0.01;
+                let anomalyData = anomaly?anomaly:0.01;
+                anomalyData>maxMap?maxMap = anomalyData: null;
+                showData.push([i,j,anomalyData]);
             }
         }
         console.log(showData);
-        //var data = [[0,0,5],[0,1,1],[0,2,3],[0,3,1],[0,4,1],[0,5,1],[0,6,1],[0,7,1],[0,8,2],[1,0,7],[1,1,0],[1,2,0],[1,3,0],[1,4,0],[1,5,0],[1,6,0],[1,7,10],[1,8,6]];
         var data = showData;
 
         data = data.map(function (item) {
@@ -69,8 +67,9 @@ const HotMapCharts = React.createClass({
                 }
             },
             visualMap: {
-                min: 0,
-                max: 10,
+                min: minMap,
+                max: maxMap,
+                color: ['#ff0000', '#ffff00','#00ff00'],
                 calculable: true,
                 orient: 'horizontal',
                 left: 'center',
@@ -82,7 +81,7 @@ const HotMapCharts = React.createClass({
                 data: data,
                 label: {
                     normal: {
-                        show: true
+                        show: false
                     }
                 },
                 itemStyle: {
