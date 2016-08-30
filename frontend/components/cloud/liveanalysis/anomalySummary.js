@@ -34,17 +34,17 @@ const HotMapCharts = React.createClass({
         filterMapList = filterMapList.map(function (value,index) {
             return $.trim(value);
         });
-        var hours = heatMapY;
-        var days = heatMapX;
+        var metrics = heatMapY;
+        var instances = heatMapX;
         var maxMap = 10;
         var minMap = 0.01;
         let showData = [];
-        console.log(hours, days, filterMapList);
-        for (let i = 0; i < days.length; i++) {
-            let newInstanceFlag = filterMapList.indexOf(days[i]);
-            let missFlag = anomalyHeatmapJson[days[i]]['_missingFlag'];
+        console.log(metrics, instances, filterMapList);
+        for (let i = 0; i < instances.length; i++) {
+            let newInstanceFlag = filterMapList.indexOf(instances[i]);
+            let missFlag = anomalyHeatmapJson[instances[i]]?anomalyHeatmapJson[instances[i]]['_missingFlag']:undefined;
             missFlag = missFlag == true;
-            for (let j = 0; j < hours.length; j++) {
+            for (let j = 0; j < metrics.length; j++) {
                 let anomalyData = 0.01;
                 if (newInstanceFlag!=-1) {
                     anomalyData = 2;
@@ -53,7 +53,7 @@ const HotMapCharts = React.createClass({
                     anomalyData = 0;
                 }
                 else {
-                    let anomaly = anomalyHeatmapJson[days[i]] ? anomalyHeatmapJson[days[i]][hours[j]] : 0.01;
+                    let anomaly = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]][metrics[j]] : 0.01;
                     anomalyData = anomaly ? anomaly : 0.01;
                     anomalyData > maxMap ? maxMap = anomalyData : null;
                 }
@@ -77,14 +77,14 @@ const HotMapCharts = React.createClass({
             },
             xAxis: {
                 type: 'category',
-                data: hours,
+                data: metrics,
                 splitArea: {
                     show: false
                 }
             },
             yAxis: {
                 type: 'category',
-                data: days,
+                data: instances,
                 splitArea: {
                     show: true
                 }
