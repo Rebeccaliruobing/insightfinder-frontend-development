@@ -7,6 +7,7 @@ import {autobind} from 'core-decorators';
 import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
+import AnomalySummary from './anomalySummary';
 import TenderModal from './tenderModal';
 import SettingDebug from './debug';
 import ShareModal from './shareModal';
@@ -50,6 +51,7 @@ class LiveAnalysisCharts extends React.Component {
             selectedAnnotation: null,
             showSettingModal: false,
             showTenderModal: false,
+            showAnomalySummary: false,
             showShareModal: false,
             showComments: false,
             showDebug: false
@@ -124,6 +126,10 @@ class LiveAnalysisCharts extends React.Component {
                         >
                         <div className="ui vertical segment">
                             <Button className="orange labeled icon"
+                                    onClick={() => this.setState({ showAnomalySummary: true })}>
+                                <i className="icon refresh"/>Anomaly Summary
+                            </Button>
+                            <Button className="orange labeled icon"
                                     onClick={() => this.setState({ showTenderModal: true })}>
                                 <i className="icon random"/>Causal Graph
                             </Button>
@@ -158,7 +164,12 @@ class LiveAnalysisCharts extends React.Component {
                         </div>
                         <div className="ui vertical segment">
                             <div className="ui grid">
-
+                                <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
+                                { this.state.showAnomalySummary &&
+                                    <div style={{'width': '100%','height': '300px'}}>
+                                        <AnomalySummary data={this.props.data} onClose={() => this.setState({ showAnomalySummary: false })}/>
+                                    </div>
+                                }
                                 {!!summary &&
                                 <DataSummaryChart
                                     key="summary_chart"
@@ -181,7 +192,6 @@ class LiveAnalysisCharts extends React.Component {
                             </div>
                         </div>
                     </div>
-
                     { this.state.showSettingModal &&
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
                     }
