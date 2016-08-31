@@ -12,6 +12,7 @@ import TenderModal from './tenderModal';
 import SettingDebug from './debug';
 import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
+import { PieChart } from '../insight-report';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import {DataSummaryChart, DataGroupCharts} from '../../share/charts';
@@ -131,6 +132,7 @@ class LiveAnalysisCharts extends React.Component {
         const groups = this.groups;
         const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
+        let radius = [60,85];
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -205,9 +207,16 @@ class LiveAnalysisCharts extends React.Component {
                             {tabStates['anomaly'] === 'active' ?
                                 <div className="ui grid">
                                     <div style={{'width': '100%'}}>
+                                        <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
+                                            <PieChart key="1" radius={radius} colorChart="#3398DB" data="Num of Instances"
+                                                             dataValue="4"/>
+                                            <PieChart key="2" radius={radius} colorChart="#3398DB" data="Num of Metrics"
+                                                             dataValue="37"/>
+                                            <PieChart key="3" radius={radius} colorChart="#3398DB" data="Avg Instance Uptime"
+                                                             dataValue="90.5%"/>
+                                        </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
-
-                                        <div style={{'width': '100%','height': '300px'}}>
+                                        <div style={{'width': '100%','height': '600px'}}>
                                             {this.props.data ? <AnomalySummary data={this.props.data}
                                                                                onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
                                         </div>
