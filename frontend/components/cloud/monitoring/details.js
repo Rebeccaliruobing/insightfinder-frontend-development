@@ -54,40 +54,41 @@ const ProjectDetails = class extends React.Component {
         console.log('load data error');
         console.error(msg);
       });
-  }
+    }
 
-  render() {
 
-    const { query } = this.props.location;
-    const { projectName, pvalue, cvalue, modelType } = query;
-
-    let { loading, data } = this.state;
-    let debugData = undefined;
-    const title = modelType === 'DBScan' ?
-      `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
-      `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</b>.`
-        :
-      `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
-      `with model type <b>${modelType}</b>, anomaly threshold <b>${pvalue}</b>, duration threshold: <b>${cvalue}</b>.`
-      ;
-    return (
-      <Console>
-        <Console.Topbar logo={require('../../../images/logo.png')}>
-          <div className="topbar-text">
-            <div className="title" dangerouslySetInnerHTML={{ __html: title }}/>
-            <div className="legend">
-              <div>Anomaly color map:</div>
-              <div className="colormap2">
-                <div style={{ float: 'left' }}>Normal</div>
-                <div style={{ float: 'right' }}>Abnormal</div>
+    render() {
+  
+      const { query } = this.props.location;
+      const { projectName, pvalue, cvalue, modelType } = query;
+  
+      let { loading, data } = this.state;
+      let debugData = undefined;
+      const title = modelType === 'DBScan' ?
+        `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
+        `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</  b>.`
+          :
+        `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
+        `with model type <b>${modelType}</b>, anomaly threshold <b>${pvalue}</b>, duration  threshold: <b>${cvalue}</b>.`
+        ;
+      return (
+        <Console>
+          <Console.Topbar logo={require('../../../images/logo.png')}>
+            <div className="topbar-text">
+              <div className="title" dangerouslySetInnerHTML={{ __html: title }}/>
+              <div className="legend">
+                <div>Anomaly color map:</div>
+                <div className="colormap2">
+                  <div style={{ float: 'left' }}>Normal</div>
+                  <div style={{ float: 'right' }}>Abnormal</div>
+                </div>
               </div>
             </div>
-          </div>
-        </Console.Topbar>
-        <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData} onRefresh={() => this.updateLiveAnalysis()}/>
-      </Console>
-    )
-  }
+          </Console.Topbar>
+          <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData}  onRefresh={() => this.updateLiveAnalysis()}/>
+        </Console>
+      )
+    }
 };
 
 export default ReactTimeout(ProjectDetails);

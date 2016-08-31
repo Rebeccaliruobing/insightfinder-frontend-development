@@ -174,9 +174,9 @@ class LiveAnalysisCharts extends React.Component {
                         <div className="ui vertical segment">
                             <div className="ui pointing secondary menu">
                                   <a className={tabStates['analysis'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'analysis')}>Analysis Summary</a>
+                                     onClick={(e) => this.selectTab(e, 'analysis')}>Chart View</a>
                                   <a className={tabStates['anomaly'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'anomaly')}>Anomaly Summary</a>
+                                     onClick={(e) => this.selectTab(e, 'anomaly')}>Heatmap View</a>
                             </div>
                             {tabStates['analysis'] === 'active' ?
                                 <div className="ui grid">

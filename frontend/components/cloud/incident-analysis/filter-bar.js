@@ -41,6 +41,7 @@ export default  class FilterBar extends Component {
             availableDataRanges: [],
             isStationary: false,
             isExistentIncident: false,
+            isReplay: false,
             incidentList: [],
             modelTypeTextMap: {},
             tabStates: {
@@ -133,17 +134,8 @@ export default  class FilterBar extends Component {
         update.incident = null;
 
         //debugger;
-        this.setState({isExistentIncident: false});
+        this.setState({isReplay: false, isExistentIncident: false});
         this.setState(update);
-    }
-
-    handleDurationChange(durationHours) {
-        let {endTime, cvalue} = this.state;
-        this.setState({
-            isExistentIncident: false,
-            durationHours,
-            startTime: moment(endTime).add(-durationHours, 'hour').toDate()
-        });
     }
 
     handleStartTimeChange(startTime) {
@@ -175,13 +167,6 @@ export default  class FilterBar extends Component {
             isExistentIncident: false,
             modelEndTime: moment(endTime).endOf('day')
         });
-    }
-
-    handleModelTimeChange(timeType) {
-        return (time)=> {
-            this.setState({isExistentIncident: false});
-            this.setState(_.fromPairs([[timeType, time]]))
-        }
     }
 
     validateStartEnd(data) {
@@ -254,6 +239,7 @@ export default  class FilterBar extends Component {
                     holisticModelKeys,
                     splitModelKeys,
                     incidentKey,
+                    isReplay: recorded,
                     isExistentIncident: true
                 })
             } else {
@@ -272,6 +258,7 @@ export default  class FilterBar extends Component {
                     holisticModelKeys,
                     splitModelKeys,
                     incidentKey,
+                    isReplay: recorded,
                     isExistentIncident: true
                 })
             }
@@ -295,7 +282,8 @@ export default  class FilterBar extends Component {
                     endTime: undefined,
                     modelStartTime: undefined,
                     modelEndTime: undefined,
-                    isExistentIncident: true,
+                    isReplay: false,
+                    isExistentIncident: false,
                     modelType: modelType,
                     modelTypeText: this.state.modelTypeTextMap[modelType],
                     recorded: recorded
@@ -378,7 +366,7 @@ export default  class FilterBar extends Component {
                             <WaringButton labelStyle={labelStyle} labelTitle="Model Type"
                                           labelSpan="choose between the Holistic model type that uses a single model induced from all metrics, and the Split model type that uses a group of models, each induced from one metric."/>
                             <ModelType value={modelType} text={modelTypeText}
-                                       onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
+                                       onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text, isReplay: false})}/>
                         </div>
                         {modelType == 'DBScan' ?
                             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
@@ -390,7 +378,7 @@ export default  class FilterBar extends Component {
                             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
                                 <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold"
                                               labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
-                                <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+                                <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t, isReplay: false})}/>
                             </div>
                         }
                         {modelType == 'DBScan' ?
@@ -403,7 +391,7 @@ export default  class FilterBar extends Component {
                             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
                                 <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold (Sample Number)"
                                               labelSpan="number of minutes of continuous anomalies to trigger an alert."/>
-                                <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+                                <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t, isReplay: false})}/>
                             </div>
                         }
 
