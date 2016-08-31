@@ -75,6 +75,7 @@ class RenderSummaryReport extends Component {
                         modelType: matchInst.modelType,
                         modelStartTime: matchInst.modelStartTime,
                         modelEndTime: matchInst.modelEndTime,
+                        isReplay: true,
                         isExistentIncident: true,
                     };
                     s.link = `/incidentAnalysis?${$.param(params)}`

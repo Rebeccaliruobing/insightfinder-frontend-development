@@ -32,10 +32,10 @@ const IncidentDetails = class extends React.Component {
     updateData() {
 
         let {query} = this.props.location;
-        let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, incidentKey, isExistentIncident} = query;
+        let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, incidentKey, isReplay, isExistentIncident} = query;
         let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
         this.setState({loading: true}, ()=> {
-            apis.postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, incidentKey, isExistentIncident)
+            apis.postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, incidentKey, isReplay, isExistentIncident)
                 .then(resp => {
                     let update = {};
                     if (resp.success) {

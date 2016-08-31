@@ -44,7 +44,7 @@ export default class IncidentDetection extends Component {
 
   handleFilterSubmit(data) {
 
-    let {projectName, pvalue, cvalue, minPts, epsilon, modelType, isExistentIncident, incidentKey} = data;
+    let {projectName, pvalue, cvalue, minPts, epsilon, modelType, isReplay, isExistentIncident, incidentKey} = data;
     let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
     let modelStartTime = moment(data.modelStartTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
@@ -63,6 +63,7 @@ export default class IncidentDetection extends Component {
       modelStartTime, 
       modelEndTime,
       incidentKey,
+      isReplay,
       isExistentIncident
     }))}`, '_blank');
   }
