@@ -7,6 +7,7 @@ import {autobind} from 'core-decorators';
 import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
+import AnomalySummary from './anomalySummary';
 import TenderModal from './tenderModal';
 import SettingDebug from './debug';
 import ShareModal from './shareModal';
@@ -50,9 +51,14 @@ class LiveAnalysisCharts extends React.Component {
             selectedAnnotation: null,
             showSettingModal: false,
             showTenderModal: false,
+            showAnomalySummary: false,
             showShareModal: false,
             showComments: false,
-            showDebug: false
+            showDebug: false,
+            tabStates: {
+                anomaly: '',
+                analysis: 'active'
+            }
         };
     }
 
@@ -101,10 +107,19 @@ class LiveAnalysisCharts extends React.Component {
         this.setState({chartDateWindow: dateWindow});
     }
 
+    selectTab(e, tab) {
+        var tabStates = this.state['tabStates'];
+        tabStates = _.mapValues(tabStates, function (val) {
+            return '';
+        });
+        tabStates[tab] = 'active';
+        this.setState({tabStates: tabStates});
+    }
+
     render() {
 
         let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
-        const { view, columns } = this.state;
+        const { view, columns,tabStates } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
         freqMockup = freqMockup || [];
@@ -157,31 +172,51 @@ class LiveAnalysisCharts extends React.Component {
                             </ButtonGroup>
                         </div>
                         <div className="ui vertical segment">
-                            <div className="ui grid">
-
-                                {!!summary &&
-                                <DataSummaryChart
-                                    key="summary_chart"
-                                    summary={summary}
-                                    onDateWindowChange={this.handleDateWindowSync}
-                                    dateWindow={this.state['chartDateWindow']}
-                                    />
-                                }
-
-                                {!!groups &&
-                                <DataGroupCharts
-                                    key={view + '_group_charts'}
-                                    period={periodString}
-                                    groups={groups} view={view} columns={columns}
-                                    onDateWindowChange={this.handleDateWindowSync}
-                                    dateWindow={this.state['chartDateWindow']}
-                                    />
-                                }
-
+                            <div className="ui pointing secondary menu">
+                                  <a className={tabStates['analysis'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'analysis')}>Chart View</a>
+                                  <a className={tabStates['anomaly'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'anomaly')}>Heatmap View</a>
                             </div>
+                            {tabStates['analysis'] === 'active' ?
+                                <div className="ui grid">
+                                    {!!summary &&
+                                    <DataSummaryChart
+                                        key="summary_chart"
+                                        summary={summary}
+                                        onDateWindowChange={this.handleDateWindowSync}
+                                        dateWindow={this.state['chartDateWindow']}
+                                        />
+                                    }
+
+                                    {!!groups &&
+                                    <DataGroupCharts
+                                        key={view + '_group_charts'}
+                                        period={periodString}
+                                        groups={groups} view={view} columns={columns}
+                                        onDateWindowChange={this.handleDateWindowSync}
+                                        dateWindow={this.state['chartDateWindow']}
+                                        />
+                                    }
+
+                                </div>:
+                                null
+                            }
+                            {tabStates['anomaly'] === 'active' ?
+                                <div className="ui grid">
+                                    <div style={{'width': '100%'}}>
+                                        <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
+
+                                        <div style={{'width': '100%','height': '300px'}}>
+                                            {this.props.data ? <AnomalySummary data={this.props.data}
+                                                                               onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
+                                        </div>
+                                    </div>
+                                </div>:
+                                null
+                            }
                         </div>
                     </div>
-
                     { this.state.showSettingModal &&
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
                     }

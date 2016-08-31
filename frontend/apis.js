@@ -371,7 +371,7 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, incidentKey, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
+    postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, incidentKey, isReplay, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -388,6 +388,7 @@ const apis = {
                     modelStartTime,
                     modelEndTime,
                     incidentKey,
+                    isReplay,
                     isExistentIncident
                 }),
                 beforeSend: function (request) {
