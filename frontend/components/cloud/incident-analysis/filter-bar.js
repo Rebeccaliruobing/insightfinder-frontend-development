@@ -71,7 +71,11 @@ export default  class FilterBar extends Component {
             return '';
         });
         tabStates[tab] = 'active';
-        this.setState({tabStates: tabStates, dataFlag: tab});
+        this.setState({
+            tabStates: tabStates, 
+            dataFlag: tab,
+            isReplay: false
+        });
     }
 
     parseDataRanges(str) {
