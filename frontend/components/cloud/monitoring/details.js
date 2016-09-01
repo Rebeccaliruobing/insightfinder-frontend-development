@@ -30,7 +30,7 @@ const ProjectDetails = class extends React.Component {
 
     let { query } = this.props.location;
     let { projectName, modelType, pvalue, cvalue } = query;
-    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
+    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
 
     this.props.clearTimeout(this.timeout);
 

@@ -26,8 +26,14 @@ export default  class FilterBar extends Component {
       anomalyThreshold: 0.99,
       durationThreshold: 5,
       minPts: 5,
-      epsilon: 1.0
+      epsilon: 1.0,
+      modelTypeTextMap: {}
     };
+    this.state.modelTypeTextMap["Holistic"] = "Holistic";
+    this.state.modelTypeTextMap["HolisticCP"] = "Holistic + Filtering";
+    this.state.modelTypeTextMap["Split"] = "Split";
+    this.state.modelTypeTextMap["Hybrid"] = "Hybrid";
+    this.state.modelTypeTextMap["DBScan"] = "Clustering (DBScan)";
   }
 
   componentDidMount() {
@@ -40,6 +46,12 @@ export default  class FilterBar extends Component {
 
   handleProjectChange(value, projectName) {
     let { projectString, sharedProjectString } = this.context.dashboardUservalues;
+    let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    let projectParam = projectParams.find((p) => p.projectName == projectName);
+    let cvalue = projectParam ? projectParam.cvalue : "0.99";
+    let pvalue = projectParam ? projectParam.pvalue : "5";
+    let modelType = projectParam ? projectParam.modelType : "Holistic";
+    let modelTypeText = projectParam ? this.state.modelTypeTextMap[projectParam.modelType] : "Holistic";
     let project = undefined;
     if (projectString.length > 0) {
       project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
@@ -52,10 +64,10 @@ export default  class FilterBar extends Component {
     let [name, dataType, cloudType] = project;
     let update = {
       projectName,
-      modelType: 'Holistic',
-      modelTypeText: 'Holistic',
-      anomalyThreshold: 0.99,
-      durationThreshold: 5,
+      modelType: modelType,
+      modelTypeText: modelTypeText,
+      anomalyThreshold: pvalue,
+      durationThreshold: cvalue,
       minPts: 5,
       epsilon: 1.0
     };

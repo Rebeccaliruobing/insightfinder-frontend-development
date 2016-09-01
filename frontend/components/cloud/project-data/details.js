@@ -33,7 +33,7 @@ const ProjectDetails = class extends React.Component {
 
     let {query} = this.props.location;
     let {projectName, startTime, endTime, groupId, instanceName} = query;
-    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
+    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
     this.setState({loading: true}, ()=> {
       apis.postProjectData(projectName, startTime, endTime, groupId, instanceName)
         .then(resp => {

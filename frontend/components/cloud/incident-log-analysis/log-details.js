@@ -33,7 +33,7 @@ const ProjectLogDetails = class extends React.Component {
 
     let {query} = this.props.location;
     let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
-    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 5));
+    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
     this.setState({loading: true}, ()=> {
       apis.postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, "")
         .then(resp => {
