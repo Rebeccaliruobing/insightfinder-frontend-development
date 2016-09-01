@@ -133,6 +133,10 @@ class LiveAnalysisCharts extends React.Component {
         const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
+        let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
+        let AvgInstanceUptime = propsData['AvgInstanceUptime'];
+        let NumberOfInstances = propsData['NumberOfInstances'];
+        let NumberOfMetrics = propsData['NumberOfMetrics'];
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -209,11 +213,11 @@ class LiveAnalysisCharts extends React.Component {
                                     <div style={{'width': '100%'}}>
                                         <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
                                             <PieChart key="1" radius={radius} colorChart="#3398DB" data="Num of Instances"
-                                                             dataValue="4"/>
+                                                             dataValue={NumberOfInstances.toString()}/>
                                             <PieChart key="2" radius={radius} colorChart="#3398DB" data="Num of Metrics"
-                                                             dataValue="37"/>
+                                                             dataValue={NumberOfMetrics.toString()} />
                                             <PieChart key="3" radius={radius} colorChart="#3398DB" data="Avg Instance Uptime"
-                                                             dataValue="90.5%"/>
+                                                             dataValue={AvgInstanceUptime.toString()}/>
                                         </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
                                         <div style={{'width': '100%','height': '600px'}}>
