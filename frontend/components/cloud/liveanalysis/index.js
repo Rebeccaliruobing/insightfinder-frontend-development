@@ -125,6 +125,7 @@ class LiveAnalysisCharts extends React.Component {
         timeMockup = timeMockup || [];
         freqMockup = freqMockup || [];
         this.calculateData();
+        let self = this;
 
         const summary = this.summary;
         const dataArray = this.causalDataArray;
@@ -137,6 +138,7 @@ class LiveAnalysisCharts extends React.Component {
         let AvgInstanceUptime = propsData['AvgInstanceUptime'];
         let NumberOfInstances = propsData['NumberOfInstances'];
         let NumberOfMetrics = propsData['NumberOfMetrics'];
+        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -212,12 +214,30 @@ class LiveAnalysisCharts extends React.Component {
                                 <div className="ui grid">
                                     <div style={{'width': '100%'}}>
                                         <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
-                                            <PieChart key="1" radius={radius} colorChart="#3398DB" data="Num of Instances"
-                                                             dataValue={NumberOfInstances.toString()}/>
-                                            <PieChart key="2" radius={radius} colorChart="#3398DB" data="Num of Metrics"
-                                                             dataValue={NumberOfMetrics.toString()} />
-                                            <PieChart key="3" radius={radius} colorChart="#3398DB" data="Avg Instance Uptime"
-                                                             dataValue={AvgInstanceUptime.toString()}/>
+                                            {self.props.data?basicStatsKeys.map(function (value,index) {
+                                                let name = undefined;
+                                                let dataValue = self.props.data['instanceMetricJson'][value];
+                                                if(dataValue == undefined){
+                                                    return null;
+                                                    }
+                                                if(value == "NumberOfInstances"){
+                                                    name = "Num of Instances";
+                                                } else if (value == "NumberOfContainers") {
+                                                    name = "Num of Containers";
+                                                } else if (value == "NumberOfMetrics") {
+                                                    name = "Num of Metrics";
+                                                } else if (value == "BillingEstimate") {
+                                                    name = "Estimated Daily Cost";
+                                                    dataValue = ("$"+(dataValue.toFixed(1)).toString());
+                                                } else if (value == "AvgInstanceUptime") {
+                                                    name = "Avg Instance Uptime";
+                                                    dataValue = (((dataValue * 100).toFixed(1)).toString()+"%");
+                                                }
+                                                return (
+                                                    <PieChart key={index} radius={radius} colorChart="#3398DB" data={name}
+                                                                     dataValue={dataValue.toString()}/>
+                                                )
+                                            }): null}
                                         </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
                                         <div style={{'width': '100%','height': '600px'}}>
