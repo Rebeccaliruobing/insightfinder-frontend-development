@@ -112,7 +112,7 @@ class DataParser {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',');
+            var items = line.split(',',3);
 
             //prepare causality chart data
             var thisAnomaly = [];
@@ -170,6 +170,76 @@ class DataParser {
   }
 
   _parseAnomalyConsolidatedText() {
+
+    if (this.anomalyConsolidatedTexts) return;
+    if (this.data['anomalyConsolidatedString'] === undefined) return;
+    let arr = this.data['anomalyConsolidatedString'];
+    let rawHintMapping = this.data['hintMapping'];
+    let hintMapping = {};
+    if (rawHintMapping) {
+      try {
+        hintMapping = $.parseJSON(rawHintMapping);
+      } catch (err) {
+      }
+    }
+    let anomalyConsolidatedTexts = [];
+    let causalDataArray = [];
+    let causalTypes = [];
+
+    if (arr) {
+      _.each(arr, function (a, i) {
+        var atext = [];
+        if (a.anomaliesConsolidated) {
+          var lines = a.anomaliesConsolidated.split('\\n');
+          _.each(lines, function (line, lineNo) {
+            if (!line || line === '') return;
+            var items = line.split(',',3);
+
+            //prepare causality chart data
+            var thisAnomaly = [];
+            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
+            thisAnomaly.push(timeString + "," + items[1]);
+
+            if (items[2]) {
+              var pos = items[2].trim().indexOf(':');
+              var newhints = items[2].trim().substring(pos+1);
+              var newhintsArr = newhints.split("\t");
+              var newhintsStr = "";
+              _.each(newhintsArr,function(h,ih){
+                var parts = h.split(":",2);
+                var hintStr = "";
+                _.each(parts[1].split(";"),function(item,index){
+                  let pos0 = item.indexOf(".");
+                  let pos1 = item.indexOf("[");
+                  let pos2 = item.indexOf("]");
+                  let pos3 = item.indexOf(")");
+                  hintStr += "instance:"+item.substring(pos1+1,pos2)
+                    +", metric:"+item.substring(pos0+1,pos1)
+                    +", value:"+item.substring(pos2+2,pos3)+"; ";
+                });
+                newhintsStr += "At " moment(parseInt(parts[0].trim())).format("MM-DD HH:mm")+", "+hintStr+"\n";
+              });
+              if(newhintsStr.length>512){
+                newhintsStr = newhintsStr.substring(0,511)+"...";
+              }
+              atext[parseInt(items[0])] = newhintsStr;
+            }
+            causalDataArray.push(thisAnomaly);
+          });
+          causalTypes = causalTypes.filter(function (el, index, arr) {
+            return index === arr.indexOf(el);
+          });
+        }
+        anomalyConsolidatedTexts.push(atext);
+      });
+    }
+
+    this.causalDataArray = causalDataArray;
+    this.causalTypes = causalTypes;
+    this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
+  }
+
+  _parseAnomalyConsolidatedTextOld() {
 
     if (this.anomalyConsolidatedTexts) return;
     if (this.data['anomalyConsolidatedString'] === undefined) return;

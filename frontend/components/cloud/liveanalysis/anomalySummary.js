@@ -37,7 +37,7 @@ const HotMapCharts = React.createClass({
         var metrics = heatMapY;
         var instances = heatMapX;
         var maxMap = 10;
-        var minMap = 0.01;
+        var minMap = 0.00001;
         let showData = [];
         for (let i = 0; i < instances.length; i++) {
             let newInstanceFlag = filterMapList.indexOf(instances[i]);
@@ -82,6 +82,9 @@ const HotMapCharts = React.createClass({
                 data: metrics,
                 splitArea: {
                     show: false
+                },
+                axisLabel:{
+                    interval: 2
                 }
             },
             yAxis: {
@@ -89,6 +92,9 @@ const HotMapCharts = React.createClass({
                 data: instances,
                 splitArea: {
                     show: true
+                },
+                axisLabel:{
+                    interval: 0
                 }
             },
             visualMap: {

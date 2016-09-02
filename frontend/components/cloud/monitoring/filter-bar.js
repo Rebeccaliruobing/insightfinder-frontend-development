@@ -50,8 +50,8 @@ export default  class FilterBar extends Component {
     let projectParam = projectParams.find((p) => p.projectName == projectName);
     let cvalue = projectParam ? projectParam.cvalue : "0.99";
     let pvalue = projectParam ? projectParam.pvalue : "5";
-    let modelType = projectParam ? projectParam.modelType : "Holistic";
-    let modelTypeText = projectParam ? this.state.modelTypeTextMap[projectParam.modelType] : "Holistic";
+    let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+    let modelTypeText = (projectParam && projectParam.modelType) ? this.state.modelTypeTextMap[projectParam.modelType] : "Holistic";
     let project = undefined;
     if (projectString.length > 0) {
       project = projectString.split(',').map((s)=>s.split(":")).find((parts) => parts[0] == projectName);
