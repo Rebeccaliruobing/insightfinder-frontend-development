@@ -84,7 +84,7 @@ const HotMapCharts = React.createClass({
                     show: false
                 },
                 axisLabel:{
-                    interval: 2
+                    interval: 0
                 }
             },
             yAxis: {
