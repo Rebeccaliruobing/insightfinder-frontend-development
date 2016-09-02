@@ -217,7 +217,7 @@ class DataParser {
                     +", metric:"+item.substring(pos0+1,pos1)
                     +", value:"+item.substring(pos2+2,pos3)+"; ";
                 });
-                newhintsStr += "At " moment(parseInt(parts[0].trim())).format("MM-DD HH:mm")+", "+hintStr+"\n";
+                newhintsStr += "At " + moment(parseInt(parts[0].trim())).format("MM-DD HH:mm")+", "+hintStr+"\n";
               });
               if(newhintsStr.length>512){
                 newhintsStr = newhintsStr.substring(0,511)+"...";
