@@ -51,7 +51,6 @@ export class DataChart extends React.Component {
   @autobind
   handleDrawCallback(g) {
     const { onDateWindowChange } = this.props;
-
     if (onDateWindowChange) {
 
       const dw = g.xAxisRange();
@@ -63,9 +62,8 @@ export class DataChart extends React.Component {
   }
 
   render() {
-    const { data, enableAnnotations, onDateWindowChange, dateWindow } = this.props;
+    const { data, enableAnnotations, onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
     const listenDrawCallback = !!onDateWindowChange;
-
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
@@ -77,6 +75,7 @@ export class DataChart extends React.Component {
         ylabel={data.unit}
         labels={data.sname}
         highlights={data.highlights}
+        latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}
         annotations={enableAnnotations ? data.annotations : null}
@@ -86,7 +85,7 @@ export class DataChart extends React.Component {
   }
 }
 
-export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow }) => {
+export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, latestDataTimestamp }) => {
   return (
     <div key="summary_chart" className="sixteen wide column" style={{ paddingTop: 0 }}>
       <div className="detail-charts" style={{ position: 'relative' }}>
@@ -95,6 +94,7 @@ export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow }) =>
           enableAnnotations={true} data={summary}
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
+          latestDataTimestamp={latestDataTimestamp}
         />
       </div>
     </div>

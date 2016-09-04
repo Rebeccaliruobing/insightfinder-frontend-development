@@ -135,6 +135,7 @@ class LiveAnalysisCharts extends React.Component {
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
+        let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
         if(propsData){
         let AvgInstanceUptime = propsData['AvgInstanceUptime'];
         let NumberOfInstances = propsData['NumberOfInstances'];
@@ -194,6 +195,7 @@ class LiveAnalysisCharts extends React.Component {
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
+                                        latestDataTimestamp={latestDataTimestamp}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />
