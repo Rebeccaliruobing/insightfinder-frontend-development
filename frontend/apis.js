@@ -46,6 +46,7 @@ $.fn.api.settings.api = {
     'remove project': `${baseUrl}remove-project`,
     'project setting': `${baseUrl}emailAlertSetting`,
     'project data': `${baseUrl}projectData`,
+    'external service': `${baseUrl}service-integration`,
 
     'upload detection': `${baseUrl}upload-detection`,
     'upload visualization': `${baseUrl}upload-visualization`,
@@ -743,6 +744,7 @@ const apis = {
             });
         });
     },
+
     /**
      *
      * @param projectName
@@ -765,6 +767,31 @@ const apis = {
                     endTime,
                     groupId,
                     instanceName,
+                    userName,
+                    token
+                }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    registerExternalService(account, serviceKey, operation, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['external service'],
+                data: $.param({
+                    account, 
+                    'service_key':serviceKey,
+                    operation,
                     userName,
                     token
                 }),

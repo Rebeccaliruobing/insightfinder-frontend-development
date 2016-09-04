@@ -3,7 +3,7 @@ import {Route, IndexRoute, IndexRedirect} from 'react-router';
 
 import {Console, Link} from '../../artui/react/index';
 import ThresholdSettings from './threshold/index';
-import ExtSvc from './extsvc';
+import ExtSvc from './extsvc/index';
 import Projects from '../monitoring/projects/index';
 
 import Navbar from './navbar';

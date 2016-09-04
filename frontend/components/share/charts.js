@@ -142,7 +142,25 @@ export class DataGroupCharts extends React.Component {
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
 
-          {groups.map((group, index, groups) => {
+          {groups.sort(function (a, b) {
+                                let aHighlight = (a.highlights.length>0);
+                                let bHighlight = (b.highlights.length>0);
+                                if (aHighlight && !bHighlight) {
+                                    return -1;
+                                } else if (!aHighlight && bHighlight) {
+                                    return 1;
+                                } else {
+                                  let aMetrics = a.metrics;
+                                  let bMetrics = b.metrics;
+                                  if (aMetrics < bMetrics) {
+                                      return -1;
+                                  } else if (aMetrics > bMetrics) {
+                                      return 1;
+                                  } else {
+                                      return 0;
+                                  }
+                                }
+                            }).map((group, index, groups) => {
 
             const rowId = Math.floor(index / colSize);
             const lastCol = !((index + 1) % colSize);
