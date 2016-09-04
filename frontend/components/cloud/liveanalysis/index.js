@@ -46,7 +46,7 @@ class LiveAnalysisCharts extends React.Component {
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            view: (store.get(DefaultView, 'list')).toLowerCase(),
             columns: (store.get(GridColumns, 'two')).toLowerCase(),
             selectedGroupId: undefined,
             selectedAnnotation: null,

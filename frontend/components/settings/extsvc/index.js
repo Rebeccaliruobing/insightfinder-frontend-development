@@ -1,8 +1,9 @@
 import React from 'react';
-import {Console, Dropdown, Accordion, Message} from '../../artui/react/index';
-import apis from '../../apis';
+import apis from '../../../apis';
 import $ from 'jquery';
 //import pdSrc from './images/pd-connect.png';
+import {Console, Dropdown, Accordion, Message} from '../../../artui/react/index';
+import SlackModal from './slack_modal';
 
 export default class ExtSvc extends React.Component {
   static contextTypes = {
@@ -18,10 +19,24 @@ export default class ExtSvc extends React.Component {
       }
     });
   }
+
+  constructor(props) {
+      super(props);
+      this.state = {
+          showModal: false
+      };
+  }
+
+  handleModalClose = () => this.setState({showModal: false});
+
+  handleAddSlack(){
+    this.setState({showModal: true});
+  }
+
   render() {
     let extServiceAllInfo = this.context.dashboardUservalues.extServiceAllInfo;
     let pagerDutyImg = 'https://pagerduty.com/assets/pd_connect_button.png';
-    let slackImg = 'https://a.slack-edge.com/ae57/img/slack_api_logo.png';
+    let slackImg = 'https://slack.com/img/slack_logo_240.png';
     return (
       <Console.Content className="single-page">
         <div className="ui container">
@@ -37,10 +52,11 @@ export default class ExtSvc extends React.Component {
           <h3>Slack Integration</h3>
           <div className="text">Register your Incoming WebHook from Slack to integrate your account alerts with Slack. 
           </div>
-          <a target="_blank"
-             href="">
-            <img alt="Connect_button" height='40px' src={slackImg}/>
-          </a>
+            <img alt="Connect_button" height='40px' src={slackImg}  /><br />
+            <button id="btn-slack" className="ui small positive action button"
+              onClick={(e) => {this.setState({showModal: true})}}>
+              Add WebHook
+            </button>
           <hr />
           <h3>Currently Registered External Services</h3>
           {extServiceAllInfo.length ? (
@@ -67,6 +83,10 @@ export default class ExtSvc extends React.Component {
           ) : (
             <div className="text">No external service registered.</div>
           )}
+          {
+              this.state.showModal &&
+              <SlackModal onClose={this.handleModalClose} onCancel={this.handleModalCancel}/>
+          }
         </div>
       </Console.Content>
     )

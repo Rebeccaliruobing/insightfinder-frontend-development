@@ -14,6 +14,7 @@ class DataParser {
 
     this.anomalyTexts = null;
     this.anomalyConsolidatedTexts = null;
+    this.anomalyConsolidatedInstanceTexts = null;
     this.causalDataArray = null;
     this.causalTypes = null;
     this.anomalies = null;
@@ -183,8 +184,6 @@ class DataParser {
       }
     }
     let anomalyConsolidatedTexts = [];
-    let causalDataArray = [];
-    let causalTypes = [];
 
     if (arr) {
       _.each(arr, function (a, i) {
@@ -202,6 +201,10 @@ class DataParser {
 
             if (items[2]) {
               var pos = items[2].trim().indexOf(':');
+              if(pos==items[2].trim().length-1){
+                // emtpy hint, skip
+                return true;
+              }
               var newhints = items[2].trim().substring(pos+1);
               var newhintsArr = newhints.split("\t");
               var newhintsStr = "";
@@ -224,26 +227,19 @@ class DataParser {
               }
               atext[parseInt(items[0])] = newhintsStr;
             }
-            causalDataArray.push(thisAnomaly);
-          });
-          causalTypes = causalTypes.filter(function (el, index, arr) {
-            return index === arr.indexOf(el);
           });
         }
         anomalyConsolidatedTexts.push(atext);
       });
     }
-
-    this.causalDataArray = causalDataArray;
-    this.causalTypes = causalTypes;
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
   }
 
-  _parseAnomalyConsolidatedTextOld() {
+  _parseAnomalyConsolidatedTextInstance() {
 
-    if (this.anomalyConsolidatedTexts) return;
-    if (this.data['anomalyConsolidatedString'] === undefined) return;
-    let arr = this.data['anomalyConsolidatedString'];
+    if (this.anomalyConsolidatedInstanceTexts) return;
+    if (this.data['anomalyConsolidatedInstanceString'] === undefined) return;
+    let arr = this.data['anomalyConsolidatedInstanceString'];
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
     if (rawHintMapping) {
@@ -252,15 +248,15 @@ class DataParser {
       } catch (err) {
       }
     }
-    let anomalyConsolidatedTexts = [];
+    let anomalyConsolidatedInstanceTexts = [];
     let causalDataArray = [];
     let causalTypes = [];
 
     if (arr) {
       _.each(arr, function (a, i) {
         var atext = [];
-        if (a.anomaliesConsolidated) {
-          var lines = a.anomaliesConsolidated.split('\\n');
+        if (a.anomaliesConsolidatedInstance) {
+          var lines = a.anomaliesConsolidatedInstance.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
             var items = line.split(',');
@@ -285,7 +281,8 @@ class DataParser {
                 } else {
                   thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
                 }
-                causalTypes.push(metric + " [" + hintparts[1] + "]");
+                // causalTypes.push(metric + " [" + hintparts[1] + "]");
+                causalTypes.push( hintparts[1] );
                 try {
                   var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                   var newval = hintparts[2].split(/\(|\)/)[1];
@@ -312,13 +309,13 @@ class DataParser {
             return index === arr.indexOf(el);
           });
         }
-        anomalyConsolidatedTexts.push(atext);
+        anomalyConsolidatedInstanceTexts.push(atext);
       });
     }
 
     this.causalDataArray = causalDataArray;
     this.causalTypes = causalTypes;
-    this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
+    this.anomalyConsolidatedInstanceTexts = anomalyConsolidatedInstanceTexts;
   }
 
   parseLogAnalysisData(){
@@ -344,6 +341,7 @@ class DataParser {
     if (this.anomalies) return;
     this._parseAnomalyText();
     this._parseAnomalyConsolidatedText();
+    this._parseAnomalyConsolidatedTextInstance();
 
     if (this.mode != 'error') {
 
