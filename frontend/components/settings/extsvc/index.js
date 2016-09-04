@@ -64,16 +64,18 @@ export default class ExtSvc extends React.Component {
               <table className="ui basic table">
                 <thead>
                 <tr>
-                  <th>Id</th>
-                  <th>Description</th>
-                  <th>Operating</th>
+                  <th>Service Type</th>
+                  <th>Account</th>
+                  <th>ServiceKey</th>
+                  <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 {extServiceAllInfo.map((info, index)=>(
                   <tr key={index}>
-                    <td>{info.id}</td>
-                    <td>{info.desc}</td>
+                    <td>{info.serviceProvider}</td>
+                    <td>{info.account}</td>
+                    <td>{info.serviceKey}</td>
                     <td><div className="ui ui mini red button button" onClick={(e)=>this.onRemove(info.id,e)}>Remove</div></td>
                   </tr>
                 ))}
