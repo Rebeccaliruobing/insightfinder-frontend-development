@@ -1,12 +1,23 @@
 import React from 'react';
 import {Console, Dropdown, Accordion, Message} from '../../artui/react/index';
+import apis from '../../apis';
+import $ from 'jquery';
 //import pdSrc from './images/pd-connect.png';
 
 export default class ExtSvc extends React.Component {
   static contextTypes = {
-    dashboardUservalues: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object
   };
-
+  onRemove(infoId,e){
+    $(e.target).addClass('loading');
+    apis.postServiceIntegration(infoId).then((resp)=>{
+      console.log(resp);
+      if(resp.success){
+        alert(resp.message);
+        window.location.reload();
+      }
+    });
+  }
   render() {
     let extServiceAllInfo = this.context.dashboardUservalues.extServiceAllInfo;
     let pagerDutyImg = 'https://pagerduty.com/assets/pd_connect_button.png';
@@ -39,6 +50,7 @@ export default class ExtSvc extends React.Component {
                 <tr>
                   <th>Id</th>
                   <th>Description</th>
+                  <th>Operating</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -46,6 +58,7 @@ export default class ExtSvc extends React.Component {
                   <tr key={index}>
                     <td>{info.id}</td>
                     <td>{info.desc}</td>
+                    <td><div className="ui ui mini red button button" onClick={(e)=>this.onRemove(info.id,e)}>Remove</div></td>
                   </tr>
                 ))}
                 </tbody>
