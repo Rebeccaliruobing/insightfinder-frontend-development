@@ -192,6 +192,26 @@ class LiveAnalysisCharts extends React.Component {
                             </div>
                             {tabStates['analysis'] === 'active' ?
                                 <div className="ui grid">
+                                    {!!summary && summary.annotations.length>0 &&
+                                      <div>
+                                        <table className="ui basic table">
+                                          <thead>
+                                          <tr>
+                                            <th>Incident ID</th>
+                                            <th>Incident Description</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          {summary.annotations.map((an, index)=>(
+                                            <tr key={index}>
+                                              <td>{an.shortText}</td>
+                                              <td>{an.text}</td>
+                                            </tr>
+                                          ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    }
                                     {!!summary &&
                                     <DataSummaryChart
                                         key="summary_chart"
