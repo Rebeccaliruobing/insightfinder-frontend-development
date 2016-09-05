@@ -78,9 +78,9 @@ class Dygraph extends BaseComponent {
         }
         else {
             if (x_start > latestDataTimestamp) {
-                rcolor = 47;
-                gcolor = 136;
-                bcolor = 225;
+                rcolor = 205;
+                gcolor = 234;
+                bcolor = 214;
                 canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
                 canvas.fillRect(canvas_left_x, area_y, canvas_width, canvas_height);
             }
