@@ -478,19 +478,19 @@ class InsightReport extends BaseComponent {
                                 <div className={tabStates['date'] + ' ui tab '}>
                                   {tabStates['date'] === 'active' ?
                                       <div className="insight-anomalies">
-                                          <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Number of Incidents" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#C13100"
                                                     useData={true}/>
 
-                                          <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Average Incident Duration (min)" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#CC6600"
                                                     useData={true}/>
 
-                                          <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Incident Severity" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#FF9900"
