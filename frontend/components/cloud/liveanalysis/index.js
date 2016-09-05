@@ -143,6 +143,20 @@ class LiveAnalysisCharts extends React.Component {
             //latestDataTimestamp = propsData['latestDataTimestamp'];
         }
         let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
+
+        // incident table
+        let incidents = [];
+        if(summary){
+            incidents =  _.map(summary.annotations, a => {
+              return {
+                id: a.shortText,
+                text: a.text
+                //.replace(/\n/g, "<br />")
+              }
+            });
+        }
+
+
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -202,10 +216,10 @@ class LiveAnalysisCharts extends React.Component {
                                           </tr>
                                           </thead>
                                           <tbody>
-                                          {summary.annotations.map((an, index)=>(
+                                          {incidents.map((incident, index)=>(
                                             <tr key={index}>
-                                              <td>{an.shortText}</td>
-                                              <td>{an.text}</td>
+                                              <td>{incident.id}</td>
+                                              <td><pre>{incident.text}</pre></td>
                                             </tr>
                                           ))}
                                           </tbody>
