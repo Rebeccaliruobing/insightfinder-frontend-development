@@ -244,7 +244,7 @@ class LiveAnalysisCharts extends React.Component {
                                             }): null}
                                         </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
-                                        <div style={{'width': '100%','height': '600px'}}>
+                                        <div style={{'width': '100%'}}>
                                             {this.props.data ? <AnomalySummary data={this.props.data}
                                                                                onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
                                         </div>
