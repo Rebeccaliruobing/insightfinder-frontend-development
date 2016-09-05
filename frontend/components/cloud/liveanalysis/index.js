@@ -135,12 +135,11 @@ class LiveAnalysisCharts extends React.Component {
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
-        let latestDataTimestamp = undefined;
+        let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
         if(propsData){
-            let AvgInstanceUptime = propsData['AvgInstanceUptime'];
-            let NumberOfInstances = propsData['NumberOfInstances'];
-            let NumberOfMetrics = propsData['NumberOfMetrics'];
-            //latestDataTimestamp = propsData['latestDataTimestamp'];
+        let AvgInstanceUptime = propsData['AvgInstanceUptime'];
+        let NumberOfInstances = propsData['NumberOfInstances'];
+        let NumberOfMetrics = propsData['NumberOfMetrics'];
         }
         let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
         return (
