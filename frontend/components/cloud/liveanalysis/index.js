@@ -138,18 +138,13 @@ class LiveAnalysisCharts extends React.Component {
         //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
         let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
         let instances = propsData['instances']?propsData['instances'].split(',').length: 1;
-        if(propsData){
-        let AvgInstanceUptime = propsData['AvgInstanceUptime'];
-        let NumberOfInstances = propsData['NumberOfInstances'];
-        let NumberOfMetrics = propsData['NumberOfMetrics'];
-        }
-        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
+        let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         // incident table
         let incidents = [];
         if(summary){
-            incidents =  _.map(summary.annotations, a => {
+            incidents =  _.map(summary.incidentSummary, a => {
               return {
-                id: a.shortText,
+                id: a.id,
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
@@ -206,7 +201,7 @@ class LiveAnalysisCharts extends React.Component {
                             </div>
                             {tabStates['analysis'] === 'active' ?
                                 <div className="ui grid">
-                                    {!!summary && summary.annotations.length>0 &&
+                                    {!!summary && summary.incidentSummary.length>0 &&
                                       <div>
                                         <table className="ui basic table">
                                           <thead>
@@ -265,11 +260,18 @@ class LiveAnalysisCharts extends React.Component {
                                                     name = "Num of Containers";
                                                 } else if (value == "NumberOfMetrics") {
                                                     name = "Num of Metrics";
+                                                } else if (value == "AvgCPUUtilization") {
+                                                    name = "Avg CPU Utilization";
+                                                    dataValue = ((dataValue.toFixed(1)).toString()+"%");
                                                 } else if (value == "BillingEstimate") {
                                                     name = "Estimated Daily Cost";
                                                     dataValue = ("$"+(dataValue.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
-                                                    name = "Avg Instance Uptime";
+                                                    if(self.props.data['instanceMetricJson']['NumberOfContainers']){
+                                                        name = "Avg Container Uptime";
+                                                    }else{
+                                                        name = "Avg Instance Uptime";
+                                                    }
                                                     dataValue = (((dataValue * 100).toFixed(1)).toString()+"%");
                                                 }
                                                 return (
