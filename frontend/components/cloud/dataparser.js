@@ -226,10 +226,12 @@ class DataParser {
                   let rootcause = item.substring(pos2+2,pos3);
                   if(rootcause != 'missing'){
                     rootcause = rootcause+'% higher than normal';
+                  } else {
+                    rootcause = "missing value"
                   }
-                  hintStr += "instance:"+item.substring(pos1+1,pos2)
-                    +", metric:"+item.substring(pos0+1,pos1)
-                    +", root cause:"+rootcause+"; ";
+                  hintStr += "  " + (index+1) + ". "+rootcause
+                    +" at instance:"+item.substring(pos1+1,pos2)
+                    +", metric:"+item.substring(pos0+1,pos1)+";\n";
                 });
                 let tsHint = parseInt(parts[0]);
                 let timeStringHint = moment(ts).format("YYYY-MM-DD HH:mm");
@@ -244,7 +246,7 @@ class DataParser {
                     maxTs = tsHint;
                   }
                 }
-                newhintsStr += "At " + timeStringHint +", "+hintStr+"\n";
+                newhintsStr += "Starting at " + timeStringHint +",\nList of ranked root causes:\n"+hintStr;
                 if(ih == 0){
                   newhintsIncidentStr = newhintsStr;
                 }              
@@ -254,8 +256,10 @@ class DataParser {
               }
               atext[parseInt(items[0])] = newhintsStr;
               var dur = ((maxTs - minTs) / 60000);
-              newhintsIncidentStr += "Duration:" + dur + " minutes";
-              intext[parseInt(items[0])] = newhintsIncidentStr;
+              if(dur == 0){
+                dur = 1;
+              }
+              intext[parseInt(items[0])] = "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
         }

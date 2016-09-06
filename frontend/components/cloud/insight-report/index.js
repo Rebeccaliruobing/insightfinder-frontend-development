@@ -426,11 +426,7 @@ class InsightReport extends BaseComponent {
                                                     name = "Estimated Daily Cost";
                                                     dataValue = ("$"+(dataItem.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
-                                                    if(chartsData['basicProjectStats']['NumberOfContainers']){
-                                                        name = "Avg Container Uptime";
-                                                    }else{
-                                                        name = "Avg Instance Uptime";
-                                                    }
+                                                    name = "Avg Instance Uptime";
                                                     dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                                 }
                                                 let radius = [60,85];

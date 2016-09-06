@@ -137,8 +137,8 @@ class LiveAnalysisCharts extends React.Component {
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
         //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
-        let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
-        let instances = propsData['instances']?propsData['instances'].split(',').length: 1;
+        let latestDataTimestamp = propsData?propsData['latestDataTimestamp']:"";
+        let instances = (propsData&&propsData['instances'])?propsData['instances'].split(',').length: 1;
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         // incident table
         let incidents = [];
@@ -195,10 +195,10 @@ class LiveAnalysisCharts extends React.Component {
                         </div>
                         <div className="ui vertical segment">
                             <div className="ui pointing secondary menu">
-                                  <a className={tabStates['heatmap'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
+                                  <a className={tabStates['heatmap'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['chart'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
                             </div>
@@ -248,9 +248,10 @@ class LiveAnalysisCharts extends React.Component {
                                         </table>
                                       </div>:
                                       <div>
-                                          <h4>Congratulations! No anomaly was detected. Please go to 
+                                          <br />
+                                          <h3>Congratulations! No anomaly was detected. Please go to 
                                            <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
-                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
+                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h3>
                                       </div>
                                     }
                                 </div>:null
@@ -278,11 +279,7 @@ class LiveAnalysisCharts extends React.Component {
                                                     name = "Estimated Daily Cost";
                                                     dataValue = ("$"+(dataValue.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
-                                                    if(self.props.data['instanceMetricJson']['NumberOfContainers']){
-                                                        name = "Avg Container Uptime";
-                                                    }else{
-                                                        name = "Avg Instance Uptime";
-                                                    }
+                                                    name = "Avg Instance Uptime";
                                                     dataValue = (((dataValue * 100).toFixed(1)).toString()+"%");
                                                 }
                                                 return (
