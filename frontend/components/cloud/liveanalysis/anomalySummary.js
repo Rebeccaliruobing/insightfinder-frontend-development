@@ -66,15 +66,14 @@ const HotMapCharts = React.createClass({
                 value: [item[1], item[0], item[2] || '-']
             }
         });
-        console.log(data);
         var option = {
             tooltip: {
                 position: 'top'
             },
             animation: false,
             grid: {
-                height: '70%',
-                y: '0%'
+                height: '50%',
+                y: '10%'
             },
             xAxis: {
                 type: 'category',
@@ -103,7 +102,7 @@ const HotMapCharts = React.createClass({
                 calculable: true,
                 orient: 'horizontal',
                 left: 'center',
-                bottom: '0%'
+                bottom: '15%'
             },
             series: [{
                 name: 'Anomaly Summary',
@@ -132,9 +131,9 @@ const HotMapCharts = React.createClass({
         return (
             <ReactEcharts
                 option={this.getOption()}
-                style={{height: '250%', width: '100%'}}
+                style={{height: '100%', width: '100%'}}
                 className='echarts-for-echarts'
-                opts={{height: '250%', width: '100%'}}
+                opts={{height: '100%', width: '100%'}}
                 theme='my_theme'/>
         )
     }
