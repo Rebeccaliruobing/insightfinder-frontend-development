@@ -243,6 +243,9 @@ const DygraphDefaultProps = getReactDefaultProps(options);
 function spreadDygraphProps(props, isInit) {
   const known = {}, rest = {};
   for (const name in props) {
+    if(name == 'latestDataTimestamp'){
+      continue;
+    }
     const isDygraphsProp = !!propMap[name];
     if (isDygraphsProp) {
       if (isInit && optionHideOnInit(options[propMap[name]]))

@@ -140,7 +140,7 @@ class ModelNameSelection extends React.Component {
     return _.uniq(result)
   }
   render(){
-    let modelString = this.splitModelString((this.context.dashboardUservalues || {}).modelString || []);
+    let modelString = this.splitModelString((this.context.dashboardUservalues || {}).modelString || "");
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>

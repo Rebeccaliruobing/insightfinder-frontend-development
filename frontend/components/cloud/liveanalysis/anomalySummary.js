@@ -25,31 +25,30 @@ const HotMapCharts = React.createClass({
         heatMapY[heatMapY.length - 1] = (heatMapY[heatMapY.length - 1].split(']'))[0];
         filterMapList[0] = (filterMapList[0].split('['))[1];
         filterMapList[filterMapList.length - 1] = (filterMapList[filterMapList.length - 1].split(']'))[0];
-        heatMapX = heatMapX.map(function (value,index) {
+        heatMapX = heatMapX.map(function (value, index) {
             return $.trim(value);
         });
-        heatMapY = heatMapY.map(function (value,index) {
+        heatMapY = heatMapY.map(function (value, index) {
             return $.trim(value);
         });
-        filterMapList = filterMapList.map(function (value,index) {
+        filterMapList = filterMapList.map(function (value, index) {
             return $.trim(value);
         });
         var metrics = heatMapY;
         var instances = heatMapX;
         var maxMap = 10;
-        var minMap = 0.01;
+        var minMap = 0.00001;
         let showData = [];
-        console.log(metrics, instances, filterMapList);
         for (let i = 0; i < instances.length; i++) {
             let newInstanceFlag = filterMapList.indexOf(instances[i]);
-            let missFlag = anomalyHeatmapJson[instances[i]]?anomalyHeatmapJson[instances[i]]['_missingFlag']:undefined;
+            let missFlag = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]]['_missingFlag'] : undefined;
             missFlag = missFlag == true;
             for (let j = 0; j < metrics.length; j++) {
                 let anomalyData = 0.01;
-                if (newInstanceFlag!=-1) {
+                if (newInstanceFlag != -1) {
                     anomalyData = 2;
                 }
-                else if(missFlag){
+                else if (missFlag) {
                     anomalyData = 0;
                 }
                 else {
@@ -63,23 +62,28 @@ const HotMapCharts = React.createClass({
         var data = showData;
 
         data = data.map(function (item) {
-            return [item[1], item[0], item[2] || '-'];
+            return {
+                value: [item[1], item[0], item[2] || '-']
+            }
         });
-
+        let height = 65+heatMapX.length;
         var option = {
             tooltip: {
                 position: 'top'
             },
             animation: false,
             grid: {
-                height: '50%',
-                y: '10%'
+                height: (height>=95?95:height)+'%',
+                y: '0%'
             },
             xAxis: {
                 type: 'category',
                 data: metrics,
                 splitArea: {
                     show: false
+                },
+                axisLabel:{
+                    interval: 0
                 }
             },
             yAxis: {
@@ -87,6 +91,9 @@ const HotMapCharts = React.createClass({
                 data: instances,
                 splitArea: {
                     show: true
+                },
+                axisLabel:{
+                    interval: 0
                 }
             },
             visualMap: {
@@ -95,8 +102,7 @@ const HotMapCharts = React.createClass({
                 color: ['#ff0000', '#ffff00', '#00ff00'],
                 calculable: true,
                 orient: 'horizontal',
-                left: 'center',
-                bottom: '15%'
+                left: 'center'
             },
             series: [{
                 name: 'Anomaly Summary',
@@ -104,13 +110,17 @@ const HotMapCharts = React.createClass({
                 data: data,
                 label: {
                     normal: {
-                        show: false
+                        show: true
                     }
                 },
                 itemStyle: {
                     emphasis: {
                         shadowBlur: 10,
-                        shadowColor: 'rgba(255, 255, 255, 0.5)'
+                        shadowColor: 'black'
+                    },
+                    normal: {
+                        borderColor: ['#333333'],
+                        borderWidth: 0.5
                     }
                 }
             }]
@@ -123,7 +133,6 @@ const HotMapCharts = React.createClass({
                 option={this.getOption()}
                 style={{height: '100%', width: '100%'}}
                 className='echarts-for-echarts'
-                opts={{height: '100%', width: '100%'}}
                 theme='my_theme'/>
         )
     }

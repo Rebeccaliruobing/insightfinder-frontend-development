@@ -46,12 +46,15 @@ $.fn.api.settings.api = {
     'remove project': `${baseUrl}remove-project`,
     'project setting': `${baseUrl}emailAlertSetting`,
     'project data': `${baseUrl}projectData`,
+    'external service': `${baseUrl}service-integration`,
 
     'upload detection': `${baseUrl}upload-detection`,
     'upload visualization': `${baseUrl}upload-visualization`,
     'upload update': `${baseUrl}upload-update`,
     'upload training': `${baseUrl}upload-training`,
-    'upload display': `${baseUrl}upload-display`
+    'upload display': `${baseUrl}upload-display`,
+
+    'service integration': `${baseUrl}service-integration`
 };
 
 let request = function (method, action, data, resolve, reject) {
@@ -743,6 +746,7 @@ const apis = {
             });
         });
     },
+
     /**
      *
      * @param projectName
@@ -765,6 +769,31 @@ const apis = {
                     endTime,
                     groupId,
                     instanceName,
+                    userName,
+                    token
+                }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    registerExternalService(account, serviceKey, operation, userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['external service'],
+                data: $.param({
+                    account, 
+                    'service_key':serviceKey,
+                    operation,
                     userName,
                     token
                 }),
@@ -926,7 +955,37 @@ const apis = {
                 reject(error);
             });
         });
+    },
+
+     /**
+     *
+     * @param service_id
+     * @param operation
+     * @param token
+     * @param userName
+     * @returns {Promise}
+     */
+
+    postServiceIntegration(service_id, operation = 'delete', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['service integration'],
+                data: $.param({ userName, token, operation, service_id }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
     }
 };
+
 
 export default apis;

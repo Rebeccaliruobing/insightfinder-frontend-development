@@ -12,6 +12,7 @@ import TenderModal from './tenderModal';
 import SettingDebug from './debug';
 import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
+import { PieChart } from '../insight-report';
 
 import {GridColumns, DefaultView} from '../../storeKeys';
 import {DataSummaryChart, DataGroupCharts} from '../../share/charts';
@@ -45,7 +46,7 @@ class LiveAnalysisCharts extends React.Component {
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            view: (store.get(DefaultView, 'list')).toLowerCase(),
             columns: (store.get(GridColumns, 'two')).toLowerCase(),
             selectedGroupId: undefined,
             selectedAnnotation: null,
@@ -56,8 +57,9 @@ class LiveAnalysisCharts extends React.Component {
             showComments: false,
             showDebug: false,
             tabStates: {
-                anomaly: '',
-                analysis: 'active'
+                rootcause: 'active',
+                chart: '',
+                heatmap: ''
             }
         };
     }
@@ -124,6 +126,7 @@ class LiveAnalysisCharts extends React.Component {
         timeMockup = timeMockup || [];
         freqMockup = freqMockup || [];
         this.calculateData();
+        let self = this;
 
         const summary = this.summary;
         const dataArray = this.causalDataArray;
@@ -131,6 +134,25 @@ class LiveAnalysisCharts extends React.Component {
         const groups = this.groups;
         const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
+        let radius = [60,85];
+        let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
+        //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
+        let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
+        let instances = propsData['instances']?propsData['instances'].split(',').length: 1;
+        let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
+        // incident table
+        let incidents = [];
+        if(summary){
+            incidents =  _.map(summary.incidentSummary, a => {
+              return {
+                id: a.id,
+                text: a.text
+                //.replace(/\n/g, "<br />")
+              }
+            });
+        }
+
+
         return (
             <Console.Wrapper>
                 <Console.Content style={{ paddingLeft: 0 }} className={ loading ? 'ui form loading' : ''}>
@@ -173,17 +195,20 @@ class LiveAnalysisCharts extends React.Component {
                         </div>
                         <div className="ui vertical segment">
                             <div className="ui pointing secondary menu">
-                                  <a className={tabStates['analysis'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'analysis')}>Chart View</a>
-                                  <a className={tabStates['anomaly'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'anomaly')}>Heatmap View</a>
+                                  <a className={tabStates['heatmap'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
+                                  <a className={tabStates['rootcause'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
+                                  <a className={tabStates['chart'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
                             </div>
-                            {tabStates['analysis'] === 'active' ?
+                            {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
                                     {!!summary &&
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
+                                        latestDataTimestamp={latestDataTimestamp}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />
@@ -198,16 +223,76 @@ class LiveAnalysisCharts extends React.Component {
                                         dateWindow={this.state['chartDateWindow']}
                                         />
                                     }
-
                                 </div>:
                                 null
                             }
-                            {tabStates['anomaly'] === 'active' ?
+                            {tabStates['rootcause'] === 'active' ?
+                                <div className="ui grid">
+                                    {(summary && summary.incidentSummary.length>0) ?
+                                      <div>
+                                        <table className="ui basic table">
+                                          <thead>
+                                          <tr>
+                                            <th>Incident ID</th>
+                                            <th>Incident Description</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          {incidents.map((incident, index)=>(
+                                            <tr key={index}>
+                                              <td>{incident.id}</td>
+                                              <td><pre>{incident.text}</pre></td>
+                                            </tr>
+                                          ))}
+                                          </tbody>
+                                        </table>
+                                      </div>:
+                                      <div>
+                                          <h4>Congratulations! No anomaly was detected. Please go to 
+                                           <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
+                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
+                                      </div>
+                                    }
+                                </div>:null
+                            }
+                            {tabStates['heatmap'] === 'active' ?
                                 <div className="ui grid">
                                     <div style={{'width': '100%'}}>
+                                        <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
+                                            {self.props.data?basicStatsKeys.map(function (value,index) {
+                                                let name = undefined;
+                                                let dataValue = self.props.data['instanceMetricJson'][value];
+                                                if(dataValue == undefined){
+                                                    return null;
+                                                    }
+                                                if(value == "NumberOfInstances"){
+                                                    name = "Num of Instances";
+                                                } else if (value == "NumberOfContainers") {
+                                                    name = "Num of Containers";
+                                                } else if (value == "NumberOfMetrics") {
+                                                    name = "Num of Metrics";
+                                                } else if (value == "AvgCPUUtilization") {
+                                                    name = "Avg CPU Utilization";
+                                                    dataValue = ((dataValue.toFixed(1)).toString()+"%");
+                                                } else if (value == "BillingEstimate") {
+                                                    name = "Estimated Daily Cost";
+                                                    dataValue = ("$"+(dataValue.toFixed(1)).toString());
+                                                } else if (value == "AvgInstanceUptime") {
+                                                    if(self.props.data['instanceMetricJson']['NumberOfContainers']){
+                                                        name = "Avg Container Uptime";
+                                                    }else{
+                                                        name = "Avg Instance Uptime";
+                                                    }
+                                                    dataValue = (((dataValue * 100).toFixed(1)).toString()+"%");
+                                                }
+                                                return (
+                                                    <PieChart key={index} radius={radius} colorChart="#3398DB" data={name}
+                                                                     dataValue={dataValue.toString()}/>
+                                                )
+                                            }): null}
+                                        </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
-
-                                        <div style={{'width': '100%','height': '300px'}}>
+                                        <div style={{'width': '100%',height: (instances)*100+'px'}}>
                                             {this.props.data ? <AnomalySummary data={this.props.data}
                                                                                onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
                                         </div>

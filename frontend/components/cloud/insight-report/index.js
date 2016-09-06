@@ -364,7 +364,7 @@ class InsightReport extends BaseComponent {
         const {showAddPanel,projectName,detailData,loadingIndex,tabStates,tabStatesBasic} = this.state;
         const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
         let chartsData = detailData[projectName];
-        let basicStatsKeys = ["NumberOfInstances","NumberOfContainers","NumberOfMetrics","AvgInstanceUptime","BillingEstimate"];
+        let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         return (
             <Console.Content className={loadingIndex?"ui form loading":""}>
                 {loadingIndex ? null :
@@ -419,11 +419,18 @@ class InsightReport extends BaseComponent {
                                                     name = "Num of Containers";
                                                 } else if (value == "NumberOfMetrics") {
                                                     name = "Num of Metrics";
+                                                } else if (value == "AvgCPUUtilization") {
+                                                    name = "Avg CPU Utilization";
+                                                    dataValue = ((dataItem.toFixed(1)).toString()+"%");
                                                 } else if (value == "BillingEstimate") {
                                                     name = "Estimated Daily Cost";
                                                     dataValue = ("$"+(dataItem.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
-                                                    name = "Avg Instance Uptime";
+                                                    if(chartsData['basicProjectStats']['NumberOfContainers']){
+                                                        name = "Avg Container Uptime";
+                                                    }else{
+                                                        name = "Avg Instance Uptime";
+                                                    }
                                                     dataValue = (((dataItem * 100).toFixed(1)).toString()+"%");
                                                 }
                                                 let radius = [60,85];
@@ -478,19 +485,19 @@ class InsightReport extends BaseComponent {
                                 <div className={tabStates['date'] + ' ui tab '}>
                                   {tabStates['date'] === 'active' ?
                                       <div className="insight-anomalies">
-                                          <BarChart title="Anomaly Count" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Number of Incidents" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyCountByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#C13100"
                                                     useData={true}/>
 
-                                          <BarChart title="Anomaly Duration (min)" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Average Incident Duration (min)" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyDurationByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#CC6600"
                                                     useData={true}/>
 
-                                          <BarChart title="Anomaly Degree" pieChartStyle={pieChartLeft}
+                                          <BarChart title="Incident Severity" pieChartStyle={pieChartLeft}
                                                     data={chartsData['anomalyTimeseries']['AnomalyDegreeByDay']}
                                                     option={{title: {y: 'top'}}}
                                                     colorChart="#FF9900"
