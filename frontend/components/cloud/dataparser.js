@@ -534,13 +534,14 @@ class DataParser {
     });
 
     let incidentTexts = this.anomalyConsolidatedIncidentTexts;
+    index=0;
     _.each(incidentTexts, (o) => {
       _.forIn(o, (v, k) => {
+        index++;
         incidentSummary.push({
           id: index.toString(),
           text: v
         })
-        index++;
       });
     });
 

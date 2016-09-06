@@ -57,8 +57,9 @@ class LiveAnalysisCharts extends React.Component {
             showComments: false,
             showDebug: false,
             tabStates: {
-                anomaly: '',
-                analysis: 'active'
+                rootcause: 'active',
+                chart: '',
+                heatmap: ''
             }
         };
     }
@@ -193,12 +194,14 @@ class LiveAnalysisCharts extends React.Component {
                         </div>
                         <div className="ui vertical segment">
                             <div className="ui pointing secondary menu">
-                                  <a className={tabStates['analysis'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'analysis')}>Chart View</a>
-                                  <a className={tabStates['anomaly'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'anomaly')}>Heatmap View</a>
+                                  <a className={tabStates['rootcause'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
+                                  <a className={tabStates['heatmap'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
+                                  <a className={tabStates['chart'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
                             </div>
-                            {tabStates['analysis'] === 'active' ?
+                            {tabStates['rootcause'] === 'active' ?
                                 <div className="ui grid">
                                     {!!summary && summary.incidentSummary.length>0 &&
                                       <div>
@@ -220,6 +223,11 @@ class LiveAnalysisCharts extends React.Component {
                                         </table>
                                       </div>
                                     }
+                                </div>:
+                                null
+                            }
+                            {tabStates['chart'] === 'active' ?
+                                <div className="ui grid">
                                     {!!summary &&
                                     <DataSummaryChart
                                         key="summary_chart"
@@ -239,11 +247,10 @@ class LiveAnalysisCharts extends React.Component {
                                         dateWindow={this.state['chartDateWindow']}
                                         />
                                     }
-
                                 </div>:
                                 null
                             }
-                            {tabStates['anomaly'] === 'active' ?
+                            {tabStates['heatmap'] === 'active' ?
                                 <div className="ui grid">
                                     <div style={{'width': '100%'}}>
                                         <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
