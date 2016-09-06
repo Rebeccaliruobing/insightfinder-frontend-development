@@ -73,8 +73,8 @@ const HotMapCharts = React.createClass({
             },
             animation: false,
             grid: {
-                height: (height>=80?80:height)+'%',
-                y: '10%'
+                height: (height>=95?95:height)+'%',
+                y: '0%'
             },
             xAxis: {
                 type: 'category',

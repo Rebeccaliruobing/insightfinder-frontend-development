@@ -195,38 +195,13 @@ class LiveAnalysisCharts extends React.Component {
                         </div>
                         <div className="ui vertical segment">
                             <div className="ui pointing secondary menu">
-                                  <a className={tabStates['rootcause'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
                                   <a className={tabStates['heatmap'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
+                                  <a className={tabStates['rootcause'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
                                   <a className={tabStates['chart'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
                             </div>
-                            {tabStates['rootcause'] === 'active' ?
-                                <div className="ui grid">
-                                    {!!summary && summary.incidentSummary.length>0 &&
-                                      <div>
-                                        <table className="ui basic table">
-                                          <thead>
-                                          <tr>
-                                            <th>Incident ID</th>
-                                            <th>Incident Description</th>
-                                          </tr>
-                                          </thead>
-                                          <tbody>
-                                          {incidents.map((incident, index)=>(
-                                            <tr key={index}>
-                                              <td>{incident.id}</td>
-                                              <td><pre>{incident.text}</pre></td>
-                                            </tr>
-                                          ))}
-                                          </tbody>
-                                        </table>
-                                      </div>
-                                    }
-                                </div>:
-                                null
-                            }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
                                     {!!summary &&
@@ -250,6 +225,35 @@ class LiveAnalysisCharts extends React.Component {
                                     }
                                 </div>:
                                 null
+                            }
+                            {tabStates['rootcause'] === 'active' ?
+                                <div className="ui grid">
+                                    {(summary && summary.incidentSummary.length>0) ?
+                                      <div>
+                                        <table className="ui basic table">
+                                          <thead>
+                                          <tr>
+                                            <th>Incident ID</th>
+                                            <th>Incident Description</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          {incidents.map((incident, index)=>(
+                                            <tr key={index}>
+                                              <td>{incident.id}</td>
+                                              <td><pre>{incident.text}</pre></td>
+                                            </tr>
+                                          ))}
+                                          </tbody>
+                                        </table>
+                                      </div>:
+                                      <div>
+                                          <h4>Congratulations! No anomaly was detected. Please go to 
+                                           <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
+                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
+                                      </div>
+                                    }
+                                </div>:null
                             }
                             {tabStates['heatmap'] === 'active' ?
                                 <div className="ui grid">
