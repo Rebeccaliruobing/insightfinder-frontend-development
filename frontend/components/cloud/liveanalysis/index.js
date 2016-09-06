@@ -136,6 +136,7 @@ class LiveAnalysisCharts extends React.Component {
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
+        //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
         let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
         let instances = propsData['instances']?propsData['instances'].split(',').length: 1;
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
@@ -287,7 +288,7 @@ class LiveAnalysisCharts extends React.Component {
                                             }): null}
                                         </div>
                                         <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
-                                        <div style={{'width': '100%',height: (instances+1)*100+'px'}}>
+                                        <div style={{'width': '100%',height: (instances)*100+'px'}}>
                                             {this.props.data ? <AnomalySummary data={this.props.data}
                                                                                onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
                                         </div>
