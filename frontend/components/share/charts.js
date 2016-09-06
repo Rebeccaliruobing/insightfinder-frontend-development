@@ -60,7 +60,9 @@ export class DataChart extends React.Component {
       }
     }
   }
-
+  test(){
+    console.log(11);
+  }
   render() {
     const { data, enableAnnotations, onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
     const listenDrawCallback = !!onDateWindowChange;
@@ -78,6 +80,7 @@ export class DataChart extends React.Component {
         latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}
+        onZoom={this.test}
         annotations={enableAnnotations ? data.annotations : null}
         onAnnotationClick={this.handleAnnotationClick}
       />
