@@ -114,15 +114,20 @@ class DataParser {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',4);
+            var items = line.split(',',0);
 
             //prepare causality chart data
             var thisAnomaly = [];
             var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
             thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[3]) {
-              var hints = items[3].trim().split(':');
+            let hintString = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hintString = items[3];
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";
@@ -140,14 +145,17 @@ class DataParser {
                 try {
                   var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                   var newval = hintparts[2].split(/\(|\)/)[1];
-                  var pct = hintparts[2].split(/\(|\)/)[3];
                   if (hintMapping[metric.trim()] != undefined) {
                     var thisMap = hintMapping[metric.trim()];
                     if (thisMap[parseInt(valparts[0])] != undefined) {
                       newval = thisMap[parseInt(valparts[0])];
                     }
                   }
-                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")("+pct+")";
+                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
+                  if(hintparts[2].split(/\(|\)/).length>=4){
+                    var pct = hintparts[2].split(/\(|\)/)[3];
+                    newhints += "("+pct+")";
+                  }
                   if (ihint < hintss.length - 1) {
                     newhints = newhints + "; ";
                   }
@@ -203,14 +211,22 @@ class DataParser {
             var ts = parseInt(items[0]);
             var timeString = moment(ts).format("YYYY-MM-DD HH:mm");
             thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[3]) {
-              var pos = items[3].trim().indexOf(':');
-              if(pos==items[3].trim().length-1){
+            let hintString = undefined;
+            let hasPct = false;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hasPct = true;
+              hintString = items[3];
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
+              var pos = hintString.trim().indexOf(':');
+              if(pos==hintString.trim().length-1){
                 // emtpy hint, skip
                 return true;
               }
-              var newhints = items[3].trim().substring(pos+1);
+              var newhints = hintString.trim().substring(pos+1);
               var newhintsArr = newhints.split("\t");
               var newhintsStr = "";
               var newhintsIncidentStr = "";
@@ -226,16 +242,21 @@ class DataParser {
                   let pos3 = item.indexOf(")");
                   let pos4 = item.indexOf(")",pos3+1);
                   let rootcause = item.substring(pos3+2,pos4);
-                  let valString = "";
-                  if(rootcause != 'missing'){
-                    rootcause = parseFloat(rootcause).toFixed(1)+'% higher than normal';
+                  let valString = item.substring(pos2+2,pos3);
+                  if(valString != 'missing'){
                     valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(2);
+                  }
+                  if(!hasPct){
+                    rootcause = "";
                   } else {
-                    rootcause = "missing value"
-                    valString = "missing";
+                    if(valString != 'missing'){
+                      rootcause = parseFloat(rootcause).toFixed(1)+'% higher than normal at ';
+                    } else {
+                      rootcause = "missing value at "
+                    }
                   }
                   hintStr += "Root cause #" + (index+1) + ": "+rootcause
-                    +" at instance:"+item.substring(pos1+1,pos2)
+                    +"instance:"+item.substring(pos1+1,pos2)
                     +", metric:"+item.substring(pos0+1,pos1)
                     +", value:"+valString+";\n";
                 });
@@ -307,9 +328,14 @@ class DataParser {
             var thisAnomaly = [];
             var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
             thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[3]) {
-              var hints = items[3].trim().split(':');
+            let hintString = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hintString = items[3];
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";

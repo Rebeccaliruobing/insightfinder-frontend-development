@@ -101,7 +101,7 @@ const HotMapCharts = React.createClass({
 
         data = data.map(function (item,index) {
             return {
-                name: heatMapX[index%(heatMapX.length)]+","+heatMapY[index%(heatMapY.length)],
+                name: heatMapY[index%(heatMapY.length)],
                 value: [item[1], item[0], item[2] || '-']
             }
         });
