@@ -114,21 +114,21 @@ class DataParser {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',3);
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
             var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
             thisAnomaly.push(timeString + "," + items[1]);
 
-            if (items[2]) {
-              var hints = items[2].trim().split(':');
+            if (items[3]) {
+              var hints = items[3].trim().split(':');
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";
               _.each(hintss, function (hint, ihint) {
-                // 1.Change_inflicted(min)[node0](1.0);
-                // 0=#.metric, 1=node, 2=(val)
+                // 1.Change_inflicted(min)[node0](1.0)(10.0);
+                // 0=#.metric, 1=node, 2=(val), 3=(pct)
                 var hintparts = hint.split(/\[|\]/);
                 var metric = hintparts[0].split('.')[1];
                 if (hintparts.length == 3) {
@@ -195,7 +195,7 @@ class DataParser {
           var lines = a.anomaliesConsolidated.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',3);
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
@@ -203,13 +203,13 @@ class DataParser {
             var timeString = moment(ts).format("YYYY-MM-DD HH:mm");
             thisAnomaly.push(timeString + "," + items[1]);
 
-            if (items[2]) {
-              var pos = items[2].trim().indexOf(':');
-              if(pos==items[2].trim().length-1){
+            if (items[3]) {
+              var pos = items[3].trim().indexOf(':');
+              if(pos==items[3].trim().length-1){
                 // emtpy hint, skip
                 return true;
               }
-              var newhints = items[2].trim().substring(pos+1);
+              var newhints = items[3].trim().substring(pos+1);
               var newhintsArr = newhints.split("\t");
               var newhintsStr = "";
               var newhintsIncidentStr = "";
@@ -223,9 +223,10 @@ class DataParser {
                   let pos1 = item.indexOf("[");
                   let pos2 = item.indexOf("]");
                   let pos3 = item.indexOf(")");
-                  let rootcause = item.substring(pos2+2,pos3);
+                  let pos4 = item.indexOf(")",pos3+1);
+                  let rootcause = item.substring(pos3+2,pos4);
                   if(rootcause != 'missing'){
-                    rootcause = rootcause+'% higher than normal';
+                    rootcause = parseFloat(rootcause).toFixed(1)+'% higher than normal';
                   } else {
                     rootcause = "missing value"
                   }
@@ -295,15 +296,15 @@ class DataParser {
           var lines = a.anomaliesConsolidatedInstance.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',');
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
             var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
             thisAnomaly.push(timeString + "," + items[1]);
 
-            if (items[2]) {
-              var hints = items[2].trim().split(':');
+            if (items[3]) {
+              var hints = items[3].trim().split(':');
               // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
               var hintss = hints[1].trim().split(';');
               var newhints = "";
