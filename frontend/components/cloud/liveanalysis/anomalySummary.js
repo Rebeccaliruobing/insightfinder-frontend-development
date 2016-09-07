@@ -145,7 +145,7 @@ const HotMapCharts = React.createClass({
                 left: 'center'
             },
             series: [{
-                name: 'Anomaly Summary',
+                name: '',
                 type: 'heatmap',
                 data: data,
                 label: {

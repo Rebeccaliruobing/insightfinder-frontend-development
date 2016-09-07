@@ -140,13 +140,14 @@ class DataParser {
                 try {
                   var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                   var newval = hintparts[2].split(/\(|\)/)[1];
+                  var pct = hintparts[2].split(/\(|\)/)[3];
                   if (hintMapping[metric.trim()] != undefined) {
                     var thisMap = hintMapping[metric.trim()];
                     if (thisMap[parseInt(valparts[0])] != undefined) {
                       newval = thisMap[parseInt(valparts[0])];
                     }
                   }
-                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
+                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")("+pct+")";
                   if (ihint < hintss.length - 1) {
                     newhints = newhints + "; ";
                   }
