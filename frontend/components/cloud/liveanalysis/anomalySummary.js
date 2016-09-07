@@ -101,7 +101,7 @@ const HotMapCharts = React.createClass({
 
         data = data.map(function (item,index) {
             return {
-                name: heatMapY[index%(heatMapY.length)],
+                name: heatMapX[index%(heatMapX.length)]+","+heatMapY[index%(heatMapY.length)],
                 value: [item[1], item[0], item[2] || '-']
             }
         });
@@ -145,7 +145,6 @@ const HotMapCharts = React.createClass({
                 left: 'center'
             },
             series: [{
-                name: 'Anomaly Summary',
                 type: 'heatmap',
                 data: data,
                 label: {
