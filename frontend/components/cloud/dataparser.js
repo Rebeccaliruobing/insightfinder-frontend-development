@@ -228,7 +228,7 @@ class DataParser {
                   let valString = "";
                   if(rootcause != 'missing'){
                     rootcause = parseFloat(rootcause).toFixed(1)+'% higher than normal';
-                    valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(5);
+                    valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(2);
                   } else {
                     rootcause = "missing value"
                     valString = "missing";

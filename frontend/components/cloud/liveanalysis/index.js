@@ -58,6 +58,7 @@ class LiveAnalysisCharts extends React.Component {
             showDebug: false,
             tabStates: {
                 rootcause: 'active',
+                prediction: '',
                 chart: '',
                 heatmap: ''
             }
@@ -197,6 +198,8 @@ class LiveAnalysisCharts extends React.Component {
                             <div className="ui pointing secondary menu">
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
+                                  <a className={tabStates['prediction'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'prediction')}>Predicted Incident</a>
                                   <a className={tabStates['heatmap'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['chart'] + ' item'}
@@ -230,6 +233,8 @@ class LiveAnalysisCharts extends React.Component {
                                 <div className="ui grid">
                                     {(summary && summary.incidentSummary.length>0) ?
                                       <div>
+                                        <br />
+                                        <h4>Detected Incidents:</h4>
                                         <table className="ui basic table">
                                           <thead>
                                           <tr>
@@ -246,14 +251,23 @@ class LiveAnalysisCharts extends React.Component {
                                           ))}
                                           </tbody>
                                         </table>
-                                      </div>:
+                                      </div>
+                                      :
                                       <div>
-                                          <br />
-                                          <h3>Congratulations! No anomaly was detected. Please go to 
-                                           <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
-                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h3>
+                                        <br />
+                                        <h4>Detected Incidents:</h4>
+                                        <h4>Congratulations! No anomaly was detected. Please go to 
+                                            <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
+                                            <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
                                       </div>
                                     }
+                                </div>:null
+                            }
+                            {tabStates['prediction'] === 'active' ?
+                                <div className="ui grid">
+                                    <br />
+                                    <h4>Predicted Incidents:</h4>
+                                    <h5>None</h5>
                                 </div>:null
                             }
                             {tabStates['heatmap'] === 'active' ?

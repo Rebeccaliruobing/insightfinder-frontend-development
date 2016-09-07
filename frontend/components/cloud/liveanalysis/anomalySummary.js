@@ -39,6 +39,43 @@ const HotMapCharts = React.createClass({
         var maxMap = 10;
         var minMap = 0.00001;
         let showData = [];
+        let instancesMax = {};
+        _.each(instances,function(inst,idxInst){
+            let a = anomalyHeatmapJson[inst];
+            if(a!=undefined){
+                let maxAr = 0;
+                for (var key in a) {
+                    let ar = parseFloat(a[key]);
+                    if(ar>maxAr){
+                        maxAr = ar;
+                    }
+                }
+                instancesMax[inst] = maxAr;
+            }
+        });
+        // sort instances by first anomaly second no anomaly
+        instances = instances.sort(function (a, b) {
+                                let aAnomaly = (anomalyHeatmapJson[a]==undefined);
+                                let bAnomaly = (anomalyHeatmapJson[b]==undefined);
+                                if (aAnomaly && !bAnomaly) {
+                                    return -1;
+                                } else if (!aAnomaly && bAnomaly) {
+                                    return 1;
+                                } else if (aAnomaly && bAnomaly) {
+                                    return 0;
+                                } else {
+                                    let aMax = instancesMax[a];
+                                    let bMax = instancesMax[b];
+                                    if (aMax < bMax) {
+                                        return -1;
+                                    } else if (aMax > bMax) {
+                                        return 1;
+                                    } else {
+                                        return 0;
+                                    }
+                                }   
+                            })
+
         for (let i = 0; i < instances.length; i++) {
             let newInstanceFlag = filterMapList.indexOf(instances[i]);
             let missFlag = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]]['_missingFlag'] : undefined;
@@ -52,10 +89,11 @@ const HotMapCharts = React.createClass({
                     anomalyData = 0;
                 }
                 else {
-                    let anomaly = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]][metrics[j]] : 0.01;
-                    anomalyData = anomaly ? anomaly : 0.01;
+                    let anomaly = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]][metrics[j]] : 0.000001;
+                    anomalyData = anomaly ? anomaly : 0.000001;
                     anomalyData > maxMap ? maxMap = anomalyData : null;
                 }
+                anomalyData = anomalyData.toFixed(2);
                 showData.push([i, j, anomalyData]);
             }
         }
@@ -74,7 +112,8 @@ const HotMapCharts = React.createClass({
             animation: false,
             grid: {
                 height: (height>=95?95:height)+'%',
-                y: '0%'
+                y: '0%',
+                x: '240px'
             },
             xAxis: {
                 type: 'category',
