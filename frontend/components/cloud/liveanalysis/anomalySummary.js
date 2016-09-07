@@ -99,8 +99,9 @@ const HotMapCharts = React.createClass({
         }
         var data = showData;
 
-        data = data.map(function (item) {
+        data = data.map(function (item,index) {
             return {
+                name: heatMapY[index%(heatMapY.length)],
                 value: [item[1], item[0], item[2] || '-']
             }
         });
