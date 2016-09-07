@@ -114,7 +114,7 @@ class DataParser {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',0);
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
