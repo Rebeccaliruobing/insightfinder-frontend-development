@@ -276,7 +276,7 @@ class LiveAnalysisCharts extends React.Component {
                                         <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
                                             {self.props.data?basicStatsKeys.map(function (value,index) {
                                                 let name = undefined;
-                                                let dataValue = self.props.data['instanceMetricJson'][value];
+                                                let dataValue = self.props.data['instanceMetricJson']?self.props.data['instanceMetricJson'][value]: undefined;
                                                 if(dataValue == undefined){
                                                     return null;
                                                     }
