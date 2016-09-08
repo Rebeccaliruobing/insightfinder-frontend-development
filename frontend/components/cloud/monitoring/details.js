@@ -66,7 +66,7 @@ const ProjectDetails = class extends React.Component {
       let debugData = undefined;
       const title = modelType === 'DBScan' ?
         `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
-        `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</  b>.`
+        `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</b>.`
           :
         `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
         `with model type <b>${modelType}</b>, anomaly threshold <b>${pvalue}</b>, duration  threshold: <b>${cvalue}</b>.`
