@@ -20,6 +20,7 @@ class DataParser {
     this.causalTypes = null;
     this.anomalies = null;
     this.seriesOptions = null;
+    this.interval = null;
     this.stats = null;
     this.metricUnitMap = null;
     this.groupsData = null;
@@ -187,6 +188,7 @@ class DataParser {
     let arr = this.data['anomalyConsolidatedString'];
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
+    let interval = this.interval;
     if (rawHintMapping) {
       try {
         hintMapping = $.parseJSON(rawHintMapping);
@@ -282,10 +284,7 @@ class DataParser {
                 newhintsStr = newhintsStr.substring(0,511)+"...";
               }
               atext[parseInt(items[0])] = newhintsStr;
-              var dur = ((maxTs - minTs) / 60000);
-              if(dur == 0){
-                dur = 1;
-              }
+              var dur = newhintsArr.length * interval / 60000;
               intext[parseInt(items[0])] = "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
@@ -501,6 +500,8 @@ class DataParser {
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
     var lines = data.split('\\n');
+    var ts1 = undefined;
+    var ts2 = undefined;
     _.each(lines, function (line, lineNo) {
       var items = line.split(',');
       if (lineNo === 0) {
@@ -518,6 +519,11 @@ class DataParser {
           }
         });
       } else {
+        if(lineNo==1){
+          ts1 = parseInt(items[0]);
+        }else if(lineNo==2){
+          ts2 = parseInt(items[0]);
+        }
         let ts = new Date(parseInt(items[0]));
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
@@ -529,6 +535,9 @@ class DataParser {
       }
     });
 
+    if(ts1 && ts2){
+      this.interval = ts2-ts1;
+    }
     this.seriesOptions = soptions;
   }
 
@@ -538,6 +547,7 @@ class DataParser {
 
     if (this.summaryData) return this.summaryData;
 
+    this._parseData();
     this._parseAnomalyData();
 
     if (this.data['detectionResults'] === undefined) return null;
@@ -599,9 +609,9 @@ class DataParser {
 
     if (this.groupsData) return this.groupsData;
 
+    this._parseData();
     this._parseMetricUnitMap();
     this._parseAnomalyData();
-    this._parseData();
 
     let soptions = this.seriesOptions;
     let anomalies = this.anomalies;
@@ -696,9 +706,9 @@ class DataParser {
 
     if (this.groupsData) return this.groupsData;
 
+    this._parseData();
     this._parseMetricUnitMap();
     this._parseAnomalyData();
-    this._parseData();
 
     let soptions = this.seriesOptions;
     let anomalies = this.anomalies;
