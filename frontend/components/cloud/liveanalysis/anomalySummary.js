@@ -102,7 +102,8 @@ const HotMapCharts = React.createClass({
         data = data.map(function (item,index) {
             return {
                 name: heatMapY[index%(heatMapY.length)],
-                value: [item[1], item[0], item[2] || '-']
+                value: [item[1], item[0], item[2] || '-'],
+                heatMap_x: heatMapX[index%(heatMapX.length)]
             }
         });
         let height = 65+heatMapX.length;
@@ -166,12 +167,19 @@ const HotMapCharts = React.createClass({
         };
         return option;
     },
+    onChartClick(e){
+      console.log(e.data);
+    },
     render() {
+        let onEvents = {
+            'click': this.onChartClick
+        };
         return (
             <ReactEcharts
                 option={this.getOption()}
                 style={{height: '100%', width: '100%'}}
                 className='echarts-for-echarts'
+                onEvents={onEvents}
                 theme='my_theme'/>
         )
     }
