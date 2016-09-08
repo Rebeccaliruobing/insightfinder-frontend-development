@@ -755,20 +755,39 @@ const apis = {
      * @param endTime
      * @param groupId
      * @param instanceName
+     * @param metricName
      * @param userName
      * @param token
      * @returns {Promise}
      */
-    postProjectData(projectName, startTime, endTime, groupId, instanceName, userName = store.get('userName'), token = store.get('token')) {
+    postProjectData(projectName, startTime, endTime, groupId, instanceName, metricName, userName = store.get('userName'), token = store.get('token')) {
+        let paramData = metricName?{projectName, startTime, endTime, groupId, instanceName, metricName, userName, token}:
+        {projectName, startTime, endTime, groupId, instanceName, userName, token};
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['project data'],
+                data: $.param(paramData),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+    postProjectDataSimple(projectName,metricName, instanceName, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['project data'],
                 data: $.param({
                     projectName,
-                    startTime,
-                    endTime,
-                    groupId,
+                    metricName,
                     instanceName,
                     userName,
                     token

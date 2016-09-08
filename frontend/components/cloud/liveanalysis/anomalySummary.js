@@ -4,6 +4,8 @@ import store from 'store';
 import ReactEcharts from 'echarts-for-react';
 import {Modal, Dropdown} from '../../../artui/react';
 import {ChartsRefreshInterval, GridColumns, DefaultView} from '../../storeKeys';
+import apis from '../../../apis/index';
+
 
 const HotMapCharts = React.createClass({
     getOption() {
@@ -40,13 +42,13 @@ const HotMapCharts = React.createClass({
         var minMap = 0.00001;
         let showData = [];
         let instancesMax = {};
-        _.each(instances,function(inst,idxInst){
+        _.each(instances, function (inst, idxInst) {
             let a = anomalyHeatmapJson[inst];
-            if(a!=undefined){
+            if (a != undefined) {
                 let maxAr = 0;
                 for (var key in a) {
                     let ar = parseFloat(a[key]);
-                    if(ar>maxAr){
+                    if (ar > maxAr) {
                         maxAr = ar;
                     }
                 }
@@ -55,26 +57,26 @@ const HotMapCharts = React.createClass({
         });
         // sort instances by first anomaly second no anomaly
         instances = instances.sort(function (a, b) {
-                                let aAnomaly = (anomalyHeatmapJson[a]==undefined);
-                                let bAnomaly = (anomalyHeatmapJson[b]==undefined);
-                                if (aAnomaly && !bAnomaly) {
-                                    return -1;
-                                } else if (!aAnomaly && bAnomaly) {
-                                    return 1;
-                                } else if (aAnomaly && bAnomaly) {
-                                    return 0;
-                                } else {
-                                    let aMax = instancesMax[a];
-                                    let bMax = instancesMax[b];
-                                    if (aMax < bMax) {
-                                        return -1;
-                                    } else if (aMax > bMax) {
-                                        return 1;
-                                    } else {
-                                        return 0;
-                                    }
-                                }   
-                            })
+            let aAnomaly = (anomalyHeatmapJson[a] == undefined);
+            let bAnomaly = (anomalyHeatmapJson[b] == undefined);
+            if (aAnomaly && !bAnomaly) {
+                return -1;
+            } else if (!aAnomaly && bAnomaly) {
+                return 1;
+            } else if (aAnomaly && bAnomaly) {
+                return 0;
+            } else {
+                let aMax = instancesMax[a];
+                let bMax = instancesMax[b];
+                if (aMax < bMax) {
+                    return -1;
+                } else if (aMax > bMax) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        })
 
         for (let i = 0; i < instances.length; i++) {
             let newInstanceFlag = filterMapList.indexOf(instances[i]);
@@ -98,22 +100,23 @@ const HotMapCharts = React.createClass({
             }
         }
         var data = showData;
-
-        data = data.map(function (item,index) {
+        let self = this;
+        data = data.map(function (item, index) {
             return {
-                name: heatMapY[index%(heatMapY.length)],
+                projectName: self.props.projectName,
+                name: heatMapY[index % (heatMapY.length)],
                 value: [item[1], item[0], item[2] || '-'],
-                heatMap_x: heatMapX[parseInt(index/(heatMapY.length))]
+                heatMap_x: heatMapX[parseInt(index / (heatMapY.length))]
             }
         });
-        let height = 65+heatMapX.length;
+        let height = 65 + heatMapX.length;
         var option = {
             tooltip: {
                 position: 'top'
             },
             animation: false,
             grid: {
-                height: (height>=95?95:height)+'%',
+                height: (height >= 95 ? 95 : height) + '%',
                 y: '0%',
                 x: '240px'
             },
@@ -123,7 +126,7 @@ const HotMapCharts = React.createClass({
                 splitArea: {
                     show: false
                 },
-                axisLabel:{
+                axisLabel: {
                     interval: 0
                 }
             },
@@ -133,7 +136,7 @@ const HotMapCharts = React.createClass({
                 splitArea: {
                     show: true
                 },
-                axisLabel:{
+                axisLabel: {
                     interval: 0
                 }
             },
@@ -168,12 +171,24 @@ const HotMapCharts = React.createClass({
         return option;
     },
     onChartClick(e){
-      console.log(e.data);
+        console.log(e.data);
+        let params = {
+            projectName: e.data['projectName'],
+            metricName: e.data['name'],
+            instanceName: e.data['heatMap_x']
+        };
+        window.location.href = `/projectDataOnly?${$.param(params)}`;
+        //apis.postProjectDataSimple(e.data['projectName'], e.data['name'], e.data['heatMap_x']).then(resp=> {
+        //    console.log(resp);
+        //});
     },
     render() {
         let onEvents = {
             'click': this.onChartClick
         };
+        if(!this.props['instanceMetricJson'] || !this.props['instanceMetricJson']){
+            return null;
+        }
         return (
             <ReactEcharts
                 option={this.getOption()}
@@ -194,7 +209,8 @@ class AnomalySummary extends React.Component {
     render() {
         let {data} = this.props;
         return (
-            <HotMapCharts instanceMetricJson={data['instanceMetricJson']}
+            <HotMapCharts projectName={data['projectName']}
+                          instanceMetricJson={data['instanceMetricJson']}
                           anomalyHeatmapJson={data['anomalyHeatmapJson']}/>
         )
     }
