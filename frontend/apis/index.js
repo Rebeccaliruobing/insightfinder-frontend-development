@@ -1,7 +1,8 @@
 import store from 'store';
 import _ from 'lodash';
 const baseUrl = window.API_BASE_URL || '/api/v1/';
-import parseCloudRollout from './data/parseCloudRollout';
+import parseCloudRollout from '../data/parseCloudRollout';
+import retrieveLiveAnalysis from './retrieve-liveanalysis';
 
 //
 // When we run frontend on localhost python web server and connect api with different host,
@@ -357,7 +358,7 @@ const apis = {
             });
         });
     },
-
+    retrieveLiveAnalysis: retrieveLiveAnalysis,
 
     /**
      *
