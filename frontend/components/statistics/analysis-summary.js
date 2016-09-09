@@ -16,6 +16,7 @@ const AnalysisSummary = ({data, duration='24h' }) => {
           style={{ width: '100%', height: '80px' }}
           axisLabelWidth={45}
           labelsDivStyles={{ padding: '4px', margin: '15px' }}
+          showLabelsOnHighlight={false}
           data={data.sdata}
           labels={data.sname}
           annotations={data.annotations}
