@@ -1,0 +1,59 @@
+.ui.segment > .ui.statistics {
+  margin: 0;
+}
+
+.ui.statistics > {
+  .statistic {
+    border: 1px solid rgba(34,36,38,.15);
+    padding: 1px;
+    border-radius: 2px;
+    margin: 0 1.5em 0 0;
+    height: 120px;
+    &:last-child {
+      margin-right: 0;
+    }
+
+    > div {
+      padding: 2px 1px;
+      &:first-child {
+        border-bottom: 1px solid rgba(34,36,38,.15);
+      }
+    }
+
+    .title {
+      padding: 0 1em;
+      font-size: 13px;
+      display: inline-block;
+      color: rgba(0,0,0,.87);
+    }
+
+    .meta {
+      display: inline-block;
+      font-size: 12px;
+      line-height: 1;
+      padding: 2px 4px;
+      color: rgba(0, 0, 0, 0.6);
+      vertical-align: baseline;
+      background-color: #E8E8E8;
+      border-radius: 1px;
+      float: right;
+    }
+
+    .value {
+      text-align: right;
+      font-size: 3rem !important;
+      line-height: 1.6;
+    }
+    
+    .label {
+      text-align: right;
+      color: #767676;
+    }
+
+    .chart {
+      width: 100%;
+      height: 100%;
+      padding-top: 20px;
+    }
+  }
+}

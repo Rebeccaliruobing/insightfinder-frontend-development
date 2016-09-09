@@ -1,5 +1,6 @@
 import store from 'store';
 import getEndpoint from './get-endpoint';
+import DataParser from './data-parser';
 
 /**
  * Api to retrieve project's live analysis data.
@@ -22,16 +23,26 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
       }
     }).done(function (resp) {
       if (resp.success) {
-        // Parse the data.
-        const data = resp.data;
-        resolve({});
+
+        try {
+          const data = resp.data;
+          const parser = new DataParser(data);
+          parser.getSummaryData();
+
+          const ret = {};
+          ret['statistics'] = data['instanceMetricJson'] || {};
+          ret['summary'] = parser.summaryData || {};
+
+          resolve(ret);
+        } catch (e) {
+          reject(`Data Error: ${e.message}`)
+        }
       } else {
         reject(resp.message);
       }
-    }).fail(function (error) {
-      console.log(arguments);
-      console.log("Server Error", arguments);
-      // reject("Server Error:" + error);
+    }).fail(function (resp) {
+      console.log(resp);
+      reject(`Server Error: ${resp.status}\n${resp.statusText}`);
     });
   });
 };

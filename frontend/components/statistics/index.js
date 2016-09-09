@@ -1,1 +1,1 @@
-export CPUUtilization from './cpu-utilization';
+export ProjectStatistics from './project';
