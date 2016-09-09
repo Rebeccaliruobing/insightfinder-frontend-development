@@ -3,7 +3,7 @@ import React, {PropTypes as T} from 'react';
 const CPUUtilization = ({average, duration='24h' }) => {
   const averageText = average !== undefined ? average.toFixed(1).toString() : '-';
   return (
-    <div className={(average < 50 ? 'yellow' : 'grey') + ' statistic'}>
+    <div className="ui statistic two wide column">
       <div>
         <span className="title">CPU Utilization</span>
         <span className="meta">{duration}</span>

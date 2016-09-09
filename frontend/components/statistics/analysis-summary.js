@@ -5,7 +5,7 @@ import {Dygraph} from '../../artui/react/dataviz';
 const AnalysisSummary = ({data, duration='24h' }) => {
   console.log(data);
   return (
-    <div className='statistic' style={{width: 500}}>
+    <div className='ui statistic eight wide column'>
       <div>
         <span className="title">Analysis Summary</span>
         <span className="meta">{duration}</span>

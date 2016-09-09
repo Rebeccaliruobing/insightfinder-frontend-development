@@ -1,27 +1,26 @@
-.ui.segment > .ui.statistics {
-  margin: 0;
-}
-
-.ui.statistics > {
-  .statistic {
+.ui.compact.grid > {
+  .ui.statistic {
     border: 1px solid rgba(34,36,38,.15);
-    padding: 1px;
-    border-radius: 2px;
-    margin: 0 1.5em 0 0;
+    border-radius: 0;
+    padding: 0;
     height: 120px;
+    border-right-width: 0;
     &:last-child {
-      margin-right: 0;
+      border-right-width: 1px;
     }
 
     > div {
-      padding: 2px 1px;
+      padding: 2px 4px;
       &:first-child {
         border-bottom: 1px solid rgba(34,36,38,.15);
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 4px;
+        margin-right: 4px;
       }
     }
 
     .title {
-      padding: 0 1em;
       font-size: 13px;
       display: inline-block;
       color: rgba(0,0,0,.87);
@@ -42,6 +41,7 @@
     .value {
       text-align: right;
       font-size: 3rem !important;
+      color: #767676;
       line-height: 1.6;
     }
     
@@ -53,7 +53,7 @@
     .chart {
       width: 100%;
       height: 100%;
-      padding-top: 20px;
+      padding-top: 14px;
     }
   }
 }

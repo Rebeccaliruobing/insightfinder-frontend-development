@@ -7,7 +7,7 @@ import MetricNumber from './metric-number';
 import AnalysisSummary from './analysis-summary';
 
 const ProjectStatistics = ({data}) => (
-  <div className="ui statistics">
+  <div className="ui compact grid">
     <CPUUtilization average={data.statistics['AvgCPUUtilization']} />
     <InstanceUptime average={data.statistics['AvgInstanceUptime']} />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
