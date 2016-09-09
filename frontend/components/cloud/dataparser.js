@@ -270,7 +270,7 @@ class DataParser {
                 newhintsStr = newhintsStr.substring(0,511)+"...";
               }
               atext[parseInt(items[0])] = newhintsStr;
-              var dur = newhintsArr.length * interval / 60000;
+              var dur = (int) (newhintsArr.length * interval / 60000);
               intext[parseInt(items[0])] = "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });

@@ -86,21 +86,6 @@ class LiveAnalysisCharts extends React.Component {
             this.causalTypes = this.dp.causalTypes;
             this.groups = this.dp.groupsData || [];
             this.groupMetrics = this.dp.groupmetrics || null;
-            let periodData = data.periodString ? data.periodString.split(",") : [];
-            let periodString = {};
-            if (data.periodString) {
-                _.compact(
-                    periodData.map(function (value, index) {
-                        if (index % 2 == 1) {
-                            if (Number.parseInt(value) != -1) {
-                                periodString[periodData[index - 1].split('[')[0]] = value;
-                            }
-                        }
-                    }));
-                this.periodString = periodString;
-            } else {
-                this.periodString = null;
-            }
             this._data = data;
         }
     }
@@ -165,7 +150,6 @@ class LiveAnalysisCharts extends React.Component {
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
         const groups = this.groups;
-        const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
@@ -253,7 +237,6 @@ class LiveAnalysisCharts extends React.Component {
                                     {!!groups &&
                                     <DataGroupCharts
                                         key={view + '_group_charts'}
-                                        period={periodString}
                                         groups={groups} view={view} columns={columns}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
