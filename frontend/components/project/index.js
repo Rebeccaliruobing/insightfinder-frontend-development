@@ -1,1 +1,0 @@
-export ProjectStatistics from './statistics';

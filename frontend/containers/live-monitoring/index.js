@@ -6,7 +6,7 @@ import {LIVE_MONITORING_REFRESH_INTERVAL} from '../storeKeys';
 import {Console} from '../../artui/react';
 import Header from '../../components/header';
 import apis from '../../apis';
-import {ProjectStatistics} from '../../components/project';
+import {ProjectStatistics} from '../../components/statistics';
 
 class LiveMonitoring extends Component {
 
@@ -17,6 +17,7 @@ class LiveMonitoring extends Component {
 
     this.state = {
       data: null,
+      statistics: undefined,
       loading: true,
     };
 
@@ -55,7 +56,7 @@ class LiveMonitoring extends Component {
       .then(data => {
         this.setState({
           loading: false,
-          data,
+          statistics: data.statistics,
         });
         if (refreshInterval > 0) {
           this.timeout = this.props.setTimeout(this.loadData.bind(this), refreshInterval);
@@ -68,7 +69,7 @@ class LiveMonitoring extends Component {
   }
 
   render() {
-    let { loading } = this.state;
+    let { loading, statistics } = this.state;
 
     return (
       <Console>
@@ -78,7 +79,7 @@ class LiveMonitoring extends Component {
             <div className="ui main tiny container"
                  style={{ minHeight: '100%', display: loading && 'none' }}>
               <div className="ui vertical segment">
-                <ProjectStatistics data={{}} />
+                <ProjectStatistics data={statistics || {}} />
               </div>
             </div>
           </Console.Content>

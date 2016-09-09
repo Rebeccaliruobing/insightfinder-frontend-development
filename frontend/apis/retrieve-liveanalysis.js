@@ -22,16 +22,17 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
       }
     }).done(function (resp) {
       if (resp.success) {
-        // Parse the data.
-        const data = resp.data;
-        resolve({});
+
+        const data = {};
+        data['statistics'] = resp.data['instanceMetricJson'] || {};
+
+        resolve(data);
       } else {
         reject(resp.message);
       }
-    }).fail(function (error) {
-      console.log(arguments);
-      console.log("Server Error", arguments);
-      // reject("Server Error:" + error);
+    }).fail(function (resp) {
+      console.log(resp);
+      reject(`Server Error: ${resp.status}\n${resp.statusText}`);
     });
   });
 };
