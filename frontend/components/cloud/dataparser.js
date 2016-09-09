@@ -88,9 +88,6 @@ class DataParser {
     return ret;
   }
 
-;
-
-
   _parseAnomalyText() {
 
     if (this.anomalyTexts) return;
@@ -142,7 +139,8 @@ class DataParser {
                 } else {
                   thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
                 }
-                causalTypes.push(metric + " [" + hintparts[1] + "]");
+                // causalTypes.push(metric + " [" + hintparts[1] + "]");
+                causalTypes.push( hintparts[1] );
                 try {
                   var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                   var newval = hintparts[2].split(/\(|\)/)[1];
@@ -232,8 +230,6 @@ class DataParser {
               var newhintsArr = newhints.split("\t");
               var newhintsStr = "";
               var newhintsIncidentStr = "";
-              var minTs = 0;
-              var maxTs = 0;
               _.each(newhintsArr,function(h,ih){
                 var parts = h.split(":",2);
                 var hintStr = "";
@@ -252,9 +248,9 @@ class DataParser {
                     rootcause = "";
                   } else {
                     if(valString != 'missing'){
-                      rootcause = parseFloat(rootcause).toFixed(1)+'% higher than normal at ';
+                      rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
                     } else {
-                      rootcause = "missing value at "
+                      rootcause = "missing value, "
                     }
                   }
                   hintStr += "Root cause #" + (index+1) + ": "+rootcause
@@ -264,17 +260,7 @@ class DataParser {
                 });
                 let tsHint = parseInt(parts[0]);
                 let timeStringHint = moment(ts).format("YYYY-MM-DD HH:mm");
-                if(ih==0){
-                  minTs = tsHint;
-                  maxTs = tsHint;
-                }else{
-                  if(tsHint<minTs){
-                    minTs = tsHint;
-                  }
-                  if(tsHint>maxTs){
-                    maxTs = tsHint;
-                  }
-                }
+
                 newhintsStr += "Starting at " + timeStringHint +",\n"+hintStr;
                 if(ih == 0){
                   newhintsIncidentStr = newhintsStr;
@@ -295,94 +281,6 @@ class DataParser {
     }
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
     this.anomalyConsolidatedIncidentTexts = anomalyConsolidatedIncidentTexts;
-  }
-
-  _parseAnomalyConsolidatedTextInstance() {
-
-    if (this.anomalyConsolidatedInstanceTexts) return;
-    if (this.data['anomalyConsolidatedInstanceString'] === undefined) return;
-    let arr = this.data['anomalyConsolidatedInstanceString'];
-    let rawHintMapping = this.data['hintMapping'];
-    let hintMapping = {};
-    if (rawHintMapping) {
-      try {
-        hintMapping = $.parseJSON(rawHintMapping);
-      } catch (err) {
-      }
-    }
-    let anomalyConsolidatedInstanceTexts = [];
-    let causalDataArray = [];
-    let causalTypes = [];
-
-    if (arr) {
-      _.each(arr, function (a, i) {
-        var atext = [];
-        if (a.anomaliesConsolidatedInstance) {
-          var lines = a.anomaliesConsolidatedInstance.split('\\n');
-          _.each(lines, function (line, lineNo) {
-            if (!line || line === '') return;
-            var items = line.split(',',4);
-
-            //prepare causality chart data
-            var thisAnomaly = [];
-            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
-            thisAnomaly.push(timeString + "," + items[1]);
-            let hintString = undefined;
-            if(items.length == 3){
-              hintString = items[2];
-            }else if(items.length == 4){
-              hintString = items[3];
-            }
-            if (hintString) {
-              var hints = hintString.trim().split(':');
-              // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
-              var hintss = hints[1].trim().split(';');
-              var newhints = "";
-              _.each(hintss, function (hint, ihint) {
-                // 1.Change_inflicted(min)[node0](1.0);
-                // 0=#.metric, 1=node, 2=(val)
-                var hintparts = hint.split(/\[|\]/);
-                var metric = hintparts[0].split('.')[1];
-                if (hintparts.length == 3) {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]" + hintparts[2]);
-                } else {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
-                }
-                // causalTypes.push(metric + " [" + hintparts[1] + "]");
-                causalTypes.push( hintparts[1] );
-                try {
-                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
-                  var newval = hintparts[2].split(/\(|\)/)[1];
-                  if (hintMapping[metric.trim()] != undefined) {
-                    var thisMap = hintMapping[metric.trim()];
-                    if (thisMap[parseInt(valparts[0])] != undefined) {
-                      newval = thisMap[parseInt(valparts[0])];
-                    }
-                  }
-                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
-                  if (ihint < hintss.length - 1) {
-                    newhints = newhints + "; ";
-                  }
-                } catch (err) {
-                  newhints = hints[1];
-                }
-              });
-
-              atext[parseInt(items[0])] = newhints;
-            }
-            causalDataArray.push(thisAnomaly);
-          });
-          causalTypes = causalTypes.filter(function (el, index, arr) {
-            return index === arr.indexOf(el);
-          });
-        }
-        anomalyConsolidatedInstanceTexts.push(atext);
-      });
-    }
-
-    this.causalDataArray = causalDataArray;
-    this.causalTypes = causalTypes;
-    this.anomalyConsolidatedInstanceTexts = anomalyConsolidatedInstanceTexts;
   }
 
   parseLogAnalysisData(){
@@ -408,7 +306,6 @@ class DataParser {
     if (this.anomalies) return;
     this._parseAnomalyText();
     this._parseAnomalyConsolidatedText();
-    this._parseAnomalyConsolidatedTextInstance();
 
     if (this.mode != 'error') {
 

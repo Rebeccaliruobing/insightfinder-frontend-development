@@ -105,6 +105,38 @@ class LiveAnalysisCharts extends React.Component {
         }
     }
 
+    _getRootCauseNameFromHints(incidentText){
+      // parse rootcause text and extract simplified rootcause names
+      const rootCauseNameMap = {
+        "cpu": "High CPU usage", 
+        "mem": "High memory usage", 
+        "disk": "High disk usage", 
+        "network": "Network Traffic surge", 
+        "load": "High load", 
+        "request": "High request count", 
+        "latency": "High latency", 
+      };
+
+      let rootcauseNames = new Set();
+      let hintStr = incidentText.split("\n",3)[2];
+      let hints = hintStr.split("\n");
+      _.each(hints,function(h,ih){
+        let parts = h.split(",");
+        if(parts[0].indexOf("missing")!=-1){
+          rootcauseNames.add("Missing metric data");
+        } else {
+          // iterate through map
+          for (var key in rootCauseNameMap) {
+            if(parts[2].toLowerCase().indexOf(key)!=-1){
+              rootcauseNames.add(rootCauseNameMap[key]);
+              break;
+            }
+          }
+        }
+      });
+      return Array.from(rootcauseNames).join("\n");
+    }
+
     @autobind
     handleDateWindowSync(dateWindow) {
         this.setState({chartDateWindow: dateWindow});
@@ -147,6 +179,7 @@ class LiveAnalysisCharts extends React.Component {
             incidents =  _.map(summary.incidentSummary, a => {
               return {
                 id: a.id,
+                rootcauseName: this._getRootCauseNameFromHints(a.text),
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
@@ -195,7 +228,7 @@ class LiveAnalysisCharts extends React.Component {
                             </ButtonGroup>
                         </div>
                         <div className="ui vertical segment">
-                            <div className="ui pointing secondary menu">
+                                <div className="ui pointing secondary menu">
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
                                   <a className={tabStates['prediction'] + ' item'}
@@ -204,7 +237,7 @@ class LiveAnalysisCharts extends React.Component {
                                      onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['chart'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
-                            </div>
+                                </div>
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
                                     {!!summary &&
@@ -238,14 +271,14 @@ class LiveAnalysisCharts extends React.Component {
                                         <table className="ui basic table">
                                           <thead>
                                           <tr>
-                                            <th>Incident ID</th>
+                                            <th>Root Cause Name</th>
                                             <th>Incident Description</th>
                                           </tr>
                                           </thead>
                                           <tbody>
                                           {incidents.map((incident, index)=>(
                                             <tr key={index}>
-                                              <td>{incident.id}</td>
+                                              <td>{incident.rootcauseName}</td>
                                               <td><pre>{incident.text}</pre></td>
                                             </tr>
                                           ))}
