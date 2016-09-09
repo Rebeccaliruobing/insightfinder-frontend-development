@@ -103,8 +103,13 @@ class LiveAnalysisCharts extends React.Component {
       };
 
       let rootcauseNames = new Set();
+      let durationLine = incidentText.split("\n",3)[0];
+      let duration = durationLine.substring(9);
+      let startLine = incidentText.split("\n",3)[1];
+      let start = startLine.substring(12,startLine.indexOf(","));
       let hintStr = incidentText.split("\n",3)[2];
       let hints = hintStr.split("\n");
+      let retObj = {};
       _.each(hints,function(h,ih){
         let parts = h.split(",");
         if(parts[0].indexOf("missing")!=-1){
@@ -119,7 +124,11 @@ class LiveAnalysisCharts extends React.Component {
           }
         }
       });
-      return Array.from(rootcauseNames).join("\n");
+      retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
+      retObj["start"] = start;
+      retObj["duration"] = duration;
+
+      return retObj;
     }
 
     @autobind
@@ -161,9 +170,12 @@ class LiveAnalysisCharts extends React.Component {
         let incidents = [];
         if(summary){
             incidents =  _.map(summary.incidentSummary, a => {
+              let incidentObj = this._getRootCauseNameFromHints(a.text);
               return {
                 id: a.id,
-                rootcauseName: this._getRootCauseNameFromHints(a.text),
+                rootcauseName: incidentObj.rootcauseName,
+                start:incidentObj.start,
+                duration:incidentObj.duration,
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
@@ -254,14 +266,20 @@ class LiveAnalysisCharts extends React.Component {
                                         <table className="ui basic table">
                                           <thead>
                                           <tr>
+                                            <th>Incident Id</th>
                                             <th>Root Cause Name</th>
+                                            <th>Incident Start</th>
+                                            <th>Incident Duration</th>
                                             <th>Incident Description</th>
                                           </tr>
                                           </thead>
                                           <tbody>
                                           {incidents.map((incident, index)=>(
                                             <tr key={index}>
+                                              <td>{incident.id}</td>
                                               <td>{incident.rootcauseName}</td>
+                                              <td>{incident.start}</td>
+                                              <td>{incident.duration}</td>
                                               <td><pre>{incident.text}</pre></td>
                                             </tr>
                                           ))}
