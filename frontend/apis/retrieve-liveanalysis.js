@@ -33,6 +33,9 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           ret['statistics'] = data['instanceMetricJson'] || {};
           ret['summary'] = parser.summaryData || {};
 
+          // TODO: Get incidents list object or array;
+          ret['incidents'] = {};
+
           resolve(ret);
         } catch (e) {
           reject(`Data Error: ${e.message}`)

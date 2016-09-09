@@ -3,7 +3,6 @@ import _ from 'lodash';
 import {Dygraph} from '../../artui/react/dataviz';
 
 const AnalysisSummary = ({data, duration='24h' }) => {
-  console.log(data);
   return (
     <div className='ui statistic eight wide column'>
       <div>

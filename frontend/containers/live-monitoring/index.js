@@ -7,6 +7,7 @@ import {Console} from '../../artui/react';
 import Header from '../../components/header';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
+import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
 
 class LiveMonitoring extends Component {
 
@@ -19,6 +20,7 @@ class LiveMonitoring extends Component {
       data: {
         statistics: {},
         summary: {},
+        incidents: {},
       },
       loading: true,
     };
@@ -82,6 +84,22 @@ class LiveMonitoring extends Component {
                  style={{ minHeight: '100%', display: loading && 'none' }}>
               <div className="ui vertical segment">
                 <ProjectStatistics data={data} />
+              </div>
+              <div className="ui vertical segment">
+                <div className="ui incidents equal width grid">
+                  <div className="equal width label row">
+                    <div className="column">Incidents TreeMap:</div>
+                    <div className="column">Incidents List:</div>
+                  </div>
+                  <div className="equal width row">
+                    <div className="column">
+                      <IncidentsTreeMap incidents={{}} />
+                    </div>
+                    <div className="column">
+                      <IncidentsList incidents={data.incidents} />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </Console.Content>
