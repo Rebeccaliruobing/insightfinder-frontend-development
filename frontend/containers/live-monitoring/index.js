@@ -16,8 +16,10 @@ class LiveMonitoring extends Component {
     super(props);
 
     this.state = {
-      data: null,
-      statistics: undefined,
+      data: {
+        statistics: {},
+        summary: {},
+      },
       loading: true,
     };
 
@@ -56,7 +58,7 @@ class LiveMonitoring extends Component {
       .then(data => {
         this.setState({
           loading: false,
-          statistics: data.statistics,
+          data,
         });
         if (refreshInterval > 0) {
           this.timeout = this.props.setTimeout(this.loadData.bind(this), refreshInterval);
@@ -69,7 +71,7 @@ class LiveMonitoring extends Component {
   }
 
   render() {
-    let { loading, statistics } = this.state;
+    let { loading, data} = this.state;
 
     return (
       <Console>
@@ -79,7 +81,7 @@ class LiveMonitoring extends Component {
             <div className="ui main tiny container"
                  style={{ minHeight: '100%', display: loading && 'none' }}>
               <div className="ui vertical segment">
-                <ProjectStatistics data={statistics || {}} />
+                <ProjectStatistics data={data} />
               </div>
             </div>
           </Console.Content>
