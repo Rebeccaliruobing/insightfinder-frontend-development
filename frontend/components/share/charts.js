@@ -128,8 +128,8 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    //const { groups, view, columns, period} = this.props;
-    const { groups, view, columns, period} = this.props;
+    //const { groups, view, columns } = this.props;
+    const { groups, view, columns } = this.props;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
     const isListView = view === 'list';
@@ -140,7 +140,6 @@ export class DataGroupCharts extends React.Component {
     const selected = selectedIndex !== undefined;
     const selectedGroup = selected ? groups[selectedIndex] : null;
     const selectedRowId = selected ? Math.floor(selectedIndex / colSize) : void 0;
-    const periodData = period || {};
     return (
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
@@ -173,11 +172,6 @@ export class DataGroupCharts extends React.Component {
 
             let elems = [];
             const idx = index;
-            const periodKeys = _.keysIn(periodData);
-            const periodList = _.compact(periodKeys.map(function (value,index) {
-                if(value == group.metrics)
-                  return value+': '+ periodData[value];
-            }));
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
                    onClick={() => {
@@ -189,7 +183,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {periodData[group.metrics]?<span title={periodList}>{group.metrics+' (period list: '+periodData[group.metrics]+')'}</span>:group.metrics}</h4>
+                  <h4 className="ui header">Metric {group.metrics}</h4>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}

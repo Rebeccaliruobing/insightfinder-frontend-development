@@ -86,21 +86,6 @@ class LiveAnalysisCharts extends React.Component {
             this.causalTypes = this.dp.causalTypes;
             this.groups = this.dp.groupsData || [];
             this.groupMetrics = this.dp.groupmetrics || null;
-            let periodData = data.periodString ? data.periodString.split(",") : [];
-            let periodString = {};
-            if (data.periodString) {
-                _.compact(
-                    periodData.map(function (value, index) {
-                        if (index % 2 == 1) {
-                            if (Number.parseInt(value) != -1) {
-                                periodString[periodData[index - 1].split('[')[0]] = value;
-                            }
-                        }
-                    }));
-                this.periodString = periodString;
-            } else {
-                this.periodString = null;
-            }
             this._data = data;
         }
     }
@@ -118,8 +103,13 @@ class LiveAnalysisCharts extends React.Component {
       };
 
       let rootcauseNames = new Set();
+      let durationLine = incidentText.split("\n",3)[0];
+      let duration = durationLine.substring(9);
+      let startLine = incidentText.split("\n",3)[1];
+      let start = startLine.substring(12,startLine.indexOf(","));
       let hintStr = incidentText.split("\n",3)[2];
       let hints = hintStr.split("\n");
+      let retObj = {};
       _.each(hints,function(h,ih){
         let parts = h.split(",");
         if(parts[0].indexOf("missing")!=-1){
@@ -134,7 +124,11 @@ class LiveAnalysisCharts extends React.Component {
           }
         }
       });
-      return Array.from(rootcauseNames).join("\n");
+      retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
+      retObj["start"] = start;
+      retObj["duration"] = duration;
+
+      return retObj;
     }
 
     @autobind
@@ -165,7 +159,6 @@ class LiveAnalysisCharts extends React.Component {
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
         const groups = this.groups;
-        const periodString = this.periodString;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
@@ -177,9 +170,12 @@ class LiveAnalysisCharts extends React.Component {
         let incidents = [];
         if(summary){
             incidents =  _.map(summary.incidentSummary, a => {
+              let incidentObj = this._getRootCauseNameFromHints(a.text);
               return {
                 id: a.id,
-                rootcauseName: this._getRootCauseNameFromHints(a.text),
+                rootcauseName: incidentObj.rootcauseName,
+                start:incidentObj.start,
+                duration:incidentObj.duration,
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
@@ -253,7 +249,6 @@ class LiveAnalysisCharts extends React.Component {
                                     {!!groups &&
                                     <DataGroupCharts
                                         key={view + '_group_charts'}
-                                        period={periodString}
                                         groups={groups} view={view} columns={columns}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
@@ -271,14 +266,20 @@ class LiveAnalysisCharts extends React.Component {
                                         <table className="ui basic table">
                                           <thead>
                                           <tr>
+                                            <th>Incident Id</th>
                                             <th>Root Cause Name</th>
+                                            <th>Incident Start</th>
+                                            <th>Incident Duration</th>
                                             <th>Incident Description</th>
                                           </tr>
                                           </thead>
                                           <tbody>
                                           {incidents.map((incident, index)=>(
                                             <tr key={index}>
+                                              <td>{incident.id}</td>
                                               <td>{incident.rootcauseName}</td>
+                                              <td>{incident.start}</td>
+                                              <td>{incident.duration}</td>
                                               <td><pre>{incident.text}</pre></td>
                                             </tr>
                                           ))}
