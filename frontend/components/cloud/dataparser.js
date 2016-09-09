@@ -364,6 +364,7 @@ class DataParser {
 
     let stats = [];
     let {minString, maxString, avgString, stdString, availString}= this.data;
+    if(!(minString&&maxString&&avgString&&stdString&&availString)) return;
 
     let mins = minString.split(',');
     let maxs = maxString.split(',');
@@ -393,6 +394,7 @@ class DataParser {
 
     if (this.seriesOptions) return;
     let data = this.data['data'];
+    if (!data) return;
 
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};

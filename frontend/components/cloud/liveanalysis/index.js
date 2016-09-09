@@ -104,7 +104,7 @@ class LiveAnalysisCharts extends React.Component {
 
       let rootcauseNames = new Set();
       let durationLine = incidentText.split("\n",3)[0];
-      let duration = durationLine.substring(9);
+      let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
       let startLine = incidentText.split("\n",3)[1];
       let start = startLine.substring(12,startLine.indexOf(","));
       let hintStr = incidentText.split("\n",3)[2];
@@ -127,6 +127,8 @@ class LiveAnalysisCharts extends React.Component {
       retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
       retObj["start"] = start;
       retObj["duration"] = duration;
+      retObj["startTimestamp"] = 0+moment(start);
+      retObj["endTimestamp"] = 0+moment(start)+parseInt(duration)*60000;
 
       return retObj;
     }
@@ -175,7 +177,9 @@ class LiveAnalysisCharts extends React.Component {
                 id: a.id,
                 rootcauseName: incidentObj.rootcauseName,
                 start:incidentObj.start,
-                duration:incidentObj.duration,
+                duration:incidentObj.duration+" minutes",
+                startTimestamp:incidentObj.startTimestamp,
+                endTimestamp:incidentObj.endTimestamp,
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
