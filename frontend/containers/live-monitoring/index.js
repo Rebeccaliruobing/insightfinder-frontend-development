@@ -21,6 +21,7 @@ class LiveMonitoring extends Component {
         statistics: {},
         summary: {},
         incidents: {},
+        incidentsTreeMap: [],
       },
       loading: true,
     };
@@ -91,9 +92,9 @@ class LiveMonitoring extends Component {
                     <div className="column">Incidents TreeMap:</div>
                     <div className="column">Incidents List:</div>
                   </div>
-                  <div className="equal width row">
+                  <div className="equal width row" style={{height: 400}}>
                     <div className="column">
-                      <IncidentsTreeMap incidents={{}} />
+                      <IncidentsTreeMap data={data.incidentsTreeMap} />
                     </div>
                     <div className="column">
                       <IncidentsList incidents={data.incidents} />
