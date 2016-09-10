@@ -5,6 +5,7 @@ import {Route, IndexRedirect} from 'react-router';
 import Navbar from './navbar';
 
 import LiveMonitoring from './monitoring';
+import HistoricalReport from './historical-report';
 import {InsightReport} from './insight-report';
 import IncidentAnalysis from './incident-analysis';
 import IncidentLogAnalysis from './incident-log-analysis';
@@ -30,6 +31,7 @@ export const cloudRoute = (
       <IndexRedirect to="monitoring" />
       <Route component={InsightReport} path="insight-report" />
       <Route component={LiveMonitoring} path="monitoring" />
+      <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
       <Route component={IncidentLogAnalysis} path="incident-log-analysis" />
       <Route component={BehaviorChangeDetection} path="behavior-change-detection" />
