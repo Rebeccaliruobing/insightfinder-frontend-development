@@ -92,16 +92,39 @@ class LiveAnalysisCharts extends React.Component {
         }
     }
 
+    exportData(){
+        let data = this.dp.data.data;
+        let fname = 'data.csv';
+        var csvString = data.split('\\n').join("\r\n");
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.innerHTML = "Click here";
+        a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        a.target   = '_blank';
+        a.download = fname;
+        a.click();
+        document.body.removeChild(a);
+    };
+
     _getRootCauseNameFromHints(incidentText){
       // parse rootcause text and extract simplified rootcause names
       const rootCauseNameMap = {
         "cpu": "High CPU usage", 
         "mem": "High memory usage", 
         "disk": "High disk usage", 
-        "network": "Network Traffic surge", 
+        "network": "Network traffic surge", 
         "load": "High load", 
         "request": "High request count", 
-        "latency": "High latency", 
+        "latency": "High latency"
+      };
+      const actionNameMap = {
+        "cpu": "Check CPU hog", 
+        "mem": "Check memory leak", 
+        "disk": "Check I/O operations", 
+        "network": "Check network operations", 
+        "load": "Check load", 
+        "request": "Check request count", 
+        "latency": "Check latency"
       };
 
       let rootcauseNames = new Set();
@@ -118,11 +141,16 @@ class LiveAnalysisCharts extends React.Component {
           rootcauseNames.add("Missing metric data");
         } else {
           // iterate through map
+          let matched = false;
           for (var key in rootCauseNameMap) {
             if(parts[2].toLowerCase().indexOf(key)!=-1){
               rootcauseNames.add(rootCauseNameMap[key]);
+              matched = true;
               break;
             }
+          }
+          if(!matched){
+            rootCauseName = "value";
           }
         }
       });
@@ -215,6 +243,9 @@ class LiveAnalysisCharts extends React.Component {
                             <Button className="labeled icon" onClick={() => onRefresh()}>
                                 <i className="icon refresh"/>Refresh
                             </Button>
+                            <Button className="labeled icon" onClick={() => this.exportData()}>
+                                <i className="icon download"/>Export
+                            </Button>
                             <ButtonGroup className="right floated basic icon">
                                 <Button onClick={()=> this.setState({ showSettingModal: true })}>
                                     <i className="icon setting"/>
@@ -273,9 +304,10 @@ class LiveAnalysisCharts extends React.Component {
                                           <thead>
                                           <tr>
                                             <th>Incident Id</th>
-                                            <th>Root Cause Name</th>
                                             <th>Incident Start</th>
                                             <th>Incident Duration</th>
+                                            <th>Root Cause Name</th>
+                                            <th>Suggested Actions</th>
                                             <th>Incident Description</th>
                                             <th></th>
                                           </tr>
@@ -284,9 +316,10 @@ class LiveAnalysisCharts extends React.Component {
                                           {incidents.map((incident, index)=>(
                                             <tr key={index}>
                                               <td>{incident.id}</td>
-                                              <td>{incident.rootcauseName}</td>
                                               <td>{incident.start}</td>
                                               <td>{incident.duration}</td>
+                                              <td>{incident.rootcauseName}</td>
+                                              <td>{incident.actions}</td>
                                               <td><pre>{incident.text}</pre></td>
                                               <td>
                                                 <Button className="orange"
