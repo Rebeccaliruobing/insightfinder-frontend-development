@@ -45,6 +45,7 @@ export default class CausalGraph extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            svgWidthUpdate: 900,
             svg: {
                 width: 900,
                 height: 500,
@@ -64,7 +65,7 @@ export default class CausalGraph extends React.Component {
     }
 
     componentDidMount() {
-        let { dataArray, types } = this.props;
+        let { dataArray, startTimestamp, endTimestamp, types } = this.props;
         let state = this.state;
         let { svg } = state;
         state.points = [];
@@ -73,27 +74,31 @@ export default class CausalGraph extends React.Component {
         let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
         let lastPoints = [];
-
+        let modelWidth = 0;
         dataArray.forEach(([x, ...records], i) => {
             lastPoints[i] = [];
-            records.map((text)=> {
-                //var pos = text.indexOf('.');
-                //var type = text.slice(pos + 1).split('(')[0];
-                var pos = text.indexOf('[');
-                var type = text.slice(pos + 1).split(']')[0];
-                var x = stageWidth * i + stageWidth / 2;
-                var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
+            let recordTime = (new Date(x.split(',')[0])).getTime();
+            if(((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)) || (!startTimestamp && !endTimestamp)){
+                modelWidth += stageWidth;
+                records.map((text)=> {
+                    //var pos = text.indexOf('.');
+                    //var type = text.slice(pos + 1).split('(')[0];
+                    var pos = text.indexOf('[');
+                    var type = text.slice(pos + 1).split(']')[0];
+                    var x = stageWidth * i + stageWidth / 2;
+                    var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
-                var point = new Point(x, y);
-                point.title = text;
+                    var point = new Point(x, y);
+                    point.title = text;
 
-                lastPoints[i].push(point);
-                state.points.push(point);
-                lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
-                    state.lines.push(new Line(p1, point))
+                    lastPoints[i].push(point);
+                    state.points.push(point);
+                    lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
+                        state.lines.push(new Line(p1, point))
+                    });
+                    return point;
                 });
-                return point;
-            });
+            }
         });
         this.setState(state);
     }
@@ -270,7 +275,7 @@ export default class CausalGraph extends React.Component {
     }
 
     render() {
-        let { dataArray, types } = this.props;
+        let { dataArray, types, startTimestamp, endTimestamp } = this.props;
         let { svg, points, lines, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
         let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
@@ -317,8 +322,15 @@ export default class CausalGraph extends React.Component {
                         {dataArray.map(([record, ...records], i) => {
                             var x = stageWidth * i + stageWidth / 2;
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
-                            return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
+                            let recordTime = (new Date(record.split(',')[0])).getTime();
+                            if((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)){
+                                return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
+                            }
+                            else if(!startTimestamp && !endTimestamp){
+                                return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
+                                         style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
+                            }
 
                         })}
                         {lines.map(this.renderLine.bind(this))}
@@ -349,8 +361,15 @@ export default class CausalGraph extends React.Component {
                             var x = stageWidth * i + stageWidth / 2;
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
 
+                            let recordTime = (new Date(record.split(',')[0])).getTime();
+                            if((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)){
                             return <text className="no-select" key={'x-text' + i} x={x - 16}
                                          y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
+                            }
+                            else if(!startTimestamp && !endTimestamp){
+                            return <text className="no-select" key={'x-text' + i} x={x - 16}
+                                         y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
+                            }
 
                         })}
 

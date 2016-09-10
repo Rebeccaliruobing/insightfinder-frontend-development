@@ -171,7 +171,6 @@ const HotMapCharts = React.createClass({
         return option;
     },
     onChartClick(e){
-        console.log(e.data);
         let params = {
             projectName: e.data['projectName'],
             metricName: e.data['name'],

@@ -56,6 +56,8 @@ class LiveAnalysisCharts extends React.Component {
             showShareModal: false,
             showComments: false,
             showDebug: false,
+            startTimestamp: undefined,
+            endTimestamp: undefined,
             tabStates: {
                 rootcause: 'active',
                 prediction: '',
@@ -195,7 +197,7 @@ class LiveAnalysisCharts extends React.Component {
                         >
                         <div className="ui vertical segment">
                             <Button className="orange labeled icon"
-                                    onClick={() => this.setState({ showTenderModal: true })}>
+                                    onClick={() => this.setState({ showTenderModal: true })} style={{'display': 'none'}}>
                                 <i className="icon random"/>Causal Graph
                             </Button>
                             <Button className="orange labeled icon"
@@ -275,6 +277,7 @@ class LiveAnalysisCharts extends React.Component {
                                             <th>Incident Start</th>
                                             <th>Incident Duration</th>
                                             <th>Incident Description</th>
+                                            <th></th>
                                           </tr>
                                           </thead>
                                           <tbody>
@@ -285,6 +288,16 @@ class LiveAnalysisCharts extends React.Component {
                                               <td>{incident.start}</td>
                                               <td>{incident.duration}</td>
                                               <td><pre>{incident.text}</pre></td>
+                                              <td>
+                                                <Button className="orange"
+                                                        onClick={() => this.setState({
+                                                        showTenderModal: true,
+                                                        startTimestamp: incident.startTimestamp,
+                                                        endTimestamp: incident.endTimestamp
+                                                         })}>
+                                                    Causal Graph
+                                                </Button>
+                                              </td>
                                             </tr>
                                           ))}
                                           </tbody>
@@ -358,6 +371,8 @@ class LiveAnalysisCharts extends React.Component {
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}
+                                 endTimestamp={this.state.endTimestamp}
+                                 startTimestamp={this.state.startTimestamp}
                                  onClose={() => this.setState({ showTenderModal: false })}/>
                     }
                     { this.state.showShareModal &&
