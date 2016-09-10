@@ -149,9 +149,6 @@ class LiveAnalysisCharts extends React.Component {
               break;
             }
           }
-          if(!matched){
-            rootCauseName = "value";
-          }
         }
       });
       retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
