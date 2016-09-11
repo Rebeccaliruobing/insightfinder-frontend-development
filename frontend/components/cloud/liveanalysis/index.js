@@ -60,7 +60,6 @@ class LiveAnalysisCharts extends React.Component {
             endTimestamp: undefined,
             tabStates: {
                 rootcause: 'active',
-                prediction: '',
                 chart: '',
                 heatmap: ''
             }
@@ -117,15 +116,6 @@ class LiveAnalysisCharts extends React.Component {
         "request": "High request count", 
         "latency": "High latency"
       };
-      const actionNameMap = {
-        "cpu": "Check CPU hog", 
-        "mem": "Check memory leak", 
-        "disk": "Check I/O operations", 
-        "network": "Check network operations", 
-        "load": "Check load", 
-        "request": "Check request count", 
-        "latency": "Check latency"
-      };
 
       let rootcauseNames = new Set();
       let durationLine = incidentText.split("\n",3)[0];
@@ -137,7 +127,7 @@ class LiveAnalysisCharts extends React.Component {
       let retObj = {};
       _.each(hints,function(h,ih){
         let parts = h.split(",");
-        if(parts[0].indexOf("missing")!=-1){
+        if(false &&parts[0].indexOf("missing")!=-1){
           rootcauseNames.add("Missing metric data");
         } else {
           // iterate through map
@@ -146,7 +136,6 @@ class LiveAnalysisCharts extends React.Component {
             if(parts[2].toLowerCase().indexOf(key)!=-1){
               rootcauseNames.add(rootCauseNameMap[key]);
               matched = true;
-              break;
             }
           }
         }
@@ -261,8 +250,6 @@ class LiveAnalysisCharts extends React.Component {
                                 <div className="ui pointing secondary menu">
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
-                                  <a className={tabStates['prediction'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'prediction')}>Predicted Incident</a>
                                   <a className={tabStates['heatmap'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['chart'] + ' item'}
@@ -303,9 +290,10 @@ class LiveAnalysisCharts extends React.Component {
                                             <th>Incident Id</th>
                                             <th>Incident Start</th>
                                             <th>Incident Duration</th>
-                                            <th>Root Cause Name</th>
+                                            <th>Root Cause Type</th>
+                                            <th>Root Cause Scope</th>
+                                            <th>Root Cause Affected Functions</th>
                                             <th>Suggested Actions</th>
-                                            <th>Incident Description</th>
                                             <th></th>
                                           </tr>
                                           </thead>
@@ -315,9 +303,10 @@ class LiveAnalysisCharts extends React.Component {
                                               <td>{incident.id}</td>
                                               <td>{incident.start}</td>
                                               <td>{incident.duration}</td>
-                                              <td>{incident.rootcauseName}</td>
-                                              <td>{incident.actions}</td>
-                                              <td><pre>{incident.text}</pre></td>
+                                              <td><pre>{incident.rootcauseName}</pre></td>
+                                              <td>N/A</td>
+                                              <td>N/A</td>
+                                              <td></td>
                                               <td>
                                                 <Button className="orange"
                                                         onClick={() => this.setState({
@@ -342,13 +331,6 @@ class LiveAnalysisCharts extends React.Component {
                                             <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
                                       </div>
                                     }
-                                </div>:null
-                            }
-                            {tabStates['prediction'] === 'active' ?
-                                <div className="ui grid">
-                                    <br />
-                                    <h4>Predicted Incidents:</h4>
-                                    <h5>None</h5>
                                 </div>:null
                             }
                             {tabStates['heatmap'] === 'active' ?
