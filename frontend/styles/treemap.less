@@ -1,7 +1,51 @@
 .treemap {
-  height: 100%;
+  svg {
+    text {
+      pointer-events: none;
+    }
+
+    rect {
+      fill: none;
+      stroke: #fff;
+    }
+
+    .navbar {
+      rect {
+        fill: orange;
+        cursor: pointer;
+      }
+
+      text {
+        font-weight: bold;
+      }
+
+      &:hover rect {
+        fill: #ee9700;
+      }
+    }
+  }
 }
 
 .incidents.treemap {
   border: 1px solid rgba(34,36,38,.15);
+  height: 400px;
+}
+
+rect.parent,
+.navbar rect {
+  stroke-width: 2px;
+}
+
+.children rect.parent,
+.navbar rect {
+  cursor: pointer;
+}
+
+.children rect.parent {
+  fill: #bbb;
+  fill-opacity: .5;
+}
+
+.children:hover rect.child {
+  fill: #bbb;
 }

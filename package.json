@@ -57,7 +57,7 @@
     "blueimp-file-upload": "^9.12.5",
     "classnames": "^2.2.5",
     "core-decorators": "^0.12.3",
-    "d3": "^4.2.2",
+    "d3": "^3.5.17",
     "dygraphs": "^1.1.1",
     "echarts-for-react": "^1.1.4",
     "form-serializer": "^2.5.0",

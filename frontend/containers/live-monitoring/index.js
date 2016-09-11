@@ -92,11 +92,11 @@ class LiveMonitoring extends Component {
                     <div className="column">Incidents TreeMap:</div>
                     <div className="column">Incidents List:</div>
                   </div>
-                  <div className="equal width row" style={{height: 400}}>
-                    <div className="column">
+                  <div className="equal width row" style={{height: 428}}>
+                    <div className="column" style={{height: 400}}>
                       <IncidentsTreeMap data={data.incidentsTreeMap} />
                     </div>
-                    <div className="column">
+                    <div className="column" style={{height: 400}}>
                       <IncidentsList incidents={data.incidents} />
                     </div>
                   </div>

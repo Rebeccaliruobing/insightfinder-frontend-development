@@ -3,12 +3,12 @@ import _ from 'lodash';
 import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 
-function buildTreemap(statistics, heapmap) {
+function buildTreemap(projectName, statistics, heapmap) {
 
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
 
-  const ret = [];
+  const root = [];
 
   // FIXME: instances, metrics is not a string instead of json array.
   const insts = (statistics['instances'] || '').replace(/[\[\]]/g, '').split(',');
@@ -32,7 +32,8 @@ function buildTreemap(statistics, heapmap) {
         type: 'metric',
         active: true,
         name: mn,
-        value: _.isFinite(val) ? val : 0.0,
+        value: 1,
+        text: _.isFinite(val) ? val.toFixed(2) : '',
       };
     });
 
@@ -42,34 +43,41 @@ function buildTreemap(statistics, heapmap) {
         name: cname,
         active: !_.find(newInsts, i => i === inst),
         instance: inst,
+        value: 1,
         children,
       };
 
       // Find the instance by name, and add container to children.
-      let instance = _.find(ret, o => o.name === iname);
+      let instance = _.find(root, o => o.name === iname);
       if (!instance) {
-        ret.push({
+        root.push({
           type: 'instance',
           name: iname,
           instance: inst,
           active: true,
+          value: 1,
           children: [container],
         });
       } else {
         instance.children.push(container);
       }
     } else {
-      ret.push({
+      root.push({
         instance: inst,
         type: 'instance',
         active: !_.find(newInsts, i => i === inst),
         name: iname,
+        value: 1,
         children,
       });
     }
   });
 
-  return ret;
+  return {
+    type: 'project',
+    name: projectName,
+    children: root,
+  };
 }
 
 /**
@@ -105,7 +113,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const ret = {};
           ret['statistics'] = statistics;
           ret['summary'] = parser.summaryData || {};
-          ret['incidentsTreeMap'] = buildTreemap(statistics, heatmap);
+          ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 
           // TODO: Get incidents list object or array;
           ret['incidents'] = {};
@@ -120,7 +128,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
       }
     }).fail(function (resp) {
       console.log(resp);
-      reject(`Server Error: ${resp.status}\n${resp.statusText}`);
+      // reject(`Server Error: ${resp.status}\n${resp.statusText}`);
     });
   });
 };
