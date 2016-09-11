@@ -14,6 +14,7 @@ import RolloutCheck from './rollout-check';
 import SummaryReport from './summary-report';
 import BehaviorChangeDetection from './behavior-change-detection';
 import DisplayModel from './display-model';
+import LiveAnalysis from '../../containers/live-analysis';
 
 export class Cloud extends React.Component {
   render() {
@@ -30,7 +31,7 @@ export const cloudRoute = (
     <Route component={Cloud} path="cloud">
       <IndexRedirect to="monitoring" />
       <Route component={InsightReport} path="insight-report" />
-      <Route component={LiveMonitoring} path="monitoring" />
+      <Route component={LiveAnalysis} path="monitoring" />
       <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
       <Route component={IncidentLogAnalysis} path="incident-log-analysis" />

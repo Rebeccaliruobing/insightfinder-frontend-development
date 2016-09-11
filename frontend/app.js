@@ -21,7 +21,6 @@ import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
-import LiveMonitoring from './containers/live-monitoring';
 
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
@@ -236,7 +235,6 @@ const routes = (
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
-    <Route component={LiveMonitoring} path="/live-monitoring"/>
     <Redirect from="*" to="/"/>
   </Router>
 );
