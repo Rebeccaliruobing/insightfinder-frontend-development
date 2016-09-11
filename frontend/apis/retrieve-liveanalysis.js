@@ -69,13 +69,16 @@ function buildTreemap(projectName, statistics, heapmap) {
     const iname = isContainer ? names[1] : names[0];
     const cname = isContainer ? names[0] : '';
 
+    let hasError = false;
     const children = _.map(metrics, (m) => {
       const mn = m.trim();
       const val = parseFloat(anomalies[mn]);
+      hasError = hasError || _.isFinite(val);
       return {
         id: mn,
         type: 'metric',
         active: true,
+        error: _.isFinite(val),
         name: mn,
         value: 1,
         text: _.isFinite(val) ? val.toFixed(2) : '',
@@ -86,6 +89,7 @@ function buildTreemap(projectName, statistics, heapmap) {
       const container = {
         type: 'container',
         name: cname,
+        error: hasError,
         active: !_.find(newInsts, i => i === inst),
         instance: inst,
         value: 1,
@@ -97,6 +101,7 @@ function buildTreemap(projectName, statistics, heapmap) {
       if (!instance) {
         root.push({
           type: 'instance',
+          error: hasError,
           name: iname,
           instance: inst,
           active: true,
@@ -109,6 +114,7 @@ function buildTreemap(projectName, statistics, heapmap) {
     } else {
       root.push({
         instance: inst,
+        error: hasError,
         type: 'instance',
         active: !_.find(newInsts, i => i === inst),
         name: iname,

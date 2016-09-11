@@ -2,6 +2,7 @@
   svg {
     text {
       pointer-events: none;
+      color: white;
     }
 
     rect {
@@ -41,10 +42,16 @@ rect.parent,
 }
 
 .children rect.parent {
-  fill: #bbb;
+  fill: #21BA45;
   fill-opacity: .5;
+  &.error {
+    fill: #DB2828;
+  }
 }
 
 .children:hover rect.child {
-  fill: #bbb;
+  fill: #16ab39;
+  &.error {
+    fill: #d01919;
+  }
 }

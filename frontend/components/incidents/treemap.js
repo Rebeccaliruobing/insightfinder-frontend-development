@@ -99,7 +99,10 @@ class IncidentsTreeMap extends Component {
       .attr('class', 'child')
       .call(this.rect);
 
-    g.append("rect").attr("class", "parent").call(this.rect).append("title").text(d => d.name);
+    g.append("rect").attr("class", "parent")
+      .call(this.rect)
+      .append("title").text(d => d.name);
+    g.selectAll('.parent').filter(d => d.error).classed('error', true);
     g.append("text").attr("dy", ".75em").text(d => d.name).call(this.text);
 
     return g;
@@ -161,6 +164,10 @@ class IncidentsTreeMap extends Component {
       this.svg.style("shape-rendering", "crispEdges");
       this.transitioning = false;
     });
+
+    // this.setState({
+    //   faux: this.svg.node().toReact(),
+    // });
   }
 
   setTreeMap(props) {
@@ -169,6 +176,7 @@ class IncidentsTreeMap extends Component {
 
       /// Clone the data since it will be changed by d3 treemap.
       const data = _.cloneDeep(props.data);
+      console.log(data);
 
       const { navHeight } = props;
       const width = this.$container.width();
