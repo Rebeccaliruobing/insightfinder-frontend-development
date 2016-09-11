@@ -26,7 +26,7 @@ export default function (props) {
       <div className="ui vertical menu text icon-menu">
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="line chart icon"></i>
-          <span> Real-time Alert </span>
+          <span> Live Analysis </span>
         </Link>
         <Link to="/cloud/historical-report" className="item text-white">
           <i className="bar chart icon"></i>
@@ -34,7 +34,7 @@ export default function (props) {
         </Link>
         <Link to="/cloud/incident-log-analysis" className="item text-white">
           <i className="file text icon"></i>
-          <span> Log Analysis (beta) </span>
+          <span> Log Analysis </span>
         </Link>
       </div>
     </Console.Navbar>

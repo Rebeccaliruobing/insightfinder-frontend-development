@@ -14,13 +14,6 @@ const HotMapCharts = React.createClass({
         let heatMapX = instanceMetricJson['instances'].split(',');
         let heatMapY = instanceMetricJson['metrics'].split(',');
         let filterMapList = instanceMetricJson['newInstances'].split(',');
-        let flagShow = true;
-        if (anomalyHeatmapJson['_maxAnomalyRatio']) {
-            flagShow = true;
-        }
-        else if (anomalyHeatmapJson['_missingFlag']) {
-            flagShow = false;
-        }
         heatMapX[0] = (heatMapX[0].split('['))[1];
         heatMapX[heatMapX.length - 1] = (heatMapX[heatMapX.length - 1].split(']'))[0];
         heatMapY[0] = (heatMapY[0].split('['))[1];
