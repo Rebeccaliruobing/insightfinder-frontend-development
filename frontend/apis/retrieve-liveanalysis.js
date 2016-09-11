@@ -2,6 +2,51 @@ import store from 'store';
 import _ from 'lodash';
 import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
+import moment from 'moment';
+
+function _getRootCauseNameFromHints(incidentText){
+  // parse rootcause text and extract simplified rootcause names
+  const rootCauseNameMap = {
+    "cpu": "High CPU usage",
+    "mem": "High memory usage",
+    "disk": "High disk usage",
+    "network": "Network traffic surge",
+    "load": "High load",
+    "request": "High request count",
+    "latency": "High latency"
+  };
+
+  let rootcauseNames = new Set();
+  let durationLine = incidentText.split("\n",3)[0];
+  let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
+  let startLine = incidentText.split("\n",3)[1];
+  let start = startLine.substring(12,startLine.indexOf(","));
+  let hintStr = incidentText.split("\n",3)[2];
+  let hints = hintStr.split("\n");
+  let retObj = {};
+  _.each(hints,function(h,ih){
+    let parts = h.split(",");
+    if(false &&parts[0].indexOf("missing")!=-1){
+      rootcauseNames.add("Missing metric data");
+    } else {
+      // iterate through map
+      let matched = false;
+      for (var key in rootCauseNameMap) {
+        if(parts[2].toLowerCase().indexOf(key)!=-1){
+          rootcauseNames.add(rootCauseNameMap[key]);
+          matched = true;
+        }
+      }
+    }
+  });
+  retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
+  retObj["start"] = start;
+  retObj["duration"] = duration;
+  retObj["startTimestamp"] = 0+moment(start);
+  retObj["endTimestamp"] = 0+moment(start)+parseInt(duration)*60000;
+
+  return retObj;
+}
 
 function buildTreemap(projectName, statistics, heapmap) {
 
@@ -108,15 +153,27 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const heatmap = data['anomalyHeatmapJson'] || {};
 
           const parser = new DataParser(data);
-          parser.getSummaryData();
+          const summary = parser.getSummaryData();
 
           const ret = {};
           ret['statistics'] = statistics;
-          ret['summary'] = parser.summaryData || {};
+          ret['summary'] = summary || {};
           ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 
-          // TODO: Get incidents list object or array;
-          ret['incidents'] = {};
+          // Build incidents list data
+          ret['incidents'] = _.map(summary.incidentSummary || [], a => {
+            let incidentObj = _getRootCauseNameFromHints(a.text);
+            return {
+              id: a.id,
+              rootcauseName: incidentObj.rootcauseName,
+              start:incidentObj.start,
+              duration:incidentObj.duration+" minutes",
+              startTimestamp:incidentObj.startTimestamp,
+              endTimestamp:incidentObj.endTimestamp,
+              text: a.text
+              //.replace(/\n/g, "<br />")
+            }
+          });
 
           resolve(ret);
         } catch (e) {

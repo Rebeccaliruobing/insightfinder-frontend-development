@@ -20,7 +20,7 @@ class LiveMonitoring extends Component {
       data: {
         statistics: {},
         summary: {},
-        incidents: {},
+        incidents: [],
         incidentsTreeMap: [],
       },
       loading: true,
@@ -87,16 +87,16 @@ class LiveMonitoring extends Component {
                 <ProjectStatistics data={data} />
               </div>
               <div className="ui vertical segment">
-                <div className="ui incidents equal width grid">
-                  <div className="equal width label row">
-                    <div className="column">Incidents TreeMap:</div>
-                    <div className="column">Incidents List:</div>
+                <div className="ui incidents grid">
+                  <div className="label row">
+                    <div className="seven wide column">Incidents TreeMap:</div>
+                    <div className="nine wide column">Incidents List:</div>
                   </div>
-                  <div className="equal width row" style={{height: 428}}>
-                    <div className="column" style={{height: 400}}>
+                  <div className="row" style={{height: 528}}>
+                    <div className="seven wide column" style={{height: 500}}>
                       <IncidentsTreeMap data={data.incidentsTreeMap} />
                     </div>
-                    <div className="column" style={{height: 400}}>
+                    <div className="nine wide column" style={{height: 500}}>
                       <IncidentsList incidents={data.incidents} />
                     </div>
                   </div>
