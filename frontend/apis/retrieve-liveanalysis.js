@@ -153,11 +153,11 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const heatmap = data['anomalyHeatmapJson'] || {};
 
           const parser = new DataParser(data);
-          const summary = parser.getSummaryData();
+          const summary = parser.getSummaryData() || {};
 
           const ret = {};
           ret['statistics'] = statistics;
-          ret['summary'] = summary || {};
+          ret['summary'] = summary;
           ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 
           // Build incidents list data

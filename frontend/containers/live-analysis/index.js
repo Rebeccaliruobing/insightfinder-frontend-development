@@ -1,18 +1,15 @@
 import React, {Component} from 'react';
 import {Console, Button} from '../../artui/react';
-import Header from '../../components/header';
+import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
 import {LiveProjectSelection} from '../../components/selections';
 
 class LiveAnalysis extends Component {
-
   static contextTypes = {
     dashboardUservalues: React.PropTypes.object
   };
-
-  static propTypes = {};
 
   constructor(props) {
     super(props);
@@ -37,6 +34,7 @@ class LiveAnalysis extends Component {
     }
   }
 
+  @autobind
   handleProjectChange(value, projectName) {
 
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
@@ -69,7 +67,6 @@ class LiveAnalysis extends Component {
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 200}}
                                   value={projectName} onChange={this.handleProjectChange}/>
-            <Button className="icon"><i className="icon refresh"/></Button>
           </div>
           <div className="ui vertical segment">
             <ProjectStatistics data={data} />
