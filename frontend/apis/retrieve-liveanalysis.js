@@ -158,6 +158,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const ret = {};
           ret['statistics'] = statistics;
           ret['summary'] = summary;
+          ret['latestDataTimestamp'] = statistics['latestDataTimestamp'];
           ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 
           // Build incidents list data

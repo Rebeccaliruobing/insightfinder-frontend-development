@@ -13,7 +13,7 @@ const ProjectStatistics = ({data}) => (
     <InstanceNumber total={data.statistics['NumberOfInstances']}
                     containerTotal={data.statistics['NumberOfContainers']} />
     <MetricNumber total={data.statistics['NumberOfMetrics']} />
-    <AnalysisSummary data={data.summary}/>
+    <AnalysisSummary data={data.summary} latestDataTimestamp={data.latestDataTimestamp}/>
   </div>
 );
 
