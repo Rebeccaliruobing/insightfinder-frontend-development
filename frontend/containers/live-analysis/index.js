@@ -6,6 +6,7 @@ import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
 import {LiveProjectSelection} from '../../components/selections';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
+import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
 
 class LiveAnalysis extends Component {
   static contextTypes = {
@@ -77,6 +78,15 @@ class LiveAnalysis extends Component {
 
   render() {
     let { loading, data, projectName } = this.state;
+    let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
+    let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+
+                // <div className="seven wide column" style={{ height: (instances)*60+'px'}}>
+                //   <AnomalySummary data={data}/>
+                // </div>
+                // <div className="seven wide column" style={{ height: 500 }}>
+                //   <IncidentsTreeMap data={data.incidentsTreeMap}/>
+                // </div>
 
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
@@ -85,7 +95,7 @@ class LiveAnalysis extends Component {
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
-            <Button className='orange' onClick={this.handleProjectChartsView}>Charts View</Button>
+            <Button className='orange' onClick={this.handleProjectChartsView}>Chart View</Button>
           </div>
           <div className="ui vertical segment">
             <ProjectStatistics data={data} />
@@ -93,15 +103,15 @@ class LiveAnalysis extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="label row">
-                <div className="seven wide column">Incidents TreeMap:</div>
-                <div className="nine wide column">Incidents List:</div>
+                <div className="seven wide column">Incident TreeMap:</div>
+                <div className="nine wide column">Incident List:</div>
               </div>
               <div className="row" style={{ height: 528 }}>
                 <div className="seven wide column" style={{ height: 500 }}>
                   <IncidentsTreeMap data={data.incidentsTreeMap}/>
                 </div>
                 <div className="nine wide column" style={{ height: 500 }}>
-                  <IncidentsList incidents={data.incidents} causalDataArray={data.causalDataArray} causalTypes={data.causalTypes}/>
+                  <IncidentsList incidents={data.incidents} causalDataArray={data.causalDataArray} causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
                 </div>
               </div>
             </div>
