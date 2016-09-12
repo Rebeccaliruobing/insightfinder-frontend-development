@@ -5,8 +5,9 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
 
+// Remove lighten color from RdYlGn11
 const RdYlGn11 = ["#a50026","#d73027","#f46d43","#fdae61","#fee08b",
-  "#ffffbf","#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"].reverse();
+  "#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"].reverse();
 
 class IncidentsTreeMap extends Component {
 
