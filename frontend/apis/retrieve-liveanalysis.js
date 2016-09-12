@@ -76,6 +76,7 @@ function buildTreemap(projectName, statistics, heapmap) {
 
   _.forEach(insts, (inst) => {
 
+    inst = inst.trim();
     const anomalies = heapmap[inst] || {};
 
     const names = inst.split('_');
