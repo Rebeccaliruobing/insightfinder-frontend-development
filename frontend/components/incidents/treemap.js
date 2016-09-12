@@ -102,7 +102,6 @@ class IncidentsTreeMap extends Component {
 
     // Set up the new layout for the data
     layout(data);
-    console.log(data);
 
     const faux = ReactFauxDOM.createElement('svg');
     const svg = d3.select(faux)
