@@ -93,6 +93,8 @@ function buildTreemap(projectName, statistics, heapmap) {
         type: 'metric',
         active: true,
         error: _.isFinite(val),
+        projectName: projectName,
+        instanceName: inst,
         name: mn,
         value: 1,
         text: _.isFinite(val) ? val.toFixed(2) : '',

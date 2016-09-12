@@ -33,6 +33,16 @@ class IncidentsTreeMap extends Component {
     }
   }
 
+  @autobind
+  showMetricChart(d) {
+    let params = {
+      projectName: d['projectName'],
+      metricName: d['name'],
+      instanceName: d['instanceName']
+    };
+    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+  }
+
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
@@ -126,7 +136,7 @@ class IncidentsTreeMap extends Component {
       .attr('class', 'child')
       .call(rect);
 
-    g.append("rect").attr("class", "parent")
+    g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
     g.selectAll('.parent').filter(d => d.error).classed('error', true);
@@ -136,6 +146,9 @@ class IncidentsTreeMap extends Component {
     g.append("text").attr("dy", ".75em").text(d => d.text).call( t => {
       t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
     });
+
+    // Bind event for metric
+    g.selectAll('.metric').on('click', this.showMetricChart);
 
     this.setState({faux: faux.toReact()});
   }
