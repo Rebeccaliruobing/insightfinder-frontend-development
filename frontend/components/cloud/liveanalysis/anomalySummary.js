@@ -109,9 +109,9 @@ const HotMapCharts = React.createClass({
             },
             animation: false,
             grid: {
-                height: (height >= 95 ? 95 : height) + '%',
+                height: (height >= 85 ? 85 : height) + '%',
                 y: '0%',
-                x: '240px'
+                x: '200px'
             },
             xAxis: {
                 type: 'category',
@@ -120,7 +120,8 @@ const HotMapCharts = React.createClass({
                     show: false
                 },
                 axisLabel: {
-                    interval: 0
+                    interval: 0,
+                    rotate: 90
                 }
             },
             yAxis: {
@@ -139,7 +140,8 @@ const HotMapCharts = React.createClass({
                 color: ['#ff0000', '#ffff00', '#00ff00'],
                 calculable: true,
                 orient: 'horizontal',
-                left: 'center'
+                left: 'center',
+                show:false
             },
             series: [{
                 type: 'heatmap',

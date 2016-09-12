@@ -11,6 +11,7 @@ class IncidentsList extends Component {
       incidents:props.incidents,
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
+      latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined
@@ -30,6 +31,7 @@ class IncidentsList extends Component {
       incidents:props.incidents,
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
+      latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined
@@ -39,7 +41,7 @@ class IncidentsList extends Component {
 
   //const IncidentsList = ({ incidents }) => {
   render() {
-    let { incidents } = this.state;
+    let { incidents,latestTimestamp } = this.state;
     return (
       <div>
       <table className="ui compact table">
@@ -50,7 +52,7 @@ class IncidentsList extends Component {
           <th>Duration</th>
           <th>Root Cause Type</th>
           <th>Root Cause Scope</th>
-          <th>Root Cause Affected Functions</th>
+          <th>Affected Functions</th>
           <th>Suggested Actions</th>
           <th>
             <Button className="orange"
@@ -66,17 +68,68 @@ class IncidentsList extends Component {
         </tr>
         </thead>
         <tbody>
-        {incidents.map((incident, index)=>(
+        {incidents.filter((incident, index) => 
+            incident.startTimestamp<latestTimestamp )
+          .map((incident, index)=>(
           <tr key={index}>
             <td>{incident.id}</td>
             <td>{incident.start}</td>
             <td>{incident.duration}</td>
+            <td><pre>{incident.rootCauseNames}</pre></td>
+            <td>N/A</td>
+            <td>N/A</td>
+            <td><pre>{incident.suggestedActions}</pre></td>
             <td>
-              <pre>{incident.rootcauseName}</pre>
+              <Button className="orange"
+                      onClick={() => this.setState({
+                        showTenderModal: true,
+                        startTimestamp: incident.startTimestamp,
+                        endTimestamp: incident.endTimestamp
+                      })} 
+                      style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                Causal Graph
+              </Button>
             </td>
+          </tr>
+        ))}
+        </tbody>
+      </table>
+      <h4>Predicted Incident List:</h4>
+      <table className="ui compact table">
+        <thead>
+        <tr>
+          <th>Id</th>
+          <th>Start Time</th>
+          <th>Duration</th>
+          <th>Root Cause Type</th>
+          <th>Root Cause Scope</th>
+          <th>Affected Functions</th>
+          <th>Suggested Actions</th>
+          <th>
+            <Button className="orange"
+                    onClick={() => this.setState({
+                      showTenderModal: true,
+                      startTimestamp: undefined,
+                      endTimestamp: undefined
+                    })}
+                    style={{width: 80, height: 40, paddingLeft:0, paddingRight:0}}>
+                Overall Causal Graph
+            </Button>
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        {incidents.filter((incident, index) => 
+            incident.startTimestamp>=latestTimestamp )
+          .map((incident, index)=>(
+          <tr key={index}>
+            <td>{incident.id}</td>
+            <td>{incident.start}</td>
+            <td>{incident.duration}</td>
+            <td><pre>{incident.rootCauseNames}</pre></td>
             <td>N/A</td>
             <td>N/A</td>
-            <td>N/A</td>
+            <td><pre>{incident.suggestedActions}</pre></td>
             <td>
               <Button className="orange"
                       onClick={() => this.setState({

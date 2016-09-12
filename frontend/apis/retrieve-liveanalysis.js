@@ -15,8 +15,19 @@ function _getRootCauseNameFromHints(incidentText){
     "request": "High request count",
     "latency": "High latency"
   };
+  const suggestedActionMap = {
+    "missing": "Check metric data source",
+    "cpu": "Upgrade CPU spec",
+    "mem": "Check for memory leak",
+    "disk": "Upgrade disk spec",
+    "network": "Check network traffic pattern",
+    "load": "Check load",
+    "request": "Check request count",
+    "latency": "Check latency",
+  };
 
-  let rootcauseNames = new Set();
+  let rootCauseNames = new Set();
+  let suggestedActions = new Set();
   let durationLine = incidentText.split("\n",3)[0];
   let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
   let startLine = incidentText.split("\n",3)[1];
@@ -27,19 +38,22 @@ function _getRootCauseNameFromHints(incidentText){
   _.each(hints,function(h,ih){
     let parts = h.split(",");
     if(false &&parts[0].indexOf("missing")!=-1){
-      rootcauseNames.add("Missing metric data");
+      rootCauseNames.add("Missing metric data");
+      suggestedActions.add("Check metric data source");
     } else {
       // iterate through map
       let matched = false;
       for (var key in rootCauseNameMap) {
         if(parts[2].toLowerCase().indexOf(key)!=-1){
-          rootcauseNames.add(rootCauseNameMap[key]);
+          rootCauseNames.add(rootCauseNameMap[key]);
+          suggestedActions.add(suggestedActionMap[key]);
           matched = true;
         }
       }
     }
   });
-  retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
+  retObj["rootCauseNames"] = Array.from(rootCauseNames).join("\n");
+  retObj["suggestedActions"] = Array.from(suggestedActions).join("\n");
   retObj["start"] = start;
   retObj["duration"] = duration;
   retObj["startTimestamp"] = 0+moment(start);
@@ -162,29 +176,69 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const summary = parser.getSummaryData() || {};
           const causalDataArray = parser.causalDataArray || [];
           const causalTypes = parser.causalTypes || [];
-
+          const latestTimestamp = statistics['latestDataTimestamp'];
           const ret = {};
           ret['statistics'] = statistics;
+          ret['instanceMetricJson'] = statistics;
+          ret['anomalyHeatmapJson'] = heatmap;
+          ret['projectName'] = projectName;
           ret['summary'] = summary;
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
-          ret['latestDataTimestamp'] = statistics['latestDataTimestamp'];
+          ret['latestDataTimestamp'] = latestTimestamp;
           ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 
           // Build incidents list data
-          ret['incidents'] = _.map(summary.incidentSummary || [], a => {
+          let incidentList = [];
+          //_.map(summary.incidentSummary || [], a => {
+          _.each(summary.incidentSummary || [],function(a,ia){
             let incidentObj = _getRootCauseNameFromHints(a.text);
-            return {
-              id: a.id,
-              rootcauseName: incidentObj.rootcauseName,
-              start:incidentObj.start,
-              duration:incidentObj.duration+" minutes",
-              startTimestamp:incidentObj.startTimestamp,
-              endTimestamp:incidentObj.endTimestamp,
-              text: a.text
-              //.replace(/\n/g, "<br />")
+            if(incidentObj.startTimestamp<latestTimestamp&&incidentObj.endTimestamp>=latestTimestamp){
+              // split this incident into two:
+              let firstDuration = Math.round((latestTimestamp - incidentObj.startTimestamp) / 60000);
+              let newDuration = incidentObj.duration-firstDuration;
+              let latestTimeString = moment(latestTimestamp).format("YYYY-MM-DD HH:mm");
+              let parts = a.text.split("\n",3);
+              let newText = "Duration:" + newDuration + " minute"+(newDuration>1?"s":"")+"\n"
+                + "Starting at " + latestTimeString +",\n" + parts[2];
+              let oldText = "Duration:" + firstDuration + " minute"+(firstDuration>1?"s":"")+"\n"
+                + parts[1] +"\n" + parts[2];
+              incidentList.push({
+                id: a.id,
+                rootCauseNames: incidentObj.rootCauseNames,
+                suggestedActions: incidentObj.suggestedActions,
+                start:incidentObj.start,
+                duration:firstDuration+" minutes",
+                startTimestamp:incidentObj.startTimestamp,
+                endTimestamp:latestTimestamp,
+                text: oldText
+              });
+              incidentList.push({
+                id: a.id,
+                rootCauseNames: incidentObj.rootCauseNames,
+                suggestedActions: incidentObj.suggestedActions,
+                start:latestTimeString,
+                duration:newDuration+" minutes",
+                startTimestamp:latestTimestamp,
+                endTimestamp:incidentObj.endTimestamp,
+                text: newText
+              });
+            } else {
+              // insert this
+              incidentList.push({
+                id: a.id,
+                rootCauseNames: incidentObj.rootCauseNames,
+                suggestedActions: incidentObj.suggestedActions,
+                start:incidentObj.start,
+                duration:incidentObj.duration+" minutes",
+                startTimestamp:incidentObj.startTimestamp,
+                endTimestamp:incidentObj.endTimestamp,
+                text: a.text
+              });
             }
+            
           });
+          ret['incidents'] = incidentList;
 
           resolve(ret);
         } catch (e) {

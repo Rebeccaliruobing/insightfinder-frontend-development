@@ -59,8 +59,8 @@ class LiveAnalysisCharts extends React.Component {
             startTimestamp: undefined,
             endTimestamp: undefined,
             tabStates: {
-                rootcause: 'active',
-                chart: '',
+                rootcause: '',
+                chart: 'active',
                 heatmap: ''
             }
         };
@@ -116,8 +116,19 @@ class LiveAnalysisCharts extends React.Component {
         "request": "High request count", 
         "latency": "High latency"
       };
+      const suggestedActionMap = {
+        "missing": "Check metric data source",
+        "cpu": "Upgrade CPU spec",
+        "mem": "Check for memory leak",
+        "disk": "Upgrade disk spec",
+        "network": "Check network traffic pattern",
+        "load": "Check load",
+        "request": "Check request count",
+        "latency": "Check latency",
+      };
 
-      let rootcauseNames = new Set();
+      let rootCauseNames = new Set();
+      let suggestedActions = new Set();
       let durationLine = incidentText.split("\n",3)[0];
       let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
       let startLine = incidentText.split("\n",3)[1];
@@ -128,19 +139,22 @@ class LiveAnalysisCharts extends React.Component {
       _.each(hints,function(h,ih){
         let parts = h.split(",");
         if(false &&parts[0].indexOf("missing")!=-1){
-          rootcauseNames.add("Missing metric data");
+          rootCauseNames.add("Missing metric data");
+          suggestedActions.add("Check metric data source");
         } else {
           // iterate through map
           let matched = false;
           for (var key in rootCauseNameMap) {
             if(parts[2].toLowerCase().indexOf(key)!=-1){
-              rootcauseNames.add(rootCauseNameMap[key]);
+              rootCauseNames.add(rootCauseNameMap[key]);
+              suggestedActions.add(suggestedActionMap[key]);
               matched = true;
             }
           }
         }
       });
-      retObj["rootcauseName"] = Array.from(rootcauseNames).join("\n");
+      retObj["rootCauseNames"] = Array.from(rootCauseNames).join("\n");
+      retObj["suggestedActions"] = Array.from(suggestedActions).join("\n");
       retObj["start"] = start;
       retObj["duration"] = duration;
       retObj["startTimestamp"] = 0+moment(start);
@@ -191,7 +205,7 @@ class LiveAnalysisCharts extends React.Component {
               let incidentObj = this._getRootCauseNameFromHints(a.text);
               return {
                 id: a.id,
-                rootcauseName: incidentObj.rootcauseName,
+                rootCauseNames: incidentObj.rootCauseNames,
                 start:incidentObj.start,
                 duration:incidentObj.duration+" minutes",
                 startTimestamp:incidentObj.startTimestamp,
@@ -247,7 +261,7 @@ class LiveAnalysisCharts extends React.Component {
                             </ButtonGroup>
                         </div>
                         <div className="ui vertical segment">
-                                <div className="ui pointing secondary menu">
+                            { false && <div className="ui pointing secondary menu">
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
                                   <a className={tabStates['heatmap'] + ' item'}
@@ -255,6 +269,7 @@ class LiveAnalysisCharts extends React.Component {
                                   <a className={tabStates['chart'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
                                 </div>
+                            }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
                                     {!!summary &&
@@ -308,10 +323,10 @@ class LiveAnalysisCharts extends React.Component {
                                               <td>{incident.id}</td>
                                               <td>{incident.start}</td>
                                               <td>{incident.duration}</td>
-                                              <td><pre>{incident.rootcauseName}</pre></td>
+                                              <td><pre>{incident.rootCauseNames}</pre></td>
                                               <td>N/A</td>
                                               <td>N/A</td>
-                                              <td></td>
+                                              <td><pre>{incident.suggestedActions}</pre></td>
                                               <td>
                                                 <Button className="orange"
                                                         onClick={() => this.setState({
