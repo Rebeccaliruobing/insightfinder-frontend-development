@@ -42,9 +42,14 @@ class IncidentsList extends Component {
   //const IncidentsList = ({ incidents }) => {
   render() {
     let { incidents,latestTimestamp } = this.state;
+    let actualIncidents = incidents.filter((incident, index) => 
+            incident.startTimestamp<latestTimestamp );
+    let predictedIncidents = incidents.filter((incident, index) => 
+            incident.startTimestamp>=latestTimestamp );
     return (
       <div>
-      <table className="ui compact table">
+      {(actualIncidents.length > 0) ? 
+        <table className="ui compact table">
         <thead>
         <tr>
           <th>Id</th>
@@ -68,9 +73,7 @@ class IncidentsList extends Component {
         </tr>
         </thead>
         <tbody>
-        {incidents.filter((incident, index) => 
-            incident.startTimestamp<latestTimestamp )
-          .map((incident, index)=>(
+        {actualIncidents.map((incident, index)=>(
           <tr key={index}>
             <td>{incident.id}</td>
             <td>{incident.start}</td>
@@ -93,9 +96,13 @@ class IncidentsList extends Component {
           </tr>
         ))}
         </tbody>
-      </table>
+        </table>
+        :
+        <h4>None</h4>
+      }
       <h4>Predicted Incident List:</h4>
-      <table className="ui compact table">
+      {(predictedIncidents.length > 0) ? 
+        <table className="ui compact table">
         <thead>
         <tr>
           <th>Id</th>
@@ -119,9 +126,7 @@ class IncidentsList extends Component {
         </tr>
         </thead>
         <tbody>
-        {incidents.filter((incident, index) => 
-            incident.startTimestamp>=latestTimestamp )
-          .map((incident, index)=>(
+        {predictedIncidents.map((incident, index)=>(
           <tr key={index}>
             <td>{incident.id}</td>
             <td>{incident.start}</td>
@@ -144,7 +149,10 @@ class IncidentsList extends Component {
           </tr>
         ))}
         </tbody>
-      </table>
+        </table>
+        :
+        <h4>None</h4>
+      }
       { this.state.showTenderModal &&
         <TenderModal dataArray={this.state.causalDataArray} types={this.state.causalTypes}
                      endTimestamp={this.state.endTimestamp}
