@@ -294,7 +294,12 @@ class LiveAnalysisCharts extends React.Component {
                                             <th>Root Cause Scope</th>
                                             <th>Root Cause Affected Functions</th>
                                             <th>Suggested Actions</th>
-                                            <th></th>
+                                            <th>
+                            <Button className="orange labeled"
+                                    onClick={() => this.setState({ showTenderModal: true })}>
+                                Overall Causal Graph
+                            </Button>
+                                            </th>
                                           </tr>
                                           </thead>
                                           <tbody>

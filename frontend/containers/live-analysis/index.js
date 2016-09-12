@@ -5,6 +5,7 @@ import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
 import {LiveProjectSelection} from '../../components/selections';
+import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 
 class LiveAnalysis extends Component {
   static contextTypes = {
@@ -23,6 +24,7 @@ class LiveAnalysis extends Component {
       },
       loading: true,
       projectName: undefined,
+      showTenderModal: false,
     };
   }
 
@@ -82,7 +84,7 @@ class LiveAnalysis extends Component {
                   <IncidentsTreeMap data={data.incidentsTreeMap}/>
                 </div>
                 <div className="nine wide column" style={{ height: 500 }}>
-                  <IncidentsList incidents={data.incidents}/>
+                  <IncidentsList incidents={data.incidents} causalDataArray={data.causalDataArray} causalTypes={data.causalTypes}/>
                 </div>
               </div>
             </div>

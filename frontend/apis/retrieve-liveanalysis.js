@@ -160,10 +160,14 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
 
           const parser = new DataParser(data);
           const summary = parser.getSummaryData() || {};
+          const causalDataArray = parser.causalDataArray || [];
+          const causalTypes = parser.causalTypes || [];
 
           const ret = {};
           ret['statistics'] = statistics;
           ret['summary'] = summary;
+          ret['causalDataArray'] = causalDataArray;
+          ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = statistics['latestDataTimestamp'];
           ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
 

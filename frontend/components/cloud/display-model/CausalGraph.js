@@ -44,7 +44,26 @@ export default class CausalGraph extends React.Component {
 
     constructor(props) {
         super(props);
+        let { dataArray, startTimestamp, endTimestamp, types } = this.props;
+        let newDataArray = [];
+        let newTypesSet = new Set();
+        dataArray.forEach((data, i) => {
+            let recordTime = (new Date(data[0].split(',')[0])).getTime();
+            if(!startTimestamp || !endTimestamp || ((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp))){
+                newDataArray.push(data);
+                types.forEach((t, it) => {
+                    if(data.join().indexOf(t)!=-1){
+                        newTypesSet.add(t);
+                    }
+
+                });
+            }
+        });
         this.state = {
+            dataArray: newDataArray.reverse(),
+            types: Array.from(newTypesSet),
+            startTimestamp:startTimestamp,
+            endTimestamp:endTimestamp,
             svgWidthUpdate: 900,
             svg: {
                 width: 900,
@@ -65,7 +84,7 @@ export default class CausalGraph extends React.Component {
     }
 
     componentDidMount() {
-        let { dataArray, startTimestamp, endTimestamp, types } = this.props;
+        let { dataArray, startTimestamp, endTimestamp, types } = this.state;
         let state = this.state;
         let { svg } = state;
         state.points = [];
@@ -78,7 +97,6 @@ export default class CausalGraph extends React.Component {
         dataArray.forEach(([x, ...records], i) => {
             lastPoints[i] = [];
             let recordTime = (new Date(x.split(',')[0])).getTime();
-            if(((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)) || (!startTimestamp && !endTimestamp)){
                 modelWidth += stageWidth;
                 records.map((text)=> {
                     //var pos = text.indexOf('.');
@@ -98,7 +116,6 @@ export default class CausalGraph extends React.Component {
                     });
                     return point;
                 });
-            }
         });
         this.setState(state);
     }
@@ -275,7 +292,7 @@ export default class CausalGraph extends React.Component {
     }
 
     render() {
-        let { dataArray, types, startTimestamp, endTimestamp } = this.props;
+        let { dataArray, types, startTimestamp, endTimestamp } = this.state;
         let { svg, points, lines, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
         let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
@@ -323,14 +340,8 @@ export default class CausalGraph extends React.Component {
                             var x = stageWidth * i + stageWidth / 2;
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
                             let recordTime = (new Date(record.split(',')[0])).getTime();
-                            if((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)){
                                 return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
-                            }
-                            else if(!startTimestamp && !endTimestamp){
-                                return <line key={'x-line' + i} x1={x} y1={0} x2={x} y2={svg.height - stageHeight / 2}
-                                         style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
-                            }
 
                         })}
                         {lines.map(this.renderLine.bind(this))}
@@ -362,14 +373,8 @@ export default class CausalGraph extends React.Component {
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
 
                             let recordTime = (new Date(record.split(',')[0])).getTime();
-                            if((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp)){
                             return <text className="no-select" key={'x-text' + i} x={x - 16}
                                          y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
-                            }
-                            else if(!startTimestamp && !endTimestamp){
-                            return <text className="no-select" key={'x-text' + i} x={x - 16}
-                                         y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
-                            }
 
                         })}
 
