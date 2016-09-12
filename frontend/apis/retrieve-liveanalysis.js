@@ -69,10 +69,10 @@ function buildTreemap(projectName, statistics, heapmap) {
 
   const root = [];
 
-  // FIXME: instances, metrics is not a string instead of json array.
-  const insts = (statistics['instances'] || '').replace(/[\[\]]/g, '').split(',');
-  const newInsts = (statistics['newInstances'] || '').replace(/[\[\]]/g, '').split(',');
-  const metrics = (statistics['metrics'] || '').replace(/[\[\]]/g, '').split(',');
+  // FIXME: instances, metrics is a string instead of json array.
+  const insts = _.filter((statistics['instances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const newInsts = _.filter((statistics['newInstances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const metrics = _.filter((statistics['metrics'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
 
   _.forEach(insts, (inst) => {
 
@@ -250,7 +250,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
       }
     }).fail(function (resp) {
       console.log(resp);
-      // reject(`Server Error: ${resp.status}\n${resp.statusText}`);
+      reject(`Server Error: ${resp.status}\n${resp.statusText}`);
     });
   });
 };

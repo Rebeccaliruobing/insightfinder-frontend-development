@@ -38,6 +38,21 @@ class LiveAnalysis extends Component {
   }
 
   @autobind
+  handleProjectChartsView() {
+    const {projectName} = this.state;
+    if (projectName) {
+      let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+      let projectParam = projectParams.find((p) => p.projectName == projectName);
+      let cvalue = projectParam ? projectParam.cvalue : "0.99";
+      let pvalue = projectParam ? projectParam.pvalue : "5";
+      let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+
+      const url = `/liveMonitoring?pvalue=${pvalue}&cvalue=${cvalue}&modelType=${modelType}&projectName=${projectName}`;
+      window.open(url, '_blank');
+    }
+  }
+
+  @autobind
   handleProjectChange(value, projectName) {
 
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
@@ -56,7 +71,8 @@ class LiveAnalysis extends Component {
       })
       .catch(msg => {
         this.setState({ loading: false });
-        alert(msg);
+        console.log(msg);
+        // alert(msg);
       });
   }
 
@@ -77,8 +93,9 @@ class LiveAnalysis extends Component {
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
           <div className="ui right aligned vertical segment">
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
-            <LiveProjectSelection style={{width: 200}}
+            <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
+            <Button className='orange' onClick={this.handleProjectChartsView}>Charts View</Button>
           </div>
           <div className="ui vertical segment">
             <ProjectStatistics data={data} />

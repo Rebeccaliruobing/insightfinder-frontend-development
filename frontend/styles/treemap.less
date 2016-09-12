@@ -2,11 +2,10 @@
   svg {
     text {
       pointer-events: none;
-      color: white;
+      fill: white;
     }
 
     rect {
-      fill: none;
       stroke: #fff;
     }
 
@@ -17,10 +16,30 @@
         color: white;
       }
       text {
-        font-weight: bold;
+        font-size: 13px;
       }
       &:hover rect {
         fill: #f26202;
+      }
+    }
+
+    .depth {
+      rect.parent {
+        stroke-width: 1px;
+        fill: #21BA45;
+        &:hover {
+          fill: #16ab39;
+        }
+        &.error {
+          fill: #DB2828;
+          &:hover {
+            fill: #d01919;
+          }
+        }
+      }
+
+      .children rect.parent {
+        cursor: pointer;
       }
     }
   }
@@ -31,27 +50,3 @@
   height: 500px;
 }
 
-rect.parent,
-.navbar rect {
-  stroke-width: 2px;
-}
-
-.children rect.parent,
-.navbar rect {
-  cursor: pointer;
-}
-
-.children rect.parent {
-  fill: #21BA45;
-  fill-opacity: .5;
-  &.error {
-    fill: #DB2828;
-  }
-}
-
-.children:hover rect.child {
-  fill: #16ab39;
-  &.error {
-    fill: #d01919;
-  }
-}
