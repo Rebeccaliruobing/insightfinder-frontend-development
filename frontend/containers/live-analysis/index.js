@@ -55,7 +55,8 @@ class LiveAnalysis extends Component {
       })
       .catch(msg => {
         this.setState({ loading: false });
-        alert(msg);
+        console.log(msg);
+        // alert(msg);
       });
   }
 
