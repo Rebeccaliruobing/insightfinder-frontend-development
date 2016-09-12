@@ -5,6 +5,9 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
 
+const RdYlGn11 = ["#a50026","#d73027","#f46d43","#fdae61","#fee08b",
+  "#ffffbf","#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"].reverse();
+
 class IncidentsTreeMap extends Component {
 
   constructor(props) {
@@ -19,6 +22,7 @@ class IncidentsTreeMap extends Component {
       .sort((a, b) => a.name - b.name)
       .ratio(0.3 * (1 + Math.sqrt(5)))
       .round(false);
+    this.color = null;
 
     this.state = {
       faux: null,
@@ -56,15 +60,33 @@ class IncidentsTreeMap extends Component {
    * @param root: The root of the data tree.
    */
   transformData(root) {
+
+    const maxScore = d => {
+      let s = 0;
+      if (d.children) {
+        s = d3.max(d.children, c => maxScore(c))
+      } else {
+        s = d.score;
+      }
+      d.score = s;
+      return s;
+    };
+    maxScore(root);
+
+    const scale = 1.25;
+    const num = 3;
     // Accumulate the node value to the count of children.
     const accumulate = d => {
       return (d._children = d.children)
-        ? d.value = d.children.reduce(function (p, v) {
+        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
         return p + accumulate(v);
       }, 0)
-        : d.value;
+        : (Math.log10(d.score) > num ? scale : 1) * d.value;
     };
     accumulate(root);
+
+    // We get the max score on the root, so we can setup the color.
+    this.color = d3.scale.quantize().domain([0, Math.log(root.score)]).range(RdYlGn11);
   }
 
   /**
@@ -139,11 +161,11 @@ class IncidentsTreeMap extends Component {
     g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
-    g.selectAll('.parent').filter(d => d.error).classed('error', true);
+    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score)));
     g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
       t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
     });
-    g.append("text").attr("dy", ".75em").text(d => d.text).call( t => {
+    g.append("text").attr("dy", ".75em").text(d => d.score > 0 ? d.score.toFixed(2) : '').call( t => {
       t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
     });
 
