@@ -28,12 +28,13 @@ function _getRootCauseNameFromHints(incidentText){
 
   let rootCauseNames = new Set();
   let suggestedActions = new Set();
-  let durationLine = incidentText.split("\n",3)[0];
+  let parts0 = incidentText.split("\n");
+  let durationLine = parts0[0];
   let neuronId = undefined;
   let duration = durationLine.substring(durationLine.indexOf("Duration")+9,durationLine.indexOf("minutes")-1);
-  let startLine = incidentText.split("\n",3)[1];
+  let startLine = parts0[1];
   let start = startLine.substring(12,startLine.indexOf(","));
-  let hintStr = incidentText.split("\n",3)[2];
+  let hintStr = parts0.splice(2,parts0.length).join("\n").trim();
   let hints = hintStr.split("\n");
   let retObj = {};
   if(durationLine.indexOf(",")!=-1){
