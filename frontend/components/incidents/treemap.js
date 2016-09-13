@@ -48,6 +48,15 @@ class IncidentsTreeMap extends Component {
     window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
   }
 
+  @autobind
+  showInstanceChart(d) {
+    let params = {
+      projectName: d['projectName'],
+      instanceName: d['instanceName']
+    };
+    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+  }
+
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
@@ -79,15 +88,15 @@ class IncidentsTreeMap extends Component {
     // Accumulate the node value to the count of children.
     const accumulate = d => {
       return (d._children = d.children)
-        ? d.value = (Math.log10((d.score == 0)?1:d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
+        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
         return p + accumulate(v);
       }, 0)
-        : (Math.log10((d.score == 0)?1:d.score) > num ? scale : 1) * d.value;
+        : (Math.log10(d.score) > num ? scale : 1) * d.value;
     };
     accumulate(root);
 
     // We get the max score on the root, so we can setup the color.
-    this.color = d3.scale.quantize().domain([0, Math.log((root.score == 0)?1:root.score)]).range(RdYlGn11);
+    this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
   }
 
   /**
@@ -144,11 +153,30 @@ class IncidentsTreeMap extends Component {
 
     // Display navbar to back to parent node on click
     const navbar = svg.append("g").attr("class", "navbar");
-    navbar.append("rect").attr({ y: -navHeight, width: width, height: navHeight, });
+    const twidth = 100;
+    console.log(data);
+
+    // Add a link to open instance chart view
+    if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
+      navbar.append("rect")
+        .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
+        .datum(data.parent).on('click', this.displayData);
+      navbar.append("rect")
+        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
+        .datum(data).on('click', this.showInstanceChart);
+
+      navbar.append("text")
+        .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em'})
+        .text('Chart View');
+    } else {
+      navbar.append("rect")
+        .attr({ y: -navHeight, width: width, height: navHeight, })
+        .datum(data.parent).on('click', this.displayData);
+    }
+
     navbar.append("text")
       .attr({x: 6, y: 6 - navHeight, dy: '1em'})
       .text(name(data));
-    navbar.datum(data.parent).on('click', this.displayData);
 
     const g1 = svg.insert("g", '.navbar').datum(data).attr("class", "depth");
     const g = g1.selectAll("g").data(data._children).enter().append("g");
@@ -162,7 +190,7 @@ class IncidentsTreeMap extends Component {
     g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
-    g.selectAll('.parent').attr('fill', d => this.color(Math.log((d.score == 0)?1:d.score)));
+    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
     g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
       t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
     });

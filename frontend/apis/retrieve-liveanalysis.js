@@ -119,9 +119,10 @@ function buildTreemap(projectName, statistics, heapmap) {
       const container = {
         type: 'container',
         name: cname,
-        score: undefined,
+        score: 0,
         active: !_.find(newInsts, i => i === inst),
-        instance: inst,
+        projectName: projectName,
+        instanceName: inst,
         value: 1,
         children,
       };
@@ -132,21 +133,26 @@ function buildTreemap(projectName, statistics, heapmap) {
         root.push({
           type: 'instance',
           name: iname,
-          instance: inst,
-          score: undefined,
+          projectName: projectName,
+          instanceName: inst,
+          containers: 1,
+          score: 0,
           active: true,
           value: 1,
           children: [container],
         });
       } else {
+        instance.containers += 1;
         instance.children.push(container);
       }
     } else {
       root.push({
-        instance: inst,
+        containers: 0,
         type: 'instance',
+        projectName: projectName,
+        instanceName: inst,
         active: !_.find(newInsts, i => i === inst),
-        score: undefined,
+        score: 0,
         name: iname,
         value: 1,
         children,
@@ -157,6 +163,7 @@ function buildTreemap(projectName, statistics, heapmap) {
   return {
     type: 'project',
     name: projectName,
+    score: 0,
     children: root,
   };
 }
