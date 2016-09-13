@@ -78,7 +78,7 @@ const FileDetails = class extends React.Component {
             </div>
           </div>
         </Console.Topbar>
-        <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData} onRefresh={() => this.updateLiveAnalysis()}/>
+        <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData} enablePublish={true} onRefresh={() => this.updateLiveAnalysis()}/>
       </Console>
     )
   }

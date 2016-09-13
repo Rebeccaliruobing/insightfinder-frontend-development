@@ -282,7 +282,7 @@ class DataParser {
                     +", value:"+valString+";\n";
                 });
                 let tsHint = parseInt(parts[0]);
-                let timeStringHint = moment(ts).format("YYYY-MM-DD HH:mm");
+                let timeStringHint = moment(tsHint).format("YYYY-MM-DD HH:mm");
 
                 newhintsStr += "Starting at " + timeStringHint +",\n"+hintStr;
                 if(ih == 0){
@@ -422,9 +422,10 @@ class DataParser {
 
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
-    var lines = data.split('\\n');
+    var lines = data.trim().split('\\n');
     var ts1 = undefined;
     var ts2 = undefined;
+    var tsN = undefined;
     _.each(lines, function (line, lineNo) {
       var items = line.split(',');
       if (lineNo === 0) {
@@ -447,6 +448,9 @@ class DataParser {
         }else if(lineNo==2){
           ts2 = parseInt(items[0]);
         }
+        if(lineNo==lines.length-1){
+          tsN = parseInt(items[0]);
+        }
         let ts = new Date(parseInt(items[0]));
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
@@ -461,6 +465,8 @@ class DataParser {
     if(ts1 && ts2){
       this.interval = ts2-ts1;
     }
+    this.startTimestamp = ts1;
+    this.endTimestamp = tsN;
     this.seriesOptions = soptions;
   }
 

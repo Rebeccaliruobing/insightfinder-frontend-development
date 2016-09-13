@@ -2,6 +2,7 @@ import React, {Component, PropTypes as T} from 'react';
 import {Button} from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
+import thumbupImg from '../../images/green-thumbup.png';
 
 class IncidentsList extends Component {
 
@@ -43,8 +44,14 @@ class IncidentsList extends Component {
   //const IncidentsList = ({ incidents }) => {
   render() {
     let { incidents,latestTimestamp } = this.state;
+    let filtered30 = true;
     let actualIncidents = incidents.filter((incident, index) => 
             incident.endTimestamp<=latestTimestamp && incident.duration>=30 );
+    if(actualIncidents.length==0){
+      filtered30 = false;
+      actualIncidents = incidents.filter((incident, index) => 
+            incident.endTimestamp<=latestTimestamp);
+    }
     let predictedIncidents = incidents.filter((incident, index) => 
             incident.endTimestamp>latestTimestamp );
     return (
@@ -90,7 +97,7 @@ class IncidentsList extends Component {
         </tbody>
         </table>
         :
-        <h5>Congratulations! Everything is normal.</h5>
+        <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
       }
       <h4>Detected Incident List</h4>
       {(actualIncidents.length > 0) ? 
@@ -162,9 +169,9 @@ class IncidentsList extends Component {
         </tbody>
         </table>
         :
-        <h5>Congratulations! Everything is normal.</h5>
+        <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal.</h5>
       }
-      {(actualIncidents.length > 0) && 
+      {filtered30 && (actualIncidents.length > 0) && 
         <div>* Incidents longer than 30 minutes shown here.</div>
       }
       { this.state.showTenderModal &&

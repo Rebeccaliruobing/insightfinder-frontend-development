@@ -16,7 +16,7 @@ function _getRootCauseNameFromHints(incidentText){
     "latency": "high latency"
   };
   const suggestedActionMap = {
-    "missing": "check metric data source",
+    "missing": "check instance availability",
     "cpu": "scale up CPU",
     "mem": "scale up memory",
     "disk": "scale up disk",
@@ -43,8 +43,10 @@ function _getRootCauseNameFromHints(incidentText){
   _.each(hints,function(h,ih){
     let parts = h.split(",");
     if(parts[0].indexOf("missing")!=-1){
+      let pos=parts[1].indexOf(":");
+      let instance=parts[1].substring(pos+1,parts[1].length);
       rootCauseNames.add("missing metric data");
-      suggestedActions.add("check metric data source");
+      suggestedActions.add(suggestedActionMap["missing"]+": "+instance);
     } else if(neuronId&&neuronId==-1){
       // iterate through map
       let matched = false;
