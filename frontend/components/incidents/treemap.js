@@ -79,15 +79,15 @@ class IncidentsTreeMap extends Component {
     // Accumulate the node value to the count of children.
     const accumulate = d => {
       return (d._children = d.children)
-        ? d.value = (Math.log10((d.score == 0)?1:d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
+        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
         return p + accumulate(v);
       }, 0)
-        : (Math.log10((d.score == 0)?1:d.score) > num ? scale : 1) * d.value;
+        : (Math.log10(d.score) > num ? scale : 1) * d.value;
     };
     accumulate(root);
 
     // We get the max score on the root, so we can setup the color.
-    this.color = d3.scale.quantize().domain([0, Math.log((root.score == 0)?1:root.score)]).range(RdYlGn11);
+    this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
   }
 
   /**
@@ -162,7 +162,7 @@ class IncidentsTreeMap extends Component {
     g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
-    g.selectAll('.parent').attr('fill', d => this.color(Math.log((d.score == 0)?1:d.score)));
+    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
     g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
       t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
     });

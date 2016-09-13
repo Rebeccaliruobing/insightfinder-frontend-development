@@ -109,7 +109,7 @@ function buildTreemap(projectName, statistics, heapmap) {
       const container = {
         type: 'container',
         name: cname,
-        score: undefined,
+        score: 0,
         active: !_.find(newInsts, i => i === inst),
         instance: inst,
         value: 1,
@@ -123,7 +123,7 @@ function buildTreemap(projectName, statistics, heapmap) {
           type: 'instance',
           name: iname,
           instance: inst,
-          score: undefined,
+          score: 0,
           active: true,
           value: 1,
           children: [container],
@@ -136,7 +136,7 @@ function buildTreemap(projectName, statistics, heapmap) {
         instance: inst,
         type: 'instance',
         active: !_.find(newInsts, i => i === inst),
-        score: undefined,
+        score: 0,
         name: iname,
         value: 1,
         children,
@@ -147,6 +147,7 @@ function buildTreemap(projectName, statistics, heapmap) {
   return {
     type: 'project',
     name: projectName,
+    score: 0,
     children: root,
   };
 }
