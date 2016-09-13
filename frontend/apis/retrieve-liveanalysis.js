@@ -7,23 +7,23 @@ import moment from 'moment';
 function _getRootCauseNameFromHints(incidentText){
   // parse rootcause text and extract simplified rootcause names
   const rootCauseNameMap = {
-    "cpu": "High CPU usage",
-    "mem": "High memory usage",
-    "disk": "High disk usage",
-    "network": "Network traffic surge",
-    "load": "High load",
-    "request": "High request count",
-    "latency": "High latency"
+    "cpu": "high CPU usage",
+    "mem": "high memory usage",
+    "disk": "high disk usage",
+    "network": "network traffic surge",
+    "load": "high load",
+    "request": "high request count",
+    "latency": "high latency"
   };
   const suggestedActionMap = {
-    "missing": "Check metric data source",
-    "cpu": "Scale up CPU",
-    "mem": "Scale up memory",
-    "disk": "Scale up disk",
-    "network": "Scale up network",
-    "load": "Scale up CPU",
-    "request": "Check request count",
-    "latency": "Check latency",
+    "missing": "check metric data source",
+    "cpu": "scale up CPU",
+    "mem": "scale up memory",
+    "disk": "scale up disk",
+    "network": "scale up network",
+    "load": "scale up CPU",
+    "request": "check request count",
+    "latency": "check latency",
   };
 
   let rootCauseNames = new Set();
@@ -41,9 +41,19 @@ function _getRootCauseNameFromHints(incidentText){
   }
   _.each(hints,function(h,ih){
     let parts = h.split(",");
-    if(false &&parts[0].indexOf("missing")!=-1){
-      rootCauseNames.add("Missing metric data");
-      suggestedActions.add("Check metric data source");
+    if(parts[0].indexOf("missing")!=-1){
+      rootCauseNames.add("missing metric data");
+      suggestedActions.add("check metric data source");
+    } else if(neuronId&&neuronId==-1){
+      // iterate through map
+      let matched = false;
+      for (var key in rootCauseNameMap) {
+        if(parts[2].toLowerCase().indexOf(key)!=-1){
+          rootCauseNames.add(key+" hotspot");
+          suggestedActions.add("check load balancing");  
+          matched = true;
+        }    
+      }
     } else {
       // iterate through map
       let matched = false;
@@ -214,7 +224,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
               rootCauseNames: incidentObj.rootCauseNames,
               suggestedActions: incidentObj.suggestedActions,
               start:incidentObj.start,
-              duration:incidentObj.duration+" minutes",
+              duration:incidentObj.duration,
               startTimestamp:incidentObj.startTimestamp,
               endTimestamp:incidentObj.endTimestamp,
               text: a.text

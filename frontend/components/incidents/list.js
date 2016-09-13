@@ -44,7 +44,7 @@ class IncidentsList extends Component {
   render() {
     let { incidents,latestTimestamp } = this.state;
     let actualIncidents = incidents.filter((incident, index) => 
-            incident.endTimestamp<=latestTimestamp );
+            incident.endTimestamp<=latestTimestamp && incident.duration>=30 );
     let predictedIncidents = incidents.filter((incident, index) => 
             incident.endTimestamp>latestTimestamp );
     return (
@@ -54,7 +54,6 @@ class IncidentsList extends Component {
         <thead>
         <tr>
           <th>Id</th>
-          <th>Incident Name</th>
           <th>Anomaly Type</th>
           <th>Start Time</th>
           <th>Duration</th>
@@ -71,7 +70,7 @@ class IncidentsList extends Component {
             <td>{incident.id}</td>
             <td><pre>{incident.rootCauseNames}</pre></td>
             <td>{incident.start}</td>
-            <td>{incident.duration}</td>
+            <td>{incident.duration} minutes</td>
             <td>Agent needed</td>
             <td>Agent needed</td>
             <td><pre>{incident.suggestedActions}</pre></td>
@@ -91,15 +90,14 @@ class IncidentsList extends Component {
         </tbody>
         </table>
         :
-        <h4>Congratulations! Everything is normal.</h4>
+        <h5>Congratulations! Everything is normal.</h5>
       }
-      <h4>Historical Incident List</h4>
+      <h4>Detected Incident List</h4>
       {(actualIncidents.length > 0) ? 
         <table className="incident-table ui compact table">
         <thead>
         <tr>
           <th>Id</th>
-          <th>Incident Name</th>
           <th>Anomaly Type</th>
           <th>Start Time</th>
           <th>Duration</th>
@@ -144,7 +142,7 @@ class IncidentsList extends Component {
             <td>{incident.id}</td>
             <td><pre>{incident.rootCauseNames}</pre></td>
             <td>{incident.start}</td>
-            <td>{incident.duration}</td>
+            <td>{incident.duration} minutes</td>
             <td>Agent needed</td>
             <td>Agent needed</td>
             <td><pre>{incident.suggestedActions}</pre></td>
@@ -164,7 +162,10 @@ class IncidentsList extends Component {
         </tbody>
         </table>
         :
-        <h4>Congratulations! Everything is normal.</h4>
+        <h5>Congratulations! Everything is normal.</h5>
+      }
+      {(actualIncidents.length > 0) && 
+        <div>* Incidents longer than 30 minutes shown here.</div>
       }
       { this.state.showTenderModal &&
         <TenderModal dataArray={this.state.causalDataArray} types={this.state.causalTypes}
