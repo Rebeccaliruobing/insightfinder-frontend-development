@@ -183,7 +183,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
   return new Promise(function (resolve, reject) {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('liveAnalysis'),
+      url: getEndpoint('liveAnalysis', 2),
       data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
