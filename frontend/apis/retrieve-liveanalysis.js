@@ -17,11 +17,11 @@ function _getRootCauseNameFromHints(incidentText){
   };
   const suggestedActionMap = {
     "missing": "Check metric data source",
-    "cpu": "Upgrade CPU spec",
-    "mem": "Check for memory leak",
-    "disk": "Upgrade disk spec",
-    "network": "Check network traffic pattern",
-    "load": "Check load",
+    "cpu": "Scale up CPU",
+    "mem": "Scale up memory",
+    "disk": "Scale up disk",
+    "network": "Scale up network",
+    "load": "Scale up CPU",
     "request": "Check request count",
     "latency": "Check latency",
   };
@@ -29,12 +29,16 @@ function _getRootCauseNameFromHints(incidentText){
   let rootCauseNames = new Set();
   let suggestedActions = new Set();
   let durationLine = incidentText.split("\n",3)[0];
-  let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
+  let neuronId = undefined;
+  let duration = durationLine.substring(durationLine.indexOf("Duration")+9,durationLine.indexOf("minutes")-1);
   let startLine = incidentText.split("\n",3)[1];
   let start = startLine.substring(12,startLine.indexOf(","));
   let hintStr = incidentText.split("\n",3)[2];
   let hints = hintStr.split("\n");
   let retObj = {};
+  if(durationLine.indexOf(",")!=-1){
+    neuronId = parseInt(durationLine.substring(0,durationLine.indexOf(",")))
+  }
   _.each(hints,function(h,ih){
     let parts = h.split(",");
     if(false &&parts[0].indexOf("missing")!=-1){
@@ -52,6 +56,7 @@ function _getRootCauseNameFromHints(incidentText){
       }
     }
   });
+  retObj["neuronId"] = neuronId;
   retObj["rootCauseNames"] = Array.from(rootCauseNames).join("\n");
   retObj["suggestedActions"] = Array.from(suggestedActions).join("\n");
   retObj["start"] = start;
@@ -194,50 +199,26 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           //_.map(summary.incidentSummary || [], a => {
           _.each(summary.incidentSummary || [],function(a,ia){
             let incidentObj = _getRootCauseNameFromHints(a.text);
-            if(incidentObj.startTimestamp<latestTimestamp&&incidentObj.endTimestamp>=latestTimestamp){
-              // split this incident into two:
-              let firstDuration = Math.round((latestTimestamp - incidentObj.startTimestamp) / 60000);
-              let newDuration = incidentObj.duration-firstDuration;
-              let latestTimeString = moment(latestTimestamp).format("YYYY-MM-DD HH:mm");
-              let parts = a.text.split("\n",3);
-              let newText = "Duration:" + newDuration + " minute"+(newDuration>1?"s":"")+"\n"
-                + "Starting at " + latestTimeString +",\n" + parts[2];
-              let oldText = "Duration:" + firstDuration + " minute"+(firstDuration>1?"s":"")+"\n"
-                + parts[1] +"\n" + parts[2];
-              incidentList.push({
-                id: a.id,
-                rootCauseNames: incidentObj.rootCauseNames,
-                suggestedActions: incidentObj.suggestedActions,
-                start:incidentObj.start,
-                duration:firstDuration+" minutes",
-                startTimestamp:incidentObj.startTimestamp,
-                endTimestamp:latestTimestamp,
-                text: oldText
-              });
-              incidentList.push({
-                id: a.id,
-                rootCauseNames: incidentObj.rootCauseNames,
-                suggestedActions: incidentObj.suggestedActions,
-                start:latestTimeString,
-                duration:newDuration+" minutes",
-                startTimestamp:latestTimestamp,
-                endTimestamp:incidentObj.endTimestamp,
-                text: newText
-              });
-            } else {
-              // insert this
-              incidentList.push({
-                id: a.id,
-                rootCauseNames: incidentObj.rootCauseNames,
-                suggestedActions: incidentObj.suggestedActions,
-                start:incidentObj.start,
-                duration:incidentObj.duration+" minutes",
-                startTimestamp:incidentObj.startTimestamp,
-                endTimestamp:incidentObj.endTimestamp,
-                text: a.text
-              });
+            let incidentName = "";
+            if(incidentObj.neuronId){
+              if(incidentObj.neuronId == -1){
+                // threshold driven
+                incidentName = "AT";
+              }else{
+                incidentName = "A"+incidentObj.neuronId;
+              }
             }
-            
+            incidentList.push({
+              id: a.id,
+              incidentName:incidentName,
+              rootCauseNames: incidentObj.rootCauseNames,
+              suggestedActions: incidentObj.suggestedActions,
+              start:incidentObj.start,
+              duration:incidentObj.duration+" minutes",
+              startTimestamp:incidentObj.startTimestamp,
+              endTimestamp:incidentObj.endTimestamp,
+              text: a.text
+            });
           });
           ret['incidents'] = incidentList;
 

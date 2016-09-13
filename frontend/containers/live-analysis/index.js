@@ -103,15 +103,15 @@ class LiveAnalysis extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="label row">
-                <div className="seven wide column">Incident TreeMap:</div>
-                <div className="nine wide column">Incident List:</div>
+                <div className="nine wide column">Predicted Incident List</div>
+                <div className="seven wide column">Incident TreeMap</div>
               </div>
               <div className="row" style={{ height: 528 }}>
-                <div className="seven wide column" style={{ height: 500 }}>
-                  <IncidentsTreeMap data={data.incidentsTreeMap}/>
-                </div>
                 <div className="nine wide column" style={{ height: 500 }}>
                   <IncidentsList incidents={data.incidents} causalDataArray={data.causalDataArray} causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
+                </div>
+                <div className="seven wide column" style={{ height: 500 }}>
+                  <IncidentsTreeMap data={data.incidentsTreeMap}/>
                 </div>
               </div>
             </div>

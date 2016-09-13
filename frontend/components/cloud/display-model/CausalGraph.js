@@ -107,7 +107,14 @@ export default class CausalGraph extends React.Component {
                     var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
                     var point = new Point(x, y);
-                    point.title = text;
+                    // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
+                    let pos1 = text.indexOf(".");
+                    let pos2 = text.indexOf("[");
+                    let pos3 = text.indexOf("(");
+                    let pos4 = text.indexOf("(",pos3+1);
+                    let metric = text.substring(pos1+1,pos2-1).trim();
+                    let value = text.substring(pos3+1,pos4-2).trim();
+                    point.title = "Metric:"+metric+", value:"+value;
 
                     lastPoints[i].push(point);
                     state.points.push(point);

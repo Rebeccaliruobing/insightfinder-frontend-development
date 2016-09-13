@@ -70,22 +70,41 @@ class DataParser {
     this.metricUnitMap = metricUnitMap;
   }
 
+  // 1.memory[node3](1630.0)(83.1801528930664); 2.disk_read[node1](2.73)(51.61351776123047)"
+  // return { metric:allocatedAnomalyRatio, ... }
   _extractMetric(atext) {
-
     if (!atext) return '';
-
-    var ret = [];
+    var retMap = {};
     var items = atext.split(';');
+    var metricList = [];
+    var percentageList = [];
+    var totalPercentage = 0;
     _.each(items, function (item, itemNo) {
-      var pos = item.trim().indexOf(".");
-      var pos2 = item.trim().substr(pos + 1).indexOf("[");
-      var metr = item.trim().substr(pos + 1).substr(0, pos2);
-      ret.push(metr);
+      var pos1 = item.indexOf(".");
+      var pos2 = item.indexOf("[");
+      var pos3 = item.indexOf("(");
+      var pos4 = item.indexOf("(",pos3+1);
+      var pos5 = item.indexOf(")",pos4+1);
+      var metr = item.substring(pos1 + 1, pos2);
+      metricList.push(metr);
+      if(pos4!=-1 && pos5!=-1){
+        let percentageString = item.substring(pos4 + 1, pos5);
+        let percentage = 0;
+        if(percentageString != "missing"){
+           percentage = parseFloat(percentageString);
+        }
+        
+        percentageList.push(percentage);
+        totalPercentage += percentage;
+      } else {
+        percentageList.push(0);
+      }
     });
-    ret = ret.filter(function (el, index, arr) {
-      return index === arr.indexOf(el);
+    _.each(metricList, function (metric, imetric) {
+      let allocatedPercentage = (totalPercentage==0) ? (1.0/metricList.length) : (percentageList[imetric]/totalPercentage);
+      retMap[metric] = allocatedPercentage;
     });
-    return ret;
+    return retMap;
   }
 
   _parseAnomalyText() {
@@ -215,11 +234,13 @@ class DataParser {
             thisAnomaly.push(timeString + "," + items[1]);
             let hintString = undefined;
             let hasPct = false;
+            let neuronId = undefined;
             if(items.length == 3){
               hintString = items[2];
             }else if(items.length == 4){
               hasPct = true;
               hintString = items[3];
+              neuronId = parseInt(items[2].split(":")[1]);
             }
             if (hintString) {
               var hints = hintString.trim().split(':');
@@ -273,7 +294,7 @@ class DataParser {
               }
               atext[parseInt(items[0])] = newhintsStr;
               var dur = Math.round(newhintsArr.length * interval / 60000);
-              intext[parseInt(items[0])] = "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
+              intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
         }
@@ -341,7 +362,7 @@ class DataParser {
                 timestamp: ts,
                 val: val,
                 text: (parseFloat(items[1]) > 0) ? atext[ts] : "",
-                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : []
+                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : {}
               });
             }
             if(items[2] && $.isNumeric(items[2])){
@@ -552,7 +573,7 @@ class DataParser {
           var thismetrs = groupmetrics[grp];
           _.each(thismetrs, function (item, itemNo) {
             var thisalies = rawalies.filter(function (ra, rai) {
-              return (ra.metrs.indexOf(item) != -1);
+              return (Object.keys(ra.metrs).indexOf(item) != -1);
             });
             alies = alies.concat(thisalies);
           });
@@ -640,7 +661,7 @@ class DataParser {
         if(rawalies!=undefined){
           var thismetrs = groupmetrics[grp];
           var thisalies = rawalies.filter(function (ra, rai) {
-            return (ra.metrs.indexOf(thismetrs) != -1);
+            return (Object.keys(ra.metrs).indexOf(thismetrs) != -1);
           });
           alies = thisalies;
           alies = alies.filter(function (el, index, arr) {
@@ -653,10 +674,17 @@ class DataParser {
         }
       }
       let highlights = _.map(alies, a => {
+        let newval = a.val < 0 ? 0 : Math.min(10, a.val);
+        let allocatedPercentage = a.metrs[value];
+        if(allocatedPercentage==0){
+          // set missing to 100%
+          allocatedPercentage = 1;
+        }
+        let allocatedVal = newval * allocatedPercentage;
         return {
           start: a.timestamp,
           end: a.timestamp,
-          val: a.val < 0 ? 0 : Math.min(10, a.val)
+          val: allocatedVal
         }
       });
       // series name & data
