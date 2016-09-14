@@ -10,7 +10,7 @@ import apis from '../../../apis/index';
 const HotMapCharts = React.createClass({
     getOption() {
         let instanceMetricJson = this.props['instanceMetricJson'];
-        let anomalyHeatmapJson = this.props['anomalyHeatmapJson'];
+        let anomalyMapJson = this.props['anomalyMapJson'];
         let heatMapX = instanceMetricJson['instances'].split(',');
         let heatMapY = instanceMetricJson['metrics'].split(',');
         let filterMapList = instanceMetricJson['newInstances'].split(',');
@@ -36,7 +36,7 @@ const HotMapCharts = React.createClass({
         let showData = [];
         let instancesMax = {};
         _.each(instances, function (inst, idxInst) {
-            let a = anomalyHeatmapJson[inst];
+            let a = anomalyMapJson[inst];
             if (a != undefined) {
                 let maxAr = 0;
                 for (var key in a) {
@@ -50,8 +50,8 @@ const HotMapCharts = React.createClass({
         });
         // sort instances by first anomaly second no anomaly
         instances = instances.sort(function (a, b) {
-            let aAnomaly = (anomalyHeatmapJson[a] == undefined);
-            let bAnomaly = (anomalyHeatmapJson[b] == undefined);
+            let aAnomaly = (anomalyMapJson[a] == undefined);
+            let bAnomaly = (anomalyMapJson[b] == undefined);
             if (aAnomaly && !bAnomaly) {
                 return -1;
             } else if (!aAnomaly && bAnomaly) {
@@ -73,7 +73,7 @@ const HotMapCharts = React.createClass({
 
         for (let i = 0; i < instances.length; i++) {
             let newInstanceFlag = filterMapList.indexOf(instances[i]);
-            let missFlag = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]]['_missingFlag'] : undefined;
+            let missFlag = anomalyMapJson[instances[i]] ? anomalyMapJson[instances[i]]['_missingFlag'] : undefined;
             missFlag = missFlag == true;
             for (let j = 0; j < metrics.length; j++) {
                 let anomalyData = 0.01;
@@ -84,7 +84,7 @@ const HotMapCharts = React.createClass({
                     anomalyData = 0;
                 }
                 else {
-                    let anomaly = anomalyHeatmapJson[instances[i]] ? anomalyHeatmapJson[instances[i]][metrics[j]] : 0.000001;
+                    let anomaly = anomalyMapJson[instances[i]] ? anomalyMapJson[instances[i]][metrics[j]] : 0.000001;
                     anomalyData = anomaly ? anomaly : 0.000001;
                     anomalyData > maxMap ? maxMap = anomalyData : null;
                 }
@@ -205,7 +205,7 @@ class AnomalySummary extends React.Component {
         return (
             <HotMapCharts projectName={data['projectName']}
                           instanceMetricJson={data['instanceMetricJson']}
-                          anomalyHeatmapJson={data['anomalyHeatmapJson']}/>
+                          anomalyMapJson={data['anomalyMapJson']}/>
         )
     }
 }

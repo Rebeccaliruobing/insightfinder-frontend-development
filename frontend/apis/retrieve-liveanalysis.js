@@ -80,7 +80,7 @@ function _getRootCauseNameFromHints(incidentText){
   return retObj;
 }
 
-function buildTreemap(projectName, statistics, heapmap) {
+function buildTreemap(projectName, statistics, anomaliesList) {
 
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
@@ -95,7 +95,7 @@ function buildTreemap(projectName, statistics, heapmap) {
   _.forEach(insts, (inst) => {
 
     inst = inst.trim();
-    const anomalies = heapmap[inst] || {};
+    const anomalies = anomaliesList[inst] || {};
 
     const names = inst.split('_');
     const isContainer = names.length > 1;
@@ -196,7 +196,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
         try {
           const data = resp.data;
           const statistics = data['instanceMetricJson'] || {};
-          const heatmap = data['anomalyHeatmapJson'] || {};
+          const heatmap = data['anomalyMapJson'] || {};
 
           const parser = new DataParser(data);
           const summary = parser.getSummaryData() || {};
@@ -206,7 +206,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           const ret = {};
           ret['statistics'] = statistics;
           ret['instanceMetricJson'] = statistics;
-          ret['anomalyHeatmapJson'] = heatmap;
+          ret['anomalyMapJson'] = heatmap;
           ret['projectName'] = projectName;
           ret['summary'] = summary;
           ret['causalDataArray'] = causalDataArray;

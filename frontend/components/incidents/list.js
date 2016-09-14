@@ -3,6 +3,7 @@ import {Button} from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
 import thumbupImg from '../../images/green-thumbup.png';
+import { IncidentDurationMinute } from '../selections';
 
 class IncidentsList extends Component {
 
@@ -16,7 +17,8 @@ class IncidentsList extends Component {
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
       startTimestamp:undefined,
-      endTimestamp:undefined
+      endTimestamp:undefined,
+      incidentDurationThreshold: 30
     }
   }
 
@@ -36,22 +38,18 @@ class IncidentsList extends Component {
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
       startTimestamp:undefined,
-      endTimestamp:undefined
+      endTimestamp:undefined,
+      incidentDurationThreshold: 30
     }
   }
 
 
   //const IncidentsList = ({ incidents }) => {
   render() {
-    let { incidents,latestTimestamp } = this.state;
+    let { incidents,latestTimestamp,incidentDurationThreshold } = this.state;
     let filtered30 = true;
     let actualIncidents = incidents.filter((incident, index) => 
-            incident.endTimestamp<=latestTimestamp && incident.duration>=30 );
-    if(actualIncidents.length==0){
-      filtered30 = false;
-      actualIncidents = incidents.filter((incident, index) => 
-            incident.endTimestamp<=latestTimestamp);
-    }
+            incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) => 
             incident.endTimestamp>latestTimestamp );
     return (
@@ -100,6 +98,7 @@ class IncidentsList extends Component {
         <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
       }
       <h4>Detected Incident List</h4>
+      Showing incident no shorter than <IncidentDurationMinute defaultValue={incidentDurationThreshold} onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
       {(actualIncidents.length > 0) ? 
         <table className="incident-table ui compact table">
         <thead>
@@ -170,9 +169,6 @@ class IncidentsList extends Component {
         </table>
         :
         <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal.</h5>
-      }
-      {filtered30 && (actualIncidents.length > 0) && 
-        <div>* Incidents longer than 30 minutes shown here.</div>
       }
       { this.state.showTenderModal &&
         <TenderModal dataArray={this.state.causalDataArray} types={this.state.causalTypes}

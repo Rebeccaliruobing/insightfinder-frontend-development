@@ -303,6 +303,21 @@ const DurationHour = (props) => {
   )
 };
 
+const IncidentDurationMinute = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">0</div>
+        <div className="item">5</div>
+        <div className="item">15</div>
+        <div className="item" selected>30</div>
+        <div className="item">60</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -316,5 +331,6 @@ export {
   AnomalyThreshold,
   DurationThreshold,
   WindowWithWeek,
-  DurationHour
+  DurationHour,
+  IncidentDurationMinute
 };
