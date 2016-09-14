@@ -102,11 +102,13 @@ class IncidentsList extends Component {
         :
         <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
       }
-      <h4>Detected Incident List</h4>
+        <h4 style={{display:'inline-block'}}>Detected Incident List</h4>
+      <div style={{float:'right', paddingTop: 24, display:'inline-block'}}>
       Showing incident no shorter than <IncidentDurationMinute
         value={incidentDurationThreshold} text={incidentDurationThreshold}
         onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
-      {(actualIncidents.length > 0) ? 
+      </div>
+      {(actualIncidents.length > 0) ?
         <table className="incident-table selectable ui compact table">
         <thead>
         <tr>
