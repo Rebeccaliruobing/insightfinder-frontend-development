@@ -1,7 +1,8 @@
-const baseUrl = window.API_BASE_URL || '/api/v1/';
-const baseUrlV2 = window.API_BASE_URL || '/api/v2/';
-
-const getEndpoint = (api) => `${baseUrl}${api}`;
-const getEndpointV2 = (api) => `${baseUrlV2}${api}`;
+/**
+ * Get the api endpoint url
+ * @param api: The API to call.
+ * @param version: API version number, default 1.
+ */
+const getEndpoint = (api, version = 1) => `${window.BASE_URL || ''}/api/v${version}/${api}`;
 
 export default getEndpoint;
