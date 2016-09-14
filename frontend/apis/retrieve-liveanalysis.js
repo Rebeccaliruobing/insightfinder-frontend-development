@@ -80,7 +80,7 @@ function _getRootCauseNameFromHints(incidentText){
   return retObj;
 }
 
-function buildTreemap(projectName, statistics, anomaliesList) {
+export function buildTreemap(projectName, incidentName, statistics, anomaliesList) {
 
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
@@ -165,7 +165,7 @@ function buildTreemap(projectName, statistics, anomaliesList) {
 
   return {
     type: 'project',
-    name: projectName,
+    name: incidentName || projectName,
     score: 0,
     children: root,
   };
@@ -178,7 +178,7 @@ function buildTreemap(projectName, statistics, anomaliesList) {
  * @param pvalue: pvalue
  * @param cvalue: cvalue
  */
-const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
+export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -212,7 +212,7 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
-          ret['incidentsTreeMap'] = buildTreemap(projectName, statistics, heatmap);
+          ret['incidentsTreeMap'] = buildTreemap(projectName, null, statistics, heatmap);
 
           // Build incidents list data
           let incidentList = [];
@@ -255,6 +255,4 @@ const retrieveLiveAnalysis = (projectName, modelType, pvalue, cvalue) => {
       reject(`Server Error: ${resp.status}\n${resp.statusText}`);
     });
   });
-};
-
-export default retrieveLiveAnalysis;
+}

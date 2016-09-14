@@ -154,7 +154,6 @@ class IncidentsTreeMap extends Component {
     // Display navbar to back to parent node on click
     const navbar = svg.append("g").attr("class", "navbar");
     const twidth = 100;
-    console.log(data);
 
     // Add a link to open instance chart view
     if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {

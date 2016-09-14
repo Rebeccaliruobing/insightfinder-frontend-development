@@ -5,6 +5,7 @@ import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
 import {LiveProjectSelection} from '../../components/selections';
+import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
 
@@ -37,6 +38,16 @@ class LiveAnalysis extends Component {
     }
   }
 
+  @autobind()
+  handleIncidentSelected(incident) {
+    // TODO: Get incidentsTreeMap for selected incident.
+    const {projectName, data} = this.state;
+    const incidentsTreeMap = buildTreemap(projectName, incident.id, data.statistics, {});
+    this.setState({
+      incidentsTreeMap,
+    });
+  }
+
   @autobind
   handleProjectChartsView() {
     const {projectName} = this.state;
@@ -66,6 +77,7 @@ class LiveAnalysis extends Component {
       .then(data => {
         this.setState({
           loading: false,
+          incidentsTreeMap: data.incidentsTreeMap,
           data,
         });
       })
@@ -77,7 +89,7 @@ class LiveAnalysis extends Component {
   }
 
   render() {
-    let { loading, data, projectName } = this.state;
+    let { loading, data, projectName, incidentsTreeMap} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
 
@@ -108,10 +120,13 @@ class LiveAnalysis extends Component {
               </div>
               <div className="row" style={{ height: 528 }}>
                 <div className="nine wide column" style={{ height: 500 }}>
-                  <IncidentsList incidents={data.incidents} causalDataArray={data.causalDataArray} causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
+                  <IncidentsList onIncidentSelected={this.handleIncidentSelected}
+                                 incidents={data.incidents}
+                                 causalDataArray={data.causalDataArray}
+                                 causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
                 </div>
                 <div className="seven wide column" style={{ height: 500 }}>
-                  <IncidentsTreeMap data={data.incidentsTreeMap}/>
+                  <IncidentsTreeMap data={incidentsTreeMap} />
                 </div>
               </div>
             </div>

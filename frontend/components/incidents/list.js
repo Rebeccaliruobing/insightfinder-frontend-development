@@ -1,4 +1,5 @@
 import React, {Component, PropTypes as T} from 'react';
+import {autobind} from 'core-decorators';
 import {Button} from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
@@ -24,6 +25,11 @@ class IncidentsList extends Component {
 
   componentDidMount() {
     this.setIncidentsList(this.props);
+  }
+
+  @autobind
+  handleIncidentSelected(incident) {
+    this.props.onIncidentSelected(incident);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -55,7 +61,7 @@ class IncidentsList extends Component {
     return (
       <div>
       {(predictedIncidents.length > 0) ? 
-        <table className="incident-table ui compact table">
+        <table className="incident-table selectable ui compact table">
         <thead>
         <tr>
           <th>Id</th>
@@ -65,27 +71,28 @@ class IncidentsList extends Component {
           <th>Root Cause Scope</th>
           <th>Affected Functions</th>
           <th>Suggested Actions</th>
-          <th>
-          </th>
+          <th/>
         </tr>
         </thead>
         <tbody>
         {predictedIncidents.reverse().map((incident, index)=>(
-          <tr key={index}>
+          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
             <td>{incident.id}</td>
-            <td><pre>{incident.rootCauseNames}</pre></td>
+            <td className="code">{incident.rootCauseNames}</td>
             <td>{incident.start}</td>
             <td>{incident.duration} minutes</td>
             <td>Agent needed</td>
             <td>Agent needed</td>
-            <td><pre>{incident.suggestedActions}</pre></td>
+            <td className="code">{incident.suggestedActions}</td>
             <td>
               <Button className="orange"
-                      onClick={() => this.setState({
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        this.setState({
                         showTenderModal: true,
                         startTimestamp: incident.startTimestamp,
                         endTimestamp: incident.endTimestamp
-                      })} 
+                      });}}
                       style={{width: 80, paddingLeft:0, paddingRight:0}}>
                 Causal Graph
               </Button>
@@ -100,7 +107,7 @@ class IncidentsList extends Component {
       <h4>Detected Incident List</h4>
       Showing incident no shorter than <IncidentDurationMinute defaultValue={incidentDurationThreshold} onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
       {(actualIncidents.length > 0) ? 
-        <table className="incident-table ui compact table">
+        <table className="incident-table selectable ui compact table">
         <thead>
         <tr>
           <th>Id</th>
@@ -112,11 +119,13 @@ class IncidentsList extends Component {
           <th>Suggested Actions</th>
           <th>
             <Button className="orange"
-                    onClick={() => this.setState({
-                      showTenderModal: true,
-                      startTimestamp: undefined,
-                      endTimestamp: undefined
-                    })}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      this.setState({
+                        showTenderModal: true,
+                        startTimestamp: undefined,
+                        endTimestamp: undefined
+                    });}}
                     style={{width: 80, height: 40, paddingLeft:0, paddingRight:0}}>
                 Overall Causal Graph
             </Button>
@@ -144,21 +153,23 @@ class IncidentsList extends Component {
                 }
               }
             }).map((incident, index)=>(
-          <tr key={index}>
+          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
             <td>{incident.id}</td>
-            <td><pre>{incident.rootCauseNames}</pre></td>
+            <td className="code">{incident.rootCauseNames}</td>
             <td>{incident.start}</td>
             <td>{incident.duration} minutes</td>
             <td>Agent needed</td>
             <td>Agent needed</td>
-            <td><pre>{incident.suggestedActions}</pre></td>
+            <td className="code">{incident.suggestedActions}</td>
             <td>
               <Button className="orange"
-                      onClick={() => this.setState({
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        this.setState({
                         showTenderModal: true,
                         startTimestamp: incident.startTimestamp,
                         endTimestamp: incident.endTimestamp
-                      })} 
+                      });}}
                       style={{width: 80, paddingLeft:0, paddingRight:0}}>
                 Causal Graph
               </Button>
