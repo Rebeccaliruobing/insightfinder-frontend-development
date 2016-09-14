@@ -37,7 +37,7 @@ class IncidentsList extends Component {
   }
 
   setIncidentsList(props){
-    this.state = {
+    this.setState({
       incidents:props.incidents,
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
@@ -45,10 +45,8 @@ class IncidentsList extends Component {
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      incidentDurationThreshold: 30
-    }
+    });
   }
-
 
   //const IncidentsList = ({ incidents }) => {
   render() {
@@ -105,7 +103,9 @@ class IncidentsList extends Component {
         <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
       }
       <h4>Detected Incident List</h4>
-      Showing incident no shorter than <IncidentDurationMinute defaultValue={incidentDurationThreshold} onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
+      Showing incident no shorter than <IncidentDurationMinute
+        value={incidentDurationThreshold} text={incidentDurationThreshold}
+        onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
       {(actualIncidents.length > 0) ? 
         <table className="incident-table selectable ui compact table">
         <thead>
