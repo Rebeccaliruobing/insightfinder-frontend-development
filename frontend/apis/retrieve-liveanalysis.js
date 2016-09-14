@@ -197,6 +197,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
           const data = resp.data;
           const statistics = data['instanceMetricJson'] || {};
           const heatmap = data['anomalyMapJson'] || {};
+          const incidentList = data['incidentsJson'] || [];
 
           const parser = new DataParser(data);
           const summary = parser.getSummaryData() || {};
@@ -215,31 +216,31 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
           ret['incidentsTreeMap'] = buildTreemap(projectName, null, statistics, heatmap);
 
           // Build incidents list data
-          let incidentList = [];
-          //_.map(summary.incidentSummary || [], a => {
-          _.each(summary.incidentSummary || [],function(a,ia){
-            let incidentObj = _getRootCauseNameFromHints(a.text);
-            let incidentName = "";
-            if(incidentObj.neuronId){
-              if(incidentObj.neuronId == -1){
-                // threshold driven
-                incidentName = "AT";
-              }else{
-                incidentName = "A"+incidentObj.neuronId;
-              }
-            }
-            incidentList.push({
-              id: a.id,
-              incidentName:incidentName,
-              rootCauseNames: incidentObj.rootCauseNames,
-              suggestedActions: incidentObj.suggestedActions,
-              start:incidentObj.start,
-              duration:incidentObj.duration,
-              startTimestamp:incidentObj.startTimestamp,
-              endTimestamp:incidentObj.endTimestamp,
-              text: a.text
-            });
-          });
+          // let incidentList = [];
+          // //_.map(summary.incidentSummary || [], a => {
+          // _.each(summary.incidentSummary || [],function(a,ia){
+          //   let incidentObj = _getRootCauseNameFromHints(a.text);
+          //   let incidentName = "";
+          //   if(incidentObj.neuronId){
+          //     if(incidentObj.neuronId == -1){
+          //       // threshold driven
+          //       incidentName = "AT";
+          //     }else{
+          //       incidentName = "A"+incidentObj.neuronId;
+          //     }
+          //   }
+          //   incidentList.push({
+          //     id: a.id,
+          //     incidentName:incidentName,
+          //     rootCauseNames: incidentObj.rootCauseNames,
+          //     suggestedActions: incidentObj.suggestedActions,
+          //     start:incidentObj.start,
+          //     duration:incidentObj.duration,
+          //     startTimestamp:incidentObj.startTimestamp,
+          //     endTimestamp:incidentObj.endTimestamp,
+          //     text: a.text
+          //   });
+          // });
           ret['incidents'] = incidentList;
 
           resolve(ret);

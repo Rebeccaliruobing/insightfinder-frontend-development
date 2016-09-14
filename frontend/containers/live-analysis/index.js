@@ -42,7 +42,13 @@ class LiveAnalysis extends Component {
   handleIncidentSelected(incident) {
     // TODO: Get incidentsTreeMap for selected incident.
     const {projectName, data} = this.state;
-    const incidentsTreeMap = buildTreemap(projectName, incident.id, data.statistics, {});
+    let incidentsTreeMap = undefined;
+    if(incident){
+      let caption = "Incident #"+incident.id+", start: "+incident.start;
+      incidentsTreeMap = buildTreemap(projectName, caption, incident.instanceMetricJson, incident.anomalyMapJson);
+    } else {
+      incidentsTreeMap = buildTreemap(projectName, null, data.statistics, data.anomalyMapJson);
+    }
     this.setState({
       incidentsTreeMap,
     });

@@ -28,6 +28,11 @@ class IncidentsList extends Component {
   }
 
   @autobind
+  handleNoIncidentSelected(){
+    this.props.onIncidentSelected(undefined);    
+  }
+
+  @autobind
   handleIncidentSelected(incident) {
     this.props.onIncidentSelected(incident);
   }
@@ -61,7 +66,7 @@ class IncidentsList extends Component {
       {(predictedIncidents.length > 0) ? 
         <table className="incident-table selectable ui compact table">
         <thead>
-        <tr>
+        <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
           <th>Anomaly Type</th>
           <th>Start Time</th>
@@ -76,12 +81,12 @@ class IncidentsList extends Component {
         {predictedIncidents.reverse().map((incident, index)=>(
           <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
             <td>{incident.id}</td>
-            <td className="code">{incident.rootCauseNames}</td>
+            <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
             <td>{incident.start}</td>
             <td>{incident.duration} minutes</td>
-            <td>Agent needed</td>
-            <td>Agent needed</td>
-            <td className="code">{incident.suggestedActions}</td>
+            <td>{incident.rootCauseJson.rootCauseScope}</td>
+            <td>{incident.rootCauseJson.rootCauseAffectedFunctions}</td>
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td>
               <Button className="orange"
                       onClick={(e) => {
@@ -111,7 +116,7 @@ class IncidentsList extends Component {
       {(actualIncidents.length > 0) ?
         <table className="incident-table selectable ui compact table">
         <thead>
-        <tr>
+        <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
           <th>Anomaly Type</th>
           <th>Start Time</th>
@@ -157,12 +162,12 @@ class IncidentsList extends Component {
             }).map((incident, index)=>(
           <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
             <td>{incident.id}</td>
-            <td className="code">{incident.rootCauseNames}</td>
+            <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
             <td>{incident.start}</td>
             <td>{incident.duration} minutes</td>
-            <td>Agent needed</td>
-            <td>Agent needed</td>
-            <td className="code">{incident.suggestedActions}</td>
+            <td>{incident.rootCauseJson.rootCauseScope}</td>
+            <td>{incident.rootCauseJson.rootCauseAffectedFunctions}</td>
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td>
               <Button className="orange"
                       onClick={(e) => {
