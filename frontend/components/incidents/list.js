@@ -1,6 +1,7 @@
 import React, {Component, PropTypes as T} from 'react';
 import {autobind} from 'core-decorators';
 import {Button} from '../../artui/react';
+import cx from 'classnames';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
 import thumbupImg from '../../images/green-thumbup.png';
@@ -58,7 +59,6 @@ class IncidentsList extends Component {
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      activeIncident:undefined
     });
   }
 
@@ -71,7 +71,7 @@ class IncidentsList extends Component {
   // </td>
   // const IncidentsList = ({ incidents }) => {
   render() {
-    let { incidents,latestTimestamp,incidentDurationThreshold } = this.state;
+    let { incidents,latestTimestamp,incidentDurationThreshold, active } = this.state;
     let filtered30 = true;
     let actualIncidents = incidents.filter((incident, index) => 
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
@@ -173,7 +173,8 @@ class IncidentsList extends Component {
                 }
               }
             }).map((incident, index)=>(
-          <tr key={index} onClick={() => this.handleIncidentSelected(incident)} className={cx({'active': incident == this.state.activeIncident})}>
+          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
+              className={cx({'active': incident === this.state.activeIncident})}>
             <td>{incident.id}</td>
             <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
             <td>{incident.duration}</td>
