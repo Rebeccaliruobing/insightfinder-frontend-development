@@ -4,7 +4,7 @@ import {Button} from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
 import thumbupImg from '../../images/green-thumbup.png';
-import { IncidentDurationMinute } from '../selections';
+import { IncidentDurationMinute,IncidentActionTaken } from '../selections';
 
 class IncidentsList extends Component {
 
@@ -19,7 +19,8 @@ class IncidentsList extends Component {
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      incidentDurationThreshold: 30
+      incidentDurationThreshold: 30,
+      activeIncident:undefined
     }
   }
 
@@ -29,16 +30,23 @@ class IncidentsList extends Component {
 
   @autobind
   handleNoIncidentSelected(){
-    this.props.onIncidentSelected(undefined);    
+    this.props.onIncidentSelected(undefined);   
+    this.setState({activeIncident:undefined}); 
   }
 
   @autobind
   handleIncidentSelected(incident) {
     this.props.onIncidentSelected(incident);
+    this.setState({activeIncident:incident});
   }
 
   componentWillReceiveProps(nextProps) {
     this.setIncidentsList(nextProps);
+  }
+
+  handleLinkToAgentWiki(){
+    const url = `https://github.com/insightfinder/InsightAgent/wiki`;
+    window.open(url, '_blank');
   }
 
   setIncidentsList(props){
@@ -50,10 +58,18 @@ class IncidentsList extends Component {
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined,
+      activeIncident:undefined
     });
   }
 
-  //const IncidentsList = ({ incidents }) => {
+  // <td>
+  //   <Button className="green"
+  //           onClick={(e) => this.handleLinkToAgentWiki()}
+  //           style={{width: 80, paddingLeft:0, paddingRight:0}}>
+  //     Need agent
+  //   </Button>
+  // </td>
+  // const IncidentsList = ({ incidents }) => {
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold } = this.state;
     let filtered30 = true;
@@ -64,29 +80,27 @@ class IncidentsList extends Component {
     return (
       <div>
       {(predictedIncidents.length > 0) ? 
-        <table className="incident-table selectable ui compact table">
+        <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
-          <th>Anomaly Type</th>
           <th>Start Time</th>
-          <th>Duration</th>
-          <th>Root Cause Scope</th>
-          <th>Affected Functions</th>
+          <th>Duration (min)</th>
+          <th>Anomaly Type</th>
           <th>Suggested Actions</th>
-          <th/>
+          <th>Action Taken</th>
+          <th>Causal Graph</th>
         </tr>
         </thead>
         <tbody>
         {predictedIncidents.reverse().map((incident, index)=>(
           <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
             <td>{incident.id}</td>
+            <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
+            <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-            <td>{incident.start}</td>
-            <td>{incident.duration} minutes</td>
-            <td>{incident.rootCauseJson.rootCauseScope}</td>
-            <td>{incident.rootCauseJson.rootCauseAffectedFunctions}</td>
-            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>            
+            <td><IncidentActionTaken/> </td>
             <td>
               <Button className="orange"
                       onClick={(e) => {
@@ -114,16 +128,15 @@ class IncidentsList extends Component {
         onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
       </div>
       {(actualIncidents.length > 0) ?
-        <table className="incident-table selectable ui compact table">
+        <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
-          <th>Anomaly Type</th>
           <th>Start Time</th>
-          <th>Duration</th>
-          <th>Root Cause Scope</th>
-          <th>Affected Functions</th>
+          <th>Duration (min)</th>
+          <th>Anomaly Type</th>
           <th>Suggested Actions</th>
+          <th>Action Taken</th>
           <th>
             <Button className="orange"
                     onClick={(e) => {
@@ -160,14 +173,13 @@ class IncidentsList extends Component {
                 }
               }
             }).map((incident, index)=>(
-          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
+          <tr key={index} onClick={() => this.handleIncidentSelected(incident)} className={cx({'active': incident == this.state.activeIncident})}>
             <td>{incident.id}</td>
+            <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
+            <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-            <td>{incident.start}</td>
-            <td>{incident.duration} minutes</td>
-            <td>{incident.rootCauseJson.rootCauseScope}</td>
-            <td>{incident.rootCauseJson.rootCauseAffectedFunctions}</td>
-            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>        
+            <td><IncidentActionTaken/> </td>
             <td>
               <Button className="orange"
                       onClick={(e) => {

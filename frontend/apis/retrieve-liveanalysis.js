@@ -4,82 +4,6 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-function _getRootCauseNameFromHints(incidentText){
-  // parse rootcause text and extract simplified rootcause names
-  const rootCauseNameMap = {
-    "cpu": "high CPU usage",
-    "mem": "high memory usage",
-    "disk": "high disk usage",
-    "network": "network traffic surge",
-    "load": "high load",
-    "request": "high request count",
-    "latency": "high latency"
-  };
-  const suggestedActionMap = {
-    "missing": "check instance availability",
-    "cpu": "scale up CPU",
-    "mem": "scale up memory",
-    "disk": "scale up disk",
-    "network": "scale up network",
-    "load": "scale up CPU",
-    "request": "check request count",
-    "latency": "check latency",
-  };
-
-  let rootCauseNames = new Set();
-  let suggestedActions = new Set();
-  let parts0 = incidentText.split("\n");
-  let durationLine = parts0[0];
-  let neuronId = undefined;
-  let duration = durationLine.substring(durationLine.indexOf("Duration")+9,durationLine.indexOf("minutes")-1);
-  let startLine = parts0[1];
-  let start = startLine.substring(12,startLine.indexOf(","));
-  let hintStr = parts0.splice(2,parts0.length).join("\n").trim();
-  let hints = hintStr.split("\n");
-  let retObj = {};
-  if(durationLine.indexOf(",")!=-1){
-    neuronId = parseInt(durationLine.substring(0,durationLine.indexOf(",")))
-  }
-  _.each(hints,function(h,ih){
-    let parts = h.split(",");
-    if(parts[0].indexOf("missing")!=-1){
-      let pos=parts[1].indexOf(":");
-      let instance=parts[1].substring(pos+1,parts[1].length);
-      rootCauseNames.add("missing metric data");
-      suggestedActions.add(suggestedActionMap["missing"]+": "+instance);
-    } else if(neuronId&&neuronId==-1){
-      // iterate through map
-      let matched = false;
-      for (var key in rootCauseNameMap) {
-        if(parts[2].toLowerCase().indexOf(key)!=-1){
-          rootCauseNames.add(key+" hotspot");
-          suggestedActions.add("check load balancing");  
-          matched = true;
-        }    
-      }
-    } else {
-      // iterate through map
-      let matched = false;
-      for (var key in rootCauseNameMap) {
-        if(parts[2].toLowerCase().indexOf(key)!=-1){
-          rootCauseNames.add(rootCauseNameMap[key]);
-          suggestedActions.add(suggestedActionMap[key]);
-          matched = true;
-        }
-      }
-    }
-  });
-  retObj["neuronId"] = neuronId;
-  retObj["rootCauseNames"] = Array.from(rootCauseNames).join("\n");
-  retObj["suggestedActions"] = Array.from(suggestedActions).join("\n");
-  retObj["start"] = start;
-  retObj["duration"] = duration;
-  retObj["startTimestamp"] = 0+moment(start);
-  retObj["endTimestamp"] = 0+moment(start)+parseInt(duration)*60000;
-
-  return retObj;
-}
-
 export function buildTreemap(projectName, incidentName, statistics, anomaliesList) {
 
   // Create tree structure with instance => container => metric.
@@ -91,6 +15,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
   const insts = _.filter((statistics['instances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
   const newInsts = _.filter((statistics['newInstances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
   const metrics = _.filter((statistics['metrics'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const startTimestamp = statistics['startTimestamp'];
+  const endTimestamp = statistics['endTimestamp'];
 
   _.forEach(insts, (inst) => {
 
@@ -168,6 +94,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     name: incidentName || projectName,
     score: 0,
     children: root,
+    startTimestamp,
+    endTimestamp
   };
 }
 
@@ -214,33 +142,6 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
           ret['incidentsTreeMap'] = buildTreemap(projectName, null, statistics, heatmap);
-
-          // Build incidents list data
-          // let incidentList = [];
-          // //_.map(summary.incidentSummary || [], a => {
-          // _.each(summary.incidentSummary || [],function(a,ia){
-          //   let incidentObj = _getRootCauseNameFromHints(a.text);
-          //   let incidentName = "";
-          //   if(incidentObj.neuronId){
-          //     if(incidentObj.neuronId == -1){
-          //       // threshold driven
-          //       incidentName = "AT";
-          //     }else{
-          //       incidentName = "A"+incidentObj.neuronId;
-          //     }
-          //   }
-          //   incidentList.push({
-          //     id: a.id,
-          //     incidentName:incidentName,
-          //     rootCauseNames: incidentObj.rootCauseNames,
-          //     suggestedActions: incidentObj.suggestedActions,
-          //     start:incidentObj.start,
-          //     duration:incidentObj.duration,
-          //     startTimestamp:incidentObj.startTimestamp,
-          //     endTimestamp:incidentObj.endTimestamp,
-          //     text: a.text
-          //   });
-          // });
           ret['incidents'] = incidentList;
 
           resolve(ret);

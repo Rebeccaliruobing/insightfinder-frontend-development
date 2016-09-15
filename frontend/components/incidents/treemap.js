@@ -27,6 +27,8 @@ class IncidentsTreeMap extends Component {
 
     this.state = {
       faux: null,
+      startTimestamp:undefined,
+      endTimestamp:undefined,
     }
   }
 
@@ -40,20 +42,30 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showMetricChart(d) {
+    let { startTimestamp,endTimestamp } = this.state;
     let params = {
       projectName: d['projectName'],
       metricName: d['name'],
       instanceName: d['instanceName']
     };
+    if(startTimestamp && endTimestamp){
+      params['startTimestamp'] = startTimestamp;
+      params['endTimestamp'] = endTimestamp;
+    }
     window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
   }
 
   @autobind
   showInstanceChart(d) {
+    let { startTimestamp,endTimestamp } = this.state;
     let params = {
       projectName: d['projectName'],
       instanceName: d['instanceName']
     };
+    if(startTimestamp && endTimestamp){
+      params['startTimestamp'] = startTimestamp;
+      params['endTimestamp'] = endTimestamp;
+    }
     window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
   }
 
@@ -62,6 +74,10 @@ class IncidentsTreeMap extends Component {
       const root = _.cloneDeep(nextProps.data);
       this.transformData(root);
       this.displayData(root);
+      this.setState({
+        startTimestamp:root.startTimestamp,
+        endTimestamp:root.endTimestamp,
+      });
     }
   }
 

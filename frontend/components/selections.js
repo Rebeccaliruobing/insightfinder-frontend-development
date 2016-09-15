@@ -318,6 +318,20 @@ const IncidentDurationMinute = (props) => {
   )
 };
 
+const IncidentActionTaken = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" selected>ignore</div>
+        <div className="item">scale-up</div>
+        <div className="item">reboot</div>
+        <div className="item">migration</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -332,5 +346,6 @@ export {
   DurationThreshold,
   WindowWithWeek,
   DurationHour,
-  IncidentDurationMinute
+  IncidentDurationMinute,
+  IncidentActionTaken
 };

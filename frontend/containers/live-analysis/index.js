@@ -44,8 +44,11 @@ class LiveAnalysis extends Component {
     const {projectName, data} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id+", start: "+incident.start;
-      incidentsTreeMap = buildTreemap(projectName, caption, incident.instanceMetricJson, incident.anomalyMapJson);
+      let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm");
+      let stats = incident.instanceMetricJson;
+      stats['startTimestamp'] = incident.startTimestamp;
+      stats['endTimestamp'] = incident.endTimestamp;
+      incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson);
     } else {
       incidentsTreeMap = buildTreemap(projectName, null, data.statistics, data.anomalyMapJson);
     }

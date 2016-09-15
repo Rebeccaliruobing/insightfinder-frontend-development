@@ -760,9 +760,9 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectData(projectName, startTime, endTime, groupId, instanceName, metricName, userName = store.get('userName'), token = store.get('token')) {
-        let paramData = metricName?{projectName, startTime, endTime, groupId, instanceName, metricName, userName, token}:
-        {projectName, startTime, endTime, groupId, instanceName, userName, token};
+    postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, userName = store.get('userName'), token = store.get('token')) {
+        let paramData = metricName?{projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, userName, token}:
+        {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, userName, token};
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',

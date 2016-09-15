@@ -272,6 +272,9 @@ class LiveAnalysisCharts extends React.Component {
                             }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
+                                    {!summary && (!groups || groups.length==0) &&
+                                      <h3>No data to display</h3>
+                                    }
                                     {!!summary &&
                                     <DataSummaryChart
                                         key="summary_chart"
