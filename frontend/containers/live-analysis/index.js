@@ -40,7 +40,6 @@ class LiveAnalysis extends Component {
 
   @autobind()
   handleIncidentSelected(incident) {
-    // TODO: Get incidentsTreeMap for selected incident.
     const {projectName, data} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){

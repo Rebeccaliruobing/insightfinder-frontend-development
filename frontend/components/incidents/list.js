@@ -31,8 +31,8 @@ class IncidentsList extends Component {
 
   @autobind
   handleNoIncidentSelected(){
-    this.props.onIncidentSelected(undefined);   
-    this.setState({activeIncident:undefined}); 
+    this.props.onIncidentSelected(undefined);
+    this.setState({activeIncident:undefined});
   }
 
   @autobind
@@ -73,13 +73,13 @@ class IncidentsList extends Component {
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold, active } = this.state;
     let filtered30 = true;
-    let actualIncidents = incidents.filter((incident, index) => 
+    let actualIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-    let predictedIncidents = incidents.filter((incident, index) => 
+    let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp );
     return (
       <div>
-      {(predictedIncidents.length > 0) ? 
+      {(predictedIncidents.length > 0) ?
         <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
@@ -94,12 +94,13 @@ class IncidentsList extends Component {
         </thead>
         <tbody>
         {predictedIncidents.reverse().map((incident, index)=>(
-          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}>
+          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
+              className={cx({'active': incident === this.state.activeIncident})}>
             <td>{incident.id}</td>
             <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
             <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-            <td className="code">{incident.rootCauseJson.suggestedActions}</td>            
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td><IncidentActionTaken/> </td>
             <td>
               <Button className="orange"
@@ -179,7 +180,7 @@ class IncidentsList extends Component {
             <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
             <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-            <td className="code">{incident.rootCauseJson.suggestedActions}</td>        
+            <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td><IncidentActionTaken/> </td>
             <td>
               <Button className="orange"
