@@ -169,7 +169,7 @@ class IncidentsTreeMap extends Component {
 
     // Display navbar to back to parent node on click
     const navbar = svg.append("g").attr("class", "navbar");
-    const twidth = 100;
+    const twidth = 180;
 
     // Add a link to open instance chart view
     if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
@@ -179,10 +179,9 @@ class IncidentsTreeMap extends Component {
       navbar.append("rect")
         .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
         .datum(data).on('click', this.showInstanceChart);
-
       navbar.append("text")
-        .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em'})
-        .text('Chart View');
+        .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
+        .text('Instance Line Chart');
     } else {
       navbar.append("rect")
         .attr({ y: -navHeight, width: width, height: navHeight, })

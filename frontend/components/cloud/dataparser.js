@@ -271,7 +271,11 @@ class DataParser {
                     rootcause = "";
                   } else {
                     if(valString != 'missing'){
-                      rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
+                      if(neuronId&&neuronId==-1){
+                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than threshold, ";  
+                      } else {
+                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
+                      }                      
                     } else {
                       rootcause = "missing value, "
                     }

@@ -7,6 +7,7 @@ const AnalysisSummary = ({data, latestDataTimestamp, duration='24h' }) => {
     <div className='ui statistic eight wide column'>
       <div>
         <span className="title">Analysis Summary</span>
+        
         <span className="meta">{duration}</span>
       </div>
       <div className="chart">

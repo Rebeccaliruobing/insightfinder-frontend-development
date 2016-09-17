@@ -73,7 +73,7 @@ class LiveAnalysisCharts extends React.Component {
     calculateData() {
 
         // Cache the data, and recalculate it if changed.
-        let { data, loading, onRefresh, ...rest } = this.props;
+        let { data, loading, onRefresh, projectName, instanceName, metricName, startTimestamp, detectSuccess, ...rest } = this.props;
         if (this._data !== data && !!data) {
             this.dp = new DataParser(data, rest);
             this.dp.getSummaryData();
@@ -87,8 +87,33 @@ class LiveAnalysisCharts extends React.Component {
             this.causalTypes = this.dp.causalTypes;
             this.groups = this.dp.groupsData || [];
             this.groupMetrics = this.dp.groupmetrics || null;
+
             this._data = data;
+        } else {
+          // create missing msg
+          if(!this.summary && (!this.groups || this.groups.length==0)){
+            if(detectSuccess!=undefined){
+              // failed detection
+              this.errorMsg = "Detection failed";
+              if(projectName){
+                this.errorMsg += " for project "+projectName;
+              } 
+            } else {
+              // display project data
+              this.errorMsg = "Empty data";
+              if(instanceName){
+                this.errorMsg += " for instance "+instanceName;
+                if(metricName){
+                  this.errorMsg += ", metric "+metricName;                  
+                }
+              }
+              if(startTimestamp){
+                this.errorMsg += " during requested time period";
+              }
+            }
+          } 
         }
+
     }
 
     exportData(){
@@ -100,6 +125,7 @@ class LiveAnalysisCharts extends React.Component {
         a.innerHTML = "Click here";
         a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
         a.target   = '_blank';
+        a.method   = 'POST';
         a.download = fname;
         a.click();
         document.body.removeChild(a);
@@ -191,6 +217,7 @@ class LiveAnalysisCharts extends React.Component {
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
         const groups = this.groups;
+        const errorMsg = this.errorMsg;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
@@ -273,7 +300,7 @@ class LiveAnalysisCharts extends React.Component {
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
                                     {!summary && (!groups || groups.length==0) &&
-                                      <h3>No data to display</h3>
+                                      <h3>{errorMsg}</h3>
                                     }
                                     {!!summary &&
                                     <DataSummaryChart

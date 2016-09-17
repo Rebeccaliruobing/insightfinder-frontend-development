@@ -20,7 +20,7 @@ class IncidentsList extends Component {
       showTenderModal:false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      incidentDurationThreshold: 30,
+      incidentDurationThreshold: 15,
       activeIncident:undefined
     }
   }
@@ -72,34 +72,59 @@ class IncidentsList extends Component {
   // const IncidentsList = ({ incidents }) => {
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold, active } = this.state;
-    let filtered30 = true;
     let actualIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
-            incident.endTimestamp>latestTimestamp );
+            incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     return (
       <div>
+        <h4 style={{display:'inline-block'}}>Predicted Events</h4>
+        <div style={{float:'right', display:'inline-block'}}>
+        Showing incident no shorter than <IncidentDurationMinute
+          value={incidentDurationThreshold} text={incidentDurationThreshold}
+          onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
+        </div>
       {(predictedIncidents.length > 0) ?
         <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
-          <th>Start Time</th>
-          <th>Duration (min)</th>
           <th>Anomaly Type</th>
+          <th>Duration</th>
           <th>Suggested Actions</th>
           <th>Action Taken</th>
           <th>Causal Graph</th>
         </tr>
         </thead>
         <tbody>
-        {predictedIncidents.reverse().map((incident, index)=>(
+        {predictedIncidents.reverse().sort(function (a, b) {
+              // reverse ordering
+              let aname = a.rootCauseJson.rootCauseTypes;
+              let bname = b.rootCauseJson.rootCauseTypes;
+              if (aname > bname) {
+                return 1;
+              } else if (aname < bname) {
+                return -1;
+              } else {
+                let aid = parseInt(a.id);
+                let bid = parseInt(b.id);
+                if (aid < bid) {
+                  return 1;
+                } else if (aid > bid) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              }
+            }).map((incident, index)=>(
           <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
-              className={cx({'active': incident === this.state.activeIncident})}>
+              className={cx({'active': incident === this.state.activeIncident})}
+              title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm") 
+                + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
+                + ", duration: " + incident.duration + " min"}>
             <td>{incident.id}</td>
-            <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-            <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+            <td>{incident.duration} min</td>
             <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td><IncidentActionTaken/> </td>
             <td>
@@ -122,20 +147,19 @@ class IncidentsList extends Component {
         :
         <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
       }
-        <h4 style={{display:'inline-block'}}>Detected Incident List</h4>
-      <div style={{float:'right', paddingTop: 24, display:'inline-block'}}>
-      Showing incident no shorter than <IncidentDurationMinute
-        value={incidentDurationThreshold} text={incidentDurationThreshold}
-        onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
-      </div>
+        <h4 style={{display:'inline-block'}}>Detected Events</h4>
+        <div style={{float:'right', paddingTop: 24, display:'inline-block'}}>
+        Showing incident no shorter than <IncidentDurationMinute
+          value={incidentDurationThreshold} text={incidentDurationThreshold}
+          onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
+        </div>
       {(actualIncidents.length > 0) ?
         <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
           <th>Id</th>
-          <th>Start Time</th>
-          <th>Duration (min)</th>
           <th>Anomaly Type</th>
+          <th>Duration</th>
           <th>Suggested Actions</th>
           <th>Action Taken</th>
           <th>
@@ -156,11 +180,11 @@ class IncidentsList extends Component {
         <tbody>
         {actualIncidents.reverse().sort(function (a, b) {
               // reverse ordering
-              let aname = a.incidentName;
-              let bname = b.incidentName;
-              if (aname < bname) {
+              let aname = a.rootCauseJson.rootCauseTypes;
+              let bname = b.rootCauseJson.rootCauseTypes;
+              if (aname > bname) {
                 return 1;
-              } else if (aname > bname) {
+              } else if (aname < bname) {
                 return -1;
               } else {
                 let aid = parseInt(a.id);
@@ -175,11 +199,13 @@ class IncidentsList extends Component {
               }
             }).map((incident, index)=>(
           <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
-              className={cx({'active': incident === this.state.activeIncident})}>
+              className={cx({'active': incident === this.state.activeIncident})}
+              title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm") 
+                + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
+                + ", duration: " + incident.duration + " min"}>
             <td>{incident.id}</td>
-            <td>{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-            <td>{incident.duration}</td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+            <td>{incident.duration} min</td>
             <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td><IncidentActionTaken/> </td>
             <td>

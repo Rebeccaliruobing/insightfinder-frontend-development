@@ -115,7 +115,6 @@ class LiveAnalysis extends Component {
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
-            <Button className='orange' onClick={this.handleProjectChartsView}>Chart View</Button>
           </div>
           <div className="ui vertical segment">
             <ProjectStatistics data={data} />
@@ -123,8 +122,10 @@ class LiveAnalysis extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="label row">
-                <div className="nine wide column">Predicted Incident List</div>
-                <div className="seven wide column">Incident TreeMap</div>
+                <div className="nine wide column"></div>
+                <div className="seven wide column right aligned">
+                  <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
+                </div>
               </div>
               <div className="row" style={{ height: 528 }}>
                 <div className="nine wide column" style={{ height: 500 }}>

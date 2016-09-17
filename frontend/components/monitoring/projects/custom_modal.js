@@ -74,6 +74,9 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="1">1 minute</option>
                 <option className="item" value="5">5 minutes</option>
                 <option className="item" value="10">10 minutes</option>
+                <option className="item" value="15">15 minutes</option>
+                <option className="item" value="30">30 minutes</option>
+                <option className="item" value="60">60 minutes</option>
               </select>
             </div>
           </form>
