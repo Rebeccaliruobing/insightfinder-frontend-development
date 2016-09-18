@@ -99,20 +99,12 @@ class LiveAnalysis extends Component {
       });
   }
   refreshProjectName(projectName){
-    console.log(projectName);
     this.handleProjectChange(projectName,projectName);
   }
   render() {
     let { loading, data, projectName, incidentsTreeMap} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-
-                // <div className="seven wide column" style={{ height: (instances)*60+'px'}}>
-                //   <AnomalySummary data={data}/>
-                // </div>
-                // <div className="seven wide column" style={{ height: 500 }}>
-                //   <IncidentsTreeMap data={data.incidentsTreeMap}/>
-                // </div>
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
@@ -136,15 +128,15 @@ class LiveAnalysis extends Component {
                   <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
                 </div>
               </div>
-              <div className="row" style={{ height: 528 }}>
-                <div className="nine wide column" style={{ height: 500 }}>
+              <div className="row" style={{ height: 528,'paddingTop': '2rem' }}>
+                <div className="eight wide column" style={{ height: 500 }}>
+                  <IncidentsTreeMap data={incidentsTreeMap} />
+                </div>
+                <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList onIncidentSelected={this.handleIncidentSelected}
                                  incidents={data.incidents}
                                  causalDataArray={data.causalDataArray}
                                  causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
-                </div>
-                <div className="seven wide column" style={{ height: 500 }}>
-                  <IncidentsTreeMap data={incidentsTreeMap} />
                 </div>
               </div>
             </div>
