@@ -8,6 +8,7 @@ import {LiveProjectSelection} from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
+import store from 'store';
 
 class LiveAnalysis extends Component {
   static contextTypes = {
@@ -33,8 +34,10 @@ class LiveAnalysis extends Component {
   componentDidMount() {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item, index) => !(item.isStationary));
+    // remember select
+    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
     if (projects.length > 0) {
-      this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+      this.handleProjectChange(refreshName, refreshName);
     }
   }
 
@@ -79,7 +82,7 @@ class LiveAnalysis extends Component {
     let cvalue = projectParam ? projectParam.cvalue : "0.99";
     let pvalue = projectParam ? projectParam.pvalue : "5";
     let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
-
+    store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
     apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue)
       .then(data => {
@@ -95,7 +98,10 @@ class LiveAnalysis extends Component {
         // alert(msg);
       });
   }
-
+  refreshProjectName(projectName){
+    console.log(projectName);
+    this.handleProjectChange(projectName,projectName);
+  }
   render() {
     let { loading, data, projectName, incidentsTreeMap} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
@@ -107,11 +113,14 @@ class LiveAnalysis extends Component {
                 // <div className="seven wide column" style={{ height: 500 }}>
                 //   <IncidentsTreeMap data={data.incidentsTreeMap}/>
                 // </div>
-
+    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
           <div className="ui right aligned vertical segment">
+            <label style={{ fontWeight: 'bold', 'float': 'left' }}>
+              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>refresh</div>
+            </label>
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
