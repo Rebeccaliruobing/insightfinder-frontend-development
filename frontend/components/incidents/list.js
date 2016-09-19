@@ -22,6 +22,7 @@ class IncidentsList extends Component {
       endTimestamp:undefined,
       incidentDurationThreshold: 15,
       activeIncident:undefined,
+      incidentFirstChoiceFlag: false,
       tabStates: {
           predicted: '',
           detected: 'active'
@@ -40,9 +41,13 @@ class IncidentsList extends Component {
   }
 
   @autobind
-  handleIncidentSelected(incident) {
-    this.props.onIncidentSelected(incident);
-    this.setState({activeIncident:incident});
+  handleIncidentSelected(incident, incidentFirstChoiceFlag=false) {
+        this.props.onIncidentSelected(incident);
+        let incidentState={activeIncident:incident};
+        if(incidentFirstChoiceFlag){
+            incidentState['incidentFirstChoiceFlag'] = incidentFirstChoiceFlag;
+        }
+        this.setState(incidentState);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -61,8 +66,9 @@ class IncidentsList extends Component {
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
+      incidentFirstChoiceFlag: false,
       startTimestamp:undefined,
-      endTimestamp:undefined,
+      endTimestamp:undefined
     });
   }
   selectTab(e, tab) {
@@ -81,15 +87,19 @@ class IncidentsList extends Component {
   //   </Button>
   // </td>
   // const IncidentsList = ({ incidents }) => {
+    test(){
+        console.log(this.state.incidentFirstChoiceFlag);
+        this.setState({incidentFirstChoiceFlag: true});
+    }
   render() {
-    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates } = this.state;
+    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, incidentFirstChoiceFlag } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-    // if(detectedIncidents.length>0){
-    //   this.handleIncidentSelected(detectedIncidents[0]);
-    // }
+     //if(!incidentFirstChoiceFlag && detectedIncidents.length>0){
+     //  this.handleIncidentSelected(detectedIncidents[0], true);
+     //}
     return (
       <div>
         <div style={{float:'right', display:'inline-block','paddingBottom': '15px'}}>
@@ -109,7 +119,7 @@ class IncidentsList extends Component {
             <thead style={{ 'display': 'block','width': '100%'}}>
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th>Id</th>
-              <th></th>
+              <th>Level</th>
               <th>Anomaly Type</th>
               <th>Duration</th>
               <th>Suggested Actions</th>
@@ -117,7 +127,7 @@ class IncidentsList extends Component {
               <th>Causal Graph</th>
             </tr>
             </thead>
-            <tbody style={{ width: '100%','height': '200px','overflow': 'auto','display': 'block' }}>
+            <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
             {predictedIncidents.reverse().sort(function (a, b) {
                   // reverse ordering
                   let aname = a.rootCauseJson.rootCauseTypes;
@@ -138,7 +148,7 @@ class IncidentsList extends Component {
                     }
                   }
                 }).map((incident, index)=>(
-              <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={() => this.handleIncidentSelected(incident)}
+              <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={()=>this.handleIncidentSelected(incident)}
                   className={cx({'active': incident === this.state.activeIncident})}
                   title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                     + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
@@ -176,28 +186,15 @@ class IncidentsList extends Component {
         <thead style={{ 'display': 'block','width': '100%'}}>
         <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
           <th>Id</th>
-          <th></th>
+          <th>Level</th>
           <th>Anomaly Type</th>
           <th>Duration</th>
           <th>Suggested Actions</th>
           <th>Action Taken</th>
-          <th>
-            <Button className="orange"
-                    title="Overall Causal Graph"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      this.setState({
-                        showTenderModal: true,
-                        startTimestamp: undefined,
-                        endTimestamp: undefined
-                    });}}
-                    style={{width: 80, height: 40,'lineHeight': '25px',paddingLeft:0, paddingRight:0,  overflow: 'hidden', 'whiteSpace': 'nowrap','textOverflow': 'ellipsis',display: 'inline-block'}}>
-                Overall Causal Graph
-            </Button>
-          </th>
+          <th>Causal Graph</th>
         </tr>
         </thead>
-        <tbody style={{ width: '100%','height': '200px','overflow': 'auto','display': 'block' }}>
+        <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
         {detectedIncidents.reverse().sort(function (a, b) {
               // reverse ordering
               let aname = a.rootCauseJson.rootCauseTypes;
@@ -218,7 +215,8 @@ class IncidentsList extends Component {
                 }
               }
             }).map((incident, index)=>(
-          <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={() => this.handleIncidentSelected(incident)}
+          <tr style={{ display: 'inline-table','width': '100%'}} key={index}
+              onClick={()=>this.handleIncidentSelected(incident)}
               className={cx({'active': incident === this.state.activeIncident})}
               title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                 + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
