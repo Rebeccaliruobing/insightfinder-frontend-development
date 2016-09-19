@@ -55,7 +55,7 @@ class LiveAnalysis extends Component {
       incidentsTreeMap = buildTreemap(projectName, null, data.statistics, data.anomalyMapJson);
     }
     this.setState({
-      incidentsTreeMap,
+      incidentsTreeMap
     });
   }
 
@@ -76,7 +76,6 @@ class LiveAnalysis extends Component {
 
   @autobind
   handleProjectChange(value, projectName) {
-
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
     let cvalue = projectParam ? projectParam.cvalue : "0.99";
@@ -90,6 +89,17 @@ class LiveAnalysis extends Component {
           loading: false,
           incidentsTreeMap: data.incidentsTreeMap,
           data,
+          startTimestamp: undefined,
+          endTimestamp: undefined,
+          showTenderModal: false
+        }, ()=>{
+            let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+            let incidentDurationThreshold = 15;
+            let detectedIncidents = data.incidents.filter((incident, index) =>
+                    incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+            if(detectedIncidents.length>0){
+                this.handleIncidentSelected(detectedIncidents[0]);
+            }
         });
       })
       .catch(msg => {
@@ -122,9 +132,19 @@ class LiveAnalysis extends Component {
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">
-              <div className="row" style={{ height: 528,'paddingTop': '2rem' }}>
+              <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
                 <div className="eight wide column" style={{ height: 500 }}>
                   <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
+                  <Button className='orange' title="Overall Causal Graph"
+                          onClick={(e) => {
+                          e.stopPropagation();
+                          this.setState({
+                            showTenderModal: true,
+                            startTimestamp: undefined,
+                            endTimestamp: undefined
+                          });}}>
+                    Overall Causal Graph
+                  </Button>
                   <IncidentsTreeMap data={incidentsTreeMap} />
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
@@ -137,6 +157,12 @@ class LiveAnalysis extends Component {
             </div>
           </div>
         </div>
+          { this.state.showTenderModal &&
+            <TenderModal dataArray={data.causalDataArray} types={data.causalTypes}
+                     endTimestamp={this.state.endTimestamp}
+                     startTimestamp={this.state.startTimestamp}
+                     onClose={() => this.setState({ showTenderModal: false })}/>
+        }
       </Console.Content>
     )
   }
