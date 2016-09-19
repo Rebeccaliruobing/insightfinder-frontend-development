@@ -158,8 +158,16 @@ class IncidentsList extends Component {
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td>{incident.duration} min</td>
                 <td className="code">{incident.rootCauseJson.suggestedActions}</td>
-                <td><IncidentActionTaken/> </td>
                 <td>
+                  { incident.anomalyRatio==0 ?
+                    "N/A"
+                    :
+                    <IncidentActionTaken/> }
+                </td>
+                <td>
+                  { incident.anomalyRatio==0 ?
+                    "N/A"
+                    :                
                   <Button className="orange"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -170,7 +178,7 @@ class IncidentsList extends Component {
                           });}}
                           style={{width: 80, paddingLeft:0, paddingRight:0}}>
                     Causal Graph
-                  </Button>
+                  </Button> }
                 </td>
               </tr>
             ))}
@@ -226,8 +234,16 @@ class IncidentsList extends Component {
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
             <td>{incident.duration} min</td>
             <td className="code">{incident.rootCauseJson.suggestedActions}</td>
-            <td><IncidentActionTaken/> </td>
             <td>
+              { incident.anomalyRatio==0?
+                "N/A"
+                :
+                <IncidentActionTaken/> }
+            </td>
+            <td>
+              { incident.anomalyRatio==0?
+                "N/A"
+                :                
               <Button className="orange"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -238,7 +254,7 @@ class IncidentsList extends Component {
                       });}}
                       style={{width: 80, paddingLeft:0, paddingRight:0}}>
                 Causal Graph
-              </Button>
+              </Button> }
             </td>
           </tr>
         ))}
