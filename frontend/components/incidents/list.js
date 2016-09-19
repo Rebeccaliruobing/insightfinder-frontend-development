@@ -160,6 +160,7 @@ class IncidentsList extends Component {
                 <td>{incident.id}</td>
                 <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+                <td>{incident.duration} min</td>
                 <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
                   { incident.anomalyRatio==0 ?
@@ -235,6 +236,7 @@ class IncidentsList extends Component {
               <td>{incident.id}</td>
               <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
               <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+              <td>{incident.duration} min</td>
               <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               <td>
                 { incident.anomalyRatio==0?
