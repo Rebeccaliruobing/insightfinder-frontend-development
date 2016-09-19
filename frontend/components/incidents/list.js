@@ -87,10 +87,6 @@ class IncidentsList extends Component {
   //   </Button>
   // </td>
   // const IncidentsList = ({ incidents }) => {
-    test(){
-        console.log(this.state.incidentFirstChoiceFlag);
-        this.setState({incidentFirstChoiceFlag: true});
-    }
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, incidentFirstChoiceFlag } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
