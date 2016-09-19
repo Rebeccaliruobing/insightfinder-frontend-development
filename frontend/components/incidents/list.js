@@ -5,6 +5,7 @@ import cx from 'classnames';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import "./incident.less";
 import thumbupImg from '../../images/green-thumbup.png';
+import _ from 'lodash';
 import { IncidentDurationMinute,IncidentActionTaken } from '../selections';
 
 class IncidentsList extends Component {
@@ -56,8 +57,13 @@ class IncidentsList extends Component {
   }
 
   setIncidentsList(props){
+      let anomalyRatioLists = props.incidents.map(function (value,index) {
+         return value['anomalyRatio']
+      });
       let stateIncidents = {
       incidents:props.incidents,
+      maxAnomalyRatio: _.max(anomalyRatioLists),
+      minAnomalyRatio: _.min(anomalyRatioLists),
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
@@ -89,7 +95,7 @@ class IncidentsList extends Component {
   // </td>
   // const IncidentsList = ({ incidents }) => {
   render() {
-    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates } = this.state;
+    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
@@ -97,6 +103,7 @@ class IncidentsList extends Component {
      //if(detectedIncidents.length>0){
      //  this.handleIncidentSelected(detectedIncidents[0], true);
      //}
+      let sumAnomalyRatio = maxAnomalyRatio+minAnomalyRatio;
     return (
       <div>
         <div style={{float:'right', display:'inline-block','paddingBottom': '15px'}}>
@@ -151,7 +158,7 @@ class IncidentsList extends Component {
                     + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                     + ", duration: " + incident.duration + " min"}>
                 <td>{incident.id}</td>
-                <td><div className="level"></div></td>
+                <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
@@ -226,7 +233,7 @@ class IncidentsList extends Component {
                   + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                   + ", duration: " + incident.duration + " min"}>
               <td>{incident.id}</td>
-              <td></td>
+              <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
               <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
               <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               <td>
