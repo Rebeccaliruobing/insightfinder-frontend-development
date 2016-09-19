@@ -109,9 +109,8 @@ class IncidentsList extends Component {
             <thead style={{ 'display': 'block','width': '100%'}}>
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th>Id</th>
-              <th></th>
-              <th>Anomaly Type</th>
-              <th>Duration</th>
+              <th>Severity</th>
+              <th>Event Type</th>
               <th>Suggested Actions</th>
               <th>Action Taken</th>
               <th>Causal Graph</th>
@@ -146,7 +145,6 @@ class IncidentsList extends Component {
                 <td>{incident.id}</td>
                 <td><div className="level"></div></td>
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-                <td>{incident.duration} min</td>
                 <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
                   { incident.anomalyRatio==0 ?
@@ -184,9 +182,8 @@ class IncidentsList extends Component {
         <thead style={{ 'display': 'block','width': '100%'}}>
         <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
           <th>Id</th>
-          <th></th>
-          <th>Anomaly Type</th>
-          <th>Duration</th>
+          <th>Severity</th>
+          <th>Event Type</th>
           <th>Suggested Actions</th>
           <th>Action Taken</th>
           <th>
@@ -232,9 +229,8 @@ class IncidentsList extends Component {
                 + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                 + ", duration: " + incident.duration + " min"}>
             <td>{incident.id}</td>
-            <td><div className="level"></div></td>
+            <td></td>
             <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-            <td>{incident.duration} min</td>
             <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             <td>
               { incident.anomalyRatio==0?
