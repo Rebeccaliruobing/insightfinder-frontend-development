@@ -103,8 +103,8 @@ class IncidentsList extends Component {
       <div className={tabStates['predicted'] + ' ui tab '}>
           {(predictedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
-            <thead>
-            <tr onClick={() => this.handleNoIncidentSelected()}>
+            <thead style={{ 'display': 'block','width': '100%'}}>
+            <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th>Id</th>
               <th></th>
               <th>Anomaly Type</th>
@@ -114,7 +114,7 @@ class IncidentsList extends Component {
               <th>Causal Graph</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody style={{ width: '100%','height': '200px','overflow': 'auto','display': 'block' }}>
             {predictedIncidents.reverse().sort(function (a, b) {
                   // reverse ordering
                   let aname = a.rootCauseJson.rootCauseTypes;
@@ -135,7 +135,7 @@ class IncidentsList extends Component {
                     }
                   }
                 }).map((incident, index)=>(
-              <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
+              <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={() => this.handleIncidentSelected(incident)}
                   className={cx({'active': incident === this.state.activeIncident})}
                   title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                     + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
@@ -170,8 +170,8 @@ class IncidentsList extends Component {
       <div className={tabStates['detected'] + ' ui tab '}>
           {(actualIncidents.length > 0) ?
         <table className="incident-table selectable ui table">
-        <thead>
-        <tr onClick={() => this.handleNoIncidentSelected()}>
+        <thead style={{ 'display': 'block','width': '100%'}}>
+        <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
           <th>Id</th>
           <th></th>
           <th>Anomaly Type</th>
@@ -194,7 +194,7 @@ class IncidentsList extends Component {
           </th>
         </tr>
         </thead>
-        <tbody>
+        <tbody style={{ width: '100%','height': '200px','overflow': 'auto','display': 'block' }}>
         {actualIncidents.reverse().sort(function (a, b) {
               // reverse ordering
               let aname = a.rootCauseJson.rootCauseTypes;
@@ -215,7 +215,7 @@ class IncidentsList extends Component {
                 }
               }
             }).map((incident, index)=>(
-          <tr key={index} onClick={() => this.handleIncidentSelected(incident)}
+          <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={() => this.handleIncidentSelected(incident)}
               className={cx({'active': incident === this.state.activeIncident})}
               title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                 + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
