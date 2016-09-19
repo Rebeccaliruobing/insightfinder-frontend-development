@@ -122,14 +122,9 @@ class LiveAnalysis extends Component {
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">
-              <div className="label row">
-                <div className="nine wide column"></div>
-                <div className="seven wide column right aligned">
-                  <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
-                </div>
-              </div>
               <div className="row" style={{ height: 528,'paddingTop': '2rem' }}>
                 <div className="eight wide column" style={{ height: 500 }}>
+                  <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
                   <IncidentsTreeMap data={incidentsTreeMap} />
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>

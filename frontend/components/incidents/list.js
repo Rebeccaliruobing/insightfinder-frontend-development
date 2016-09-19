@@ -23,8 +23,8 @@ class IncidentsList extends Component {
       incidentDurationThreshold: 15,
       activeIncident:undefined,
       tabStates: {
-          predicted: 'active',
-          detected: ''
+          predicted: '',
+          detected: 'active'
       }
     }
   }
@@ -83,22 +83,25 @@ class IncidentsList extends Component {
   // const IncidentsList = ({ incidents }) => {
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates } = this.state;
-    let actualIncidents = incidents.filter((incident, index) =>
+    let detectedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+    // if(detectedIncidents.length>0){
+    //   this.handleIncidentSelected(detectedIncidents[0]);
+    // }
     return (
       <div>
-        <div className="ui pointing secondary menu">
-            <a className={tabStates['predicted'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
-            <a className={tabStates['detected'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
-        </div>
         <div style={{float:'right', display:'inline-block','paddingBottom': '15px'}}>
         Showing incident no shorter than <IncidentDurationMinute
           value={incidentDurationThreshold} text={incidentDurationThreshold}
           onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
+        </div>
+        <div className="ui pointing secondary menu">
+            <a className={tabStates['detected'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
+            <a className={tabStates['predicted'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
         </div>
       <div className={tabStates['predicted'] + ' ui tab '}>
           {(predictedIncidents.length > 0) ?
@@ -168,7 +171,7 @@ class IncidentsList extends Component {
       }
       </div>
       <div className={tabStates['detected'] + ' ui tab '}>
-          {(actualIncidents.length > 0) ?
+          {(detectedIncidents.length > 0) ?
         <table className="incident-table selectable ui table">
         <thead>
         <tr onClick={() => this.handleNoIncidentSelected()}>
@@ -195,7 +198,7 @@ class IncidentsList extends Component {
         </tr>
         </thead>
         <tbody>
-        {actualIncidents.reverse().sort(function (a, b) {
+        {detectedIncidents.reverse().sort(function (a, b) {
               // reverse ordering
               let aname = a.rootCauseJson.rootCauseTypes;
               let bname = b.rootCauseJson.rootCauseTypes;
