@@ -22,7 +22,6 @@ class IncidentsList extends Component {
       endTimestamp:undefined,
       incidentDurationThreshold: 15,
       activeIncident:undefined,
-      incidentFirstChoiceFlag: false,
       tabStates: {
           predicted: '',
           detected: 'active'
@@ -41,12 +40,9 @@ class IncidentsList extends Component {
   }
 
   @autobind
-  handleIncidentSelected(incident, incidentFirstChoiceFlag=false) {
+  handleIncidentSelected(incident) {
         this.props.onIncidentSelected(incident);
         let incidentState={activeIncident:incident};
-        if(incidentFirstChoiceFlag){
-            incidentState['incidentFirstChoiceFlag'] = incidentFirstChoiceFlag;
-        }
         this.setState(incidentState);
   }
 
@@ -60,16 +56,21 @@ class IncidentsList extends Component {
   }
 
   setIncidentsList(props){
-    this.setState({
+      let stateIncidents = {
       incidents:props.incidents,
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
-      incidentFirstChoiceFlag: false,
       startTimestamp:undefined,
       endTimestamp:undefined
-    });
+    };
+    let detectedIncidents = props.incidents.filter((incident, index) =>
+            incident.endTimestamp<=props.latestTimestamp && incident.duration>=parseInt(this.state.incidentDurationThreshold) );
+    if(detectedIncidents.length>0){
+        stateIncidents['activeIncident'] = detectedIncidents[0];
+    }
+    this.setState(stateIncidents);
   }
   selectTab(e, tab) {
       var tabStates = this.state['tabStates'];
@@ -88,12 +89,12 @@ class IncidentsList extends Component {
   // </td>
   // const IncidentsList = ({ incidents }) => {
   render() {
-    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, incidentFirstChoiceFlag } = this.state;
+    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-     //if(!incidentFirstChoiceFlag && detectedIncidents.length>0){
+     //if(detectedIncidents.length>0){
      //  this.handleIncidentSelected(detectedIncidents[0], true);
      //}
     return (
