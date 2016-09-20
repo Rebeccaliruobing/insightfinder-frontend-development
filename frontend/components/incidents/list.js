@@ -7,6 +7,7 @@ import "./incident.less";
 import thumbupImg from '../../images/green-thumbup.png';
 import _ from 'lodash';
 import { IncidentDurationMinute,IncidentActionTaken } from '../selections';
+import TakeActionModal from './takeActionModal';
 
 class IncidentsList extends Component {
 
@@ -19,6 +20,7 @@ class IncidentsList extends Component {
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
+      showTakeActionModal: false,
       startTimestamp:undefined,
       endTimestamp:undefined,
       incidentDurationThreshold: 15,
@@ -57,10 +59,10 @@ class IncidentsList extends Component {
   }
 
   setIncidentsList(props){
-      let anomalyRatioLists = props.incidents.map(function (value,index) {
-         return value['anomalyRatio']
-      });
-      let stateIncidents = {
+    let anomalyRatioLists = props.incidents.map(function (value,index) {
+      return value['anomalyRatio']
+    });
+    let stateIncidents = {
       incidents:props.incidents,
       maxAnomalyRatio: _.max(anomalyRatioLists),
       minAnomalyRatio: _.min(anomalyRatioLists),
@@ -68,16 +70,13 @@ class IncidentsList extends Component {
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
       showTenderModal:false,
+      showTakeActionModal: false,
       startTimestamp:undefined,
       endTimestamp:undefined
     };
-    let detectedIncidents = props.incidents.filter((incident, index) =>
-            incident.endTimestamp<=props.latestTimestamp && incident.duration>=parseInt(this.state.incidentDurationThreshold) );
-    if(detectedIncidents.length>0){
-        stateIncidents['activeIncident'] = detectedIncidents[0];
-    }
     this.setState(stateIncidents);
   }
+
   selectTab(e, tab) {
       var tabStates = this.state['tabStates'];
       tabStates = _.mapValues(tabStates, function (val) {
@@ -86,24 +85,42 @@ class IncidentsList extends Component {
       tabStates[tab] = 'active';
       this.setState({tabStates: tabStates});
   }
-  // <td>
-  //   <Button className="green"
-  //           onClick={(e) => this.handleLinkToAgentWiki()}
-  //           style={{width: 80, paddingLeft:0, paddingRight:0}}>
-  //     Need agent
-  //   </Button>
-  // </td>
-  // const IncidentsList = ({ incidents }) => {
+
+  calculateRGB(anomalyRatio, size){
+    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+    var rcolor, gcolor, bcolor = 0;
+    if (val <= 1) {
+        if (val < 0) val = 0;
+        rcolor = Math.floor(255 * val);
+        gcolor = 255;
+    } else {
+        if (val > 10) val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+    }
+    return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
+  }
+
+
+                // <td>
+                //   { incident.anomalyRatio==0 ?
+                //     "N/A"
+                //     :
+                //     <Button className="blue" onClick={(e) => {
+                //             e.stopPropagation();
+                //             this.setState({
+                //             showTakeActionModal: true
+                //           });}}
+                //           style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                //     take action
+                //   </Button> }
+                // </td>
   render() {
     let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-     //if(detectedIncidents.length>0){
-     //  this.handleIncidentSelected(detectedIncidents[0], true);
-     //}
-      let sumAnomalyRatio = maxAnomalyRatio+minAnomalyRatio;
     return (
       <div>
         <div style={{float:'right', display:'inline-block','paddingBottom': '15px'}}>
@@ -124,11 +141,10 @@ class IncidentsList extends Component {
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th>Id</th>
               <th>Severity</th>
-              <th>Anomaly Type</th>
+              <th>Event Type</th>
               <th>Duration</th>
-              <th>Suggested Actions</th>
-              <th>Action Taken</th>
               <th>Causal Graph</th>
+              <th>Suggested Actions</th>
             </tr>
             </thead>
             <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
@@ -158,22 +174,18 @@ class IncidentsList extends Component {
                     + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                     + ", duration: " + incident.duration + " min"}>
                 <td>{incident.id}</td>
-                <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
+                <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td>{incident.duration} min</td>
-                <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
                   { incident.anomalyRatio==0 ?
-                    "N/A"
-                    :
-                    <IncidentActionTaken/> }
-                </td>
-                <td>
-                  { incident.anomalyRatio==0 ?
-                    "N/A"
-                    :                
-                  <Button className="orange"
-                          onClick={(e) => {
+                  <Button className="grey" onClick={(e) => {
+                            e.stopPropagation()}}
+                          style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                    display
+                  </Button> 
+                  :                
+                  <Button className="blue" onClick={(e) => {
                             e.stopPropagation();
                             this.setState({
                             showTenderModal: true,
@@ -181,9 +193,10 @@ class IncidentsList extends Component {
                             endTimestamp: incident.endTimestamp
                           });}}
                           style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                    Causal Graph
+                    display
                   </Button> }
                 </td>
+                <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               </tr>
             ))}
             </tbody>
@@ -199,11 +212,10 @@ class IncidentsList extends Component {
           <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
             <th>Id</th>
             <th>Severity</th>
-            <th>Anomaly Type</th>
+            <th>Event Type</th>
             <th>Duration</th>
-            <th>Suggested Actions</th>
-            <th>Action Taken</th>
             <th>Causal Graph</th>
+            <th>Suggested Actions</th>
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
@@ -234,32 +246,35 @@ class IncidentsList extends Component {
                   + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                   + ", duration: " + incident.duration + " min"}>
               <td>{incident.id}</td>
-              <td><div className="level" style={{'backgroundColor': 'rgb(255, '+parseInt((incident['anomalyRatio']/sumAnomalyRatio)*255)+', 0)'}}></div></td>
+              <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
               <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-              <td>{incident.duration} min</td>
-              <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               <td>
-                { incident.anomalyRatio==0?
+                { incident.anomalyRatio==0 ?
                   "N/A"
                   :
-                  <IncidentActionTaken/> }
+                  incident.duration+" min"
+                }
               </td>
               <td>
-                { incident.anomalyRatio==0?
-                  "N/A"
+                  { incident.anomalyRatio==0 ?
+                  <Button className="grey" onClick={(e) => {
+                            e.stopPropagation()}}
+                          style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                    display
+                  </Button> 
                   :                
-                <Button className="orange"
-                        onClick={(e) => {
+                  <Button className="blue" onClick={(e) => {
                           e.stopPropagation();
                           this.setState({
-                          showTenderModal: true,
-                          startTimestamp: incident.startTimestamp,
-                          endTimestamp: incident.endTimestamp
-                        });}}
+                            showTenderModal: true,
+                            startTimestamp: incident.startTimestamp,
+                            endTimestamp: incident.endTimestamp
+                          });}}
                         style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                  Causal Graph
-                </Button> }
+                   display
+                  </Button> }
               </td>
+              <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             </tr>
           ))}
           </tbody>
@@ -273,6 +288,10 @@ class IncidentsList extends Component {
                        endTimestamp={this.state.endTimestamp}
                        startTimestamp={this.state.startTimestamp}
                        onClose={() => this.setState({ showTenderModal: false })}/>
+        }
+        { this.state.showTakeActionModal &&
+          <TakeActionModal incident={this.state.activeIncident} 
+                       onClose={() => this.setState({ showTakeActionModal: false })}/>
         }
       </div>
     )

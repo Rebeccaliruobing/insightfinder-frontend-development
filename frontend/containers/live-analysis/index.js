@@ -52,7 +52,8 @@ class LiveAnalysis extends Component {
       stats['endTimestamp'] = incident.endTimestamp;
       incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson);
     } else {
-      incidentsTreeMap = buildTreemap(projectName, null, data.statistics, data.anomalyMapJson);
+      let caption = projectName + " (24h)";
+      incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
       incidentsTreeMap
@@ -133,7 +134,7 @@ class LiveAnalysis extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
-                <div className="eight wide column" style={{ height: 500 }}>
+                <div className="eight wide column" style={{ height: 500, 'paddingTop': 50 }}>
                   <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
                   <Button className='orange' title="Overall Causal Graph"
                           onClick={(e) => {

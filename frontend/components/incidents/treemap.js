@@ -87,6 +87,37 @@ class IncidentsTreeMap extends Component {
    */
   transformData(root) {
 
+    const sumScore = d => {
+      let s = 0;
+      if (d.children) {
+        s = d3.sum(d.children, c => sumScore(c))
+      } else {
+        s = d.score;
+      }
+      d.score = s;
+      return s;
+    };
+    sumScore(root);
+
+    const scale = 1.25;
+    const num = 3;
+    // Accumulate the node value to the count of children.
+    const accumulate = d => {
+      return (d._children = d.children)
+        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
+        return p + accumulate(v);
+      }, 0)
+        : (Math.log10(d.score) > num ? scale : 1) * d.value;
+    };
+    accumulate(root);
+
+    // We get the max score on the root, so we can setup the color.
+    this.color = this.severityToRGBHex;
+    //this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
+  }
+
+  transformDataOld(root) {
+
     const maxScore = d => {
       let s = 0;
       if (d.children) {
@@ -113,6 +144,25 @@ class IncidentsTreeMap extends Component {
 
     // We get the max score on the root, so we can setup the color.
     this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
+  }
+
+  rootToRGBHex(root) {
+    let val = root.score / root.value;
+    return severityToRGBHex(val);
+  }
+
+  severityToRGBHex(val) {
+    var rcolor, gcolor, bcolor = 0;
+    if (val <= 1) {
+        if (val < 0) val = 0;
+        rcolor = Math.floor(255 * val);
+        gcolor = 255;
+    } else {
+        if (val > 10) val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+    }
+    return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
 
   /**
@@ -204,7 +254,8 @@ class IncidentsTreeMap extends Component {
     g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
-    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
+    g.selectAll('.parent').attr('fill', d => this.color(d.score));
+//    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
     g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
       t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
     });

@@ -1,7 +1,6 @@
 import React from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
 import CausalGraph from '../display-model/CausalGraph'
-
 import {Modal} from '../../../artui/react';
 
 class TenderModal extends React.Component {
