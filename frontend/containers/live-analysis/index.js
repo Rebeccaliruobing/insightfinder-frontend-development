@@ -35,9 +35,12 @@ class LiveAnalysis extends Component {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item, index) => !(item.isStationary));
     // remember select
-    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
     if (projects.length > 0) {
+      let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
+    } else {
+      const url = `/settings/project-list/custom`;
+      window.open(url, '_self');
     }
   }
 
@@ -52,7 +55,7 @@ class LiveAnalysis extends Component {
       stats['endTimestamp'] = incident.endTimestamp;
       incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson);
     } else {
-      let caption = projectName + " (24h)";
+      let caption = projectName + " (48h)";
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
@@ -134,7 +137,7 @@ class LiveAnalysis extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
-                <div className="eight wide column" style={{ height: 500, 'paddingTop': 50 }}>
+                <div className="eight wide column" style={{ height: 500, 'paddingTop': 20 }}>
                   <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
                   <Button className='orange' title="Overall Causal Graph"
                           onClick={(e) => {

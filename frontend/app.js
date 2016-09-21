@@ -62,7 +62,9 @@ class App extends React.Component {
       dashboardDailySummaryReport,
       root: {
         loadData: this.loadData.bind(this),
-        loadUserValues: this.loadUserValues.bind(this)
+        loadUserValues: this.loadUserValues.bind(this),
+        loadBenchmark: this.loadBenchmark.bind(this),
+        loadIncident: this.loadIncident.bind(this),
       }
     }
   }
@@ -88,6 +90,39 @@ class App extends React.Component {
   
   parseJson(data, defval={}) {
     return !!data? JSON.parse(data) : defval;
+  }
+
+  loadIncident() {
+    var self = this;
+    return new Promise((resolve, reject) => {
+      apis.postDashboardIncident().then((result)=> {
+        let resp = result.data;
+        resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
+        let { dashboardUservalues } = this.state;
+        dashboardUservalues.incidentAllInfo = resp.incidentAllInfo;
+        this.setState({dashboardUservalues: dashboardUservalues}, ()=>resolve(this));
+      });
+    });
+  }
+
+  loadBenchmark() {
+    var self = this;
+    return new Promise((resolve, reject) => {
+      apis.postDashboardBenchmark().then((result)=> {
+        let resp = result.data;
+        resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
+        if(resp.publishedDataAllInfo){
+          resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
+            return Object.assign({}, info, {
+              metaData: self.parseJson(info.metaData)
+            });
+          });
+        }
+        let { dashboardUservalues } = this.state;
+        dashboardUservalues.publishedDataAllInfo = resp.publishedDataAllInfo;
+        this.setState({dashboardUservalues: dashboardUservalues}, ()=>resolve(this));
+      });
+    });
   }
 
   loadUserValues() {

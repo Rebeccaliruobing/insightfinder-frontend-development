@@ -23,7 +23,7 @@ class IncidentsList extends Component {
       showTakeActionModal: false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      incidentDurationThreshold: 15,
+      incidentDurationThreshold: 0,
       activeIncident:undefined,
       angleIconStyleSelect: 'angleIconStyleEvent',
       angleIconStyle: {
@@ -101,15 +101,16 @@ class IncidentsList extends Component {
 
   calculateRGB(anomalyRatio, size){
     let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+    let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
     if (val <= 1) {
         if (val < 0) val = 0;
         rcolor = Math.floor(255 * val);
-        gcolor = 255;
+        gcolor = gcolorMax;
     } else {
         if (val > 10) val = 10;
         rcolor = 255;
-        gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
     }
     return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
   }
@@ -119,7 +120,7 @@ class IncidentsList extends Component {
                 //   { incident.anomalyRatio==0 ?
                 //     "N/A"
                 //     :
-                //     <Button className="blue" onClick={(e) => {
+                //     <Button className="orange" onClick={(e) => {
                 //             e.stopPropagation();
                 //             this.setState({
                 //             showTakeActionModal: true
@@ -137,12 +138,7 @@ class IncidentsList extends Component {
     let self =this;
     return (
       <div>
-        <div style={{float:'right', display:'inline-block','paddingBottom': '15px'}}>
-        Showing incident no shorter than <IncidentDurationMinute
-          value={incidentDurationThreshold} text={incidentDurationThreshold}
-          onChange={(v, t)=>this.setState({incidentDurationThreshold: t})}/> minutes
-        </div>
-        <div className="ui pointing secondary menu" style={{'paddingTop': '25px'}}>
+        <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}
                onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
             <a className={tabStates['predicted'] + ' item'}
@@ -157,11 +153,11 @@ class IncidentsList extends Component {
               <th>Severity</th>
               <th>Event Type</th>
               <th>Duration</th>
-              <th>Causal Graph</th>
               <th>Suggested Actions</th>
+              <th>Causal Graph</th>
             </tr>
             </thead>
-            <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
+            <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
             {predictedIncidents.reverse().sort(function (a, b) {
                   // reverse ordering
                   let aname = a.rootCauseJson.rootCauseTypes;
@@ -191,6 +187,7 @@ class IncidentsList extends Component {
                 <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                 <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td>{incident.duration} min</td>
+                <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
                   { incident.anomalyRatio==0 ?
                   <Button className="grey" onClick={(e) => {
@@ -199,7 +196,7 @@ class IncidentsList extends Component {
                     display
                   </Button> 
                   :                
-                  <Button className="blue" onClick={(e) => {
+                  <Button className="orange" onClick={(e) => {
                             e.stopPropagation();
                             this.setState({
                             showTenderModal: true,
@@ -210,7 +207,6 @@ class IncidentsList extends Component {
                     display
                   </Button> }
                 </td>
-                <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               </tr>
             ))}
             </tbody>
@@ -228,8 +224,8 @@ class IncidentsList extends Component {
             <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
-            <th>Causal Graph</th>
             <th>Suggested Actions</th>
+            <th>Causal Graph</th>
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
@@ -303,6 +299,7 @@ class IncidentsList extends Component {
                   incident.duration+" min"
                 }
               </td>
+              <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               <td>
                   { incident.anomalyRatio==0 ?
                   <Button className="grey" onClick={(e) => {
@@ -311,7 +308,7 @@ class IncidentsList extends Component {
                     display
                   </Button> 
                   :                
-                  <Button className="blue" onClick={(e) => {
+                  <Button className="orange" onClick={(e) => {
                           e.stopPropagation();
                           this.setState({
                             showTenderModal: true,
@@ -322,7 +319,6 @@ class IncidentsList extends Component {
                    display
                   </Button> }
               </td>
-              <td className="code">{incident.rootCauseJson.suggestedActions}</td>
             </tr>
           ))}
           </tbody>

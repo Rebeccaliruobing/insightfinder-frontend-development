@@ -31,6 +31,8 @@ $.fn.api.settings.api = {
     'reset password': `${baseUrl}reset-password`,
 
     'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
+    'dashboard benchmark': `${baseUrl}dashboard-benchmark`,
+    'dashboard incident': `${baseUrl}dashboard-incident`,
     'live analysis': `${baseUrl}liveAnalysis`,
     'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
     'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
@@ -164,6 +166,50 @@ const apis = {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['dashboard uservalues'],
+                data: $.param({ userName, token, operation, ...other }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    postDashboardBenchmark (operation = 'display',
+                             other,
+                             userName = store.get('userName'),
+                             token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['dashboard benchmark'],
+                data: $.param({ userName, token, operation, ...other }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    postDashboardIncident (operation = 'display',
+                             other,
+                             userName = store.get('userName'),
+                             token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['dashboard incident'],
                 data: $.param({ userName, token, operation, ...other }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');

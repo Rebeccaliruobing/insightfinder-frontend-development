@@ -47,7 +47,7 @@ export default class CausalGraph extends React.Component {
         let { dataArray, startTimestamp, endTimestamp, types } = this.props;
         let newDataArray = [];
         let newTypesSet = new Set();
-        dataArray.forEach((data, i) => {
+        dataArray.reverse().forEach((data, i) => {
             let recordTime = (new Date(data[0].split(',')[0])).getTime();
             if(!startTimestamp || !endTimestamp || ((startTimestamp && endTimestamp) && (recordTime>=startTimestamp && recordTime<=endTimestamp))){
                 newDataArray.push(data);
@@ -55,7 +55,6 @@ export default class CausalGraph extends React.Component {
                     if(data.join().indexOf(t)!=-1){
                         newTypesSet.add(t);
                     }
-
                 });
             }
         });
