@@ -1,6 +1,6 @@
 import React, {PropTypes as T} from 'react';
 
-const CPUUtilization = ({average, duration='24h' }) => {
+const CPUUtilization = ({average, duration='48h' }) => {
   const averageText = average !== undefined ? average.toFixed(1).toString() : '-';
   const valueStyle = _.isFinite(average) && average < 50 ? 'value error' : 'value';
   return (

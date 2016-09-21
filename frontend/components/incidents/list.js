@@ -86,12 +86,20 @@ class IncidentsList extends Component {
   }
 
   selectTab(e, tab) {
-      var tabStates = this.state['tabStates'];
+
+      let angleIconStyleSelect='angleIconStyleEvent';
+      let angleIconStyle = {
+          angleIconStyleId: 'down',
+          angleIconStyleSeverity: 'down',
+          angleIconStyleEvent: 'down',
+          angleIconStyleDuration: 'down'
+      };
+      let tabStates = this.state['tabStates'];
       tabStates = _.mapValues(tabStates, function (val) {
           return '';
       });
       tabStates[tab] = 'active';
-      this.setState({tabStates: tabStates});
+      this.setState({tabStates: tabStates, angleIconStyleSelect: angleIconStyleSelect, angleIconStyle: angleIconStyle});
   }
     changeAngleStyle(angleIconStyleSelect){
         let {angleIconStyle} = this.state;
@@ -149,10 +157,10 @@ class IncidentsList extends Component {
             <table className="incident-table selectable ui table">
             <thead style={{ 'display': 'block','width': '100%'}}>
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
-              <th>Id</th>
-              <th>Severity</th>
-              <th>Event Type</th>
-              <th>Duration</th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i className={"angle "+ this.state.angleIconStyle['angleIconStyleId'] +" icon"}/></th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
               <th>Suggested Actions</th>
               <th>Causal Graph</th>
             </tr>
@@ -160,22 +168,51 @@ class IncidentsList extends Component {
             <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
             {predictedIncidents.reverse().sort(function (a, b) {
                   // reverse ordering
-                  let aname = a.rootCauseJson.rootCauseTypes;
-                  let bname = b.rootCauseJson.rootCauseTypes;
-                  if (aname > bname) {
-                    return 1;
-                  } else if (aname < bname) {
-                    return -1;
-                  } else {
-                    let aid = parseInt(a.id);
-                    let bid = parseInt(b.id);
-                    if (aid < bid) {
-                        return self.state.angleIconStyleId === "up"? 1:-1;
-                    } else if (aid > bid) {
-                        return self.state.angleIconStyleId === "up"? -1:1;
-                    } else {
-                      return 0;
-                    }
+                    if(angleIconStyleSelect == 'angleIconStyleId'){
+                        let aid = parseInt(a.id);
+                        let bid = parseInt(b.id);
+                        let returnId = angleIconStyle['angleIconStyleId'] === 'up'?-1:1;
+                        if (aid < bid) {
+                            return returnId;
+                        } else if (aid > bid) {
+                            return returnId*-1;
+                        } else {
+                          return 0;
+                        }
+                  }
+                  else if(angleIconStyleSelect == 'angleIconStyleSeverity'){
+                        let aAnomalyRatio = parseInt(a.anomalyRatio);
+                        let bAnomalyRatio = parseInt(b.anomalyRatio);
+                        let returnId = angleIconStyle['angleIconStyleSeverity'] === 'up'?-1:1;
+                        if (aAnomalyRatio < bAnomalyRatio) {
+                            return returnId;
+                        } else if (aAnomalyRatio > bAnomalyRatio) {
+                            return returnId*-1;
+                        } else {
+                          return 0;
+                        }
+                  }
+                  else if(angleIconStyleSelect == 'angleIconStyleDuration'){
+                        let aDuration = parseInt(a.duration);
+                        let bDuration = parseInt(b.duration);
+                        let returnId = angleIconStyle['angleIconStyleDuration'] === 'up'?-1:1;
+                        if (aDuration <= bDuration) {
+                            return returnId;
+                        } else if (aDuration > bDuration) {
+                            return returnId*-1;
+                        } else {
+                          return 0;
+                        }
+                  }
+                  else{
+                    let aname = a.rootCauseJson.rootCauseTypes;
+                    let bname = b.rootCauseJson.rootCauseTypes;
+                    let returnId = angleIconStyle['angleIconStyleEvent'] === 'up'?-1:1;
+                     if (aname > bname) {
+                        return returnId;
+                      } else if (aname < bname) {
+                        return returnId*-1;
+                      }
                   }
                 }).map((incident, index)=>(
               <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={()=>this.handleIncidentSelected(incident)}
@@ -231,11 +268,6 @@ class IncidentsList extends Component {
           <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
           {detectedIncidents.reverse().sort(function (a, b) {
                 // reverse ordering
-          //angleIconStyleSelect
-          //angleIconStyleId: 'down',
-          //angleIconStyleSeverity: 'down',
-          //angleIconStyleEvent: 'down',
-          //angleIconStyleDuration: 'down'
               if(angleIconStyleSelect == 'angleIconStyleId'){
                     let aid = parseInt(a.id);
                     let bid = parseInt(b.id);
