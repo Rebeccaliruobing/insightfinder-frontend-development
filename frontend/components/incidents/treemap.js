@@ -152,15 +152,17 @@ class IncidentsTreeMap extends Component {
   }
 
   severityToRGBHex(val) {
+    let maxGreen = 215;
     var rcolor, gcolor, bcolor = 0;
     if (val <= 1) {
         if (val < 0) val = 0;
+        if (val > 0) val = 1;
         rcolor = Math.floor(255 * val);
-        gcolor = 255;
+        gcolor = maxGreen;
     } else {
         if (val > 10) val = 10;
         rcolor = 255;
-        gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+        gcolor = Math.floor(maxGreen - (val - 1) / 9 * maxGreen);
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }

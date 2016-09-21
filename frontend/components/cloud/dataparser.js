@@ -691,6 +691,9 @@ class DataParser {
           allocatedPercentage = 1;
         }
         let allocatedVal = newval * allocatedPercentage;
+        if(allocatedVal < 1){
+          allocatedVal = 1;
+        }
         return {
           start: a.timestamp,
           end: a.timestamp,
