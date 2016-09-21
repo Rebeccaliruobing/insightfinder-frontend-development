@@ -141,7 +141,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
-          ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" (48h)", statistics, heatmap);
+          ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" (24h)", statistics, heatmap);
           ret['incidents'] = incidentList;
 
           resolve(ret);

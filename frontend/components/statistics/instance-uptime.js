@@ -1,7 +1,7 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const InstanceUptime = ({average, duration='48h' }) => {
+const InstanceUptime = ({average, duration='24h' }) => {
   const averageText = _.isFinite(average) ? (average * 100).toFixed(1).toString() : '-';
   return (
     <div className='ui statistic two wide column'>
