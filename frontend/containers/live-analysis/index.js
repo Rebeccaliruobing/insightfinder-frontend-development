@@ -24,6 +24,7 @@ class LiveAnalysis extends Component {
         summary: {},
         incidents: [],
         incidentsTreeMap: [],
+        instanceMetricJson: {}
       },
       loading: true,
       projectName: undefined,
@@ -92,6 +93,7 @@ class LiveAnalysis extends Component {
         this.setState({
           loading: false,
           incidentsTreeMap: data.incidentsTreeMap,
+          instanceMetricJson: data.instanceMetricJson,
           data,
           startTimestamp: undefined,
           endTimestamp: undefined,
@@ -116,7 +118,7 @@ class LiveAnalysis extends Component {
     this.handleProjectChange(projectName,projectName);
   }
   render() {
-    let { loading, data, projectName, incidentsTreeMap} = this.state;
+    let { loading, data, projectName, incidentsTreeMap,instanceMetricJson} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
@@ -132,7 +134,7 @@ class LiveAnalysis extends Component {
             </label>
           </div>
           <div className="ui vertical segment">
-            <ProjectStatistics data={data} />
+            <ProjectStatistics data={data}/>
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">
@@ -149,7 +151,7 @@ class LiveAnalysis extends Component {
                           });}}>
                     Overall Causal Graph
                   </Button>
-                  <IncidentsTreeMap data={incidentsTreeMap} />
+                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetricJson={instanceMetricJson} />
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList onIncidentSelected={this.handleIncidentSelected}
