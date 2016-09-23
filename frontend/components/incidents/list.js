@@ -23,7 +23,6 @@ class IncidentsList extends Component {
       showTakeActionModal: false,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      incidentDurationThreshold: 0,
       activeIncident:undefined,
       angleIconStyleSelect: 'angleIconStyleEvent',
       angleIconStyle: {
@@ -138,11 +137,11 @@ class IncidentsList extends Component {
                 //   </Button> }
                 // </td>
   render() {
-    let { incidents,latestTimestamp,incidentDurationThreshold, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
+    let { incidents,latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
-            incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+            incident.startTimestamp<=latestTimestamp );
     let predictedIncidents = incidents.filter((incident, index) =>
-            incident.endTimestamp>latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+            incident.endTimestamp>latestTimestamp );
     let self =this;
     return (
       <div>
@@ -159,8 +158,8 @@ class IncidentsList extends Component {
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i className={"angle "+ this.state.angleIconStyle['angleIconStyleId'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
-              <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
               <th>Suggested Actions</th>
               <th>Causal Graph</th>
             </tr>
@@ -222,8 +221,8 @@ class IncidentsList extends Component {
                     + ", duration: " + incident.duration + " min"}>
                 <td>{incident.id}</td>
                 <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
-                <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td>{incident.duration} min</td>
+                <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                 <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                 <td>
                   { incident.anomalyRatio==0 ?
@@ -259,8 +258,8 @@ class IncidentsList extends Component {
           <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i className={"angle "+ this.state.angleIconStyle['angleIconStyleId'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
-            <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
+            <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th>Suggested Actions</th>
             <th>Causal Graph</th>
           </tr>
@@ -323,7 +322,6 @@ class IncidentsList extends Component {
                   + ", duration: " + incident.duration + " min"}>
               <td>{incident.id}</td>
               <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
-              <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
               <td>
                 { incident.anomalyRatio==0 ?
                   "N/A"
@@ -331,6 +329,7 @@ class IncidentsList extends Component {
                   incident.duration+" min"
                 }
               </td>
+              <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
               <td className="code">{incident.rootCauseJson.suggestedActions}</td>
               <td>
                   { incident.anomalyRatio==0 ?

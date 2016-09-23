@@ -106,14 +106,14 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
  * @param pvalue: pvalue
  * @param cvalue: cvalue
  */
-export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue) {
+export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, version) {
   const userName = store.get('userName');
   const token = store.get('token');
 
   return new Promise(function (resolve, reject) {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('liveAnalysis', 2),
+      url: getEndpoint('liveAnalysis', version),
       data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
