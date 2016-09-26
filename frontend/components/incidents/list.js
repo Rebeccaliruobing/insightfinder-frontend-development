@@ -213,38 +213,58 @@ class IncidentsList extends Component {
                         return returnId*-1;
                       }
                   }
-                }).map((incident, index)=>(
-              <tr style={{ display: 'inline-table','width': '100%'}} key={index} onClick={()=>this.handleIncidentSelected(incident)}
-                  className={cx({'active': incident === this.state.activeIncident})}
-                  title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
-                    + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
-                    + ", duration: " + incident.duration + " min"}>
-                <td>{incident.id}</td>
-                <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
-                <td>{incident.duration} min</td>
-                <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-                <td className="code">{incident.rootCauseJson.suggestedActions}</td>
-                <td>
-                  { incident.anomalyRatio==0 ?
-                  <Button className="grey" onClick={(e) => {
-                            e.stopPropagation()}}
-                          style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                    display
-                  </Button> 
-                  :                
-                  <Button className="orange" onClick={(e) => {
-                            e.stopPropagation();
-                            this.setState({
-                            showTenderModal: true,
-                            startTimestamp: incident.startTimestamp,
-                            endTimestamp: incident.endTimestamp
-                          });}}
-                          style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                    display
-                  </Button> }
-                </td>
-              </tr>
-            ))}
+                }).map(function (incident,index) {
+                  let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
+                  let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
+                    return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
+                    if(rootCauseTypesCategory[incidentX][0]){
+                        return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
+                            if(suggestedActionsCategory[suggestedX][0]){
+                                return (
+                                    <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
+                                        onClick={()=>self.handleIncidentSelected(incident)}
+                                        className={cx({'active': incident === self.state.activeIncident})}
+                                        title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
+                                          + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
+                                          + ", duration: " + incident.duration + " min"}>
+                                      <td>{incident.id}</td>
+                                      <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
+                                      <td>
+                                        { incident.anomalyRatio==0 ?
+                                          "N/A"
+                                          :
+                                          incident.duration+" min"
+                                        }
+                                      </td>
+                                      <td className="code">{rootCauseTypesCategory[incidentX][0]}</td>
+                                      <td className="code">{suggestedActionsCategory[suggestedX][0]}</td>
+                                      <td>
+                                          { incident.anomalyRatio==0 ?
+                                          <Button className="grey" onClick={(e) => {
+                                                    e.stopPropagation()}}
+                                                  style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                                            display
+                                          </Button>
+                                          :
+                                          <Button className="orange" onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  self.setState({
+                                                    showTenderModal: true,
+                                                    startTimestamp: incident.startTimestamp,
+                                                    endTimestamp: incident.endTimestamp
+                                                  });}}
+                                                style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                                           display
+                                          </Button> }
+                                      </td>
+                                    </tr>
+                                )
+                            }
+                            });
+                          }
+                      });
+            }
+            )}
             </tbody>
             </table>
             :
@@ -313,45 +333,57 @@ class IncidentsList extends Component {
                     return returnId*-1;
                   }
               }
-              }).map((incident, index)=>(
-            <tr style={{ display: 'inline-table','width': '100%'}} key={index}
-                onClick={()=>this.handleIncidentSelected(incident)}
-                className={cx({'active': incident === this.state.activeIncident})}
-                title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
-                  + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
-                  + ", duration: " + incident.duration + " min"}>
-              <td>{incident.id}</td>
-              <td><div className="level" style={{'backgroundColor': 'rgb('+this.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
-              <td>
-                { incident.anomalyRatio==0 ?
-                  "N/A"
-                  :
-                  incident.duration+" min"
-                }
-              </td>
-              <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-              <td className="code">{incident.rootCauseJson.suggestedActions}</td>
-              <td>
-                  { incident.anomalyRatio==0 ?
-                  <Button className="grey" onClick={(e) => {
-                            e.stopPropagation()}}
-                          style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                    display
-                  </Button> 
-                  :                
-                  <Button className="orange" onClick={(e) => {
-                          e.stopPropagation();
-                          this.setState({
-                            showTenderModal: true,
-                            startTimestamp: incident.startTimestamp,
-                            endTimestamp: incident.endTimestamp
-                          });}}
-                        style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                   display
-                  </Button> }
-              </td>
-            </tr>
-          ))}
+              }).map(function(incident, index){
+              let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
+              let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
+              return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
+                    if(rootCauseTypesCategory[incidentX][0]){
+                        return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
+                            if(suggestedActionsCategory[suggestedX][0]){
+                                return (
+                                    <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
+                                        onClick={()=>self.handleIncidentSelected(incident)}
+                                        className={cx({'active': incident === self.state.activeIncident})}
+                                        title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
+                                          + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
+                                          + ", duration: " + incident.duration + " min"}>
+                                      <td>{incident.id}</td>
+                                      <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
+                                      <td>
+                                        { incident.anomalyRatio==0 ?
+                                          "N/A"
+                                          :
+                                          incident.duration+" min"
+                                        }
+                                      </td>
+                                      <td className="code">{rootCauseTypesCategory[incidentX][0]}</td>
+                                      <td className="code">{suggestedActionsCategory[suggestedX][0]}</td>
+                                      <td>
+                                          { incident.anomalyRatio==0 ?
+                                          <Button className="grey" onClick={(e) => {
+                                                    e.stopPropagation()}}
+                                                  style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                                            display
+                                          </Button>
+                                          :
+                                          <Button className="orange" onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  self.setState({
+                                                    showTenderModal: true,
+                                                    startTimestamp: incident.startTimestamp,
+                                                    endTimestamp: incident.endTimestamp
+                                                  });}}
+                                                style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                                           display
+                                          </Button> }
+                                      </td>
+                                    </tr>
+                                )
+                            }
+                        });
+                  }
+              });
+          })}
           </tbody>
           </table>
           :
@@ -365,7 +397,7 @@ class IncidentsList extends Component {
                        onClose={() => this.setState({ showTenderModal: false })}/>
         }
         { this.state.showTakeActionModal &&
-          <TakeActionModal incident={this.state.activeIncident} 
+          <TakeActionModal incident={this.state.activeIncident}
                        onClose={() => this.setState({ showTakeActionModal: false })}/>
         }
       </div>
