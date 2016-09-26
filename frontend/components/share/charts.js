@@ -169,8 +169,24 @@ export class DataGroupCharts extends React.Component {
             const length = groups.length;
             const lastItem = index == length - 1;
             const isSelectedItem = index === selectedIndex;
-
+            let values = [];
             let elems = [];
+            let missingTag = "";
+            _.each(group.sdata,function(data,index){
+              if(data.length >= 2 && !isNaN(data[1])){
+                values.push(data);
+              }
+            });
+            if(group.sdata.length<=5){
+              if(values.length<=2){
+                missingTag = " (missing data)";
+              }
+            } else {
+              if((values.length /  group.sdata.length)<0.05){
+                missingTag = " (missing data)";
+              }
+            } 
+
             const idx = index;
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
@@ -183,7 +199,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {group.metrics}</h4>
+                  <h4 className="ui header">Metric {group.metrics} {missingTag}</h4>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}

@@ -267,7 +267,7 @@ export default class ThresholdSettings extends React.Component {
                                 </div>
                             </div>}
                             {!isLogProject && <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
                                 </h3>
 
                                 <div className="field">
@@ -393,7 +393,7 @@ export default class ThresholdSettings extends React.Component {
                         <br /><hr />
                         {isLogProject && <div className="wide column">
                             <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
                                 </h3>
 
                                 <div className="field">

@@ -86,7 +86,7 @@ class Signup extends BaseComponent {
                 <Link to="/signup2">Already have a signup code?</Link>
               </div>
               <div className="field required">
-                <label>User Name</label>
+                <label>Username</label>
                 <div className="ui icon input">
                   <i className="user icon"/>
                   <input type="text" name="userName" value={userName}

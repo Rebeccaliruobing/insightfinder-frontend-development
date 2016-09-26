@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
-import {LiveProjectSelection} from '../../components/selections';
+import {LiveProjectSelection,NumberOfDays} from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
@@ -28,6 +28,7 @@ class LiveAnalysis extends Component {
       loading: true,
       projectName: undefined,
       showTenderModal: false,
+      cvalue: "1",
     };
   }
 
@@ -69,8 +70,8 @@ class LiveAnalysis extends Component {
     if (projectName) {
       let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
       let projectParam = projectParams.find((p) => p.projectName == projectName);
-      let cvalue = projectParam ? projectParam.cvalue : "0.99";
-      let pvalue = projectParam ? projectParam.pvalue : "5";
+      let cvalue = projectParam ? projectParam.cvalue : "5";
+      let pvalue = projectParam ? projectParam.pvalue : "0.99";
       let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
 
       const url = `/liveMonitoring?pvalue=${pvalue}&cvalue=${cvalue}&modelType=${modelType}&projectName=${projectName}`;
@@ -79,11 +80,16 @@ class LiveAnalysis extends Component {
   }
 
   @autobind
+  handleDayChange(value, numberOfDays) {
+    this.setState({cvalue:numberOfDays.toString()});
+  }
+
+  @autobind
   handleProjectChange(value, projectName) {
+    const {cvalue} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
-    let cvalue = projectParam ? projectParam.cvalue : "0.99";
-    let pvalue = projectParam ? projectParam.pvalue : "5";
+    let pvalue = projectParam ? projectParam.pvalue : "0.99";
     let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
@@ -116,7 +122,7 @@ class LiveAnalysis extends Component {
     this.handleProjectChange(projectName,projectName);
   }
   render() {
-    let { loading, data, projectName, incidentsTreeMap} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, cvalue} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
@@ -127,6 +133,9 @@ class LiveAnalysis extends Component {
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
+            <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Number of Days:&nbsp;</label>
+            <NumberOfDays style={{width: 50}}
+                                  value={cvalue} onChange={this.handleDayChange}/>
             <label style={{ fontWeight: 'bold', 'float': 'right' }}>
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </label>

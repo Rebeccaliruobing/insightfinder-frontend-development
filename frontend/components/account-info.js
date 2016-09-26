@@ -29,7 +29,7 @@ export default class AccountInfo extends React.Component {
           <table className="ui small table" style={{width: '40%',}}>
             <tbody>
               <tr>
-                <td className="bold" style={{width: '15%'}}>User Name:</td>
+                <td className="bold" style={{width: '15%'}}>Username:</td>
                 <td style={{width: '25%'}}>{this.state.userInfo.userName}</td>
               </tr>
               <tr>

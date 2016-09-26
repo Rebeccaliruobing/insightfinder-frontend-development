@@ -332,6 +332,20 @@ const IncidentActionTaken = (props) => {
   )
 };
 
+const NumberOfDays = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" selected>1</div>
+        <div className="item">3</div>
+        <div className="item">7</div>
+        <div className="item">14</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -347,5 +361,6 @@ export {
   WindowWithWeek,
   DurationHour,
   IncidentDurationMinute,
-  IncidentActionTaken
+  IncidentActionTaken,
+  NumberOfDays
 };

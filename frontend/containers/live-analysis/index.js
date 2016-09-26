@@ -69,8 +69,8 @@ class LiveAnalysis extends Component {
     if (projectName) {
       let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
       let projectParam = projectParams.find((p) => p.projectName == projectName);
-      let cvalue = projectParam ? projectParam.cvalue : "0.99";
-      let pvalue = projectParam ? projectParam.pvalue : "5";
+      let cvalue = projectParam ? projectParam.cvalue : "5";
+      let pvalue = projectParam ? projectParam.pvalue : "0.99";
       let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
 
       const url = `/liveMonitoring?pvalue=${pvalue}&cvalue=${cvalue}&modelType=${modelType}&projectName=${projectName}`;
@@ -82,8 +82,8 @@ class LiveAnalysis extends Component {
   handleProjectChange(value, projectName) {
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
-    let cvalue = projectParam ? projectParam.cvalue : "0.99";
-    let pvalue = projectParam ? projectParam.pvalue : "5";
+    let cvalue = projectParam ? projectParam.cvalue : "5";
+    let pvalue = projectParam ? projectParam.pvalue : "0.99";
     let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
