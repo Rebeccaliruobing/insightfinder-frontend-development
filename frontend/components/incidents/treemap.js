@@ -33,9 +33,10 @@ class IncidentsTreeMap extends Component {
   }
 
   componentDidMount() {
+    console.log(this.props.treeMapValue);
     if (!_.isEmpty(this.props.data) && this.$container) {
       const root = _.cloneDeep(this.props.data);
-      this.transformData(root);
+      this.transformData(root,this.props.treeMapValue,this.props.cpuUtilizationByInstance);
       this.displayData(root);
     }
   }
@@ -72,7 +73,7 @@ class IncidentsTreeMap extends Component {
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
-      this.transformData(root);
+      this.transformData(root,nextProps.treeMapValue,nextProps.cpuUtilizationByInstance);
       this.displayData(root);
       this.setState({
         startTimestamp:root.startTimestamp,
@@ -85,7 +86,8 @@ class IncidentsTreeMap extends Component {
    * Transform the data into the format used by d3 treemap.
    * @param root: The root of the data tree.
    */
-  transformData(root) {
+  transformData(root, treeMapValue, cpuUtilizationByInstance) {
+    console.log(treeMapValue, cpuUtilizationByInstance);
 
     const sumScore = d => {
       let s = 0;

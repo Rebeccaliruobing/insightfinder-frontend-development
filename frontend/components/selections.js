@@ -182,6 +182,28 @@ class OperationOptionsSelect extends React.Component {
   }
 }
 
+class TreemapOptionsSelect extends React.Component {
+  render(){
+    let selectOption = [0, 5, 10, 25];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {value}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
 class LogModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -362,5 +384,6 @@ export {
   DurationHour,
   IncidentDurationMinute,
   IncidentActionTaken,
-  NumberOfDays
+  NumberOfDays,
+  TreemapOptionsSelect
 };

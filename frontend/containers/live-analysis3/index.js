@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
-import {LiveProjectSelection,NumberOfDays} from '../../components/selections';
+import { LiveProjectSelection,NumberOfDays, TreemapOptionsSelect } from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
@@ -19,6 +19,7 @@ class LiveAnalysis extends Component {
     super(props);
 
     this.state = {
+      treeMapValue: '0',
       data: {
         statistics: {},
         summary: {},
@@ -121,10 +122,14 @@ class LiveAnalysis extends Component {
   refreshProjectName(projectName){
     this.handleProjectChange(projectName,projectName);
   }
+  handleTreeMapChange(value){
+    this.setState({treeMapValue: value});
+  }
   render() {
-    let { loading, data, projectName, incidentsTreeMap, cvalue} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, cvalue, treeMapValue} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+    let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
@@ -158,7 +163,8 @@ class LiveAnalysis extends Component {
                           });}}>
                     Overall Causal Graph
                   </Button>
-                  <IncidentsTreeMap data={incidentsTreeMap} />
+                  <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList onIncidentSelected={this.handleIncidentSelected}
