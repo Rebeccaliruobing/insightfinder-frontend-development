@@ -32,8 +32,8 @@ export const cloudRoute = (
     <Route component={Cloud} path="cloud">
       <IndexRedirect to="monitoring" />
       <Route component={InsightReport} path="insight-report" />
-      <Route component={LiveAnalysis} path="monitoring" />
-      <Route component={LiveAnalysis3} path="monitoring3" />
+      <Route component={LiveAnalysis} path="monitoring0" />
+      <Route component={LiveAnalysis3} path="monitoring" />
       <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
       <Route component={IncidentLogAnalysis} path="incident-log-analysis" />
