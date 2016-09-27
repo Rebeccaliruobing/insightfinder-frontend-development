@@ -217,9 +217,9 @@ class IncidentsList extends Component {
                   let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
                   let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
                     return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
-                    if(rootCauseTypesCategory[incidentX][0]){
+                    if(rootCauseTypesCategory[incidentX]){
                         return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
-                            if(suggestedActionsCategory[suggestedX][0]){
+                            if(suggestedActionsCategory[suggestedX]){
                                 return (
                                     <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
                                         onClick={()=>self.handleIncidentSelected(incident)}
@@ -236,8 +236,8 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{rootCauseTypesCategory[incidentX][0]}</td>
-                                      <td className="code">{suggestedActionsCategory[suggestedX][0]}</td>
+                                      <td className="code">{rootCauseTypesCategory[incidentX]}</td>
+                                      <td className="code">{suggestedActionsCategory[suggestedX]}</td>
                                       <td>
                                           { incident.anomalyRatio==0 ?
                                           <Button className="grey" onClick={(e) => {
@@ -337,9 +337,9 @@ class IncidentsList extends Component {
               let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
               let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
               return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
-                    if(rootCauseTypesCategory[incidentX][0]){
+                    if(rootCauseTypesCategory[incidentX]){
                         return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
-                            if(suggestedActionsCategory[suggestedX][0]){
+                            if(suggestedActionsCategory[suggestedX]){
                                 return (
                                     <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
                                         onClick={()=>self.handleIncidentSelected(incident)}
@@ -356,8 +356,8 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{rootCauseTypesCategory[incidentX][0]}</td>
-                                      <td className="code">{suggestedActionsCategory[suggestedX][0]}</td>
+                                      <td className="code">{rootCauseTypesCategory[incidentX]}</td>
+                                      <td className="code">{suggestedActionsCategory[suggestedX]}</td>
                                       <td>
                                           { incident.anomalyRatio==0 ?
                                           <Button className="grey" onClick={(e) => {
