@@ -88,7 +88,7 @@ class EventSummary extends Component {
     let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
-    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 1)
+    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 2)
       .then(data => {
         this.setState({
           loading: false,
