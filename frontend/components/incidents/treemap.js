@@ -172,8 +172,11 @@ class IncidentsTreeMap extends Component {
             bcolor = 230;
         }
         else{
-          rcolor = 255;
-          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+          rcolor = 0;
+          gcolor = 255;
+          bcolor = 0;
+          //rcolor = 255;
+          //gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
         }
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
