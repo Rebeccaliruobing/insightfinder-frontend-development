@@ -178,7 +178,10 @@ class EventSummary2 extends Component {
                   }}>
                     {treeMapText} View
                   </Button>
+                  {treeMapChange?
                   <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  :
+                  null}
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
