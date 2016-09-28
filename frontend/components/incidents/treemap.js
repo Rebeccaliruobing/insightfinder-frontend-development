@@ -26,6 +26,7 @@ class IncidentsTreeMap extends Component {
     this.color = null;
 
     this.state = {
+      treeMapChange: false,
       faux: null,
       startTimestamp:undefined,
       endTimestamp:undefined,
@@ -33,11 +34,15 @@ class IncidentsTreeMap extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.treeMapValue);
     if (!_.isEmpty(this.props.data) && this.$container) {
       const root = _.cloneDeep(this.props.data);
-      this.transformData(root,this.props.treeMapValue,this.props.cpuUtilizationByInstance);
-      this.displayData(root);
+      this.transformData(root);
+      if(this.props.treeMapChange){
+        this.displayData(root);
+      }
+      else{
+        this.displayData(root, this.props.treeMapValue, this.props.cpuUtilizationByInstance);
+      }
     }
   }
 
@@ -73,11 +78,11 @@ class IncidentsTreeMap extends Component {
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
-      this.transformData(root,nextProps.treeMapValue,nextProps.cpuUtilizationByInstance);
-      this.displayData(root);
+      this.transformData(root);
+      this.displayData(root, nextProps.treeMapValue, nextProps.cpuUtilizationByInstance ,nextProps.treeMapChange);
       this.setState({
         startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp,
+        endTimestamp:root.endTimestamp
       });
     }
   }
@@ -86,8 +91,7 @@ class IncidentsTreeMap extends Component {
    * Transform the data into the format used by d3 treemap.
    * @param root: The root of the data tree.
    */
-  transformData(root, treeMapValue, cpuUtilizationByInstance) {
-    console.log(treeMapValue, cpuUtilizationByInstance);
+  transformData(root) {
 
     const sumScore = d => {
       let s = 0;
@@ -153,18 +157,47 @@ class IncidentsTreeMap extends Component {
     return severityToRGBHex(val);
   }
 
-  severityToRGBHex(val) {
+  severityToRGBHex(treeMapValue,cpuUtilizationByInstance,d) {
+    let val = d.score;
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    if (val <= 1) {
+    if(this.state.treeMapChange){
+     if (treeMapValue>cpuUtilizationByInstance[d.name]) {
         if (val < 0) val = 0;
         if (val > 0) val = 1;
-        rcolor = Math.floor(255 * val);
-        gcolor = gcolorMax;
+        //rcolor = Math.floor(255 * val);
+        //gcolor = gcolorMax;
+
+        rcolor = 173;
+        gcolor = 216;
+        bcolor = 230;
     } else {
         if (val > 10) val = 10;
-        rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        if(d.id == 'CPUUtilization'){
+            rcolor = 173;
+            gcolor = 216;
+            bcolor = 230;
+        }
+        else{
+          rcolor = 0;
+          gcolor = 255;
+          bcolor = 0;
+          //rcolor = 255;
+          //gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        }
+    }
+    }
+    else{
+      if (val <= 1) {
+          if (val < 0) val = 0;
+          if (val > 0) val = 1;
+          rcolor = Math.floor(255 * val);
+          gcolor = gcolorMax;
+      } else {
+          if (val > 10) val = 10;
+          rcolor = 255;
+          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
@@ -174,103 +207,105 @@ class IncidentsTreeMap extends Component {
    * @param data
    */
   @autobind
-  displayData(data) {
-    if (!data) return;
+  displayData(data, treeMapValue=undefined, cpuUtilizationByInstance=undefined, treeMapChange=this.state.treeMapChange) {
+    this.setState({treeMapChange: treeMapChange},()=>{
+      if (!data) return;
 
-    const navHeight = this.navHeight;
-    const width = this.$container.width();
-    const height = this.$container.height() - navHeight;
+      const navHeight = this.navHeight;
+      const width = this.$container.width();
+      const height = this.$container.height() - navHeight;
 
-    const x = d3.scale.linear().domain([0, width]).range([0, width]);
-    const y = d3.scale.linear().domain([0, height]).range([0, height]);
+      const x = d3.scale.linear().domain([0, width]).range([0, width]);
+      const y = d3.scale.linear().domain([0, height]).range([0, height]);
 
-    data.x = data.y = 0;
-    data.dx = width;
-    data.dy = height;
-    data.depth = 0;
+      data.x = data.y = 0;
+      data.dx = width;
+      data.dy = height;
+      data.depth = 0;
 
-    const layout = d => {
-      if (d._children) {
-        this.treemap.nodes({ _children: d._children });
-        d._children.forEach(function (c) {
-          c.x = d.x + c.x * d.dx;
-          c.y = d.y + c.y * d.dy;
-          c.dx *= d.dx;
-          c.dy *= d.dy;
-          c.parent = d;
-          layout(c);
-        });
+      const layout = d => {
+        if (d._children) {
+          this.treemap.nodes({ _children: d._children });
+          d._children.forEach(function (c) {
+            c.x = d.x + c.x * d.dx;
+            c.y = d.y + c.y * d.dy;
+            c.dx *= d.dx;
+            c.dy *= d.dy;
+            c.parent = d;
+            layout(c);
+          });
+        }
+      };
+      const rect = r => {
+        r.attr("x", d => x(d.x))
+          .attr("y", d => y(d.y))
+          .attr("width", d => x(d.x + d.dx) - x(d.x))
+          .attr("height", d => y(d.y + d.dy) - y(d.y));
+      };
+      const text = t => {
+      };
+      const name = d => d.parent ? name(d.parent) + " / " + d.name : d.name;
+
+      // Set up the new layout for the data
+      layout(data);
+
+      const faux = ReactFauxDOM.createElement('svg');
+      const svg = d3.select(faux)
+        .attr({ width, height: height + navHeight })
+        .append("g")
+        .attr("transform", `translate(0, ${navHeight})`);
+
+      // Display navbar to back to parent node on click
+      const navbar = svg.append("g").attr("class", "navbar");
+      const twidth = 180;
+
+      // Add a link to open instance chart view
+      if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
+        navbar.append("rect")
+          .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
+          .datum(data.parent).on('click', this.displayData);
+        navbar.append("rect")
+          .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
+          .datum(data).on('click', this.showInstanceChart);
+        navbar.append("text")
+          .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
+          .text('Instance Line Chart');
+      } else {
+        navbar.append("rect")
+          .attr({ y: -navHeight, width: width, height: navHeight, })
+          .datum(data.parent).on('click', this.displayData);
       }
-    };
-    const rect = r => {
-      r.attr("x", d => x(d.x))
-        .attr("y", d => y(d.y))
-        .attr("width", d => x(d.x + d.dx) - x(d.x))
-        .attr("height", d => y(d.y + d.dy) - y(d.y));
-    };
-    const text = t => {
-    };
-    const name = d => d.parent ? name(d.parent) + " / " + d.name : d.name;
 
-    // Set up the new layout for the data
-    layout(data);
-
-    const faux = ReactFauxDOM.createElement('svg');
-    const svg = d3.select(faux)
-      .attr({ width, height: height + navHeight })
-      .append("g")
-      .attr("transform", `translate(0, ${navHeight})`);
-
-    // Display navbar to back to parent node on click
-    const navbar = svg.append("g").attr("class", "navbar");
-    const twidth = 180;
-
-    // Add a link to open instance chart view
-    if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
-      navbar.append("rect")
-        .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
-        .datum(data.parent).on('click', this.displayData);
-      navbar.append("rect")
-        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
-        .datum(data).on('click', this.showInstanceChart);
       navbar.append("text")
-        .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
-        .text('Instance Line Chart');
-    } else {
-      navbar.append("rect")
-        .attr({ y: -navHeight, width: width, height: navHeight, })
-        .datum(data.parent).on('click', this.displayData);
-    }
+        .attr({x: 6, y: 6 - navHeight, dy: '1em'})
+        .text(name(data));
 
-    navbar.append("text")
-      .attr({x: 6, y: 6 - navHeight, dy: '1em'})
-      .text(name(data));
+      const g1 = svg.insert("g", '.navbar').datum(data).attr("class", "depth");
+      const g = g1.selectAll("g").data(data._children).enter().append("g");
 
-    const g1 = svg.insert("g", '.navbar').datum(data).attr("class", "depth");
-    const g = g1.selectAll("g").data(data._children).enter().append("g");
+      g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.displayData);
+      g.selectAll(".child").data(d => d._children || [d])
+        .enter().append('rect')
+        .attr('class', 'child')
+        .call(rect);
 
-    g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.displayData);
-    g.selectAll(".child").data(d => d._children || [d])
-      .enter().append('rect')
-      .attr('class', 'child')
-      .call(rect);
+      g.append("rect").attr("class", d => "parent " + d.type)
+        .call(rect)
+        .append("title").text(d => d.name);
+      g.selectAll('.parent').attr('fill', d => this.color(treeMapValue,cpuUtilizationByInstance,d));
+  //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
+      g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
+        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+      });
+      g.append("text").attr("dy", ".75em").text(d => d.score > 0 ? d.score.toFixed(2) : '').call( t => {
+        t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
+      });
 
-    g.append("rect").attr("class", d => "parent " + d.type)
-      .call(rect)
-      .append("title").text(d => d.name);
-    g.selectAll('.parent').attr('fill', d => this.color(d.score));
-//    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
-    g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
-      t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+      // Bind event for metric
+      g.selectAll('.metric').on('click', this.showMetricChart);
+
+      this.setState({faux: faux.toReact()});
     });
-    g.append("text").attr("dy", ".75em").text(d => d.score > 0 ? d.score.toFixed(2) : '').call( t => {
-      t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
-    });
-
-    // Bind event for metric
-    g.selectAll('.metric').on('click', this.showMetricChart);
-
-    this.setState({faux: faux.toReact()});
   }
 
   render() {

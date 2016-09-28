@@ -20,16 +20,18 @@ class EventSummary2 extends Component {
 
     this.state = {
       treeMapValue: '0',
+      treeMapChange: false,
+      treeMapText: "Anomaly",
       data: {
         statistics: {},
         summary: {},
         incidents: [],
-        incidentsTreeMap: [],
+        incidentsTreeMap: []
       },
       loading: true,
       projectName: undefined,
       showTenderModal: false,
-      cvalue: "1",
+      cvalue: "1"
     };
   }
 
@@ -130,7 +132,7 @@ class EventSummary2 extends Component {
                     // <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
 
   render() {
-    let { loading, data, projectName, incidentsTreeMap, cvalue, treeMapValue} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, cvalue, treeMapValue,treeMapChange,treeMapText} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
@@ -167,7 +169,20 @@ class EventSummary2 extends Component {
                           });}}>
                     Overall Causal Graph
                   </Button>
-                  <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapValue={treeMapValue}/>
+                  <Button className="orange" onClick={(e)=>{
+                      e.stopPropagation();
+                      this.setState({
+                      treeMapChange: !treeMapChange,
+                      treeMapText: treeMapText == "Anomaly"?"Utilization":"Anomaly"
+                      });
+                  }}>
+                    {treeMapText} View
+                  </Button>
+                  {treeMapChange?
+                  <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  :
+                  null}
+                  <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList onIncidentSelected={this.handleIncidentSelected}
