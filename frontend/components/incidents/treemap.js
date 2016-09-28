@@ -33,11 +33,10 @@ class IncidentsTreeMap extends Component {
   }
 
   componentDidMount() {
-    console.log(this.props.treeMapValue);
     if (!_.isEmpty(this.props.data) && this.$container) {
       const root = _.cloneDeep(this.props.data);
-      this.transformData(root,this.props.treeMapValue,this.props.cpuUtilizationByInstance);
-      this.displayData(root);
+      this.transformData(root);
+      this.displayData(root, this.props.treeMapValue, this.props.cpuUtilizationByInstance);
     }
   }
 
@@ -73,11 +72,11 @@ class IncidentsTreeMap extends Component {
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
-      this.transformData(root,nextProps.treeMapValue,nextProps.cpuUtilizationByInstance);
-      this.displayData(root);
+      this.transformData(root);
+      this.displayData(root, nextProps.treeMapValue, nextProps.cpuUtilizationByInstance);
       this.setState({
         startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp,
+        endTimestamp:root.endTimestamp
       });
     }
   }
@@ -86,8 +85,7 @@ class IncidentsTreeMap extends Component {
    * Transform the data into the format used by d3 treemap.
    * @param root: The root of the data tree.
    */
-  transformData(root, treeMapValue, cpuUtilizationByInstance) {
-    console.log(treeMapValue, cpuUtilizationByInstance);
+  transformData(root) {
 
     const sumScore = d => {
       let s = 0;
@@ -153,18 +151,30 @@ class IncidentsTreeMap extends Component {
     return severityToRGBHex(val);
   }
 
-  severityToRGBHex(val) {
+  severityToRGBHex(treeMapValue,cpuUtilizationByInstance,d) {
+    let val = d.score;
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    if (val <= 1) {
+    if (treeMapValue>cpuUtilizationByInstance[d.name]) {
         if (val < 0) val = 0;
         if (val > 0) val = 1;
-        rcolor = Math.floor(255 * val);
-        gcolor = gcolorMax;
+        //rcolor = Math.floor(255 * val);
+        //gcolor = gcolorMax;
+
+        rcolor = 173;
+        gcolor = 216;
+        bcolor = 230;
     } else {
         if (val > 10) val = 10;
-        rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        if(d.id == 'CPUUtilization'){
+            rcolor = 173;
+            gcolor = 216;
+            bcolor = 230;
+        }
+        else{
+          rcolor = 255;
+          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        }
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
@@ -174,7 +184,7 @@ class IncidentsTreeMap extends Component {
    * @param data
    */
   @autobind
-  displayData(data) {
+  displayData(data, treeMapValue=null, cpuUtilizationByInstance=null) {
     if (!data) return;
 
     const navHeight = this.navHeight;
@@ -258,7 +268,7 @@ class IncidentsTreeMap extends Component {
     g.append("rect").attr("class", d => "parent " + d.type)
       .call(rect)
       .append("title").text(d => d.name);
-    g.selectAll('.parent').attr('fill', d => this.color(d.score));
+    g.selectAll('.parent').attr('fill', d => this.color(treeMapValue,cpuUtilizationByInstance,d));
 //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
     g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
       t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);

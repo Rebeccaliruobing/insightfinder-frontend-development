@@ -167,6 +167,7 @@ class EventSummary2 extends Component {
                           });}}>
                     Overall Causal Graph
                   </Button>
+                  <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
