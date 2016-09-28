@@ -26,6 +26,7 @@ class IncidentsTreeMap extends Component {
     this.color = null;
 
     this.state = {
+      treeMapChange: false,
       faux: null,
       startTimestamp:undefined,
       endTimestamp:undefined,
@@ -36,7 +37,12 @@ class IncidentsTreeMap extends Component {
     if (!_.isEmpty(this.props.data) && this.$container) {
       const root = _.cloneDeep(this.props.data);
       this.transformData(root);
-      this.displayData(root, this.props.treeMapValue, this.props.cpuUtilizationByInstance);
+      if(this.props.treeMapChange){
+        this.displayData(root);
+      }
+      else{
+        this.displayData(root, this.props.treeMapValue, this.props.cpuUtilizationByInstance);
+      }
     }
   }
 
@@ -73,10 +79,16 @@ class IncidentsTreeMap extends Component {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
       this.transformData(root);
-      this.displayData(root, nextProps.treeMapValue, nextProps.cpuUtilizationByInstance);
+      if(nextProps.treeMapChange){
+        this.displayData(root);
+      }
+      else{
+        this.displayData(root, nextProps.treeMapValue, nextProps.cpuUtilizationByInstance);
+      }
       this.setState({
         startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp
+        endTimestamp:root.endTimestamp,
+        treeMapChange: nextProps.treeMapChange
       });
     }
   }
@@ -155,7 +167,8 @@ class IncidentsTreeMap extends Component {
     let val = d.score;
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    if (treeMapValue>cpuUtilizationByInstance[d.name]) {
+    if(this.state.treeMapChange){
+     if (treeMapValue>cpuUtilizationByInstance[d.name]) {
         if (val < 0) val = 0;
         if (val > 0) val = 1;
         //rcolor = Math.floor(255 * val);
@@ -179,6 +192,19 @@ class IncidentsTreeMap extends Component {
           //gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
         }
     }
+    }
+    else{
+      if (val <= 1) {
+          if (val < 0) val = 0;
+          if (val > 0) val = 1;
+          rcolor = Math.floor(255 * val);
+          gcolor = gcolorMax;
+      } else {
+          if (val > 10) val = 10;
+          rcolor = 255;
+          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
+    }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
 
@@ -187,7 +213,7 @@ class IncidentsTreeMap extends Component {
    * @param data
    */
   @autobind
-  displayData(data, treeMapValue=null, cpuUtilizationByInstance=null) {
+  displayData(data, treeMapValue=undefined, cpuUtilizationByInstance=undefined) {
     if (!data) return;
 
     const navHeight = this.navHeight;
