@@ -113,7 +113,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, ver
   return new Promise(function (resolve, reject) {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('liveAnalysis', version),
+      url: getEndpoint('eventSummary', version),
       data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');

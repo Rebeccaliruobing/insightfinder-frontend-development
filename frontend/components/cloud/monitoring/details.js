@@ -29,13 +29,15 @@ const ProjectDetails = class extends React.Component {
   updateLiveAnalysis() {
 
     let { query } = this.props.location;
-    let { projectName, modelType, pvalue, cvalue } = query;
+    let { projectName, modelType, pvalue, cvalue, version } = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
-
+    if(!version){
+        version = "1";
+    }
     this.props.clearTimeout(this.timeout);
 
     this.setState({ loading: true });
-    apis.postLiveAnalysis(projectName, modelType, pvalue, cvalue)
+    apis.postLiveAnalysis(projectName, modelType, pvalue, cvalue, version)
       .then(resp => {
         let update = {};
         if (resp.success) {

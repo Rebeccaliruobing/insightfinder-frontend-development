@@ -1,6 +1,7 @@
 import store from 'store';
 import _ from 'lodash';
 const baseUrl = window.API_BASE_URL || '/api/v1/';
+import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
 
@@ -386,11 +387,15 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, modelType, pvalue, cvalue, version, userName = store.get('userName'), token = store.get('token')) {
+        if(!version){
+            version = "1";
+        }
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
-                url: $.fn.api.settings.api['live analysis'],
+                url: getEndpoint('liveAnalysis', version),
+//                url: $.fn.api.settings.api['live analysis'],
                 data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
