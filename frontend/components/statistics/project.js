@@ -6,14 +6,14 @@ import InstanceNumber from './instance-number';
 import MetricNumber from './metric-number';
 import AnalysisSummary from './analysis-summary';
 
-const ProjectStatistics = ({data}) => (
+const ProjectStatistics = ({data, dur}) => (
   <div className="ui compact grid">
-    <CPUUtilization average={data.statistics['AvgCPUUtilization']} />
-    <InstanceUptime average={data.statistics['AvgInstanceUptime']} />
+    <CPUUtilization average={data.statistics['AvgCPUUtilization']} duration={dur+'d'} />
+    <InstanceUptime average={data.statistics['AvgInstanceUptime']} duration={dur+'d'} />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
                     containerTotal={data.statistics['NumberOfContainers']} />
     <MetricNumber total={data.statistics['NumberOfMetrics']} />
-    <AnalysisSummary data={data.summary} latestDataTimestamp={data.latestDataTimestamp}/>
+    <AnalysisSummary data={data.summary} latestDataTimestamp={data.latestDataTimestamp} duration={dur+'d'} />
   </div>
 );
 

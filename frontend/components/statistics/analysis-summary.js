@@ -2,7 +2,7 @@ import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 import {Dygraph} from '../../artui/react/dataviz';
 
-const AnalysisSummary = ({data, latestDataTimestamp, duration='24h' }) => {
+const AnalysisSummary = ({data, latestDataTimestamp, duration='1d' }) => {
   return (
     <div className='ui statistic eight wide column'>
       <div>

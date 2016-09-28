@@ -24,13 +24,12 @@ class IncidentsList extends Component {
       startTimestamp:undefined,
       endTimestamp:undefined,
       activeIncident:undefined,
-      angleIconStyleSelect: 'angleIconStyleEvent',
+      angleIconStyleSelect: 'angleIconStyleId',
       angleIconStyle: {
           angleIconStyleId: 'down',
           angleIconStyleSeverity: 'down',
           angleIconStyleEvent: 'down',
           angleIconStyleDuration: 'down'
-
       },
       tabStates: {
           predicted: '',
@@ -86,7 +85,7 @@ class IncidentsList extends Component {
 
   selectTab(e, tab) {
 
-      let angleIconStyleSelect='angleIconStyleEvent';
+      let angleIconStyleSelect='angleIconStyleId';
       let angleIconStyle = {
           angleIconStyleId: 'down',
           angleIconStyleSeverity: 'down',
@@ -165,7 +164,7 @@ class IncidentsList extends Component {
             </tr>
             </thead>
             <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
-            {predictedIncidents.reverse().sort(function (a, b) {
+            {predictedIncidents.sort(function (a, b) {
                   // reverse ordering
                     if(angleIconStyleSelect == 'angleIconStyleId'){
                         let aid = parseInt(a.id);
@@ -285,7 +284,7 @@ class IncidentsList extends Component {
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
-          {detectedIncidents.reverse().sort(function (a, b) {
+          {detectedIncidents.sort(function (a, b) {
                 // reverse ordering
               if(angleIconStyleSelect == 'angleIconStyleId'){
                     let aid = parseInt(a.id);

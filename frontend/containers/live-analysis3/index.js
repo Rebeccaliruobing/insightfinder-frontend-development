@@ -47,7 +47,7 @@ class LiveAnalysis extends Component {
 
   @autobind()
   handleIncidentSelected(incident) {
-    const {projectName, data} = this.state;
+    const {projectName, data, cvalue} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
       let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm");
@@ -56,7 +56,7 @@ class LiveAnalysis extends Component {
       stats['endTimestamp'] = incident.endTimestamp;
       incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson);
     } else {
-      let caption = projectName + " (24h)";
+      let caption = projectName + " (" + cvalue + "d)";
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
@@ -117,6 +117,7 @@ class LiveAnalysis extends Component {
         console.log(msg);
         // alert(msg);
       });
+      this.handleIncidentSelected();
   }
   refreshProjectName(projectName){
     this.handleProjectChange(projectName,projectName);
@@ -141,7 +142,7 @@ class LiveAnalysis extends Component {
             </label>
           </div>
           <div className="ui vertical segment">
-            <ProjectStatistics data={data} />
+            <ProjectStatistics data={data} dur={cvalue} />
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">

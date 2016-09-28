@@ -33,9 +33,16 @@ class Signup extends BaseComponent {
           var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
           if (!re.test(email)) {
             this.setState({
-              error: 'Please input correct email address.'
+              error: 'Please check your email address.'
             });
             return false;
+          }
+          let userName = this.state['userName'];
+          if(userName.toLowerCase() == "all" || userName.toLowerCase() == "none" || userName.indexOf(" ")!=-1){
+            this.setState({
+              error: 'Please check your username. It might have been used or have white space in it.'
+            });
+            return false;            
           }
           
           settings.data = {
