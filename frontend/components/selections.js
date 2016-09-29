@@ -193,7 +193,7 @@ class TreemapOptionsSelect extends React.Component {
               selectOption.map(function (value,index) {
                 return (
                     <div className="item" key={index} data-value={value}>
-                      {value}
+                      {value}%
                     </div>
                 )
               })
