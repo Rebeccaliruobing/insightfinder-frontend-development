@@ -31,6 +31,7 @@ class EventSummary2 extends Component {
       loading: true,
       projectName: undefined,
       showTenderModal: false,
+      selectedIncident: undefined,
       cvalue: "1"
     };
   }
@@ -53,7 +54,7 @@ class EventSummary2 extends Component {
     const {projectName, data, cvalue} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm");
+      let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm")+", end: "+moment(incident.endTimestamp).format("MM-DD HH:mm");
       let stats = incident.instanceMetricJson;
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
@@ -63,7 +64,8 @@ class EventSummary2 extends Component {
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
-      incidentsTreeMap
+      incidentsTreeMap, 
+      selectedIncident:incident,
     });
   }
 
@@ -188,7 +190,7 @@ class EventSummary2 extends Component {
                     Utilization View
                   </Button>
                   {treeMapChange?
-                  CPU utilization threshold: <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                    <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>

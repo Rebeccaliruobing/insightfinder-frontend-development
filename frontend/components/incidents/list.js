@@ -298,7 +298,7 @@ class IncidentsList extends Component {
             <th>Suggested Actions</th>
           </tr>
           </thead>
-          <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
+          <tbody style={{ width: '100%','height': '444px','overflow': 'auto','display': 'block' }}>
           {detectedIncidents.sort(function (a, b) {
                 // reverse ordering
               if(angleIconStyleSelect == 'angleIconStyleId'){
