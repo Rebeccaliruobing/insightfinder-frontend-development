@@ -20,8 +20,8 @@ class EventSummary2 extends Component {
 
     this.state = {
       treeMapValue: '0',
-      treeMapChange: false,
-      treeMapText: "Anomaly",
+      treeMapChange: false, // utilization view flag
+      treeMapText: "Utilization",
       data: {
         statistics: {},
         summary: {},
@@ -85,6 +85,8 @@ class EventSummary2 extends Component {
   @autobind
   handleDayChange(value, numberOfDays) {
     this.setState({cvalue:numberOfDays.toString()});
+    let { projectName } = this.state;
+    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -96,7 +98,7 @@ class EventSummary2 extends Component {
     let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
-    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 0)
+    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 2)
       .then(data => {
         this.setState({
           loading: false,
@@ -128,8 +130,6 @@ class EventSummary2 extends Component {
   handleTreeMapChange(value){
     this.setState({treeMapValue: value});
   }
-
-                    // <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
 
   render() {
     let { loading, data, projectName, incidentsTreeMap, cvalue, treeMapValue,treeMapChange,treeMapText} = this.state;
@@ -173,7 +173,7 @@ class EventSummary2 extends Component {
                       e.stopPropagation();
                       this.setState({
                       treeMapChange: !treeMapChange,
-                      treeMapText: treeMapText == "Anomaly"?"Utilization":"Anomaly"
+                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
                       });
                   }}>
                     {treeMapText} View

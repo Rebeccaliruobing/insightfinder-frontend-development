@@ -161,42 +161,41 @@ class IncidentsTreeMap extends Component {
     let val = d.score;
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    if(this.state.treeMapChange){
-     if (treeMapValue>cpuUtilizationByInstance[d.name]) {
-        if (val < 0) val = 0;
-        if (val > 0) val = 1;
-        //rcolor = Math.floor(255 * val);
-        //gcolor = gcolorMax;
-
+    if (this.state.treeMapChange) {
+      if (treeMapValue > cpuUtilizationByInstance[d.name]) {
+        if (val < 0)
+          val = 0;
+        if (val > 0)
+          val = 1;
         rcolor = 173;
         gcolor = 216;
         bcolor = 230;
-    } else {
-        if (val > 10) val = 10;
-        if(d.id == 'CPUUtilization'){
-            rcolor = 173;
-            gcolor = 216;
-            bcolor = 230;
-        }
-        else{
-          rcolor = 0;
-          gcolor = 255;
-          bcolor = 0;
-          //rcolor = 255;
-          //gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
-        }
-    }
-    }
-    else{
-      if (val <= 1) {
-          if (val < 0) val = 0;
-          if (val > 0) val = 1;
-          rcolor = Math.floor(255 * val);
-          gcolor = gcolorMax;
       } else {
-          if (val > 10) val = 10;
-          rcolor = 255;
-          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        if (val > 10)
+          val = 10;
+        if (d.id && d.id.toLowerCase().indexOf('cpu') != -1) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+        } else {
+          rcolor = 0;
+          gcolor = gcolorMax;
+          bcolor = 0;
+        }
+      }
+    } else {
+      if (val <= 1) {
+        if (val < 0)
+          val = 0;
+        if (val > 0)
+          val = 1;
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+      } else {
+        if (val > 10)
+          val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
       }
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);

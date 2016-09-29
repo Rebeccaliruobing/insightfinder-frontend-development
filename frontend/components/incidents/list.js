@@ -26,7 +26,7 @@ class IncidentsList extends Component {
       activeIncident:undefined,
       angleIconStyleSelect: 'angleIconStyleId',
       angleIconStyle: {
-          angleIconStyleId: 'down',
+          angleIconStyleId: 'up',
           angleIconStyleSeverity: 'down',
           angleIconStyleEvent: 'down',
           angleIconStyleDuration: 'down'
@@ -87,7 +87,7 @@ class IncidentsList extends Component {
 
       let angleIconStyleSelect='angleIconStyleId';
       let angleIconStyle = {
-          angleIconStyleId: 'down',
+          angleIconStyleId: 'up',
           angleIconStyleSeverity: 'down',
           angleIconStyleEvent: 'down',
           angleIconStyleDuration: 'down'
