@@ -109,13 +109,14 @@ class LiveProjectSelection extends React.Component {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item,index) => !(item.isStationary));
+    var projectNameList = [];
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
         <div className="menu"> 
           {
-            projects.map((p) => {
-              return <div className="item" key={p.projectName}
+            projects.map((p,index) => {
+              return <div className="item" key={p.projectName+index}
                           data-value={p.projectName}>{p.projectName}</div>
             })
           }

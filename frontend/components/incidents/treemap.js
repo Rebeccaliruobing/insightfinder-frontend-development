@@ -171,7 +171,6 @@ class IncidentsTreeMap extends Component {
         gcolor = 216;
         bcolor = 230;
       } else {
-        console.log(val);
         if ((d.id && d.id.toLowerCase().indexOf('cpu') != -1) || val>0) {
           rcolor = 173;
           gcolor = 216;
