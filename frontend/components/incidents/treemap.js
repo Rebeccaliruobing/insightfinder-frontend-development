@@ -171,16 +171,14 @@ class IncidentsTreeMap extends Component {
         gcolor = 216;
         bcolor = 230;
       } else {
-        if (val > 10)
-          val = 10;
-        if (d.id && d.id.toLowerCase().indexOf('cpu') != -1) {
+        if ((d.id && d.id.toLowerCase().indexOf('cpu') != -1) || val>0) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
         } else {
-          rcolor = 0;
-          gcolor = gcolorMax;
-          bcolor = 0;
+            rcolor = 0;
+            gcolor = gcolorMax;
+            bcolor = 0;
         }
       }
     } else {

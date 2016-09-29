@@ -169,14 +169,23 @@ class EventSummary2 extends Component {
                           });}}>
                     Overall Causal Graph
                   </Button>
-                  <Button className="orange" onClick={(e)=>{
+                  <Button className={treeMapChange?"orange":"orange in-button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
                       e.stopPropagation();
                       this.setState({
                       treeMapChange: !treeMapChange,
                       treeMapText: (treeMapChange)?"Utilization":"Anomaly"
                       });
                   }}>
-                    {treeMapText} View
+                    Anomaly View
+                  </Button>
+                  <Button className={treeMapChange?"orange in-button":"orange"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
+                      e.stopPropagation();
+                      this.setState({
+                      treeMapChange: !treeMapChange,
+                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
+                      });
+                  }}>
+                    Utilization View
                   </Button>
                   {treeMapChange?
                   <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
