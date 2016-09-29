@@ -29,6 +29,7 @@ class IncidentsList extends Component {
           angleIconStyleId: 'up',
           angleIconStyleSeverity: 'down',
           angleIconStyleEvent: 'down',
+          angleIconStyleStartTime: 'down',
           angleIconStyleDuration: 'down'
       },
       tabStates: {
@@ -90,6 +91,7 @@ class IncidentsList extends Component {
           angleIconStyleId: 'up',
           angleIconStyleSeverity: 'down',
           angleIconStyleEvent: 'down',
+          angleIconStyleStartTime: 'down',
           angleIconStyleDuration: 'down'
       };
       let tabStates = this.state['tabStates'];
@@ -176,6 +178,7 @@ class IncidentsList extends Component {
             <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i className={"angle "+ this.state.angleIconStyle['angleIconStyleId'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
+              <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i className={"angle "+ this.state.angleIconStyle['angleIconStyleStartTime'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
               <th>Suggested Actions</th>
@@ -203,6 +206,18 @@ class IncidentsList extends Component {
                         if (aAnomalyRatio < bAnomalyRatio) {
                             return returnId;
                         } else if (aAnomalyRatio > bAnomalyRatio) {
+                            return returnId*-1;
+                        } else {
+                          return 0;
+                        }
+                  }
+                  else if(angleIconStyleSelect == 'angleIconStyleStartTime'){
+                        let aStartTime = parseInt(a.startTimestamp);
+                        let bStartTime = parseInt(b.startTimestamp);
+                        let returnId = angleIconStyle['angleIconStyleStartTime'] === 'up'?-1:1;
+                        if (aStartTime <= bStartTime) {
+                            return returnId;
+                        } else if (aStartTime > bStartTime) {
                             return returnId*-1;
                         } else {
                           return 0;
@@ -246,6 +261,7 @@ class IncidentsList extends Component {
                                           + ", duration: " + incident.duration + " min"}>
                                       <td>{incident.id}</td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
+                                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
                                           "N/A"
@@ -276,6 +292,7 @@ class IncidentsList extends Component {
           <tr onClick={() => this.handleNoIncidentSelected()} style={{ display: 'inline-table','width': '100%'}}>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i className={"angle "+ this.state.angleIconStyle['angleIconStyleId'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i className={"angle "+ this.state.angleIconStyle['angleIconStyleSeverity'] +" icon"}/></th>
+            <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i className={"angle "+ this.state.angleIconStyle['angleIconStyleStartTime'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th>Suggested Actions</th>
@@ -303,6 +320,18 @@ class IncidentsList extends Component {
                     if (aAnomalyRatio < bAnomalyRatio) {
                         return returnId;
                     } else if (aAnomalyRatio > bAnomalyRatio) {
+                        return returnId*-1;
+                    } else {
+                      return 0;
+                    }
+              }
+              else if(angleIconStyleSelect == 'angleIconStyleStartTime'){
+                    let aStartTime = parseInt(a.startTimestamp);
+                    let bStartTime = parseInt(b.startTimestamp);
+                    let returnId = angleIconStyle['angleIconStyleStartTime'] === 'up'?-1:1;
+                    if (aStartTime <= bStartTime) {
+                        return returnId;
+                    } else if (aStartTime > bStartTime) {
                         return returnId*-1;
                     } else {
                       return 0;
@@ -346,6 +375,7 @@ class IncidentsList extends Component {
                                           + ", duration: " + incident.duration + " min"}>
                                       <td>{incident.id}</td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
+                                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
                                           "N/A"

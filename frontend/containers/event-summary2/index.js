@@ -188,7 +188,7 @@ class EventSummary2 extends Component {
                     Utilization View
                   </Button>
                   {treeMapChange?
-                  <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  CPU utilization threshold: <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
