@@ -184,7 +184,7 @@ class OperationOptionsSelect extends React.Component {
 
 class TreemapOptionsSelect extends React.Component {
   render(){
-    let selectOption = [0, 5, 10, 25];
+    let selectOption = [0, 1, 5, 10];
       return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -193,7 +193,7 @@ class TreemapOptionsSelect extends React.Component {
               selectOption.map(function (value,index) {
                 return (
                     <div className="item" key={index} data-value={value}>
-                      {value}
+                      {value+'%'}
                     </div>
                 )
               })

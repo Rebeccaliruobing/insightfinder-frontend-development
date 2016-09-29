@@ -44,8 +44,8 @@ class IncidentsList extends Component {
 
   @autobind
   handleNoIncidentSelected(){
-    this.props.onIncidentSelected(undefined);
-    this.setState({activeIncident:undefined});
+    // this.props.onIncidentSelected(undefined);
+    // this.setState({activeIncident:undefined});
   }
 
   @autobind
@@ -135,6 +135,25 @@ class IncidentsList extends Component {
                 //     take action
                 //   </Button> }
                 // </td>
+                // <td>
+                //     { incident.anomalyRatio==0 ?
+                //     <Button className="grey" onClick={(e) => {
+                //               e.stopPropagation()}}
+                //             style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                //       display
+                //     </Button>
+                //     :
+                //     <Button className="orange" onClick={(e) => {
+                //             e.stopPropagation();
+                //             self.setState({
+                //               showTenderModal: true,
+                //               startTimestamp: incident.startTimestamp,
+                //               endTimestamp: incident.endTimestamp
+                //             });}}
+                //           style={{width: 80, paddingLeft:0, paddingRight:0}}>
+                //      display
+                //     </Button> }
+                // </td>
   render() {
     let { incidents,latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
@@ -160,7 +179,6 @@ class IncidentsList extends Component {
               <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
               <th>Suggested Actions</th>
-              <th>Causal Graph</th>
             </tr>
             </thead>
             <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
@@ -237,25 +255,6 @@ class IncidentsList extends Component {
                                       </td>
                                       <td className="code">{rootCauseTypesCategory[incidentX]}</td>
                                       <td className="code">{suggestedActionsCategory[suggestedX]}</td>
-                                      <td>
-                                          { incident.anomalyRatio==0 ?
-                                          <Button className="grey" onClick={(e) => {
-                                                    e.stopPropagation()}}
-                                                  style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                                            display
-                                          </Button>
-                                          :
-                                          <Button className="orange" onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  self.setState({
-                                                    showTenderModal: true,
-                                                    startTimestamp: incident.startTimestamp,
-                                                    endTimestamp: incident.endTimestamp
-                                                  });}}
-                                                style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                                           display
-                                          </Button> }
-                                      </td>
                                     </tr>
                                 )
                             }
@@ -280,7 +279,6 @@ class IncidentsList extends Component {
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th>Suggested Actions</th>
-            <th>Causal Graph</th>
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '418px','overflow': 'auto','display': 'block' }}>
@@ -357,25 +355,6 @@ class IncidentsList extends Component {
                                       </td>
                                       <td className="code">{rootCauseTypesCategory[incidentX]}</td>
                                       <td className="code">{suggestedActionsCategory[suggestedX]}</td>
-                                      <td>
-                                          { incident.anomalyRatio==0 ?
-                                          <Button className="grey" onClick={(e) => {
-                                                    e.stopPropagation()}}
-                                                  style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                                            display
-                                          </Button>
-                                          :
-                                          <Button className="orange" onClick={(e) => {
-                                                  e.stopPropagation();
-                                                  self.setState({
-                                                    showTenderModal: true,
-                                                    startTimestamp: incident.startTimestamp,
-                                                    endTimestamp: incident.endTimestamp
-                                                  });}}
-                                                style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                                           display
-                                          </Button> }
-                                      </td>
                                     </tr>
                                 )
                             }
