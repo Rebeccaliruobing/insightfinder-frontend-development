@@ -190,7 +190,7 @@ class IncidentsList extends Component {
       <div>
         <div className="row" style={{ marginBottom: 10 }}>
           <Button className='orange' style={{'float':'right','marginTop':'5px'}} onClick={this.handleProjectChartsView}>Line Charts</Button>
-          <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Overall Causal Graph"
+          <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Causal Graph"
                   onClick={(e) => {
                   e.stopPropagation();
                   this.setState({
@@ -198,7 +198,7 @@ class IncidentsList extends Component {
                     startTimestamp: undefined,
                     endTimestamp: undefined
                   });}}>
-            Overall Causal Graph
+            Causal Graph
           </Button>
         <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}

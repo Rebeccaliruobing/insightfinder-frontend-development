@@ -106,6 +106,39 @@ class DataParser {
     });
     return retMap;
   }
+  _parseIncidentList(){
+    if (this.causalDataArray) return;
+    let causalDataArray = [];
+    let causalTypes = [];
+    let incidents = this.data['incidentsJson'];
+    if(incidents){
+      _.each(incidents, function (incident, index) {
+        if(incident.anomalyMapJson){
+          let thisAnomaly = [];
+          let timeString = moment(parseInt(incident.timestamp)).format("YYYY-MM-DD HH:mm")
+          thisAnomaly.push(timeString + ",anomaly ratio:" + incident.anomalyRatio);
+          if(incident.anomalyMapJson){
+            for(var k in incident.anomalyMapJson){
+              let rank = 1;
+              causalTypes.push(k);
+              let hint = incident.anomalyMapJson[k];
+              for(var h in hint){
+                let val = hint[h];
+                thisAnomaly.push(rank + "." + h + " [" + k + "](" + val + ")");
+                rank++;
+              }
+            }
+          }
+          causalDataArray.push(thisAnomaly);
+        }
+      });
+    }
+    causalTypes = causalTypes.filter(function (el, index, arr) {
+      return index === arr.indexOf(el);
+    });
+    this.causalDataArray = causalDataArray;
+    this.causalTypes = causalTypes;
+  }
 
   _parseAnomalyText() {
 
@@ -121,8 +154,8 @@ class DataParser {
       }
     }
     let anomalyTexts = [];
-    let causalDataArray = [];
-    let causalTypes = [];
+    // let causalDataArray = [];
+    // let causalTypes = [];
 
     if (arr) {
       _.each(arr, function (a, i) {
@@ -160,7 +193,7 @@ class DataParser {
                     thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
                   }
                   // causalTypes.push(metric + " [" + hintparts[1] + "]");
-                  causalTypes.push( hintparts[1] );
+                  // causalTypes.push( hintparts[1] );
                   try {
                     var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
                     var newval = hintparts[2].split(/\(|\)/)[1];
@@ -186,17 +219,17 @@ class DataParser {
                 atext[parseInt(items[0])] = newhints;
               }
             }
-            causalDataArray.push(thisAnomaly);
+            // causalDataArray.push(thisAnomaly);
           });
-          causalTypes = causalTypes.filter(function (el, index, arr) {
-            return index === arr.indexOf(el);
-          });
+          // causalTypes = causalTypes.filter(function (el, index, arr) {
+          //   return index === arr.indexOf(el);
+          // });
         }
         anomalyTexts.push(atext);
       });
     }
-    this.causalDataArray = causalDataArray;
-    this.causalTypes = causalTypes;
+    // this.causalDataArray = causalDataArray;
+    // this.causalTypes = causalTypes;
     this.anomalyTexts = anomalyTexts;
   }
 
@@ -333,6 +366,7 @@ class DataParser {
     if (this.anomalies) return;
     this._parseAnomalyText();
     this._parseAnomalyConsolidatedText();
+    this._parseIncidentList(); // for causal graph
 
     if (this.mode != 'error') {
 
