@@ -378,12 +378,14 @@ class LogAnalysisCharts extends React.Component {
         <div>
           <div className="ui header">Number of anomalies: {logEventArr.length}</div>
           <table className="event-table">
-            <tbody>
-              <tr>
+            <thead>
+            <tr>
                 <td>Time</td>
                 <td>Event</td>
                 <td>Anomaly Hint</td>
-              </tr>
+            </tr>
+            </thead>
+            <tbody>
               {logEventArr.map((event, iEvent) => {
                 let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
                 let anomalyString = event.anomaly;
@@ -479,9 +481,6 @@ class LogAnalysisCharts extends React.Component {
 
     return (
       <div className="ui grid">
-        {!!summary &&
-        <DataSummaryChart key="summary_chart" summary={summary}/>
-        }
         <div className="sixteen wide column">
           <div className="ui pointing secondary menu">
             <a className={tabStates['event'] + ' item'}
