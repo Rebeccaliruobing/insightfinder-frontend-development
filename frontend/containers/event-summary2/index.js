@@ -160,18 +160,7 @@ class EventSummary2 extends Component {
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
                 <div className="eight wide column" style={{ height: 500, 'paddingTop': 20 }}>
-                  <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
-                  <Button className='orange' title="Overall Causal Graph"
-                          onClick={(e) => {
-                          e.stopPropagation();
-                          this.setState({
-                            showTenderModal: true,
-                            startTimestamp: undefined,
-                            endTimestamp: undefined
-                          });}}>
-                    Overall Causal Graph
-                  </Button>
-                  <Button className={treeMapChange?"orange":"orange in-button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
+                  <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
                       e.stopPropagation();
                       this.setState({
                       treeMapChange: !treeMapChange,
@@ -180,7 +169,7 @@ class EventSummary2 extends Component {
                   }}>
                     Anomaly View
                   </Button>
-                  <Button className={treeMapChange?"orange in-button":"orange"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
+                  <Button className={treeMapChange?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
                       e.stopPropagation();
                       this.setState({
                       treeMapChange: !treeMapChange,
@@ -196,7 +185,9 @@ class EventSummary2 extends Component {
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
-                  <IncidentsList onIncidentSelected={this.handleIncidentSelected}
+                  <IncidentsList projectName={refreshName} 
+                                 cvalue={cvalue} 
+                                 onIncidentSelected={this.handleIncidentSelected}
                                  incidents={data.incidents}
                                  causalDataArray={data.causalDataArray}
                                  causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />

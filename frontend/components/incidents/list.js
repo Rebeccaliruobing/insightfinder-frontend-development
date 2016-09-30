@@ -19,6 +19,8 @@ class IncidentsList extends Component {
       causalDataArray:props.causalDataArray,
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
+      cvalue:props.cvalue,
+      projectName:props.projectName,
       showTenderModal:false,
       showTakeActionModal: false,
       startTimestamp:undefined,
@@ -43,6 +45,10 @@ class IncidentsList extends Component {
     this.setIncidentsList(this.props);
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setIncidentsList(this.props);
+  }
+
   @autobind
   handleNoIncidentSelected(){
     // this.props.onIncidentSelected(undefined);
@@ -54,6 +60,21 @@ class IncidentsList extends Component {
         this.props.onIncidentSelected(incident);
         let incidentState={activeIncident:incident};
         this.setState(incidentState);
+  }
+
+  @autobind
+  handleProjectChartsView() {
+    const {projectName,cvalue} = this.state;
+    if (projectName) {
+      let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+      let projectParam = projectParams.find((p) => p.projectName == projectName);
+      let cvalueParam = cvalue ? cvalue : "1";
+      let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
+      let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+
+      const url = `/liveMonitoring?version=2&pvalue=${pvalueParam}&cvalue=${cvalueParam}&modelType=${modelType}&projectName=${projectName}`;
+      window.open(url, '_blank');
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -70,6 +91,8 @@ class IncidentsList extends Component {
       return value['anomalyRatio']
     });
     let stateIncidents = {
+      cvalue:props.cvalue,
+      projectName:props.projectName,
       incidents:props.incidents,
       maxAnomalyRatio: _.max(anomalyRatioLists),
       minAnomalyRatio: _.min(anomalyRatioLists),
@@ -165,11 +188,24 @@ class IncidentsList extends Component {
     let self =this;
     return (
       <div>
+        <div className="row" style={{ marginBottom: 10 }}>
+          <Button className='orange' style={{'float':'right','marginTop':'5px'}} onClick={this.handleProjectChartsView}>Line Charts</Button>
+          <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Overall Causal Graph"
+                  onClick={(e) => {
+                  e.stopPropagation();
+                  this.setState({
+                    showTenderModal: true,
+                    startTimestamp: undefined,
+                    endTimestamp: undefined
+                  });}}>
+            Overall Causal Graph
+          </Button>
         <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}
                onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
             <a className={tabStates['predicted'] + ' item'}
                onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
+        </div>
         </div>
         <div className={tabStates['predicted'] + ' ui tab '}>
           {(predictedIncidents.length > 0) ?
@@ -246,14 +282,14 @@ class IncidentsList extends Component {
                       }
                   }
                 }).map(function (incident,index) {
-                  let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
-                  let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
-                    return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
-                    if(rootCauseTypesCategory[incidentX]){
-                        return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
-                            if(suggestedActionsCategory[suggestedX]){
+                  // let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
+                  // let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
+                  //   return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
+                  //   if(rootCauseTypesCategory[incidentX]){
+                  //       return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
+                  //           if(suggestedActionsCategory[suggestedX]){
                                 return (
-                                    <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
+                                    <tr style={{ display: 'inline-table','width': '100%'}} key={index}
                                         onClick={()=>self.handleIncidentSelected(incident)}
                                         className={cx({'active': incident === self.state.activeIncident})}
                                         title={"Start: " + moment(moment(incident.startTimestamp).utc()['_d']).format("MM-DD HH:mm")
@@ -269,16 +305,15 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{rootCauseTypesCategory[incidentX]}</td>
-                                      <td className="code">{suggestedActionsCategory[suggestedX]}</td>
+                                      <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+                                      <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                                     </tr>
                                 )
-                            }
-                            });
-                          }
-                      });
-            }
-            )}
+                          //   }
+                          //   });
+                          // }
+                      // });
+            })}
             </tbody>
             </table>
             :
@@ -360,14 +395,14 @@ class IncidentsList extends Component {
                   }
               }
               }).map(function(incident, index){
-              let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
-              let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
-              return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
-                    if(rootCauseTypesCategory[incidentX]){
-                        return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
-                            if(suggestedActionsCategory[suggestedX]){
+              // let rootCauseTypesCategory = incident.rootCauseJson.rootCauseTypesCategory;
+              // let suggestedActionsCategory = incident.rootCauseJson.suggestedActionsCategory;
+              // return _.keysIn(rootCauseTypesCategory).map(function (incidentX,indexY) {
+              //       if(rootCauseTypesCategory[incidentX]){
+              //           return _.keysIn(suggestedActionsCategory).map(function (suggestedX,suggestedY){
+              //               if(suggestedActionsCategory[suggestedX]){
                                 return (
-                                    <tr style={{ display: 'inline-table','width': '100%'}} key={incidentX+index+suggestedX}
+                                    <tr style={{ display: 'inline-table','width': '100%'}} key={index}
                                         onClick={()=>self.handleIncidentSelected(incident)}
                                         className={cx({'active': incident === self.state.activeIncident})}
                                         title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
@@ -383,14 +418,14 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{rootCauseTypesCategory[incidentX]}</td>
-                                      <td className="code">{suggestedActionsCategory[suggestedX]}</td>
+                                      <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+                                      <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                                     </tr>
                                 )
-                            }
-                        });
-                  }
-              });
+                  //           }
+                  //       });
+                  // }
+              // });
           })}
           </tbody>
           </table>

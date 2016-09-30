@@ -30,6 +30,8 @@ class IncidentsTreeMap extends Component {
       faux: null,
       startTimestamp:undefined,
       endTimestamp:undefined,
+      treeMapValue:"0",
+      cpuUtilizationByInstance:props.cpuUtilizationByInstance
     }
   }
 
@@ -37,12 +39,11 @@ class IncidentsTreeMap extends Component {
     if (!_.isEmpty(this.props.data) && this.$container) {
       const root = _.cloneDeep(this.props.data);
       this.transformData(root);
-      if(this.props.treeMapChange){
-        this.displayData(root);
-      }
-      else{
-        this.displayData(root, this.props.treeMapValue, this.props.cpuUtilizationByInstance);
-      }
+      this.setState({
+        startTimestamp:root.startTimestamp,
+        endTimestamp:root.endTimestamp
+      });
+      this.displayData(root);
     }
   }
 
@@ -79,11 +80,22 @@ class IncidentsTreeMap extends Component {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
       this.transformData(root);
-      this.displayData(root, nextProps.treeMapValue, nextProps.cpuUtilizationByInstance ,nextProps.treeMapChange);
+      this.displayData(root);
       this.setState({
         startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp
+        endTimestamp:root.endTimestamp,
+        treeMapChange:nextProps.treeMapChange
       });
+      if(nextProps.treeMapValue != 0){
+        this.setState({
+          treeMapValue:nextProps.treeMapValue
+        });        
+      }
+      if(nextProps.cpuUtilizationByInstance != 0){
+        this.setState({
+          cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
+        });        
+      }
     }
   }
 
@@ -157,29 +169,32 @@ class IncidentsTreeMap extends Component {
     return severityToRGBHex(val);
   }
 
-  severityToRGBHex(treeMapValue,cpuUtilizationByInstance,d) {
+  severityToRGBHex(d) {
+    let {cpuUtilizationByInstance,treeMapValue} = this.state;
     let val = d.score;
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
+    let threshold = parseInt(treeMapValue);
     if (this.state.treeMapChange) {
-      if (treeMapValue > cpuUtilizationByInstance[d.name]) {
-        if (val < 0)
-          val = 0;
-        if (val > 0)
-          val = 1;
-        rcolor = 173;
-        gcolor = 216;
-        bcolor = 230;
-      } else {
-        if ((d.id && d.id.toLowerCase().indexOf('cpu') != -1) || val>0) {
+      if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
+        && threshold > cpuUtilizationByInstance[d.instanceName]) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
-        } else {
-            rcolor = 0;
-            gcolor = gcolorMax;
-            bcolor = 0;
-        }
+      } else if(d.type == 'instance' 
+        && threshold > cpuUtilizationByInstance[d.name]) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+      } else if(d.type == 'container' 
+        && threshold > cpuUtilizationByInstance[d.instanceName]) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+      } else {
+          rcolor = 0;
+          gcolor = gcolorMax;
+          bcolor = 0;
       }
     } else {
       if (val <= 1) {
@@ -204,8 +219,8 @@ class IncidentsTreeMap extends Component {
    * @param data
    */
   @autobind
-  displayData(data, treeMapValue=undefined, cpuUtilizationByInstance=undefined, treeMapChange=this.state.treeMapChange) {
-    this.setState({treeMapChange: treeMapChange},()=>{
+  displayData(data) {
+    this.setState({},()=>{
       if (!data) return;
 
       const navHeight = this.navHeight;
@@ -289,7 +304,7 @@ class IncidentsTreeMap extends Component {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
         .append("title").text(d => d.name);
-      g.selectAll('.parent').attr('fill', d => this.color(treeMapValue,cpuUtilizationByInstance,d));
+      g.selectAll('.parent').attr('fill', d => this.color(d));
   //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
       g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
@@ -307,7 +322,7 @@ class IncidentsTreeMap extends Component {
 
   render() {
     return (
-      <div className="incidents treemap">
+      <div className="incidents treemap"  style={{ marginTop: 10 }}>
         <div ref={c => this.$container = $(c)}
              style={{ padding: 4, height: '100%', width: '100%' }}>
           {this.state.faux}
