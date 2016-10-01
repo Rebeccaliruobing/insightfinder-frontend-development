@@ -84,14 +84,18 @@ class IncidentsTreeMap extends Component {
       this.setState({
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp,
-        treeMapChange:nextProps.treeMapChange
       });
-      if(nextProps.treeMapValue != 0){
+      if(typeof nextProps.treeMapChange == 'boolean'){
+        this.setState({
+          treeMapChange:nextProps.treeMapChange
+        });        
+      }
+      if(typeof nextProps.treeMapValue == 'string'){
         this.setState({
           treeMapValue:nextProps.treeMapValue
         });        
       }
-      if(nextProps.cpuUtilizationByInstance != 0){
+      if(typeof nextProps.cpuUtilizationByInstance == 'object'){
         this.setState({
           cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
         });        
@@ -177,17 +181,17 @@ class IncidentsTreeMap extends Component {
     let threshold = parseInt(treeMapValue);
     if (this.state.treeMapChange) {
       if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
-        && threshold > cpuUtilizationByInstance[d.instanceName]) {
+        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
       } else if(d.type == 'instance' 
-        && threshold > cpuUtilizationByInstance[d.name]) {
+        && threshold >= cpuUtilizationByInstance[d.name]) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
       } else if(d.type == 'container' 
-        && threshold > cpuUtilizationByInstance[d.instanceName]) {
+        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;

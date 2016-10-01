@@ -167,7 +167,7 @@ class EventSummary2 extends Component {
                       treeMapText: (treeMapChange)?"Utilization":"Anomaly"
                       });
                   }}>
-                    Anomaly View
+                    Anomalies
                   </Button>
                   <Button className={treeMapChange?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
                       e.stopPropagation();
@@ -176,10 +176,10 @@ class EventSummary2 extends Component {
                       treeMapText: (treeMapChange)?"Utilization":"Anomaly"
                       });
                   }}>
-                    Utilization View
+                    CPU Utilization
                   </Button>
                   {treeMapChange?
-                    <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                    <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
                   <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>

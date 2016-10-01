@@ -190,7 +190,7 @@ class IncidentsList extends Component {
       <div>
         <div className="row" style={{ marginBottom: 10 }}>
           <Button className='orange' style={{'float':'right','marginTop':'5px'}} onClick={this.handleProjectChartsView}>Line Charts</Button>
-          <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Overall Causal Graph"
+          <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Causal Graph"
                   onClick={(e) => {
                   e.stopPropagation();
                   this.setState({
@@ -198,7 +198,7 @@ class IncidentsList extends Component {
                     startTimestamp: undefined,
                     endTimestamp: undefined
                   });}}>
-            Overall Causal Graph
+            Causal Graph
           </Button>
         <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}
@@ -218,6 +218,7 @@ class IncidentsList extends Component {
               <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
               <th>Suggested Actions</th>
+              <th></th>
             </tr>
             </thead>
             <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
@@ -307,6 +308,20 @@ class IncidentsList extends Component {
                                       </td>
                                       <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                                       <td className="code">{incident.rootCauseJson.suggestedActions}</td>
+                                      <td>
+                                        { incident.anomalyRatio==0 ?
+                                          "N/A"
+                                          :
+                                          <Button className="blue" onClick={(e) => {
+                                            e.stopPropagation();
+                                            self.setState({
+                                              activeIncident: incident,
+                                              showTakeActionModal: true
+                                            });}}
+                                            style={{paddingLeft:2, paddingRight:2}}>
+                                          Take action
+                                        </Button> }
+                                      </td>
                                     </tr>
                                 )
                           //   }
@@ -331,6 +346,7 @@ class IncidentsList extends Component {
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
             <th>Suggested Actions</th>
+            <th></th>
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '444px','overflow': 'auto','display': 'block' }}>
@@ -420,6 +436,20 @@ class IncidentsList extends Component {
                                       </td>
                                       <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
                                       <td className="code">{incident.rootCauseJson.suggestedActions}</td>
+                                      <td>
+                                        { incident.anomalyRatio==0 ?
+                                          "N/A"
+                                          :
+                                          <Button className="blue" onClick={(e) => {
+                                            e.stopPropagation();
+                                            self.setState({
+                                              activeIncident: incident,
+                                              showTakeActionModal: true
+                                            });}}
+                                            style={{paddingLeft:2, paddingRight:2}}>
+                                          Take action
+                                        </Button> }
+                                      </td>
                                     </tr>
                                 )
                   //           }
@@ -440,7 +470,7 @@ class IncidentsList extends Component {
                        onClose={() => this.setState({ showTenderModal: false })}/>
         }
         { this.state.showTakeActionModal &&
-          <TakeActionModal incident={this.state.activeIncident}
+          <TakeActionModal incident={this.state.activeIncident} projectName={this.state.projectName}
                        onClose={() => this.setState({ showTakeActionModal: false })}/>
         }
       </div>
