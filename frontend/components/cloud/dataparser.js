@@ -106,26 +106,39 @@ class DataParser {
     });
     return retMap;
   }
+
+  _calculateRGB(anomalyRatio, size){
+    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+    let gcolorMax = 205;
+    var rcolor, gcolor, bcolor = 0;
+    if (val <= 1) {
+        if (val < 0) val = 0;
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+    } else {
+        if (val > 10) val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+    }
+    return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
+  }
+
   _parseIncidentList(){
     if (this.causalDataArray) return;
     let causalDataArray = [];
     let causalTypes = [];
     let incidents = this.data['incidentsJson'];
+    let self = this;
     if(incidents){
       _.each(incidents, function (incident, index) {
-        if(incident.anomalyMapJson){
+        if(incident.rootCauseByInstanceJson){
           let thisAnomaly = [];
           let timeString = moment(parseInt(incident.timestamp)).format("YYYY-MM-DD HH:mm")
           thisAnomaly.push(timeString + ",anomaly ratio:" + incident.anomalyRatio);
-          for(var k in incident.anomalyMapJson){
-            let rank = 1;
+          for(var k in incident.rootCauseByInstanceJson){
             causalTypes.push(k);
-            let hint = incident.anomalyMapJson[k];
-            for(var h in hint){
-              let val = hint[h];
-              thisAnomaly.push(rank + "." + h + " [" + k + "](" + val + ")");
-              rank++;
-            }
+            let rootcause = incident.rootCauseByInstanceJson[k];
+            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + k + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
           }
           causalDataArray.push(thisAnomaly);
         }

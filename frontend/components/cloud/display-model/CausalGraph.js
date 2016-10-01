@@ -9,6 +9,7 @@ class Point {
     x;
     y;
     title;
+    color;
 
     constructor(x, y) {
         this.id = `point-${parseInt(x)}-${parseInt(y)}`;
@@ -88,6 +89,7 @@ export default class CausalGraph extends React.Component {
         let { svg } = state;
         state.points = [];
         state.lines = [];
+        let self = this;
 
         let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
@@ -107,13 +109,16 @@ export default class CausalGraph extends React.Component {
 
                     var point = new Point(x, y);
                     // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
-                    let pos1 = text.indexOf(".");
-                    let pos2 = text.indexOf("[");
-                    let pos3 = text.indexOf("(");
-                    let pos4 = text.indexOf("(",pos3+1);
-                    let metric = text.substring(pos1+1,pos2-1).trim();
-                    let value = text.substring(pos3+1,pos4-2).trim();
-                    point.title = "Metric:"+metric+", value:"+value;
+                    let pos1 = text.indexOf(']');
+                    point.title = text.substring(0,pos1)+']';
+                    point.color = text.substring(pos1+1,text.length);
+                    // let pos1 = text.indexOf(".");
+                    // let pos2 = text.indexOf("[");
+                    // let pos3 = text.indexOf("(");
+                    // let pos4 = text.indexOf("(",pos3+1);
+                    // let metric = text.substring(pos1+1,pos2-1).trim();
+                    // let value = text.substring(pos3+1,pos4-2).trim();
+                    // point.title = "Metric:"+metric+", value:"+value;
 
                     lastPoints[i].push(point);
                     state.points.push(point);
@@ -184,8 +189,8 @@ export default class CausalGraph extends React.Component {
 
         return (
             <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={(isHover ? 8 : 5)}
-                    cx={x} cy={y} fill="rgb(255, 127, 14)"
-                    style={{ strokeWidth: 1, stroke: isHover ? 'rgb(255, 127, 14)' : '#fff', cursor: 'pointer' }}
+                    cx={x} cy={y} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: isHover ? point.color : '#fff', cursor: 'pointer' }}
                     onMouseEnter={()=>this.highLightPoint(point)}
                     onMouseLeave={()=>this.unHighLightPoint(point)}>
                 <title>{point.title}</title>

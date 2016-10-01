@@ -124,11 +124,12 @@ class IncidentsList extends Component {
       tabStates[tab] = 'active';
       this.setState({tabStates: tabStates, angleIconStyleSelect: angleIconStyleSelect, angleIconStyle: angleIconStyle});
   }
-    changeAngleStyle(angleIconStyleSelect){
-        let {angleIconStyle} = this.state;
-        angleIconStyle[angleIconStyleSelect] = angleIconStyle[angleIconStyleSelect] === 'up'?'down':'up';
-        this.setState({angleIconStyle: angleIconStyle, angleIconStyleSelect: angleIconStyleSelect});
-    }
+  
+  changeAngleStyle(angleIconStyleSelect){
+      let {angleIconStyle} = this.state;
+      angleIconStyle[angleIconStyleSelect] = angleIconStyle[angleIconStyleSelect] === 'up'?'down':'up';
+      this.setState({angleIconStyle: angleIconStyle, angleIconStyleSelect: angleIconStyleSelect});
+  }
 
   calculateRGB(anomalyRatio, size){
     let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
