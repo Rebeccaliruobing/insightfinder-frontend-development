@@ -117,16 +117,14 @@ class DataParser {
           let thisAnomaly = [];
           let timeString = moment(parseInt(incident.timestamp)).format("YYYY-MM-DD HH:mm")
           thisAnomaly.push(timeString + ",anomaly ratio:" + incident.anomalyRatio);
-          if(incident.anomalyMapJson){
-            for(var k in incident.anomalyMapJson){
-              let rank = 1;
-              causalTypes.push(k);
-              let hint = incident.anomalyMapJson[k];
-              for(var h in hint){
-                let val = hint[h];
-                thisAnomaly.push(rank + "." + h + " [" + k + "](" + val + ")");
-                rank++;
-              }
+          for(var k in incident.anomalyMapJson){
+            let rank = 1;
+            causalTypes.push(k);
+            let hint = incident.anomalyMapJson[k];
+            for(var h in hint){
+              let val = hint[h];
+              thisAnomaly.push(rank + "." + h + " [" + k + "](" + val + ")");
+              rank++;
             }
           }
           causalDataArray.push(thisAnomaly);
