@@ -1084,6 +1084,26 @@ const apis = {
             });
         });
     },
+
+    postSysCallResult(projectName, startTimestamp, endTimestamp, userName = store.get('userName'), token = store.get('token')) {
+        let version = "1";
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: getEndpoint('sysCallResult', version),
+                data: $.param({ userName, token, projectName, startTimestamp, endTimestamp }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
 };
 
 

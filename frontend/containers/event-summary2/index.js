@@ -196,7 +196,7 @@ class EventSummary2 extends Component {
             </div>
           </div>
         </div>
-          { this.state.showTenderModal &&
+        { this.state.showTenderModal &&
             <TenderModal dataArray={data.causalDataArray} types={data.causalTypes}
                      endTimestamp={this.state.endTimestamp}
                      startTimestamp={this.state.startTimestamp}

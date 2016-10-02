@@ -8,6 +8,8 @@ import thumbupImg from '../../images/green-thumbup.png';
 import _ from 'lodash';
 import { IncidentDurationMinute,IncidentActionTaken } from '../selections';
 import TakeActionModal from './takeActionModal';
+import SysCallModal from './sysCallModal';
+import apis from '../../apis';
 
 class IncidentsList extends Component {
 
@@ -23,6 +25,10 @@ class IncidentsList extends Component {
       projectName:props.projectName,
       showTenderModal:false,
       showTakeActionModal: false,
+      showSysCall: false,
+      debugData:undefined,
+      timeRanking:undefined,
+      freqRanking:undefined,
       startTimestamp:undefined,
       endTimestamp:undefined,
       activeIncident:undefined,
@@ -47,6 +53,31 @@ class IncidentsList extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setIncidentsList(this.props);
+  }
+
+  handleLoadSysCall(activeIncident){
+    let {projectName} = this.state;
+    let instanceId = undefined;
+    let self = this;
+    if(activeIncident){
+      let startTimestamp = activeIncident.startTimestamp;
+      let endTimestamp = activeIncident.endTimestamp;
+      apis.postSysCallResult(projectName, startTimestamp, endTimestamp).then((resp)=>{
+        console.log(resp);
+        if(resp.success){
+          self.setState({
+            debugData:resp.data.syscallResults,
+            timeRanking:resp.data.freqFunctionList,
+            freqRanking:resp.data.timeFunctionList,
+            showSysCall: true
+          });
+        }else{
+          alert(resp.message);
+        }
+      });
+    } else {
+      alert("Cannot find incident to retrieve syscall data for.");
+    }
   }
 
   @autobind
@@ -124,7 +155,7 @@ class IncidentsList extends Component {
       tabStates[tab] = 'active';
       this.setState({tabStates: tabStates, angleIconStyleSelect: angleIconStyleSelect, angleIconStyle: angleIconStyle});
   }
-  
+
   changeAngleStyle(angleIconStyleSelect){
       let {angleIconStyle} = this.state;
       angleIconStyle[angleIconStyleSelect] = angleIconStyle[angleIconStyleSelect] === 'up'?'down':'up';
@@ -425,7 +456,7 @@ class IncidentsList extends Component {
                                         title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                                           + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                                           + ", duration: " + incident.duration + " min"}>
-                                      <td>{incident.id}</td>
+                                      <td><span onClick={(e) => {self.handleLoadSysCall(incident)}}>{incident.id}</span></td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                                       <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
                                       <td>
@@ -473,6 +504,10 @@ class IncidentsList extends Component {
         { this.state.showTakeActionModal &&
           <TakeActionModal incident={this.state.activeIncident} projectName={this.state.projectName}
                        onClose={() => this.setState({ showTakeActionModal: false })}/>
+        }
+        { this.state.showSysCall &&
+          <SysCallModal timeRanking={this.state.timeRanking} freqRanking={this.state.freqRanking} dataArray={this.state.debugData} 
+                      onClose={() => this.setState({ showSysCall: false })}/>
         }
       </div>
     )
