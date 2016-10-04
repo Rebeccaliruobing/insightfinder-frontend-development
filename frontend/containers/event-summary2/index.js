@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
-import { LiveProjectSelection,NumberOfDays, TreemapOptionsSelect } from '../../components/selections';
+import { LiveProjectSelection,NumberOfDays, TreemapOptionsSelect,EventSummaryModelType } from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
@@ -32,7 +32,8 @@ class EventSummary2 extends Component {
       projectName: undefined,
       showTenderModal: false,
       selectedIncident: undefined,
-      cvalue: "1"
+      cvalue: "1",
+      modelType:"Holistic",
     };
   }
 
@@ -71,17 +72,24 @@ class EventSummary2 extends Component {
 
   @autobind
   handleProjectChartsView() {
-    const {projectName,cvalue} = this.state;
+    const {projectName,cvalue,modelType} = this.state;
     if (projectName) {
       let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
       let projectParam = projectParams.find((p) => p.projectName == projectName);
       let cvalueParam = cvalue ? cvalue : "1";
       let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
-      let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+      // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
 
       const url = `/liveMonitoring?version=2&pvalue=${pvalueParam}&cvalue=${cvalueParam}&modelType=${modelType}&projectName=${projectName}`;
       window.open(url, '_blank');
     }
+  }
+
+  @autobind
+  handleModelTypeChange(value, modelType) {
+    this.setState({modelType:modelType});
+    let { projectName } = this.state;
+    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -93,11 +101,11 @@ class EventSummary2 extends Component {
 
   @autobind
   handleProjectChange(value, projectName) {
-    const {cvalue} = this.state;
+    const {cvalue, modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
     let pvalue = projectParam ? projectParam.pvalue : "0.99";
-    let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+    // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
     apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 2)
@@ -134,7 +142,7 @@ class EventSummary2 extends Component {
   }
 
   render() {
-    let { loading, data, projectName, incidentsTreeMap, cvalue, treeMapValue,treeMapChange,treeMapText} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, cvalue, modelType, treeMapValue,treeMapChange,treeMapText} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
@@ -149,6 +157,9 @@ class EventSummary2 extends Component {
             <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Number of Days:&nbsp;</label>
             <NumberOfDays style={{width: 50}}
                                   value={cvalue} onChange={this.handleDayChange}/>
+            <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Model Type:&nbsp;</label>
+            <EventSummaryModelType style={{width: 50}}
+                                  value={modelType} onChange={this.handleModelTypeChange}/>
             <label style={{ fontWeight: 'bold', 'float': 'right' }}>
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </label>
