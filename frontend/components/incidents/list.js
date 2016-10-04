@@ -189,7 +189,7 @@ class IncidentsList extends Component {
                 //             showTakeActionModal: true
                 //           });}}
                 //           style={{width: 80, paddingLeft:0, paddingRight:0}}>
-                //     take action
+                //     Action
                 //   </Button> }
                 // </td>
                 // <td>
@@ -351,7 +351,7 @@ class IncidentsList extends Component {
                                               showTakeActionModal: true
                                             });}}
                                             style={{paddingLeft:2, paddingRight:2}}>
-                                          Take action
+                                          Action
                                         </Button> }
                                       </td>
                                     </tr>
@@ -456,7 +456,7 @@ class IncidentsList extends Component {
                                         title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
                                           + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
                                           + ", duration: " + incident.duration + " min"}>
-                                      <td><span onClick={(e) => {self.handleLoadSysCall(incident)}}>{incident.id}</span></td>
+                                      <td>{incident.id}</td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                                       <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
                                       <td>
@@ -466,7 +466,7 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+                                      <td className="code">{incident.rootCauseJson.rootCauseTypes} <i className="zoom icon" onClick={(e) => {self.handleLoadSysCall(incident)}}/></td>
                                       <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
@@ -479,7 +479,7 @@ class IncidentsList extends Component {
                                               showTakeActionModal: true
                                             });}}
                                             style={{paddingLeft:2, paddingRight:2}}>
-                                          Take action
+                                          Action
                                         </Button> }
                                       </td>
                                     </tr>

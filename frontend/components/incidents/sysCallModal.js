@@ -82,8 +82,8 @@ class SysCallModal extends React.Component {
                                                     <table className="word-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
-                                                            <th>rank</th>
-                                                            <th>functionName</th>
+                                                            <th>Rank</th>
+                                                            <th>Function Name</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
@@ -107,8 +107,8 @@ class SysCallModal extends React.Component {
                                                     <table className="word-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
-                                                            <th>rank</th>
-                                                            <th>functionName</th>
+                                                            <th>Rank</th>
+                                                            <th>Function Name</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
