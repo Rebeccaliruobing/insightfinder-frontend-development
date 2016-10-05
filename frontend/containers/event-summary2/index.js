@@ -198,6 +198,7 @@ class EventSummary2 extends Component {
                 <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 
                                  cvalue={cvalue} 
+                                 modelType={modelType} 
                                  onIncidentSelected={this.handleIncidentSelected}
                                  incidents={data.incidents}
                                  causalDataArray={data.causalDataArray}

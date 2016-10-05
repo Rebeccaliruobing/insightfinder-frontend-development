@@ -22,6 +22,7 @@ class IncidentsList extends Component {
       causalTypes:props.causalTypes,
       latestTimestamp:props.latestTimestamp,
       cvalue:props.cvalue,
+      modelType:props.modelType,
       projectName:props.projectName,
       showTenderModal:false,
       showTakeActionModal: false,
@@ -95,13 +96,13 @@ class IncidentsList extends Component {
 
   @autobind
   handleProjectChartsView() {
-    const {projectName,cvalue} = this.state;
+    const {projectName,cvalue,modelType} = this.state;
     if (projectName) {
       let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
       let projectParam = projectParams.find((p) => p.projectName == projectName);
       let cvalueParam = cvalue ? cvalue : "1";
       let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
-      let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+      // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
 
       const url = `/liveMonitoring?version=2&pvalue=${pvalueParam}&cvalue=${cvalueParam}&modelType=${modelType}&projectName=${projectName}`;
       window.open(url, '_blank');
@@ -123,6 +124,7 @@ class IncidentsList extends Component {
     });
     let stateIncidents = {
       cvalue:props.cvalue,
+      modelType:props.modelType,
       projectName:props.projectName,
       incidents:props.incidents,
       maxAnomalyRatio: _.max(anomalyRatioLists),

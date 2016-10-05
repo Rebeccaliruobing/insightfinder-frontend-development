@@ -3,7 +3,7 @@ import store from 'store';
 import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
-
+import apis from '../../../apis';
 import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
@@ -46,8 +46,8 @@ class LiveAnalysisCharts extends React.Component {
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'list')).toLowerCase(),
-            columns: (store.get(GridColumns, 'two')).toLowerCase(),
+            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            columns: (store.get(GridColumns, 'four')).toLowerCase(),
             selectedGroupId: undefined,
             selectedAnnotation: null,
             showSettingModal: false,
@@ -113,8 +113,46 @@ class LiveAnalysisCharts extends React.Component {
             }
           } 
         }
-
     }
+
+    saveDataToStorage(){
+      let { projectName, ...rest } = this.props;
+      let data = this.dp.data.data;
+      let lines = data.trim().split("\\n");
+      if(lines.length <= 1){
+        alert("empty data");
+        return;
+      }
+      if(lines.length == 2 && lines[1]==""){
+        alert("empty data");
+        return;
+      }
+      let line1 = lines[1];
+      let fields1 = line1.split(',');
+      let startTimestamp = parseInt(fields1[0]);
+      let lineN = lines[lines.length-1];
+      if(lineN.trim().length==0){
+        lineN = lines[lines.length-2];
+      }
+      let fieldsN = lineN.split(',');
+      let endTimestamp = parseInt(fieldsN[0]);
+
+      this.setState({loading: true}, ()=> {
+        apis.postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp)
+          .then(resp => {
+            if (resp.success) {
+              alert(resp.message);
+            } else {
+              console.error(resp.message);
+            }
+            this.setState({loading: false});
+          })
+          .catch(msg=> {
+            console.error(msg);
+            this.setState({loading: false});
+          });
+      });
+    };
 
     exportData(){
         let data = this.dp.data.data;
@@ -205,7 +243,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
+        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName} = this.props;
         const { view, columns,tabStates } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -221,7 +259,6 @@ class LiveAnalysisCharts extends React.Component {
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
-        //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
         let latestDataTimestamp = propsData?propsData['latestDataTimestamp']:"";
         let instances = (propsData&&propsData['instances'])?propsData['instances'].split(',').length: 1;
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
@@ -273,6 +310,9 @@ class LiveAnalysisCharts extends React.Component {
                             <Button className="labeled icon" onClick={() => this.exportData()}>
                                 <i className="icon download"/>Export
                             </Button>
+                            {projectName!=undefined && <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
+                                <i className="icon cloud"/>Save To Storage
+                            </Button>}
                             <ButtonGroup className="right floated basic icon">
                                 <Button onClick={()=> this.setState({ showSettingModal: true })}>
                                     <i className="icon setting"/>
@@ -302,7 +342,7 @@ class LiveAnalysisCharts extends React.Component {
                                     {!summary && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
-                                    {!!summary &&
+                                    {!!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
