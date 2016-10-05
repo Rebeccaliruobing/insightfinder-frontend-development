@@ -26,7 +26,8 @@ class EventSummary2 extends Component {
         statistics: {},
         summary: {},
         incidents: [],
-        incidentsTreeMap: []
+        incidentsTreeMap: [],
+        instanceMetaData: {},
       },
       loading: true,
       projectName: undefined,
@@ -55,7 +56,7 @@ class EventSummary2 extends Component {
     const {projectName, data, cvalue} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm")+", end: "+moment(incident.endTimestamp).format("MM-DD HH:mm");
+      let caption = "Incident #"+incident.id;
       let stats = incident.instanceMetricJson;
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
@@ -146,6 +147,7 @@ class EventSummary2 extends Component {
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
+    let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
@@ -193,7 +195,7 @@ class EventSummary2 extends Component {
                     <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
-                  <IncidentsTreeMap data={incidentsTreeMap} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
+                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="eight wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 

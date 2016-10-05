@@ -31,7 +31,8 @@ class IncidentsTreeMap extends Component {
       startTimestamp:undefined,
       endTimestamp:undefined,
       treeMapValue:"0",
-      cpuUtilizationByInstance:props.cpuUtilizationByInstance
+      cpuUtilizationByInstance:props.cpuUtilizationByInstance,
+      instanceMetaData:props.instanceMetaData
     }
   }
 
@@ -84,6 +85,7 @@ class IncidentsTreeMap extends Component {
       this.setState({
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp,
+        instanceMetaData:nextProps.instanceMetaData
       });
       if(typeof nextProps.treeMapChange == 'boolean'){
         this.setState({
@@ -224,6 +226,7 @@ class IncidentsTreeMap extends Component {
    */
   @autobind
   displayData(data) {
+    let {instanceMetaData} = this.state;
     this.setState({},()=>{
       if (!data) return;
 
@@ -260,7 +263,7 @@ class IncidentsTreeMap extends Component {
       };
       const text = t => {
       };
-      const name = d => d.parent ? name(d.parent) + " / " + d.name : d.name;
+      const name = d => (d.parent ? name(d.parent) + " / " + ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name) : ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name));
 
       // Set up the new layout for the data
       layout(data);
@@ -310,7 +313,7 @@ class IncidentsTreeMap extends Component {
         .append("title").text(d => d.name);
       g.selectAll('.parent').attr('fill', d => this.color(d));
   //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
-      g.append("text").attr("dy", ".75em").text(d => d.name).call( t => {
+      g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
       });
       g.append("text").attr("dy", ".75em").text(d => d.score > 0 ? d.score.toFixed(2) : '').call( t => {

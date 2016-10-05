@@ -145,7 +145,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, ver
           const statistics = data['instanceMetricJson'] || {};
           const heatmap = data['anomalyMapJson'] || {};
           const incidentList = data['incidentsJson'] || [];
-
+          const instanceMetaData = data['instanceMetaDataJson'] || {};
           const parser = new DataParser(data);
           const summary = parser.getSummaryData() || {};
           const causalDataArray = parser.causalDataArray || [];
@@ -155,6 +155,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, ver
           ret['statistics'] = statistics;
           ret['instanceMetricJson'] = statistics;
           ret['anomalyMapJson'] = heatmap;
+          ret['instanceMetaData'] = instanceMetaData;
           ret['projectName'] = projectName;
           ret['summary'] = summary;
           ret['causalDataArray'] = causalDataArray;
