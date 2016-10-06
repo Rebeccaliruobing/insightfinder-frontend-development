@@ -316,7 +316,7 @@ class IncidentsTreeMap extends Component {
       g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
       });
-      g.append("text").attr("dy", ".75em").text(d => d.score > 0 ? d.score.toFixed(2) : '').call( t => {
+      g.append("text").attr("dy", ".75em").text(d => d.eventType).call( t => {
         t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
       });
 
