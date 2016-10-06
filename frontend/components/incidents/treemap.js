@@ -90,7 +90,7 @@ class IncidentsTreeMap extends Component {
       if(typeof nextProps.treeMapChange == 'boolean'){
         this.setState({
           treeMapChange:nextProps.treeMapChange
-        });        
+        });
       }
       if(typeof nextProps.treeMapValue == 'string'){
         this.setState({
@@ -288,7 +288,7 @@ class IncidentsTreeMap extends Component {
           .datum(data).on('click', this.showInstanceChart);
         navbar.append("text")
           .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
-          .text('Instance Line Chart');
+          .text('All Metric Charts');
       } else {
         navbar.append("rect")
           .attr({ y: -navHeight, width: width, height: navHeight, })

@@ -100,8 +100,7 @@ class EventSummary2 extends Component {
     this.refreshProjectName(projectName);
   }
 
-  @autobind
-  handleProjectChange(value, projectName) {
+  refreshProjectName(projectName) {
     const {cvalue, modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
@@ -135,8 +134,14 @@ class EventSummary2 extends Component {
       });
       this.handleIncidentSelected();
   }
-  refreshProjectName(projectName){
-    this.handleProjectChange(projectName,projectName);
+
+  @autobind
+  handleProjectChange(value,projectName){
+    this.setState({
+      cvalue: "1",
+      modelType:"Holistic",
+    });
+    this.refreshProjectName(projectName);
   }
   handleTreeMapChange(value){
     this.setState({treeMapValue: value});
@@ -149,6 +154,7 @@ class EventSummary2 extends Component {
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
+    let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
@@ -172,7 +178,7 @@ class EventSummary2 extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
-                <div className="eight wide column" style={{ height: 500, 'paddingTop': 20 }}>
+                <div className="ten wide column" style={{ height: 500, 'paddingTop': 20 }}>
                   <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
                       e.stopPropagation();
                       this.setState({
@@ -197,8 +203,9 @@ class EventSummary2 extends Component {
                   null}
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
-                <div className="eight wide column" style={{ height: 500 }}>
+                <div className="six wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 
+                                 projectType={projectType}
                                  cvalue={cvalue} 
                                  modelType={modelType} 
                                  onIncidentSelected={this.handleIncidentSelected}

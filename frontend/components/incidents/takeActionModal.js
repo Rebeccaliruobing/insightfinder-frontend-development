@@ -3,6 +3,7 @@ import shallowCompare from 'react-addons-shallow-compare';
 import {Modal} from '../../artui/react';
 import {IncidentActionTaken} from '../selections';
 import apis from '../../apis';
+import "./incident.less";
 
 class TakeActionModal extends React.Component {
 
@@ -74,7 +75,11 @@ class TakeActionModal extends React.Component {
     return(
       <Modal {...rest} size="mini" closable={false}>
         <div className="content">
-          Take action on this event: <br/>
+          <h5>Suggested action: </h5>
+          <span className="code">{incident.rootCauseJson.suggestedActions}</span>
+        </div>
+        <div className="content">
+          <h5>Take action on this event:</h5>
           <IncidentActionTaken value={action} onChange={(value)=>this.handleActionChange(value)}/>
         </div>
         <div className="actions">

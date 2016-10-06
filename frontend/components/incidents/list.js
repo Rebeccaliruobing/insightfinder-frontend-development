@@ -24,6 +24,7 @@ class IncidentsList extends Component {
       cvalue:props.cvalue,
       modelType:props.modelType,
       projectName:props.projectName,
+      projectType:props.projectType,
       showTenderModal:false,
       showTakeActionModal: false,
       showSysCall: false,
@@ -53,7 +54,7 @@ class IncidentsList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setIncidentsList(this.props);
+    this.setIncidentsList(nextProps);
   }
 
   handleLoadSysCall(activeIncident){
@@ -109,10 +110,6 @@ class IncidentsList extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setIncidentsList(nextProps);
-  }
-
   handleLinkToAgentWiki(){
     const url = `https://github.com/insightfinder/InsightAgent/wiki`;
     window.open(url, '_blank');
@@ -126,6 +123,7 @@ class IncidentsList extends Component {
       cvalue:props.cvalue,
       modelType:props.modelType,
       projectName:props.projectName,
+      projectType:props.projectType,
       incidents:props.incidents,
       maxAnomalyRatio: _.max(anomalyRatioLists),
       minAnomalyRatio: _.min(anomalyRatioLists),
@@ -214,11 +212,13 @@ class IncidentsList extends Component {
                 //     </Button> }
                 // </td>
   render() {
-    let { incidents,latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
+    let { projectType, incidents,latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.startTimestamp<=latestTimestamp );
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp );
+    let sysCallEnabled = (projectType == 'CUSTOM');
+
     let self =this;
     return (
       <div>
@@ -251,8 +251,7 @@ class IncidentsList extends Component {
               <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i className={"angle "+ this.state.angleIconStyle['angleIconStyleStartTime'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
               <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
-              <th>Suggested Actions</th>
-              <th></th>
+              <th>Control</th>
             </tr>
             </thead>
             <tbody style={{ width: '100%','height': '450px','overflow': 'auto','display': 'block' }}>
@@ -341,7 +340,6 @@ class IncidentsList extends Component {
                                         }
                                       </td>
                                       <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-                                      <td className="code">{incident.rootCauseJson.suggestedActions}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
                                           "N/A"
@@ -379,8 +377,7 @@ class IncidentsList extends Component {
             <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i className={"angle "+ this.state.angleIconStyle['angleIconStyleStartTime'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i className={"angle "+ this.state.angleIconStyle['angleIconStyleDuration'] +" icon"}/></th>
             <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i className={"angle "+ this.state.angleIconStyle['angleIconStyleEvent'] +" icon"}/></th>
-            <th>Suggested Actions</th>
-            <th></th>
+            <th>Control</th>
           </tr>
           </thead>
           <tbody style={{ width: '100%','height': '444px','overflow': 'auto','display': 'block' }}>
@@ -468,8 +465,7 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{incident.rootCauseJson.rootCauseTypes} <i className="zoom icon" onClick={(e) => {self.handleLoadSysCall(incident)}}/></td>
-                                      <td className="code">{incident.rootCauseJson.suggestedActions}</td>
+                                      <td className="code">{incident.rootCauseJson.rootCauseTypes} {sysCallEnabled && <i className="zoom icon" onClick={(e) => {self.handleLoadSysCall(incident)}}/>}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
                                           "N/A"

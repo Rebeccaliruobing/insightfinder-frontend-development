@@ -11,8 +11,8 @@ const ProjectStatistics = ({data, dur}) => (
     <CPUUtilization average={data.statistics['AvgCPUUtilization']} duration={dur+'d'} />
     <InstanceUptime average={data.statistics['AvgInstanceUptime']} duration={dur+'d'} />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
-                    containerTotal={data.statistics['NumberOfContainers']} />
-    <MetricNumber total={data.statistics['NumberOfMetrics']} />
+                    containerTotal={data.statistics['NumberOfContainers']}  duration={dur+'d'} />
+    <MetricNumber total={data.statistics['NumberOfMetrics']}  duration={dur+'d'} />
     <AnalysisSummary data={data.summary} latestDataTimestamp={data.latestDataTimestamp} duration={dur+'d'} />
   </div>
 );

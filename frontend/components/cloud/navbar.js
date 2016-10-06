@@ -28,10 +28,6 @@ export default function (props) {
           <i className="line chart icon"></i>
           <span> Live Analysis </span>
         </Link>
-        <Link to="/cloud/incident-analysis" className="item text-white">
-         <i className="zoom icon"></i>
-         <span> Interactive Analysis </span>
-        </Link>
         <Link to="/cloud/behavior-change-detection" className="item text-white">
           <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>

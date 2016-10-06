@@ -128,6 +128,7 @@ class DataParser {
     let causalDataArray = [];
     let causalTypes = [];
     let incidents = this.data['incidentsJson'];
+    let instanceMetaData = this.data['instanceMetaDataJson'];
     let self = this;
     if(incidents){
       _.each(incidents, function (incident, index) {
@@ -136,9 +137,10 @@ class DataParser {
           let timeString = moment(parseInt(incident.timestamp)).format("YYYY-MM-DD HH:mm")
           thisAnomaly.push(timeString + ",anomaly ratio:" + incident.anomalyRatio);
           for(var k in incident.rootCauseByInstanceJson){
-            causalTypes.push(k);
+            let instance = (instanceMetaData[k] && instanceMetaData[k]['tagName'])?(instanceMetaData[k]['tagName']):k;
             let rootcause = incident.rootCauseByInstanceJson[k];
-            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + k + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
+            causalTypes.push(instance);
+            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
           }
           causalDataArray.push(thisAnomaly);
         }

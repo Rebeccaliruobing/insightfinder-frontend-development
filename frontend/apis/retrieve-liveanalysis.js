@@ -151,12 +151,14 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, ver
           const causalDataArray = parser.causalDataArray || [];
           const causalTypes = parser.causalTypes || [];
           const latestTimestamp = statistics['latestDataTimestamp'];
+          const projectType = data['projectType'] || "";
           const ret = {};
           ret['statistics'] = statistics;
           ret['instanceMetricJson'] = statistics;
           ret['anomalyMapJson'] = heatmap;
           ret['instanceMetaData'] = instanceMetaData;
           ret['projectName'] = projectName;
+          ret['projectType'] = projectType;
           ret['summary'] = summary;
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
