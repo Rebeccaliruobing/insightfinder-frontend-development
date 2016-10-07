@@ -300,7 +300,7 @@ export default  class FilterBar extends Component {
 
     handleRefresh() {
         this.setState({loading: true}, ()=> {
-            this.context.root.loadUserValues().then(()=> {
+            this.context.root.loadIncident().then(()=> {
                 this.setState({loading: false}, ()=> {
                     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
                     if (projects.length > 0) {

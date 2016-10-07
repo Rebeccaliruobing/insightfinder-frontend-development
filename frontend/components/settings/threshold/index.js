@@ -87,13 +87,16 @@ export default class ThresholdSettings extends React.Component {
 
     handleProjectChange(projectName) {
         let {dashboardUservalues} = this.context;
-        let {projectModelAllInfo, projectSettingsAllInfo, projectString} = dashboardUservalues;
+        let {projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString} = dashboardUservalues;
         let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
         let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
         let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
         let {cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames} = project;
 
         let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
+        if(!projectStr){
+            projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0]+'@'+v[3]) == projectName);
+        }
         // // 前三部分是名称，数据类型dataType和云类型cloudType
         let dataType = projectStr ? projectStr[1] : null;
         let cloudType = projectStr ? projectStr[2] : '';
@@ -267,7 +270,7 @@ export default class ThresholdSettings extends React.Component {
                                 </div>
                             </div>}
                             {!isLogProject && <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
                                 </h3>
 
                                 <div className="field">
@@ -393,7 +396,7 @@ export default class ThresholdSettings extends React.Component {
                         <br /><hr />
                         {isLogProject && <div className="wide column">
                             <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated user names)</span>
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
                                 </h3>
 
                                 <div className="field">
@@ -451,7 +454,10 @@ export default class ThresholdSettings extends React.Component {
         let {tempSharedUsernames,data} = this.state;
         this.setState({settingLoading: true}, ()=> {
             apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
-                this.setState({settingLoading: false}, this.context.root.loadData)
+                    if(!resp.success){
+                        window.alert(resp.message);
+                    }
+                    this.setState({settingLoading: false}, this.context.root.loadData)
             });
         });
     }

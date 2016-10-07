@@ -3,7 +3,7 @@ import store from 'store';
 import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
-
+import apis from '../../../apis';
 import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';
@@ -46,8 +46,8 @@ class LiveAnalysisCharts extends React.Component {
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'list')).toLowerCase(),
-            columns: (store.get(GridColumns, 'two')).toLowerCase(),
+            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            columns: (store.get(GridColumns, 'four')).toLowerCase(),
             selectedGroupId: undefined,
             selectedAnnotation: null,
             showSettingModal: false,
@@ -56,9 +56,11 @@ class LiveAnalysisCharts extends React.Component {
             showShareModal: false,
             showComments: false,
             showDebug: false,
+            startTimestamp: undefined,
+            endTimestamp: undefined,
             tabStates: {
-                rootcause: 'active',
-                chart: '',
+                rootcause: '',
+                chart: 'active',
                 heatmap: ''
             }
         };
@@ -71,7 +73,7 @@ class LiveAnalysisCharts extends React.Component {
     calculateData() {
 
         // Cache the data, and recalculate it if changed.
-        let { data, loading, onRefresh, ...rest } = this.props;
+        let { data, loading, onRefresh, projectName, instanceName, metricName, startTimestamp, detectSuccess, ...rest } = this.props;
         if (this._data !== data && !!data) {
             this.dp = new DataParser(data, rest);
             this.dp.getSummaryData();
@@ -85,23 +87,144 @@ class LiveAnalysisCharts extends React.Component {
             this.causalTypes = this.dp.causalTypes;
             this.groups = this.dp.groupsData || [];
             this.groupMetrics = this.dp.groupmetrics || null;
-            let periodData = data.periodString ? data.periodString.split(",") : [];
-            let periodString = {};
-            if (data.periodString) {
-                _.compact(
-                    periodData.map(function (value, index) {
-                        if (index % 2 == 1) {
-                            if (Number.parseInt(value) != -1) {
-                                periodString[periodData[index - 1].split('[')[0]] = value;
-                            }
-                        }
-                    }));
-                this.periodString = periodString;
-            } else {
-                this.periodString = null;
-            }
+
             this._data = data;
+        } else {
+          // create missing msg
+          if(!this.summary && (!this.groups || this.groups.length==0)){
+            if(detectSuccess!=undefined){
+              // failed detection
+              this.errorMsg = "Detection failed";
+              if(projectName){
+                this.errorMsg += " for project "+projectName;
+              } 
+            } else {
+              // display project data
+              this.errorMsg = "Empty data";
+              if(instanceName){
+                this.errorMsg += " for instance "+instanceName;
+                if(metricName){
+                  this.errorMsg += ", metric "+metricName;                  
+                }
+              }
+              if(startTimestamp){
+                this.errorMsg += " during requested time period";
+              }
+            }
+          } 
         }
+    }
+
+    saveDataToStorage(){
+      let { projectName, ...rest } = this.props;
+      let data = this.dp.data.data;
+      let lines = data.trim().split("\\n");
+      if(lines.length <= 1){
+        alert("empty data");
+        return;
+      }
+      if(lines.length == 2 && lines[1]==""){
+        alert("empty data");
+        return;
+      }
+      let line1 = lines[1];
+      let fields1 = line1.split(',');
+      let startTimestamp = parseInt(fields1[0]);
+      let lineN = lines[lines.length-1];
+      if(lineN.trim().length==0){
+        lineN = lines[lines.length-2];
+      }
+      let fieldsN = lineN.split(',');
+      let endTimestamp = parseInt(fieldsN[0]);
+
+      this.setState({loading: true}, ()=> {
+        apis.postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp)
+          .then(resp => {
+            if (resp.success) {
+              alert(resp.message);
+            } else {
+              console.error(resp.message);
+            }
+            this.setState({loading: false});
+          })
+          .catch(msg=> {
+            console.error(msg);
+            this.setState({loading: false});
+          });
+      });
+    };
+
+    exportData(){
+        let data = this.dp.data.data;
+        let fname = 'data.csv';
+        var csvString = data.split('\\n').join("\r\n");
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.innerHTML = "Click here";
+        a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        a.target   = '_blank';
+        a.method   = 'POST';
+        a.download = fname;
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    _getRootCauseNameFromHints(incidentText){
+      // parse rootcause text and extract simplified rootcause names
+      const rootCauseNameMap = {
+        "cpu": "High CPU usage", 
+        "mem": "High memory usage", 
+        "disk": "High disk usage", 
+        "network": "Network traffic surge", 
+        "load": "High load", 
+        "request": "High request count", 
+        "latency": "High latency"
+      };
+      const suggestedActionMap = {
+        "missing": "Check metric data source",
+        "cpu": "Upgrade CPU spec",
+        "mem": "Check for memory leak",
+        "disk": "Upgrade disk spec",
+        "network": "Check network traffic pattern",
+        "load": "Check load",
+        "request": "Check request count",
+        "latency": "Check latency",
+      };
+
+      let rootCauseNames = new Set();
+      let suggestedActions = new Set();
+      let durationLine = incidentText.split("\n",3)[0];
+      let duration = durationLine.substring(9,durationLine.indexOf("minutes")-1);
+      let startLine = incidentText.split("\n",3)[1];
+      let start = startLine.substring(12,startLine.indexOf(","));
+      let hintStr = incidentText.split("\n",3)[2];
+      let hints = hintStr.split("\n");
+      let retObj = {};
+      _.each(hints,function(h,ih){
+        let parts = h.split(",");
+        if(false &&parts[0].indexOf("missing")!=-1){
+          rootCauseNames.add("Missing metric data");
+          suggestedActions.add("Check metric data source");
+        } else {
+          // iterate through map
+          let matched = false;
+          for (var key in rootCauseNameMap) {
+            if(parts[2].toLowerCase().indexOf(key)!=-1){
+              rootCauseNames.add(rootCauseNameMap[key]);
+              suggestedActions.add(suggestedActionMap[key]);
+              matched = true;
+            }
+          }
+        }
+      });
+      retObj["rootCauseNames"] = Array.from(rootCauseNames).join("\n");
+      retObj["suggestedActions"] = Array.from(suggestedActions).join("\n");
+      retObj["start"] = start;
+      retObj["duration"] = duration;
+      retObj["startTimestamp"] = 0+moment(start);
+      retObj["endTimestamp"] = 0+moment(start)+parseInt(duration)*60000;
+
+      return retObj;
     }
 
     @autobind
@@ -120,7 +243,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup} = this.props;
+        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName} = this.props;
         const { view, columns,tabStates } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -132,20 +255,25 @@ class LiveAnalysisCharts extends React.Component {
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
         const groups = this.groups;
-        const periodString = this.periodString;
+        const errorMsg = this.errorMsg;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
-        //propsData['instances'] = "[i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7, i-55d26464, i-df1ae3c7,i-eb45e5da, i-55d26464, i-df1ae3c7]";
-        let latestDataTimestamp = this.props.data?this.props.data['instanceMetricJson']['latestDataTimestamp']:"";
-        let instances = propsData['instances']?propsData['instances'].split(',').length: 1;
+        let latestDataTimestamp = propsData?propsData['latestDataTimestamp']:"";
+        let instances = (propsData&&propsData['instances'])?propsData['instances'].split(',').length: 1;
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         // incident table
         let incidents = [];
         if(summary){
             incidents =  _.map(summary.incidentSummary, a => {
+              let incidentObj = this._getRootCauseNameFromHints(a.text);
               return {
                 id: a.id,
+                rootCauseNames: incidentObj.rootCauseNames,
+                start:incidentObj.start,
+                duration:incidentObj.duration+" minutes",
+                startTimestamp:incidentObj.startTimestamp,
+                endTimestamp:incidentObj.endTimestamp,
                 text: a.text
                 //.replace(/\n/g, "<br />")
               }
@@ -161,7 +289,7 @@ class LiveAnalysisCharts extends React.Component {
                         >
                         <div className="ui vertical segment">
                             <Button className="orange labeled icon"
-                                    onClick={() => this.setState({ showTenderModal: true })}>
+                                    onClick={() => this.setState({ showTenderModal: true })} style={{'display': 'none'}}>
                                 <i className="icon random"/>Causal Graph
                             </Button>
                             <Button className="orange labeled icon"
@@ -179,6 +307,12 @@ class LiveAnalysisCharts extends React.Component {
                             <Button className="labeled icon" onClick={() => onRefresh()}>
                                 <i className="icon refresh"/>Refresh
                             </Button>
+                            <Button className="labeled icon" onClick={() => this.exportData()}>
+                                <i className="icon download"/>Export
+                            </Button>
+                            {projectName!=undefined && <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
+                                <i className="icon cloud"/>Save To Storage
+                            </Button>}
                             <ButtonGroup className="right floated basic icon">
                                 <Button onClick={()=> this.setState({ showSettingModal: true })}>
                                     <i className="icon setting"/>
@@ -194,17 +328,21 @@ class LiveAnalysisCharts extends React.Component {
                             </ButtonGroup>
                         </div>
                         <div className="ui vertical segment">
-                            <div className="ui pointing secondary menu">
-                                  <a className={tabStates['heatmap'] + ' item'}
-                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
+                            { false && <div className="ui pointing secondary menu">
                                   <a className={tabStates['rootcause'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'rootcause')}>Root Cause Result</a>
+                                  <a className={tabStates['heatmap'] + ' item'}
+                                     onClick={(e) => this.selectTab(e, 'heatmap')}>Heatmap View</a>
                                   <a className={tabStates['chart'] + ' item'}
                                      onClick={(e) => this.selectTab(e, 'chart')}>Chart View</a>
-                            </div>
+                                </div>
+                            }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
-                                    {!!summary &&
+                                    {!summary && (!groups || groups.length==0) &&
+                                      <h3>{errorMsg}</h3>
+                                    }
+                                    {!!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
@@ -217,7 +355,6 @@ class LiveAnalysisCharts extends React.Component {
                                     {!!groups &&
                                     <DataGroupCharts
                                         key={view + '_group_charts'}
-                                        period={periodString}
                                         groups={groups} view={view} columns={columns}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
@@ -230,27 +367,58 @@ class LiveAnalysisCharts extends React.Component {
                                 <div className="ui grid">
                                     {(summary && summary.incidentSummary.length>0) ?
                                       <div>
+                                        <br />
+                                        <h4>Detected Incidents:</h4>
                                         <table className="ui basic table">
                                           <thead>
                                           <tr>
-                                            <th>Incident ID</th>
-                                            <th>Incident Description</th>
+                                            <th>Incident Id</th>
+                                            <th>Incident Start</th>
+                                            <th>Incident Duration</th>
+                                            <th>Root Cause Type</th>
+                                            <th>Root Cause Scope</th>
+                                            <th>Root Cause Affected Functions</th>
+                                            <th>Suggested Actions</th>
+                                            <th>
+                            <Button className="orange labeled"
+                                    onClick={() => this.setState({ showTenderModal: true })}>
+                                Overall Causal Graph
+                            </Button>
+                                            </th>
                                           </tr>
                                           </thead>
                                           <tbody>
                                           {incidents.map((incident, index)=>(
                                             <tr key={index}>
                                               <td>{incident.id}</td>
-                                              <td><pre>{incident.text}</pre></td>
+                                              <td>{incident.start}</td>
+                                              <td>{incident.duration}</td>
+                                              <td><pre>{incident.rootCauseNames}</pre></td>
+                                              <td>N/A</td>
+                                              <td>N/A</td>
+                                              <td><pre>{incident.suggestedActions}</pre></td>
+                                              <td>
+                                                <Button className="orange"
+                                                        onClick={() => this.setState({
+                                                        showTenderModal: true,
+                                                        startTimestamp: incident.startTimestamp,
+                                                        endTimestamp: incident.endTimestamp
+                                                         })}>
+                                                    Causal Graph
+                                                </Button>
+                                              </td>
                                             </tr>
                                           ))}
                                           </tbody>
                                         </table>
-                                      </div>:
+                                      </div>
+                                      :
                                       <div>
-                                          <h4>Congratulations! No anomaly was detected. Please go to 
-                                           <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
-                                           <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
+                                        <br />
+                                        <h4>Detected Incidents:</h4>
+                                        <h4>Congratulations! No anomaly was detected. Please go to 
+                                            <a onClick={(e) => this.selectTab(e, 'heatmap')}> Heatmap View </a> or
+                                            <a onClick={(e) => this.selectTab(e, 'chart')}> Chart View </a> to view data details.</h4>
                                       </div>
                                     }
                                 </div>:null
@@ -261,7 +429,7 @@ class LiveAnalysisCharts extends React.Component {
                                         <div style={{'width': '100%','display': 'flex','marginTop':'40px'}}>
                                             {self.props.data?basicStatsKeys.map(function (value,index) {
                                                 let name = undefined;
-                                                let dataValue = self.props.data['instanceMetricJson'][value];
+                                                let dataValue = self.props.data['instanceMetricJson']?self.props.data['instanceMetricJson'][value]: undefined;
                                                 if(dataValue == undefined){
                                                     return null;
                                                     }
@@ -278,11 +446,7 @@ class LiveAnalysisCharts extends React.Component {
                                                     name = "Estimated Daily Cost";
                                                     dataValue = ("$"+(dataValue.toFixed(1)).toString());
                                                 } else if (value == "AvgInstanceUptime") {
-                                                    if(self.props.data['instanceMetricJson']['NumberOfContainers']){
-                                                        name = "Avg Container Uptime";
-                                                    }else{
-                                                        name = "Avg Instance Uptime";
-                                                    }
+                                                    name = "Avg Instance Uptime";
                                                     dataValue = (((dataValue * 100).toFixed(1)).toString()+"%");
                                                 }
                                                 return (
@@ -291,7 +455,6 @@ class LiveAnalysisCharts extends React.Component {
                                                 )
                                             }): null}
                                         </div>
-                                        <h4 className="ui header" style={{'marginTop': '30px'}}>Anomaly Summary</h4>
                                         <div style={{'width': '100%',height: (instances)*100+'px'}}>
                                             {this.props.data ? <AnomalySummary data={this.props.data}
                                                                                onClose={() => this.setState({ showAnomalySummary: false })}/> : null}
@@ -310,6 +473,8 @@ class LiveAnalysisCharts extends React.Component {
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}
+                                 endTimestamp={this.state.endTimestamp}
+                                 startTimestamp={this.state.startTimestamp}
                                  onClose={() => this.setState({ showTenderModal: false })}/>
                     }
                     { this.state.showShareModal &&

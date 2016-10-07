@@ -128,8 +128,8 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    //const { groups, view, columns, period} = this.props;
-    const { groups, view, columns, period} = this.props;
+    //const { groups, view, columns } = this.props;
+    const { groups, view, columns } = this.props;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
     const isListView = view === 'list';
@@ -140,7 +140,6 @@ export class DataGroupCharts extends React.Component {
     const selected = selectedIndex !== undefined;
     const selectedGroup = selected ? groups[selectedIndex] : null;
     const selectedRowId = selected ? Math.floor(selectedIndex / colSize) : void 0;
-    const periodData = period || {};
     return (
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
@@ -170,14 +169,28 @@ export class DataGroupCharts extends React.Component {
             const length = groups.length;
             const lastItem = index == length - 1;
             const isSelectedItem = index === selectedIndex;
-
+            let values = [];
             let elems = [];
+            let missingTag = "";
+            if(group.sdata.length>0){
+              _.each(group.sdata[0],function(mdata,mindex){
+                values.push(0);
+              });
+              _.each(group.sdata,function(data,index){
+                _.each(data,function(mdata,mindex){
+                  if(mindex>0 && !isNaN(mdata)){
+                    values[mindex] = values[mindex]+1;
+                  }
+                }); 
+              });
+              _.each(group.sdata[0],function(mdata,mindex){
+                if(mindex>0 && (values[mindex] / group.sdata.length) < 0.95){
+                  missingTag = " (missing data)";
+                  return false;
+                }
+              });
+            }
             const idx = index;
-            const periodKeys = _.keysIn(periodData);
-            const periodList = _.compact(periodKeys.map(function (value,index) {
-                if(value == group.metrics)
-                  return value+': '+ periodData[value];
-            }));
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
                    onClick={() => {
@@ -189,7 +202,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <h4 className="ui header">Metric {periodData[group.metrics]?<span title={periodList}>{group.metrics+' (period list: '+periodData[group.metrics]+')'}</span>:group.metrics}</h4>
+                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{missingTag}</span></div>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}

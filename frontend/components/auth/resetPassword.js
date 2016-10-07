@@ -101,9 +101,9 @@ class ResetPassword extends BaseComponent {
             <div className="ui segment left aligned">
               <h4 className="ui header center aligned">Reset your password</h4>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>User Name</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>Username</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" placeholder="User name"
+                  <input type="text" placeholder="Username"
                          value={this.state['userName']}
                          onChange={(e) => this.setState({error: '', userName: e.target.value})}/>
                 </div>

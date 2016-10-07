@@ -63,21 +63,22 @@ class Dygraph extends BaseComponent {
         let area_y = number == 2 ? area.y + 12 : area.y;
         var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
         var rcolor, gcolor, bcolor = 0;
+        let gcolorMax = 205;
         if (number == 1) {
             if (val <= 1) {
                 if (val < 0) val = 0;
                 rcolor = Math.floor(255 * val);
-                gcolor = 255;
+                gcolor = gcolorMax;
             } else {
                 if (val > 10) val = 10;
                 rcolor = 255;
-                gcolor = Math.floor(255 - (val - 1) / 9 * 255);
+                gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
             }
             canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
             canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
         }
         else {
-            if (x_start > latestDataTimestamp) {
+            if (latestDataTimestamp && x_start > latestDataTimestamp) {
                 rcolor = 205;
                 gcolor = 234;
                 bcolor = 214;

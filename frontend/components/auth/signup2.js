@@ -232,9 +232,9 @@ class SignupStep2 extends BaseComponent {
             <div className="ui segment left aligned">
               <h4 className="ui header center aligned">Sign up</h4>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>Sign Code</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>Signup Code</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" className="required" placeholder="Sign code"
+                  <input type="text" className="required" placeholder="Signup code"
                          value={this.state['signCode']}
                          onChange={(e) => this.setState({error: '', signCode: e.target.value})}
                          id="form_signcode"/>
@@ -243,9 +243,9 @@ class SignupStep2 extends BaseComponent {
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>
-                <label style={{width: '120px', lineHeight: '32px'}}>User Name</label>
+                <label style={{width: '120px', lineHeight: '32px'}}>Username</label>
                 <div className="ui input" style={{flex: 1}}>
-                  <input type="text" className="required" placeholder="User name"
+                  <input type="text" className="required" placeholder="Username"
                          value={this.state['userName']}
                          onChange={(e) => this.setState({error: '', userName: e.target.value})}
                          id="form_username" />

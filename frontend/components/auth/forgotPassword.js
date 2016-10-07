@@ -72,7 +72,7 @@ class ForgotPassword extends BaseComponent {
             <div className="ui segment left aligned">
               <h4 className="ui header center aligned">Get a temporary password</h4>
               <div className="field required">
-                <label>User Name</label>
+                <label>Username</label>
                 <div className="ui icon input">
                   <i className="user icon"/>
                   <input type="text" name="userName" value={userName}
@@ -89,7 +89,7 @@ class ForgotPassword extends BaseComponent {
                 </div>
               </div>
               <div className="field" style={{textAlign: 'right'}}>
-                <Link to="/forgotUsername">Forgot user name?</Link>
+                <Link to="/forgotUsername">Forgot username?</Link>
               </div>
               <div className="field">
                 <div className={cx('ui fluid orange submit button', {disabled:disabled})}>Submit</div>

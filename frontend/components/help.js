@@ -34,11 +34,8 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="dashboard icon"></i>
                 <h3>Dashboard</h3>
-                <Link to="/cloud/monitoring" className="item">&bull; View realtime anomaly detection results.</Link>
-                <Link to="/cloud/incident-analysis" className="item">&bull; Triage historical incidents or view recorded incidents.</Link>
-                <Link to="/cloud/outlier-detection" className="item">&bull; Identify abnormal instances/hosts in outlier detection.</Link>
-                <Link to="/cloud/rollout-check" className="item">&bull; View system behavior change in behavior change detection.</Link>
-                <Link to="/cloud/summary-report" className="item">&bull; View summary results in summary report.</Link>
+                <Link to="/cloud/monitoring" className="item">&bull; View realtime anomaly detection and root cause analysis results.</Link>
+                <Link to="/cloud/behavior-change-detection" className="item">&bull; View system behavior change in behavior change detection.</Link>
               </div>
             </div>
             <div className="column">

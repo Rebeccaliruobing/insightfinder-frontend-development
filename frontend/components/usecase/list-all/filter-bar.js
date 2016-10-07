@@ -116,6 +116,7 @@ export default  class FilterBar extends Component {
       }
     }
   }
+  
   handleMetricSetting(index, name) {
     return (e) =>{
       let metricSettings = this.state.metricSettings;
@@ -180,7 +181,7 @@ export default  class FilterBar extends Component {
 
   handleRefresh() {
     this.setState({loading: true});
-    this.context.root.loadUserValues().then(()=> {
+    this.context.root.loadBenchmark().then(()=> {
       this.setState({loading: false})
     })
   }

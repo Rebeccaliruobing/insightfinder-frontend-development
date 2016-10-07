@@ -20,6 +20,7 @@ class DataParser {
     this.causalTypes = null;
     this.anomalies = null;
     this.seriesOptions = null;
+    this.interval = null;
     this.stats = null;
     this.metricUnitMap = null;
     this.groupsData = null;
@@ -69,26 +70,88 @@ class DataParser {
     this.metricUnitMap = metricUnitMap;
   }
 
+  // 1.memory[node3](1630.0)(83.1801528930664); 2.disk_read[node1](2.73)(51.61351776123047)"
+  // return { metric:allocatedAnomalyRatio, ... }
   _extractMetric(atext) {
-
     if (!atext) return '';
-
-    var ret = [];
+    var retMap = {};
     var items = atext.split(';');
+    var metricList = [];
+    var percentageList = [];
+    var totalPercentage = 0;
     _.each(items, function (item, itemNo) {
-      var pos = item.trim().indexOf(".");
-      var pos2 = item.trim().substr(pos + 1).indexOf("[");
-      var metr = item.trim().substr(pos + 1).substr(0, pos2);
-      ret.push(metr);
+      var pos1 = item.indexOf(".");
+      var pos2 = item.indexOf("[");
+      var pos3 = item.indexOf("(");
+      var pos4 = item.indexOf("(",pos3+1);
+      var pos5 = item.indexOf(")",pos4+1);
+      var metr = item.substring(pos1 + 1, pos2);
+      metricList.push(metr);
+      if(pos4!=-1 && pos5!=-1){
+        let percentageString = item.substring(pos4 + 1, pos5);
+        let percentage = 0;
+        if(percentageString != "missing"){
+           percentage = parseFloat(percentageString);
+        }
+        
+        percentageList.push(percentage);
+        totalPercentage += percentage;
+      } else {
+        percentageList.push(0);
+      }
     });
-    ret = ret.filter(function (el, index, arr) {
-      return index === arr.indexOf(el);
+    _.each(metricList, function (metric, imetric) {
+      let allocatedPercentage = (totalPercentage==0) ? (1.0/metricList.length) : (percentageList[imetric]/totalPercentage);
+      retMap[metric] = allocatedPercentage;
     });
-    return ret;
+    return retMap;
   }
 
-;
+  _calculateRGB(anomalyRatio, size){
+    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+    let gcolorMax = 205;
+    var rcolor, gcolor, bcolor = 0;
+    if (val <= 1) {
+        if (val < 0) val = 0;
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+    } else {
+        if (val > 10) val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+    }
+    return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
+  }
 
+  _parseIncidentList(){
+    if (this.causalDataArray) return;
+    let causalDataArray = [];
+    let causalTypes = [];
+    let incidents = this.data['incidentsJson'];
+    let instanceMetaData = this.data['instanceMetaDataJson'];
+    let self = this;
+    if(incidents){
+      _.each(incidents, function (incident, index) {
+        if(incident.rootCauseByInstanceJson){
+          let thisAnomaly = [];
+          let timeString = moment(parseInt(incident.timestamp)).format("YYYY-MM-DD HH:mm")
+          thisAnomaly.push(timeString + ",anomaly ratio:" + incident.anomalyRatio);
+          for(var k in incident.rootCauseByInstanceJson){
+            let instance = (instanceMetaData[k] && instanceMetaData[k]['tagName'])?(instanceMetaData[k]['tagName']):k;
+            let rootcause = incident.rootCauseByInstanceJson[k];
+            causalTypes.push(instance);
+            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
+          }
+          causalDataArray.push(thisAnomaly);
+        }
+      });
+    }
+    causalTypes = causalTypes.filter(function (el, index, arr) {
+      return index === arr.indexOf(el);
+    });
+    this.causalDataArray = causalDataArray;
+    this.causalTypes = causalTypes;
+  }
 
   _parseAnomalyText() {
 
@@ -104,70 +167,82 @@ class DataParser {
       }
     }
     let anomalyTexts = [];
-    let causalDataArray = [];
-    let causalTypes = [];
+    // let causalDataArray = [];
+    // let causalTypes = [];
 
     if (arr) {
       _.each(arr, function (a, i) {
         var atext = [];
-        if (a.anomalies != "") {
+        if (a.anomalies && a.anomalies != "") {
           var lines = a.anomalies.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',3);
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
             var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
             thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[2]) {
-              var hints = items[2].trim().split(':');
-              // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
-              var hintss = hints[1].trim().split(';');
-              var newhints = "";
-              _.each(hintss, function (hint, ihint) {
-                // 1.Change_inflicted(min)[node0](1.0);
-                // 0=#.metric, 1=node, 2=(val)
-                var hintparts = hint.split(/\[|\]/);
-                var metric = hintparts[0].split('.')[1];
-                if (hintparts.length == 3) {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]" + hintparts[2]);
-                } else {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
-                }
-                causalTypes.push(metric + " [" + hintparts[1] + "]");
-                try {
-                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
-                  var newval = hintparts[2].split(/\(|\)/)[1];
-                  if (hintMapping[metric.trim()] != undefined) {
-                    var thisMap = hintMapping[metric.trim()];
-                    if (thisMap[parseInt(valparts[0])] != undefined) {
-                      newval = thisMap[parseInt(valparts[0])];
-                    }
-                  }
-                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
-                  if (ihint < hintss.length - 1) {
-                    newhints = newhints + "; ";
-                  }
-                } catch (err) {
-                  newhints = hints[1];
-                }
-              });
-
-              atext[parseInt(items[0])] = newhints;
+            let hintString = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hintString = items[3];
             }
-            causalDataArray.push(thisAnomaly);
+            if (hintString) {
+              var hints = hintString.trim().split(':');
+              if(hints.length>1){
+                // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
+                var hintss = hints[1].trim().split(';');
+                var newhints = "";
+                _.each(hintss, function (hint, ihint) {
+                  // 1.Change_inflicted(min)[node0](1.0)(10.0);
+                  // 0=#.metric, 1=node, 2=(val), 3=(pct)
+                  var hintparts = hint.split(/\[|\]/);
+                  var metric = hintparts[0].split('.')[1];
+                  if (hintparts.length == 3) {
+                    thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]" + hintparts[2]);
+                  } else {
+                    thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
+                  }
+                  // causalTypes.push(metric + " [" + hintparts[1] + "]");
+                  // causalTypes.push( hintparts[1] );
+                  try {
+                    var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
+                    var newval = hintparts[2].split(/\(|\)/)[1];
+                    if (hintMapping[metric.trim()] != undefined) {
+                      var thisMap = hintMapping[metric.trim()];
+                      if (thisMap[parseInt(valparts[0])] != undefined) {
+                        newval = thisMap[parseInt(valparts[0])];
+                      }
+                    }
+                    newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
+                    if(hintparts[2].split(/\(|\)/).length>=4){
+                      var pct = hintparts[2].split(/\(|\)/)[3];
+                      newhints += "("+pct+")";
+                    }
+                    if (ihint < hintss.length - 1) {
+                      newhints = newhints + "; ";
+                    }
+                  } catch (err) {
+                    newhints = hints[1];
+                  }
+                });
+  
+                atext[parseInt(items[0])] = newhints;
+              }
+            }
+            // causalDataArray.push(thisAnomaly);
           });
-          causalTypes = causalTypes.filter(function (el, index, arr) {
-            return index === arr.indexOf(el);
-          });
+          // causalTypes = causalTypes.filter(function (el, index, arr) {
+          //   return index === arr.indexOf(el);
+          // });
         }
         anomalyTexts.push(atext);
       });
     }
-    this.causalDataArray = causalDataArray;
-    this.causalTypes = causalTypes;
+    // this.causalDataArray = causalDataArray;
+    // this.causalTypes = causalTypes;
     this.anomalyTexts = anomalyTexts;
   }
 
@@ -178,6 +253,7 @@ class DataParser {
     let arr = this.data['anomalyConsolidatedString'];
     let rawHintMapping = this.data['hintMapping'];
     let hintMapping = {};
+    let interval = this.interval;
     if (rawHintMapping) {
       try {
         hintMapping = $.parseJSON(rawHintMapping);
@@ -195,26 +271,34 @@ class DataParser {
           var lines = a.anomaliesConsolidated.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
-            var items = line.split(',',3);
+            var items = line.split(',',4);
 
             //prepare causality chart data
             var thisAnomaly = [];
             var ts = parseInt(items[0]);
             var timeString = moment(ts).format("YYYY-MM-DD HH:mm");
             thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[2]) {
-              var pos = items[2].trim().indexOf(':');
-              if(pos==items[2].trim().length-1){
+            let hintString = undefined;
+            let hasPct = false;
+            let neuronId = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hasPct = true;
+              hintString = items[3];
+              neuronId = parseInt(items[2].split(":")[1]);
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
+              var pos = hintString.trim().indexOf(':');
+              if(pos==hintString.trim().length-1){
                 // emtpy hint, skip
                 return true;
               }
-              var newhints = items[2].trim().substring(pos+1);
+              var newhints = hintString.trim().substring(pos+1);
               var newhintsArr = newhints.split("\t");
               var newhintsStr = "";
               var newhintsIncidentStr = "";
-              var minTs = 0;
-              var maxTs = 0;
               _.each(newhintsArr,function(h,ih){
                 var parts = h.split(":",2);
                 var hintStr = "";
@@ -223,28 +307,34 @@ class DataParser {
                   let pos1 = item.indexOf("[");
                   let pos2 = item.indexOf("]");
                   let pos3 = item.indexOf(")");
-                  let rootcause = item.substring(pos2+2,pos3);
-                  if(rootcause != 'missing'){
-                    rootcause = rootcause+'% higher than normal';
+                  let pos4 = item.indexOf(")",pos3+1);
+                  let rootcause = item.substring(pos3+2,pos4);
+                  let valString = item.substring(pos2+2,pos3);
+                  if(valString != 'missing'){
+                    valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(2);
                   }
-                  hintStr += "instance:"+item.substring(pos1+1,pos2)
+                  if(!hasPct){
+                    rootcause = "";
+                  } else {
+                    if(valString != 'missing'){
+                      if(neuronId&&neuronId==-1){
+                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than threshold, ";  
+                      } else {
+                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
+                      }                      
+                    } else {
+                      rootcause = "missing value, "
+                    }
+                  }
+                  hintStr += "Root cause #" + (index+1) + ": "+rootcause
+                    +"instance:"+item.substring(pos1+1,pos2)
                     +", metric:"+item.substring(pos0+1,pos1)
-                    +", root cause:"+rootcause+"; ";
+                    +", value:"+valString+";\n";
                 });
                 let tsHint = parseInt(parts[0]);
-                let timeStringHint = moment(ts).format("YYYY-MM-DD HH:mm");
-                if(ih==0){
-                  minTs = tsHint;
-                  maxTs = tsHint;
-                }else{
-                  if(tsHint<minTs){
-                    minTs = tsHint;
-                  }
-                  if(tsHint>maxTs){
-                    maxTs = tsHint;
-                  }
-                }
-                newhintsStr += "At " + timeStringHint +", "+hintStr+"\n";
+                let timeStringHint = moment(tsHint).format("YYYY-MM-DD HH:mm");
+
+                newhintsStr += "Starting at " + timeStringHint +",\n"+hintStr;
                 if(ih == 0){
                   newhintsIncidentStr = newhintsStr;
                 }              
@@ -253,9 +343,8 @@ class DataParser {
                 newhintsStr = newhintsStr.substring(0,511)+"...";
               }
               atext[parseInt(items[0])] = newhintsStr;
-              var dur = ((maxTs - minTs) / 60000);
-              newhintsIncidentStr += "Duration:" + dur + " minutes";
-              intext[parseInt(items[0])] = newhintsIncidentStr;
+              var dur = Math.round(newhintsArr.length * interval / 60000);
+              intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
         }
@@ -265,89 +354,6 @@ class DataParser {
     }
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
     this.anomalyConsolidatedIncidentTexts = anomalyConsolidatedIncidentTexts;
-  }
-
-  _parseAnomalyConsolidatedTextInstance() {
-
-    if (this.anomalyConsolidatedInstanceTexts) return;
-    if (this.data['anomalyConsolidatedInstanceString'] === undefined) return;
-    let arr = this.data['anomalyConsolidatedInstanceString'];
-    let rawHintMapping = this.data['hintMapping'];
-    let hintMapping = {};
-    if (rawHintMapping) {
-      try {
-        hintMapping = $.parseJSON(rawHintMapping);
-      } catch (err) {
-      }
-    }
-    let anomalyConsolidatedInstanceTexts = [];
-    let causalDataArray = [];
-    let causalTypes = [];
-
-    if (arr) {
-      _.each(arr, function (a, i) {
-        var atext = [];
-        if (a.anomaliesConsolidatedInstance) {
-          var lines = a.anomaliesConsolidatedInstance.split('\\n');
-          _.each(lines, function (line, lineNo) {
-            if (!line || line === '') return;
-            var items = line.split(',');
-
-            //prepare causality chart data
-            var thisAnomaly = [];
-            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
-            thisAnomaly.push(timeString + "," + items[1]);
-
-            if (items[2]) {
-              var hints = items[2].trim().split(':');
-              // further parse hints[1], eg. 1.Change_inflicted(min)[node0](1.0); 2.Sub_cause_type[node0](4.0); 3.Sub_cause_subset[node0](4.0)
-              var hintss = hints[1].trim().split(';');
-              var newhints = "";
-              _.each(hintss, function (hint, ihint) {
-                // 1.Change_inflicted(min)[node0](1.0);
-                // 0=#.metric, 1=node, 2=(val)
-                var hintparts = hint.split(/\[|\]/);
-                var metric = hintparts[0].split('.')[1];
-                if (hintparts.length == 3) {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]" + hintparts[2]);
-                } else {
-                  thisAnomaly.push(hintparts[0] + " [" + hintparts[1] + "]");
-                }
-                // causalTypes.push(metric + " [" + hintparts[1] + "]");
-                causalTypes.push( hintparts[1] );
-                try {
-                  var valparts = hintparts[2].split(/\(|\)/)[1].split('.');
-                  var newval = hintparts[2].split(/\(|\)/)[1];
-                  if (hintMapping[metric.trim()] != undefined) {
-                    var thisMap = hintMapping[metric.trim()];
-                    if (thisMap[parseInt(valparts[0])] != undefined) {
-                      newval = thisMap[parseInt(valparts[0])];
-                    }
-                  }
-                  newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
-                  if (ihint < hintss.length - 1) {
-                    newhints = newhints + "; ";
-                  }
-                } catch (err) {
-                  newhints = hints[1];
-                }
-              });
-
-              atext[parseInt(items[0])] = newhints;
-            }
-            causalDataArray.push(thisAnomaly);
-          });
-          causalTypes = causalTypes.filter(function (el, index, arr) {
-            return index === arr.indexOf(el);
-          });
-        }
-        anomalyConsolidatedInstanceTexts.push(atext);
-      });
-    }
-
-    this.causalDataArray = causalDataArray;
-    this.causalTypes = causalTypes;
-    this.anomalyConsolidatedInstanceTexts = anomalyConsolidatedInstanceTexts;
   }
 
   parseLogAnalysisData(){
@@ -373,7 +379,7 @@ class DataParser {
     if (this.anomalies) return;
     this._parseAnomalyText();
     this._parseAnomalyConsolidatedText();
-    this._parseAnomalyConsolidatedTextInstance();
+    this._parseIncidentList(); // for causal graph
 
     if (this.mode != 'error') {
 
@@ -387,6 +393,7 @@ class DataParser {
       _.each(arr, function (a, i) {
         var atext = (arr.length === 1) ? anomalyTexts[0] : anomalyTexts[i];
         var alies = [];
+        if(!a.detectionResults) return false;
         var lines = a.detectionResults.split('\\n');
         _.each(lines, function (line, lineNo) {
           var items = line.split(',');
@@ -406,7 +413,7 @@ class DataParser {
                 timestamp: ts,
                 val: val,
                 text: (parseFloat(items[1]) > 0) ? atext[ts] : "",
-                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : []
+                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : {}
               });
             }
             if(items[2] && $.isNumeric(items[2])){
@@ -432,6 +439,7 @@ class DataParser {
 
     let stats = [];
     let {minString, maxString, avgString, stdString, availString}= this.data;
+    if(!(minString&&maxString&&avgString&&stdString&&availString)) return;
 
     let mins = minString.split(',');
     let maxs = maxString.split(',');
@@ -461,10 +469,14 @@ class DataParser {
 
     if (this.seriesOptions) return;
     let data = this.data['data'];
+    if (!data) return;
 
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
-    var lines = data.split('\\n');
+    var lines = data.trim().split('\\n');
+    var ts1 = undefined;
+    var ts2 = undefined;
+    var tsN = undefined;
     _.each(lines, function (line, lineNo) {
       var items = line.split(',');
       if (lineNo === 0) {
@@ -482,6 +494,14 @@ class DataParser {
           }
         });
       } else {
+        if(lineNo==1){
+          ts1 = parseInt(items[0]);
+        }else if(lineNo==2){
+          ts2 = parseInt(items[0]);
+        }
+        if(lineNo==lines.length-1){
+          tsN = parseInt(items[0]);
+        }
         let ts = new Date(parseInt(items[0]));
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
@@ -493,6 +513,11 @@ class DataParser {
       }
     });
 
+    if(ts1 && ts2){
+      this.interval = ts2-ts1;
+    }
+    this.startTimestamp = ts1;
+    this.endTimestamp = tsN;
     this.seriesOptions = soptions;
   }
 
@@ -502,6 +527,7 @@ class DataParser {
 
     if (this.summaryData) return this.summaryData;
 
+    this._parseData();
     this._parseAnomalyData();
 
     if (this.data['detectionResults'] === undefined) return null;
@@ -563,9 +589,9 @@ class DataParser {
 
     if (this.groupsData) return this.groupsData;
 
+    this._parseData();
     this._parseMetricUnitMap();
     this._parseAnomalyData();
-    this._parseData();
 
     let soptions = this.seriesOptions;
     let anomalies = this.anomalies;
@@ -604,7 +630,7 @@ class DataParser {
           var thismetrs = groupmetrics[grp];
           _.each(thismetrs, function (item, itemNo) {
             var thisalies = rawalies.filter(function (ra, rai) {
-              return (ra.metrs.indexOf(item) != -1);
+              return (Object.keys(ra.metrs).indexOf(item) != -1);
             });
             alies = alies.concat(thisalies);
           });
@@ -660,9 +686,9 @@ class DataParser {
 
     if (this.groupsData) return this.groupsData;
 
+    this._parseData();
     this._parseMetricUnitMap();
     this._parseAnomalyData();
-    this._parseData();
 
     let soptions = this.seriesOptions;
     let anomalies = this.anomalies;
@@ -692,7 +718,7 @@ class DataParser {
         if(rawalies!=undefined){
           var thismetrs = groupmetrics[grp];
           var thisalies = rawalies.filter(function (ra, rai) {
-            return (ra.metrs.indexOf(thismetrs) != -1);
+            return (Object.keys(ra.metrs).indexOf(thismetrs) != -1);
           });
           alies = thisalies;
           alies = alies.filter(function (el, index, arr) {
@@ -705,10 +731,21 @@ class DataParser {
         }
       }
       let highlights = _.map(alies, a => {
+        let newval = a.val < 0 ? 0 : Math.min(10, a.val);
+        let allocatedPercentage = a.metrs[value];
+        if(allocatedPercentage==0){
+          // set missing to 100%
+          allocatedPercentage = 1;
+        }
+        let allocatedVal = newval * allocatedPercentage;
+        // set floor for allocated value
+        if(allocatedVal < 0.5){
+          allocatedVal = 0.5;
+        }
         return {
           start: a.timestamp,
           end: a.timestamp,
-          val: a.val < 0 ? 0 : Math.min(10, a.val)
+          val: allocatedVal
         }
       });
       // series name & data

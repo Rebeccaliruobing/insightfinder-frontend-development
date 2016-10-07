@@ -109,13 +109,14 @@ class LiveProjectSelection extends React.Component {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item,index) => !(item.isStationary));
+    var projectNameList = [];
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
         <div className="menu"> 
           {
-            projects.map((p) => {
-              return <div className="item" key={p.projectName}
+            projects.map((p,index) => {
+              return <div className="item" key={p.projectName+index}
                           data-value={p.projectName}>{p.projectName}</div>
             })
           }
@@ -182,6 +183,28 @@ class OperationOptionsSelect extends React.Component {
   }
 }
 
+class TreemapOptionsSelect extends React.Component {
+  render(){
+    let selectOption = [0, 1, 5, 10];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {'<='+value+'%'}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
 class LogModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -230,6 +253,24 @@ class ModelTypeSimple extends React.Component{
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
           <div className="item" data-value="Split">Split</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
+class EventSummaryModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="Threshold">Threshold</div>
+          <div className="item" data-value="DBScan">DBScan</div>
         </div>
       </Dropdown>
     );
@@ -303,6 +344,49 @@ const DurationHour = (props) => {
   )
 };
 
+const IncidentDurationMinute = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">0</div>
+        <div className="item">5</div>
+        <div className="item">15</div>
+        <div className="item" selected>30</div>
+        <div className="item">60</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const IncidentActionTaken = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" selected>ignore</div>
+        <div className="item">scale-up</div>
+        <div className="item">reboot</div>
+        <div className="item">migration</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const NumberOfDays = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" selected>1</div>
+        <div className="item">3</div>
+        <div className="item">7</div>
+        <div className="item">14</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -313,8 +397,13 @@ export {
   ModelType,
   LogModelType,
   ModelTypeSimple,
+  EventSummaryModelType,
   AnomalyThreshold,
   DurationThreshold,
   WindowWithWeek,
-  DurationHour
+  DurationHour,
+  IncidentDurationMinute,
+  IncidentActionTaken,
+  NumberOfDays,
+  TreemapOptionsSelect
 };

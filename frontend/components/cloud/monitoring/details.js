@@ -29,13 +29,15 @@ const ProjectDetails = class extends React.Component {
   updateLiveAnalysis() {
 
     let { query } = this.props.location;
-    let { projectName, modelType, pvalue, cvalue } = query;
+    let { projectName, modelType, pvalue, cvalue, version } = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
-
+    if(!version){
+        version = "1";
+    }
     this.props.clearTimeout(this.timeout);
 
     this.setState({ loading: true });
-    apis.postLiveAnalysis(projectName, modelType, pvalue, cvalue)
+    apis.postLiveAnalysis(projectName, modelType, pvalue, cvalue, version)
       .then(resp => {
         let update = {};
         if (resp.success) {
@@ -66,7 +68,7 @@ const ProjectDetails = class extends React.Component {
       let debugData = undefined;
       const title = modelType === 'DBScan' ?
         `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
-        `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</  b>.`
+        `with model type <b>${modelType}</b>, MinPts <b>${pvalue}</b>, Epsilon: <b>${cvalue}</b>.`
           :
         `Please view anomaly detection result for project <b>${projectName}</b><br/>` +
         `with model type <b>${modelType}</b>, anomaly threshold <b>${pvalue}</b>, duration  threshold: <b>${cvalue}</b>.`
@@ -85,7 +87,7 @@ const ProjectDetails = class extends React.Component {
               </div>
             </div>
           </Console.Topbar>
-          <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData}  onRefresh={() => this.updateLiveAnalysis()}/>
+          <LiveAnalysisCharts {...query} data={data} loading={loading} debugData={debugData} enablePublish={true} onRefresh={() => this.updateLiveAnalysis()}/>
         </Console>
       )
     }

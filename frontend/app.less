@@ -1,17 +1,21 @@
 @import "./artui/mixins";
 @import "./iconfont/iconfont.css";
+@import "./styles/grid";
+@import "./styles/statistic";
+@import "./styles/treemap";
 
 #app {
   height: 100%;
   width: 100%;
 }
 
-.ui.dimmer {
-  background-color: rgba(0, 0, 0, 0.25) !important;
+.yellow {
+  color: #FBBD08; // #767676
 }
 
-.ui.secondary.pointing.menu .active.item {
-  background-color: lightblue !important;
+
+.ui.dimmer {
+  background-color: rgba(0, 0, 0, 0.25) !important;
 }
 
 .dygraph-legend {
@@ -427,4 +431,8 @@
   & > span.highlight {
     display: block !important;
   }
+}
+.in-button{
+  box-shadow: inset 0 3px 3px rgba(0,0,0,0.2) !important;
+  background-color: #CC511E !important;;
 }

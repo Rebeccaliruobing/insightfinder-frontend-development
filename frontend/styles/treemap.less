@@ -1,0 +1,48 @@
+.treemap {
+  svg {
+    text {
+      pointer-events: none;
+      fill: white;
+    }
+
+    rect {
+      stroke: #fff;
+      stroke-width: 1px;
+    }
+
+    .navbar {
+      rect {
+        fill: #F2711C;
+        cursor: pointer;
+        color: white;
+      }
+      text {
+        font-size: 13px;
+        fill: white;
+      }
+      &:hover rect {
+        fill: #f26202;
+      }
+    }
+
+    .depth {
+      rect.parent {
+        stroke-width: 1px;
+        &:hover {
+          fill-opacity: 0.9;
+        }
+      }
+
+      rect.metric,
+      .children rect.parent {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.incidents.treemap {
+  border: 1px solid rgba(34,36,38,.15);
+  height: 500px;
+}
+
