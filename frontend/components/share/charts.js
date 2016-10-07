@@ -172,15 +172,24 @@ export class DataGroupCharts extends React.Component {
             let values = [];
             let elems = [];
             let missingTag = "";
-            _.each(group.sdata,function(data,index){
-              if(data.length >= 2 && !isNaN(data[1])){
-                values.push(data);
-              }
-            });
-            if((values.length / group.sdata.length)<0.50){
-              missingTag = " (missing data)";
+            if(group.sdata.length>0){
+              _.each(group.sdata[0],function(mdata,mindex){
+                values.push(0);
+              });
+              _.each(group.sdata,function(data,index){
+                _.each(data,function(mdata,mindex){
+                  if(mindex>0 && !isNaN(mdata)){
+                    values[mindex] = values[mindex]+1;
+                  }
+                }); 
+              });
+              _.each(group.sdata[0],function(mdata,mindex){
+                if(mindex>0 && (values[mindex] / group.sdata.length) < 0.95){
+                  missingTag = " (missing data)";
+                  return false;
+                }
+              });
             }
-
             const idx = index;
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}

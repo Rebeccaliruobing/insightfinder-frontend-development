@@ -77,7 +77,7 @@ export default class CausalGraph extends React.Component {
             svgWidthUpdate: 900,
             svg: {
                 width: 900,
-                height: 500,
+                height: 600,
                 style: {
                     border: '1px solid #e0e0e0'
                 }
@@ -87,7 +87,7 @@ export default class CausalGraph extends React.Component {
             selectRange: {},
             zoomRange: {
                 x1: 0, y1: 0,
-                x2: 900, y2: 500,
+                x2: 900, y2: 600,
                 zoomX: 1, zoomY: 1
             }
         }
@@ -101,7 +101,7 @@ export default class CausalGraph extends React.Component {
         state.lines = [];
         let self = this;
 
-        let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
+        let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
         let lastPoints = [];
         let modelWidth = 0;
@@ -235,7 +235,10 @@ export default class CausalGraph extends React.Component {
     }
 
     getWrapText(text, maxLength) {
-        return text.split(' ');
+        let ret = [];
+        ret.push(text);
+        return ret;
+        //return text.split(' ');
         /*
         if (text.length > maxLength && text.split(" ").length > 0) {
             var s = '';
@@ -266,13 +269,13 @@ export default class CausalGraph extends React.Component {
 
     handleMouseDown(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 140;
+        layerX = layerX - 250;
         this.setState({ selectRange: Object.assign({}, this.state.selectRange, { x1: layerX, y1: layerY }) })
     }
 
     handleMouseMove(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 140;
+        layerX = layerX - 250;
         let selectRange = this.state.selectRange;
         selectRange.x2 = layerX;
         selectRange.y2 = layerY;
@@ -286,7 +289,7 @@ export default class CausalGraph extends React.Component {
 
     handleMouseUp(e) {
         let { layerX, layerY } = e.nativeEvent;
-        layerX = layerX - 140;
+        layerX = layerX - 250;
         let svg = this.state.svg;
         let selectRange = this.state.selectRange;
         selectRange.x2 = layerX;
@@ -306,7 +309,7 @@ export default class CausalGraph extends React.Component {
         this.setState({
             zoomRange: {
                 x1: 0, y1: 0,
-                x2: 900, y2: 500,
+                x2: 900, y2: 600,
                 zoomX: 1, zoomY: 1
             }
         })
@@ -316,12 +319,12 @@ export default class CausalGraph extends React.Component {
         let { dataArray, types, startTimestamp, endTimestamp } = this.state;
         let { svg, points, lines, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
-        let stageWidth = (svg.width - 140) / Math.max(dataArray.length, 1);
+        let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
         return (
             <div>
                 <span className="ui button mini green" onClick={this.reset}>Reset</span><br/>
                 <div className="relative" style={{ display: 'flex' }}>
-                    <svg {...{ width: 140, height: 500, }}>
+                    <svg {...{ width: 250, height: 600, }}>
                         {types.map((type, index)=> {
                             var y = stageHeight * index + stageHeight * 0.5;
                             y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
@@ -354,7 +357,7 @@ export default class CausalGraph extends React.Component {
                         {types.map((type, index)=> {
                             var y = stageHeight * index + stageHeight * 0.5;
                             y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
-                            return <line key={type} x1={0} y1={y} x2={svg.width - 140} y2={y}
+                            return <line key={type} x1={0} y1={y} x2={svg.width - 250} y2={y}
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
                         })}
                         {dataArray.map(([record, ...records], i) => {
@@ -382,7 +385,7 @@ export default class CausalGraph extends React.Component {
                                   strokeOpacity: 0.5
                               }}/>
 
-                        <rect x={800} y={0} width={140} height={500}
+                        <rect x={800} y={0} width={250} height={600}
                               style={{ fill: 'white', stroke: 'white', strokeWidth: 2 }}/>
                         <rect x={0} y={svg.height - stageHeight / 4} width={900} height={stageHeight / 4}
                               style={{ fill: 'white', stroke: 'white', strokeWidth: 2 }}/>

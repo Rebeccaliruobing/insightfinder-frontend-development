@@ -170,6 +170,14 @@ class IncidentsTreeMap extends Component {
     this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
   }
 
+  chopString(str,n){
+    if(str.length<=n+2){
+      return str;
+    }else{
+      return str.slice(0,n)+'..';
+    }
+  }
+
   rootToRGBHex(root) {
     let val = root.score / root.value;
     return severityToRGBHex(val);
@@ -227,6 +235,7 @@ class IncidentsTreeMap extends Component {
   @autobind
   displayData(data) {
     let {instanceMetaData} = this.state;
+    let self = this;
     this.setState({},()=>{
       if (!data) return;
 
@@ -308,15 +317,16 @@ class IncidentsTreeMap extends Component {
         .attr('class', 'child')
         .call(rect);
 
+      // this is mouse over popup text, no chopping
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
-        .append("title").text(d => d.name);
+        .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)+"\n"+d.eventType);
       g.selectAll('.parent').attr('fill', d => this.color(d));
   //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
-      g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)).call( t => {
+      g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(this.chopString(instanceMetaData[d.name]['tagName'],8)):d.name)).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
       });
-      g.append("text").attr("dy", ".75em").text(d => d.eventType).call( t => {
+      g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType,10)).call( t => {
         t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
       });
 

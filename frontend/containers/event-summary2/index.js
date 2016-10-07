@@ -178,7 +178,7 @@ class EventSummary2 extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
-                <div className="ten wide column" style={{ height: 500, 'paddingTop': 20 }}>
+                <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
                   <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
                       e.stopPropagation();
                       this.setState({
@@ -203,7 +203,7 @@ class EventSummary2 extends Component {
                   null}
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
-                <div className="six wide column" style={{ height: 500 }}>
+                <div className="seven wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 
                                  projectType={projectType}
                                  cvalue={cvalue} 
