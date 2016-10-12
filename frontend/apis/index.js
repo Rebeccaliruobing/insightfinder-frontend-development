@@ -387,7 +387,7 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, version, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, modelType, pvalue, cvalue, numberOfDays, endTimestamp, version, userName = store.get('userName'), token = store.get('token')) {
         if(!version){
             version = "1";
         }
@@ -396,7 +396,7 @@ const apis = {
                 type: 'POST',
                 url: getEndpoint('liveAnalysis', version),
 //                url: $.fn.api.settings.api['live analysis'],
-                data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
+                data: $.param({ userName, token, pvalue, cvalue, numberOfDays, endTimestamp, modelType, projectName }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }

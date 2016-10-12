@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
-import {LiveProjectSelection} from '../../components/selections';
+import { LiveProjectSelection,NumberOfDays, TreemapOptionsSelect,EventSummaryModelType } from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
@@ -19,16 +19,22 @@ class EventSummary extends Component {
     super(props);
 
     this.state = {
+      treeMapValue: '0',
+      treeMapChange: false, // utilization view flag
+      treeMapText: "Utilization",
       data: {
         statistics: {},
         summary: {},
         incidents: [],
         incidentsTreeMap: [],
-        instanceMetricJson: {}
+        instanceMetaData: {},
       },
       loading: true,
       projectName: undefined,
       showTenderModal: false,
+      selectedIncident: undefined,
+      cvalue: "1",
+      modelType:"Holistic",
     };
   }
 
@@ -47,45 +53,59 @@ class EventSummary extends Component {
 
   @autobind()
   handleIncidentSelected(incident) {
-    const {projectName, data} = this.state;
+    const {projectName, data, cvalue} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id+", start: "+moment(incident.startTimestamp).format("MM-DD HH:mm");
-      let stats = incident.instanceMetricJson;
+      let caption = "Incident #"+incident.id;
+      let stats = incident.instanceMetricJson || {};
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
-      incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson);
+      incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident.rootCauseByInstanceJson);
     } else {
-      let caption = projectName + " (1d)";
+      let caption = projectName + " (" + cvalue + "d)";
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
-      incidentsTreeMap
+      incidentsTreeMap, 
+      selectedIncident:incident,
     });
   }
 
   @autobind
   handleProjectChartsView() {
-    const {projectName} = this.state;
+    const {projectName,cvalue,modelType} = this.state;
     if (projectName) {
       let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
       let projectParam = projectParams.find((p) => p.projectName == projectName);
-      let cvalue = projectParam ? projectParam.cvalue : "5";
-      let pvalue = projectParam ? projectParam.pvalue : "0.99";
-      let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+      let cvalueParam = cvalue ? cvalue : "1";
+      let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
+      // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
 
-      const url = `/liveMonitoring?version=1&pvalue=${pvalue}&cvalue=${cvalue}&modelType=${modelType}&projectName=${projectName}`;
+      const url = `/liveMonitoring?version=1&pvalue=${pvalueParam}&cvalue=${cvalueParam}&modelType=${modelType}&projectName=${projectName}`;
       window.open(url, '_blank');
     }
   }
 
   @autobind
-  handleProjectChange(value, projectName) {
+  handleModelTypeChange(value, modelType) {
+    this.setState({modelType:modelType});
+    let { projectName } = this.state;
+    this.refreshProjectName(projectName);
+  }
+
+  @autobind
+  handleDayChange(value, numberOfDays) {
+    this.setState({cvalue:numberOfDays.toString()});
+    let { projectName } = this.state;
+    this.refreshProjectName(projectName);
+  }
+
+  refreshProjectName(projectName) {
+    const {cvalue, modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
-    let cvalue = projectParam ? projectParam.cvalue : "5";
     let pvalue = projectParam ? projectParam.pvalue : "0.99";
-    let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
+    // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName });
     apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, 1)
@@ -93,7 +113,6 @@ class EventSummary extends Component {
         this.setState({
           loading: false,
           incidentsTreeMap: data.incidentsTreeMap,
-          instanceMetricJson: data.instanceMetricJson,
           data,
           startTimestamp: undefined,
           endTimestamp: undefined,
@@ -113,15 +132,29 @@ class EventSummary extends Component {
         console.log(msg);
         // alert(msg);
       });
+      this.handleIncidentSelected();
   }
-  refreshProjectName(projectName){
-    this.handleProjectChange(projectName,projectName);
+
+  @autobind
+  handleProjectChange(value,projectName){
+    this.setState({
+      cvalue: "1",
+      modelType:"Holistic",
+    });
+    this.refreshProjectName(projectName);
   }
+  handleTreeMapChange(value){
+    this.setState({treeMapValue: value});
+  }
+
   render() {
-    let { loading, data, projectName, incidentsTreeMap,instanceMetricJson} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, cvalue, modelType, treeMapValue,treeMapChange,treeMapText} = this.state;
     let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+    let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
+    let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
+    let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
@@ -129,32 +162,53 @@ class EventSummary extends Component {
             <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
             <LiveProjectSelection style={{width: 250}}
                                   value={projectName} onChange={this.handleProjectChange}/>
+            <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Number of Days:&nbsp;</label>
+            <NumberOfDays style={{width: 50}}
+                                  value={cvalue} onChange={this.handleDayChange}/>
+            <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Model Type:&nbsp;</label>
+            <EventSummaryModelType style={{width: 50}}
+                                  value={modelType} onChange={this.handleModelTypeChange}/>
             <label style={{ fontWeight: 'bold', 'float': 'right' }}>
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </label>
           </div>
           <div className="ui vertical segment">
-            <ProjectStatistics data={data}/>
+            <ProjectStatistics data={data} dur={cvalue} />
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
-                <div className="eight wide column" style={{ height: 500, 'paddingTop': 20 }}>
-                  <Button className='orange' onClick={this.handleProjectChartsView}>Line Charts</Button>
-                  <Button className='orange' title="Overall Causal Graph"
-                          onClick={(e) => {
-                          e.stopPropagation();
-                          this.setState({
-                            showTenderModal: true,
-                            startTimestamp: undefined,
-                            endTimestamp: undefined
-                          });}}>
-                    Overall Causal Graph
+                <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
+                  <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
+                      e.stopPropagation();
+                      this.setState({
+                      treeMapChange: !treeMapChange,
+                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
+                      });
+                  }}>
+                    Anomalies
                   </Button>
-                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetricJson={instanceMetricJson} />
+                  <Button className={treeMapChange?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
+                      e.stopPropagation();
+                      this.setState({
+                      treeMapChange: !treeMapChange,
+                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
+                      });
+                  }}>
+                    CPU Utilization
+                  </Button>
+                  {treeMapChange?
+                    <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  :
+                  null}
+                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
-                <div className="eight wide column" style={{ height: 500 }}>
-                  <IncidentsList onIncidentSelected={this.handleIncidentSelected}
+                <div className="seven wide column" style={{ height: 500 }}>
+                  <IncidentsList projectName={refreshName} 
+                                 projectType={projectType}
+                                 cvalue={cvalue} 
+                                 modelType={modelType} 
+                                 onIncidentSelected={this.handleIncidentSelected}
                                  incidents={data.incidents}
                                  causalDataArray={data.causalDataArray}
                                  causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
@@ -163,7 +217,7 @@ class EventSummary extends Component {
             </div>
           </div>
         </div>
-          { this.state.showTenderModal &&
+        { this.state.showTenderModal &&
             <TenderModal dataArray={data.causalDataArray} types={data.causalTypes}
                      endTimestamp={this.state.endTimestamp}
                      startTimestamp={this.state.startTimestamp}

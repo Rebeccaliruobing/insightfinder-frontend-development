@@ -155,7 +155,7 @@ function buildTimeTable(startTime, endTime, predicatedEndTime, incidents) {
  * @param pvalue: pvalue
  * @param cvalue: cvalue
  */
-export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, version) {
+export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, version) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -163,7 +163,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, ver
     $.ajax({
       type: 'POST',
       url: getEndpoint('eventSummary', version),
-      data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
+      data: $.param({ userName, token, pvalue, cvalue, modelType, endTimestamp, numberOfDays, projectName }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }

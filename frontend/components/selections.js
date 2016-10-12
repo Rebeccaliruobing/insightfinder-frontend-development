@@ -77,7 +77,7 @@ class InstanceProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => (!(item.isStationary)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
+    projects = projects.filter((item,index) => ((item.fileProjectType!=0)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -108,7 +108,7 @@ class LiveProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => !(item.isStationary));
+    projects = projects.filter((item,index) => item.fileProjectType!=0);
     var projectNameList = [];
     return (
       <Dropdown mode="select" {...this.props}>
@@ -382,6 +382,9 @@ const NumberOfDays = (props) => {
         <div className="item">3</div>
         <div className="item">7</div>
         <div className="item">14</div>
+        <div className="item">30</div>
+        <div className="item">60</div>
+        <div className="item">90</div>
       </div>
     </Dropdown>
   )
