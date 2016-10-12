@@ -160,36 +160,32 @@ class EventSummary2 extends Component {
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
-          <div className="ui right aligned vertical segment" style={{'display': 'flex'}}>
-            <div className="field" style={{'width': '20%'}}>
-            </div>
-            <div className="field" style={{'width': '25%'}}>
+          <div className="ui right aligned vertical inline segment" style={{zIndex: 1000}}>
+            <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{width: 200}}/>
             </div>
-            <div className="field" style={{'width': '8%'}}>
-              <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;End date:&nbsp;</label>
-            </div>
-            <div className="field" style={{'width': '7%'}}>
-              <DateTimePicker className='ui input' style={{'width': '50%'}}
+            <div className="field">
+              <label style={{ fontWeight: 'bold' }}>End date:&nbsp;</label>
+                <div className="ui input">
+                  <DateTimePicker className='ui input' style={{'width': '50%'}}
                               dateValidator={this.modelDateValidator.bind(this)}
                               dateTimeFormat='YYYY-MM-DD' value={endTime}
                               onChange={this.handleEndTimeChange}/>
+                </div>
             </div>
-            <div className="field" style={{'width': '15%'}}>
+            <div className="field">
               <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Number of Days:&nbsp;</label>
               <NumberOfDays style={{width: 120}}
                                     value={numberOfDays} onChange={this.handleDayChange}/>
             </div>
-            <div className="field" style={{'width': '15%'}}>
+            <div className="field">
               <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Model Type:&nbsp;</label>
               <EventSummaryModelType style={{width: 120}}
                                     value={modelType} onChange={this.handleModelTypeChange}/>
             </div>
-            <div className="field" style={{'width': '10%'}}>
-              <label style={{ fontWeight: 'bold', 'float': 'right' }}>
-                <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
-              </label>
+            <div className="field">
+              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </div>
           </div>
           <div className="ui vertical segment">
