@@ -162,11 +162,11 @@ class EventSummary2 extends Component {
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
           <div className="ui right aligned vertical inline segment" style={{zIndex: 1000}}>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Project Name:&nbsp;</label>
+              <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{width: 200}}/>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>End date:&nbsp;</label>
+              <label style={{ fontWeight: 'bold' }}>End date:</label>
                 <div className="ui input">
                   <DateTimePicker className='ui input' style={{'width': '50%'}}
                               dateValidator={this.modelDateValidator.bind(this)}
@@ -175,12 +175,12 @@ class EventSummary2 extends Component {
                 </div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Number of Days:&nbsp;</label>
+              <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
               <NumberOfDays style={{width: 120}}
                                     value={numberOfDays} onChange={this.handleDayChange}/>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>&nbsp;&nbsp;&nbsp;&nbsp;Model Type:&nbsp;</label>
+              <label style={{ fontWeight: 'bold' }}>Model Type:</label>
               <EventSummaryModelType style={{width: 120}}
                                     value={modelType} onChange={this.handleModelTypeChange}/>
             </div>
