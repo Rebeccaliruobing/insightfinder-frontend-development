@@ -35,7 +35,7 @@ class EventSummary2 extends Component {
       showTenderModal: false,
       selectedIncident: undefined,
       numberOfDays: "1",
-      endTime: moment().endOf('day'),
+      endTime: moment(),
       modelType:"Holistic",
     };
   }
@@ -89,7 +89,13 @@ class EventSummary2 extends Component {
 
   @autobind
   handleEndTimeChange(value, endTime) {
-    this.setState({endTime: moment(value).endOf('day')});
+    let newEndTime = moment(value).endOf('day');
+    let curTime = moment();
+    if(newEndTime>curTime){
+      newEndTime = curTime;
+    }
+
+    this.setState({endTime: newEndTime});
     // let { projectName } = this.state;
     // this.refreshProjectName(projectName);
   }
@@ -110,8 +116,8 @@ class EventSummary2 extends Component {
           loading: false,
           incidentsTreeMap: data.incidentsTreeMap,
           data,
-          startTimestamp: undefined,
-          endTimestamp: undefined,
+          startTimestamp: data.startTimestamp,
+          endTimestamp: data.endTimestamp,
           showTenderModal: false
         }, ()=>{
             let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
@@ -119,7 +125,7 @@ class EventSummary2 extends Component {
             let detectedIncidents = data.incidents.filter((incident, index) =>
                     incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
             if(detectedIncidents.length>0){
-                this.handleIncidentSelected(detectedIncidents[0]);
+                this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
             }
         });
       })
@@ -134,6 +140,7 @@ class EventSummary2 extends Component {
   @autobind
   handleProjectChange(value,projectName){
     this.setState({
+      endTime: moment(),
       numberOfDays: "1",
       modelType:"Holistic",
     });
@@ -160,7 +167,7 @@ class EventSummary2 extends Component {
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
-          <div className="ui right aligned vertical inline segment" style={{zIndex: 1000}}>
+          <div className="ui right aligned vertical inline segment" style={{zIndex: 100}}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{width: 200}}/>

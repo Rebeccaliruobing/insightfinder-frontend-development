@@ -193,7 +193,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, end
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
-          ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" (1d)", statistics, heatmap);
+          ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
           ret['incidents'] = incidentList;
           ret['incidentsTimeTable'] = buildTimeTable(
             data.startTimestamp, data.endTimestamp, data.predictedEndTime, incidentList);

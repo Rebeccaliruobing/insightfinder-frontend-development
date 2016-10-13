@@ -35,7 +35,7 @@ class IncidentsList extends Component {
       startTimestamp:undefined,
       endTimestamp:undefined,
       activeIncident:undefined,
-      angleIconStyleSelect: 'angleIconStyleId',
+      angleIconStyleSelect: 'angleIconStyleStartTime',
       angleIconStyle: {
           angleIconStyleId: 'down',
           angleIconStyleSeverity: 'down',
@@ -143,7 +143,7 @@ class IncidentsList extends Component {
 
   selectTab(e, tab) {
 
-      let angleIconStyleSelect='angleIconStyleId';
+      let angleIconStyleSelect='angleIconStyleStartTime';
       let angleIconStyle = {
           angleIconStyleId: 'down',
           angleIconStyleSeverity: 'down',
