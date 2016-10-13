@@ -96,8 +96,10 @@ class EventSummary2 extends Component {
     }
 
     this.setState({endTime: newEndTime});
-    // let { projectName } = this.state;
-    // this.refreshProjectName(projectName);
+    let { projectName } = this.state;
+    this.setState({endTime: moment(value).endOf('day')}, () => {
+      this.refreshProjectName(projectName);
+    });
   }
 
   refreshProjectName(projectName) {
@@ -167,10 +169,10 @@ class EventSummary2 extends Component {
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
-          <div className="ui right aligned vertical inline segment" style={{zIndex: 100}}>
+          <div className="ui right aligned vertical inline segment" style={{zIndex: 200}}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
-              <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{width: 200}}/>
+              <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
