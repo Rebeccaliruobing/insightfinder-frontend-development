@@ -89,9 +89,10 @@ class EventSummary2 extends Component {
 
   @autobind
   handleEndTimeChange(value, endTime) {
-    this.setState({endTime: moment(value).endOf('day')});
-    // let { projectName } = this.state;
-    // this.refreshProjectName(projectName);
+    let { projectName } = this.state;
+    this.setState({endTime: moment(value).endOf('day')}, () => {
+      this.refreshProjectName(projectName);
+    });
   }
 
   refreshProjectName(projectName) {
