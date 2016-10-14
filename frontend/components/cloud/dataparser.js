@@ -267,7 +267,7 @@ class DataParser {
       _.each(arr, function (a, i) {
         var atext = [];
         var intext = [];
-        if (a.anomaliesConsolidated) {
+        if (a.anomaliesConsolidated && a.anomaliesConsolidated != "") {
           var lines = a.anomaliesConsolidated.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
@@ -352,9 +352,9 @@ class DataParser {
               intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
+          anomalyConsolidatedTexts.push(atext);
+          anomalyConsolidatedIncidentTexts.push(intext);
         }
-        anomalyConsolidatedTexts.push(atext);
-        anomalyConsolidatedIncidentTexts.push(intext);
       });
     }
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
@@ -550,7 +550,10 @@ class DataParser {
       }
     });
 
-    let anomalyTexts = this.anomalyConsolidatedTexts || this.anomalyTexts;
+    let anomalyTexts = this.anomalyTexts;
+    if(this.anomalyConsolidatedTexts.length>0){
+      anomalyTexts = this.anomalyConsolidatedTexts;
+    }
     _.each(anomalyTexts, (o) => {
       _.forIn(o, (v, k) => {
         index++;
