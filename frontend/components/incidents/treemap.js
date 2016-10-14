@@ -32,7 +32,8 @@ class IncidentsTreeMap extends Component {
       endTimestamp:undefined,
       treeMapValue:"0",
       cpuUtilizationByInstance:props.cpuUtilizationByInstance,
-      instanceMetaData:props.instanceMetaData
+      instanceMetaData:props.instanceMetaData,
+      anomaliesList:undefined
     }
   }
 
@@ -65,10 +66,17 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showInstanceChart(d) {
-    let { startTimestamp,endTimestamp } = this.state;
+    let { startTimestamp,endTimestamp,anomaliesList } = this.state;
+    let instance = d['instanceName'];
+    let anomalyMetrics = [];
+    if(instance && anomaliesList[instance]){
+      let anomalies = anomaliesList[instance];
+      anomalyMetrics = Object.keys(anomalies);
+    }
     let params = {
       projectName: d['projectName'],
-      instanceName: d['instanceName']
+      instanceName: d['instanceName'],
+      anomalyMetrics:anomalyMetrics.toString(),
     };
     if(startTimestamp && endTimestamp){
       params['startTimestamp'] = startTimestamp;
@@ -85,7 +93,8 @@ class IncidentsTreeMap extends Component {
       this.setState({
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp,
-        instanceMetaData:nextProps.instanceMetaData
+        instanceMetaData:nextProps.instanceMetaData,
+        anomaliesList:nextProps.data.anomaliesList
       });
       if(typeof nextProps.treeMapChange == 'boolean'){
         this.setState({

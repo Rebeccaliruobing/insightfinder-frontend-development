@@ -21,8 +21,16 @@ export class DataChart extends React.Component {
     super(props);
 
     this.dateWindow = [];
+    this.state = {
+      metricTags: props.metricTags
+    }
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      metricTags: nextProps.metricTags
+    });
+  }
   shouldComponentUpdate(nextProps, nextState) {
     let update = shallowCompare(this, nextProps, nextState);
 
@@ -128,8 +136,8 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    //const { groups, view, columns } = this.props;
-    const { groups, view, columns } = this.props;
+    const { groups, view, columns, } = this.props;
+    let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
     const isListView = view === 'list';
@@ -171,6 +179,10 @@ export class DataGroupCharts extends React.Component {
             const isSelectedItem = index === selectedIndex;
             let values = [];
             let elems = [];
+            let anomalyTag = "";
+            if(metricTags && metricTags[group.metrics]){
+              anomalyTag = metricTags[group.metrics];
+            }
             let missingTag = "";
             if(group.sdata.length>0){
               _.each(group.sdata[0],function(mdata,mindex){
@@ -202,7 +214,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{missingTag}</span></div>
+                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span></div>
                   <DataChart
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}

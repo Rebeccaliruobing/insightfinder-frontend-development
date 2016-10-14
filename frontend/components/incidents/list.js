@@ -468,7 +468,7 @@ class IncidentsList extends Component {
                                           incident.duration+" min"
                                         }
                                       </td>
-                                      <td className="code">{incident.rootCauseJson.rootCauseTypes} {sysCallEnabled && <i className="zoom icon" onClick={(e) => {self.handleLoadSysCall(incident)}}/>}</td>
+                                      <td className="code">{incident.rootCauseJson.rootCauseTypes} {false && sysCallEnabled && <i className="zoom icon" onClick={(e) => {self.handleLoadSysCall(incident)}}/>}</td>
                                       <td>
                                         { incident.anomalyRatio==0 ?
                                           "N/A"

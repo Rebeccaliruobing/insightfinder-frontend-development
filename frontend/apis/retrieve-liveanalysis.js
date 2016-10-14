@@ -125,7 +125,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         eventType:"",
     children: root,
     startTimestamp,
-    endTimestamp
+    endTimestamp,
+    anomaliesList,
   };
 }
 

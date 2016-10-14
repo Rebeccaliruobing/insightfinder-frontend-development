@@ -243,7 +243,7 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName} = this.props;
+        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName, data} = this.props;
         const { view, columns,tabStates } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -264,6 +264,14 @@ class LiveAnalysisCharts extends React.Component {
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         // incident table
         let incidents = [];
+        let metricTags = {};
+        if(data && data.anomalyMetrics){
+          let anomalyMetrics = data.anomalyMetrics.split(",");
+          _.each(anomalyMetrics,function(am,index){
+            metricTags[am] = " (Anomaly Detected) ";
+          });
+        }
+
         if(summary){
             incidents =  _.map(summary.incidentSummary, a => {
               let incidentObj = this._getRootCauseNameFromHints(a.text);
@@ -354,7 +362,7 @@ class LiveAnalysisCharts extends React.Component {
 
                                     {!!groups &&
                                     <DataGroupCharts
-                                        key={view + '_group_charts'}
+                                        key={view + '_group_charts'} metricTags={metricTags}
                                         groups={groups} view={view} columns={columns}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
