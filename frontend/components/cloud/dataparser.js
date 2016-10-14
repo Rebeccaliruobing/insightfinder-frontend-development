@@ -317,10 +317,15 @@ class DataParser {
                     rootcause = "";
                   } else {
                     if(valString != 'missing'){
+                      let changePct = parseFloat(rootcause);
+                      let direction = "higher";
+                      if(changePct<0){
+                        direction = "lower";
+                      }
                       if(neuronId&&neuronId==-1){
-                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than threshold, ";  
+                        rootcause = changePct.toFixed(1) + "% higher than threshold, ";  
                       } else {
-                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
+                        rootcause = changePct.toFixed(1) + "% " + direction + " than normal, ";
                       }                      
                     } else {
                       rootcause = "missing value, "
@@ -339,9 +344,9 @@ class DataParser {
                   newhintsIncidentStr = newhintsStr;
                 }              
               });
-              if(newhintsStr.length>512){
-                newhintsStr = newhintsStr.substring(0,511)+"...";
-              }
+              // if(newhintsStr.length>512){
+              //   newhintsStr = newhintsStr.substring(0,511)+"...";
+              // }
               atext[parseInt(items[0])] = newhintsStr;
               var dur = Math.round(newhintsArr.length * interval / 60000);
               intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
