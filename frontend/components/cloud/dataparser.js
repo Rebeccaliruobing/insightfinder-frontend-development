@@ -344,9 +344,9 @@ class DataParser {
                   newhintsIncidentStr = newhintsStr;
                 }              
               });
-              if(newhintsStr.length>750){
-                newhintsStr = newhintsStr.substring(0,750)+"...";
-              }
+              // if(newhintsStr.length>750){
+              //   newhintsStr = newhintsStr.substring(0,750)+"...";
+              // }
               atext[parseInt(items[0])] = newhintsStr;
               var dur = Math.round(newhintsArr.length * interval / 60000);
               intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
