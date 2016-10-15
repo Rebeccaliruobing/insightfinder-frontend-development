@@ -5,10 +5,6 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
 
-// Remove lighten color from RdYlGn11
-const RdYlGn11 = ["#a50026","#d73027","#f46d43","#fdae61","#fee08b",
-  "#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"].reverse();
-
 class IncidentsTreeMap extends Component {
 
   constructor(props) {
@@ -23,7 +19,6 @@ class IncidentsTreeMap extends Component {
       .sort((a, b) => a.name - b.name)
       .ratio(0.3 * (1 + Math.sqrt(5)))
       .round(false);
-    this.color = null;
 
     this.state = {
       treeMapChange: false,
@@ -104,12 +99,12 @@ class IncidentsTreeMap extends Component {
       if(typeof nextProps.treeMapValue == 'string'){
         this.setState({
           treeMapValue:nextProps.treeMapValue
-        });        
+        });
       }
       if(typeof nextProps.cpuUtilizationByInstance == 'object'){
         this.setState({
           cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
-        });        
+        });
       }
     }
   }
@@ -143,40 +138,6 @@ class IncidentsTreeMap extends Component {
         : (Math.log10(d.score) > num ? scale : 1) * d.value;
     };
     accumulate(root);
-
-    // We get the max score on the root, so we can setup the color.
-    this.color = this.severityToRGBHex;
-    //this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
-  }
-
-  transformDataOld(root) {
-
-    const maxScore = d => {
-      let s = 0;
-      if (d.children) {
-        s = d3.max(d.children, c => maxScore(c))
-      } else {
-        s = d.score;
-      }
-      d.score = s;
-      return s;
-    };
-    maxScore(root);
-
-    const scale = 1.25;
-    const num = 3;
-    // Accumulate the node value to the count of children.
-    const accumulate = d => {
-      return (d._children = d.children)
-        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
-        return p + accumulate(v);
-      }, 0)
-        : (Math.log10(d.score) > num ? scale : 1) * d.value;
-    };
-    accumulate(root);
-
-    // We get the max score on the root, so we can setup the color.
-    this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
   }
 
   chopString(str,n){
@@ -187,14 +148,21 @@ class IncidentsTreeMap extends Component {
     }
   }
 
-  rootToRGBHex(root) {
-    let val = root.score / root.value;
-    return severityToRGBHex(val);
-  }
+  /**
+   * Get the fill color of the node, based on severity and type of event.
+   * @param d. The node data.
+   * @returns {string} Color hex string.
+   */
+  @autobind
+  getNodeFillColor(d) {
 
-  severityToRGBHex(d) {
+    if ( d.eventType === '- new instance') {
+      return '#ffcd00';
+    }
+
     let {cpuUtilizationByInstance,treeMapValue} = this.state;
     let val = d.score;
+
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
     let threshold = parseInt(treeMapValue);
@@ -204,12 +172,12 @@ class IncidentsTreeMap extends Component {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
-      } else if(d.type == 'instance' 
+      } else if(d.type == 'instance'
         && threshold >= cpuUtilizationByInstance[d.name]) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
-      } else if(d.type == 'container' 
+      } else if(d.type == 'container'
         && threshold >= cpuUtilizationByInstance[d.instanceName]) {
           rcolor = 173;
           gcolor = 216;
@@ -330,9 +298,11 @@ class IncidentsTreeMap extends Component {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
         .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)+"\n"+d.eventType);
-      g.selectAll('.parent').attr('fill', d => this.color(d));
-  //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
-      g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(this.chopString(instanceMetaData[d.name]['tagName'],8)):d.name)).call( t => {
+      g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d));
+      g.append("text").attr("dy", ".75em").text(
+        d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?
+          (this.chopString(instanceMetaData[d.name]['tagName'],8)):d.name)
+      ).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
       });
       g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType,10)).call( t => {

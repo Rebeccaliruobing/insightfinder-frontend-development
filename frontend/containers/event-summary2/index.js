@@ -226,7 +226,9 @@ class EventSummary2 extends Component {
                     <TreemapOptionsSelect style={{ width: 10, 'float': 'right' }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
-                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} cpuUtilizationByInstance={cpuUtilizationByInstance} treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
+                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                                    cpuUtilizationByInstance={cpuUtilizationByInstance}
+                                    treeMapChange={treeMapChange} treeMapValue={treeMapValue}/>
                 </div>
                 <div className="seven wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 
