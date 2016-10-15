@@ -2,190 +2,171 @@
  * React component of dygraphs
  *
  * http://dygraphs.com/options.html
- * https://github.com/motiz88/react-dygraphs
- * 
+ *
  * * Remove interaction support which causes zoom failed.
  **/
 
-import React from 'react';
+import React, {Component, PropTypes as T} from 'react';
 import classNames from 'classnames';
+import {autobind} from 'core-decorators';
+import {DygraphDefaultProps, spreadDygraphProps} from './options';
 
-import {BaseComponent, PropTypes} from '../../base';
-import DygraphBase from '../../../core/elements/dygraph';
-import {DygraphPropTypes, DygraphDefaultProps, spreadDygraphProps} from './options';
+const DygraphBase = require('exports?Dygraph!dygraphs/dygraph-combined-dev');
 
-class InteractionModelProxy {
+class Dygraph extends Component {
 
-    constructor() {
-        // Default target, can be changed.
-        this.target = DygraphBase.Interaction.defaultModel;
+  static propTypes = {
+    underlayCallback: T.func,
+  };
 
-        const proxyMethods = ['mousedown', 'touchstart', 'touchmove', 'touchend', 'dblclick'];
-        for (const method of proxyMethods) {
-            const thisProxy = this;
-            this[method] = function (...args) {
-                const calledContext = this;
-                return thisProxy.target[method].call(calledContext, ...args);
-            };
-        }
+  static defaultProps = Object.assign({
+    labelsDivStyles: {
+      'backgroundColor': 'transparent',
+      'float': 'right',
+      'textAlign': 'right'
+    },
+    isZoomedIgnoreProgrammaticZoom: true
+  }, DygraphDefaultProps);
+
+  constructor(props) {
+    super(props);
+
+    this._el = null;
+    this._dygraph = null;
+
+    this.predicatedRangeFillStyle = 'rgba(205, 234, 214,1.0)';
+    this.highlightBarHeight = 12;
+  }
+
+  _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, number = 1) {
+    // val between 0-green to 1-yellow to 10-red (logarithmic)
+    var canvas_left_x = g.toDomXCoord(x_start);
+    var canvas_right_x = g.toDomXCoord(x_end);
+    var canvas_height = number == 2 ? g.height_ - 12 : 12;
+    let area_y = number == 2 ? area.y + 12 : area.y;
+    var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
+    var rcolor, gcolor, bcolor = 0;
+    let gcolorMax = 205;
+    if (number == 1) {
+      if (val <= 1) {
+        if (val < 0) val = 0;
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+      } else {
+        if (val > 10) val = 10;
+        rcolor = 255;
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
+      canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
+      canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
     }
-}
-
-class Dygraph extends BaseComponent {
-
-    static propTypes = Object.assign({
-        tag: PropTypes.string.isRequired,
-    }, DygraphPropTypes);
-
-    static defaultProps = Object.assign({
-        tag: 'div',
-        labelsDivStyles: {
-            'backgroundColor': 'transparent',
-            'float': 'right',
-            'textAlign': 'right'
-        },
-        isZoomedIgnoreProgrammaticZoom: true
-    }, DygraphDefaultProps);
-
-    constructor(props) {
-        super(props);
-
-        // this._interactionProxy = new InteractionModelProxy();
-        this._el = null;
-        this._dygraph = null;
+    else {
+      if (latestDataTimestamp && x_start > latestDataTimestamp) {
+        rcolor = 205;
+        gcolor = 234;
+        bcolor = 214;
+        canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
+        canvas.fillRect(canvas_left_x, area_y, canvas_width, canvas_height);
+      }
     }
+  }
 
-    _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, number = 1) {
-        // val between 0-green to 1-yellow to 10-red (logarithmic)
-        var canvas_left_x = g.toDomXCoord(x_start);
-        var canvas_right_x = g.toDomXCoord(x_end);
-        var canvas_height = number == 2 ? g.height_ - 12 : 12;
-        let area_y = number == 2 ? area.y + 12 : area.y;
-        var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
-        var rcolor, gcolor, bcolor = 0;
-        let gcolorMax = 205;
-        if (number == 1) {
-            if (val <= 1) {
-                if (val < 0) val = 0;
-                rcolor = Math.floor(255 * val);
-                gcolor = gcolorMax;
-            } else {
-                if (val > 10) val = 10;
-                rcolor = 255;
-                gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
-            }
-            canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
-            canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
-        }
-        else {
-            if (latestDataTimestamp && x_start > latestDataTimestamp) {
-                rcolor = 205;
-                gcolor = 234;
-                bcolor = 214;
-                canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
-                canvas.fillRect(canvas_left_x, area_y, canvas_width, canvas_height);
-            }
-        }
-    }
+  @autobind
+  handleUnderlayCallback(canvas, area, g) {
 
-    componentDidMount() {
+    const {highlights, latestDataTimestamp} = this.props;
 
-        if (this._el) {
-            const {known: initAttrs, rest} = spreadDygraphProps(this.props, true);
-            let {annotations, highlights, selection} = rest;
-            // this._interactionProxy.target =
-            //   initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
-            // initAttrs.interactionModel = this._interactionProxy;
-
-            initAttrs.underlayCallback = (canvas, area, g)=> {
-                // If has highlights, set
-                if (highlights) {
-                    highlights.forEach(o => {
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], 1);
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], 2);
-                    });
-                }
-                this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);
-            };
-
-            this._dygraph = new DygraphBase(this._el, this.props.data, initAttrs);
-
-            if (annotations) {
-                this._dygraph.ready(() => {
-                    this._dygraph.setAnnotations(annotations);
-                });
-            }
-
-            if (selection) {
-                this._dygraph.ready(() => {
-                    let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
-                    if (idx !== null) {
-                        this._dygraph.setSelection(idx, selection.seriesName);
-                    }
-                });
-            } else {
-                this._dygraph.ready(() => {
-                    this._dygraph.clearSelection();
-                });
-            }
-        }
+    // Draw predicated range if latestDataTimestamp is specified.
+    if (latestDataTimestamp) {
+      console.log(area, g);
+      const x = g.toDomXCoord(latestDataTimestamp);
+      const y = area.y;
+      const w = area.w;
+      const h = area.h;
+      console.log(x,y, w,h);
+      canvas.fillStyle = this.predicatedRangeFillStyle;
+      canvas.fillRect(x, y, w, h);
     }
 
-    componentWillUpdate(nextProps) {
-
-        if (this._dygraph) {
-            const {known: updateAttrs, rest} = spreadDygraphProps(nextProps, false);
-            let {annotations, selection, highlights} = rest;
-
-            // this._interactionProxy.target =
-            //   updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
-            // updateAttrs.interactionModel = this._interactionProxy;
-            updateAttrs.underlayCallback = (canvas, area, g)=> {
-                // If has highlights, set
-                if (highlights) {
-                    highlights.forEach(o => {
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], 1);
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], 2);
-                    });
-                }
-                this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);
-            };
-            this._dygraph.updateOptions(updateAttrs);
-            if (annotations) {
-                this._dygraph.setAnnotations(annotations);
-            }
-
-            if (selection) {
-                let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
-                if (idx) {
-                    // this._dygraph.setSelection(idx, selection.seriesName);
-                }
-            } else {
-                this._dygraph.clearSelection();
-            }
-        }
+    // If has highlights, draw the highlight bar.
+    if (highlights) {
+      highlights.forEach(o => {
+        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], 1);
+      });
     }
 
-    componentWillUnmount() {
-        if (this._dygraph) {
-            this._dygraph.destroy();
-            this._dygraph = null;
-        }
+    if (this.props.underlayCallback) {
+      this.props.underlayCallback(canvas, area, g);
     }
+  }
 
-    render() {
-        let {known, rest} = spreadDygraphProps(this.props, false);
-        let {tag, className, style, annotations, highlights, ...others} =  rest;
-        let classes = classNames('ui', className, 'graph');
-        style = Object.assign(style || {}, {});
+  componentDidMount() {
 
-        return React.createElement(tag, {
-            ref: c => this._el = c,
-            className: classes,
-            style,
-            ...others
+    if (this._el) {
+      const { known: initAttrs, rest } = spreadDygraphProps(this.props, true);
+      let { annotations, highlights, selection } = rest;
+
+      initAttrs.underlayCallback = this.handleUnderlayCallback;
+      this._dygraph = new DygraphBase(this._el, this.props.data, initAttrs);
+
+      if (annotations) {
+        this._dygraph.ready(() => {
+          this._dygraph.setAnnotations(annotations);
         });
+      }
+
+      if (selection) {
+        this._dygraph.ready(() => {
+          let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
+          if (idx !== null) {
+            this._dygraph.setSelection(idx, selection.seriesName);
+          }
+        });
+      } else {
+        this._dygraph.ready(() => {
+          this._dygraph.clearSelection();
+        });
+      }
     }
+  }
+
+  componentWillUpdate(nextProps) {
+
+    if (this._dygraph) {
+      const { known: updateAttrs, rest } = spreadDygraphProps(nextProps, false);
+      let { annotations, selection, highlights } = rest;
+
+      this._dygraph.updateOptions(updateAttrs);
+      if (annotations) {
+        this._dygraph.setAnnotations(annotations);
+      }
+
+      if (selection) {
+        let idx = this._dygraph.findClosestRow(this._dygraph.toDomXCoord(selection.x));
+        if (idx) {
+          // this._dygraph.setSelection(idx, selection.seriesName);
+        }
+      } else {
+        this._dygraph.clearSelection();
+      }
+    }
+  }
+
+  componentWillUnmount() {
+    if (this._dygraph) {
+      this._dygraph.destroy();
+      this._dygraph = null;
+    }
+  }
+
+  render() {
+    const {className, style} = this.props;
+    const classes = classNames('ui', className, 'graph');
+
+    return (
+      <div ref={c=> this._el = c} className={classes} style={style} />
+    );
+  }
 }
 
 export default Dygraph;

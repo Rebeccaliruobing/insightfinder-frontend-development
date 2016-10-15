@@ -136,7 +136,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, } = this.props;
+    const { groups, view, columns, latestDataTimestamp } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -217,6 +217,7 @@ export class DataGroupCharts extends React.Component {
                   <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span></div>
                   <DataChart
                     data={group}
+                    latestDataTimestamp={latestDataTimestamp}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
                     dateWindow={ syncDateWindow ? this.props.dateWindow : null}
                   />
@@ -246,6 +247,7 @@ export class DataGroupCharts extends React.Component {
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
                     <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
+                      latestDataTimestamp={latestDataTimestamp}
                       enableAnnotations={true} data={selectedGroup}
                     />
                     <i onClick={()=>this.setState({ selectedIndex: undefined })} className="close icon"
