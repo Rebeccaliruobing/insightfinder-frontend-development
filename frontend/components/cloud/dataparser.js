@@ -321,6 +321,7 @@ class DataParser {
                       let direction = "higher";
                       if(changePct<0){
                         direction = "lower";
+                        changePct = -changePct;
                       }
                       if(neuronId&&neuronId==-1){
                         rootcause = changePct.toFixed(1) + "% higher than threshold, ";  
