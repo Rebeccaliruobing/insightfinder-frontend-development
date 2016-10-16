@@ -140,7 +140,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, } = this.props;
+    const { groups, view, columns, latestDataTimestamp } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -222,6 +222,7 @@ export class DataGroupCharts extends React.Component {
                   <DataChart
                     enableTriangleHighlight={true}
                     data={group}
+                    latestDataTimestamp={latestDataTimestamp}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
                     dateWindow={ syncDateWindow ? this.props.dateWindow : null}
                   />
@@ -252,6 +253,7 @@ export class DataGroupCharts extends React.Component {
                     <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
                       enableTriangleHighlight={true}
+                      latestDataTimestamp={latestDataTimestamp}
                       enableAnnotations={true} data={selectedGroup}
                     />
                     <i onClick={()=>this.setState({ selectedIndex: undefined })} className="close icon"

@@ -348,7 +348,7 @@ class LiveAnalysisCharts extends React.Component {
                                     {!summary && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
-                                    {!!summary && 
+                                    {false && !!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
@@ -362,6 +362,7 @@ class LiveAnalysisCharts extends React.Component {
                                     <DataGroupCharts
                                         key={view + '_group_charts'} metricTags={metricTags}
                                         groups={groups} view={view} columns={columns}
+                                        latestDataTimestamp={latestDataTimestamp}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />
