@@ -77,9 +77,7 @@ class LiveAnalysisCharts extends React.Component {
         if (this._data !== data && !!data) {
             this.dp = new DataParser(data, rest);
             this.dp.getSummaryData();
-
-            // FIXME: getGroupsData vs getGroupsDataTest?
-            this.dp.getGroupsDataTest();
+            this.dp.getMetricsData();
 
             // Sort the grouped data
             this.summary = this.dp.summaryData;

@@ -21,6 +21,7 @@ const AnalysisSummary = ({data, latestDataTimestamp, duration='1d' }) => {
           data={data.sdata}
           labels={data.sname}
           annotations={data.annotations}
+          enableTriangleHighlight={false}
         />
         }
       </div>

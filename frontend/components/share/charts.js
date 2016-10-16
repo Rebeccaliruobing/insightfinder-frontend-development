@@ -8,12 +8,14 @@ import {autobind} from 'core-decorators';
 export class DataChart extends React.Component {
 
   static propTypes = {
+    enableTriangleHighlight: T.bool,
     enableAnnotations: T.bool,
     onDateWindowChange: T.func,
     dateWindow: T.any,
   };
 
   static defaultProps = {
+    enableTriangleHighlight: true,
     enableAnnotations: false
   };
 
@@ -72,7 +74,7 @@ export class DataChart extends React.Component {
     console.log(11);
   }
   render() {
-    const { data, enableAnnotations, onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
+    const { data, enableAnnotations, enableTriangleHighlight, onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
     const listenDrawCallback = !!onDateWindowChange;
     return (
       <Dygraph
@@ -91,6 +93,7 @@ export class DataChart extends React.Component {
         onZoom={this.test}
         annotations={enableAnnotations ? data.annotations : null}
         onAnnotationClick={this.handleAnnotationClick}
+        enableTriangleHighlight={enableTriangleHighlight}
       />
     )
   }
@@ -102,6 +105,7 @@ export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, late
       <div className="detail-charts" style={{ position: 'relative' }}>
         <h4 className="ui header">{summary.title}</h4>
         <DataChart
+          enableTriangleHighlight={false}
           enableAnnotations={true} data={summary}
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
@@ -216,6 +220,7 @@ export class DataGroupCharts extends React.Component {
                 <div className="content">
                   <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span></div>
                   <DataChart
+                    enableTriangleHighlight={true}
                     data={group}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
                     dateWindow={ syncDateWindow ? this.props.dateWindow : null}
@@ -246,6 +251,7 @@ export class DataGroupCharts extends React.Component {
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
                     <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
+                      enableTriangleHighlight={true}
                       enableAnnotations={true} data={selectedGroup}
                     />
                     <i onClick={()=>this.setState({ selectedIndex: undefined })} className="close icon"

@@ -55,7 +55,7 @@ class Dygraph extends BaseComponent {
         this._dygraph = null;
     }
 
-    _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, number = 1) {
+    _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, enableTriangleHighlight=false, number = 1) {
         // val between 0-green to 1-yellow to 10-red (logarithmic)
         var canvas_left_x = g.toDomXCoord(x_start);
         var canvas_right_x = g.toDomXCoord(x_end);
@@ -64,6 +64,13 @@ class Dygraph extends BaseComponent {
         var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
         var rcolor, gcolor, bcolor = 0;
         let gcolorMax = 205;
+        let sign = 0;
+        if(val < 0){
+            val = -val;
+            sign = -1;
+        } else if (val > 0){
+            sign = 1;
+        }
         if (number == 1) {
             if (val <= 1) {
                 if (val < 0) val = 0;
@@ -75,9 +82,22 @@ class Dygraph extends BaseComponent {
                 gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
             }
             canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
-            canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
-        }
-        else {
+            if(!enableTriangleHighlight || sign==0){
+                canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
+            }else if(sign<0){
+                canvas.beginPath();
+                canvas.moveTo(canvas_left_x,area.y);
+                canvas.lineTo(canvas_left_x+canvas_width/2,area.y+12);
+                canvas.lineTo(canvas_left_x+canvas_width,area.y);
+                canvas.fill();
+            } else if (sign>0){
+                canvas.beginPath();
+                canvas.moveTo(canvas_left_x,area.y+12);
+                canvas.lineTo(canvas_left_x+canvas_width/2,area.y);
+                canvas.lineTo(canvas_left_x+canvas_width,area.y+12);
+                canvas.fill();
+            }
+        } else {
             if (latestDataTimestamp && x_start > latestDataTimestamp) {
                 rcolor = 205;
                 gcolor = 234;
@@ -92,7 +112,7 @@ class Dygraph extends BaseComponent {
 
         if (this._el) {
             const {known: initAttrs, rest} = spreadDygraphProps(this.props, true);
-            let {annotations, highlights, selection} = rest;
+            let {annotations, highlights, selection, enableTriangleHighlight} = rest;
             // this._interactionProxy.target =
             //   initAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
             // initAttrs.interactionModel = this._interactionProxy;
@@ -101,8 +121,8 @@ class Dygraph extends BaseComponent {
                 // If has highlights, set
                 if (highlights) {
                     highlights.forEach(o => {
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], 1);
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], 2);
+                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], enableTriangleHighlight, 1);
+                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'], enableTriangleHighlight, 2);
                     });
                 }
                 this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);
@@ -135,7 +155,7 @@ class Dygraph extends BaseComponent {
 
         if (this._dygraph) {
             const {known: updateAttrs, rest} = spreadDygraphProps(nextProps, false);
-            let {annotations, selection, highlights} = rest;
+            let {annotations, selection, enableTriangleHighlight, highlights} = rest;
 
             // this._interactionProxy.target =
             //   updateAttrs.interactionModel || DygraphBase.Interaction.defaultModel;
@@ -144,8 +164,8 @@ class Dygraph extends BaseComponent {
                 // If has highlights, set
                 if (highlights) {
                     highlights.forEach(o => {
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], 1);
-                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], 2);
+                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], enableTriangleHighlight, 1);
+                        this._highlight_period(canvas, area, g, o.start, o.end, o.val, nextProps['latestDataTimestamp'], enableTriangleHighlight, 2);
                     });
                 }
                 this.props.underlayCallback && this.props.underlayCallback(canvas, area, g);

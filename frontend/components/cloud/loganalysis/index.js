@@ -152,7 +152,7 @@ class LogAnalysisCharts extends React.Component {
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
-      this.dp.getGroupsDataTest();
+      this.dp.getMetricsData();
       this.dp.parseLogAnalysisData();
       this.calculateEventTableData();
 

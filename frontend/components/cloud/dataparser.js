@@ -78,6 +78,7 @@ class DataParser {
     var items = atext.split(';');
     var metricList = [];
     var percentageList = [];
+    var positiveList = [];
     var totalPercentage = 0;
     _.each(items, function (item, itemNo) {
       var pos1 = item.indexOf(".");
@@ -90,19 +91,27 @@ class DataParser {
       if(pos4!=-1 && pos5!=-1){
         let percentageString = item.substring(pos4 + 1, pos5);
         let percentage = 0;
+        let positiveFlag = true;
         if(percentageString != "missing"){
-           percentage = parseFloat(percentageString);
+           let val = parseFloat(percentageString);
+           percentage = Math.abs(val);
+           positiveFlag = (val>=0);
         }
         
         percentageList.push(percentage);
+        positiveList.push(positiveFlag);
         totalPercentage += percentage;
       } else {
         percentageList.push(0);
+        positiveList.push(true);
       }
     });
     _.each(metricList, function (metric, imetric) {
       let allocatedPercentage = (totalPercentage==0) ? (1.0/metricList.length) : (percentageList[imetric]/totalPercentage);
-      retMap[metric] = allocatedPercentage;
+      retMap[metric] = {
+        allocatedPercentage:allocatedPercentage,
+        positiveFlag:positiveList[imetric],
+      };
     });
     return retMap;
   }
@@ -418,8 +427,8 @@ class DataParser {
                 time: new Date(ts),
                 timestamp: ts,
                 val: val,
-                text: (parseFloat(items[1]) > 0) ? atext[ts] : "",
-                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : {}
+                text: (val > 0) ? atext[ts] : "",
+                metrs: (val > 0) ? (self._extractMetric(atext[ts])) : {}
               });
             }
             if(items[2] && $.isNumeric(items[2])){
@@ -691,7 +700,7 @@ class DataParser {
     return this.groupsData;
   }
 
-  getGroupsDataTest() {
+  getMetricsData() {
 
     if (this.groupsData) return this.groupsData;
 
@@ -741,7 +750,10 @@ class DataParser {
       }
       let highlights = _.map(alies, a => {
         let newval = a.val < 0 ? 0 : Math.min(10, a.val);
-        let allocatedPercentage = a.metrs[value];
+        let allocatedPercentage = 0;
+        if(a.metrs[value].allocatedPercentage){
+          allocatedPercentage = a.metrs[value].allocatedPercentage;
+        }
         if(allocatedPercentage==0){
           // set missing to 100%
           allocatedPercentage = 1;
@@ -750,6 +762,9 @@ class DataParser {
         // set floor for allocated value
         if(allocatedVal < 0.5){
           allocatedVal = 0.5;
+        }
+        if(a.metrs[value].positiveFlag!=undefined && a.metrs[value].positiveFlag==false){
+          allocatedVal = -allocatedVal;
         }
         return {
           start: a.timestamp,
