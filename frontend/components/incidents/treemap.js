@@ -1,9 +1,11 @@
 import React, {Component, PropTypes as T} from 'react';
 import {autobind} from 'core-decorators';
 import _ from 'lodash';
-import * as d3 from 'd3';
+import d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
+
+import MetricModal from './metric_modal';
 
 class IncidentsTreeMap extends Component {
 
@@ -28,7 +30,9 @@ class IncidentsTreeMap extends Component {
       treeMapValue:"0",
       cpuUtilizationByInstance:props.cpuUtilizationByInstance,
       instanceMetaData:props.instanceMetaData,
-      anomaliesList:undefined
+      anomaliesList:undefined,
+      showMetricModal: false,
+      metricModalProps: {},
     }
   }
 
@@ -46,6 +50,7 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showMetricChart(d) {
+    let { onMetricSelected } = this.props;
     let { startTimestamp,endTimestamp } = this.state;
     let params = {
       projectName: d['projectName'],
@@ -56,7 +61,12 @@ class IncidentsTreeMap extends Component {
       params['startTimestamp'] = startTimestamp;
       params['endTimestamp'] = endTimestamp;
     }
-    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+
+    // window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+    this.setState({
+      showMetricModal: true,
+      metricModalProps: params,
+    });
   }
 
   @autobind
@@ -316,6 +326,14 @@ class IncidentsTreeMap extends Component {
     });
   }
 
+  @autobind
+  hideMetricModal() {
+    this.setState({
+      showMetricModal: false,
+      metricModalProps: {}
+    })
+  };
+
   render() {
     return (
       <div className="incidents treemap"  style={{ marginTop: 10 }}>
@@ -323,6 +341,9 @@ class IncidentsTreeMap extends Component {
              style={{ padding: 4, height: '100%', width: '100%' }}>
           {this.state.faux}
         </div>
+        { this.state.showMetricModal &&
+          <MetricModal {...this.state.metricModalProps} onClose={this.hideMetricModal} />
+        }
       </div>
     )
   }

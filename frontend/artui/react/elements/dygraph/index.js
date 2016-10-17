@@ -98,12 +98,10 @@ class Dygraph extends Component {
 
     // Draw predicated range if latestDataTimestamp is specified.
     if (latestDataTimestamp) {
-      console.log(area, g);
       const x = g.toDomXCoord(latestDataTimestamp);
       const y = area.y;
       const w = area.w;
       const h = area.h;
-      console.log(x,y, w,h);
       canvas.fillStyle = this.predicatedRangeFillStyle;
       canvas.fillRect(x, y, w, h);
     }
