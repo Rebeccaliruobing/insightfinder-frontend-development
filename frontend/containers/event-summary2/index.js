@@ -149,6 +149,7 @@ class EventSummary2 extends Component {
       endTime: moment(),
       numberOfDays: "1",
       modelType:"Holistic",
+      currentTreemapData: undefined,
     });
     this.refreshProjectName(projectName);
   }
