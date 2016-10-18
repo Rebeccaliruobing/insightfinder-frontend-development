@@ -8,7 +8,7 @@ import AnalysisSummary from './analysis-summary';
 
 const ProjectStatistics = ({data, dur}) => (
   <div className="ui compact grid">
-    <CPUUtilization average={data.statistics['AvgCPUUtilization']} duration={dur+'d'} />
+    <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} />
     <InstanceUptime average={data.statistics['AvgInstanceUptime']} duration={dur+'d'} />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
                     containerTotal={data.statistics['NumberOfContainers']}  duration={dur+'d'} />

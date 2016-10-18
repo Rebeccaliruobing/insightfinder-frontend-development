@@ -33,6 +33,9 @@ class IncidentsTreeMap extends Component {
       anomaliesList:undefined,
       showMetricModal: false,
       metricModalProps: {},
+      feedbackData: props.feedbackData,
+      currentData: undefined,
+      parent:props.parent,
     }
   }
 
@@ -44,7 +47,11 @@ class IncidentsTreeMap extends Component {
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp
       });
-      this.displayData(root);
+      if(this.props.currentData){
+        this.displayData(this.props.currentData);        
+      } else {
+        this.displayData(root);
+      }
     }
   }
 
@@ -94,12 +101,14 @@ class IncidentsTreeMap extends Component {
     if (!_.isEmpty(nextProps.data) && this.$container) {
       const root = _.cloneDeep(nextProps.data);
       this.transformData(root);
-      this.displayData(root);
       this.setState({
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp,
         instanceMetaData:nextProps.instanceMetaData,
-        anomaliesList:nextProps.data.anomaliesList
+        anomaliesList:nextProps.data.anomaliesList,
+        feedbackData: nextProps.feedbackData,
+        currentData:nextProps.currentData,
+        parent:nextProps.parent,
       });
       if(typeof nextProps.treeMapChange == 'boolean'){
         this.setState({
@@ -115,6 +124,11 @@ class IncidentsTreeMap extends Component {
         this.setState({
           cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
         });
+      }
+      if(nextProps.currentData){
+        this.displayData(nextProps.currentData);        
+      } else {
+        this.displayData(root);
       }
     }
   }
@@ -178,17 +192,20 @@ class IncidentsTreeMap extends Component {
     let threshold = parseInt(treeMapValue);
     if (this.state.treeMapChange) {
       if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
-        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
+        && cpuUtilizationByInstance[d.instanceName]
+        && threshold >= cpuUtilizationByInstance[d.instanceName]['avg']) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
       } else if(d.type == 'instance'
-        && threshold >= cpuUtilizationByInstance[d.name]) {
+        && cpuUtilizationByInstance[d.name]
+        && threshold >= cpuUtilizationByInstance[d.name]['avg']) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
       } else if(d.type == 'container'
-        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
+        && cpuUtilizationByInstance[d.instanceName] 
+        && threshold >= cpuUtilizationByInstance[d.instanceName]['avg']) {
           rcolor = 173;
           gcolor = 216;
           bcolor = 230;
@@ -215,11 +232,15 @@ class IncidentsTreeMap extends Component {
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
 
+  @autobind
+  handleTileClick(data) {
+    this.displayData(data);
+    this.state.feedbackData(data);
+  }
   /**
    * Display the data. Data maybe a child node in the tree.
    * @param data
    */
-  @autobind
   displayData(data) {
     let {instanceMetaData} = this.state;
     let self = this;
@@ -278,7 +299,7 @@ class IncidentsTreeMap extends Component {
       if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
         navbar.append("rect")
           .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
-          .datum(data.parent).on('click', this.displayData);
+          .datum(data.parent).on('click', this.handleTileClick);
         navbar.append("rect")
           .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
           .datum(data).on('click', this.showInstanceChart);
@@ -288,7 +309,7 @@ class IncidentsTreeMap extends Component {
       } else {
         navbar.append("rect")
           .attr({ y: -navHeight, width: width, height: navHeight, })
-          .datum(data.parent).on('click', this.displayData);
+          .datum(data.parent).on('click', this.handleTileClick);
       }
 
       navbar.append("text")
@@ -298,7 +319,7 @@ class IncidentsTreeMap extends Component {
       const g1 = svg.insert("g", '.navbar').datum(data).attr("class", "depth");
       const g = g1.selectAll("g").data(data._children).enter().append("g");
 
-      g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.displayData);
+      g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.handleTileClick);
       g.selectAll(".child").data(d => d._children || [d])
         .enter().append('rect')
         .attr('class', 'child')
