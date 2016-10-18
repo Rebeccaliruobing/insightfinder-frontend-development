@@ -298,7 +298,7 @@ class IncidentsTreeMap extends Component {
       // Add a link to open instance chart view
       if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
         navbar.append("rect")
-          .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
+          .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight, })
           .datum(data.parent).on('click', this.handleTileClick);
         navbar.append("rect")
           .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
