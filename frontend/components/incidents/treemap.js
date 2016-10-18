@@ -99,9 +99,11 @@ class IncidentsTreeMap extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.data) && this.$container) {
+
       const root = _.cloneDeep(nextProps.data);
       this.transformData(root);
-      this.setState({
+
+      const state = {
         startTimestamp:root.startTimestamp,
         endTimestamp:root.endTimestamp,
         instanceMetaData:nextProps.instanceMetaData,
@@ -109,27 +111,25 @@ class IncidentsTreeMap extends Component {
         feedbackData: nextProps.feedbackData,
         currentData:nextProps.currentData,
         parent:nextProps.parent,
-      });
+      };
+
       if(typeof nextProps.treeMapChange == 'boolean'){
-        this.setState({
-          treeMapChange:nextProps.treeMapChange
-        });
+        state['treeMapChange'] = nextProps.treeMapChange;
       }
       if(typeof nextProps.treeMapValue == 'string'){
-        this.setState({
-          treeMapValue:nextProps.treeMapValue
-        });
+        state['treeMapValue'] = nextProps.treeMapValue;
       }
       if(typeof nextProps.cpuUtilizationByInstance == 'object'){
-        this.setState({
-          cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
-        });
+        state['cpuUtilizationByInstance'] = nextProps.cpuUtilizationByInstance;
       }
-      if(nextProps.currentData){
-        this.displayData(nextProps.currentData);        
-      } else {
-        this.displayData(root);
-      }
+
+      this.setState(state, () => {
+        if(nextProps.currentData){
+          this.displayData(nextProps.currentData);
+        } else {
+          this.displayData(root);
+        }
+      });
     }
   }
 
