@@ -504,7 +504,7 @@ class DataParser {
               data: [],
               metric: cats[0].trim(),
               node: cats[1].trim(),
-              groupId: cats[3].trim()
+              groupId: cats[3] ? cats[3].trim() : ''
             };
           }
         });

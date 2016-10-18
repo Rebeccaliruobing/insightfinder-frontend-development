@@ -36,7 +36,6 @@ class MetricModal extends React.Component {
       .then(resp => {
         if (resp.success) {
           const data = this.calculateData(resp.data, instanceName);
-          console.log(data);
           this.setState({ data });
         } else {
           console.error(resp.message);
