@@ -186,7 +186,9 @@ class IncidentsTreeMap extends Component {
 
     let {cpuUtilizationByInstance,treeMapValue} = this.state;
     let val = d.score;
-
+    if(val<0){
+      val = -val;
+    }
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
     let threshold = parseInt(treeMapValue);

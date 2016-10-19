@@ -185,7 +185,6 @@ class EventSummary2 extends Component {
 
   render() {
     let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapValue,treeMapChange,treeMapText, statsInstance, currentTreemapData} = this.state;
-    let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};

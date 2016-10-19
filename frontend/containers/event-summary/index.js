@@ -149,7 +149,6 @@ class EventSummary extends Component {
 
   render() {
     let { loading, data, projectName, incidentsTreeMap, cvalue, modelType, treeMapValue,treeMapChange,treeMapText} = this.state;
-    let instances = (data['instanceMetricJson']&&data['instanceMetricJson']['instances'])?data['instanceMetricJson']['instances'].split(',').length:0;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
