@@ -39,7 +39,7 @@ class EventSummary2 extends Component {
       numberOfDays: "1",
       endTime: moment(),
       modelType:"Holistic",
-      statsInstance: undefined,
+      selectedInstance: undefined,
     };
   }
 
@@ -177,18 +177,33 @@ class EventSummary2 extends Component {
     if(data){
       this.parent.setState({
         currentTreemapData: data,
-        statsInstance: data.instanceName,
-        showInstanceStatsModal:false
+        selectedInstance: data.instanceName,
+        startTimestamp: data.startTimestamp,
+        endTimestamp: data.endTimestamp,
+        showInstanceStatsModal:false,
       });
     }
   }
 
+  showInstanceChart() {
+    let { startTimestamp,endTimestamp,selectedInstance,projectName } = this.state;
+    let params = {
+      projectName: projectName,
+      instanceName: selectedInstance,
+    };
+    if(startTimestamp && endTimestamp){
+      params['startTimestamp'] = startTimestamp;
+      params['endTimestamp'] = endTimestamp;
+    }
+    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+  }
+
   render() {
-    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapValue,treeMapChange,treeMapText, statsInstance, currentTreemapData} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapValue,treeMapChange,treeMapText, selectedInstance, currentTreemapData} = this.state;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
-    let instanceStats = (instanceStatsMap && instanceStatsMap[statsInstance])? instanceStatsMap[statsInstance] : undefined;
+    let instanceStats = (instanceStatsMap && instanceStatsMap[selectedInstance])? instanceStatsMap[selectedInstance] : undefined;
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
@@ -254,11 +269,9 @@ class EventSummary2 extends Component {
                   null}
                   <Button className={instanceStats?"orange button":"grey"} style={{ 'float':'right' }} onClick={(e)=>{
                       e.stopPropagation();
-                      this.setState({
-                        showInstanceStatsModal: true
-                      });
+                      this.showInstanceChart();
                     }}>
-                    Instance Stats
+                    All Metric Chart
                   </Button>
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData}
                                     cpuUtilizationByInstance={cpuUtilizationByInstance}
@@ -289,7 +302,7 @@ class EventSummary2 extends Component {
                       onClose={() => this.setState({ showTenderModal: false })}/>
         }
         { this.state.showInstanceStatsModal && instanceStats && 
-            <InstanceStatsModal instanceName={statsInstance} instanceStats={instanceStats}
+            <InstanceStatsModal instanceName={selectedInstance} instanceStats={instanceStats}
                       dur={numberOfDays} 
                       onClose={() => this.setState({ showInstanceStatsModal: false })}/>
         }
