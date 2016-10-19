@@ -78,14 +78,20 @@ class EventSummary2 extends Component {
 
   @autobind
   handleModelTypeChange(value, modelType) {
-    this.setState({modelType:modelType});
+    this.setState({
+      modelType:modelType,
+      currentTreemapData: undefined,
+    });
     let { projectName } = this.state;
     this.refreshProjectName(projectName);
   }
 
   @autobind
   handleDayChange(value, numberOfDays) {
-    this.setState({numberOfDays:numberOfDays.toString()});
+    this.setState({
+      numberOfDays:numberOfDays.toString(),
+      currentTreemapData: undefined,
+    });
     let { projectName } = this.state;
     this.refreshProjectName(projectName);
   }
@@ -98,7 +104,10 @@ class EventSummary2 extends Component {
       newEndTime = curTime;
     }
 
-    this.setState({endTime: newEndTime});
+    this.setState({
+      endTime: newEndTime,
+      currentTreemapData: undefined,
+    });
     let { projectName } = this.state;
     this.setState({endTime: moment(value).endOf('day')}, () => {
       this.refreshProjectName(projectName);
