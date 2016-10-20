@@ -173,9 +173,10 @@ class EventSummary2 extends Component {
     return timestamp<=curTimestamp;
   }
 
+  @autobind
   feedbackData(data) {
     if(data){
-      this.parent.setState({
+      this.setState({
         currentTreemapData: data,
         selectedInstance: data.instanceName,
         startTimestamp: data.startTimestamp,
