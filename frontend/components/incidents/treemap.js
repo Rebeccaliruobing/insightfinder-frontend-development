@@ -33,7 +33,6 @@ class IncidentsTreeMap extends Component {
       anomaliesList:undefined,
       showMetricModal: false,
       metricModalProps: {},
-      feedbackData: props.feedbackData,
       currentData: undefined,
       parent:props.parent,
     }
@@ -108,7 +107,6 @@ class IncidentsTreeMap extends Component {
         endTimestamp:root.endTimestamp,
         instanceMetaData:nextProps.instanceMetaData,
         anomaliesList:nextProps.data.anomaliesList,
-        feedbackData: nextProps.feedbackData,
         currentData:nextProps.currentData,
         parent:nextProps.parent,
       };
@@ -237,7 +235,7 @@ class IncidentsTreeMap extends Component {
   @autobind
   handleTileClick(data) {
     this.displayData(data);
-    this.state.feedbackData(data);
+    this.props.feedbackData(data);
   }
   /**
    * Display the data. Data maybe a child node in the tree.
