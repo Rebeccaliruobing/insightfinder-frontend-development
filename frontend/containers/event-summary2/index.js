@@ -73,6 +73,7 @@ class EventSummary2 extends Component {
     this.setState({
       incidentsTreeMap, 
       selectedIncident:incident,
+      currentTreemapData: undefined,
     });
   }
 
@@ -185,7 +186,7 @@ class EventSummary2 extends Component {
     }
   }
 
-  showInstanceChart() {
+  showInstanceChartOld() {
     let { startTimestamp,endTimestamp,selectedInstance,projectName } = this.state;
     let params = {
       projectName: projectName,
@@ -196,6 +197,31 @@ class EventSummary2 extends Component {
       params['endTimestamp'] = endTimestamp;
     }
     window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+  }
+
+  showInstanceChart() {
+    let { selectedIncident,selectedInstance,projectName,modelType } = this.state;
+    let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    let projectParam = projectParams.find((p) => p.projectName == projectName);
+    let cvalueParam = projectParam ? projectParam.cvalue : "1";
+    let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
+    let params = {
+      version:2,
+      pvalue:pvalueParam,
+      cvalue:cvalueParam,
+      modelType:modelType,
+      projectName:projectName,
+    };
+    if(selectedInstance){
+      params['instanceName'] = selectedInstance;
+    }
+    if(selectedIncident){
+      params['startTimestamp'] = selectedIncident.startTimestamp;
+      params['endTimestamp'] = selectedIncident.endTimestamp;
+    }
+
+    const url = `/liveMonitoring?${$.param(params)}`;
+    window.open(url, '_blank');
   }
 
   render() {
