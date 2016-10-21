@@ -79,6 +79,7 @@ class DataParser {
     var metricList = [];
     var percentageList = [];
     var positiveList = [];
+    var isMissingValueList = [];
     var totalPercentage = 0;
     _.each(items, function (item, itemNo) {
       var pos1 = item.indexOf(".");
@@ -88,14 +89,21 @@ class DataParser {
       var pos5 = item.indexOf(")",pos4+1);
       var metr = item.substring(pos1 + 1, pos2);
       metricList.push(metr);
+      if(pos3!=-1 && pos4!=-1){
+        let valString = item.substring(pos3 + 1, pos4-1);
+        let isMissingValue = (valString == "missing");
+        isMissingValueList.push(isMissingValue);
+      } else {
+        isMissingValueList.push(true);
+      }
       if(pos4!=-1 && pos5!=-1){
         let percentageString = item.substring(pos4 + 1, pos5);
         let percentage = 0;
         let positiveFlag = true;
         if(percentageString != "missing"){
-           let val = parseFloat(percentageString);
-           percentage = Math.abs(val);
-           positiveFlag = (val>=0);
+          let val = parseFloat(percentageString);
+          percentage = Math.abs(val);
+          positiveFlag = (val>=0);
         }
         
         percentageList.push(percentage);
@@ -111,6 +119,7 @@ class DataParser {
       retMap[metric] = {
         allocatedPercentage:allocatedPercentage,
         positiveFlag:positiveList[imetric],
+        isMissingValue:isMissingValueList[imetric],
       };
     });
     return retMap;
@@ -759,6 +768,7 @@ class DataParser {
           allocatedPercentage = 1;
         }
         let allocatedVal = newval * allocatedPercentage;
+        let isMissingValue = false;
         // set floor for allocated value
         if(allocatedVal < 0.5){
           allocatedVal = 0.5;
@@ -766,10 +776,14 @@ class DataParser {
         if(a.metrs[value].positiveFlag!=undefined && a.metrs[value].positiveFlag==false){
           allocatedVal = -allocatedVal;
         }
+        if(a.metrs[value].isMissingValue!=undefined){
+          isMissingValue = a.metrs[value].isMissingValue;
+        }
         return {
           start: a.timestamp,
           end: a.timestamp,
-          val: allocatedVal
+          val: allocatedVal,
+          isMissingValue: isMissingValue,
         }
       });
       // series name & data
