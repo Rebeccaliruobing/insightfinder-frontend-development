@@ -294,7 +294,7 @@ class EventSummary2 extends Component {
                     <TreemapOptionsSelect style={{ width: 10 }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
                   :
                   null}
-                  <Button className={instanceStats?"orange button":"grey"} style={{ 'float':'right' }} onClick={(e)=>{
+                  <Button className="orange button" style={{ 'float':'right' }} onClick={(e)=>{
                       e.stopPropagation();
                       this.showInstanceChart();
                     }}>
@@ -304,7 +304,6 @@ class EventSummary2 extends Component {
                                     cpuUtilizationByInstance={cpuUtilizationByInstance}
                                     treeMapChange={treeMapChange} treeMapValue={treeMapValue}
                                     feedbackData={this.feedbackData}
-                                    parent={this}
                                     currentData={currentTreemapData} />
                 </div>
                 <div className="seven wide column" style={{ height: 500 }}>

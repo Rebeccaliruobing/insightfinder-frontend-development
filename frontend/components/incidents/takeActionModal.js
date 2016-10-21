@@ -107,7 +107,7 @@ class TakeActionModal extends React.Component {
       });
     });
     return(
-      <Modal {...rest} size="small" closable={false}>
+      <Modal {...rest} size="small" closable={true}>
         <div className="content">
           <h5>Suggested action: </h5>
           <table className="ui small table">
@@ -152,10 +152,10 @@ class TakeActionModal extends React.Component {
           </div>
         </div>
         <div className="actions">
-          <div className="ui button deny">Cancel</div>
+          <div className="ui button deny">Ignore This Event</div>
           <div className="ui button approve labeled">
             <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
-              Confirm
+              Take Action
             </div>
           </div>
         </div>

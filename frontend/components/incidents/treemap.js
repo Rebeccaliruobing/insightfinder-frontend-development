@@ -34,7 +34,6 @@ class IncidentsTreeMap extends Component {
       showMetricModal: false,
       metricModalProps: {},
       currentData: undefined,
-      parent:props.parent,
     }
   }
 
@@ -108,7 +107,6 @@ class IncidentsTreeMap extends Component {
         instanceMetaData:nextProps.instanceMetaData,
         anomaliesList:nextProps.data.anomaliesList,
         currentData:nextProps.currentData,
-        parent:nextProps.parent,
       };
 
       if(typeof nextProps.treeMapChange == 'boolean'){
