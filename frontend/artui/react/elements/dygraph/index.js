@@ -38,12 +38,12 @@ class Dygraph extends Component {
     this.highlightBarHeight = 12;
   }
 
-  _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, enableTriangleHighlight=false, number = 1) {
+  _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, enableTriangleHighlight=false, isMissingValue = false) {
       // val between 0-green to 1-yellow to 10-red (logarithmic)
       var canvas_left_x = g.toDomXCoord(x_start);
       var canvas_right_x = g.toDomXCoord(x_end);
-      var canvas_height = number == 2 ? g.height_ - 12 : 12;
-      let area_y = number == 2 ? area.y + 12 : area.y;
+      var canvas_height = 12;
+      let area_y = area.y;
       var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
       var rcolor, gcolor, bcolor = 0;
       let gcolorMax = 205;
@@ -54,40 +54,30 @@ class Dygraph extends Component {
       } else if (val > 0){
           sign = 1;
       }
-      if (number == 1) {
-          if (val <= 1) {
-              if (val < 0) val = 0;
-              rcolor = Math.floor(255 * val);
-              gcolor = gcolorMax;
-          } else {
-              if (val > 10) val = 10;
-              rcolor = 255;
-              gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
-          }
-          canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
-          if(!enableTriangleHighlight || sign==0){
-              canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
-          }else if(sign<0){
-              canvas.beginPath();
-              canvas.moveTo(canvas_left_x,area.y);
-              canvas.lineTo(canvas_left_x+canvas_width/2,area.y+12);
-              canvas.lineTo(canvas_left_x+canvas_width,area.y);
-              canvas.fill();
-          } else if (sign>0){
-              canvas.beginPath();
-              canvas.moveTo(canvas_left_x,area.y+12);
-              canvas.lineTo(canvas_left_x+canvas_width/2,area.y);
-              canvas.lineTo(canvas_left_x+canvas_width,area.y+12);
-              canvas.fill();
-          }
+      if (val <= 1) {
+          if (val < 0) val = 0;
+          rcolor = Math.floor(255 * val);
+          gcolor = gcolorMax;
       } else {
-          if (latestDataTimestamp && x_start > latestDataTimestamp) {
-              rcolor = 205;
-              gcolor = 234;
-              bcolor = 214;
-              canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
-              canvas.fillRect(canvas_left_x, area_y, canvas_width, canvas_height);
-          }
+          if (val > 10) val = 10;
+          rcolor = 255;
+          gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
+      canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
+      if(!enableTriangleHighlight || isMissingValue || sign==0){
+          canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
+      }else if(sign<0){
+          canvas.beginPath();
+          canvas.moveTo(canvas_left_x,area.y);
+          canvas.lineTo(canvas_left_x+canvas_width/2,area.y+12);
+          canvas.lineTo(canvas_left_x+canvas_width,area.y);
+          canvas.fill();
+      } else if (sign>0){
+          canvas.beginPath();
+          canvas.moveTo(canvas_left_x,area.y+12);
+          canvas.lineTo(canvas_left_x+canvas_width/2,area.y);
+          canvas.lineTo(canvas_left_x+canvas_width,area.y+12);
+          canvas.fill();
       }
   }
 
@@ -109,7 +99,7 @@ class Dygraph extends Component {
     // If has highlights, draw the highlight bar.
     if (highlights) {
       highlights.forEach(o => {
-        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'],enableTriangleHighlight, 1);
+        this._highlight_period(canvas, area, g, o.start, o.end, o.val, this.props['latestDataTimestamp'],enableTriangleHighlight, o.isMissingValue);
       });
     }
 
