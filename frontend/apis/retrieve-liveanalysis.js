@@ -183,9 +183,11 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, end
           const causalTypes = parser.causalTypes || [];
           const latestTimestamp = statistics['latestDataTimestamp'];
           const projectType = data['projectType'] || "";
+          const eventStats = data['eventStatsJson'] || {};
           const ret = {};
           ret['statistics'] = statistics;
           ret['instanceMetricJson'] = statistics;
+          ret['eventStats'] = eventStats;
           ret['anomalyMapJson'] = heatmap;
           ret['instanceMetaData'] = instanceMetaData;
           ret['projectName'] = projectName;

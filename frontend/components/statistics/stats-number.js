@@ -1,25 +1,25 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const MetricNumber = ({total, duration='1d', width='two' }) => {
+const StatsNumber = ({title, number, duration='1d', width='two' }) => {
   const className = "ui statistic "+width+" wide column";
-  const totalText = _.isFinite(total) ? total.toString() : '-';
   return (
     <div className={className}>
       <div>
-        <span className="title">{`Num of Metrics`}</span>
+        <span className="title">{title}</span>
         <span className="meta">{duration}</span>
       </div>
-      <div className="value">{totalText}</div>
+      <div className="value">{number}</div>
       <div className="label">Total</div>
     </div>
   )
 };
 
-MetricNumber.propTypes = {
-  total: T.number,
+StatsNumber.propTypes = {
+  title: T.string,
+  number: T.number,
   duration: T.string,
   width: T.string,
 };
 
-export default MetricNumber;
+export default StatsNumber;

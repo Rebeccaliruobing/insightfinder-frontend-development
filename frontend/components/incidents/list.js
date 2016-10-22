@@ -329,9 +329,7 @@ class IncidentsList extends Component {
                                     <tr style={{ display: 'inline-table','width': '100%'}} key={index}
                                         onClick={()=>self.handleIncidentSelected(incident)}
                                         className={cx({'active': incident === self.state.activeIncident})}
-                                        title={"Start: " + moment(moment(incident.startTimestamp).utc()['_d']).format("MM-DD HH:mm")
-                                          + ", end: " + moment(moment(incident.endTimestamp).utc()['_d']).format("MM-DD HH:mm")
-                                          + ", duration: " + incident.duration + " min"}>
+                                        title={"Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                                       <td>{incident.id}</td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                                       <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
@@ -455,9 +453,7 @@ class IncidentsList extends Component {
                                     <tr style={{ display: 'inline-table','width': '100%'}} key={index}
                                         onClick={()=>self.handleIncidentSelected(incident)}
                                         className={cx({'active': incident === self.state.activeIncident})}
-                                        title={"Start: " + moment(incident.startTimestamp).format("MM-DD HH:mm")
-                                          + ", end: " + moment(incident.endTimestamp).format("MM-DD HH:mm")
-                                          + ", duration: " + incident.duration + " min"}>
+                                        title={"Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                                       <td>{incident.id}</td>
                                       <td><div className="level" style={{'backgroundColor': 'rgb('+self.calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')'}}></div></td>
                                       <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>

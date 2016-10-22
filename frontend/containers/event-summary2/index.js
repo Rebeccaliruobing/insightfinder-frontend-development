@@ -30,6 +30,7 @@ class EventSummary2 extends Component {
         incidents: [],
         incidentsTreeMap: [],
         instanceMetaData: {},
+        eventStats:{},
       },
       loading: true,
       projectName: undefined,
