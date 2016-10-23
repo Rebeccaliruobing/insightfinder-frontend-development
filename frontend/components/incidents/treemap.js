@@ -23,12 +23,13 @@ class IncidentsTreeMap extends Component {
       .round(false);
 
     this.state = {
-      treeMapChange: false,
+      treeMapScheme: 'anomaly',
       faux: null,
       startTimestamp:undefined,
       endTimestamp:undefined,
-      treeMapValue:"0",
-      cpuUtilizationByInstance:props.cpuUtilizationByInstance,
+      treeMapCPUThreshold:"0",
+      treeMapAvailabilityThreshold:'100',
+      instanceStatsJson:props.instanceStatsJson,
       instanceMetaData:props.instanceMetaData,
       anomaliesList:undefined,
       showMetricModal: false,
@@ -109,14 +110,17 @@ class IncidentsTreeMap extends Component {
         currentData:nextProps.currentData,
       };
 
-      if(typeof nextProps.treeMapChange == 'boolean'){
-        state['treeMapChange'] = nextProps.treeMapChange;
+      if(typeof nextProps.treeMapScheme == 'string'){
+        state['treeMapScheme'] = nextProps.treeMapScheme;
       }
-      if(typeof nextProps.treeMapValue == 'string'){
-        state['treeMapValue'] = nextProps.treeMapValue;
+      if(typeof nextProps.treeMapCPUThreshold == 'string'){
+        state['treeMapCPUThreshold'] = nextProps.treeMapCPUThreshold;
       }
-      if(typeof nextProps.cpuUtilizationByInstance == 'object'){
-        state['cpuUtilizationByInstance'] = nextProps.cpuUtilizationByInstance;
+      if(typeof nextProps.treeMapAvailabilityThreshold == 'string'){
+        state['treeMapAvailabilityThreshold'] = nextProps.treeMapAvailabilityThreshold;
+      }
+      if(typeof nextProps.instanceStatsJson == 'object'){
+        state['instanceStatsJson'] = nextProps.instanceStatsJson;
       }
 
       this.setState(state, () => {
@@ -176,43 +180,20 @@ class IncidentsTreeMap extends Component {
   @autobind
   getNodeFillColor(d) {
 
-    if ( d.eventType === '- new instance') {
+    if ( d.eventType === '- new instance' || d.eventType === '- new container') {
       return '#ffcd00';
     }
 
-    let {cpuUtilizationByInstance,treeMapValue} = this.state;
+    let {instanceStatsJson,treeMapCPUThreshold,treeMapAvailabilityThreshold} = this.state;
     let val = d.score;
     if(val<0){
       val = -val;
     }
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    let threshold = parseInt(treeMapValue);
-    if (this.state.treeMapChange) {
-      if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
-        && cpuUtilizationByInstance[d.instanceName]
-        && threshold >= cpuUtilizationByInstance[d.instanceName]['avg']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else if(d.type == 'instance'
-        && cpuUtilizationByInstance[d.name]
-        && threshold >= cpuUtilizationByInstance[d.name]['avg']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else if(d.type == 'container'
-        && cpuUtilizationByInstance[d.instanceName] 
-        && threshold >= cpuUtilizationByInstance[d.instanceName]['avg']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else {
-          rcolor = 0;
-          gcolor = gcolorMax;
-          bcolor = 0;
-      }
-    } else {
+    let cpuThreshold = parseInt(treeMapCPUThreshold);
+    let availabilityThreshold = parseFloat(treeMapAvailabilityThreshold)/100.0;
+    if (this.state.treeMapScheme == 'anomaly') {
       if (val <= 1) {
         if (val < 0)
           val = 0;
@@ -225,6 +206,54 @@ class IncidentsTreeMap extends Component {
           val = 10;
         rcolor = 255;
         gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
+    } else if(this.state.treeMapScheme == 'cpu') {
+      if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
+        && instanceStatsJson[d.instanceName]
+        && cpuThreshold >= instanceStatsJson[d.instanceName]['AvgCPUUtilization']) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+      } else if(d.type == 'instance'
+        && instanceStatsJson[d.name]
+        && cpuThreshold >= instanceStatsJson[d.name]['AvgCPUUtilization']) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+      } else if(d.type == 'container'
+        && instanceStatsJson[d.instanceName] 
+        && cpuThreshold >= instanceStatsJson[d.instanceName]['AvgCPUUtilization']) {
+          rcolor = 173;
+          gcolor = 216;
+          bcolor = 230;
+      } else {
+          rcolor = 0;
+          gcolor = gcolorMax;
+          bcolor = 0;
+      }
+    } else if(this.state.treeMapScheme == 'availability') {
+      if(d.type == 'metric'
+        && instanceStatsJson[d.instanceName]
+        && availabilityThreshold > instanceStatsJson[d.instanceName]['AvgInstanceUptime']) {
+          rcolor = 255;
+          gcolor = 0;
+          bcolor = 0;
+      } else if(d.type == 'instance'
+        && instanceStatsJson[d.name]
+        && availabilityThreshold > instanceStatsJson[d.name]['AvgInstanceUptime']) {
+          rcolor = 255;
+          gcolor = 0;
+          bcolor = 0;
+      } else if(d.type == 'container'
+        && instanceStatsJson[d.instanceName] 
+        && availabilityThreshold > instanceStatsJson[d.instanceName]['AvgInstanceUptime']) {
+          rcolor = 255;
+          gcolor = 0;
+          bcolor = 0;
+      } else {
+          rcolor = 0;
+          gcolor = gcolorMax;
+          bcolor = 0;
       }
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
