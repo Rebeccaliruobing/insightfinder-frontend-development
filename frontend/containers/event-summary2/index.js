@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
-import { LiveProjectSelection,NumberOfDays, TreemapOptionsSelect,EventSummaryModelType } from '../../components/selections';
+import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect, TreeMapCPUThresholdSelect,TreeMapAvailabilityThresholdSelect,EventSummaryModelType } from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
@@ -21,8 +21,9 @@ class EventSummary2 extends Component {
     super(props);
 
     this.state = {
-      treeMapValue: '0',
-      treeMapChange: false, // utilization view flag
+      treeMapCPUThreshold: '0',
+      treeMapAvailabilityThreshold: '100',
+      treeMapScheme: 'anomaly', // utilization view flag
       treeMapText: "Utilization",
       data: {
         statistics: {},
@@ -165,8 +166,16 @@ class EventSummary2 extends Component {
     this.refreshProjectName(projectName);
   }
 
-  handleTreeMapChange(value){
-    this.setState({treeMapValue: value});
+  handleTreeMapAvailabilityThreshold(value){
+    this.setState({treeMapAvailabilityThreshold: value});
+  }
+
+  handleTreeMapCPUThreshold(value){
+    this.setState({treeMapCPUThreshold: value});
+  }
+
+  handleTreeMapScheme(value){
+    this.setState({treeMapScheme: value});
   }
 
   modelDateValidator(date) {
@@ -226,12 +235,23 @@ class EventSummary2 extends Component {
     window.open(url, '_blank');
   }
 
+  getTreeMapSchemeText(scheme){
+    if(scheme == 'anomaly'){
+      return "Anomaly";
+    } else if (scheme == 'cpu'){
+      return "CPU Utilization";
+    } else if (scheme == 'availability'){
+      return "Availability";
+    }
+    return "error";
+  }
+
   render() {
-    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapValue,treeMapChange,treeMapText, selectedInstance, currentTreemapData} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapCPUThreshold,treeMapAvailabilityThreshold,treeMapScheme,treeMapText, selectedInstance, currentTreemapData} = this.state;
+    let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-    let cpuUtilizationByInstance = data['instanceMetricJson'] ? data['instanceMetricJson']['cpuUtilizationByInstance'] : {};
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
-    let instanceStats = (instanceStatsMap && instanceStatsMap[selectedInstance])? instanceStatsMap[selectedInstance] : undefined;
+    let instanceStats = (instanceStatsMap && instanceStatsMap[selectedInstance])? instanceStatsMap[selectedInstance] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
@@ -284,26 +304,14 @@ class EventSummary2 extends Component {
                                  causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
                 </div>
                 <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
-                  <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
-                      e.stopPropagation();
-                      this.setState({
-                      treeMapChange: !treeMapChange,
-                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
-                      });
-                  }}>
-                    Anomalies
-                  </Button>
-                  <Button className={treeMapChange?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
-                      e.stopPropagation();
-                      this.setState({
-                      treeMapChange: !treeMapChange,
-                      treeMapText: (treeMapChange)?"Utilization":"Anomaly"
-                      });
-                  }}>
-                    CPU Utilization
-                  </Button>
-                  {treeMapChange?
-                    <TreemapOptionsSelect style={{ width: 10 }} value={treeMapValue} text={'<='+treeMapValue+'%'} onChange={(value)=>this.handleTreeMapChange(value)}/>
+                  <b>Show event by:&nbsp;&nbsp;</b>
+                  <TreeMapSchemeSelect style={{ minWidth: 80 }} value={treeMapScheme} text={treeMapSchemeText} onChange={(value)=>this.handleTreeMapScheme(value)}/>
+                  {treeMapScheme=='cpu'?
+                    <TreeMapCPUThresholdSelect style={{ minWidth: 10 }} value={treeMapCPUThreshold} text={'<='+treeMapCPUThreshold+'%'} onChange={(value)=>this.handleTreeMapCPUThreshold(value)}/>
+                  :
+                  null}
+                  {treeMapScheme=='availability'?
+                    <TreeMapAvailabilityThresholdSelect style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold} text={'<='+treeMapAvailabilityThreshold+'%'} onChange={(value)=>this.handleTreeMapAvailabilityThreshold(value)}/>
                   :
                   null}
                   <Button className="orange button" style={{ 'float':'right' }} onClick={(e)=>{
@@ -313,10 +321,9 @@ class EventSummary2 extends Component {
                     All Metric Chart
                   </Button>
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                                    cpuUtilizationByInstance={cpuUtilizationByInstance}
-                                    treeMapChange={treeMapChange} treeMapValue={treeMapValue}
-                                    feedbackData={this.feedbackData}
-                                    currentData={currentTreemapData} />
+                                    instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme} 
+                                    treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                                    feedbackData={this.feedbackData} currentData={currentTreemapData} />
                 </div>
               </div>
             </div>
@@ -337,5 +344,24 @@ class EventSummary2 extends Component {
     )
   }
 }
+
+// <Button className={treeMapScheme?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
+//                       e.stopPropagation();
+//                       this.setState({
+//                       treeMapScheme: !treeMapScheme,
+//                       treeMapText: (treeMapScheme)?"Utilization":"Anomaly"
+//                       });
+//                   }}>
+//                     Anomalies
+//                   </Button>
+//                   <Button className={treeMapScheme?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
+//                       e.stopPropagation();
+//                       this.setState({
+//                       treeMapScheme: !treeMapScheme,
+//                       treeMapText: (treeMapScheme)?"Utilization":"Anomaly"
+//                       });
+//                   }}>
+//                     CPU Utilization
+//                   </Button>
 
 export default EventSummary2;

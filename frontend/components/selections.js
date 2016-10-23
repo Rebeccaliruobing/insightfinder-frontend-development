@@ -183,9 +183,31 @@ class OperationOptionsSelect extends React.Component {
   }
 }
 
-class TreemapOptionsSelect extends React.Component {
+class TreeMapCPUThresholdSelect extends React.Component {
   render(){
     let selectOption = [0, 1, 5, 10];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {'<='+value+'%'}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
+class TreeMapAvailabilityThresholdSelect extends React.Component {
+  render(){
+    let selectOption = [100, 99, 97, 95, 90];
       return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -389,6 +411,19 @@ const NumberOfDays = (props) => {
   )
 };
 
+const TreeMapSchemeSelect = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" data-value='anomaly'>Anomaly</div>
+        <div className="item" data-value='cpu'>CPU Utilization</div>
+        <div className="item" data-value='availability'>Availability</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -407,5 +442,7 @@ export {
   IncidentDurationMinute,
   IncidentActionTaken,
   NumberOfDays,
-  TreemapOptionsSelect
+  TreeMapCPUThresholdSelect,
+  TreeMapAvailabilityThresholdSelect,
+  TreeMapSchemeSelect,
 };
