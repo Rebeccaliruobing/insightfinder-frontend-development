@@ -112,28 +112,30 @@ class TakeActionModal extends React.Component {
       <Modal {...rest} size="small" closable={true}>
         <div className="content">
           <h5>Suggested action: </h5>
-          <table className="ui small table action-table" style={{ 'height': '300px','overflow': 'auto','display': 'block' }}>
-            <thead>
-              <tr className="bold" style={{ display: 'inline-table','width': '100%'}}>
+          <div style={{maxHeight: 300, overflow: 'auto'}}>
+            <table className="ui small table action-table">
+              <thead>
+              <tr className="bold">
                 <th>Suggested Action</th>
                 <th>Instance Name</th>
                 <th>Instance ID</th>
               </tr>
-            </thead>
-            <tbody>
-            {actions.map((action, i) => {
-              return (
-                <tr key={i} style={{ display: 'inline-table','width': '100%'}}>
-                  <td>{action.action}</td>
-                  <td>{action.instanceName}</td>
-                  <td>{action.instanceId}</td>
-                </tr>
-              )
-            })}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+              {actions.map((action, i) => {
+                return (
+                    <tr key={i}>
+                      <td>{action.action}</td>
+                      <td>{action.instanceName}</td>
+                      <td>{action.instanceId}</td>
+                    </tr>
+                )
+              })}
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div className="content" style={{padding:20}}>
+        <div className="content" style={{padding:'0 20px'}}>
           <h5>Take action on this event:</h5>
           <div style={{display:'flex'}}>
             <div className="content" style={{padding:10}}>
