@@ -1,16 +1,17 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const StatsNumber = ({title, number, duration='1d', width='two' }) => {
+const StatsNumber = ({title, number, label='Total', duration='1d', width='two' }) => {
   const className = "ui statistic "+width+" wide column";
+  let numberString = number ? number.toString() : "-";
   return (
     <div className={className}>
       <div>
         <span className="title">{title}</span>
         <span className="meta">{duration}</span>
       </div>
-      <div className="value">{number}</div>
-      <div className="label">Total</div>
+      <div className="value error">{numberString}</div>
+      <div className="label">{label}</div>
     </div>
   )
 };

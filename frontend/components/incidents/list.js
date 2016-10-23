@@ -237,12 +237,12 @@ class IncidentsList extends Component {
                   });}}>
             Causal Graph
           </Button>
-        <div className="ui pointing secondary menu">
-            <a className={tabStates['detected'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
-            <a className={tabStates['predicted'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
-        </div>
+          <div className="ui pointing secondary menu">
+              <a className={tabStates['detected'] + ' item'}
+                 onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
+              <a className={tabStates['predicted'] + ' item'}
+                 onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
+          </div>
         </div>
         <div className={tabStates['predicted'] + ' ui tab '}>
           {(predictedIncidents.length > 0) ?

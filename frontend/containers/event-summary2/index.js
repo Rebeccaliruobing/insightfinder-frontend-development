@@ -272,6 +272,17 @@ class EventSummary2 extends Component {
           <div className="ui vertical segment">
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
+                <div className="seven wide column" style={{ height: 500 }}>
+                  <IncidentsList projectName={refreshName} 
+                                 projectType={projectType}
+                                 endTime={endTime} 
+                                 numberOfDays={numberOfDays} 
+                                 modelType={modelType} 
+                                 onIncidentSelected={this.handleIncidentSelected}
+                                 incidents={data.incidents}
+                                 causalDataArray={data.causalDataArray}
+                                 causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
+                </div>
                 <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
                   <Button className={treeMapChange?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
                       e.stopPropagation();
@@ -306,17 +317,6 @@ class EventSummary2 extends Component {
                                     treeMapChange={treeMapChange} treeMapValue={treeMapValue}
                                     feedbackData={this.feedbackData}
                                     currentData={currentTreemapData} />
-                </div>
-                <div className="seven wide column" style={{ height: 500 }}>
-                  <IncidentsList projectName={refreshName} 
-                                 projectType={projectType}
-                                 endTime={endTime} 
-                                 numberOfDays={numberOfDays} 
-                                 modelType={modelType} 
-                                 onIncidentSelected={this.handleIncidentSelected}
-                                 incidents={data.incidents}
-                                 causalDataArray={data.causalDataArray}
-                                 causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
                 </div>
               </div>
             </div>

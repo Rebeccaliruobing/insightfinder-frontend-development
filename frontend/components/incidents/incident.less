@@ -2,6 +2,44 @@
   white-space: pre-wrap;
 }
 
+.action-table {
+  th {
+    cursor: pointer !important;
+    font-weight: bold !important;
+    background-color: #767676 !important;
+    color: #ffffff !important;
+  }
+  .code {
+    white-space: pre-wrap;
+  }
+  tr {
+      td{
+        &:nth-child(1){
+          width: 50%;
+        }
+        &:nth-child(2){
+          width: 30%;
+        }
+        &:nth-child(3){
+          width: 20%;
+        }
+      }
+  }
+  tr {
+      th{
+        &:nth-child(1){
+          width: 50%;
+        }
+        &:nth-child(2){
+          width: 30%;
+        }
+        &:nth-child(3){
+          width: 20%;
+        }
+      }
+  }
+}
+
 .incident-table {
   th {
     cursor: pointer !important;

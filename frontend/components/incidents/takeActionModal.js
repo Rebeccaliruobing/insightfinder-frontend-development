@@ -89,6 +89,7 @@ class TakeActionModal extends React.Component {
     let { incident, action, instanceId, ...rest} = this.props;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
+    let self = this;
     _.forEach(incident.suggestedActionsByInstanceJson, function (saInstance, key) {
       let pos1 = saInstance.indexOf(" on ");
       let pos2 = saInstance.indexOf(" instanceId ");
@@ -106,20 +107,23 @@ class TakeActionModal extends React.Component {
         instanceName:tagName,
       });
     });
+
     return(
       <Modal {...rest} size="small" closable={true}>
         <div className="content">
           <h5>Suggested action: </h5>
-          <table className="ui small table">
+          <table className="ui small table action-table" style={{ 'height': '300px','overflow': 'auto','display': 'block' }}>
+            <thead>
+              <tr className="bold" style={{ display: 'inline-table','width': '100%'}}>
+                <th>Suggested Action</th>
+                <th>Instance Name</th>
+                <th>Instance ID</th>
+              </tr>
+            </thead>
             <tbody>
-            <tr className="bold">
-              <td>Suggested Action</td>
-              <td>Instance Name</td>
-              <td>Instance ID</td>
-            </tr>
             {actions.map((action, i) => {
               return (
-                <tr key={i}>
+                <tr key={i} style={{ display: 'inline-table','width': '100%'}}>
                   <td>{action.action}</td>
                   <td>{action.instanceName}</td>
                   <td>{action.instanceId}</td>
