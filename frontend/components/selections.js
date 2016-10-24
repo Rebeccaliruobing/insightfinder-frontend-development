@@ -207,7 +207,7 @@ class TreeMapCPUThresholdSelect extends React.Component {
 
 class TreeMapAvailabilityThresholdSelect extends React.Component {
   render(){
-    let selectOption = [100, 99, 97, 95, 90];
+    let selectOption = [90, 80, 50, 25];
       return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>

@@ -1,3 +1,4 @@
+import store from 'store';
 import React, {Component, PropTypes as T} from 'react';
 import {autobind} from 'core-decorators';
 import {Button} from '../../artui/react';
@@ -215,6 +216,7 @@ class IncidentsList extends Component {
                 //     </Button> }
                 // </td>
   render() {
+    const userName = store.get('userName');
     let { projectType, incidents,latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let detectedIncidents = incidents.filter((incident, index) =>
             incident.startTimestamp<=latestTimestamp );
@@ -226,7 +228,9 @@ class IncidentsList extends Component {
     return (
       <div>
         <div className="row" style={{ marginBottom: 10 }}>
+          {(userName=='admin' || userName=='guest')&&
           <Button className='orange' style={{'float':'right','marginTop':'5px'}} onClick={this.handleProjectChartsView}>Line Charts</Button>
+          }
           <Button className='orange' style={{'float':'right','marginTop':'5px'}} title="Causal Graph"
                   onClick={(e) => {
                   e.stopPropagation();

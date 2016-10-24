@@ -181,7 +181,7 @@ class IncidentsTreeMap extends Component {
   getNodeFillColor(d) {
 
     if ( d.eventType === '- new instance' || d.eventType === '- new container') {
-      return '#ffcd00';
+      return '#88bbee';
     }
 
     let {instanceStatsJson,treeMapCPUThreshold,treeMapAvailabilityThreshold} = this.state;
@@ -269,7 +269,7 @@ class IncidentsTreeMap extends Component {
    * @param data
    */
   displayData(data) {
-    let {instanceMetaData} = this.state;
+    let {instanceMetaData,instanceStatsJson} = this.state;
     let self = this;
     this.setState({},()=>{
       if (!data) return;
@@ -354,9 +354,20 @@ class IncidentsTreeMap extends Component {
         .call(rect);
 
       // this is mouse over popup text, no chopping
-      g.append("rect").attr("class", d => "parent " + d.type)
-        .call(rect)
-        .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)+"\n"+d.eventType);
+      if (this.state.treeMapScheme == 'anomaly') {
+        g.append("rect").attr("class", d => "parent " + d.type)
+          .call(rect)
+          .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):  d.name)+"\n"+d.eventType);
+      } else if (this.state.treeMapScheme == 'cpu') {
+        g.append("rect").attr("class", d => "parent " + d.type)
+          .call(rect)
+          .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):  d.name)+"\n"+(instanceStatsJson[d.name]?'Average CPU Utilization: '+(Math.round(instanceStatsJson[d.name]['AvgCPUUtilization']*10)/10).toString()+'%':''));
+      } else if (this.state.treeMapScheme == 'availability') {
+        g.append("rect").attr("class", d => "parent " + d.type)
+          .call(rect)
+          .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):  d.name)+"\n"+(instanceStatsJson[d.name]?'Average Instance Availability: '+(Math.round(instanceStatsJson[d.name]['AvgInstanceUptime']*1000)/10).toString()+'%':''));
+      } 
+
       g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d));
       g.append("text").attr("dy", ".75em").text(
         d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?
@@ -364,9 +375,20 @@ class IncidentsTreeMap extends Component {
       ).call( t => {
         t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
       });
-      g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType,10)).call( t => {
-        t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
-      });
+
+      if (this.state.treeMapScheme == 'anomaly') {
+        g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType,10)).call( t => {
+          t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
+        });
+      } else if (this.state.treeMapScheme == 'cpu') {
+        g.append("text").attr("dy", ".75em").text(d => (instanceStatsJson[d.name]?(Math.round(instanceStatsJson[d.name]['AvgCPUUtilization']*10)/10).toString()+'%':'')).call( t => {
+          t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
+        });
+      } else if (this.state.treeMapScheme == 'availability') {
+        g.append("text").attr("dy", ".75em").text(d => (instanceStatsJson[d.name]?(Math.round(instanceStatsJson[d.name]['AvgInstanceUptime']*1000)/10).toString()+'%':'')).call( t => {
+          t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
+        });
+      } 
 
       // Bind event for metric
       g.selectAll('.metric').on('click', this.showMetricChart);

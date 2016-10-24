@@ -17,7 +17,7 @@ const ProjectStatistics = ({data, dur}) => (
   <div className="ui compact grid">
     <div className='ui compact grid nine wide column'>
     <StatsNumber title='Num of Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='three' />
-    <StatsNumber title='Event Avg Dur' number={data.eventStats.eventAverageDuration} label='Minutes' duration={dur+'d'} width='three' />
+    <StatsNumber title='Avg Event Dur' number={data.eventStats.eventAverageDuration} label='Minutes' duration={dur+'d'} width='three' />
     <StatsList title='Top Event Types' list={data.eventStats.countByRootCause} topK={3} duration={dur+'d'} width='five' />
     <StatsList title='Top Anomalous Applications' list={data.eventStats.countByInstance} topK={3} duration={dur+'d'} width='five' />
     </div>

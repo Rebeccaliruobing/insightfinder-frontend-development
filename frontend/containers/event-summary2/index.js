@@ -305,7 +305,7 @@ class EventSummary2 extends Component {
                 </div>
                 <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
                   <b>Show event by:&nbsp;&nbsp;</b>
-                  <TreeMapSchemeSelect style={{ minWidth: 80 }} value={treeMapScheme} text={treeMapSchemeText} onChange={(value)=>this.handleTreeMapScheme(value)}/>
+                  <TreeMapSchemeSelect style={{ width: 130 }} value={treeMapScheme} text={treeMapSchemeText} onChange={(value)=>this.handleTreeMapScheme(value)}/>
                   {treeMapScheme=='cpu'?
                     <TreeMapCPUThresholdSelect style={{ minWidth: 10 }} value={treeMapCPUThreshold} text={'<='+treeMapCPUThreshold+'%'} onChange={(value)=>this.handleTreeMapCPUThreshold(value)}/>
                   :
