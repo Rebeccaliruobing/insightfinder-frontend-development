@@ -24,12 +24,12 @@ class CustomProjectModal extends React.Component {
   }
 
   handleSubmit() {
-    let {projectName, projectCloudType, samplingInterval} = this.state;
+    let {projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key} = this.state;
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    apis.postAddCustomProject(projectName, projectCloudType, samplingInterval).then((resp)=> {
+    apis.postAddCustomProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
         // this.setState({message:resp.message});
@@ -79,6 +79,33 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="60">60 minutes</option>
               </select>
             </div>
+            {projectCloudType=='AWS'&&
+            <div className="field">
+              <label>Availability Zone*</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
+                <option className="item"></option>
+                <option className="item" value="us-east-1">us-east-1</option>
+                <option className="item" value="us-west-1">us-west-1</option>
+                <option className="item" value="us-west-2">us-west-2</option>
+                <option className="item" value="eu-west-1">eu-west-1</option>
+                <option className="item" value="eu-central-1">eu-central-1</option>
+                <option className="item" value="ap-northeast-1">ap-northeast-1</option>
+                <option className="item" value="ap-northeast-2">ap-northeast-2</option>
+                <option className="item" value="ap-southeast-1">ap-southeast-1</option>
+                <option className="item" value="ap-southeast-2">ap-southeast-2</option>
+                <option className="item" value="sa-east-1">sa-east-1</option>
+              </select>
+            </div>}
+            {projectCloudType=='AWS'&&
+            <div className="field">
+              <label>IAM Access Key ID* **</label>
+              <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
+            </div>}
+            {projectCloudType=='AWS'&&
+            <div className="field">
+              <label>Secret Access Key* **</label>
+              <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
+            </div>}
           </form>
         </div>
         <div className="actions">
@@ -89,6 +116,10 @@ class CustomProjectModal extends React.Component {
             </div>
           </div>
         </div>
+        {projectCloudType=='AWS'&&
+        <div>* Optional fields enable automatic agent deployment on new instances.</div>}
+        {projectCloudType=='AWS'&&
+        <div>** Fields encrypted for extra security protection.</div>}
       </Modal>
     )
   }

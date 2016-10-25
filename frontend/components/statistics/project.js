@@ -15,13 +15,17 @@ import StatsList from './stats-list';
 
 const ProjectStatistics = ({data, dur}) => (
   <div className="ui compact grid">
-    <div className='ui compact grid nine wide column'>
-    <StatsNumber title='Num of Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='three' />
-    <StatsNumber title='Avg Event Dur' number={data.eventStats.eventAverageDuration} label='Minutes' duration={dur+'d'} width='three' />
-    <StatsList title='Top Event Types' list={data.eventStats.countByRootCause} topK={3} duration={dur+'d'} width='five' />
-    <StatsList title='Top Anomalous Applications' list={data.eventStats.countByInstance} topK={3} duration={dur+'d'} width='five' />
+    <div className='ui compact grid three wide column'>
+    <StatsNumber title='Num of Anomalous Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='eight' />
+    <StatsNumber title='Avg Event Duration' number={data.eventStats.eventAverageDuration} label='Minutes' duration={dur+'d'} width='eight' />
     </div>
     <div className='ui compact grid seven wide column'>
+    <StatsList title='Top Event Types' list={data.eventStats.countByRootCause} topK={3} order='desc' duration={dur+'d'} width='four' />
+    <StatsList title='Top Anomalous Apps' list={data.eventStats.countByInstance} topK={3} order='desc' duration={dur+'d'} width='four' />
+    <StatsList title='Top Underutilized Apps' list={data.eventStats.CPUUtilizationByInstance} topK={3} order='asc' duration={dur+'d'} width='four' />
+    <StatsList title='Top Unavailable Apps' list={data.eventStats.AvailabilityByInstance} topK={3} order='asc' duration={dur+'d'} width='four' />
+    </div>
+    <div className='ui compact grid six wide column'>
     <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='four' />
     <InstanceUptime average={data.statistics['AvgInstanceUptime']} duration={dur+'d'} width='four' />
     <InstanceNumber total={data.statistics['NumberOfInstances']}

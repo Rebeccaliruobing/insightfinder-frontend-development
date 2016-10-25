@@ -22,7 +22,7 @@ class EventSummary2 extends Component {
 
     this.state = {
       treeMapCPUThreshold: '0',
-      treeMapAvailabilityThreshold: '100',
+      treeMapAvailabilityThreshold: '90',
       treeMapScheme: 'anomaly', // utilization view flag
       treeMapText: "Utilization",
       data: {

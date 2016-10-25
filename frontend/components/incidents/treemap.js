@@ -28,7 +28,7 @@ class IncidentsTreeMap extends Component {
       startTimestamp:undefined,
       endTimestamp:undefined,
       treeMapCPUThreshold:"0",
-      treeMapAvailabilityThreshold:'100',
+      treeMapAvailabilityThreshold:'90',
       instanceStatsJson:props.instanceStatsJson,
       instanceMetaData:props.instanceMetaData,
       anomaliesList:undefined,
@@ -211,21 +211,21 @@ class IncidentsTreeMap extends Component {
       if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
         && instanceStatsJson[d.instanceName]
         && cpuThreshold >= instanceStatsJson[d.instanceName]['AvgCPUUtilization']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
+          rcolor = 0;
+          gcolor = 102;
+          bcolor = 204;
       } else if(d.type == 'instance'
         && instanceStatsJson[d.name]
         && cpuThreshold >= instanceStatsJson[d.name]['AvgCPUUtilization']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
+          rcolor = 0;
+          gcolor = 102;
+          bcolor = 204;
       } else if(d.type == 'container'
         && instanceStatsJson[d.instanceName] 
         && cpuThreshold >= instanceStatsJson[d.instanceName]['AvgCPUUtilization']) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
+          rcolor = 0;
+          gcolor = 102;
+          bcolor = 204;
       } else {
           rcolor = 0;
           gcolor = gcolorMax;
@@ -236,19 +236,19 @@ class IncidentsTreeMap extends Component {
         && instanceStatsJson[d.instanceName]
         && availabilityThreshold > instanceStatsJson[d.instanceName]['AvgInstanceUptime']) {
           rcolor = 255;
-          gcolor = 0;
+          gcolor = 204;
           bcolor = 0;
       } else if(d.type == 'instance'
         && instanceStatsJson[d.name]
         && availabilityThreshold > instanceStatsJson[d.name]['AvgInstanceUptime']) {
           rcolor = 255;
-          gcolor = 0;
+          gcolor = 204;
           bcolor = 0;
       } else if(d.type == 'container'
         && instanceStatsJson[d.instanceName] 
         && availabilityThreshold > instanceStatsJson[d.instanceName]['AvgInstanceUptime']) {
           rcolor = 255;
-          gcolor = 0;
+          gcolor = 204;
           bcolor = 0;
       } else {
           rcolor = 0;

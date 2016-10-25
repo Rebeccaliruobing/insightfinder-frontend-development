@@ -3,7 +3,7 @@
     border: 1px solid rgba(34,36,38,.15);
     border-radius: 0;
     padding: 0;
-    height: 120px;
+    height: 100px;
     border-right-width: 0;
     &:last-child {
       border-right-width: 1px;
@@ -21,14 +21,16 @@
     }
 
     .title {
-      font-size: 13px;
+      font-size: 11px;
+      font-weight: bold;
       display: inline-block;
+      white-space: nowrap;
       color: rgba(0,0,0,.87);
     }
 
     .meta {
       display: inline-block;
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1;
       padding: 2px 4px;
       margin-top: 1px;
@@ -41,9 +43,9 @@
 
     .value {
       text-align: right;
-      font-size: 3rem !important;
+      font-size: 2.5rem !important;
       color: #767676;
-      line-height: 1.6;
+      line-height: 1.5;
     }
     .value.error {
       color: #d01919;
@@ -67,12 +69,26 @@
     }
 
     .list {
-      font-size: 1.4rem !important;
+      font-size: 1rem !important;
       color: #d01919;
-      padding-left: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      margin-right: 5px;
       .dygraph-legend {
         visibility: hidden;
       }
+    }
+    .list.normal {
+      font-size: 1.1rem !important;
+      font-weight: bold;
+      line-height: 4.5rem;
+      color: #767676;
+    }
+    .list.error {
+      color: #d01919;
+    }
+    .list.warning {
+      color: #FBBD08;
     }
   }
 }
