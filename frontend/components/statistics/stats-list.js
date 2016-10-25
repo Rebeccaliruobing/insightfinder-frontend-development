@@ -31,7 +31,7 @@ const StatsList = ({title, list, topK, alt='Everything is normal', duration='1d'
       </div>
         {topKList.length>0 && topKList.map((item, i) => {
           return (
-            <div className="list error">{item}</div>
+            <div key={i} className="list error">{item}</div>
           )
         })}
         {topKList.length==0 &&
