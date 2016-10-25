@@ -18,7 +18,7 @@ class IncidentsTreeMap extends Component {
     // D3 treemap layout settings.
     this.treemap = d3.layout.treemap()
       .children((d, depth) => depth ? null : d._children)
-      .sort((a, b) => a.name - b.name)
+      .sort((a, b) => b.name.localeCompare(a.name))
       .ratio(0.3 * (1 + Math.sqrt(5)))
       .round(false);
 
