@@ -49,7 +49,7 @@ export default class ListAll extends Component {
 
   handleFilterChange(data) {
     let {cvalue, pvalue, minPts, epsilon, modelType} = data;
-    let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime} = data.activeItem;
+    let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp} = data.activeItem;
     metaData = JSON.stringify(metaData);
     if(modelType=='DBScan'){
       cvalue = minPts;
@@ -57,7 +57,7 @@ export default class ListAll extends Component {
     }
 
     window.open(`/useCaseDetails?${$.param(Object.assign({}, {
-      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime
+      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,latestDataTimestamp
     }))}`, '_blank');
 
     // this.setState({loading: true}, ()=>{

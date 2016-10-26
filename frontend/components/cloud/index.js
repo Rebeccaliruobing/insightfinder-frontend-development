@@ -16,6 +16,7 @@ import BehaviorChangeDetection from './behavior-change-detection';
 import DisplayModel from './display-model';
 import EventSummary from '../../containers/event-summary';
 import EventSummary2 from '../../containers/event-summary2';
+import AppForecast from '../../containers/app-forecast';
 
 export class Cloud extends React.Component {
   render() {
@@ -34,6 +35,7 @@ export const cloudRoute = (
       <Route component={InsightReport} path="insight-report" />
       <Route component={EventSummary} path="monitoring0" />
       <Route component={EventSummary2} path="monitoring" />
+      <Route component={AppForecast} path="app-forecast" />
       <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
       <Route component={IncidentLogAnalysis} path="incident-log-analysis" />

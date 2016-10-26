@@ -33,7 +33,7 @@ class ShareModal extends React.Component {
     
     let {name, description, system, showOther, other ,...rest} = this.state;
     let data = Object.assign({}, this.context.location.query, rest);
-    let {dp} = this.props;
+    let {dp, latestDataTimestamp} = this.props;
     let startTimestamp = (data['startTime'])?data['startTime']:dp.startTimestamp;
     let endTimestamp = (data['endTime'])?data['endTime']:dp.startTimestamp;
     
@@ -51,7 +51,7 @@ class ShareModal extends React.Component {
     
     data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
     data['rawData'] = dp ? dp.data.data : null;
-
+    data['latestDataTimestamp'] = latestDataTimestamp;
     apis.postDashboardUserValues('publishdata', data);
   }
 

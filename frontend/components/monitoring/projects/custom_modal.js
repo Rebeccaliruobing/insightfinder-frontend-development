@@ -79,7 +79,7 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="60">60 minutes</option>
               </select>
             </div>
-            {projectCloudType=='AWS'&&
+            {false && projectCloudType=='AWS'&&
             <div className="field">
               <label>Availability Zone*</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
@@ -96,12 +96,12 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="sa-east-1">sa-east-1</option>
               </select>
             </div>}
-            {projectCloudType=='AWS'&&
+            {false && projectCloudType=='AWS'&&
             <div className="field">
               <label>IAM Access Key ID* **</label>
               <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
             </div>}
-            {projectCloudType=='AWS'&&
+            {false && projectCloudType=='AWS'&&
             <div className="field">
               <label>Secret Access Key* **</label>
               <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
@@ -116,9 +116,9 @@ class CustomProjectModal extends React.Component {
             </div>
           </div>
         </div>
-        {projectCloudType=='AWS'&&
+        {false && projectCloudType=='AWS'&&
         <div>* Optional fields enable automatic agent deployment on new instances.</div>}
-        {projectCloudType=='AWS'&&
+        {false && projectCloudType=='AWS'&&
         <div>** Fields encrypted for extra security protection.</div>}
       </Modal>
     )

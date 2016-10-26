@@ -258,7 +258,7 @@ class EventSummary2 extends Component {
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
-          <div className="ui right aligned vertical inline segment" style={{zIndex: 200}}>
+          <div className="ui right aligned vertical inline segment" style={{zIndex: 1}}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
@@ -304,7 +304,11 @@ class EventSummary2 extends Component {
                                  causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
                 </div>
                 <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
+                  {treeMapScheme=='anomaly'?
                   <b>Show event by:&nbsp;&nbsp;</b>
+                  :
+                  <b>Show instance by:&nbsp;&nbsp;</b>
+                  }
                   <TreeMapSchemeSelect style={{ width: 130 }} value={treeMapScheme} text={treeMapSchemeText} onChange={(value)=>this.handleTreeMapScheme(value)}/>
                   {treeMapScheme=='cpu'?
                     <TreeMapCPUThresholdSelect style={{ minWidth: 10 }} value={treeMapCPUThreshold} text={'<='+treeMapCPUThreshold+'%'} onChange={(value)=>this.handleTreeMapCPUThreshold(value)}/>

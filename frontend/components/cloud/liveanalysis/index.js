@@ -248,7 +248,7 @@ class LiveAnalysisCharts extends React.Component {
         freqMockup = freqMockup || [];
         this.calculateData();
         let self = this;
-
+        let isFileDetection = (data && data.caller && data.caller == 'fileDetection');
         const summary = this.summary;
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
@@ -348,7 +348,7 @@ class LiveAnalysisCharts extends React.Component {
                                     {!summary && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
-                                    {false && !!summary && 
+                                    {isFileDetection && !!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
@@ -485,7 +485,7 @@ class LiveAnalysisCharts extends React.Component {
                                  onClose={() => this.setState({ showTenderModal: false })}/>
                     }
                     { this.state.showShareModal &&
-                    <ShareModal dataArray={dataArray} types={types} dp={this.dp}
+                    <ShareModal dataArray={dataArray} types={types} dp={this.dp} latestDataTimestamp={latestDataTimestamp}
                                 onClose={() => this.setState({ showShareModal: false })}/>
                     }
                     { this.state.showComments &&
