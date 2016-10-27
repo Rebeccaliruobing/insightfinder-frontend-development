@@ -4,6 +4,7 @@ const baseUrl = window.API_BASE_URL || '/api/v1/';
 import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
+import {retrieveAppNames,retrieveAppMetricForecastData} from './retrieve-forecast';
 
 //
 // When we run frontend on localhost python web server and connect api with different host,
@@ -116,6 +117,9 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 const apis = {
+    retrieveLiveAnalysis: retrieveLiveAnalysis,
+    retrieveAppNames: retrieveAppNames,
+    retrieveAppMetricForecastData: retrieveAppMetricForecastData,
 
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
@@ -409,7 +413,6 @@ const apis = {
             });
         });
     },
-    retrieveLiveAnalysis: retrieveLiveAnalysis,
 
     /**
      *
