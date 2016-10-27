@@ -244,6 +244,7 @@ class LogModelType extends React.Component{
   }
 };
 
+// <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
 class ModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -254,7 +255,6 @@ class ModelType extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
-          <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
           <div className="item" data-value="Split">Split</div>
           <div className="item" data-value="Hybrid">Hybrid</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
