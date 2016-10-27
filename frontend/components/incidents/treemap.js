@@ -15,12 +15,6 @@ class IncidentsTreeMap extends Component {
     this.$container = null;
     this.navHeight = 28;
 
-    // D3 treemap layout settings.
-    this.treemap = d3.layout.treemap()
-      .children((d, depth) => depth ? null : d._children)
-      .sort((a, b) => b.name.localeCompare(a.name))
-      .ratio(0.3 * (1 + Math.sqrt(5)))
-      .round(false);
 
     this.state = {
       treeMapScheme: 'anomaly',
@@ -36,6 +30,21 @@ class IncidentsTreeMap extends Component {
       metricModalProps: {},
       currentData: undefined,
     }
+
+    // D3 treemap layout settings.
+    let instanceMetaData = props.instanceMetaData;
+    this.treemap = d3.layout.treemap()
+      .children((d, depth) => depth ? null : d._children)
+      .sort((a,b) => this.sortTile(a,b))
+      .ratio(0.3 * (1 + Math.sqrt(5)))
+      .round(false);
+  }
+// (a, b) => ((instanceMetaData[b.name] && instanceMetaData[b.name]['tagName'])?(instanceMetaData[b.name]['tagName']):b.name).localeCompare((instanceMetaData[a.name] && instanceMetaData[a.name]['tagName'])?(instanceMetaData[a.name]['tagName']):a.name)
+  sortTile(a, b) {
+    let {instanceMetaData} = this.state;
+    let aName = (instanceMetaData[a.name] && instanceMetaData[a.name]['tagName'])?(instanceMetaData[a.name]['tagName']):a.name;
+    let bName = (instanceMetaData[b.name] && instanceMetaData[b.name]['tagName'])?(instanceMetaData[b.name]['tagName']):b.name;
+    return bName.localeCompare(aName);
   }
 
   componentDidMount() {
@@ -180,10 +189,6 @@ class IncidentsTreeMap extends Component {
   @autobind
   getNodeFillColor(d) {
 
-    if ( d.eventType === '- new instance' || d.eventType === '- new container') {
-      return '#88bbee';
-    }
-
     let {instanceStatsJson,treeMapCPUThreshold,treeMapAvailabilityThreshold} = this.state;
     let val = d.score;
     if(val<0){
@@ -194,6 +199,9 @@ class IncidentsTreeMap extends Component {
     let cpuThreshold = parseInt(treeMapCPUThreshold);
     let availabilityThreshold = parseFloat(treeMapAvailabilityThreshold)/100.0;
     if (this.state.treeMapScheme == 'anomaly') {
+      if ( d.eventType === '- new instance' || d.eventType === '- new container') {
+        return '#88bbee';
+      }
       if (val <= 1) {
         if (val < 0)
           val = 0;

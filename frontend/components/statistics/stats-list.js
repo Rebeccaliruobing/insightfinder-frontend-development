@@ -1,7 +1,7 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const StatsList = ({title, list, topK, alt='Everything is normal', duration='1d', order='asc', width='three' }) => {
+const StatsList = ({title, list, topK, alt='Everything is normal', normalValue='-1', duration='1d', order='asc', width='three' }) => {
   const className = "ui statistic "+width+" wide column";
   let sortedList = $.map(list, function(val, key){
       return {
@@ -14,14 +14,18 @@ const StatsList = ({title, list, topK, alt='Everything is normal', duration='1d'
     sortedList = sortedList.reverse();
   }
   let topKList = _.map(sortedList, a => {
-    let key = a.key;
-    if(key[0]!='-'){
-      key = '- ' + key;
+    if(a.key[0]!='-'){
+      a.key = '- ' + a.key;
     }
     // if(key.length>24){
     //   key = key.slice(0,22)+"..";
     // }
-    return key;
+    if(a.val == normalValue){
+      a['style'] = "list omit";
+    } else {
+      a['style'] = "list error";
+    }
+    return a;
   }).slice(0, topK);
   return (
     <div className={className}>
@@ -31,7 +35,7 @@ const StatsList = ({title, list, topK, alt='Everything is normal', duration='1d'
       </div>
         {topKList.length>0 && topKList.map((item, i) => {
           return (
-            <div key={i} className="list error">{item}</div>
+            <div key={i} className={item.style}>{item.key}</div>
           )
         })}
         {topKList.length==0 &&

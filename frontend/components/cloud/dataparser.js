@@ -318,9 +318,13 @@ class DataParser {
               var newhintsStr = "";
               var newhintsIncidentStr = "";
               _.each(newhintsArr,function(h,ih){
-                var parts = h.split(":",2);
+                var parts = h.split(":");
+                var hintsSeries = parts[1];
+                if(parts.length == 3){
+                  hintsSeries = parts[2];
+                }
                 var hintStr = "";
-                _.each(parts[1].split(";"),function(item,index){
+                _.each(hintsSeries.split(";"),function(item,index){
                   let pos0 = item.indexOf(".");
                   let pos1 = item.indexOf("[");
                   let pos2 = item.indexOf("]");

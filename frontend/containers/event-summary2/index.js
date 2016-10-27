@@ -291,7 +291,7 @@ class EventSummary2 extends Component {
           </div>
           <div className="ui vertical segment">
             <div className="ui incidents grid">
-              <div className="row" style={{ height: 528,'paddingTop': '1rem' }}>
+              <div className="row" style={{ height: 528,'paddingTop': '0rem' }}>
                 <div className="seven wide column" style={{ height: 500 }}>
                   <IncidentsList projectName={refreshName} 
                                  projectType={projectType}

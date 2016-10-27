@@ -1,7 +1,7 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const InstanceUptime = ({average, duration='1d', width='two' }) => {
+const InstanceUptime = ({average, type='avg', duration='1d', width='two' }) => {
   const className = "ui statistic "+width+" wide column";
   const averageText = _.isFinite(average) ? (average * 100).toFixed(1).toString() : '-';
   return (
@@ -11,13 +11,14 @@ const InstanceUptime = ({average, duration='1d', width='two' }) => {
         <span className="meta">{duration}</span>
       </div>
       <div className="value">{`${averageText}%`}</div>
-      <div className="label">Avg</div>
+      <div className="label">{type}</div>
     </div>
   )
 };
 
 InstanceUptime.propTypes = {
   average: T.number,
+  type: T.string,
   duration: T.string,
 };
 
