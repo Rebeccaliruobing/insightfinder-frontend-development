@@ -35,12 +35,6 @@ export class DataChart extends React.Component {
   }
   shouldComponentUpdate(nextProps, nextState) {
     let update = shallowCompare(this, nextProps, nextState);
-
-    // Check dateWindow with deep compare, otherwise it will cause loop.
-    if (update && nextProps.dateWindow) {
-      update = !_.isEqual(nextProps.dateWindow, this.props.dateWindow);
-    }
-
     return update;
   }
 

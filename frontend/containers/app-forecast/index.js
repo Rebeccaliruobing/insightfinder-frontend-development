@@ -124,7 +124,7 @@ class AppForecast extends Component {
                   return (
                       <tr key={i} onClick={()=>this.handleAppNameSelected(appName)} className={cx({
                         'active': appName == this.state.selectedAppName
-                      })}>
+                      })} style={{cursor: 'pointer'}}>
                         <td>{appName}</td>
                       </tr>
                   )
