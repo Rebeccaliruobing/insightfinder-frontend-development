@@ -3,7 +3,7 @@ import {Console, Button} from '../../artui/react';
 import {autobind} from 'core-decorators';
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
-import { LiveProjectSelection } from '../../components/selections';
+import { LiveProjectSelection, ForecastIntervalHour } from '../../components/selections';
 import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
 import store from 'store';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
@@ -23,6 +23,7 @@ class AppForecast extends Component {
       projectName: undefined,
       selectedAppName: undefined,
       appNames:[],
+      interval: "4",
     };
   }
 
@@ -41,12 +42,12 @@ class AppForecast extends Component {
 
   @autobind()
   handleAppNameSelected(appName) {
-    const {projectName, data } = this.state;
+    const {projectName, interval, data } = this.state;
     this.setState({
       loading: true, 
       selectedAppName:appName,
     });
-    apis.retrieveAppMetricForecastData(projectName, appName)
+    apis.retrieveAppMetricForecastData(projectName, appName, interval)
       .then(resp => {
         let update = {};
         update.data = resp;
@@ -66,6 +67,7 @@ class AppForecast extends Component {
       loading: true, 
       projectName 
     });
+    let {interval} = this.state;
     apis.retrieveAppNames(projectName)
       .then(resp => {
         this.setState({
@@ -95,8 +97,19 @@ class AppForecast extends Component {
     this.refreshProjectName(projectName);
   }
 
+  @autobind
+  handleIntervalChange(value,interval){
+    let { projectName, selectedAppName } = this.state;
+    this.setState({
+      interval: interval,
+    }, ()=>{
+      this.handleAppNameSelected(selectedAppName);
+    });
+  }
+
+
   render() {
-    let { loading, data, projectName, appNames, selectedAppName } = this.state;
+    let { loading, data, projectName, interval, appNames, selectedAppName } = this.state;
     let refreshName = store.get('appForecaseProjectName')?store.get('appForecaseProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (
@@ -106,6 +119,10 @@ class AppForecast extends Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
+            </div>
+            <div className="field">
+              <label style={{ fontWeight: 'bold' }}>Forecast Interval (hour):</label>
+              <ForecastIntervalHour value={interval} onChange={this.handleIntervalChange} style={{minWidth: 80}}/>
             </div>
             <div className="field">
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
@@ -133,7 +150,7 @@ class AppForecast extends Component {
               </table>
             </div>        
             <div className="thirteen wide column">
-              <LiveAnalysisCharts data={data} loading={loading} enablePublish={false} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
+              <LiveAnalysisCharts data={data} loading={loading} enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
             </div>
           </div>
         </div>

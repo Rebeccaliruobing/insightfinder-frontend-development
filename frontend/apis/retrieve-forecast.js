@@ -36,7 +36,7 @@ export function retrieveAppNames(projectName) {
   });
 }
 
-export function retrieveAppMetricForecastData(projectName, appName) {
+export function retrieveAppMetricForecastData(projectName, appName, interval) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -44,7 +44,7 @@ export function retrieveAppMetricForecastData(projectName, appName) {
     $.ajax({
       type: 'POST',
       url: getEndpoint('appForecast', 1),
-      data: $.param({ userName, token, projectName, appName, operation:'timeseries' }),
+      data: $.param({ userName, token, projectName, appName, interval, operation:'timeseries' }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }

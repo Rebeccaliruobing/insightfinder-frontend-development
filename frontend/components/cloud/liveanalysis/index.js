@@ -58,12 +58,18 @@ class LiveAnalysisCharts extends React.Component {
             showDebug: false,
             startTimestamp: undefined,
             endTimestamp: undefined,
+            isForecast: false,
             tabStates: {
                 rootcause: '',
                 chart: 'active',
                 heatmap: ''
             }
         };
+
+        if(props.isForecast && !!props.isForecast){
+          this.state.isForecast = true;
+          this.state.view = 'list';
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -242,7 +248,7 @@ class LiveAnalysisCharts extends React.Component {
     render() {
 
         let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName, data} = this.props;
-        const { view, columns,tabStates } = this.state;
+        const { view, columns,tabStates,isForecast } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
         freqMockup = freqMockup || [];
@@ -319,7 +325,7 @@ class LiveAnalysisCharts extends React.Component {
                             {projectName!=undefined && <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
                                 <i className="icon cloud"/>Save To Storage
                             </Button>}
-                            <ButtonGroup className="right floated basic icon">
+                            {!isForecast && <ButtonGroup className="right floated basic icon">
                                 <Button onClick={()=> this.setState({ showSettingModal: true })}>
                                     <i className="icon setting"/>
                                 </Button>
@@ -331,7 +337,7 @@ class LiveAnalysisCharts extends React.Component {
                                         onClick={()=>this.setState({ view: 'grid' })}>
                                     <i className="grid layout icon"/>
                                 </Button>
-                            </ButtonGroup>
+                            </ButtonGroup>}
                         </div>
                         <div className="ui vertical segment">
                             { false && <div className="ui pointing secondary menu">

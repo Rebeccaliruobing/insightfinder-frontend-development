@@ -424,6 +424,22 @@ const TreeMapSchemeSelect = (props) => {
   )
 };
 
+const ForecastIntervalHour = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">1</div>
+        <div className="item">2</div>
+        <div className="item">4</div>
+        <div className="item">6</div>
+        <div className="item">12</div>
+        <div className="item">24</div>
+      </div>
+    </Dropdown>
+  )
+};
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -445,4 +461,5 @@ export {
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
   TreeMapSchemeSelect,
+  ForecastIntervalHour,
 };
