@@ -120,10 +120,10 @@ class AppForecast extends Component {
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
-            <div className="field">
+            {false && <div className="field">
               <label style={{ fontWeight: 'bold' }}>Forecast Interval (hour):</label>
               <ForecastIntervalHour value={interval} onChange={this.handleIntervalChange} style={{minWidth: 80}}/>
-            </div>
+            </div>}
             <div className="field">
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </div>

@@ -386,9 +386,11 @@ const IncidentActionTaken = (props) => {
     <Dropdown mode="select" {...props}>
       <i className="dropdown icon"/>
       <div className="menu">
+        <div className="item">ignore</div>
         <div className="item">scale-up</div>
         <div className="item">reboot</div>
         <div className="item">migration</div>
+        <div className="item">custom</div>
       </div>
     </Dropdown>
   )

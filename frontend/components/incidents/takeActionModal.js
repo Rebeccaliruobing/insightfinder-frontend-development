@@ -86,7 +86,8 @@ class TakeActionModal extends React.Component {
   //           })
 
   render() {
-    let { incident, action, instanceId, ...rest} = this.props;
+    let { incident, ...rest} = this.props;
+    let { action, instanceId } = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
     let self = this;
@@ -157,8 +158,16 @@ class TakeActionModal extends React.Component {
             </div>
           </div>
         </div>
+        {action=='custom' && <div className="content" style={{padding:'0 20px'}}>
+          <div>Custom action:</div>
+          <form className="ui reply form">
+            <div className="field">
+              <textarea rows="4"/>
+            </div>
+          </form>
+        </div>}
         <div className="actions">
-          <div className="ui button deny">Ignore This Event</div>
+          <div className="ui button deny">Cancel</div>
           <div className="ui button approve labeled">
             <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
               Take Action
