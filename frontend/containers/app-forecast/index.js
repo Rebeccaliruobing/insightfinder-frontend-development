@@ -150,7 +150,7 @@ class AppForecast extends Component {
               </table>
             </div>        
             <div className="thirteen wide column">
-              <LiveAnalysisCharts data={data} loading={loading} enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
+              <LiveAnalysisCharts data={data} chartType="bar" loading={loading} enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
             </div>
           </div>
         </div>

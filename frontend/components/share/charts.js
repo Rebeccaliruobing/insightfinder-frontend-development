@@ -1,9 +1,9 @@
 import React, {PropTypes as T} from 'react';
-import {Dygraph} from '../../artui/react/dataviz';
 import moment from 'moment'
 import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
+import {Dygraph} from '../../artui/react/dataviz';
 
 export class DataChart extends React.Component {
 
@@ -12,11 +12,13 @@ export class DataChart extends React.Component {
     enableAnnotations: T.bool,
     onDateWindowChange: T.func,
     dateWindow: T.any,
+    chartType: T.string,
   };
 
   static defaultProps = {
     enableTriangleHighlight: true,
-    enableAnnotations: false
+    enableAnnotations: false,
+    chartType: 'line',
   };
 
   constructor(props) {
@@ -64,15 +66,91 @@ export class DataChart extends React.Component {
       }
     }
   }
-  test(){
-    console.log(11);
+
+  @autobind
+  barChartPlotter(e) {
+    var ctx = e.drawingContext;
+    var points = e.points;
+    var y_bottom = e.dygraph.toDomYCoord(0);
+
+    ctx.fillStyle = 'red';
+
+    // Find the minimum separation between x-values.
+    // This determines the bar width.
+    var min_sep = Infinity;
+    for (var i = 1; i < points.length; i++) {
+      var sep = points[i].canvasx - points[i - 1].canvasx;
+      if (sep < min_sep) min_sep = sep;
+    }
+    var bar_width = Math.floor(2.0 / 3 * min_sep);
+
+    // Do the actual plotting.
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
+      var center_x = p.canvasx;
+
+      ctx.fillRect(center_x - bar_width / 2, p.canvasy,
+        bar_width, y_bottom - p.canvasy);
+
+      ctx.strokeRect(center_x - bar_width / 2, p.canvasy,
+        bar_width, y_bottom - p.canvasy);
+    }
   }
+
+  @autobind
+  multiColumnBarPlotter(e) {
+      // We need to handle all the series simultaneously.
+      if (e.seriesIndex !== 0) return;
+
+      var g = e.dygraph;
+      var ctx = e.drawingContext;
+      var sets = e.allSeriesPoints;
+      var y_bottom = e.dygraph.toDomYCoord(0);
+
+      // Find the minimum separation between x-values.
+      // This determines the bar width.
+      var min_sep = Infinity;
+      for (var j = 0; j < sets.length; j++) {
+        var points = sets[j];
+        for (var i = 1; i < points.length; i++) {
+          var sep = points[i].canvasx - points[i - 1].canvasx;
+          if (sep < min_sep) min_sep = sep;
+        }
+      }
+      var bar_width = Math.floor(2.0 / 3 * min_sep);
+
+      var fillColors = [];
+      var strokeColors = g.getColors();
+      console.log(strokeColors);
+      for (var i = 0; i < strokeColors.length; i++) {
+        fillColors.push(strokeColors[i]);
+      }
+
+      for (var j = 0; j < sets.length; j++) {
+        ctx.fillStyle = fillColors[j];
+        ctx.strokeStyle = strokeColors[j];
+        for (var i = 0; i < sets[j].length; i++) {
+          var p = sets[j][i];
+          var center_x = p.canvasx;
+          var x_left = center_x - (bar_width / 2) * (1 - j/(sets.length-1));
+
+          ctx.fillRect(x_left, p.canvasy,
+              bar_width/sets.length, y_bottom - p.canvasy);
+
+          ctx.strokeRect(x_left, p.canvasy,
+              bar_width/sets.length, y_bottom - p.canvasy);
+        }
+      }
+  }
+
   render() {
-    const { data, enableAnnotations, enableTriangleHighlight, onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
+    const { data, enableAnnotations, enableTriangleHighlight, chartType,
+      onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
     const listenDrawCallback = !!onDateWindowChange;
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
+        chartType={chartType}
         axisLabelWidth={45}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
@@ -84,8 +162,8 @@ export class DataChart extends React.Component {
         latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}
-        onZoom={this.test}
         annotations={enableAnnotations ? data.annotations : null}
+        plotter={chartType == 'bar' ? this.barChartPlotter : null}
         onAnnotationClick={this.handleAnnotationClick}
         enableTriangleHighlight={enableTriangleHighlight}
       />
@@ -117,6 +195,7 @@ export class DataGroupCharts extends React.Component {
     view: T.string.isRequired,
     columns: T.string,
     onDateWindowChange: T.func,
+    chartType: T.string,
     dateWindow: T.any,
   };
 
@@ -134,7 +213,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, latestDataTimestamp } = this.props;
+    const { groups, view, columns, latestDataTimestamp, chartType } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -214,6 +293,7 @@ export class DataGroupCharts extends React.Component {
                 <div className="content">
                   <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span></div>
                   <DataChart
+                    chartType={chartType}
                     enableTriangleHighlight={true}
                     data={group}
                     latestDataTimestamp={latestDataTimestamp}
@@ -246,6 +326,7 @@ export class DataGroupCharts extends React.Component {
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
                     <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
                     <DataChart
+                      chartType={chartType}
                       enableTriangleHighlight={true}
                       latestDataTimestamp={latestDataTimestamp}
                       enableAnnotations={true} data={selectedGroup}

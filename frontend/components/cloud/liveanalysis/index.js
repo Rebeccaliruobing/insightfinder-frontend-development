@@ -28,12 +28,14 @@ class LiveAnalysisCharts extends React.Component {
         data: React.PropTypes.object,
         loading: React.PropTypes.bool,
         enablePublish: React.PropTypes.bool,
-        onRefresh: React.PropTypes.func
+        onRefresh: React.PropTypes.func,
+        chartType: React.PropTypes.string,
     };
 
     static defaultProps = {
         loading: true,
         enablePublish: false,
+        chartType: 'line',
         onRefresh: () => {
         }
     };
@@ -247,7 +249,8 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName, data} = this.props;
+        let { loading, onRefresh, enablePublish, enableComments,
+          debugData, timeMockup, freqMockup, projectName, data, chartType} = this.props;
         const { view, columns,tabStates,isForecast } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -366,6 +369,7 @@ class LiveAnalysisCharts extends React.Component {
 
                                     {!!groups &&
                                     <DataGroupCharts
+                                        chartType={chartType}
                                         key={view + '_group_charts'} metricTags={metricTags}
                                         groups={groups} view={view} columns={columns}
                                         latestDataTimestamp={latestDataTimestamp}
