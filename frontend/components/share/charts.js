@@ -73,7 +73,7 @@ export class DataChart extends React.Component {
     var points = e.points;
     var y_bottom = e.dygraph.toDomYCoord(0);
 
-    ctx.fillStyle = 'red';
+    ctx.fillStyle = e.color;
 
     // Find the minimum separation between x-values.
     // This determines the bar width.
