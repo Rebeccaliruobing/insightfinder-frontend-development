@@ -23,7 +23,7 @@ class AppForecast extends Component {
       projectName: undefined,
       selectedAppName: undefined,
       appNames:[],
-      interval: "4",
+      interval: "3",
     };
   }
 
@@ -120,7 +120,7 @@ class AppForecast extends Component {
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
-            {false && <div className="field">
+            {true && <div className="field">
               <label style={{ fontWeight: 'bold' }}>Forecast Interval (hour):</label>
               <ForecastIntervalHour value={interval} onChange={this.handleIntervalChange} style={{minWidth: 80}}/>
             </div>}
