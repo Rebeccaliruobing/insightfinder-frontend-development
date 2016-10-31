@@ -18,12 +18,15 @@ class TakeActionModal extends React.Component {
       projectName: props.projectName,
       action: "ignore",
       instanceId: undefined,
-      actionMap:{}
+      actionMap:{},
+      showCustomAction: false,
+      customAction:undefined,
     };
-    this.state.actionMap["ignore"] = "";
+    this.state.actionMap["ignore"] = "ignore";
     this.state.actionMap["scale-up"] = "coldclone";
     this.state.actionMap["reboot"] = "filterreboot";
     this.state.actionMap["migrate"] = "dummy";
+    this.state.actionMap["custom"] = "custom";
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
@@ -33,12 +36,33 @@ class TakeActionModal extends React.Component {
       projectName: nextProps.projectName,
       action: "ignore",
       instanceId: undefined,
+      showCustomAction: false,
+      customAction:undefined,
     };
   }
 
   handleActionChange(value) {
     this.setState({ action:value });
   }
+
+
+  handleCustomToggle() {
+    let {incident, projectName, showCustomAction, customAction} = this.state;
+    let eventType = incident.rootCauseJson.rootCauseTypes;
+    showCustomAction = !showCustomAction;
+    if(showCustomAction && customAction == undefined){
+      apis.retrieveCustomAction(projectName, eventType).then((resp)=>{
+        console.log(resp);
+        this.setState({
+          customAction:resp.customAction,
+        });
+      });
+    }
+    this.setState({
+      showCustomAction: showCustomAction,
+    });
+  }
+
 
   handleSubmit() {
     let {incident, projectName, instanceId, action} = this.state;
@@ -87,7 +111,7 @@ class TakeActionModal extends React.Component {
 
   render() {
     let { incident, ...rest} = this.props;
-    let { action, instanceId } = this.state;
+    let { action, instanceId, showCustomAction, customAction } = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
     let self = this;
@@ -137,7 +161,11 @@ class TakeActionModal extends React.Component {
           </div>
         </div>
         <div className="content" style={{padding:'0 20px'}}>
-          <h5>Take action on this event:</h5>
+          <h5>Take action on this event:
+            <div className="ui button tiny gray" style={{float:'right'}} onClick={this.handleCustomToggle.bind(this)}>
+              {showCustomAction ? "Hide Custom Action" : "Show Custom Action"}
+            </div>          
+          </h5> 
           <div style={{display:'flex'}}>
             <div className="content" style={{padding:10}}>
               <div>Action</div>
@@ -158,11 +186,12 @@ class TakeActionModal extends React.Component {
             </div>
           </div>
         </div>
-        {action=='custom' && <div className="content" style={{padding:'0 20px'}}>
+        {showCustomAction && <div className="content" style={{padding:'0 20px'}}>
           <div>Custom action:</div>
           <form className="ui reply form">
             <div className="field">
-              <textarea rows="4"/>
+              <textarea value={customAction} rows="4" 
+                        onChange={(e) => this.setState({customAction: e.target.value})}/>
             </div>
           </form>
         </div>}

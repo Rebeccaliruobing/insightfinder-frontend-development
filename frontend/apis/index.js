@@ -5,6 +5,7 @@ import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
 import {retrieveAppNames,retrieveAppMetricForecastData} from './retrieve-forecast';
+import {retrieveCustomAction} from './retrieve-actions';
 
 //
 // When we run frontend on localhost python web server and connect api with different host,
@@ -120,7 +121,8 @@ const apis = {
     retrieveLiveAnalysis: retrieveLiveAnalysis,
     retrieveAppNames: retrieveAppNames,
     retrieveAppMetricForecastData: retrieveAppMetricForecastData,
-
+    retrieveCustomAction: retrieveCustomAction,
+    
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
             requestPost('login', { userName, password }, resolve, reject);

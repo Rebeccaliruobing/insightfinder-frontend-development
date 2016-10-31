@@ -390,7 +390,6 @@ const IncidentActionTaken = (props) => {
         <div className="item">scale-up</div>
         <div className="item">reboot</div>
         <div className="item">migration</div>
-        <div className="item">custom</div>
       </div>
     </Dropdown>
   )
