@@ -130,32 +130,6 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
   };
 }
 
-function buildTimeTable(startTime, endTime, predicatedEndTime, incidents) {
-  const table = [];
-
-  if (!startTime && !endTime && !predicatedEndTime && !incidents) {
-    return table;
-  }
-
-  const start = moment(startTime);
-  const end = moment(endTime);
-  const pend = moment(predicatedEndTime);
-
-  // 1 day, 1* 24 * 60 = 24 * 6 * 10m
-  // 3 day, 3 * 24 * 60 = 24 * 6 * 30mins
-  // 7 day, 7 * 24 * 60 = 28 * 6 * 60mins
-  // 14 day, 14 * 24 * 60 = 28 * 6 * 120min
-
-  return table;
-}
-
-/**
- * Api to retrieve project's live analysis data.
- * @param pname: The name of the project
- * @param mtype: The type of the model
- * @param pvalue: pvalue
- * @param cvalue: cvalue
- */
 export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, version) {
   const userName = store.get('userName');
   const token = store.get('token');
@@ -198,8 +172,6 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, end
           ret['latestDataTimestamp'] = latestTimestamp;
           ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
           ret['incidents'] = incidentList;
-          ret['incidentsTimeTable'] = buildTimeTable(
-            data.startTimestamp, data.endTimestamp, data.predictedEndTime, incidentList);
 
           resolve(ret);
         } catch (e) {
