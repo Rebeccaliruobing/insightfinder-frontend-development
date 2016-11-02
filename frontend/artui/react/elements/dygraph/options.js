@@ -7,7 +7,6 @@
 **/
 
 import {PropTypes} from '../../base';
-
 const options = {
 
   // Annotations
@@ -67,6 +66,7 @@ const options = {
   ylabel: {type: PropTypes.oneOfType([PropTypes.string, PropTypes.element])},
   
   // Configuration
+  // axes: true,
   axes: true,
   plugins: true,
   

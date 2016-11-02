@@ -4,7 +4,7 @@ const baseUrl = window.API_BASE_URL || '/api/v1/';
 import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
-import {retrieveAppNames,retrieveAppMetricForecastData} from './retrieve-forecast';
+import {retrieveAppNames,retrieveAppMetricForecastData,retrieveAppForecastData} from './retrieve-forecast';
 import {retrieveCustomAction} from './retrieve-actions';
 
 //
@@ -121,6 +121,7 @@ const apis = {
     retrieveLiveAnalysis: retrieveLiveAnalysis,
     retrieveAppNames: retrieveAppNames,
     retrieveAppMetricForecastData: retrieveAppMetricForecastData,
+    retrieveAppForecastData: retrieveAppForecastData,
     retrieveCustomAction: retrieveCustomAction,
     
     postLogin(userName, password) {

@@ -167,7 +167,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, latestDataTimestamp, chartType } = this.props;
+    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -215,7 +215,7 @@ export class DataGroupCharts extends React.Component {
               anomalyTag = metricTags[group.metrics];
             }
             let missingTag = "";
-            if(group.sdata.length>0){
+            if((alertMissingData==undefined || alertMissingData==true) && group.sdata.length>0){
               _.each(group.sdata[0],function(mdata,mindex){
                 values.push(0);
               });

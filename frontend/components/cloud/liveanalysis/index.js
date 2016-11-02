@@ -250,7 +250,7 @@ class LiveAnalysisCharts extends React.Component {
     render() {
 
         let { loading, onRefresh, enablePublish, enableComments,
-          debugData, timeMockup, freqMockup, projectName, data, chartType} = this.props;
+          debugData, timeMockup, freqMockup, projectName, data, chartType, alertMissingData} = this.props;
         const { view, columns,tabStates,isForecast } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -319,12 +319,12 @@ class LiveAnalysisCharts extends React.Component {
                                     onClick={() => this.setState({ showComments: true })}>
                                 <i className="icon comments"/>Comments
                             </Button>
-                            <Button className="labeled icon" onClick={() => onRefresh()}>
+                            {!isForecast && <Button className="labeled icon" onClick={() => onRefresh()}>
                                 <i className="icon refresh"/>Refresh
-                            </Button>
-                            <Button className="labeled icon" onClick={() => this.exportData()}>
+                            </Button>}
+                            {!isForecast && <Button className="labeled icon" onClick={() => this.exportData()}>
                                 <i className="icon download"/>Export
-                            </Button>
+                            </Button>}
                             {projectName!=undefined && <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
                                 <i className="icon cloud"/>Save To Storage
                             </Button>}
@@ -354,7 +354,7 @@ class LiveAnalysisCharts extends React.Component {
                             }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
-                                    {!summary && (!groups || groups.length==0) &&
+                                    {(!isFileDetection || !summary) && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
                                     {isFileDetection && !!summary && 
@@ -373,6 +373,7 @@ class LiveAnalysisCharts extends React.Component {
                                         key={view + '_group_charts'} metricTags={metricTags}
                                         groups={groups} view={view} columns={columns}
                                         latestDataTimestamp={latestDataTimestamp}
+                                        alertMissingData={alertMissingData}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />

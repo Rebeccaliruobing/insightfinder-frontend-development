@@ -23,7 +23,10 @@ class AppForecast extends Component {
       projectName: undefined,
       selectedAppName: undefined,
       appNames:[],
-      interval: "3",
+      appObj:{},
+      appCpuJson:{},
+      interval: "24",
+      showErrorMsg: false,
     };
   }
 
@@ -42,46 +45,78 @@ class AppForecast extends Component {
 
   @autobind()
   handleAppNameSelected(appName) {
-    const {projectName, interval, data } = this.state;
+    const { appObj } = this.state;
     this.setState({
       loading: true, 
       selectedAppName:appName,
     });
-    apis.retrieveAppMetricForecastData(projectName, appName, interval)
-      .then(resp => {
-        let update = {};
-        update.data = resp;
-        update.loading = false;
-        this.setState(update);
-      })
-      .catch(msg => {
-        this.setState({ loading: false });
-        console.log(msg);
-        // alert(msg);
-      });
+    let thisData = {};
+    let instanceMetricJson = {};
+    let endDataTimestamp = appObj['endDataTimestamp'];
+    let dataObj = appObj['appForecastData'];
+    instanceMetricJson['latestDataTimestamp'] = endDataTimestamp;
+    thisData['instanceMetricJson'] = instanceMetricJson;
+    if(dataObj){
+      thisData['data'] = dataObj[appName];
+    }
+    this.setState({ 
+      data: thisData,
+      loading: false,
+    });
+  }
+
+  sortAppByCPU(a,b){
+    let {appCpuJson} = this.state;
+    let aid = appCpuJson[a];
+    let bid = appCpuJson[b];
+    if(aid==undefined && bid==undefined){
+      return 0;
+    } else if(aid!=undefined && bid==undefined){
+      return -1;
+    } else if(aid==undefined && bid!=undefined){
+      return 1;
+    } else {
+      if (aid < bid) {
+          return 1;
+      } else if (aid > bid) {
+          return -1;
+      } else {
+        return 0;
+      }
+    }
   }
 
   refreshProjectName(projectName) {
+    let self = this;
     store.set('appForecaseProjectName', projectName);
     this.setState({ 
       loading: true, 
       projectName 
     });
     let {interval} = this.state;
-    apis.retrieveAppNames(projectName)
+    apis.retrieveAppForecastData(projectName)
       .then(resp => {
         this.setState({
           loading: false,
           appNames:resp.appNames,
+          appCpuJson: resp.appCpuJson,
+          appObj: resp.appObj,
         }, ()=>{
-            let appNames = resp.appNames.sort((a,b) => b.localeCompare(a));
+            this.setState({ 
+              showErrorMsg: false,
+            });
+            let appNames = resp.appNames.sort((a,b) => self.sortAppByCPU(a,b));
             if(appNames.length>0){
                 this.handleAppNameSelected(appNames[0]);
             }
         });
       })
       .catch(msg => {
-        this.setState({ loading: false });
+        // reset UI
+        this.setState({ 
+          showErrorMsg: true,
+          loading: false,
+        });
         console.log(msg);
         // alert(msg);
       });
@@ -109,7 +144,7 @@ class AppForecast extends Component {
 
 
   render() {
-    let { loading, data, projectName, interval, appNames, selectedAppName } = this.state;
+    let { loading, data, projectName, interval, appNames, selectedAppName, showErrorMsg } = this.state;
     let refreshName = store.get('appForecaseProjectName')?store.get('appForecaseProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (
@@ -120,7 +155,7 @@ class AppForecast extends Component {
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
-            {true && <div className="field">
+            {false && <div className="field">
               <label style={{ fontWeight: 'bold' }}>Forecast Interval (hour):</label>
               <ForecastIntervalHour value={interval} onChange={this.handleIntervalChange} style={{minWidth: 80}}/>
             </div>}
@@ -128,12 +163,15 @@ class AppForecast extends Component {
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </div>
           </div>
+          {showErrorMsg ?
+          <h3>Forecast data unavailable for this project.</h3>
+          :
           <div className="ui grid">
             <div className="three wide column">
               <table className="ui selectable celled table">
                 <thead>
                   <tr>
-                  <th style={{fontWeight:'bold'}}>Application Names</th>
+                  <th><span style={{fontWeight:'bold'}}>Application Names</span> <br/>(sorted by CPU usage)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -150,9 +188,10 @@ class AppForecast extends Component {
               </table>
             </div>        
             <div className="thirteen wide column">
-              <LiveAnalysisCharts data={data} chartType="bar" loading={loading} enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
+              <LiveAnalysisCharts data={data} chartType="bar" loading={loading} alertMissingData={false} 
+                enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
             </div>
-          </div>
+          </div>}
         </div>
       </Console.Content>
     )

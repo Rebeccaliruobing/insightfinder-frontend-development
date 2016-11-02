@@ -109,11 +109,21 @@ class Dygraph extends Component {
   }
 
   componentDidMount() {
+    // var d_names = ["Sun","Mon", "Tue", "Wed", 
+    // "Thu", "Fri", "Sat"];
 
     if (this._el) {
       const { known: initAttrs, rest } = spreadDygraphProps(this.props, true);
       let { annotations, highlights, selection } = rest;
 
+      // initAttrs.axes =  {
+      //           x:{
+      //             axisLabelFormatter: function(d, gran) {
+      //               var curr_day  = d_names[d.getDay()];
+      //               return curr_day;
+      //             }
+      //           }
+      //       };
       initAttrs.underlayCallback = this.handleUnderlayCallback;
       this._dygraph = new DygraphBase(this._el, this.props.data, initAttrs);
 
