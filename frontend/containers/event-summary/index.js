@@ -78,6 +78,7 @@ class EventSummary extends Component {
     this.setState({
       incidentsTreeMap,
       selectedIncident:incident,
+      treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
     });
   }
