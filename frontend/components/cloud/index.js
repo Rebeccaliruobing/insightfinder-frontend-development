@@ -33,8 +33,8 @@ export const cloudRoute = (
     <Route component={Cloud} path="cloud">
       <IndexRedirect to="monitoring" />
       <Route component={InsightReport} path="insight-report" />
-      <Route component={EventSummary} path="monitoring0" />
-      <Route component={EventSummary2} path="monitoring" />
+      <Route component={EventSummary} path="monitoring" />
+      <Route component={EventSummary2} path="monitoring0" />
       <Route component={AppForecast} path="app-forecast" />
       <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
