@@ -1,17 +1,19 @@
 import React, {Component} from 'react';
-import {Console, Button} from '../../artui/react';
+import store from 'store';
 import {autobind} from 'core-decorators';
+import {Console, Button} from '../../artui/react';
+import DateTimePicker from "../../components/ui/datetimepicker/index";
+
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
-import IncidentsTreeMap from '../../components/incidents/treemap2';
-import { IncidentsList } from '../../components/incidents';
-import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect, TreeMapCPUThresholdSelect,TreeMapAvailabilityThresholdSelect,EventSummaryModelType } from '../../components/selections';
+import {IncidentsList, IncidentsTreeMap} from '../../components/incidents';
+import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect,
+  TreeMapCPUThresholdSelect,
+  TreeMapAvailabilityThresholdSelect,
+  EventSummaryModelType
+} from '../../components/selections';
 import {buildTreemap} from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
-import AnomalySummary from '../../components/cloud/liveanalysis/anomalySummary';
-import store from 'store';
-import DateTimePicker from "../../components/ui/datetimepicker/index";
-import InstanceStatsModal from "../../components/incidents/instanceStatsModal";
 
 class EventSummary2 extends Component {
   static contextTypes = {
@@ -37,7 +39,6 @@ class EventSummary2 extends Component {
       loading: true,
       projectName: undefined,
       showTenderModal: false,
-      showInstanceStatsModal: false,
       selectedIncident: undefined,
       numberOfDays: "1",
       endTime: moment(),
@@ -137,7 +138,6 @@ class EventSummary2 extends Component {
           startTimestamp: data.startTimestamp,
           endTimestamp: data.endTimestamp,
           showTenderModal: false,
-          showInstanceStatsModal: false
         }, ()=>{
             let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
             let incidentDurationThreshold = 15;
@@ -193,22 +193,8 @@ class EventSummary2 extends Component {
         selectedInstance: data.instanceName,
         startTimestamp: data.startTimestamp,
         endTimestamp: data.endTimestamp,
-        showInstanceStatsModal:false,
       });
     }
-  }
-
-  showInstanceChartOld() {
-    let { startTimestamp,endTimestamp,selectedInstance,projectName } = this.state;
-    let params = {
-      projectName: projectName,
-      instanceName: selectedInstance,
-    };
-    if(startTimestamp && endTimestamp){
-      params['startTimestamp'] = startTimestamp;
-      params['endTimestamp'] = endTimestamp;
-    }
-    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
   }
 
   showInstanceChart() {
@@ -248,11 +234,13 @@ class EventSummary2 extends Component {
   }
 
   render() {
-    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType, treeMapCPUThreshold,treeMapAvailabilityThreshold,treeMapScheme,treeMapText, selectedInstance, currentTreemapData} = this.state;
+    let { loading, data, projectName,
+      incidentsTreeMap, endTime, numberOfDays, modelType,
+      treeMapCPUThreshold,treeMapAvailabilityThreshold,
+      treeMapScheme,currentTreemapData} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
-    let instanceStats = (instanceStatsMap && instanceStatsMap[selectedInstance])? instanceStatsMap[selectedInstance] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
@@ -294,11 +282,11 @@ class EventSummary2 extends Component {
             <div className="ui incidents grid">
               <div className="row" style={{ height: 528,'paddingTop': '0rem' }}>
                 <div className="seven wide column" style={{ height: 500 }}>
-                  <IncidentsList projectName={refreshName} 
+                  <IncidentsList projectName={refreshName}
                                  projectType={projectType}
-                                 endTime={endTime} 
-                                 numberOfDays={numberOfDays} 
-                                 modelType={modelType} 
+                                 endTime={endTime}
+                                 numberOfDays={numberOfDays}
+                                 modelType={modelType}
                                  onIncidentSelected={this.handleIncidentSelected}
                                  incidents={data.incidents}
                                  causalDataArray={data.causalDataArray}
@@ -326,7 +314,7 @@ class EventSummary2 extends Component {
                     All Metric Chart
                   </Button>
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} numberOfDays={numberOfDays} 
-                                    instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme} 
+                                    instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
                                     feedbackData={this.feedbackData} currentData={currentTreemapData} />
                 </div>
@@ -340,33 +328,9 @@ class EventSummary2 extends Component {
                       startTimestamp={latestTimestamp}
                       onClose={() => this.setState({ showTenderModal: false })}/>
         }
-        { this.state.showInstanceStatsModal && instanceStats && 
-            <InstanceStatsModal instanceName={selectedInstance} instanceStats={instanceStats}
-                      dur={numberOfDays} 
-                      onClose={() => this.setState({ showInstanceStatsModal: false })}/>
-        }
       </Console.Content>
     )
   }
 }
-
-// <Button className={treeMapScheme?"grey":"orange button"} style={{'marginRight': '0px','borderRadius': '3px 0 0 3px'}} onClick={(e)=>{
-//                       e.stopPropagation();
-//                       this.setState({
-//                       treeMapScheme: !treeMapScheme,
-//                       treeMapText: (treeMapScheme)?"Utilization":"Anomaly"
-//                       });
-//                   }}>
-//                     Anomalies
-//                   </Button>
-//                   <Button className={treeMapScheme?"orange button":"grey"} style={{'borderRadius': '0px 3px 3px 0'}} onClick={(e)=>{
-//                       e.stopPropagation();
-//                       this.setState({
-//                       treeMapScheme: !treeMapScheme,
-//                       treeMapText: (treeMapScheme)?"Utilization":"Anomaly"
-//                       });
-//                   }}>
-//                     CPU Utilization
-//                   </Button>
 
 export default EventSummary2;

@@ -80,7 +80,8 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showMetricChart(d) {
-
+    
+    const numberOfDays = this.props.numberOfDays;
     const { startTimestamp, endTimestamp } = this.props.data || {};
     const params = {
       projectName: d['projectName'],
@@ -89,6 +90,7 @@ class IncidentsTreeMap extends Component {
       metricAvg: (this.props['instanceStatsJson'] && this.props['instanceStatsJson'][d['instanceName']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson']  && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']]['avg']),
       eventStartTime: d['eventStartTime'],
       eventEndTime: d['eventEndTime'],
+      numberOfDays,
     };
     if (startTimestamp && endTimestamp) {
       params['startTimestamp'] = startTimestamp;
@@ -381,7 +383,6 @@ class IncidentsTreeMap extends Component {
   }
 
   render() {
-    let numberOfDays = this.props['numberOfDays'];
     const { faux, showMetricModal, metricModalProps } = this.state;
     return (
       <div className="incidents treemap" style={{ marginTop: 10 }}>
@@ -389,7 +390,7 @@ class IncidentsTreeMap extends Component {
           {faux}
         </div>
         { showMetricModal &&
-        <MetricModal {...metricModalProps} numberOfDays={numberOfDays} onClose={this.hideMetricModal}/>
+        <MetricModal {...metricModalProps} onClose={this.hideMetricModal}/>
         }
       </div>
     )

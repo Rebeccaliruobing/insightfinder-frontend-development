@@ -315,7 +315,7 @@ class EventSummary extends Component {
                     }}>
                     All Metric Chart
                   </Button>
-                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} numberOfDays={numberOfDays} 
                                     instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
                                     feedbackData={this.feedbackData} currentData={currentTreemapData} />

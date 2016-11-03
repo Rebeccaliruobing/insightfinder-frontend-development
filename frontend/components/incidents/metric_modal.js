@@ -69,13 +69,12 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose, eventEndTime, eventStartTime, numberOfDays } = this.props;
+    const { onClose, eventEndTime, eventStartTime, metricAvg, numberOfDays } = this.props;
     const { data,showErrorMsg,loading } = this.state;
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
     if(metricAvg!=undefined){
-      // chartLabel = ' (' + numberOfDays + 'd avg: ' + metricAvg.toPrecision(3) + ')';
-      chartLabel = ' (avg: ' + metricAvg.toPrecision(3) + ')';
+      chartLabel = ' (' + numberOfDays + 'd avg: ' + metricAvg.toPrecision(3) + ')';
     } 
     return (
       <Modal closable={true} onClose={onClose}>
