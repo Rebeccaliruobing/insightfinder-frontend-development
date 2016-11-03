@@ -126,8 +126,14 @@ class IncidentsTreeMap extends Component {
       }
       d.score = s;
       if (d.type === 'instance') {
-        d.avg_cpu = Math.log10(stats[d.instanceName]['AvgCPUUtilization'] * 100);
-        d.avg_up = Math.log10(stats[d.instanceName]['AvgInstanceUptime'] * 1000);
+        d.avg_cpu = 0;
+        d.avg_avail = 0;
+        if(stats[d.instanceName] && stats[d.instanceName]['AvgCPUUtilization']){
+          d.avg_cpu = Math.log10(stats[d.instanceName]['AvgCPUUtilization'] * 100);
+        }
+        if(stats[d.instanceName] && stats[d.instanceName]['AvgInstanceUptime']){
+          d.avg_avail = Math.log10(stats[d.instanceName]['AvgInstanceUptime'] * 1000);
+        }
       }
       return s;
     };
@@ -149,7 +155,7 @@ class IncidentsTreeMap extends Component {
       if (d.type === 'instance' && schema === 'cpu') {
         d.value = d.avg_cpu;
       } else if(d.type === 'instance' && schema === 'availability'){
-        d.value = d.avg_up;
+        d.value = d.avg_avail;
       } else {
         if (d._children) {
           d.value = val;
@@ -214,8 +220,10 @@ class IncidentsTreeMap extends Component {
         gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
       }
     } else if (schema == 'cpu') {
-      const overAvg = stats[d.instanceName] &&
-        cpuThreshold >= stats[d.instanceName]['AvgCPUUtilization'];
+      let overAvg = false;
+      if(stats[d.instanceName] && stats[d.instanceName]['AvgCPUUtilization']){
+        overAvg = cpuThreshold >= stats[d.instanceName]['AvgCPUUtilization'];
+      }
       if (d.type === 'metric') {
         // For metric, display grey for non-cpu related metrics.
         if (d.name.toLowerCase().indexOf('cpu') >= 0) {
@@ -227,8 +235,10 @@ class IncidentsTreeMap extends Component {
         return overAvg ? this.colors.blue : this.colors.green;
       }
     } else if (schema == 'availability') {
-      const overAvg = stats[d.instanceName] &&
-        availabilityThreshold >= stats[d.instanceName]['AvgInstanceUptime'];
+      let overAvg = false;
+      if(stats[d.instanceName] && stats[d.instanceName]['AvgInstanceUptime']){
+        overAvg = availabilityThreshold >= stats[d.instanceName]['AvgInstanceUptime'];
+      }
       return overAvg ? this.colors.yellow : this.colors.green;
     }
     return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
@@ -247,7 +257,7 @@ class IncidentsTreeMap extends Component {
    */
   setTreemap(data, props) {
     const schema = props['treeMapScheme'] || this.props['treeMapScheme'];
-    const meta = props['instanceStatsJson'] || this.props['instanceMetaData'];
+    const meta = props['instanceMetaData'] || this.props['instanceMetaData'];
     const stats = props['instanceStatsJson'] || this.props['instanceStatsJson'];
 
     const navHeight = this.navHeight;
@@ -333,31 +343,45 @@ class IncidentsTreeMap extends Component {
     } else if (schema == 'cpu') {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
-        .append("title").text(d => ((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (meta[d.name] ? 'Average CPU Utilization: ' + (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : ''));
+        .append("title").text(d => (stats[d.name]&&stats[d.name]['AvgCPUUtilization'])?(((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average CPU Utilization: ' + (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')):'');
     } else if (schema == 'availability') {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
-        .append("title").text(d => ((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (meta[d.name] ? 'Average Instance Availability: ' + (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : ''));
+        .append("title").text(d => (stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? (((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average Instance Availability: ' + (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')):'');
     }
 
     g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d, props));
-    g.append("text").attr("dy", ".75em").text(
-      d => ((meta[d.name] && meta[d.name]['tagName']) ?
-        (this.chopString(meta[d.name]['tagName'], 8)) : d.name)
-    ).call(t => {
-      t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
-    });
-
     if (schema == 'anomaly') {
+      g.append("text").attr("dy", ".75em").text(
+        d => ((meta[d.name] && meta[d.name]['tagName']) ?
+          (this.chopString(meta[d.name]['tagName'], 8)) : d.name)
+      ).call(t => {
+        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+      });
+
       g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType, 10)).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
     } else if (schema == 'cpu') {
-      g.append("text").attr("dy", ".75em").text(d => (stats[d.name] ? (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')).call(t => {
+      g.append("text").attr("dy", ".75em").text(
+        d => ((stats[d.name]&&stats[d.name]['AvgCPUUtilization']) ? ((meta[d.name] && meta[d.name]['tagName']) ?
+          (this.chopString(meta[d.name]['tagName'], 8)) : d.name) : '')
+      ).call(t => {
+        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+      });
+
+      g.append("text").attr("dy", ".75em").text(d => ((stats[d.name]&&stats[d.name]['AvgCPUUtilization']) ? (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
     } else if (schema == 'availability') {
-      g.append("text").attr("dy", ".75em").text(d => (stats[d.name] ? (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')).call(t => {
+      g.append("text").attr("dy", ".75em").text(
+        d => ((stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? ((meta[d.name] && meta[d.name]['tagName']) ?
+          (this.chopString(meta[d.name]['tagName'], 8)) : d.name) : '')
+      ).call(t => {
+        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+      });
+      
+      g.append("text").attr("dy", ".75em").text(d => ((stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
     }

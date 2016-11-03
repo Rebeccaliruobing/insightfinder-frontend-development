@@ -19,7 +19,6 @@ class TakeActionModal extends React.Component {
       action: "ignore",
       instanceId: undefined,
       actionMap:{},
-      showCustomAction: false,
       customAction:undefined,
     };
     this.state.actionMap["ignore"] = "ignore";
@@ -36,7 +35,6 @@ class TakeActionModal extends React.Component {
       projectName: nextProps.projectName,
       action: "ignore",
       instanceId: undefined,
-      showCustomAction: false,
       customAction:undefined,
     };
   }
@@ -46,11 +44,10 @@ class TakeActionModal extends React.Component {
   }
 
 
-  handleCustomToggle() {
-    let {incident, projectName, showCustomAction, customAction} = this.state;
+  handleTriageSave() {
+    let {incident, projectName, customAction} = this.state;
     let eventType = incident.rootCauseJson.rootCauseTypes;
-    showCustomAction = !showCustomAction;
-    if(showCustomAction && customAction == undefined){
+    if(customAction == undefined){
       apis.retrieveCustomAction(projectName, eventType).then((resp)=>{
         console.log(resp);
         this.setState({
@@ -58,9 +55,6 @@ class TakeActionModal extends React.Component {
         });
       });
     }
-    this.setState({
-      showCustomAction: showCustomAction,
-    });
   }
 
 
@@ -111,7 +105,7 @@ class TakeActionModal extends React.Component {
 
   render() {
     let { incident, ...rest} = this.props;
-    let { action, instanceId, showCustomAction, customAction } = this.state;
+    let { action, instanceId, customAction } = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
     let self = this;
@@ -159,13 +153,9 @@ class TakeActionModal extends React.Component {
               </tbody>
             </table>
           </div>
-        </div>
+        </div><hr/>
         <div className="content" style={{padding:'0 20px'}}>
-          <h5>Take action on this event:
-            <div className="ui button tiny gray" style={{float:'right'}} onClick={this.handleCustomToggle.bind(this)}>
-              {showCustomAction ? "Hide Custom Action" : "Show Custom Action"}
-            </div>          
-          </h5> 
+          <h5>Take action on this event: </h5> 
           <div style={{display:'flex'}}>
             <div className="content" style={{padding:10}}>
               <div>Action</div>
@@ -185,23 +175,21 @@ class TakeActionModal extends React.Component {
               </Dropdown>
             </div>
           </div>
-        </div>
-        {showCustomAction && <div className="content" style={{padding:'0 20px'}}>
-          <div>Custom action:</div>
+            <div className="ui button orange" style={{float:'right', marginTop:'-40px'}} onClick={this.handleSubmit.bind(this)}>
+              Take Action
+            </div>
+        </div><hr/>
+        <div className="content" style={{padding:'0 20px'}}>
+          <h5>Triage history:</h5>
           <form className="ui reply form">
             <div className="field">
               <textarea value={customAction} rows="4" 
                         onChange={(e) => this.setState({customAction: e.target.value})}/>
-            </div>
+            </div>   
           </form>
-        </div>}
-        <div className="actions">
-          <div className="ui button deny">Cancel</div>
-          <div className="ui button approve labeled">
-            <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
-              Take Action
-            </div>
-          </div>
+            <div className="ui button orange" style={{float:'right'}} onClick={this.handleTriageSave.bind(this)}>
+              Save Triage
+            </div> 
         </div>
       </Modal>
       );

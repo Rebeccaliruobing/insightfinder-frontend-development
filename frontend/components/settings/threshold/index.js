@@ -41,6 +41,7 @@ export default class ThresholdSettings extends React.Component {
             },
             data: {},
             tempSharedUsernames: '',
+            learningSkippingPeriod:'',
             metricSettings: [],
             episodeList: [],
             wordList: [],
@@ -158,6 +159,13 @@ export default class ThresholdSettings extends React.Component {
         }
     }
 
+    handleLearningSkippingPeriodChange(e) {
+        let v = e.target.value;
+        this.setState({
+            data: Object.assign({}, this.state.data, {sharedUsernames: JSON.stringify(v.split(","))})
+        });
+    }
+
     handleSharingChange(e) {
         let v = e.target.value;
         this.setState({
@@ -214,7 +222,7 @@ export default class ThresholdSettings extends React.Component {
 
     render() {        
         let labelStyle = {};
-        let {data, tempSharedUsernames, loading, metricSettings,episodeList,wordList,indexLoading,tabStates} = this.state;
+        let {data, tempSharedUsernames,learningSkippingPeriod, loading, metricSettings,episodeList,wordList,indexLoading,tabStates} = this.state;
         let {dashboardUservalues} = this.context;
         let {projectModelAllInfo, projectSettingsAllInfo, projectString} = dashboardUservalues;
         let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
@@ -278,6 +286,18 @@ export default class ThresholdSettings extends React.Component {
                                         <input key={data.projectName} type="text"
                                                value={tempSharedUsernames}
                                                onChange={this.handleSharingChange.bind(this)}/>
+                                    </div>
+                                </div>
+                            </div>}
+                            {!isLogProject && <div className="wide column">
+                                <h3>Learning Skipping Period: <span style={{fontSize: '0.8em', color: '#666'}}>(example format...)</span>
+                                </h3>
+
+                                <div className="field">
+                                    <div className="ui input">
+                                        <input key={data.projectName} type="text"
+                                               value={learningSkippingPeriod}
+                                               onChange={this.handleLearningSkippingPeriodChange.bind(this)}/>
                                     </div>
                                 </div>
                             </div>}

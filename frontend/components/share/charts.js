@@ -108,7 +108,9 @@ export class DataChart extends React.Component {
     if (chartType === 'bar' && data.sdata && data.sname) {
       const yname = data.sname[1];
       const annotations = [];
-      _.each(data.sdata, value => {
+      // Skip the last one to make annotation looks better.
+      for(let i = 0; i < data.sdata.length - 1; ++i) {
+        const value = data.sdata[i];
         const x = moment(value[0]);
         const wd = x.weekday();
         annotations.push({
@@ -117,7 +119,7 @@ export class DataChart extends React.Component {
           shortText: days[wd][0],
           text: days[wd][1],
         });
-      });
+      }
 
       return annotations
     }

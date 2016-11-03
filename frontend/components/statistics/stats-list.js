@@ -1,7 +1,7 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const StatsList = ({title, list, topK, alt='Everything is normal', normalValue='-1', duration='1d', order='asc', width='three' }) => {
+const StatsList = ({title, list, topK, normalValue='-1', duration='1d', order='asc', valFormat='', valMultiplier=1, width='three' }) => {
   const className = "ui statistic "+width+" wide column";
   let sortedList = $.map(list, function(val, key){
       return {
@@ -27,6 +27,7 @@ const StatsList = ({title, list, topK, alt='Everything is normal', normalValue='
     }
     return a;
   }).slice(0, topK);
+  let alt='Everything is normal';
   return (
     <div className={className}>
       <div>
@@ -34,8 +35,17 @@ const StatsList = ({title, list, topK, alt='Everything is normal', normalValue='
         <span className="meta">{duration}</span>
       </div>
         {topKList.length>0 && topKList.map((item, i) => {
+          let val = '';
+          if(valFormat=='frequency'){
+            val = ' (x' + item.val + ')';
+          } else if(valFormat=='duration'){
+            val = ' (' + item.val + ' min)';
+          } else if(valFormat=='percentage'){
+            let value = item.val * valMultiplier;
+            val = ' (' + value.toFixed(1) + '%)';
+          }
           return (
-            <div key={i} className={item.style}>{item.key}</div>
+            <div key={i} className={item.style}>{item.key + val}</div>
           )
         })}
         {topKList.length==0 &&
