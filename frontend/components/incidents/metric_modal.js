@@ -69,7 +69,7 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose, metricAvg, numberOfDays } = this.props;
+    const { onClose, eventEndTime, eventStartTime, numberOfDays } = this.props;
     const { data,showErrorMsg,loading } = this.state;
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
@@ -89,7 +89,7 @@ class MetricModal extends React.Component {
             <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
             }
             {data  &&
-            <DataChart data={data} addLabel={metricAvg}/>
+            <DataChart data={data} eventStartTime={eventStartTime} eventEndTime={eventEndTime} addLabel={metricAvg} />
             }
           </div>
         }

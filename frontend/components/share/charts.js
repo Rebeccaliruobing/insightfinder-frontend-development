@@ -1,9 +1,9 @@
-import React, {PropTypes as T} from 'react';
-import moment from 'moment'
-import _ from 'lodash';
-import shallowCompare from 'react-addons-shallow-compare';
-import {autobind} from 'core-decorators';
-import {Dygraph} from '../../artui/react/dataviz';
+import React, {PropTypes as T} from "react";
+import moment from "moment";
+import _ from "lodash";
+import shallowCompare from "react-addons-shallow-compare";
+import {autobind} from "core-decorators";
+import {Dygraph} from "../../artui/react/dataviz";
 
 export class DataChart extends React.Component {
 
@@ -89,23 +89,57 @@ export class DataChart extends React.Component {
       var p = points[i];
       var center_x = p.canvasx;
 
-      ctx.fillRect(center_x - bar_width / 2, p.canvasy,
-        bar_width, y_bottom - p.canvasy);
-
-      ctx.strokeRect(center_x - bar_width / 2, p.canvasy,
-        bar_width, y_bottom - p.canvasy);
+      ctx.fillRect(center_x, p.canvasy, bar_width, y_bottom - p.canvasy);
+      ctx.strokeRect(center_x, p.canvasy, bar_width, y_bottom - p.canvasy);
     }
+  }
+
+  @autobind
+  setWeekdaysForBarChar() {
+    const {data, chartType} = this.props;
+
+    const days = [
+      ['Su', 'Sunday'], ['Mo', 'Monday'],
+      ['Tu', 'Tuesday'], ['We', 'Wednesday'],
+      ['Th', 'Thursday'], ['Fr', 'Friday'],
+      ['Sa', 'Saturday']
+    ];
+
+    if (chartType === 'bar' && data.sdata && data.sname) {
+      const yname = data.sname[1];
+      const annotations = [];
+      // Skip the last one to make annotation looks better.
+      for(let i = 0; i < data.sdata.length - 1; ++i) {
+        const value = data.sdata[i];
+        const x = moment(value[0]);
+        const wd = x.weekday();
+        annotations.push({
+          series: yname,
+          x: x.valueOf(),
+          shortText: days[wd][0],
+          text: days[wd][1],
+        });
+      }
+
+      return annotations
+    }
+
+    return data.annotations;
   }
 
   render() {
     const { data, enableAnnotations, enableTriangleHighlight, chartType,
-      onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
+      onDateWindowChange, dateWindow,latestDataTimestamp,
+      eventEndTime, eventStartTime,
+    } = this.props;
+    const annotations = this.setWeekdaysForBarChar(data);
     const listenDrawCallback = !!onDateWindowChange;
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
         chartType={chartType}
-        axisLabelWidth={45}
+        className={chartType}
+        axisLabelWidth={55}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
@@ -114,12 +148,14 @@ export class DataChart extends React.Component {
         ylabel={data.unit}
         labels={data.sname}
         highlights={data.highlights}
+        highlightStartTime={eventStartTime}
+        highlightEndTime={eventEndTime}
         latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}
-        annotations={enableAnnotations ? data.annotations : null}
+        annotations={enableAnnotations || chartType === 'bar' ? annotations : null}
         plotter={chartType == 'bar' ? this.barChartPlotter : null}
-        onAnnotationClick={this.handleAnnotationClick}
+        onAnnotationClick={chartType === 'bar' ? null : this.handleAnnotationClick}
         enableTriangleHighlight={enableTriangleHighlight}
       />
     )

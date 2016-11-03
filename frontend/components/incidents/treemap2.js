@@ -87,6 +87,8 @@ class IncidentsTreeMap extends Component {
       metricName: d['name'],
       instanceName: d['instanceName'],
       metricAvg: (this.props['instanceStatsJson'] && this.props['instanceStatsJson'][d['instanceName']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson']  && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']]['avg']),
+      eventStartTime: d['eventStartTime'],
+      eventEndTime: d['eventEndTime'],
     };
     if (startTimestamp && endTimestamp) {
       params['startTimestamp'] = startTimestamp;

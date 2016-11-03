@@ -305,7 +305,7 @@
     line-height: 12px;
   }
   .dygraph-axis-label-y {
-    width: 35px;
+    width: 55px;
   }
 }
 
@@ -449,4 +449,16 @@
 .in-button{
   box-shadow: inset 0 3px 3px rgba(0,0,0,0.2) !important;
   background-color: #CC511E !important;;
+}
+
+.ui.bar.graph {
+  .dygraphDefaultAnnotation {
+    width: 24px !important;
+    transform: translateX(7px);
+
+    &[title='Sunday'] {
+      color: #F2711C !important;
+      border-color: #F2711C !important;
+    }
+  }
 }

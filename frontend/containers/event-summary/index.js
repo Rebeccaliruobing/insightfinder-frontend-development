@@ -70,7 +70,7 @@ class EventSummary extends Component {
       let stats = incident.instanceMetricJson || {};
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
-      incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident.rootCauseByInstanceJson);
+      incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
     } else {
       let caption = projectName + " (" + numberOfDays + "d)";
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);

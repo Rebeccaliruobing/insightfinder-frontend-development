@@ -4,12 +4,15 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-export function buildTreemap(projectName, incidentName, statistics, anomaliesList, rootCauseByInstanceJson) {
+export function buildTreemap(projectName, incidentName, statistics, anomaliesList, incident) {
 
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
 
   const root = [];
+  const rootCauseByInstanceJson = incident ? (incident['rootCauseByInstanceJson'] || {}) : {};
+  const eventStartTime = incident ? incident['startTimestamp'] : null;
+  const eventEndTime = incident ? incident['endTimestamp'] : null;
 
   // FIXME: instances, metrics is a string instead of json array.
   const insts = _.filter((statistics['instances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
@@ -31,7 +34,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     const children = _.map(metrics, (m) => {
       const mn = m.trim();
       const val = parseFloat(anomalies[mn]);
-      let eventType1 = (rootCauseByInstanceJson&&rootCauseByInstanceJson[mn])?rootCauseByInstanceJson[mn]+"":"";
+      let eventType1 = rootCauseByInstanceJson[mn] ? rootCauseByInstanceJson[mn]+"":"";
       let pos1 = eventType1.indexOf(":");
       if(pos1>0){
         // remove repeated instance name
@@ -45,6 +48,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         projectName: projectName,
         instanceName: inst,
         name: mn,
+        eventStartTime,
+        eventEndTime,
         value: 1,
         text: _.isFinite(val) ? val.toFixed(2) : '',
         score: _.isFinite(val) ? val : 0.0,
@@ -53,7 +58,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     });
 
     if (isContainer) {
-      let eventType2 = (rootCauseByInstanceJson&&rootCauseByInstanceJson[inst])?rootCauseByInstanceJson[inst]+"":"";
+      let eventType2 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
       let pos2 = eventType2.indexOf(":");
       if(pos2>0){
         // remove repeated instance name
@@ -74,7 +79,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
       // Find the instance by name, and add container to children.
       let instance = _.find(root, o => o.name === iname);
       if (!instance) {
-        let eventType3 = (rootCauseByInstanceJson&&rootCauseByInstanceJson[inst])?rootCauseByInstanceJson[inst]+"":"";
+        let eventType3 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
         let pos3 = eventType3.indexOf(":");
         if(pos3>0){
           // remove repeated instance name
@@ -97,7 +102,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         instance.children.push(container);
       }
     } else {
-      let eventType4 = (rootCauseByInstanceJson&&rootCauseByInstanceJson[inst])?rootCauseByInstanceJson[inst]+"":"";
+      let eventType4 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
       let pos4 = eventType4.indexOf(":");
       if(pos4>0){
         // remove repeated instance name
