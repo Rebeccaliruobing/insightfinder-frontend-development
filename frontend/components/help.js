@@ -35,7 +35,8 @@ export default class Help extends React.Component {
                 <i className="dashboard icon"></i>
                 <h3>Dashboard</h3>
                 <Link to="/cloud/monitoring" className="item">&bull; View realtime anomaly detection and root cause analysis results.</Link>
-                <Link to="/cloud/behavior-change-detection" className="item">&bull; View system behavior change in behavior change detection.</Link>
+                <Link to="/cloud/app-forecast" className="item">&bull; View application level forecast for resource planning.</Link>
+                <Link to="/cloud/incident-log-analysis" className="item">&bull; View log analysis for patterns and anomalies in log.</Link>
               </div>
             </div>
             <div className="column">

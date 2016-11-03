@@ -4,6 +4,7 @@ import moment from 'moment';
 import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
 import store from 'store';
+import WaringButton from '../../cloud/monitoring/waringButton';
 
 import "./threshold.less";
 import apis from '../../../apis';
@@ -41,7 +42,7 @@ export default class ThresholdSettings extends React.Component {
             },
             data: {},
             tempSharedUsernames: '',
-            learningSkippingPeriod:'',
+            tempLearningSkippingPeriod:'',
             metricSettings: [],
             episodeList: [],
             wordList: [],
@@ -134,7 +135,8 @@ export default class ThresholdSettings extends React.Component {
             metricSettings: metricSettings,
             data: data,
             tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
-            loading: projectSetting['fileProjectType'] == 0
+            tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+            loading: projectSetting['fileProjectType'] == 0,
         }, ()=> {
             projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null
         });
@@ -162,7 +164,8 @@ export default class ThresholdSettings extends React.Component {
     handleLearningSkippingPeriodChange(e) {
         let v = e.target.value;
         this.setState({
-            data: Object.assign({}, this.state.data, {sharedUsernames: JSON.stringify(v.split(","))})
+            tempLearningSkippingPeriod: v,
+            data: Object.assign({}, this.state.data, {learningSkippingPeriod: v})
         });
     }
 
@@ -220,9 +223,84 @@ export default class ThresholdSettings extends React.Component {
         }
     }
 
+
+    fileUploadRef(r) {
+        $(ReactDOM.findDOMNode(r))
+            .fileupload({
+                dataType: 'json',
+                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/wordMap.csv`,
+                sequentialUploads: true,
+                multipart: false
+            })
+            .bind('fileuploadadd', (e, data) => {
+                this.setState({settingLoading: true, projectName: data.files[0]['name']});
+            })
+            .bind('fileuploadprogress', (e, data) => {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                this.setState({settingLoading: true});
+            })
+            .bind('fileuploadfail', (e, data) => {
+                var resp = data.response().jqXHR.responseJSON;
+                this.setState({settingLoading: false});
+            })
+            .bind('fileuploaddone', (e, data) => {
+                var resp = data.response().jqXHR.responseJSON;
+                this.setState({
+                    projectHintMapFilename: data['data']['name'],
+                    data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
+                    settingLoading: false
+                });
+            });
+
+    }
+
+    handleSaveProjectSetting() {
+        let {projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename,} = this.state.data;
+        let {tempSharedUsernames,data} = this.state;
+        this.setState({settingLoading: true}, ()=> {
+            apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
+                    if(!resp.success){
+                        window.alert(resp.message);
+                    }
+                    this.setState({settingLoading: false}, this.context.root.loadData)
+            });
+        });
+    }
+
+    handleSaveMapArrSetting() {
+        let selectedIndexArr = [];
+        $('input[name="indexCheckEpisode"]:checked').each(function () {
+            selectedIndexArr.push($(this).data('id'));
+        });
+        $('input[name="indexCheckWord"]:checked').each(function () {
+            selectedIndexArr.push($(this).data('id'));
+        });
+        this.setState({indexLoading: true}, ()=> {
+            apis.postDashboardUserValuesMapArr('updatefrequencyvector', this.state.data.projectName,JSON.stringify(selectedIndexArr)
+            ).then((resp)=> {
+                    if(resp.success){
+                        window.alert("Interesting patterns updated.");
+                    }
+                    this.setState({indexLoading: false});
+            });
+        });
+
+    }
+
+    handleSaveMetricSetting() {
+        this.setState({uservaluesLoading: true}, ()=> {
+            apis.postDashboardUserValues('updateprojsettings', {
+                projectName: this.state.data.projectName,
+                projectSettings: JSON.stringify(this.state.metricSettings)
+            }).then((resp)=> {
+                this.setState({uservaluesLoading: false}, this.context.root.loadData)
+            });
+        });
+    }
+
     render() {        
         let labelStyle = {};
-        let {data, tempSharedUsernames,learningSkippingPeriod, loading, metricSettings,episodeList,wordList,indexLoading,tabStates} = this.state;
+        let {data, tempSharedUsernames,tempLearningSkippingPeriod, loading, metricSettings,episodeList,wordList,indexLoading,tabStates} = this.state;
         let {dashboardUservalues} = this.context;
         let {projectModelAllInfo, projectSettingsAllInfo, projectString} = dashboardUservalues;
         let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
@@ -236,15 +314,59 @@ export default class ThresholdSettings extends React.Component {
                     </div>
                     <div className="ui vertical segment">
                         <div className={cx('ui grid two columns form', {'loading': !!this.state.settingLoading})}>
-
                             <div className="wide column">
-                                <h3>Real-time Report Alerts</h3>
-
                                 <div className="field">
-                                    <label style={labelStyle}>Project Name</label>
+                                    <h3>Project Name</h3>
                                     <ProjectSelection key={data.projectName} value={data.projectName}
                                                       onChange={this.handleProjectChange.bind(this)}/>
                                 </div>
+                                <br /><hr />
+                            </div>
+                            <div className="wide column">
+                                <div className="field">
+                                    <h3>Project Type</h3>
+                                    <div className="ui input">
+                                        <input type="text" readOnly={true} value={data.projectType}/>
+                                    </div>
+                                </div>
+                                <br /><hr />
+                            </div>
+                            {!isLogProject && <div className="wide column">
+                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
+                                </h3>
+                                <div className="field">
+                                    <div className="ui input">
+                                        <input key={data.projectName} type="text"
+                                               value={tempSharedUsernames}
+                                               onChange={this.handleSharingChange.bind(this)}/>
+                                    </div>
+                                </div>
+                                <div className="wide column">
+                                    <Button className="blue"
+                                            onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
+                                </div>
+                                <br /><hr />
+                            </div>}
+                            {!isLogProject && <div className="wide column">
+                                <h3>Learning Skipping Period:                                 
+                                    <WaringButton labelStyle={labelStyle} labelTitle=""
+                                          labelSpan="eg. 'day-of-week:saturday,sunday' or 'time:1am-7am'"/>
+                                </h3>
+                                <div className="field">
+                                    <div className="ui input">
+                                        <input key={data.projectName} type="text"
+                                               value={tempLearningSkippingPeriod}
+                                               onChange={this.handleLearningSkippingPeriodChange.bind(this)}/>
+                                    </div>
+                                </div>
+                                <div className="wide column">
+                                    <Button className="blue"
+                                            onClick={this.handleSaveProjectSetting.bind(this)}>Update Learning Settings</Button>
+                                </div>
+                                <br /><hr />
+                            </div>}
+                            <div className="wide column">
+                                <h3>Real-time Report Alerts</h3>
                                 {!isLogProject && <div className="field">
                                     <label style={labelStyle}>Anomaly Threshold</label>
                                     <AnomalyThreshold key={data.projectName} value={data.pvalue}
@@ -258,14 +380,6 @@ export default class ThresholdSettings extends React.Component {
                             </div>
                             {!isLogProject && <div className="wide column">
                                 <h3>Email Alerts</h3>
-
-                                <div className="field">
-                                    <label style={labelStyle}>Project Type</label>
-
-                                    <div className="ui input">
-                                        <input type="text" readOnly={true} value={data.projectType}/>
-                                    </div>
-                                </div>
                                 <div className="field">
                                     <label style={labelStyle}>Anomaly Threshold</label>
                                     <AnomalyThreshold key={data.projectName} value={data.emailpvalue}
@@ -278,45 +392,8 @@ export default class ThresholdSettings extends React.Component {
                                 </div>
                             </div>}
                             {!isLogProject && <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
-                                </h3>
-
-                                <div className="field">
-                                    <div className="ui input">
-                                        <input key={data.projectName} type="text"
-                                               value={tempSharedUsernames}
-                                               onChange={this.handleSharingChange.bind(this)}/>
-                                    </div>
-                                </div>
-                            </div>}
-                            {!isLogProject && <div className="wide column">
-                                <h3>Learning Skipping Period: <span style={{fontSize: '0.8em', color: '#666'}}>(example format...)</span>
-                                </h3>
-
-                                <div className="field">
-                                    <div className="ui input">
-                                        <input key={data.projectName} type="text"
-                                               value={learningSkippingPeriod}
-                                               onChange={this.handleLearningSkippingPeriodChange.bind(this)}/>
-                                    </div>
-                                </div>
-                            </div>}
-                            {!isLogProject && <div className="wide column">
-                                <h3>Hint mapping file:</h3>
-
-                                <div className="field">
-                                    <div className="ui button fileinput-button">
-                                        Upload Hint mapping file
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
-                                    </div>
-                                    {this.state.projectHintMapFilename &&
-                                    <span className="text-blue"
-                                          id="productName">{this.state.projectHintMapFilename}</span>}
-                                </div>
-                            </div>}
-                            {!isLogProject && <div className="wide column">
                                 <Button className="blue"
-                                        onClick={this.handleSaveProjectSetting.bind(this)}>Submit</Button>
+                                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
                             </div>}
                         </div>
                         <br /><hr />
@@ -350,7 +427,7 @@ export default class ThresholdSettings extends React.Component {
                                 })}
                                 </tbody>
                             </table>
-                            <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Submit</Button>
+                            <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Threshold Settings</Button>
                           </div>}
                           {isLogProject && <div className="ui">
                             <h3>Episode and Word Selection</h3>
@@ -437,79 +514,18 @@ export default class ThresholdSettings extends React.Component {
             </Console.Content>
         );
     }
-
-
-    fileUploadRef(r) {
-        $(ReactDOM.findDOMNode(r))
-            .fileupload({
-                dataType: 'json',
-                url: `${baseUrl}cloudstorage/${store.get('userName')}/${this.state.data.projectName}/wordMap.csv`,
-                sequentialUploads: true,
-                multipart: false
-            })
-            .bind('fileuploadadd', (e, data) => {
-                this.setState({settingLoading: true, projectName: data.files[0]['name']});
-            })
-            .bind('fileuploadprogress', (e, data) => {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                this.setState({settingLoading: true});
-            })
-            .bind('fileuploadfail', (e, data) => {
-                var resp = data.response().jqXHR.responseJSON;
-                this.setState({settingLoading: false});
-            })
-            .bind('fileuploaddone', (e, data) => {
-                var resp = data.response().jqXHR.responseJSON;
-                this.setState({
-                    projectHintMapFilename: data['data']['name'],
-                    data: Object.assign({}, this.state.data, {projectHintMapFilename: resp.filename}),
-                    settingLoading: false
-                });
-            });
-
-    }
-
-    handleSaveProjectSetting() {
-        let {projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename,} = this.state.data;
-        let {tempSharedUsernames,data} = this.state;
-        this.setState({settingLoading: true}, ()=> {
-            apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
-                    if(!resp.success){
-                        window.alert(resp.message);
-                    }
-                    this.setState({settingLoading: false}, this.context.root.loadData)
-            });
-        });
-    }
-
-    handleSaveMapArrSetting() {
-        let selectedIndexArr = [];
-        $('input[name="indexCheckEpisode"]:checked').each(function () {
-            selectedIndexArr.push($(this).data('id'));
-        });
-        $('input[name="indexCheckWord"]:checked').each(function () {
-            selectedIndexArr.push($(this).data('id'));
-        });
-        this.setState({indexLoading: true}, ()=> {
-            apis.postDashboardUserValuesMapArr('updatefrequencyvector', this.state.data.projectName,JSON.stringify(selectedIndexArr)
-            ).then((resp)=> {
-                    if(resp.success){
-                        window.alert("Interesting patterns updated.");
-                    }
-                    this.setState({indexLoading: false});
-            });
-        });
-
-    }
-
-    handleSaveMetricSetting() {
-        this.setState({uservaluesLoading: true}, ()=> {
-            apis.postDashboardUserValues('updateprojsettings', {
-                projectName: this.state.data.projectName,
-                projectSettings: JSON.stringify(this.state.metricSettings)
-            }).then((resp)=> {
-                this.setState({uservaluesLoading: false}, this.context.root.loadData)
-            });
-        });
-    }
 }
+
+                            // {!isLogProject && <div className="wide column">
+                            //     <h3>Hint mapping file:</h3>
+
+                            //     <div className="field">
+                            //         <div className="ui button fileinput-button">
+                            //             Upload Hint mapping file
+                            //             <input type="file" name="file" ref={::this.fileUploadRef}/>
+                            //         </div>
+                            //         {this.state.projectHintMapFilename &&
+                            //         <span className="text-blue"
+                            //               id="productName">{this.state.projectHintMapFilename}</span>}
+                            //     </div>
+                            // </div>}

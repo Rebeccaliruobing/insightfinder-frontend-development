@@ -3,6 +3,7 @@ import {Console, Accordion, Link, IndexLink} from '../../artui/react/index';
 import store from 'store';
 
 export default function (props) {
+  let userName = store.get('userName');
   // <Link to="/cloud/display-model" className="item">Display Model</Link>
 
         // <Link to="/cloud/historical-report" className="item text-white">
@@ -32,10 +33,10 @@ export default function (props) {
           <i className="line chart icon"></i>
           <span> Application Forecast </span>
         </Link>
-        <Link to="/cloud/behavior-change-detection" className="item text-white">
+        {(userName=='guest'||userName=='admin') && <Link to="/cloud/behavior-change-detection" className="item text-white">
           <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>
-        </Link>
+        </Link>}
         <Link to="/cloud/incident-log-analysis" className="item text-white">
           <i className="file text icon"></i>
           <span> Log Analysis </span>
