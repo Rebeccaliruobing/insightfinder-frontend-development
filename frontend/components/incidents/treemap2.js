@@ -85,7 +85,8 @@ class IncidentsTreeMap extends Component {
     const params = {
       projectName: d['projectName'],
       metricName: d['name'],
-      instanceName: d['instanceName']
+      instanceName: d['instanceName'],
+      metricAvg: (this.props['instanceStatsJson'] && this.props['instanceStatsJson'][d['instanceName']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson']  && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']]['avg']),
     };
     if (startTimestamp && endTimestamp) {
       params['startTimestamp'] = startTimestamp;
@@ -343,44 +344,29 @@ class IncidentsTreeMap extends Component {
     } else if (schema == 'cpu') {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
-        .append("title").text(d => (stats[d.name]&&stats[d.name]['AvgCPUUtilization'])?(((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average CPU Utilization: ' + (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')):'');
+        .append("title").text(d => (d.dx>0&&d.dy>0) ? (((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average CPU Utilization: ' + (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')):'');
     } else if (schema == 'availability') {
       g.append("rect").attr("class", d => "parent " + d.type)
         .call(rect)
-        .append("title").text(d => (stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? (((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average Instance Availability: ' + (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')):'');
+        .append("title").text(d => (d.dx>0&&d.dy>0) ? (((meta[d.name] && meta[d.name]['tagName']) ? (meta[d.name]['tagName']) : d.name) + "\n" + (stats[d.name] ? 'Average Instance Availability: ' + (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')):'');
     }
 
     g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d, props));
+    g.append("text").attr("dy", ".75em").text(
+      d => ((d.dx>0&&d.dy>0) ? ((meta[d.name] && meta[d.name]['tagName']) ?
+        (this.chopString(meta[d.name]['tagName'], 8)) : d.name) : '')
+    ).call(t => {
+      t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
+    });
     if (schema == 'anomaly') {
-      g.append("text").attr("dy", ".75em").text(
-        d => ((meta[d.name] && meta[d.name]['tagName']) ?
-          (this.chopString(meta[d.name]['tagName'], 8)) : d.name)
-      ).call(t => {
-        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
-      });
-
       g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType, 10)).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
     } else if (schema == 'cpu') {
-      g.append("text").attr("dy", ".75em").text(
-        d => ((stats[d.name]&&stats[d.name]['AvgCPUUtilization']) ? ((meta[d.name] && meta[d.name]['tagName']) ?
-          (this.chopString(meta[d.name]['tagName'], 8)) : d.name) : '')
-      ).call(t => {
-        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
-      });
-
       g.append("text").attr("dy", ".75em").text(d => ((stats[d.name]&&stats[d.name]['AvgCPUUtilization']) ? (Math.round(stats[d.name]['AvgCPUUtilization'] * 10) / 10).toString() + '%' : '')).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
     } else if (schema == 'availability') {
-      g.append("text").attr("dy", ".75em").text(
-        d => ((stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? ((meta[d.name] && meta[d.name]['tagName']) ?
-          (this.chopString(meta[d.name]['tagName'], 8)) : d.name) : '')
-      ).call(t => {
-        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
-      });
-      
       g.append("text").attr("dy", ".75em").text(d => ((stats[d.name]&&stats[d.name]['AvgInstanceUptime']) ? (Math.round(stats[d.name]['AvgInstanceUptime'] * 1000) / 10).toString() + '%' : '')).call(t => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
@@ -393,6 +379,7 @@ class IncidentsTreeMap extends Component {
   }
 
   render() {
+    let numberOfDays = this.props['numberOfDays'];
     const { faux, showMetricModal, metricModalProps } = this.state;
     return (
       <div className="incidents treemap" style={{ marginTop: 10 }}>
@@ -400,7 +387,7 @@ class IncidentsTreeMap extends Component {
           {faux}
         </div>
         { showMetricModal &&
-        <MetricModal {...metricModalProps} onClose={this.hideMetricModal}/>
+        <MetricModal {...metricModalProps} numberOfDays={numberOfDays} onClose={this.hideMetricModal}/>
         }
       </div>
     )

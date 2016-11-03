@@ -40,11 +40,18 @@ class MetricModal extends React.Component {
       .then(resp => {
         if (resp.success) {
           const data = this.calculateData(resp.data, instanceName);
-          this.setState({ 
-            showErrorMsg: false,
-            loading: false,
-            data 
-          });
+          if(data==null){
+            this.setState({ 
+              showErrorMsg: true,
+              loading: false,
+            });
+          } else {
+            this.setState({ 
+              showErrorMsg: false,
+              loading: false,
+              data 
+            });
+          }
         } else {
           this.setState({ 
             showErrorMsg: true,
@@ -62,9 +69,14 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose } = this.props;
+    const { onClose, metricAvg, numberOfDays } = this.props;
     const { data,showErrorMsg,loading } = this.state;
     const classes = cx('content', loading ? 'ui form loading' : '');
+    let chartLabel = '';
+    if(metricAvg!=undefined){
+      // chartLabel = ' (' + numberOfDays + 'd avg: ' + metricAvg.toPrecision(3) + ')';
+      chartLabel = ' (avg: ' + metricAvg.toPrecision(3) + ')';
+    } 
     return (
       <Modal closable={true} onClose={onClose}>
         {showErrorMsg ?
@@ -74,10 +86,10 @@ class MetricModal extends React.Component {
           :
           <div className={classes} style={{ height: 300 }}>
             {data &&
-            <div className="ui header">{`Metric ${data.metrics}`}</div>
+            <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
             }
             {data  &&
-            <DataChart data={data}/>
+            <DataChart data={data} addLabel={metricAvg}/>
             }
           </div>
         }
