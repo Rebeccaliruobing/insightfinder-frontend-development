@@ -33,10 +33,10 @@ const ProjectStatistics = ({data, dur}) => (
    </div>
    </div>
    <div className='ui compact grid'>
-    <StatsList title='Top Event Types' list={data.eventStats.countByRootCause} topK={3} order='desc' duration={dur+'d'} width='four' />
-    <StatsList title='Top Anomalous Apps' list={data.eventStats.countByInstance} topK={3} order='desc' duration={dur+'d'} width='four' />
-    <StatsList title='Top Underutilized Apps' list={data.eventStats.CPUUtilizationByInstance} topK={3} order='asc' normalValue={1} duration={dur+'d'} width='four' />
-    <StatsList title='Top Unavailable Apps' list={data.eventStats.AvailabilityByInstance} topK={3} order='asc' normalValue={1} duration={dur+'d'} width='four' />
+    <StatsList title='Top Event Types (instance level)' list={data.eventStats.countByRootCause} topK={3} order='desc' duration={dur+'d'} valFormat='frequency' width='four' />
+    <StatsList title='Top Anomalous Apps' list={data.eventStats.countByInstance} topK={3} order='desc' duration={dur+'d'} valFormat='duration' width='four' />
+    <StatsList title='Top Underutilized Apps' list={data.eventStats.CPUUtilizationByInstance} topK={3} order='asc' normalValue={1} duration={dur+'d'} valFormat='percentage' width='four' />
+    <StatsList title='Top Unavailable Apps' list={data.eventStats.AvailabilityByInstance} topK={3} order='asc' normalValue={1} duration={dur+'d'} valFormat='percentage' valMultiplier={100} width='four' />
     </div>
   </div>
 );

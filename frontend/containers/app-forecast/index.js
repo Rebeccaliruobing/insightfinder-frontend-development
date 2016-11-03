@@ -144,7 +144,7 @@ class AppForecast extends Component {
 
 
   render() {
-    let { loading, data, projectName, interval, appNames, selectedAppName, showErrorMsg } = this.state;
+    let { loading, data, projectName, interval, appNames, appCpuJson, selectedAppName, showErrorMsg } = this.state;
     let refreshName = store.get('appForecaseProjectName')?store.get('appForecaseProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (

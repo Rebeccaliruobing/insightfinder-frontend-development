@@ -14,6 +14,7 @@ class MetricModal extends React.Component {
 
     this.state = {
       data: null,
+      showErrorMsg: false,
     }
   }
 
@@ -30,36 +31,56 @@ class MetricModal extends React.Component {
 
   componentDidMount() {
     let { projectName, startTimestamp, endTimestamp, instanceName, metricName } = this.props;
+    this.setState({ 
+      loading: true,
+    });
     apis.postProjectData(
       projectName, undefined, undefined, startTimestamp, endTimestamp, undefined,
       instanceName, metricName, undefined)
       .then(resp => {
         if (resp.success) {
           const data = this.calculateData(resp.data, instanceName);
-          this.setState({ data });
+          this.setState({ 
+            showErrorMsg: false,
+            loading: false,
+            data 
+          });
         } else {
-          console.error(resp.message);
+          this.setState({ 
+            showErrorMsg: true,
+            loading: false,
+          });
         }
       })
       .catch(msg=> {
+        this.setState({ 
+          showErrorMsg: true,
+          loading: false,
+        });
         console.error(msg);
       });
   }
 
   render() {
     const { onClose } = this.props;
-    const { data } = this.state;
-    const classes = cx('content', data ? '' : 'ui form loading');
+    const { data,showErrorMsg,loading } = this.state;
+    const classes = cx('content', loading ? 'ui form loading' : '');
     return (
       <Modal closable={true} onClose={onClose}>
-        <div className={classes} style={{ height: 300 }}>
-          {data &&
-          <div className="ui header">{`Metric ${data.metrics}`}</div>
-          }
-          {data  &&
-          <DataChart data={data}/>
-          }
-        </div>
+        {showErrorMsg ?
+          <div className={classes} style={{ height: 300 }}>
+            <h3>Metric data unavailable for this period.</h3>
+          </div>
+          :
+          <div className={classes} style={{ height: 300 }}>
+            {data &&
+            <div className="ui header">{`Metric ${data.metrics}`}</div>
+            }
+            {data  &&
+            <DataChart data={data}/>
+            }
+          </div>
+        }
       </Modal>
     )
   }
