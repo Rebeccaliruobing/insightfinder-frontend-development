@@ -137,7 +137,7 @@ export class DataChart extends React.Component {
         style={{ width: '100%', height: '200px' }}
         chartType={chartType}
         className={chartType}
-        axisLabelWidth={45}
+        axisLabelWidth={55}
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
