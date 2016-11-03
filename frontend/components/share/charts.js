@@ -129,7 +129,9 @@ export class DataChart extends React.Component {
 
   render() {
     const { data, enableAnnotations, enableTriangleHighlight, chartType,
-      onDateWindowChange, dateWindow,latestDataTimestamp } = this.props;
+      onDateWindowChange, dateWindow,latestDataTimestamp,
+      eventEndTime, eventStartTime,
+    } = this.props;
     const annotations = this.setWeekdaysForBarChar(data);
     const listenDrawCallback = !!onDateWindowChange;
     return (
@@ -146,6 +148,8 @@ export class DataChart extends React.Component {
         ylabel={data.unit}
         labels={data.sname}
         highlights={data.highlights}
+        highlightStartTime={eventStartTime}
+        highlightEndTime={eventEndTime}
         latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}

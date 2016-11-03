@@ -85,7 +85,9 @@ class IncidentsTreeMap extends Component {
     const params = {
       projectName: d['projectName'],
       metricName: d['name'],
-      instanceName: d['instanceName']
+      instanceName: d['instanceName'],
+      eventStartTime: d['eventStartTime'],
+      eventEndTime: d['eventEndTime'],
     };
     if (startTimestamp && endTimestamp) {
       params['startTimestamp'] = startTimestamp;

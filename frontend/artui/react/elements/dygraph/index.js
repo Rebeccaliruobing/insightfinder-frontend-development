@@ -38,6 +38,14 @@ class Dygraph extends Component {
     this.highlightBarHeight = 12;
   }
 
+  @autobind
+  drawHighlightRange(canvas, area, g, x_start, x_end) {
+    const left = g.toDomXCoord(x_start);
+    const right = g.toDomXCoord(x_end);
+    canvas.fillStyle = '#88bbee';
+    canvas.fillRect(left, area.y, right - left , 12);
+  }
+
   _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, enableTriangleHighlight=false, isMissingValue = false) {
       // val between 0-green to 1-yellow to 10-red (logarithmic)
       var canvas_left_x = g.toDomXCoord(x_start);
@@ -84,7 +92,9 @@ class Dygraph extends Component {
   @autobind
   handleUnderlayCallback(canvas, area, g) {
 
-    const {highlights, enableTriangleHighlight, latestDataTimestamp} = this.props;
+    const {highlights, enableTriangleHighlight, latestDataTimestamp,
+       highlightStartTime, highlightEndTime
+    } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
     if (latestDataTimestamp) {
@@ -103,27 +113,21 @@ class Dygraph extends Component {
       });
     }
 
+    // If has highlight start/end, draw the highlight bar.
+    if (highlightEndTime && highlightStartTime) {
+      this.drawHighlightRange(canvas, area, g, highlightStartTime, highlightEndTime);
+    }
+
     if (this.props.underlayCallback) {
       this.props.underlayCallback(canvas, area, g);
     }
   }
 
   componentDidMount() {
-    // var d_names = ["Sun","Mon", "Tue", "Wed", 
-    // "Thu", "Fri", "Sat"];
-
     if (this._el) {
       const { known: initAttrs, rest } = spreadDygraphProps(this.props, true);
       let { annotations, highlights, selection } = rest;
 
-      // initAttrs.axes =  {
-      //           x:{
-      //             axisLabelFormatter: function(d, gran) {
-      //               var curr_day  = d_names[d.getDay()];
-      //               return curr_day;
-      //             }
-      //           }
-      //       };
       initAttrs.underlayCallback = this.handleUnderlayCallback;
       this._dygraph = new DygraphBase(this._el, this.props.data, initAttrs);
 
