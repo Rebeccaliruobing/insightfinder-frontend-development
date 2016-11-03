@@ -109,6 +109,7 @@ export class DataChart extends React.Component {
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
+        includeZero={true}
         data={data.sdata}
         ylabel={data.unit}
         labels={data.sname}
