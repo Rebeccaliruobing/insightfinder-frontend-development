@@ -35,7 +35,7 @@ class AppForecast extends Component {
     projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
     if (projects.length > 0) {
-      let refreshName = store.get('appForecaseProjectName')?store.get('appForecaseProjectName'): projects[0].projectName;
+      let refreshName = store.get('appForecastProjectName')?store.get('appForecastProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
       const url = `/settings/project-list/custom`;
@@ -88,7 +88,7 @@ class AppForecast extends Component {
 
   refreshProjectName(projectName) {
     let self = this;
-    store.set('appForecaseProjectName', projectName);
+    store.set('appForecastProjectName', projectName);
     this.setState({ 
       loading: true, 
       projectName 
@@ -145,7 +145,7 @@ class AppForecast extends Component {
 
   render() {
     let { loading, data, projectName, interval, appNames, appCpuJson, selectedAppName, showErrorMsg } = this.state;
-    let refreshName = store.get('appForecaseProjectName')?store.get('appForecaseProjectName'): projectName;
+    let refreshName = store.get('appForecastProjectName')?store.get('appForecastProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
