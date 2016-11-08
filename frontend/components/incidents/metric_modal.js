@@ -88,7 +88,7 @@ class MetricModal extends React.Component {
             <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
             }
             {data  &&
-            <DataChart data={data} eventStartTime={eventStartTime} eventEndTime={eventEndTime} addLabel={metricAvg} />
+            <DataChart data={data} addLabel={metricAvg} />
             }
           </div>
         }

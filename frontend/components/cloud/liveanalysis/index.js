@@ -250,7 +250,7 @@ class LiveAnalysisCharts extends React.Component {
     render() {
 
         let { loading, onRefresh, enablePublish, enableComments,
-          debugData, timeMockup, freqMockup, projectName, data, chartType, alertMissingData} = this.props;
+          debugData, timeMockup, freqMockup, projectName, periodMap, data, chartType, alertMissingData} = this.props;
         const { view, columns,tabStates,isForecast } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
@@ -374,6 +374,7 @@ class LiveAnalysisCharts extends React.Component {
                                         groups={groups} view={view} columns={columns}
                                         latestDataTimestamp={latestDataTimestamp}
                                         alertMissingData={alertMissingData}
+                                        periodMap={periodMap}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />

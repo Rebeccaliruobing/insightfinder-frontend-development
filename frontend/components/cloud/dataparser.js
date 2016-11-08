@@ -333,22 +333,25 @@ class DataParser {
                   let rootcause = item.substring(pos3+2,pos4);
                   let valString = item.substring(pos2+2,pos3);
                   if(valString != 'missing'){
-                    valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(2);
+                    let val = parseFloat(item.substring(pos2+2,pos3));
+                    let roundedVal = Math.round(val*100)/100;
+                    valString = roundedVal.toString();
                   }
                   if(!hasPct){
                     rootcause = "";
                   } else {
                     if(valString != 'missing'){
                       let changePct = parseFloat(rootcause);
+                      let roundedChangePtc = Math.round(changePct*10)/10;
                       let direction = "higher";
                       if(changePct<0){
                         direction = "lower";
                         changePct = -changePct;
                       }
                       if(neuronId&&neuronId==-1){
-                        rootcause = changePct.toFixed(1) + "% higher than threshold, ";  
+                        rootcause = roundedChangePtc.toString() + "% higher than threshold, ";  
                       } else {
-                        rootcause = changePct.toFixed(1) + "% " + direction + " than normal, ";
+                        rootcause = roundedChangePtc.toString() + "% " + direction + " than normal, ";
                       }                      
                     } else {
                       rootcause = "missing value, "

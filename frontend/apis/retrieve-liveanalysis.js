@@ -20,6 +20,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
   const metrics = _.filter((statistics['metrics'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
   const startTimestamp = statistics['startTimestamp'];
   const endTimestamp = statistics['endTimestamp'];
+  const maxAnomalyRatio = statistics['maxAnomalyRatio'];
+  const minAnomalyRatio = statistics['minAnomalyRatio'];
 
   _.forEach(insts, (inst) => {
 
@@ -131,6 +133,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     children: root,
     startTimestamp,
     endTimestamp,
+    maxAnomalyRatio,
+    minAnomalyRatio,
     anomaliesList,
   };
 }
@@ -175,7 +179,7 @@ export function retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, end
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
-          ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
+          // ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
           ret['incidents'] = incidentList;
 
           resolve(ret);

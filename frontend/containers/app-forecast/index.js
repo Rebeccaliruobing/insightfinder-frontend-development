@@ -25,6 +25,8 @@ class AppForecast extends Component {
       appNames:[],
       appObj:{},
       appCpuJson:{},
+      periodMap:{},
+      metricUnitMapping:{},
       interval: "24",
       showErrorMsg: false,
     };
@@ -35,7 +37,7 @@ class AppForecast extends Component {
     projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
     if (projects.length > 0) {
-      let refreshName = store.get('appForecastProjectName')?store.get('appForecastProjectName'): projects[0].projectName;
+      let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
       const url = `/settings/project-list/custom`;
@@ -45,7 +47,7 @@ class AppForecast extends Component {
 
   @autobind()
   handleAppNameSelected(appName) {
-    const { appObj } = this.state;
+    const { appObj,metricUnitMapping, periodMap } = this.state;
     this.setState({
       loading: true, 
       selectedAppName:appName,
@@ -54,13 +56,16 @@ class AppForecast extends Component {
     let instanceMetricJson = {};
     let endDataTimestamp = appObj['endDataTimestamp'];
     let dataObj = appObj['appForecastData'];
+    let thisPeriodMap = periodMap[appName] || {};
     instanceMetricJson['latestDataTimestamp'] = endDataTimestamp;
     thisData['instanceMetricJson'] = instanceMetricJson;
+    thisData['metricUnitMapping'] = metricUnitMapping;
     if(dataObj){
       thisData['data'] = dataObj[appName];
     }
     this.setState({ 
       data: thisData,
+      thisPeriodMap,
       loading: false,
     });
   }
@@ -88,7 +93,7 @@ class AppForecast extends Component {
 
   refreshProjectName(projectName) {
     let self = this;
-    store.set('appForecastProjectName', projectName);
+    store.set('liveAnalysisProjectName', projectName);
     this.setState({ 
       loading: true, 
       projectName 
@@ -101,6 +106,8 @@ class AppForecast extends Component {
           appNames:resp.appNames,
           appCpuJson: resp.appCpuJson,
           appObj: resp.appObj,
+          periodMap: resp.periodMap,
+          metricUnitMapping: resp.metricUnitMapping,
         }, ()=>{
             this.setState({ 
               showErrorMsg: false,
@@ -124,11 +131,6 @@ class AppForecast extends Component {
 
   @autobind
   handleProjectChange(value,projectName){
-    // this.setState({
-    //   endTime: moment(),
-    //   numberOfDays: "1",
-    //   modelType:"Holistic",
-    // });
     this.refreshProjectName(projectName);
   }
 
@@ -144,8 +146,8 @@ class AppForecast extends Component {
 
 
   render() {
-    let { loading, data, projectName, interval, appNames, appCpuJson, selectedAppName, showErrorMsg } = this.state;
-    let refreshName = store.get('appForecastProjectName')?store.get('appForecastProjectName'): projectName;
+    let { loading, data, projectName, interval, appNames, appCpuJson, thisPeriodMap, selectedAppName, showErrorMsg } = this.state;
+    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content className={ loading ? 'ui form loading' : ''}>
@@ -188,8 +190,9 @@ class AppForecast extends Component {
               </table>
             </div>        
             <div className="thirteen wide column">
-              <LiveAnalysisCharts data={data} chartType="bar" loading={loading} alertMissingData={false} 
+              <LiveAnalysisCharts data={data} chartType="bar" loading={loading} alertMissingData={false} periodMap={thisPeriodMap}
                 enablePublish={false} isForecast={true} onRefresh={() => this.handleAppNameSelected(selectedAppName)}/>
+              }
             </div>
           </div>}
         </div>

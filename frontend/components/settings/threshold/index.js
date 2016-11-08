@@ -310,47 +310,22 @@ export default class ThresholdSettings extends React.Component {
         return (
             <Console.Content className={loading?"ui form loading":""}>
                 <div className="ui main tiny container" ref={c => this._el = c}>
-                    <div className="ui clearing vertical segment">
+                    <div className="ui right aligned vertical inline segment" style={{zIndex: 200}}>
+                      <div className="field">
+                        <label style={{ fontWeight: 'bold' }}>Project Name:</label>
+                              <ProjectSelection key={data.projectName} value={data.projectName} style={{minWidth: 200}}
+                                                                onChange={this.handleProjectChange.bind(this)}/>
+                      </div>
+                      <div className="field">
+                        <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
+                      </div>
                     </div>
                     <div className="ui vertical segment">
                         <div className={cx('ui grid two columns form', {'loading': !!this.state.settingLoading})}>
-                            <div className="wide column">
-                                <div className="field">
-                                    <h3>Project Name</h3>
-                                    <ProjectSelection key={data.projectName} value={data.projectName}
-                                                      onChange={this.handleProjectChange.bind(this)}/>
-                                </div>
-                                <br /><hr />
-                            </div>
-                            <div className="wide column">
-                                <div className="field">
-                                    <h3>Project Type</h3>
-                                    <div className="ui input">
-                                        <input type="text" readOnly={true} value={data.projectType}/>
-                                    </div>
-                                </div>
-                                <br /><hr />
-                            </div>
-                            {!isLogProject && <div className="wide column">
-                                <h3>Sharing group: <span style={{fontSize: '0.8em', color: '#666'}}>(comma separated usernames)</span>
-                                </h3>
-                                <div className="field">
-                                    <div className="ui input">
-                                        <input key={data.projectName} type="text"
-                                               value={tempSharedUsernames}
-                                               onChange={this.handleSharingChange.bind(this)}/>
-                                    </div>
-                                </div>
-                                <div className="wide column">
-                                    <Button className="blue"
-                                            onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
-                                </div>
-                                <br /><hr />
-                            </div>}
                             {!isLogProject && <div className="wide column">
                                 <h3>Learning Skipping Period:                                 
                                     <WaringButton labelStyle={labelStyle} labelTitle=""
-                                          labelSpan="eg. 'day-of-week:saturday,sunday' or 'time:1am-7am'"/>
+                                          labelSpan="Eg. 'Every Sunday, Every Day 00:00-01:00 GMT, Christmas Day'"/>
                                 </h3>
                                 <div className="field">
                                     <div className="ui input">
@@ -359,25 +334,29 @@ export default class ThresholdSettings extends React.Component {
                                                onChange={this.handleLearningSkippingPeriodChange.bind(this)}/>
                                     </div>
                                 </div>
-                                <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
                                     <Button className="blue"
                                             onClick={this.handleSaveProjectSetting.bind(this)}>Update Learning Settings</Button>
-                                </div>
                                 <br /><hr />
                             </div>}
-                            <div className="wide column">
+                            {!isLogProject && <div className="wide column">
+                            </div>}
+                            {!isLogProject && <div className="wide column">
                                 <h3>Real-time Report Alerts</h3>
-                                {!isLogProject && <div className="field">
+                                <div className="field">
                                     <label style={labelStyle}>Anomaly Threshold</label>
                                     <AnomalyThreshold key={data.projectName} value={data.pvalue}
                                                       onChange={this.handleValueChange('pvalue')}/>
-                                </div>}
-                                {!isLogProject && <div className="field">
+                                </div>
+                                <div className="field">
                                     <label style={labelStyle}>Duration Threshold</label>
                                     <DurationThreshold key={data.projectName} value={data.cvalue}
                                                        onChange={this.handleValueChange('cvalue')}/>
-                                </div>}
-                            </div>
+                                </div>
+                            </div>}
                             {!isLogProject && <div className="wide column">
                                 <h3>Email Alerts</h3>
                                 <div className="field">
@@ -394,9 +373,29 @@ export default class ThresholdSettings extends React.Component {
                             {!isLogProject && <div className="wide column">
                                 <Button className="blue"
                                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+                                <br /><hr />
                             </div>}
                         </div>
-                        <br /><hr />
+                        {!isLogProject && <div className="wide column">
+                            <div className="wide column">
+                                <h3>Sharing group:
+                                    <WaringButton labelStyle={labelStyle} labelTitle=""
+                                          labelSpan="comma separated usernames"/>
+                                </h3>
+                                <div className="field">
+                                    <div className="ui input">
+                                        <input key={data.projectName} type="text"
+                                               value={tempSharedUsernames}
+                                               onChange={this.handleSharingChange.bind(this)}/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="wide column">
+                                <Button className="blue"
+                                    onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
+                                <br /><hr />
+                            </div>
+                        </div>}                        
                         <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})}>
                           {!isLogProject && <div className="ui">
                             <h3>Metric Settings (Optional)</h3>
@@ -429,7 +428,7 @@ export default class ThresholdSettings extends React.Component {
                             </table>
                             <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Threshold Settings</Button>
                           </div>}
-                          {isLogProject && <div className="ui">
+                          {isLogProject && <div className="ui" style={{'paddingTop': '40px' }}>
                             <h3>Episode and Word Selection</h3>
                             <Button className={indexLoading?"loading blue":"blue"} onClick={this.handleSaveMapArrSetting.bind(this)}>Submit</Button>
                             <div className="ui pointing secondary menu">

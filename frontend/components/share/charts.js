@@ -130,7 +130,7 @@ export class DataChart extends React.Component {
   render() {
     const { data, enableAnnotations, enableTriangleHighlight, chartType,
       onDateWindowChange, dateWindow,latestDataTimestamp,
-      eventEndTime, eventStartTime,
+      eventEndTime, eventStartTime, 
     } = this.props;
     const annotations = this.setWeekdaysForBarChar(data);
     const listenDrawCallback = !!onDateWindowChange;
@@ -204,7 +204,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType } = this.props;
+    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType, periodMap, } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -221,24 +221,24 @@ export class DataGroupCharts extends React.Component {
         <div className={groupsContainerClass}>
 
           {groups.sort(function (a, b) {
-                                let aHighlight = (a.highlights.length>0);
-                                let bHighlight = (b.highlights.length>0);
-                                if (aHighlight && !bHighlight) {
-                                    return -1;
-                                } else if (!aHighlight && bHighlight) {
-                                    return 1;
-                                } else {
-                                  let aMetrics = a.metrics;
-                                  let bMetrics = b.metrics;
-                                  if (aMetrics < bMetrics) {
-                                      return -1;
-                                  } else if (aMetrics > bMetrics) {
-                                      return 1;
-                                  } else {
-                                      return 0;
-                                  }
-                                }
-                            }).map((group, index, groups) => {
+                let aHighlight = (a.highlights.length>0);
+                let bHighlight = (b.highlights.length>0);
+                if (aHighlight && !bHighlight) {
+                    return -1;
+                } else if (!aHighlight && bHighlight) {
+                    return 1;
+                } else {
+                  let aMetrics = a.metrics;
+                  let bMetrics = b.metrics;
+                  if (aMetrics < bMetrics) {
+                      return -1;
+                  } else if (aMetrics > bMetrics) {
+                      return 1;
+                  } else {
+                      return 0;
+                  }
+                }
+            }).map((group, index, groups) => {
 
             const rowId = Math.floor(index / colSize);
             const lastCol = !((index + 1) % colSize);
@@ -270,6 +270,11 @@ export class DataGroupCharts extends React.Component {
                 }
               });
             }
+            let periodTag = "";
+            let period = (periodMap && periodMap[group.metrics]) || "";
+            if(period != ""){
+              periodTag = "(Period: "+period+")";
+            }
             const idx = index;
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
@@ -282,7 +287,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span></div>
+                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span><span>{periodTag}</span></div>
                   <DataChart
                     chartType={chartType}
                     enableTriangleHighlight={true}

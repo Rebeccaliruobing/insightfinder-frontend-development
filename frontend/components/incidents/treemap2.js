@@ -256,6 +256,37 @@ class IncidentsTreeMap extends Component {
     }
   }
 
+  @autobind
+  showInstanceChart(d) {
+    let projectName = d['projectName'];
+    let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    let projectParam = projectParams.find((p) => p.projectName == projectName);
+    let modelType = "Holistic";
+    let cvalueParam = projectParam ? projectParam.cvalue : "1";
+    let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
+    let params = {
+      projectName,
+      version:2,
+      pvalue:pvalueParam,
+      cvalue:cvalueParam,
+      modelType:modelType,
+    };
+    if(d['instanceName']){
+      params['instanceName'] = d['instanceName'];
+    }
+    if(d.parent && d.parent['startTimestamp'] && d.parent['endTimestamp']){
+      params['startTimestamp'] = d.parent['startTimestamp'];
+      params['endTimestamp'] = d.parent['endTimestamp'];
+    }else if(d.parent && d.parent.parent 
+        && d.parent.parent['startTimestamp'] && d.parent.parent['endTimestamp']){
+      params['startTimestamp'] = d.parent.parent['startTimestamp'];
+      params['endTimestamp'] = d.parent.parent['endTimestamp'];
+    }
+
+    const url = `/liveMonitoring?${$.param(params)}`;
+    window.open(url, '_blank');
+  }
+
   /**
    * Set the treemap state based on the data. The data maybe a child node in the tree.
    * @param data
@@ -314,13 +345,19 @@ class IncidentsTreeMap extends Component {
     // Display navbar to back to parent node on click
     const navbar = svg.append("g").attr("class", "navbar");
     // const twidth = 180;
-    const twidth = 0;
+    const twidth = 180;
 
     // Add a link to open instance chart view
     if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
       navbar.append("rect")
         .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight, })
         .datum(data.parent).on('click', this.handleTileClick);
+      navbar.append("rect")
+        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
+        .datum(data).on('click', this.showInstanceChart);
+      navbar.append("text")
+        .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
+        .text('All Metric Charts');
     } else {
       navbar.append("rect")
         .attr({ y: -navHeight, width: width, height: navHeight, })

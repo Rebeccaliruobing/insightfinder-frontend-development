@@ -42,7 +42,8 @@ const StatsList = ({title, list, topK, normalValue='-1', duration='1d', order='a
             val = ' (' + item.val + ' min)';
           } else if(valFormat=='percentage'){
             let value = item.val * valMultiplier;
-            val = ' (' + value.toFixed(1) + '%)';
+            let roundedVal = Math.round(value*10)/10;
+            val = ' (' + roundedVal.toString() + '%)';
           }
           return (
             <div key={i} className={item.style}>{item.key + val}</div>

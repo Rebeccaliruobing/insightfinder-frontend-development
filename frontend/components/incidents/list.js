@@ -167,17 +167,26 @@ class IncidentsList extends Component {
   }
 
   calculateRGB(anomalyRatio, size){
-    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+    let { maxAnomalyRatio, minAnomalyRatio } = this.state;
+    if(minAnomalyRatio >= 0) {
+      minAnomalyRatio = 0;
+    }
+    let range = maxAnomalyRatio - minAnomalyRatio;
+    let val = (anomalyRatio==0) ? 0 : (anomalyRatio);
     let gcolorMax = 205;
     var rcolor, gcolor, bcolor = 0;
-    if (val <= 1) {
-        if (val < 0) val = 0;
+    if (val == 0) {
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+    } else if (val <= 1) {
+        // if (val < 0) val = 0;
+        val = 1;
         rcolor = Math.floor(255 * val);
         gcolor = gcolorMax;
     } else {
-        if (val > 10) val = 10;
+        // if (val > 10) val = 10;
         rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        gcolor = Math.floor(gcolorMax - (val - minAnomalyRatio) / range * gcolorMax);
     }
     return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
   }

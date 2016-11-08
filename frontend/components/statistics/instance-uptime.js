@@ -3,7 +3,8 @@ import _ from 'lodash';
 
 const InstanceUptime = ({average, type='avg', duration='1d', width='two' }) => {
   const className = "ui statistic "+width+" wide column";
-  const averageText = _.isFinite(average) ? (average * 100).toFixed(1).toString() : '-';
+  let roundedAvg = Math.round(average*1000)/10;
+  let averageText = _.isFinite(average) ? roundedAvg.toString() : '-';
   return (
     <div className={className}>
       <div>

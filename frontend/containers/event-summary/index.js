@@ -63,16 +63,20 @@ class EventSummary extends Component {
 
   @autobind()
   handleIncidentSelected(incident) {
-    const {projectName, data, numberOfDays} = this.state;
+    const {projectName, data, numberOfDays, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
       let caption = "Incident #"+incident.id;
       let stats = incident.instanceMetricJson || {};
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
+      stats['maxAnomalyRatio'] = maxAnomalyRatio;
+      stats['minAnomalyRatio'] = minAnomalyRatio;
       incidentsTreeMap = buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
     } else {
       let caption = projectName + " (" + numberOfDays + "d)";
+      data.statistics['maxAnomalyRatio'] = maxAnomalyRatio;
+      data.statistics['minAnomalyRatio'] = minAnomalyRatio;
       incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
     }
     this.setState({
@@ -85,22 +89,24 @@ class EventSummary extends Component {
 
   @autobind
   handleModelTypeChange(value, modelType) {
+    let { projectName } = this.state;
     this.setState({
       modelType:modelType,
       currentTreemapData: undefined,
+    }, () => {
+      this.refreshProjectName(projectName);
     });
-    let { projectName } = this.state;
-    this.refreshProjectName(projectName);
   }
 
   @autobind
   handleDayChange(value, numberOfDays) {
+    let { projectName } = this.state;
     this.setState({
       numberOfDays:numberOfDays.toString(),
       currentTreemapData: undefined,
+    }, () => {
+      this.refreshProjectName(projectName);
     });
-    let { projectName } = this.state;
-    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -111,12 +117,11 @@ class EventSummary extends Component {
       newEndTime = curTime;
     }
 
+    let { projectName } = this.state;
     this.setState({
       endTime: newEndTime,
       currentTreemapData: undefined,
-    });
-    let { projectName } = this.state;
-    this.setState({endTime: moment(value).endOf('day')}, () => {
+    }, () => {
       this.refreshProjectName(projectName);
     });
   }
@@ -133,29 +138,37 @@ class EventSummary extends Component {
     this.setState({ loading: true, projectName });
     apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
       .then(data => {
+        let anomalyRatioLists = data.incidents.map(function (value,index) {
+          return value['anomalyRatio']
+        });
+        let maxAnomalyRatio = _.max(anomalyRatioLists);
+        let minAnomalyRatio = _.min(anomalyRatioLists);
         this.setState({
           loading: false,
-          incidentsTreeMap: data.incidentsTreeMap,
+          // incidentsTreeMap: data.incidentsTreeMap,
           data,
+          maxAnomalyRatio,
+          minAnomalyRatio,
           startTimestamp: data.startTimestamp,
           endTimestamp: data.endTimestamp,
           showTenderModal: false,
         }, ()=>{
-            let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-            let incidentDurationThreshold = 15;
-            let detectedIncidents = data.incidents.filter((incident, index) =>
-                    incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-            if(detectedIncidents.length>0){
-                this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
-            }
-        });
+          let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+          let incidentDurationThreshold = 15;
+          let detectedIncidents = data.incidents.filter((incident, index) =>
+                  incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+          if(detectedIncidents.length>0){
+            this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
+          } else {
+            this.handleIncidentSelected();
+          }
+        })
       })
       .catch(msg => {
         this.setState({ loading: false });
         console.log(msg);
         // alert(msg);
       });
-      this.handleIncidentSelected();
   }
 
   @autobind
@@ -239,7 +252,7 @@ class EventSummary extends Component {
     let { loading, data, projectName,
       incidentsTreeMap, endTime, numberOfDays, modelType,
       treeMapCPUThreshold,treeMapAvailabilityThreshold,
-      treeMapScheme,currentTreemapData} = this.state;
+      treeMapScheme} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
@@ -309,16 +322,16 @@ class EventSummary extends Component {
                     <TreeMapAvailabilityThresholdSelect style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold} text={'<='+treeMapAvailabilityThreshold+'%'} onChange={(value)=>this.handleTreeMapAvailabilityThreshold(value)}/>
                   :
                   null}
-                  <Button className="orange button" style={{ 'float':'right' }} onClick={(e)=>{
+                  {false && <Button className="orange button" style={{ 'float':'right' }} onClick={(e)=>{
                       e.stopPropagation();
                       this.showInstanceChart();
                     }}>
                     All Metric Chart
-                  </Button>
+                  </Button>}
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} numberOfDays={numberOfDays} 
                                     instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                                    feedbackData={this.feedbackData} currentData={currentTreemapData} />
+                                    feedbackData={this.feedbackData} />
                 </div>
               </div>
             </div>
