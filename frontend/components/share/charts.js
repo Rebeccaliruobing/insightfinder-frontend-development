@@ -204,7 +204,7 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType, periodMap, } = this.props;
+    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -272,9 +272,14 @@ export class DataGroupCharts extends React.Component {
             }
             let periodTag = "";
             let period = (periodMap && periodMap[group.metrics]) || "";
-            if(period != ""){
-              periodTag = "(Period: "+period+")";
+            if(periodMap == undefined){
+              periodTag = "";
+            } else if(period != ""){
+              periodTag = "(Cycle: "+period+")";
+            } else {
+              periodTag = "(No cycle detected)";
             }
+            let avgTag = (metricAvg && metricAvg[group.metrics]) || "";
             const idx = index;
             elems.push(
               <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
@@ -287,7 +292,7 @@ export class DataGroupCharts extends React.Component {
                    }}
               >
                 <div className="content">
-                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span><span>{periodTag}</span></div>
+                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span><span>{periodTag}</span><span>{avgTag}</span></div>
                   <DataChart
                     chartType={chartType}
                     enableTriangleHighlight={true}

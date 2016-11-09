@@ -69,13 +69,13 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose, eventEndTime, eventStartTime, metricAvg, numberOfDays } = this.props;
+    const { onClose, eventEndTime, eventStartTime, avgLabel } = this.props;
     const { data,showErrorMsg,loading } = this.state;
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
-    if(metricAvg!=undefined){
-      chartLabel = ' (' + numberOfDays + 'd avg: ' + metricAvg.toPrecision(3) + ')';
-    } 
+    if(avgLabel!=undefined){
+      chartLabel = avgLabel;
+    }
     return (
       <Modal closable={true} onClose={onClose}>
         {showErrorMsg ?
@@ -88,7 +88,7 @@ class MetricModal extends React.Component {
             <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
             }
             {data  &&
-            <DataChart data={data} addLabel={metricAvg} />
+            <DataChart data={data}/>
             }
           </div>
         }

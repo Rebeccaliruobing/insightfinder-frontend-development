@@ -119,6 +119,17 @@ class LiveAnalysisCharts extends React.Component {
             }
           } 
         }
+        if(instanceName && data){
+          let metricAvgRaw = data['instanceMetricJson'] && data['instanceMetricJson']['instanceStatsJson'] && data['instanceMetricJson']['instanceStatsJson'][instanceName] && data['instanceMetricJson']['instanceStatsJson'][instanceName]['statsByMetricJson'];
+          let avgNumberOfDays = data['instanceMetricJson'] && data['instanceMetricJson']['avgNumberOfDays'];
+          let metricAvg = {}
+          Object.keys(metricAvgRaw).forEach(function(key){
+            if(metricAvgRaw[key] && metricAvgRaw[key]['avg']!=undefined){
+              metricAvg[key] = ' (' + avgNumberOfDays + 'd avg: ' + metricAvgRaw[key]['avg'].toPrecision(3) + ')';
+            }
+          });
+          this.metricAvg = metricAvg;
+        }
     }
 
     saveDataToStorage(){
@@ -263,6 +274,7 @@ class LiveAnalysisCharts extends React.Component {
         const types = this.causalTypes;
         const groups = this.groups;
         const errorMsg = this.errorMsg;
+        const metricAvg = this.metricAvg;
         let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
@@ -375,6 +387,7 @@ class LiveAnalysisCharts extends React.Component {
                                         latestDataTimestamp={latestDataTimestamp}
                                         alertMissingData={alertMissingData}
                                         periodMap={periodMap}
+                                        metricAvg={metricAvg}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />

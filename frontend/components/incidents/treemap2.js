@@ -81,16 +81,20 @@ class IncidentsTreeMap extends Component {
   @autobind
   showMetricChart(d) {
     
-    const numberOfDays = this.props.numberOfDays;
+    const {endTime, numberOfDays,} = this.props;
     const { startTimestamp, endTimestamp } = this.props.data || {};
+    let avgLabel = undefined;
+    let metricAvg = (this.props['instanceStatsJson'] && this.props['instanceStatsJson'][d['instanceName']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson']  && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']]['avg']);
+    if(metricAvg!=undefined){
+      avgLabel = ' (' + numberOfDays + 'd avg: ' + metricAvg.toPrecision(3) + ')';
+    } 
     const params = {
       projectName: d['projectName'],
       metricName: d['name'],
       instanceName: d['instanceName'],
-      metricAvg: (this.props['instanceStatsJson'] && this.props['instanceStatsJson'][d['instanceName']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson']  && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']] && this.props['instanceStatsJson'][d['instanceName']]['statsByMetricJson'][d['name']]['avg']),
       eventStartTime: d['eventStartTime'],
       eventEndTime: d['eventEndTime'],
-      numberOfDays,
+      avgLabel,
     };
     if (startTimestamp && endTimestamp) {
       params['startTimestamp'] = startTimestamp;
@@ -258,6 +262,7 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showInstanceChart(d) {
+    const {endTime, numberOfDays,} = this.props;
     let projectName = d['projectName'];
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
@@ -270,6 +275,8 @@ class IncidentsTreeMap extends Component {
       pvalue:pvalueParam,
       cvalue:cvalueParam,
       modelType:modelType,
+      avgEndTimestamp:+endTime,
+      avgNumberOfDays:numberOfDays,
     };
     if(d['instanceName']){
       params['instanceName'] = d['instanceName'];
