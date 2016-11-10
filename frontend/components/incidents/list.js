@@ -515,8 +515,10 @@ class IncidentsList extends Component {
                        onClose={() => this.setState({ showTenderModal: false })}/>
         }
         { this.state.showTakeActionModal &&
-          <TakeActionModal incident={this.state.activeIncident} projectName={this.state.projectName} actionTime={this.state.actionTime}
-                       onClose={() => this.setState({ showTakeActionModal: false })}/>
+          <TakeActionModal incident={this.state.activeIncident}
+                           projectName={this.state.projectName}
+                           actionTime={this.state.actionTime}
+                           onClose={() => this.setState({ showTakeActionModal: false })}/>
         }
         { this.state.showSysCall &&
           <SysCallModal timeRanking={this.state.timeRanking} freqRanking={this.state.freqRanking} dataArray={this.state.debugData} 
