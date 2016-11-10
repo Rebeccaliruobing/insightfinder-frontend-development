@@ -191,7 +191,7 @@ class TakeActionModal extends React.Component {
               </Dropdown>
             </div>
           </div>
-            <div className="ui button orange" style={{float:'right', marginTop:'28px',minWidth: 110}}
+            <div className="ui button orange" style={{float:'right', marginTop:'-44px',minWidth: 110}}
                  onClick={this.handleSubmit}>Take Action</div>
         </div><hr/>
         <div className="content" style={{padding:'0 20px'}}>
