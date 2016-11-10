@@ -130,19 +130,20 @@ class App extends React.Component {
     return new Promise((resolve, reject) => {
       apis.postJSONDashboardUserValues().then((result)=> {
         let resp = result.data;
-        resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
-        resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
-        resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
-        resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
-        resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
-        resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
-
-        resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
-          return Object.assign({}, info, {
-            metricSettings: JSON.parse(info.metricSettings)
+        if(resp.dataAllInfo) resp.dataAllInfo = JSON.parse(resp.dataAllInfo);
+        if(resp.extServiceAllInfo) resp.extServiceAllInfo = JSON.parse(resp.extServiceAllInfo);
+        if(resp.incidentAllInfo) resp.incidentAllInfo = JSON.parse(resp.incidentAllInfo);
+        if(resp.projectModelAllInfo) resp.projectModelAllInfo = JSON.parse(resp.projectModelAllInfo);
+        if(resp.projectSettingsAllInfo) resp.projectSettingsAllInfo = JSON.parse(resp.projectSettingsAllInfo);
+        if(resp.publishedDataAllInfo) resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
+        if(resp.projectSettingsAllInfo) {
+          resp.projectSettingsAllInfo = resp.projectSettingsAllInfo.map((info)=> {
+            return Object.assign({}, info, {
+              metricSettings: JSON.parse(info.metricSettings)
+            });
           });
-        });
-
+        }
+    
         if(resp.publishedDataAllInfo){
           resp.publishedDataAllInfo = resp.publishedDataAllInfo.map((info)=> {
             return Object.assign({}, info, {

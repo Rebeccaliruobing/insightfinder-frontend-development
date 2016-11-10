@@ -22,7 +22,8 @@ class TakeActionModal extends React.Component {
       customAction:undefined,
     };
     this.state.actionMap["ignore"] = "ignore";
-    this.state.actionMap["scale-up"] = "coldclone";
+    this.state.actionMap["scale-up one-time"] = "coldclone";
+    this.state.actionMap["scale-up always"] = "dummy";
     this.state.actionMap["reboot"] = "filterreboot";
     this.state.actionMap["migrate"] = "dummy";
     this.state.actionMap["custom"] = "custom";
@@ -37,26 +38,38 @@ class TakeActionModal extends React.Component {
       instanceId: undefined,
       customAction:undefined,
     };
+    this.loadTriageAction();
   }
 
   handleActionChange(value) {
     this.setState({ action:value });
   }
 
+  loadTriageAction() {
+    let {incident, projectName, customAction} = this.state;
+    let eventType = incident.rootCauseJson.rootCauseTypes;
+    apis.loadTriageActionRecord(projectName, eventType).then((resp)=>{
+      console.log(resp);
+      if(resp.found){
+        this.setState({
+          customAction:resp.data.triageAction,
+        });
+      }else{
+        alert("triage record not found");
+      }
+    });
+  }
 
   handleTriageSave() {
     let {incident, projectName, customAction} = this.state;
     let eventType = incident.rootCauseJson.rootCauseTypes;
-    if(customAction == undefined){
-      apis.retrieveCustomAction(projectName, eventType).then((resp)=>{
+    if(customAction != undefined){
+      apis.saveTriageActionRecord(projectName, eventType, customAction).then((resp)=>{
         console.log(resp);
-        this.setState({
-          customAction:resp.customAction,
-        });
+        alert(resp.message);
       });
     }
   }
-
 
   handleSubmit() {
     let {incident, projectName, instanceId, action} = this.state;
@@ -77,7 +90,7 @@ class TakeActionModal extends React.Component {
       }
     }
     if(instanceId){
-      apis.postAWSOperation(projectName, instanceId, operation).then((resp)=>{
+      apis.postUserAction(projectName, instanceId, operation).then((resp)=>{
         console.log(resp);
         if(resp.success){
           alert("Success: action "+action+" was sent to instance "+instanceId);

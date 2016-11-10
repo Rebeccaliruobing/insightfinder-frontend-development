@@ -175,6 +175,24 @@ class LiveAnalysisCharts extends React.Component {
         let data = this.dp.data.data;
         let fname = 'data.csv';
         var csvString = data.split('\\n').join("\r\n");
+        let csvData = new Blob([csvString], { type: 'text/csv' }); 
+        var csvUrl = URL.createObjectURL(csvData);
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.innerHTML = "Click here";
+        a.href =  csvUrl;
+        // a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        a.target   = '_blank';
+        a.method   = 'POST';
+        a.download = fname;
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    exportDataOld(){
+        let data = this.dp.data.data;
+        let fname = 'data.csv';
+        var csvString = data.split('\\n').join("\r\n");
         var a = document.createElement('a');
         document.body.appendChild(a);
         a.innerHTML = "Click here";

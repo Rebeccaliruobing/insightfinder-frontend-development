@@ -36,6 +36,7 @@ class IncidentsList extends Component {
       startTimestamp:undefined,
       endTimestamp:undefined,
       activeIncident:undefined,
+      actionTime:+moment(),
       angleIconStyleSelect: 'angleIconStyleStartTime',
       angleIconStyle: {
           angleIconStyleId: 'down',
@@ -137,7 +138,8 @@ class IncidentsList extends Component {
       showTenderModal:false,
       showTakeActionModal: false,
       startTimestamp:undefined,
-      endTimestamp:undefined
+      endTimestamp:undefined,
+      actionTime:+moment(),
     };
     this.setState(stateIncidents);
   }
@@ -232,7 +234,6 @@ class IncidentsList extends Component {
     let predictedIncidents = incidents.filter((incident, index) =>
             incident.endTimestamp>latestTimestamp );
     let sysCallEnabled = (projectType == 'CUSTOM');
-
     let self =this;
     return (
       <div>
@@ -362,7 +363,8 @@ class IncidentsList extends Component {
                                             e.stopPropagation();
                                             self.setState({
                                               activeIncident: incident,
-                                              showTakeActionModal: true
+                                              showTakeActionModal: true,
+                                              actionTime: +moment(),
                                             });}}
                                             style={{paddingLeft:2, paddingRight:2}}>
                                           Action
@@ -486,7 +488,8 @@ class IncidentsList extends Component {
                                             e.stopPropagation();
                                             self.setState({
                                               activeIncident: incident,
-                                              showTakeActionModal: true
+                                              showTakeActionModal: true,
+                                              actionTime: +moment(),
                                             });}}
                                             style={{paddingLeft:2, paddingRight:2}}>
                                           Action
@@ -512,7 +515,7 @@ class IncidentsList extends Component {
                        onClose={() => this.setState({ showTenderModal: false })}/>
         }
         { this.state.showTakeActionModal &&
-          <TakeActionModal incident={this.state.activeIncident} projectName={this.state.projectName}
+          <TakeActionModal incident={this.state.activeIncident} projectName={this.state.projectName} actionTime={this.state.actionTime}
                        onClose={() => this.setState({ showTakeActionModal: false })}/>
         }
         { this.state.showSysCall &&

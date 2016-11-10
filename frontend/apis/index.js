@@ -5,7 +5,7 @@ import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
 import {retrieveAppNames,retrieveAppMetricForecastData,retrieveAppForecastData} from './retrieve-forecast';
-import {retrieveCustomAction} from './retrieve-actions';
+import {loadTriageActionRecord, saveTriageActionRecord} from './retrieve-actions';
 
 //
 // When we run frontend on localhost python web server and connect api with different host,
@@ -122,7 +122,8 @@ const apis = {
     retrieveAppNames: retrieveAppNames,
     retrieveAppMetricForecastData: retrieveAppMetricForecastData,
     retrieveAppForecastData: retrieveAppForecastData,
-    retrieveCustomAction: retrieveCustomAction,
+    loadTriageActionRecord: loadTriageActionRecord,
+    saveTriageActionRecord: saveTriageActionRecord,
     
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
@@ -1108,12 +1109,12 @@ const apis = {
      * @param userName
      * @returns {Promise}
      */
-    postAWSOperation(projectName, instanceId, operation = 'coldclone', userName = store.get('userName'), token = store.get('token')) {
+    postUserAction(projectName, instanceId, operation = 'coldclone', userName = store.get('userName'), token = store.get('token')) {
         let version = "1";
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
-                url: getEndpoint('awsOperationProxy', version),
+                url: getEndpoint('userAction', version),
                 data: $.param({ userName, token, projectName, instanceId, operation }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
