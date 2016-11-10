@@ -143,15 +143,15 @@ export default class CausalGraph extends React.Component {
 
     highLightPoint(point) {
         let $component = $(point.component);
-        $component.attr({ r: 8 }).css({
+        $component.css({
             strokeWidth: 1,
-            stroke: 'rgb(255, 127, 14)',
+            stroke: '#000000',
             cursor: 'pointer'
         });
 
         $(this.$showText).text(point.title).attr({
-            x: point.component.getAttribute('cx') + 10,
-            y: point.component.getAttribute('cy')
+            x: point.x + 15,
+            y: point.y + 10
         });
 
         point.outLines.forEach((line)=>this.highLightLine(line, 'blue'));
@@ -174,7 +174,7 @@ export default class CausalGraph extends React.Component {
     highLightLine(line, color) {
         let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
         $(line.component).attr({ 'marker-end': `url(#arrow-${color})` }).css({
-            strokeWidth: 2,
+            strokeWidth: 1.4,
             stroke: hex,
             cursor: 'pointer'
         });
@@ -188,24 +188,89 @@ export default class CausalGraph extends React.Component {
         });
     }
 
+    getEventSharpType(text) {
+        if (text.indexOf('- network') >= 0)
+            return 'rect-x';
+        else if(text.indexOf('- disk') >=0 ){
+            return 'rect-y';
+        }
+        else if(text.indexOf('- workload increase') >= 0)
+            return 'up';
+        else if(text.indexOf('- instance down') >= 0)
+            return 'down';
+        else if(text.indexOf('- high cpu') >=0)
+            return 'diamond'
+        return 'circle';
+    }
     renderPoint(point, index) {
-        let isHover = false;
-
         let { x, y } = point;
         let zoomRange = this.state.zoomRange;
+        const shape = this.getEventSharpType(point.title.toLowerCase());
 
         x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
         y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
-        return (
-            <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={(isHover ? 8 : 5)}
-                    cx={x} cy={y} fill={point.color}
-                    style={{ strokeWidth: 1, stroke: isHover ? point.color : '#fff', cursor: 'pointer' }}
+        if (shape === 'circle') {
+            return (
+              <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={5}
+                      cx={x} cy={y} fill={point.color}
+                      style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                      onMouseEnter={()=>this.highLightPoint(point)}
+                      onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </circle>
+            )
+        } else if (shape === 'rect-x') {
+            return (
+              <rect ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    x={x-5} y={y-3} width={10} height={6} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
                     onMouseEnter={()=>this.highLightPoint(point)}
                     onMouseLeave={()=>this.unHighLightPoint(point)}>
-                <title>{point.title}</title>
-            </circle>
-        );
+                  <title>{point.title}</title>
+              </rect>
+            )
+        } else if (shape === 'rect-y') {
+            return (
+              <rect ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    x={x-3} y={y-5} width={6} height={10} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                    onMouseEnter={()=>this.highLightPoint(point)}
+                    onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </rect>
+            )
+        } else if (shape === 'up'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    points={`${x},${y-7} ${x-5},${y+4} ${x+5},${y+4}`} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                    onMouseEnter={()=>this.highLightPoint(point)}
+                    onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        } else if (shape === 'down'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                       points={`${x-5},${y-4} ${x+5},${y-4} ${x},${y+7}`} fill={point.color}
+                       style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                       onMouseEnter={()=>this.highLightPoint(point)}
+                       onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        } else if (shape === 'diamond'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                       points={`${x},${y-6} ${x+6},${y} ${x},${y+6} ${x-6},${y}`} fill={point.color}
+                       style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                       onMouseEnter={()=>this.highLightPoint(point)}
+                       onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        }
     }
 
     renderLine(line, index) {
@@ -238,33 +303,6 @@ export default class CausalGraph extends React.Component {
         let ret = [];
         ret.push(text);
         return ret;
-        //return text.split(' ');
-        /*
-        if (text.length > maxLength && text.split(" ").length > 0) {
-            var s = '';
-            var list = text.split(" ");
-
-            if (list[0].length > maxLength) {
-                return [list.splice(0, 1), this.getWrapText(list)]
-            }
-
-
-            s = `${s} ${list.shift()}`;
-            while (s.length <= maxLength) {
-                s = `${s} ${list.shift()}`;
-            }
-
-            var currentList = s.split(" ");
-            list.unshift(currentList.pop());
-
-            // FIXME: What'is logical of this code!!!!
-            return [currentList.join(" ")];
-            // return [currentList.join(" ")].concat(this.getWrapText(list.join(" "), maxLength));
-
-        } else {
-            return [text]
-        }
-        */
     }
 
     handleMouseDown(e) {
@@ -371,7 +409,7 @@ export default class CausalGraph extends React.Component {
                         {lines.map(this.renderLine.bind(this))}
                         {points.map(this.renderPoint.bind(this))}
 
-                        <text ref={(c)=>this.$showText = c}></text>
+                        <text ref={(c)=>this.$showText = c} />
                         <rect ref={(c)=>this.$selectReact = ReactDOM.findDOMNode(c)}
                               x={Math.min(selectRange.x1, selectRange.x2) || 0}
                               y={Math.min(selectRange.y1, selectRange.y2) || 0}
