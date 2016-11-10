@@ -17,13 +17,13 @@ class TakeActionModal extends React.Component {
       incident: props.incident,
       projectName: props.projectName,
       action: "ignore",
+      oneTime:"one-time",
       instanceId: undefined,
       actionMap:{},
       customAction:undefined,
     };
     this.state.actionMap["ignore"] = "ignore";
-    this.state.actionMap["scale-up one-time"] = "coldclone";
-    this.state.actionMap["scale-up always"] = "dummy";
+    this.state.actionMap["scale-up"] = "coldclone";
     this.state.actionMap["reboot"] = "filterreboot";
     this.state.actionMap["migrate"] = "dummy";
     this.state.actionMap["custom"] = "custom";
@@ -35,6 +35,7 @@ class TakeActionModal extends React.Component {
       incident: nextProps.incident,
       projectName: nextProps.projectName,
       action: "ignore",
+      oneTime:"one-time",
       instanceId: undefined,
       customAction:undefined,
     };
@@ -118,7 +119,7 @@ class TakeActionModal extends React.Component {
 
   render() {
     let { incident, ...rest} = this.props;
-    let { action, instanceId, customAction } = this.state;
+    let { action, oneTime, instanceId, customAction } = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
     let self = this;
@@ -172,13 +173,25 @@ class TakeActionModal extends React.Component {
           <div style={{display:'flex'}}>
             <div className="content" style={{padding:10}}>
               <div>Action</div>
-              <IncidentActionTaken value={action} onChange={(value)=>this.handleActionChange(value)} style={{minWidth: 170}} />
+              <IncidentActionTaken value={action} onChange={(value)=>this.handleActionChange(value)} style={{minWidth: 120}} />
+            </div>
+            <div className="content" style={{padding:10}}>
+              <div style={{color:'white'}}>space</div>
+              <Dropdown mode="select" value={oneTime} text={oneTime}
+                        onChange={(v, t) => this.setState({oneTime: v})}  
+                        style={{minWidth: 120}}>
+                <i className="dropdown icon"/>
+                <div className="menu">
+                  <div className="item">one-time</div>
+                  <div className="item">always</div>
+                </div>
+              </Dropdown>
             </div>
             <div className="content" style={{padding:10}}>
               <div>Instance Id</div>
               <Dropdown mode="select" value={instanceId} text={instanceId}
                         onChange={(v, t) => this.setState({instanceId: v})}  
-                        style={{minWidth: 170}}>
+                        style={{minWidth: 150}}>
                 <i className="dropdown icon"/>
                 <div className="menu">
                   {instances.map((instance, index) => {
@@ -187,10 +200,10 @@ class TakeActionModal extends React.Component {
                 </div>
               </Dropdown>
             </div>
-          </div>
-            <div className="ui button orange" style={{float:'right', marginTop:'-40px'}} onClick={this.handleSubmit.bind(this)}>
+            <div className="ui button orange" style={{float:'right', marginTop:'28px',minWidth: 110}} onClick={this.handleSubmit.bind(this)}>
               Take Action
             </div>
+          </div>
         </div><hr/>
         <div className="content" style={{padding:'0 20px'}}>
           <h5>Triage history:</h5>
@@ -200,7 +213,7 @@ class TakeActionModal extends React.Component {
                         onChange={(e) => this.setState({customAction: e.target.value})}/>
             </div>   
           </form>
-            <div className="ui button orange" style={{float:'right'}} onClick={this.handleTriageSave.bind(this)}>
+            <div className="ui button orange" style={{float:'right',minWidth: 110}} onClick={this.handleTriageSave.bind(this)}>
               Save Triage
             </div> 
         </div>

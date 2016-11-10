@@ -387,8 +387,7 @@ const IncidentActionTaken = (props) => {
       <i className="dropdown icon"/>
       <div className="menu">
         <div className="item">ignore</div>
-        <div className="item">scale-up one-time</div>
-        <div className="item">scale-up always</div>
+        <div className="item">scale-up</div>
         <div className="item">reboot</div>
         <div className="item">migration</div>
       </div>

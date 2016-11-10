@@ -41,7 +41,7 @@ class EventSummary extends Component {
       projectName: undefined,
       showTenderModal: false,
       selectedIncident: undefined,
-      numberOfDays: "3",
+      numberOfDays: "7",
       endTime: moment(),
       modelType:"Holistic",
       selectedInstance: undefined,
@@ -175,7 +175,7 @@ class EventSummary extends Component {
   handleProjectChange(value,projectName){
     this.setState({
       endTime: moment(),
-      numberOfDays: "3",
+      numberOfDays: "7",
       modelType:"Holistic",
       currentTreemapData: undefined,
     });
