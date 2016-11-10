@@ -1,5 +1,6 @@
 import React from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
+import {autobind} from 'core-decorators'
 import {Modal,Dropdown} from '../../artui/react';
 import {IncidentActionTaken} from '../selections';
 import apis from '../../apis';
@@ -14,12 +15,11 @@ class TakeActionModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      incident: props.incident,
-      projectName: props.projectName,
       action: "ignore",
       instanceId: undefined,
       actionMap:{},
       customAction:undefined,
+      textLoaded: false,
     };
     this.state.actionMap["ignore"] = "ignore";
     this.state.actionMap["scale-up one-time"] = "coldclone";
@@ -27,52 +27,56 @@ class TakeActionModal extends React.Component {
     this.state.actionMap["reboot"] = "filterreboot";
     this.state.actionMap["migrate"] = "dummy";
     this.state.actionMap["custom"] = "custom";
-    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadTriageAction(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.state = {
-      incident: nextProps.incident,
-      projectName: nextProps.projectName,
-      action: "ignore",
-      instanceId: undefined,
-      customAction:undefined,
-    };
-    this.loadTriageAction();
+    this.loadTriageAction(nextProps);
   }
 
   handleActionChange(value) {
     this.setState({ action:value });
   }
 
-  loadTriageAction() {
-    let {incident, projectName, customAction} = this.state;
+  loadTriageAction(props) {
+    let {incident, projectName} = props;
     let eventType = incident.rootCauseJson.rootCauseTypes;
     apis.loadTriageActionRecord(projectName, eventType).then((resp)=>{
-      console.log(resp);
       if(resp.found){
         this.setState({
           customAction:resp.data.triageAction,
+          textLoaded: true,
         });
       }else{
-        alert("triage record not found");
+        this.setState({
+          action: "ignore",
+          instanceId: undefined,
+          customAction:undefined,
+          textLoaded: true,
+        });
       }
     });
   }
 
+  @autobind
   handleTriageSave() {
-    let {incident, projectName, customAction} = this.state;
+    let {incident, projectName} = this.props;
+    let {customAction} = this.state;
     let eventType = incident.rootCauseJson.rootCauseTypes;
     if(customAction != undefined){
       apis.saveTriageActionRecord(projectName, eventType, customAction).then((resp)=>{
-        console.log(resp);
         alert(resp.message);
       });
     }
   }
 
+  @autobind
   handleSubmit() {
-    let {incident, projectName, instanceId, action} = this.state;
+    let {incident, projectName} = this.props;
+    let {instanceId, action} = this.state;
     let operation = "dummy";
     if(this.state.actionMap[action]){
       operation = this.state.actionMap[action];
@@ -103,22 +107,9 @@ class TakeActionModal extends React.Component {
     }
   }
 
-  // .sort(function (a, b) {
-  //             // reverse ordering
-  //             let aid = parseInt(a.count);
-  //             let bid = parseInt(b.count);
-  //             if (aid < bid) {
-  //               return 1;
-  //             } else if (aid > bid) {
-  //               return -1;
-  //             } else {
-  //               return 0;
-  //             }
-  //           })
-
   render() {
-    let { incident, ...rest} = this.props;
-    let { action, instanceId, customAction } = this.state;
+    let { incident, projectName, actionTime, ...rest} = this.props;
+    let { action, instanceId, customAction, textLoaded} = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
     let self = this;
@@ -168,7 +159,7 @@ class TakeActionModal extends React.Component {
           </div>
         </div><hr/>
         <div className="content" style={{padding:'0 20px'}}>
-          <h5>Take action on this event: </h5> 
+          <h5>Take action on this event: </h5>
           <div style={{display:'flex'}}>
             <div className="content" style={{padding:10}}>
               <div>Action</div>
@@ -177,30 +168,29 @@ class TakeActionModal extends React.Component {
             <div className="content" style={{padding:10}}>
               <div>Instance Id</div>
               <Dropdown mode="select" value={instanceId} text={instanceId}
-                        onChange={(v, t) => this.setState({instanceId: v})}  
+                        onChange={(v, t) => this.setState({instanceId: v})}
                         style={{minWidth: 170}}>
                 <i className="dropdown icon"/>
                 <div className="menu">
                   {instances.map((instance, index) => {
-                    return <div className="item">{instance}</div>
+                    return <div className="item" key={index}>{instance}</div>
                   })}
                 </div>
               </Dropdown>
             </div>
           </div>
-            <div className="ui button orange" style={{float:'right', marginTop:'-40px'}} onClick={this.handleSubmit.bind(this)}>
-              Take Action
-            </div>
+            <div className="ui button orange" style={{float:'right', marginTop:'-40px'}}
+                 onClick={this.handleSubmit}>Take Action</div>
         </div><hr/>
         <div className="content" style={{padding:'0 20px'}}>
           <h5>Triage history:</h5>
           <form className="ui reply form">
             <div className="field">
-              <textarea value={customAction} rows="4" 
+              <textarea value={customAction} rows="4" readOnly={!textLoaded}
                         onChange={(e) => this.setState({customAction: e.target.value})}/>
-            </div>   
+            </div>
           </form>
-            <div className="ui button orange" style={{float:'right'}} onClick={this.handleTriageSave.bind(this)}>
+            <div className="ui button orange" style={{float:'right'}} onClick={this.handleTriageSave}>
               Save Triage
             </div> 
         </div>
