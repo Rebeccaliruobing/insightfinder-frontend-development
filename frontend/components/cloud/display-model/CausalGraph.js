@@ -108,35 +108,36 @@ export default class CausalGraph extends React.Component {
         dataArray.forEach(([x, ...records], i) => {
             lastPoints[i] = [];
             let recordTime = (new Date(x.split(',')[0])).getTime();
-                modelWidth += stageWidth;
-                records.map((text)=> {
-                    //var pos = text.indexOf('.');
-                    //var type = text.slice(pos + 1).split('(')[0];
-                    var pos = text.indexOf('[');
-                    var type = text.slice(pos + 1).split(']')[0];
-                    var x = stageWidth * i + stageWidth / 2;
-                    var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
+            let timeTag = moment(recordTime).format('MM-DD hh:mm');
+            modelWidth += stageWidth;
+            records.map((text)=> {
+                //var pos = text.indexOf('.');
+                //var type = text.slice(pos + 1).split('(')[0];
+                var pos = text.indexOf('[');
+                var type = text.slice(pos + 1).split(']')[0];
+                var x = stageWidth * i + stageWidth / 2;
+                var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
-                    var point = new Point(x, y);
-                    // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
-                    let pos1 = text.indexOf(']');
-                    point.title = text.substring(0,pos1)+']';
-                    point.color = text.substring(pos1+1,text.length);
-                    // let pos1 = text.indexOf(".");
-                    // let pos2 = text.indexOf("[");
-                    // let pos3 = text.indexOf("(");
-                    // let pos4 = text.indexOf("(",pos3+1);
-                    // let metric = text.substring(pos1+1,pos2-1).trim();
-                    // let value = text.substring(pos3+1,pos4-2).trim();
-                    // point.title = "Metric:"+metric+", value:"+value;
+                var point = new Point(x, y);
+                // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
+                let pos1 = text.indexOf(']');
+                point.title = timeTag + ": " + text.substring(0,pos1)+']';
+                point.color = text.substring(pos1+1,text.length);
+                // let pos1 = text.indexOf(".");
+                // let pos2 = text.indexOf("[");
+                // let pos3 = text.indexOf("(");
+                // let pos4 = text.indexOf("(",pos3+1);
+                // let metric = text.substring(pos1+1,pos2-1).trim();
+                // let value = text.substring(pos3+1,pos4-2).trim();
+                // point.title = "Metric:"+metric+", value:"+value;
 
-                    lastPoints[i].push(point);
-                    state.points.push(point);
-                    lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
-                        state.lines.push(new Line(p1, point))
-                    });
-                    return point;
+                lastPoints[i].push(point);
+                state.points.push(point);
+                lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
+                    state.lines.push(new Line(p1, point))
                 });
+                return point;
+            });
         });
         this.setState(state);
     }

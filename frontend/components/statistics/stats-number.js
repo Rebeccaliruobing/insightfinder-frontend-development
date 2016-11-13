@@ -2,7 +2,10 @@ import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
 const StatsNumber = ({title, number, label='Total', duration='1d', width='two' }) => {
-  const className = "ui statistic "+width+" wide column";
+  let className = "ui statistic "+width+" wide column";
+  if(width=='equal'){
+    className = "ui statistic column";
+  }
   const valueStyle = _.isFinite(number) && number>0 ? 'value error' : 'value';
   let numberString = number!=undefined ? number.toString() : "-";
   return (

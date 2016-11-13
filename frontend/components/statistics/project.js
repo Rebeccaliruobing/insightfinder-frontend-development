@@ -15,15 +15,15 @@ import StatsList from './stats-list';
 
 const ProjectStatistics = ({data, dur}) => (
   <div>
-   <div className='ui compact grid'>
-    <StatsNumber title='Total Anomaly Score' number={data.eventStats.totalAnomalyScore} duration={dur+'d'} width='three' />
-    <StatsNumber title='Num of Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='two' />
-    <StatsNumber title='Avg Event Duration' number={data.eventStats.AvgEventDuration} label='Minutes' duration={dur+'d'} width='two' />
-    <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='two' />
-    <InstanceUptime average={data.statistics['AvgInstanceUptime']} type='avg' duration={dur+'d'} width='two' />
+   <div className='ui compact equal width grid'>
+    <StatsNumber title='Total Anomaly Score' number={data.eventStats.totalAnomalyScore} duration={dur+'d'} width='equal' />
+    <StatsNumber title='Num of Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='equal' />
+    <StatsNumber title='Avg Event Duration' number={data.eventStats.AvgEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
+    <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='equal' />
+    <InstanceUptime average={data.statistics['AvgInstanceUptime']} type='avg' duration={dur+'d'} width='equal' />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
-                    containerTotal={data.statistics['NumberOfContainers']}  duration={dur+'d'} width='three' />
-    <MetricNumber total={data.statistics['NumberOfMetrics']}  duration={dur+'d'} width='two' />
+                    containerTotal={data.statistics['NumberOfContainers']}  duration={dur+'d'} width='equal' />
+    <MetricNumber total={data.statistics['NumberOfMetrics']}  duration={dur+'d'} width='equal' />
    </div>
    <div className='ui compact grid'>
     <StatsList title='Top Event Types (instance level)' list={data.eventStats.countByRootCause} topK={3} order='desc' duration={dur+'d'} valFormat='frequency' width='four' />

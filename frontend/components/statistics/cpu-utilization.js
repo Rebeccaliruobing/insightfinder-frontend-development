@@ -1,7 +1,10 @@
 import React, {PropTypes as T} from 'react';
 
 const CPUUtilization = ({average, type='avg', duration='1d', width='two' }) => {
-  const className = "ui statistic "+width+" wide column";
+  let className = "ui statistic "+width+" wide column";
+  if(width=='equal'){
+    className = "ui statistic column";
+  }
   let roundedAvg = Math.round(average*10)/10;
   let averageText = average !== undefined ? roundedAvg.toString() : '-';
   const valueStyle = _.isFinite(average) && average < 50 ? 'value error' : 'value';

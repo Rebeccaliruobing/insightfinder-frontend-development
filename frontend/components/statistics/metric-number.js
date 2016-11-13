@@ -2,7 +2,10 @@ import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
 const MetricNumber = ({total, duration='1d', width='two' }) => {
-  const className = "ui statistic "+width+" wide column";
+  let className = "ui statistic "+width+" wide column";
+  if(width=='equal'){
+    className = "ui statistic column";
+  }
   const totalText = _.isFinite(total) ? total.toString() : '-';
   return (
     <div className={className}>

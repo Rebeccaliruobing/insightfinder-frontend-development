@@ -2,7 +2,10 @@ import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
 const InstanceUptime = ({average, type='avg', duration='1d', width='two' }) => {
-  const className = "ui statistic "+width+" wide column";
+  let className = "ui statistic "+width+" wide column";
+  if(width=='equal'){
+    className = "ui statistic column";
+  }
   let roundedAvg = Math.round(average*1000)/10;
   let averageText = _.isFinite(average) ? roundedAvg.toString() : '-';
   return (
