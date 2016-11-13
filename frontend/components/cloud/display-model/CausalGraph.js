@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import moment from 'moment'
 import {autobind} from 'core-decorators';
+import {Dropdown} from '../../../artui/react/index';
 
 class Point {
     inLines = [];
@@ -69,12 +71,15 @@ export default class CausalGraph extends React.Component {
                 });
             }
         });
+        this.points = [];
+        this.lines = [];
         this.state = {
             dataArray: newDataArray,
             types: Array.from(newTypesSet),
             startTimestamp:startTimestamp,
             endTimestamp:endTimestamp,
             svgWidthUpdate: 900,
+            threshold: '3',
             svg: {
                 width: 900,
                 height: 600,
@@ -82,8 +87,6 @@ export default class CausalGraph extends React.Component {
                     border: '1px solid #e0e0e0'
                 }
             },
-            points: [],
-            lines: [],
             selectRange: {},
             zoomRange: {
                 x1: 0, y1: 0,
@@ -93,13 +96,14 @@ export default class CausalGraph extends React.Component {
         }
     }
 
-    componentDidMount() {
-        let { dataArray, startTimestamp, endTimestamp, types } = this.state;
-        let state = this.state;
-        let { svg } = state;
-        state.points = [];
-        state.lines = [];
-        let self = this;
+    componentDidMount() {}
+
+    @autobind
+    calculateGraph() {
+        const { svg, dataArray, types } = this.state;
+        const threshold = parseInt(this.state.threshold);
+        const points = [];
+        const lines = [];
 
         let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
@@ -107,8 +111,8 @@ export default class CausalGraph extends React.Component {
         let modelWidth = 0;
         dataArray.forEach(([x, ...records], i) => {
             lastPoints[i] = [];
-            let recordTime = (new Date(x.split(',')[0])).getTime();
-            let timeTag = moment(recordTime).format('MM-DD hh:mm');
+            const recordTime = moment((new Date(x.split(',')[0])).getTime());
+            const timeTag = recordTime.format('MM-DD hh:mm');
             modelWidth += stageWidth;
             records.map((text)=> {
                 //var pos = text.indexOf('.');
@@ -123,6 +127,7 @@ export default class CausalGraph extends React.Component {
                 let pos1 = text.indexOf(']');
                 point.title = timeTag + ": " + text.substring(0,pos1)+']';
                 point.color = text.substring(pos1+1,text.length);
+                point.recordTime = recordTime;
                 // let pos1 = text.indexOf(".");
                 // let pos2 = text.indexOf("[");
                 // let pos3 = text.indexOf("(");
@@ -132,14 +137,17 @@ export default class CausalGraph extends React.Component {
                 // point.title = "Metric:"+metric+", value:"+value;
 
                 lastPoints[i].push(point);
-                state.points.push(point);
+                points.push(point);
                 lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
-                    state.lines.push(new Line(p1, point))
+                    if (point.recordTime.diff(p1.recordTime, 'hours') < threshold) {
+                        lines.push(new Line(p1, point));
+                    }
                 });
                 return point;
             });
         });
-        this.setState(state);
+        this.points = points;
+        this.lines = lines;
     }
 
     highLightPoint(point) {
@@ -355,13 +363,30 @@ export default class CausalGraph extends React.Component {
     }
 
     render() {
-        let { dataArray, types, startTimestamp, endTimestamp } = this.state;
-        let { svg, points, lines, selectRange, zoomRange } = this.state;
+        let { dataArray, types, threshold, startTimestamp, endTimestamp } = this.state;
+        let { svg, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
         let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
+
+        this.calculateGraph();
         return (
             <div>
-                <span className="ui button mini green" onClick={this.reset}>Reset</span><br/>
+                <div style={{paddingBottom:8, marginBottom:8, borderBottom: '1px solid #ddd'}}>
+                    <span
+                      style={{display: 'inline-block', paddingRight: '1em', fontSize:12, fontWeight: 'bold'}}
+                    >Threshold (hours):</span>
+                    <Dropdown mode="select" className="mini" value={threshold}
+                              onChange={(v, t) => this.setState({threshold: t})}>
+                        <i className="dropdown icon"/>
+                        <div className="menu">
+                            <div className="item">1</div>
+                            <div className="item">3</div>
+                            <div className="item">6</div>
+                        </div>
+                    </Dropdown>
+                    <span style={{float:'right'}}
+                          className="ui button mini green" onClick={this.reset}>Reset</span>
+                </div>
                 <div className="relative" style={{ display: 'flex' }}>
                     <svg {...{ width: 250, height: 600, }}>
                         {types.map((type, index)=> {
@@ -407,8 +432,8 @@ export default class CausalGraph extends React.Component {
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
 
                         })}
-                        {lines.map(this.renderLine.bind(this))}
-                        {points.map(this.renderPoint.bind(this))}
+                        {this.lines.map(this.renderLine.bind(this))}
+                        {this.points.map(this.renderPoint.bind(this))}
 
                         <text ref={(c)=>this.$showText = c} />
                         <rect ref={(c)=>this.$selectReact = ReactDOM.findDOMNode(c)}
