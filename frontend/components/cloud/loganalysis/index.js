@@ -79,7 +79,6 @@ class EventTableGroup extends React.Component {
       <tbody>
       <tr key="0">
         <td rowSpan={group.rowSpan}>
-          Cluster {group.iGroup} <br />
           Number of events: {group.nEvents} <br />
           {topKWords.length > 0 ? "Top words: " : ""}
           {
@@ -370,20 +369,20 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
     logEventArr = logEventArr.filter(function (el, index, arr) {
-      return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3) || (el.nid == -1)
+      // return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3) || (el.nid == -1)
+      return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3)
     });
 
     if (logEventArr) {
       return (
         <div>
           <div className="ui header">Number of anomalies: {logEventArr.length}</div>
-          <table className="event-table">
+          <table className="rare-event-table">
             <thead>
             <tr>
                 <td>Time</td>
                 <td>Event</td>
-                <td>Anomaly Hint</td>
-            </tr>
+             </tr>
             </thead>
             <tbody>
               {logEventArr.map((event, iEvent) => {
@@ -422,8 +421,6 @@ class LogAnalysisCharts extends React.Component {
                   <tr key={iEvent}>
                     <td>{timestamp}</td>
                     <td>{event.rawData}</td>
-                    <td>{anomalyString}</td>
-                    <td>{clusterFeature}</td>
                   </tr>
                 )
               })}              
@@ -486,7 +483,7 @@ class LogAnalysisCharts extends React.Component {
             <a className={tabStates['event'] + ' item'}
                onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
             <a className={tabStates['anomaly'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'anomaly')}>Anomaly List</a>
+               onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (

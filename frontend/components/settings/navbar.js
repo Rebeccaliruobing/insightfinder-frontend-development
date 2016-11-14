@@ -5,9 +5,6 @@ export default function (props) {
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
-        <Link to="/settings/project-list" className="item">
-          <i className="edit icon"></i> <span> Register Project</span>
-        </Link>
         <Link to="/settings/threshold" className="item">
           <i className="icon iconfont icon-threshold "></i> <span>Project Settings</span>
         </Link>

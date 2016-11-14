@@ -27,6 +27,29 @@
   }
 }
 
+.rare-event-table {
+  border: 2px solid black;
+  width: 60%;
+  td{
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+    text-align: left;
+    vertical-align: top;
+  }
+  thead > tr {
+    border-top: none;
+    font-weight: bold;
+    td {
+      &:nth-child(1) {
+        width: 20%;
+      }
+      &:nth-child(2) {
+        width: 80%;
+      }
+    }
+  }
+}
+
 .vector-table {
   border: 2px solid black;
   width: 60%;

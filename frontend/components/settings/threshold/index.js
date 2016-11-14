@@ -155,7 +155,11 @@ export default class ThresholdSettings extends React.Component {
             tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
             loading: projectSetting['fileProjectType'] == 0,
         }, ()=> {
-            projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null
+            projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
+            let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);  
+            if(isLogProject){
+                this.selectTab0(null, 'episodeword');
+            }
         });
     }
 

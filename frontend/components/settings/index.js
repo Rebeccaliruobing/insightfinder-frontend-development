@@ -21,9 +21,7 @@ export class Settings extends React.Component {
 
 export const settingsRoute = (
   <Route component={Settings} path="settings">
-    <IndexRedirect to="project-list/custom"/>
-    <Route component={Projects} path="project-list"/>
-    <Route component={Projects} path="project-list/:tabId"/>
+    <IndexRedirect to="threshold"/>
     <Route component={ThresholdSettings} path="threshold"/>
     <Route component={ExtSvc} path="extsvc"/>
   </Route>

@@ -197,7 +197,8 @@ export default class CausalGraph extends React.Component {
         });
     }
 
-    getEventSharpType(text) {
+    getEventShapeType(text) {
+        text = text.toLowerCase();
         if (text.indexOf('- network') >= 0)
             return 'rect-x';
         else if(text.indexOf('- disk') >=0 ){
@@ -214,7 +215,7 @@ export default class CausalGraph extends React.Component {
     renderPoint(point, index) {
         let { x, y } = point;
         let zoomRange = this.state.zoomRange;
-        const shape = this.getEventSharpType(point.title.toLowerCase());
+        const shape = this.getEventShapeType(point.title.toLowerCase());
 
         x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
         y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
@@ -374,12 +375,14 @@ export default class CausalGraph extends React.Component {
                 <div style={{paddingBottom:8, marginBottom:8, borderBottom: '1px solid #ddd'}}>
                     <span
                       style={{display: 'inline-block', paddingRight: '1em', fontSize:12, fontWeight: 'bold'}}
-                    >Threshold (hours):</span>
+                    >Time Thresholds for Causal Relationships (hour):</span>
                     <Dropdown mode="select" className="mini" value={threshold}
                               onChange={(v, t) => this.setState({threshold: t})}>
                         <i className="dropdown icon"/>
                         <div className="menu">
+                            <div className="item">0.5</div>
                             <div className="item">1</div>
+                            <div className="item">1.5</div>
                             <div className="item">3</div>
                             <div className="item">6</div>
                         </div>

@@ -105,7 +105,7 @@ class Projects extends React.Component {
     this.sharedProjectList(sharedProjectString,projectGroupByType,projectInfoArray);
     console.log(_.last(location.pathname.split('/')));
     return (
-      <Console.Content>
+      <Console.Content className="projects">
         <div className="ui main tiny container" ref={c => this._el = c}>
           <div className="ui clearing vertical segment">
           </div>

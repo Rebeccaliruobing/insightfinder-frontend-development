@@ -56,7 +56,7 @@ class EventSummary extends Component {
       let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = `/settings/project-list/custom`;
+      const url = `/newproject/project-list/custom`;
       window.open(url, '_self');
     }
   }

@@ -10,6 +10,7 @@ import {Console, Link} from './artui/react';
 import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
 import {settingsRoute} from './components/settings';
+import {newProjectRoute} from './components/monitoring';
 import {useCaseRoute} from './components/usecase/index';
 import {fileTabsRoute} from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
@@ -168,6 +169,7 @@ class App extends React.Component {
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
+          <Link to="/newproject" className="item">Register Project</Link>
           <Link to="/settings" className="item">Settings</Link>
           <Link to="/usecase" className="item">Benchmarks</Link>
           {['admin','guest'].indexOf(store.get('userName'))!=-1?<Link to="/filetabs" className="item">File Analysis</Link>:null}
@@ -259,6 +261,7 @@ const routes = (
       <IndexRedirect to="/cloud"/>
       {cloudRoute}
       {settingsRoute}
+      {newProjectRoute}
       {useCaseRoute}
       {fileTabsRoute}
       <Route component={Help} path="help"/>

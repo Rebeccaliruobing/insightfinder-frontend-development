@@ -187,50 +187,70 @@ class IncidentsList extends Component {
   }
 
   @autobind
-  getEventSharp(text, index, color) {
+  getEventShapeType(text, index, color) {
     const size = 5;
     const height = 26;
     const cx = index * size * 2 + size;
     const cy = height / 2;
+    text = text.toLowerCase();
 
     if (text.indexOf('- network') >= 0) {
       return (
-        <rect key={index} fill={`rgb(${color})`}
+        <rect key={index} fill={`rgb(${color})`} eventtype='network'
               x={cx - size} y={cy - size * 0.6} width={size * 1.9} height={size * 1.2}/>
       );
     } else if(text.indexOf('- disk') >=0 ){
       return (
         <rect
-          key={index} fill={`rgb(${color})`}
+          key={index} fill={`rgb(${color})`} eventtype='disk'
           x={cx - size * 0.6} y={cy - size} width={size * 1.2} height={size * 2}/>
       );
-    } else if(text.indexOf('- workload increase') >= 0) {
+    } else if(text.indexOf('- workload') >= 0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`}
+          key={index} fill={`rgb(${color})`} eventtype='workload'
           points={`${cx},${cy - 7} ${cx - 5},${cy + 4} ${cx + 5},${cy + 4}`}
         />
+      );
+    } else if(text.indexOf('- new instance') >= 0) {
+      return (
+        <circle key={index} fill={`rgb(${color})`} eventtype='new' 
+          cx={cx} cy={cy} r={size * 0.95} />
       );
     } else if(text.indexOf('- instance down') >= 0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`}
+          key={index} fill={`rgb(${color})`} eventtype='down'
           points={`${cx-5},${cy-4} ${cx+5},${cy-4} ${cx},${cy+7}`}
         />
       );
     } else if(text.indexOf('- high cpu') >=0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`}
-          points={`${cx},${cy - 7} ${cx - 5},${cy + 4} ${cx + 5},${cy + 4}`}
+          key={index} fill={`rgb(${color})`} eventtype='cpu'
+          points={`${cx},${cy-6} ${cx+6},${cy} ${cx},${cy+6} ${cx-6},${cy}`}
         />
       );
+    } else  {
+      return (
+        <circle key={index} fill={`rgb(${color})`} eventtype='others' cx={cx} cy={cy} r={size * 0.95} />
+      );
     }
-
-    return (
-      <circle key={index} fill={`rgb(${color})`} cx={cx} cy={cy} r={size * 0.95} />
-    );
   }
+
+
+  unique(array){
+      var len = array.length;
+      for(var i = 0; i < len; i++) 
+        for(var j = i + 1; j < len; j++) 
+          if(array[j].props.eventtype != 'others' && array[j].props.eventtype == array[i].props.eventtype){
+            array.splice(j,1);
+            j--;
+            len--;
+          }
+      return array;
+  }
+
 
   @autobind
   renderEventSeverity(incident) {
@@ -239,9 +259,9 @@ class IncidentsList extends Component {
     const eventTypes = incident.rootCauseJson.rootCauseTypes.split('\n');
     return (
       <svg width={70} height={26}>
-        {eventTypes.map((event, index) => {
-          return this.getEventSharp(event, index, color);
-        })}
+        {this.unique(eventTypes.map((event, index) => {
+          return this.getEventShapeType(event, index, color);
+        }))}
       </svg>
     );
   }
