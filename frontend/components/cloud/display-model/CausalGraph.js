@@ -180,6 +180,16 @@ export default class CausalGraph extends React.Component {
         point.inLines.forEach((line)=>this.unHighLightLine(line));
     }
 
+    getZoomedX(x) {
+        const zoomRange = this.state.zoomRange;
+        return (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
+    }
+    getZoomedY(y) {
+        const zoomRange = this.state.zoomRange;
+        return (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
+    }
+
+    @autobind
     highLightLine(line, color) {
         let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
         $(line.component).attr({ 'marker-end': `url(#arrow-${color})` }).css({
@@ -187,14 +197,26 @@ export default class CausalGraph extends React.Component {
             stroke: hex,
             cursor: 'pointer'
         });
+        const from = line.fromPoint;
+        const to = line.toPoint;
+        const cx = (this.getZoomedX(to.x) - this.getZoomedX(from.x))/2 + this.getZoomedX(from.x);
+        const cy = (this.getZoomedY(to.y) - this.getZoomedY(from.y))/2 + this.getZoomedY(from.y);
+        $(this.$crossLine).attr({ d: `M ${cx-5} ${cy-5} L ${cx+5} ${cy+5} M ${cx+5} ${cy-5} L ${cx-5} ${cy+5} Z` });
     }
 
+    @autobind
     unHighLightLine(line) {
         $(line.component).attr({ 'marker-end': `url(#arrow)` }).css({
             strokeWidth: 1,
             stroke: "#999",
             cursor: 'pointer'
         });
+        $(this.$crossLine).attr({ d: ''});
+    }
+
+    @autobind
+    handleLineClick(line) {
+        alert('Remove line');
     }
 
     getEventShapeType(text) {
@@ -299,11 +321,15 @@ export default class CausalGraph extends React.Component {
             cursor: 'pointer'
         };
         return (
-            <g key={line.id + index}>
+            <g key={line.id + index}
+               onMouseEnter={()=>this.highLightLine(line, 'blue')}
+               onMouseLeave={()=>this.unHighLightLine(line)}
+            >
                 <line ref={(c)=>line.component = c}
                       x1={x1} y1={y1} x2={x2} y2={y2} style={style}
                       onMouseEnter={()=>this.highLightLine(line, 'blue')}
                       onMouseLeave={()=>this.unHighLightLine(line)}
+                      onClick={() => this.handleLineClick(line)}
                       markerEnd={`url(#arrow)`}/>
             </g>
         )
@@ -468,7 +494,7 @@ export default class CausalGraph extends React.Component {
                                          y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
 
                         })}
-
+                        <path ref={(c) => this.$crossLine = c} stroke="red" strokeWidth={2} />
                     </svg>
                 </div>
             </div>
