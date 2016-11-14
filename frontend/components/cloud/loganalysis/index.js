@@ -446,7 +446,7 @@ class LogAnalysisCharts extends React.Component {
           <table className="event-table">
             <thead>
             <tr>
-              <td>Cluster ID</td>
+              <td>Event Type</td>
               <td>Time</td>
               <td>Event</td>
             </tr>

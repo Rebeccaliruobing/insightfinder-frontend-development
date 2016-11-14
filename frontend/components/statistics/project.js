@@ -16,7 +16,7 @@ import StatsList from './stats-list';
 const ProjectStatistics = ({data, dur}) => (
   <div>
    <div className='ui compact equal width grid'>
-    <StatsNumber title='Total Anomaly Score' number={data.eventStats.totalAnomalyScore} duration={dur+'d'} width='equal' />
+    <StatsNumber title='Daily Anomaly Score' number={data.eventStats.avgDailyAnomalyScore} prevNumber={data.eventStats.prevAvgDailyAnomalyScore} label='avg' duration={dur+'d'} width='equal' />
     <StatsNumber title='Num of Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='equal' />
     <StatsNumber title='Avg Event Duration' number={data.eventStats.AvgEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
     <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='equal' />

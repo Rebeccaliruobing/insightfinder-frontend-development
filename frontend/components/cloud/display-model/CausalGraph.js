@@ -191,6 +191,7 @@ export default class CausalGraph extends React.Component {
 
     @autobind
     highLightLine(line, color) {
+        return;
         let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
         $(line.component).attr({ 'marker-end': `url(#arrow-${color})` }).css({
             strokeWidth: 1.4,
@@ -206,6 +207,7 @@ export default class CausalGraph extends React.Component {
 
     @autobind
     unHighLightLine(line) {
+        return;
         $(line.component).attr({ 'marker-end': `url(#arrow)` }).css({
             strokeWidth: 1,
             stroke: "#999",
@@ -216,6 +218,7 @@ export default class CausalGraph extends React.Component {
 
     @autobind
     handleLineClick(line) {
+        return;
         alert('Remove line');
     }
 
@@ -334,6 +337,7 @@ export default class CausalGraph extends React.Component {
             </g>
         )
     }
+                      
 
     getWrapText(text, maxLength) {
         let ret = [];
