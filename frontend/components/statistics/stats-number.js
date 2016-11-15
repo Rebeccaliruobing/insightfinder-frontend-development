@@ -16,9 +16,9 @@ const StatsNumber = ({title, number, prevNumber, label='Total', duration='1d', w
       </div>
       <div className={valueStyle}>
       {prevNumber!=undefined && prevNumber>number &&
-        <span style={{fontWeight:'bold', color:'green'}}>&darr;&nbsp;&nbsp;</span>}
+        <span style={{fontWeight:'bold', color:'green'}}>&darr;&nbsp;</span>}
       {prevNumber!=undefined && prevNumber<number &&
-        <span style={{fontWeight:'bold', color:'red'}}>&uarr;&nbsp;&nbsp;</span>}
+        <span style={{fontWeight:'bold', color:'red'}}>&uarr;&nbsp;</span>}
       {numberString}</div>
       <div className="label">{label}</div>
     </div>

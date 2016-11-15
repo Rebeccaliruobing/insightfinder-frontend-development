@@ -16,7 +16,7 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="info circle icon"></i>
                 <h3>How to get started?</h3>
-                <Link to="/settings/project-list" className="item">Step 1: Register your project in settings. Choose from Insight Agent and/or AWS CloudWatch, Google Cloud Monitoring.</Link>
+                <Link to="/newproject/project-list" className="item">Step 1: Register your project according to data source types.</Link>
                 <Link to="/cloud/" className="item">Step 2: View anomaly detection and diagnosis results in Dashboard.</Link>
                 <Link to="/settings/threshold" className="item">Step 3: Configure your projects in settings.</Link>
               </div>

@@ -6,7 +6,7 @@ import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
 import {retrieveAppNames,retrieveAppMetricForecastData,retrieveAppForecastData} from './retrieve-forecast';
 import {loadTriageActionRecord, saveTriageActionRecord} from './retrieve-actions';
-
+import {loadInstanceGrouping, saveInstanceGrouping} from './instanceGrouping';
 //
 // When we run frontend on localhost python web server and connect api with different host,
 // Chrome will report cross-domain error, we need to install the chrome plugin to avoid it:
@@ -124,6 +124,8 @@ const apis = {
     retrieveAppForecastData: retrieveAppForecastData,
     loadTriageActionRecord: loadTriageActionRecord,
     saveTriageActionRecord: saveTriageActionRecord,
+    loadInstanceGrouping:loadInstanceGrouping,
+    saveInstanceGrouping:saveInstanceGrouping,
     
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {

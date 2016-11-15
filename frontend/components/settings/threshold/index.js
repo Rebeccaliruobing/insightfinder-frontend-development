@@ -13,6 +13,7 @@ import {
     ProjectSelection,
     DurationThreshold,
     AnomalyThreshold,
+    EnvironmentSelect,
 } from '../../selections';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
@@ -56,6 +57,7 @@ export default class ThresholdSettings extends React.Component {
                 sharing: '',
                 threshold: '',
                 episodeword: '',
+                grouping:'',
             },
 
         };
@@ -66,13 +68,9 @@ export default class ThresholdSettings extends React.Component {
         let {projectModelAllInfo, projectString} = dashboardUservalues;
         let projectNames = projectModelAllInfo.map((info)=>info.projectName);
 
-        let {
-            projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames
-            }=this.state.data;
-        projectName = projectName || projectNames[0];
-
+        let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectNames[0];
         if (projectNames.length > 0) {
-            this.handleProjectChange(projectNames[0]);
+            this.handleProjectChange(refreshName);
         }
     }
 
@@ -111,7 +109,6 @@ export default class ThresholdSettings extends React.Component {
         let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
         let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
         let {cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames} = project;
-
         let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
         if(!projectStr){
             projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0]+'@'+v[3]) == projectName);
@@ -119,7 +116,8 @@ export default class ThresholdSettings extends React.Component {
         // // 前三部分是名称，数据类型dataType和云类型cloudType
         let dataType = projectStr ? projectStr[1] : null;
         let cloudType = projectStr ? projectStr[2] : '';
-        let projectType;
+        let projectType = "";
+        let instanceGrouping = {};
         let self = this;
         switch (dataType) {
             case 'AWS':
@@ -135,7 +133,38 @@ export default class ThresholdSettings extends React.Component {
             default:
                 projectType = `${cloudType}/Agent`;
         }
-
+        apis.loadInstanceGrouping(projectName).then((resp)=>{
+            instanceGrouping = resp.instanceGrouping;
+            let data = Object.assign({}, this.state.data, {
+                projectName,
+                projectType,
+                cvalue,
+                pvalue,
+                emailcvalue,
+                emailpvalue,
+                filtercvalue,
+                filterpvalue,
+                minAnomalyRatioFilter,
+                sharedUsernames,
+                instanceGrouping,
+            });
+            this.setState({
+                metricSettings: metricSettings,
+                data: data,
+                tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+                tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+                loading: projectSetting['fileProjectType'] == 0,
+            }, ()=> {
+                projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
+                let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);  
+                if(isLogProject){
+                    this.selectTab0(null, this.state['tabStates0']);
+                } else {
+                    this.selectTab0(null, this.state['tabStates0']);
+                    store.set('liveAnalysisProjectName', projectName);
+                }
+            });
+        });
         let data = Object.assign({}, this.state.data, {
             projectName,
             projectType,
@@ -146,7 +175,8 @@ export default class ThresholdSettings extends React.Component {
             filtercvalue,
             filterpvalue,
             minAnomalyRatioFilter,
-            sharedUsernames
+            sharedUsernames,
+            instanceGrouping,
         });
         this.setState({
             metricSettings: metricSettings,
@@ -158,7 +188,10 @@ export default class ThresholdSettings extends React.Component {
             projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
             let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);  
             if(isLogProject){
-                this.selectTab0(null, 'episodeword');
+                this.selectTab0(null, this.state['tabStates0']);
+            } else {
+                this.selectTab0(null, this.state['tabStates0']);
+                store.set('liveAnalysisProjectName', projectName);
             }
         });
     }
@@ -172,6 +205,10 @@ export default class ThresholdSettings extends React.Component {
                 loading: false
             });
         });
+    }
+
+    handleValueChangeDummy(name) {
+        return;
     }
 
     handleValueChange(name) {
@@ -203,6 +240,13 @@ export default class ThresholdSettings extends React.Component {
             let metricSettings = this.state.metricSettings;
             metricSettings[index][name] = e.target.value;
             this.setState({metricSettings});
+        }
+    }
+
+    handleMetricSettingChecked(index, e) {
+        if (!e.target.checked) {
+        } else {
+
         }
     }
 
@@ -327,6 +371,13 @@ export default class ThresholdSettings extends React.Component {
         let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
         let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
         let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
+        let instanceGroupingArr = [];
+        if(data.instanceGrouping){
+            Object.keys(data.instanceGrouping).map(function(key, index) {
+                instanceGroupingArr.push(data.instanceGrouping[key]);
+            }); 
+            instanceGroupingArr = _.sortBy(instanceGroupingArr,"instanceId");
+        }
         let self = this;
         return (
             <Console.Content className={loading?"ui form loading":""}>
@@ -337,9 +388,6 @@ export default class ThresholdSettings extends React.Component {
                               <ProjectSelection key={data.projectName} value={data.projectName} style={{minWidth: 200}}
                                                                 onChange={this.handleProjectChange.bind(this)}/>
                       </div>
-                      <div className="field">
-                        <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
-                      </div>
                     </div>
                     <div className="ui vertical segment" >
                         <div className="ui pointing secondary menu">
@@ -349,6 +397,8 @@ export default class ThresholdSettings extends React.Component {
                                onClick={(e) => this.selectTab0(e, 'alert')}>Alert Settings</a>}
                             <a className={tabStates0['sharing'] + ' item'}
                                onClick={(e) => this.selectTab0(e, 'sharing')}>Sharing Settings</a>
+                            {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
+                               onClick={(e) => this.selectTab0(e, 'grouping')}>Instance Grouping</a>}
                             {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
                                onClick={(e) => this.selectTab0(e, 'threshold')}>Metric Thresholds</a>}
                             {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
@@ -422,6 +472,7 @@ export default class ThresholdSettings extends React.Component {
                                         <th>Normalization Group</th>
                                         <th>Alert Threshold</th>
                                         <th>No Alert Threshold</th>
+                                        <th>KPI</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -437,12 +488,48 @@ export default class ThresholdSettings extends React.Component {
                                                 <td><input value={setting.thresholdNoAlert}
                                                            onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/>
                                                 </td>
+                                                <td><input type='checkbox' defaultChecked={setting.isKPI}
+                                                           onChange={this.handleMetricSetting(index, 'isKPI')}/>
+                                                </td>
                                             </tr>
                                         )
                                     })}
                                     </tbody>
                                 </table>
                                 <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Threshold Settings</Button>
+                            </div>}
+                            {!isLogProject && <div className={tabStates0['grouping'] + ' ui tab'}>
+                                <h3>Instance Grouping Settings </h3>
+                                <div className='ui vertical segment'>
+                                    <table className="ui celled table grouping-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Instance ID</th>
+                                            <th>Instance Name</th>
+                                            <th>Environment</th>
+                                            <th>Service Name</th>
+                                            <th>Team</th>
+                                            <th>Business Unit</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {instanceGroupingArr.map((grouping, index)=> {
+                                            return (
+                                                <tr key={`${data.projectName}-${index}`}>
+                                                    <td>{grouping.instanceId}</td>
+                                                    <td><input value={grouping.instanceName} onChange={this.handleValueChangeDummy('instanceName')}/></td>
+                                                    <td><EnvironmentSelect key={data.projectName} value={grouping.environment}
+                                                          onChange={this.handleValueChangeDummy('environment')} style={{width:'100%'}} /></td>
+                                                    <td><input onChange={this.handleValueChangeDummy('service')}/></td>
+                                                    <td><input onChange={this.handleValueChangeDummy('team')}/></td>
+                                                    <td><input onChange={this.handleValueChangeDummy('businessUnit')}/></td>
+                                                </tr>
+                                            )
+                                        })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Instance Grouping<    /Button>
                             </div>}
                             {isLogProject && <div className={tabStates0['episodeword'] + ' ui tab'} style={{'paddingTop': '40px' }}>
                                 <h3>Episode and Word Selection</h3>
