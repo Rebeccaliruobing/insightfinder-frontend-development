@@ -191,31 +191,41 @@ export default class CausalGraph extends React.Component {
 
     @autobind
     highLightLine(line, color) {
-        let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
-        $(line.component).attr({ 'marker-end': `url(#arrow-${color})` }).css({
-            strokeWidth: 1.4,
-            stroke: hex,
-            cursor: 'pointer'
-        });
+        const $line = $(line.component);
+        const $cross = $(line.crossLine);
 
-        if ( color === 'blue') {
-            $(line.crossLine).attr({ 'visibility': 'visible'});
+        let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
+        if($line && $cross) {
+            $line.attr({ 'marker-end': `url(#arrow-${color})` }).css({
+                strokeWidth: 1.4,
+                stroke: hex,
+                cursor: 'pointer'
+            });
+            if ( color === 'blue') {
+                $cross.attr({ 'visibility': 'visible'});
+            }
         }
     }
 
     @autobind
     unHighLightLine(line) {
-        $(line.component).attr({ 'marker-end': `url(#arrow)` }).css({
-            strokeWidth: 1,
-            stroke: "#999",
-            cursor: 'pointer'
-        });
-        $(line.crossLine).attr({ 'visibility': 'hidden'});
+        const $line = $(line.component);
+        const $cross = $(line.crossLine);
+        if($line && $cross) {
+            $line.attr({ 'marker-end': `url(#arrow)` }).css({
+                strokeWidth: 1,
+                stroke: "#999",
+                cursor: 'pointer'
+            });
+            $cross.attr({ 'visibility': 'hidden'});
+        }
     }
 
     @autobind
     handleLineClick(line) {
-        console.log(line);
+        $(line.component).remove();
+        $(line.crossLine).remove();
+        $(line.lineRect).remove();
     }
 
     getEventShapeType(text) {
@@ -330,7 +340,8 @@ export default class CausalGraph extends React.Component {
                       visibility='hidden'
                       d={`M ${cx-5} ${cy-5} L ${cx+5} ${cy+5} M ${cx+5} ${cy-5} L ${cx-5} ${cy+5} Z`}
                 />
-                <path d={`M ${x1-4} ${y1} L ${x1+4} ${y1} L ${x2+4} ${y2} L ${x2-4} ${y2} Z`}
+                <path ref={(c) => line.lineRect= c}
+                      d={`M ${x1-4} ${y1} L ${x1+4} ${y1} L ${x2+4} ${y2} L ${x2-4} ${y2} Z`}
                       style={{ strokeWidth: 8, stroke: 'transparent', fill:'transparent', cursor: 'pointer' }}
                       onMouseEnter={()=>this.highLightLine(line, 'blue')}
                       onMouseLeave={()=>this.unHighLightLine(line)}
