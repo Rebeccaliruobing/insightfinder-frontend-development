@@ -3,7 +3,7 @@
  */
 
 import 'babel-polyfill';
-require('expose?$!expose?jQuery!jquery');
+import 'jquery';
 import 'react';
 import 'react-dom';
 import 'react-router';

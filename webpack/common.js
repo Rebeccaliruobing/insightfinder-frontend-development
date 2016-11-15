@@ -37,10 +37,15 @@ module.exports = merge({}, {
       },
       happy: { id: 'js' }
     }, {
+      test: require.resolve('dygraphs/dygraph-combined-dev'), loader: "exports?Dygraph",
+    }, {
       test: /\.json$/, loader: 'json'
     } , {
       test: require.resolve("react-addons-perf"),
-      loader: "expose?Perf" 
+      loader: "expose?Perf"
+    }, {
+      test: require.resolve('jquery'),
+      loader: "expose?$!expose?jQuery",
     },{
       test: /\.css$/,
       loader: ExtractTextPlugin.extract(

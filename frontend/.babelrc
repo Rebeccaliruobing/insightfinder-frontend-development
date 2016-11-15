@@ -2,5 +2,4 @@
 // Browser babel configuration is in ./webpack/makeConfig.js.
 // https://github.com/facebook/react-native/tree/master/babel-preset
 {
-  "presets": ["react-native"]
 }
