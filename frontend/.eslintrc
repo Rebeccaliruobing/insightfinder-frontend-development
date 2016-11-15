@@ -1,0 +1,26 @@
+{
+  "parser": "babel-eslint",
+  "plugins": [
+  ],
+  "extends": [
+    "airbnb"
+  ],
+  "rules": {
+    // Used by webpack-isomorphic-tools and React Native.
+    "global-require": "off",
+    // Easy for naming local variable
+    "no-param-reassign": "off",
+    // Use js for jsx
+    "react/jsx-filename-extension": "off",
+    // For immutable types.
+    "new-cap": [
+      "error", { "capIsNew": false, "newIsCap": true }
+    ],
+    "no-shadow": "off",
+    // TODO: Turn on devDependencies check until issue fixed
+    // https://github.com/benmosher/eslint-plugin-import/issues/602
+    "import/no-extraneous-dependencies": [
+      "error", { "devDependencies": true }
+    ]
+  }
+}

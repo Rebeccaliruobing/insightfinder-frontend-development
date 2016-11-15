@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import {autobind} from 'core-decorators';
 import {DygraphDefaultProps, spreadDygraphProps} from './options';
 
-const DygraphBase = require('exports?Dygraph!dygraphs/dygraph-combined-dev');
+const DygraphBase = require('dygraphs/dygraph-combined-dev');
 
 class Dygraph extends Component {
 

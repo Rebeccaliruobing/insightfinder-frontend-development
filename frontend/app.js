@@ -297,5 +297,4 @@ class AppRoute extends React.Component {
   }
 }
 
-$('body').prepend($('<div id="app"></div>'));
 ReactDOM.render(<AppRoute/>, document.querySelector('#app'));
