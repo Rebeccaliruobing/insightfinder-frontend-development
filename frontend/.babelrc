@@ -1,0 +1,6 @@
+// This .babelrc is for react-native, webpack, and gulp.
+// Browser babel configuration is in ./webpack/makeConfig.js.
+// https://github.com/facebook/react-native/tree/master/babel-preset
+{
+  "presets": ["react-native"]
+}
