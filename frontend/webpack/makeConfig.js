@@ -12,6 +12,7 @@ import compact from 'lodash/compact';
 import cloneDeep from 'lodash/cloneDeep';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import autoprefixer from 'autoprefixer';
+import HappyPack from 'happypack';
 import webpackSettings from '../webpack.settings';
 import babel from './parts/babel';
 import assets from './parts/assets';
@@ -19,6 +20,8 @@ import entry from './parts/entry';
 import output from './parts/output';
 import html from './parts/html';
 import styles from './parts/styles';
+
+const happyThreadPool = HappyPack.ThreadPool({ size: 4 });
 
 const makeConfig = () => {
   const settings = cloneDeep(webpackSettings);
@@ -41,6 +44,21 @@ const makeConfig = () => {
   let plugins = [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoErrorsPlugin(),
+    new HappyPack({
+      id: 'js',
+      threads: 4,
+      loaders: ['babel-loader'],
+    }),
+    new HappyPack({
+      id: 'sass',
+      threadPool: happyThreadPool,
+      loaders: ['sass-loader'],
+    }),
+    new HappyPack({
+      id: 'less',
+      threadPool: happyThreadPool,
+      loaders: ['less-loader'],
+    }),
   ];
 
   plugins = compact(plugins.concat(
@@ -78,7 +96,7 @@ const makeConfig = () => {
     entry: entry(settings),
     output: output(settings),
     module: {
-      rules,
+      loaders: rules,
     },
     resolve: {
       extensions: ['.js'],

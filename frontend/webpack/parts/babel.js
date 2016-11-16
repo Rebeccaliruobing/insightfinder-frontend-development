@@ -34,7 +34,7 @@ const babel = (settings) => {
       test: /\.jsx?$/,
       exclude: paths.node_modules,
     },
-    use: [{
+    loaders: [{
       loader: 'babel-loader',
       options: {
         cacheDirectory: true,

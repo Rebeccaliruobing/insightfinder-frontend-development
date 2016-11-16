@@ -43,19 +43,13 @@ const assets = (settings) => {
     // Sass
     test: /\.scss$/,
     loaders: styleLoaders(cssLoaders.concat({
-      loader: 'sass-loader',
-      options: {
-        sourceMap: isDev,
-      },
+      loader: `sass-loader${isDev ? '?sourceMap' : ''}`,
     })),
   }, {
     // Less
     test: /\.less$/,
     loaders: styleLoaders(cssLoaders.concat({
-      loader: 'less-loader',
-      options: {
-        sourceMap: isDev,
-      },
+      loader: `less-loader${isDev ? '?sourceMap' : ''}`,
     })),
   }];
 };
