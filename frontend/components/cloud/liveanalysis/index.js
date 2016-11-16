@@ -14,7 +14,7 @@ import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
 import { PieChart } from '../insight-report';
 
-import {GridColumns, DefaultView} from '../../storeKeys';
+import {GridColumns, DefaultView, ShowSummaryFlag} from '../../storeKeys';
 import {DataSummaryChart, DataGroupCharts} from '../../share/charts';
 
 
@@ -50,6 +50,7 @@ class LiveAnalysisCharts extends React.Component {
             instanceName: false,
             view: (store.get(DefaultView, 'grid')).toLowerCase(),
             columns: (store.get(GridColumns, 'four')).toLowerCase(),
+            showSummaryFlag: (store.get(ShowSummaryFlag, 'Yes')),
             selectedGroupId: undefined,
             selectedAnnotation: null,
             showSettingModal: false,
@@ -280,7 +281,7 @@ class LiveAnalysisCharts extends React.Component {
 
         let { loading, onRefresh, enablePublish, enableComments,
           debugData, timeMockup, freqMockup, projectName, periodMap, data, chartType, alertMissingData} = this.props;
-        const { view, columns,tabStates,isForecast } = this.state;
+        const { view, columns,showSummaryFlag,tabStates,isForecast } = this.state;
         debugData = debugData || [];
         timeMockup = timeMockup || [];
         freqMockup = freqMockup || [];
@@ -384,10 +385,10 @@ class LiveAnalysisCharts extends React.Component {
                             }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
-                                    {(!isFileDetection || !summary) && (!groups || groups.length==0) &&
+                                    {(!summary) && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
-                                    {isFileDetection && !!summary && 
+                                    {showSummaryFlag.toLowerCase()=='yes' && !!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}

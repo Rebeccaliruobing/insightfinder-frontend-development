@@ -18,7 +18,8 @@ const ProjectStatistics = ({data, dur}) => (
    <div className='ui compact equal width grid'>
     <StatsNumber title='Daily Anomaly Score' number={data.eventStats.avgDailyAnomalyScore} prevNumber={data.eventStats.prevAvgDailyAnomalyScore} label='avg' duration={dur+'d'} width='equal' />
     <StatsNumber title='Num of Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='equal' />
-    <StatsNumber title='Avg Event Duration' number={data.eventStats.AvgEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
+    <StatsNumber title='Num of Anomalies' number={data.eventStats.numberOfAnomalies} duration={dur+'d'} width='equal' />
+    <StatsNumber title='Total Event Duration' number={data.eventStats.totalEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
     <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='equal' />
     <InstanceUptime average={data.statistics['AvgInstanceUptime']} type='avg' duration={dur+'d'} width='equal' />
     <InstanceNumber total={data.statistics['NumberOfInstances']}

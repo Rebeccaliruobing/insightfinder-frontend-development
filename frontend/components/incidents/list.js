@@ -384,7 +384,7 @@ class IncidentsList extends Component {
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
                       onClick={()=>self.handleIncidentSelected(incident)}
                       className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={"Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
+                      title={"Event Anomaly Score: " + incident.anomalyRatio + "\nEvent details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>
                     <td>
                       {self.renderEventSeverity(incident)}
@@ -508,7 +508,7 @@ class IncidentsList extends Component {
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
                       onClick={()=>self.handleIncidentSelected(incident)}
                       className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={"Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
+                      title={"Event Anomaly Score: " + incident.anomalyRatio + "\nEvent details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>
                     <td>
                       {self.renderEventSeverity(incident)}

@@ -407,17 +407,17 @@ export default class ThresholdSettings extends React.Component {
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
               {!isLogProject && <a className={tabStates0['learning'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'learning')}>Learning Settings</a>}
+                                   onClick={(e) => this.selectTab0(e, 'learning')}>Learning Periods</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'alert')}>Alert Settings</a>}
+                                   onClick={(e) => this.selectTab0(e, 'alert')}>Alert Thresholds</a>}
               <a className={tabStates0['sharing'] + ' item'}
-                 onClick={(e) => this.selectTab0(e, 'sharing')}>Sharing Settings</a>
+                 onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'grouping')}>Instance Grouping</a>}
+                                   onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'threshold')}>Metric Thresholds</a>}
               {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
-                                  onClick={(e) => this.selectTab0(e, 'episodeword')}>Log Analysis Settings</a>}
+                                  onClick={(e) => this.selectTab0(e, 'episodeword')}>Log Analysis</a>}
             </div>
             <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
                  style={{ 'paddingTop': '10px' }}>
