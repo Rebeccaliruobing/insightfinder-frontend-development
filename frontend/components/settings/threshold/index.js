@@ -248,6 +248,18 @@ export default class ThresholdSettings extends React.Component {
       metricSettings[index][name] = e.target.value;
       this.setState({ metricSettings });
     }
+  }  
+
+  handleMetricSettingChecked(index, name) {
+    return (e) => {
+        let metricSettings = this.state.metricSettings;
+        if (e.target.checked) {
+            metricSettings[index][name] = "on";
+        } else {
+            metricSettings[index][name] = undefined;
+        }
+        this.setState({ metricSettings });
+    }
   }
 
   getEpisodeIndexNumber(index, e) {
@@ -493,7 +505,7 @@ export default class ThresholdSettings extends React.Component {
                                    onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/>
                         </td>
                         <td><input type='checkbox' defaultChecked={setting.isKPI}
-                                   onChange={this.handleMetricSetting(index, 'isKPI')}/>
+                                   onChange={this.handleMetricSettingChecked(index, 'isKPI')}/>
                         </td>
                       </tr>
                     )
