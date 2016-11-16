@@ -18,12 +18,15 @@ const htmlsDir = path.join(sourceDir, 'browser/app/htmls');
 // html template, the initialState might be different.
 const initialState = {};
 
-// Webpack 2.0 config object doesn't support customize variables.
-// So we need keep the settings and export it.
+// Webpack 2.0 config object doesn't support customize variables. So we create a
+// settings object and export to other modules.
 const webpackSettings = {
-  // The port for frontend hot dev server.
+
+  // The port of hot dev server used in development
   hotPort: 5000,
-  // apiServerUrl: 'http://0.0.0.0:6068',
+
+  // If the apiServerUrl is set, request to /api will proxy to this url.
+  // apiServerUrl: '',
 
   paths: {
     root: currentDir,
@@ -34,13 +37,10 @@ const webpackSettings = {
     node_modules: nodeModulesDir,
   },
 
-  // others loaders, mainly for exports & expose
+  // others webpack loaders, mainly for exports & expose
   loaders: [{
     test: require.resolve('dygraphs/dygraph-combined-dev'),
-    loader: 'exports-loader',
-    options: {
-      Dygraph: true,
-    }
+    loader: 'exports-loader?Dygraph',
   }, {
     test: require.resolve('jquery'),
     loaders: ['expose-loader?$', 'expose-loader?jQuery'],
@@ -51,25 +51,31 @@ const webpackSettings = {
     new webpack.ProvidePlugin({
       _: 'lodash',
       $: 'jquery',
-      'jQuery': 'jquery',
+      jQuery: 'jquery',
       'window.jQuery': 'jquery',
-      'moment': 'moment',
-      'React': 'react',
-      'ReactDOM': 'react-dom',
-      'cx': 'classnames',
-    })
+      moment: 'moment',
+      React: 'react',
+      ReactDOM: 'react-dom',
+      cx: 'classnames',
+    }),
   ],
 
   // Define the starting points of app, use object syntax.
   // https://webpack.js.org/concepts/entry-points/
   entries: {
-    'assets/app': './browser',
+    'assets/js/app': './browser',
   },
 
-  // The list of [template, output, initialState] for html files generation.
-  htmls: [
-    ['index.ejs', 'index.html', initialState],
-  ],
+  // Default html page for HMR in development.
+  hotDefaultHtml: 'index.jsp',
+
+  // Html files, template file is related with the path.htmls folder,
+  // the filename is the output path related with the path.build folder.
+  htmls: [{
+    template: 'index.ejs',
+    filename: 'index.jsp',
+    initialState,
+  }],
 };
 
 export default webpackSettings;
