@@ -45,15 +45,14 @@ const makeConfig = () => {
 
   plugins = compact(plugins.concat(
     html(settings),
+    new webpack.DefinePlugin({
+      'process.env': {
+        IS_BROWSER: true,
+        NODE_ENV: JSON.stringify(env),
+      },
+    }),
     isDev ? null : [
-      new webpack.DefinePlugin({
-        'process.env': {
-          IS_BROWSER: true,
-          NODE_ENV: JSON.stringify(env),
-        },
-      }),
       new ExtractTextPlugin('[name]-[hash].css'),
-      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.UglifyJsPlugin({
         compress: {
           screw_ie8: true,

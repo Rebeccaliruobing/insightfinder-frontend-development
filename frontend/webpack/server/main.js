@@ -30,16 +30,21 @@ if (webpackSettings.apiServerUrl) {
   }));
 }
 
+// Return the default html page if routing not match.
 app.use('*', (req, res, next) => {
-  const fname = path.join(compiler.outputPath, 'index.html');
+  const fname = path.join(
+    compiler.outputPath,
+    webpackSettings.hotDefaultHtml || 'index.html',
+  );
+
   compiler.outputFileSystem.readFile(fname, (err, result) => {
     if (err) {
-      return next(err);
+      next(err);
+    } else {
+      res.set('content-type', 'text/html');
+      res.send(result);
+      res.end();
     }
-
-    res.set('content-type','text/html');
-    res.send(result);
-    res.end();
   });
 });
 
