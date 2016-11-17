@@ -42,8 +42,8 @@ export default class Help extends React.Component {
             <div className="column">
               <div className="card">
                 <i className="add to calendar icon"></i>
-                <h3>Register Project</h3>
-                <Link to="/newproject/project-list" className="item">Add/remove projects. Currently available project types include:</Link>
+                <h3>Projects</h3>
+                <Link to="/newproject/project-list" className="item">See a list of existing projects, and register/remove project. Currently available project types include:</Link>
                 <Link to="/newproject/project-list/custom" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; Insight Agent Project </Link>
                 <Link to="/newproject/project-list/amazon" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; AWS CloudWatch Project</Link>
                 <Link to="/newproject/project-list/google" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; Google Cloud Monitoring Project</Link>
