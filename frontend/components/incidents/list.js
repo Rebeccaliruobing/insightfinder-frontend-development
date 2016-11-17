@@ -380,11 +380,15 @@ class IncidentsList extends Component {
                   }
                 }
               }).map(function (incident, index) {
+                let anomalyRatioString = "";
+                if(incident.anomalyRatio>0){
+                  anomalyRatioString = "Event Anomaly Score: "+(Math.round(incident.anomalyRatio*10)/10)+"\n";                
+                }
                 return (
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
                       onClick={()=>self.handleIncidentSelected(incident)}
                       className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={"Event Anomaly Score: " + incident.anomalyRatio + "\nEvent details: \n" + incident.rootCauseJson.rootCauseDetails}>
+                      title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>
                     <td>
                       {self.renderEventSeverity(incident)}
@@ -504,11 +508,15 @@ class IncidentsList extends Component {
                   }
                 }
               }).map(function (incident, index) {
+                let anomalyRatioString = "";
+                if(incident.anomalyRatio>0){
+                  anomalyRatioString = "Event Anomaly Score: "+(Math.round(incident.anomalyRatio*10)/10)+"\n";                
+                }
                 return (
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
                       onClick={()=>self.handleIncidentSelected(incident)}
                       className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={"Event Anomaly Score: " + incident.anomalyRatio + "\nEvent details: \n" + incident.rootCauseJson.rootCauseDetails}>
+                      title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>
                     <td>
                       {self.renderEventSeverity(incident)}
