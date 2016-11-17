@@ -505,10 +505,15 @@ export default class CausalGraph extends React.Component {
                             var x = stageWidth * i + stageWidth / 2;
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
 
-                            let recordTime = (new Date(record.split(',')[0])).getTime();
-                            return <text className="no-select" key={'x-text' + i} x={x - 16}
-                                         y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
-
+                            const recordTime = moment(record.split(',')[0]);
+                            return [
+                            <text className="no-select" 
+                                key={'x-date' + i} x={x - 16} 
+                                y={svg.height - stageHeight / 4}>{recordTime.format('MMM DD')}</text>,
+                            <text className="no-select" 
+                                key={'x-time' + i} x={x - 9} 
+                                y={svg.height - stageHeight / 4 + 16}>{recordTime.format('HH:mm')}</text>,
+                            ]
                         })}
                     </svg>
                 </div>
