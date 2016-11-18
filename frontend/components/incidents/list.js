@@ -529,7 +529,7 @@ class IncidentsList extends Component {
                       incident.duration + " min"
                       }
                     </td>
-                    <td className="code">{incident.rootCauseJson.rootCauseTypes} {false && sysCallEnabled &&
+                    <td className="code">{incident.rootCauseJson.rootCauseTypes} {sysCallEnabled && incident.syscallFlag &&
                     <i className="zoom icon" onClick={(e) => {
                       self.handleLoadSysCall(incident)
                     }}/>}</td>
