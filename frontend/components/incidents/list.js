@@ -364,7 +364,7 @@ class IncidentsList extends Component {
             </tbody>
             </table>
             :
-            <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.</h5>
+            <h5><img alt="normal" height='40px' src={thumbupImg}/>&nbsp;&nbsp;Congratulations! No anomaly events are predicted.</h5>
         }
         </div>
         <div className={tabStates['detected'] + ' ui tab '}>
@@ -490,7 +490,7 @@ class IncidentsList extends Component {
           </tbody>
           </table>
           :
-          <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal.</h5>
+          <h5><img alt="normal" height='40px' src={thumbupImg}/>&nbsp;&nbsp;Congratulations! No anomaly events have been detected.</h5>
         }
         </div>
         { this.state.showTenderModal &&
