@@ -16,12 +16,12 @@ import StatsList from './stats-list';
 const ProjectStatistics = ({data, dur}) => (
   <div>
    <div className='ui compact equal width grid'>
-    <StatsNumber title='Daily Anomaly Score' number={data.eventStats.avgDailyAnomalyScore} prevNumber={data.eventStats.prevAvgDailyAnomalyScore} label='avg' duration={dur+'d'} width='equal' />
-    <StatsNumber title='Num of Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='equal' />
-    <StatsNumber title='Num of Anomalies' number={data.eventStats.numberOfAnomalies} duration={dur+'d'} width='equal' />
-    <StatsNumber title='Total Event Duration' number={data.eventStats.totalEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
-    <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='avg' duration={dur+'d'} width='equal' />
-    <InstanceUptime average={data.statistics['AvgInstanceUptime']} type='avg' duration={dur+'d'} width='equal' />
+    <StatsNumber title='Total Anomaly Score' number={data.eventStats.avgDailyAnomalyScore} prevNumber={data.eventStats.prevAvgDailyAnomalyScore} label='daily avg' duration={dur+'d'} width='equal' />
+    <StatsNumber title='Total Anomaly Duration' number={data.eventStats.totalEventDuration} label='Minutes' duration={dur+'d'} width='equal' />
+    <StatsNumber title='Detected Anomalies' number={data.eventStats.numberOfAnomalies} duration={dur+'d'} width='equal' />
+    <StatsNumber title='Consolidated Abnormal Events' number={data.eventStats.numberOfEvents} duration={dur+'d'} width='equal' />
+    <CPUUtilization average={data.statistics['AvgCPUUtilization']} type='per-instance avg' duration={dur+'d'} width='equal' />
+    <InstanceUptime average={data.statistics['AvgInstanceUptime']} type='per-instance avg' duration={dur+'d'} width='equal' />
     <InstanceNumber total={data.statistics['NumberOfInstances']}
                     containerTotal={data.statistics['NumberOfContainers']}  duration={dur+'d'} width='equal' />
     <MetricNumber total={data.statistics['NumberOfMetrics']}  duration={dur+'d'} width='equal' />

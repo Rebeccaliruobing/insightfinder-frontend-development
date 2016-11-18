@@ -123,13 +123,15 @@ class LiveAnalysisCharts extends React.Component {
         if(instanceName && data){
           let metricAvgRaw = data['instanceMetricJson'] && data['instanceMetricJson']['instanceStatsJson'] && data['instanceMetricJson']['instanceStatsJson'][instanceName] && data['instanceMetricJson']['instanceStatsJson'][instanceName]['statsByMetricJson'];
           let avgNumberOfDays = data['instanceMetricJson'] && data['instanceMetricJson']['avgNumberOfDays'];
-          let metricAvg = {}
-          Object.keys(metricAvgRaw).forEach(function(key){
-            if(metricAvgRaw[key] && metricAvgRaw[key]['avg']!=undefined){
-              metricAvg[key] = ' (' + avgNumberOfDays + 'd avg: ' + metricAvgRaw[key]['avg'].toPrecision(3) + ')';
-            }
-          });
-          this.metricAvg = metricAvg;
+          if(metricAvgRaw && avgNumberOfDays) {
+            let metricAvg = {}
+            Object.keys(metricAvgRaw).forEach(function(key){
+              if(metricAvgRaw[key] && metricAvgRaw[key]['avg']!=undefined){
+                metricAvg[key] = ' (' + avgNumberOfDays + 'd avg: ' + metricAvgRaw[key]['avg'].toPrecision(3) + ')';
+              }
+            });
+            this.metricAvg = metricAvg;
+          }
         }
     }
 

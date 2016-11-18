@@ -11,7 +11,7 @@ const InstanceUptime = ({average, type='avg', duration='1d', width='two' }) => {
   return (
     <div className={className}>
       <div>
-        <span className="title">Instance Uptime</span>
+        <span className="title">Availability</span>
         <span className="meta">{duration}</span>
       </div>
       <div className="value">{`${averageText}%`}</div>

@@ -275,13 +275,16 @@ class IncidentsTreeMap extends Component {
       pvalue:pvalueParam,
       cvalue:cvalueParam,
       modelType:modelType,
-      avgEndTimestamp:+endTime,
-      avgNumberOfDays:numberOfDays,
     };
     if(d['instanceName']){
       params['instanceName'] = d['instanceName'];
+      params['avgEndTimestamp'] = +endTime;
+      params['avgNumberOfDays'] = numberOfDays;
     }
-    if(d.parent && d.parent['startTimestamp'] && d.parent['endTimestamp']){
+    if(d['startTimestamp'] && d['endTimestamp']){
+      params['startTimestamp'] = d['startTimestamp'];
+      params['endTimestamp'] = d['endTimestamp'];
+    }else if(d.parent && d.parent['startTimestamp'] && d.parent['endTimestamp']){
       params['startTimestamp'] = d.parent['startTimestamp'];
       params['endTimestamp'] = d.parent['endTimestamp'];
     }else if(d.parent && d.parent.parent 
@@ -355,7 +358,7 @@ class IncidentsTreeMap extends Component {
     const twidth = 180;
 
     // Add a link to open instance chart view
-    if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
+    if (true || (data.type === 'instance' && data.containers == 0) || data.type === 'container') {
       navbar.append("rect")
         .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight, })
         .datum(data.parent).on('click', this.handleTileClick);

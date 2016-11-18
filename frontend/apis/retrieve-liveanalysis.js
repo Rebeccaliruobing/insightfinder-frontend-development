@@ -131,6 +131,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     score: 0,
         eventType:"",
     children: root,
+    projectName: projectName,
     startTimestamp,
     endTimestamp,
     maxAnomalyRatio,
