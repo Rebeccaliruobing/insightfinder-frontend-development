@@ -79,6 +79,7 @@ class AppForecast extends Component {
       chartDateWindow: undefined,
       selectedMetrics: '',
       selectedGroups: null,
+      hideGroupSelector: true,
     };
   }
 
@@ -145,57 +146,60 @@ class AppForecast extends Component {
       loading: true,
       projectName,
       selectedMetrics,
+      hideGroupSelector: true,
+    }, () => {
+      apis.retrieveAppForecastData(projectName)
+        .then((resp) => {
+          let appNames = resp.appNames;
+          const appObj = resp.appObj;
+          const appCpuJson = resp.appCpuJson;
+          const periodMap = resp.periodMap;
+          const metricUnitMapping = resp.metricUnitMapping;
+          let appName = null;
+          let data = null;
+          let thisPeriodMap = null;
+          let appGroups = null;
+          let selectedGroups = null;
+
+
+          appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
+          if (appNames.length > 0) {
+            appName = appNames[0];
+            const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+            data = d.appData;
+            thisPeriodMap = d.appPeriodMap;
+            appGroups = d.appGroups;
+            const g = getSelectedGroup(selectedMetrics, appGroups);
+            selectedGroups = g.selectedGroups;
+            selectedMetrics = g.names.join(',');
+            store.set(`${projectName}-forecast-metrics`, selectedMetrics);
+          }
+
+          this.setState({
+            loading: false,
+            appNames,
+            appCpuJson,
+            appObj,
+            periodMap,
+            metricUnitMapping,
+            selectedAppName: appName,
+            data,
+            thisPeriodMap,
+            appGroups,
+            selectedGroups,
+            selectedMetrics,
+            hideGroupSelector: false,
+            showErrorMsg: false,
+          });
+        })
+        .catch(() => {
+          // reset UI
+          this.setState({
+            showErrorMsg: true,
+            loading: false,
+          });
+        });
     });
-    apis.retrieveAppForecastData(projectName)
-      .then((resp) => {
-        let appNames = resp.appNames;
-        const appObj = resp.appObj;
-        const appCpuJson = resp.appCpuJson;
-        const periodMap = resp.periodMap;
-        const metricUnitMapping = resp.metricUnitMapping;
-        let appName = null;
-        let data = null;
-        let thisPeriodMap = null;
-        let appGroups = null;
-        let selectedGroups = null;
-
-
-        appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
-        if (appNames.length > 0) {
-          appName = appNames[0];
-          const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
-          data = d.appData;
-          thisPeriodMap = d.appPeriodMap;
-          appGroups = d.appGroups;
-          const g = getSelectedGroup(selectedMetrics, appGroups);
-          selectedGroups = g.selectedGroups;
-          selectedMetrics = g.names.join(',');
-          store.set(`${projectName}-forecast-metrics`, selectedMetrics);
-        }
-
-        this.setState({
-          loading: false,
-          appNames,
-          appCpuJson,
-          appObj,
-          periodMap,
-          metricUnitMapping,
-          selectedAppName: appName,
-          data,
-          thisPeriodMap,
-          appGroups,
-          selectedGroups,
-          selectedMetrics,
-          showErrorMsg: false,
-        });
-      })
-      .catch(() => {
-        // reset UI
-        this.setState({
-          showErrorMsg: true,
-          loading: false,
-        });
-      });
   }
 
   @autobind
@@ -218,7 +222,7 @@ class AppForecast extends Component {
   render() {
     const {
       loading, data, projectName, appNames, appGroups, selectedGroups,
-      thisPeriodMap, showErrorMsg, selectedMetrics,
+      thisPeriodMap, showErrorMsg, selectedMetrics, hideGroupSelector,
     } = this.state;
     const refreshName = store.get('liveAnalysisProjectName') || projectName;
     return (
@@ -284,9 +288,10 @@ class AppForecast extends Component {
                   >
                     <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric
                       Filters:</label>
+                    { !hideGroupSelector &&
                     <Dropdown
                       key={projectName}
-                      className="forecast" mode="select" multiple searchable
+                      className="forecast" mode="select" multiple
                       value={selectedMetrics}
                       onChange={this.handleMetricSelectionChange}
                       style={{ minWidth: 200 }}
@@ -302,6 +307,7 @@ class AppForecast extends Component {
                         }
                       </div>
                     </Dropdown>
+                    }
                   </div>
                   }
                   { !!selectedGroups &&

@@ -69,23 +69,7 @@ class Dropdown extends BaseComponent {
 
   componentDidUpdate() {
     if (this._$el) {
-      const { multiple } = this.props;
-
-      if (multiple) {
-        // For multiple, need to recreate the whole dropdown, otherwise
-        // the selected label will not display correctly.
-        this._$el.dropdown('destroy');
-        this._$el.dropdown({
-          on: this.props.on,
-          direction: this.props.direction,
-          transition: this.props.transition,
-          onChange: (value, text) => {
-            this.props.onChange(value, text);
-          },
-        });
-      } else {
-        this._$el.dropdown('refresh');
-      }
+      this._$el.dropdown('refresh');
     }
   }
 
