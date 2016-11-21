@@ -2,11 +2,36 @@ import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
 import cx from 'classnames';
 import store from 'store';
-import { Console } from '../../artui/react';
+import _ from 'lodash'
+import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { LiveProjectSelection } from '../../components/selections';
 import DataParser from '../../components/cloud/dataparser';
 import { DataGroupCharts } from '../../components/share/charts';
+
+
+const getSelectedGroup = (value, appGroups) => {
+  let selectedGroups = appGroups;
+  const newNames = [];
+
+  if (appGroups && value) {
+    const names = value.split(',');
+    const groups = [];
+    _.forEach(names, (n) => {
+      const gp = _.find(appGroups, g => g.metrics === n);
+      if (gp) {
+        groups.push(gp);
+        newNames.push(n);
+      }
+    });
+    selectedGroups = groups;
+  }
+
+  return {
+    names: newNames,
+    selectedGroups,
+  };
+};
 
 const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
 
@@ -52,6 +77,8 @@ class AppForecast extends Component {
       metricUnitMapping: {},
       showErrorMsg: false,
       chartDateWindow: undefined,
+      selectedMetrics: '',
+      selectedGroups: null,
     };
   }
 
@@ -70,14 +97,17 @@ class AppForecast extends Component {
 
   @autobind()
   handleAppNameSelected(appName) {
-    const { appObj, metricUnitMapping, periodMap } = this.state;
+    const { appObj, metricUnitMapping, periodMap, selectedMetrics } = this.state;
     const { appData, appPeriodMap, appGroups } =
       getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+    const { names, selectedGroups } = getSelectedGroup(selectedMetrics, appGroups);
 
     this.setState({
       selectedAppName: appName,
       data: appData,
       appGroups,
+      selectedGroups,
+      selectedMetrics: names.join(','),
       thisPeriodMap: appPeriodMap,
       loading: false,
     });
@@ -109,6 +139,7 @@ class AppForecast extends Component {
   @autobind
   refreshProjectName(projectName) {
     const self = this;
+    let selectedMetrics = store.get(`${projectName}-forecast-metrics`, '');
     store.set('liveAnalysisProjectName', projectName);
     this.setState({
       loading: true,
@@ -125,6 +156,8 @@ class AppForecast extends Component {
         let data = null;
         let thisPeriodMap = null;
         let appGroups = null;
+        let selectedGroups = null;
+
 
         appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
         if (appNames.length > 0) {
@@ -133,6 +166,10 @@ class AppForecast extends Component {
           data = d.appData;
           thisPeriodMap = d.appPeriodMap;
           appGroups = d.appGroups;
+          const g = getSelectedGroup(selectedMetrics, appGroups);
+          selectedGroups = g.selectedGroups;
+          selectedMetrics = g.names.join(',');
+          store.set(`${projectName}-forecast-metrics`, selectedMetrics);
         }
 
         this.setState({
@@ -146,6 +183,8 @@ class AppForecast extends Component {
           data,
           thisPeriodMap,
           appGroups,
+          selectedGroups,
+          selectedMetrics,
           showErrorMsg: false,
         });
       })
@@ -163,10 +202,22 @@ class AppForecast extends Component {
     this.refreshProjectName(projectName);
   }
 
+  @autobind
+  handleMetricSelectionChange(value) {
+    const { projectName, appGroups } = this.state;
+    store.set(`${projectName}-forecast-metrics`, value);
+    const { names, selectedGroups } = getSelectedGroup(value, appGroups);
+
+    this.setState({
+      selectedMetrics: names.join(','),
+      selectedGroups,
+    });
+  }
+
   render() {
     const {
-      loading, data, projectName, appNames, appGroups,
-      thisPeriodMap, showErrorMsg,
+      loading, data, projectName, appNames, appGroups, selectedGroups,
+      thisPeriodMap, showErrorMsg, selectedMetrics,
     } = this.state;
     const refreshName = store.get('liveAnalysisProjectName') || projectName;
     return (
@@ -225,11 +276,38 @@ class AppForecast extends Component {
                   </table>
                 </div>
                 <div className="thirteen wide column">
-                  { !!appGroups &&
+                  { selectedGroups && appGroups &&
+                  <div
+                    className="field"
+                    style={{ paddingTop: 10, paddingBottom: 10 }}
+                  >
+                    <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric
+                      Filters:</label>
+                    <Dropdown
+                      key={projectName}
+                      className="forecast" mode="select" multiple
+                      value={selectedMetrics}
+                      onChange={this.handleMetricSelectionChange}
+                      style={{ minWidth: 200 }}
+                    >
+                      <div className="menu">
+                        {
+                          appGroups.map(g => (
+                            <div
+                              className="item" key={g.metrics}
+                              data-value={g.metrics}
+                            >{g.metrics}</div>
+                          ))
+                        }
+                      </div>
+                    </Dropdown>
+                  </div>
+                  }
+                  { !!selectedGroups &&
                   <div className="ui grid">
                     <DataGroupCharts
                       chartType="bar"
-                      groups={appGroups} view="list"
+                      groups={selectedGroups} view="list"
                       latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}
                       periodMap={thisPeriodMap}
                       alertMissingData={false}
