@@ -144,6 +144,7 @@ class AppForecast extends Component {
     this.setState({
       loading: true,
       projectName,
+      selectedMetrics,
     });
     apis.retrieveAppForecastData(projectName)
       .then((resp) => {
@@ -285,8 +286,8 @@ class AppForecast extends Component {
                       Filters:</label>
                     <Dropdown
                       key={projectName}
-                      className="forecast" mode="select" multiple
-                      value={selectedMetrics.split(',')}
+                      className="forecast" mode="select" multiple searchable
+                      value={selectedMetrics}
                       onChange={this.handleMetricSelectionChange}
                       style={{ minWidth: 200 }}
                     >

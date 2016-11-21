@@ -23,7 +23,7 @@ const initialState = {};
 const webpackSettings = {
 
   // The port of hot dev server used in development
-  hotPort: 5000,
+  hotPort: 3060,
 
   // If the apiServerUrl is set, request to /api will proxy to this url.
   // apiServerUrl: '',

@@ -16,6 +16,7 @@
     // Use js for jsx
     "react/jsx-filename-extension": "off",
     "react/forbid-prop-types": "off",
+    "no-underscore-dangle": "off",
     // For immutable types.
     "new-cap": [
       "error", { "capIsNew": false, "newIsCap": true }
