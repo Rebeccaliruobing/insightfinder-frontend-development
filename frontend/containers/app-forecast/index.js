@@ -286,7 +286,7 @@ class AppForecast extends Component {
                     <Dropdown
                       key={projectName}
                       className="forecast" mode="select" multiple
-                      value={selectedMetrics}
+                      value={selectedMetrics.split(',')}
                       onChange={this.handleMetricSelectionChange}
                       style={{ minWidth: 200 }}
                     >
