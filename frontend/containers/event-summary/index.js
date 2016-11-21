@@ -260,9 +260,15 @@ class EventSummary extends Component {
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     return (
-      <Console.Content className={ loading ? 'ui form loading' : ''}>
+      <Console.Content
+        className={loading ? 'ui form loading' : ''}
+        style={{ background: '#f5f5f5' }}
+      >
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
-          <div className="ui right aligned vertical inline segment" style={{zIndex: 1}}>
+          <div
+            className="ui right aligned vertical inline segment"
+            style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
+          >
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
@@ -290,13 +296,19 @@ class EventSummary extends Component {
               <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
             </div>
           </div>
-          <div className="ui vertical segment">
+          <div
+            className="ui vertical segment"
+            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
+          >
             <ProjectStatistics data={data} dur={numberOfDays} />
           </div>
-          <div className="ui vertical segment">
+          <div
+            className="ui vertical segment"
+            style={{ background: 'white', padding: 4 }}
+          >
             <div className="ui incidents grid">
-              <div className="row" style={{ height: 528,'paddingTop': '0rem' }}>
-                <div className="seven wide column" style={{ height: 500 }}>
+              <div className="row" style={{ height: 600, paddingTop: 0 }}>
+                <div className="seven wide column" style={{ height: 500, paddingRight: 0 }}>
                   <IncidentsList projectName={refreshName}
                                  projectType={projectType}
                                  endTime={endTime}

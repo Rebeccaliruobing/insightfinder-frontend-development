@@ -432,15 +432,18 @@ class IncidentsTreeMap extends Component {
   render() {
     const { faux, showMetricModal, metricModalProps } = this.state;
     return (
-      <div className="incidents treemap" style={{ marginTop: 10 }}>
-        <div ref={c => this.$container = $(c)} style={{ padding: 4, height: '100%', width: '100%' }}>
-          {faux}
-        </div>
+      <div className="incidents treemap" style={{ marginTop: 4 }}>
+        <div
+          ref={(c) => {
+            this.$container = $(c);
+          }}
+          style={{ paddingTop: 10, height: '100%', width: '100%' }}
+        >{faux}</div>
         { showMetricModal &&
-        <MetricModal {...metricModalProps} onClose={this.hideMetricModal}/>
+        <MetricModal {...metricModalProps} onClose={this.hideMetricModal} />
         }
       </div>
-    )
+    );
   }
 }
 

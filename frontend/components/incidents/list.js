@@ -277,22 +277,26 @@ class IncidentsList extends Component {
     let self = this;
     return (
       <div>
-        <div className="row" style={{ marginBottom: 10 }}>
-          {(userName == 'admin' || userName == 'guest') &&
-          <Button className='orange' style={{ 'float': 'right', 'marginTop': '5px' }}
-                  onClick={this.handleProjectChartsView}>Line Charts</Button>
+        <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
+          {(userName === 'admin' || userName === 'guest') &&
+          <Button
+            className="orange"
+            style={{ position: 'absolute', right: 0, top: 5 }}
+            onClick={this.handleProjectChartsView}
+          >Line Charts</Button>
           }
-          <Button className='orange' style={{ 'float': 'right', 'marginTop': '5px' }} title="Causal Graph"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    this.setState({
-                      showTenderModal: true,
-                      startTimestamp: undefined,
-                      endTimestamp: undefined
-                    });
-                  }}>
-            Causal Graph
-          </Button>
+          <Button
+            className="orange"
+            style={{ position: 'absolute', right: 100, top: 5 }} title="Causal Graph"
+            onClick={(e) => {
+              e.stopPropagation();
+              this.setState({
+                showTenderModal: true,
+                startTimestamp: undefined,
+                endTimestamp: undefined,
+              });
+            }}
+          >Causal Graph</Button>
           <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}
                onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
