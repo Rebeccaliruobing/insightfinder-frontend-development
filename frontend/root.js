@@ -166,7 +166,7 @@ class App extends React.Component {
     let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
     return (
       <Console className={cx({'ui form loading': loading})}>
-        <Console.Topbar logo={require('./images/logo.png')}>
+        <Console.Topbar logo={require('./images/logo_white.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/newproject" className="item">Projects</Link>
           <Link to="/settings" className="item">Settings</Link>

@@ -129,8 +129,9 @@
     z-index: 32;
     > .logo {
       width: 160px;
-      background: #ffffff;
-      border-bottom: thin solid #2f88e1;
+      background: #2196f3;
+      //background: #ffffff;
+      //border-bottom: thin solid #2f88e1;
     }
   }
 }
@@ -162,17 +163,22 @@
 .ui.console > .topbar > .inner {
   margin-left: 160px;
   > .ui.menu {
-    background: #88bbee;
+    //background: #88bbee;
+    background: #2196f3;
     color: #EEEEEE;
     font-size: 16px;
-    border-bottom: thin solid #2f88e1;
+    //border-bottom: thin solid #2f88e1;
   
     > .right.menu > .item,
     > .item {
+      &:before {
+        background: transparent;
+      }
       color: #FFFFFF;
       background: transparent;
       &.active {
-        background: darken(#88bbee, 20%);
+        //background: darken(#88bbee, 20%);
+        background: #1976d2;
       }
     }
   }
@@ -347,6 +353,8 @@
     width: 60px;
     > img {
       width: 100%;
+      height: 36px;
+      margin: 6px auto;
     }
   }
   > .content {
@@ -437,7 +445,7 @@
 }
 
 .ui.console > .topbar {
-  box-shadow: 0 -1px 8px 1px #bbb;
+  //box-shadow: 0 -1px 8px 1px #bbb;
 }
 
 .dygraph-legend {
