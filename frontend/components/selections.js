@@ -264,6 +264,27 @@ class ModelType extends React.Component{
   }
 };
 
+class FileModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="SplitByGroup">SplitByGroup</div>
+          <div className="item" data-value="SplitByService">SplitByService</div>
+          <div className="item" data-value="Split">Split</div>
+          <div className="item" data-value="Hybrid">Hybrid</div>
+          <div className="item" data-value="DBScan">Clustering (DBScan)</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
 class ModelTypeSimple extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -274,6 +295,8 @@ class ModelTypeSimple extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="SplitByGroup">SplitByGroup</div>
+          <div className="item" data-value="SplitByService">SplitByService</div>
           <div className="item" data-value="Split">Split</div>
         </div>
       </Dropdown>
@@ -460,6 +483,7 @@ export {
   InstanceProjectSelection,
   LogFileReplayProjectSelection,
   ModelType,
+  FileModelType,
   LogModelType,
   ModelTypeSimple,
   EventSummaryModelType,
