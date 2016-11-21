@@ -4,11 +4,33 @@ import cx from 'classnames';
 import store from 'store';
 import { Console } from '../../artui/react';
 import apis from '../../apis';
-import {
-  LiveProjectSelection,
-  ForecastIntervalHour,
-} from '../../components/selections';
-import LiveAnalysisCharts from '../../components/cloud/liveanalysis';
+import { LiveProjectSelection } from '../../components/selections';
+import DataParser from '../../components/cloud/dataparser';
+import { DataGroupCharts } from '../../components/share/charts';
+
+const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
+
+  const dataObj = appObj.appForecastData;
+  const appPeriodMap = periodMap[appName] || {};
+
+  const appData = {
+    instanceMetricJson: {
+      latestDataTimestamp: appObj.endDataTimestamp,
+    },
+    metricUnitMapping,
+    data: dataObj ? dataObj[appName] : null,
+  };
+
+  const dp = new DataParser(appData);
+  dp.getSummaryData();
+  dp.getMetricsData();
+
+  return {
+    appData,
+    appPeriodMap,
+    appGroups: dp.groupsData,
+  };
+};
 
 class AppForecast extends Component {
   static contextTypes = {
@@ -28,8 +50,8 @@ class AppForecast extends Component {
       appCpuJson: {},
       periodMap: {},
       metricUnitMapping: {},
-      interval: '24',
       showErrorMsg: false,
+      chartDateWindow: undefined,
     };
   }
 
@@ -49,24 +71,14 @@ class AppForecast extends Component {
   @autobind()
   handleAppNameSelected(appName) {
     const { appObj, metricUnitMapping, periodMap } = this.state;
+    const { appData, appPeriodMap, appGroups } =
+      getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+
     this.setState({
-      loading: true,
       selectedAppName: appName,
-    });
-    const thisData = {};
-    const instanceMetricJson = {};
-    const endDataTimestamp = appObj.endDataTimestamp;
-    const dataObj = appObj.appForecastData;
-    const thisPeriodMap = periodMap[appName] || {};
-    instanceMetricJson.latestDataTimestamp = endDataTimestamp;
-    thisData.instanceMetricJson = instanceMetricJson;
-    thisData.metricUnitMapping = metricUnitMapping;
-    if (dataObj) {
-      thisData.data = dataObj[appName];
-    }
-    this.setState({
-      data: thisData,
-      thisPeriodMap,
+      data: appData,
+      appGroups,
+      thisPeriodMap: appPeriodMap,
       loading: false,
     });
   }
@@ -89,6 +101,12 @@ class AppForecast extends Component {
     return 0;
   }
 
+  @autobind
+  handleDateWindowSync(dateWindow) {
+    this.setState({ chartDateWindow: dateWindow });
+  }
+
+  @autobind
   refreshProjectName(projectName) {
     const self = this;
     store.set('liveAnalysisProjectName', projectName);
@@ -98,21 +116,37 @@ class AppForecast extends Component {
     });
     apis.retrieveAppForecastData(projectName)
       .then((resp) => {
+        let appNames = resp.appNames;
+        const appObj = resp.appObj;
+        const appCpuJson = resp.appCpuJson;
+        const periodMap = resp.periodMap;
+        const metricUnitMapping = resp.metricUnitMapping;
+        let appName = null;
+        let data = null;
+        let thisPeriodMap = null;
+        let appGroups = null;
+
+        appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
+        if (appNames.length > 0) {
+          appName = appNames[0];
+          const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+          data = d.appData;
+          thisPeriodMap = d.appPeriodMap;
+          appGroups = d.appGroups;
+        }
+
         this.setState({
           loading: false,
-          appNames: resp.appNames,
-          appCpuJson: resp.appCpuJson,
-          appObj: resp.appObj,
-          periodMap: resp.periodMap,
-          metricUnitMapping: resp.metricUnitMapping,
-        }, () => {
-          this.setState({
-            showErrorMsg: false,
-          });
-          const appNames = resp.appNames.sort((a, b) => self.sortAppByCPU(a, b));
-          if (appNames.length > 0) {
-            this.handleAppNameSelected(appNames[0]);
-          }
+          appNames,
+          appCpuJson,
+          appObj,
+          periodMap,
+          metricUnitMapping,
+          selectedAppName: appName,
+          data,
+          thisPeriodMap,
+          appGroups,
+          showErrorMsg: false,
         });
       })
       .catch(() => {
@@ -129,22 +163,12 @@ class AppForecast extends Component {
     this.refreshProjectName(projectName);
   }
 
-  @autobind
-  handleIntervalChange(value, interval) {
-    const { selectedAppName } = this.state;
-    this.setState({
-      interval,
-    }, () => {
-      this.handleAppNameSelected(selectedAppName);
-    });
-  }
-
   render() {
     const {
-      loading, data, projectName, interval, appNames,
-      thisPeriodMap, selectedAppName, showErrorMsg,
+      loading, data, projectName, appNames, appGroups,
+      thisPeriodMap, showErrorMsg,
     } = this.state;
-    const refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectName;
+    const refreshName = store.get('liveAnalysisProjectName') || projectName;
     return (
       <Console.Content className={loading ? 'ui form loading' : ''}>
         <div
@@ -162,14 +186,6 @@ class AppForecast extends Component {
                 onChange={this.handleProjectChange} style={{ minWidth: 200 }}
               />
             </div>
-            {false && <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Forecast Interval
-                (hour):</label>
-              <ForecastIntervalHour
-                value={interval}
-                onChange={this.handleIntervalChange} style={{ minWidth: 80 }}
-              />
-            </div>}
             <div className="field">
               <div
                 className="ui orange button" tabIndex="0"
@@ -209,12 +225,19 @@ class AppForecast extends Component {
                   </table>
                 </div>
                 <div className="thirteen wide column">
-                  <LiveAnalysisCharts
-                    data={data} chartType="bar" loading={loading}
-                    alertMissingData={false} periodMap={thisPeriodMap}
-                    enablePublish={false} isForecast
-                    onRefresh={() => this.handleAppNameSelected(selectedAppName)}
-                  />
+                  { !!appGroups &&
+                  <div className="ui grid">
+                    <DataGroupCharts
+                      chartType="bar"
+                      groups={appGroups} view="list"
+                      latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}
+                      periodMap={thisPeriodMap}
+                      alertMissingData={false}
+                      onDateWindowChange={this.handleDateWindowSync}
+                      dateWindow={this.state.chartDateWindow}
+                    />
+                  </div>
+                  }
                 </div>
               </div>
           )}

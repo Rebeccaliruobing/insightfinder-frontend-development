@@ -15,6 +15,7 @@
     "no-param-reassign": "off",
     // Use js for jsx
     "react/jsx-filename-extension": "off",
+    "react/forbid-prop-types": "off",
     // For immutable types.
     "new-cap": [
       "error", { "capIsNew": false, "newIsCap": true }
