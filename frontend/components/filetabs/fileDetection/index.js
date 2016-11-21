@@ -6,6 +6,7 @@ import {
     LiveProjectSelection,
     ModelNameSelection,
     ModelType,
+    FileModelType,
     DurationThreshold,
     AnomalyThreshold
 } from '../../selections';
@@ -131,7 +132,7 @@ export default class FileDetection extends Component {
                                 </div>
                                 <div className="field">
                                     <label>Model Type</label>
-                                    <ModelType value={modelType} text={modelTypeText}
+                                    <FileModelType value={modelType} text={modelTypeText}
                                                onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
                                 </div>
                                 {modelType == 'DBScan' ?
