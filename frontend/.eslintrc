@@ -5,6 +5,9 @@
   "extends": [
     "airbnb"
   ],
+  "env": {
+    "browser": true
+  },
   "rules": {
     // Used by webpack-isomorphic-tools and React Native.
     "global-require": "off",
@@ -21,6 +24,8 @@
     // https://github.com/benmosher/eslint-plugin-import/issues/602
     "import/no-extraneous-dependencies": [
       "error", { "devDependencies": true }
-    ]
+    ],
+    "jsx-a11y/label-has-for": "off",
+    "jsx-a11y/no-static-element-interactions": "off"
   }
 }
