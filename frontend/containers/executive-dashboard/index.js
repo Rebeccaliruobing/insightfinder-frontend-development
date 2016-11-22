@@ -35,10 +35,10 @@ class ExecutiveDashboard extends Component {
 // TO-DO  Add concept of "groups"
   componentDidMount() {
     let groups = (this.context.dashboardUservalues || {}).groupSettingsAllInfo || [];
-    projects = projects.filter((item, index) => item.fileProjectType!=0);
+    //projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
-    if (projects.length > 0) {
-      let refreshName = store.get('liveAnalysisGroupName')?store.get('liveAnalysisGroupName'): groups[0].groupName;
+    if (groups.length > 0) {
+      let refreshName = store.get('lastUsedGroupName')?store.get('lastUsedGroupName'): groups[0].groupName;
       this.handleGroupChange(refreshName, refreshName);
     } else {
       const url = `/newgroup/group-list/custom`;
@@ -84,39 +84,25 @@ class ExecutiveDashboard extends Component {
 
   refreshGroupName(groupName) {
     const {numberOfDays,endTime,modelType} = this.state;
-    let groupParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    let groupParams = (this.context.dashboardUservalues || {}).groupModelAllInfo || [];
     let groupParam = groupParams.find((p) => p.groupName == groupName);
     let pvalue = groupParam ? groupParam.pvalue : "0.99";
     let cvalue = groupParam ? groupParam.cvalue : "1";
     let endTimestamp = +moment(endTime);
-    store.set('liveAnalysisGroupName', projectName);
-    this.setState({ loading: true, projectName });
-    apis.retrieveLiveAnalysis(groupName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
+    store.set('mostRecentGroupName', groupName);
+    this.setState({ loading: true, groupName });
+    apis.getGroupStats(groupName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
       .then(data => {
         let anomalyRatioLists = data.incidents.map(function (value,index) {
           return value['anomalyRatio']
         });
-        let maxAnomalyRatio = _.max(anomalyRatioLists);
-        let minAnomalyRatio = _.min(anomalyRatioLists);
         this.setState({
           loading: false,
           data,
-          maxAnomalyRatio,
-          minAnomalyRatio,
-          startTimestamp: data.startTimestamp,
+					duration,
           endTimestamp: data.endTimestamp
-        }, ()=>{
-          let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-          let incidentDurationThreshold = 15;
-          let detectedIncidents = data.incidents.filter((incident, index) =>
-                  incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-          if(detectedIncidents.length>0){
-            this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
-          } else {
-            this.handleIncidentSelected();
-          }
-        })
-      })
+        	}, ()=>{} 
+					}})
       .catch(msg => {
         this.setState({ loading: false });
         console.log(msg);
@@ -202,27 +188,12 @@ class ExecutiveDashboard extends Component {
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-            <ProjectStatistics data={data} dur={numberOfDays} />
+            <GroupStatistics data={data} dur={numberOfDays} />
           </div>
           <div
             className="ui vertical segment"
             style={{ background: 'white', padding: 4 }}
           >
-            <div className="ui incidents grid">
-              <div className="row" style={{ height: 600, paddingTop: 0 }}>
-                <div className="seven wide column" style={{ height: 500, paddingRight: 0 }}>
-                  <IncidentsList groupName={refreshName}
-                                 groupType={groupType}
-                                 endTime={endTime}
-                                 numberOfDays={numberOfDays}
-                                 modelType={modelType}
-                                 onIncidentSelected={this.handleIncidentSelected}
-                                 incidents={data.incidents}
-                                 causalDataArray={data.causalDataArray}
-                                 causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </Console.Content>
