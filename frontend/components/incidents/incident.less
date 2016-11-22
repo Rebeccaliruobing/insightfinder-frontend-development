@@ -40,16 +40,27 @@
   }
 }
 
-.incident-table {
+.incident-table.ui.table {
   th {
     cursor: pointer !important;
     font-weight: bold !important;
-    background-color: #ADD8E6 !important;
-    color: #666666 !important;
+    //background-color: #ADD8E6 !important;
+    background-color: #566f84 !important;
+    //color: #666666 !important;
+    color: white !important;
   }
   .code {
     white-space: pre-wrap;
   }
+
+  tbody {
+    tr:hover,
+    tr.active, td.active,
+    tr.active:hover {
+      background-color: #d6ebfc !important;
+    }
+  }
+
   tr {
       td{
         &:nth-child(1){
