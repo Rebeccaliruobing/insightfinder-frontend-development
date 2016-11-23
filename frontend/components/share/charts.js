@@ -185,9 +185,14 @@ export class DataGroupCharts extends React.Component {
     groups: T.any.isRequired,
     view: T.string.isRequired,
     columns: T.string,
+    orderByMetric: T.bool,
     onDateWindowChange: T.func,
     chartType: T.string,
     dateWindow: T.any,
+  };
+
+  static defaultProps = {
+    orderByMetric: true,
   };
 
   constructor(props) {
@@ -204,7 +209,8 @@ export class DataGroupCharts extends React.Component {
 
   render() {
 
-    const { groups, view, columns, latestDataTimestamp, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
+    const { groups, view, columns, orderByMetric,
+      latestDataTimestamp, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -216,30 +222,32 @@ export class DataGroupCharts extends React.Component {
     const selected = selectedIndex !== undefined;
     const selectedGroup = selected ? groups[selectedIndex] : null;
     const selectedRowId = selected ? Math.floor(selectedIndex / colSize) : void 0;
+
+    let orderedGroups = orderByMetric ?
+      groups.sort(function (a, b) {
+        let aHighlight = (a.highlights.length > 0);
+        let bHighlight = (b.highlights.length > 0);
+        if (aHighlight && !bHighlight) {
+          return -1;
+        } else if (!aHighlight && bHighlight) {
+          return 1;
+        } else {
+          let aMetrics = a.metrics;
+          let bMetrics = b.metrics;
+          if (aMetrics < bMetrics) {
+            return -1;
+          } else if (aMetrics > bMetrics) {
+            return 1;
+          } else {
+            return 0;
+          }
+        }
+      }) : groups;
+
     return (
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
-
-          {groups.sort(function (a, b) {
-                let aHighlight = (a.highlights.length>0);
-                let bHighlight = (b.highlights.length>0);
-                if (aHighlight && !bHighlight) {
-                    return -1;
-                } else if (!aHighlight && bHighlight) {
-                    return 1;
-                } else {
-                  let aMetrics = a.metrics;
-                  let bMetrics = b.metrics;
-                  if (aMetrics < bMetrics) {
-                      return -1;
-                  } else if (aMetrics > bMetrics) {
-                      return 1;
-                  } else {
-                      return 0;
-                  }
-                }
-            }).map((group, index, groups) => {
-
+          { orderedGroups.map((group, index, groups) => {
             const rowId = Math.floor(index / colSize);
             const lastCol = !((index + 1) % colSize);
             const length = groups.length;

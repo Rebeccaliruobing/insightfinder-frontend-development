@@ -313,6 +313,7 @@ class AppForecast extends Component {
                   { !!selectedGroups &&
                   <div className="ui grid">
                     <DataGroupCharts
+                      orderByMetric={false}
                       chartType="bar"
                       groups={selectedGroups} view="list"
                       latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}

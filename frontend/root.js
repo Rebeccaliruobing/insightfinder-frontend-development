@@ -19,7 +19,7 @@ import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
-import ExecutiveDashboard from './containers/executive-dashboard';
+// import ExecutiveDashboard from './containers/executive-dashboard';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
 
@@ -274,10 +274,11 @@ const routes = (
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
-    <Route component={ExecutiveDashboard} path="/executiveDashboard"/>
     <Redirect from="*" to="/"/>
   </Router>
 );
+
+    // <Route component={ExecutiveDashboard} path="/executiveDashboard"/>
 
 class AppRoute extends React.Component {
   constructor(props) {

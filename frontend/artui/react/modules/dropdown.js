@@ -69,6 +69,11 @@ class Dropdown extends BaseComponent {
 
   componentDidUpdate() {
     if (this._$el) {
+      const {value} = this.props;
+      // Fix bug of dropdown, which will not clear the data.
+      if (!value) {
+        this._$el.data('value', null);
+      }
       this._$el.dropdown('refresh');
     }
   }
