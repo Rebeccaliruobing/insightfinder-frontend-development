@@ -25,7 +25,9 @@ export default class ListAll extends Component {
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
         startTime: moment(new Date()).add(-7 * weeks, 'days')
-      }
+      },
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
+      colors:['#339999','#1976d2','#1ac986','#2196f3','#505077'],
     };
   }
 
@@ -65,7 +67,7 @@ export default class ListAll extends Component {
   }
 
   render() {
-    const {view, showAddPanel, params} = this.state;
+    const {view, showAddPanel, params, colors, systemNames} = this.state;
     const {userInstructions} = this.context;
 
 
@@ -91,24 +93,24 @@ export default class ListAll extends Component {
       <Console.Content>
         <div style={{padding: 20}}>
           <div className="ui four column grid">
+            { systemNames.map((system, index)=> {
+                let color = colors[index % 5];
+                let link = "/usecase/list-some?system="+system;
+                return(
+                  <div className="wide column text-center" style={wrapperStyle}>
+                    <Link to={link} className="item text-white">
+                      <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
+                        <span>{system}</span>
+                      </div>
+                    </Link>
+                  </div>
+                )
+              })
+            }
             <div className="wide column text-center" style={wrapperStyle}>
-              <Link to="/usecase/list-some?system=Cassandra" className="item text-white">
-                <div style={Object.assign({},blockStyle, {backgroundColor: '#339999'})}>
-                  <span>Cassandra</span>
-                </div>
-              </Link>
-            </div>
-            <div className="wide column text-center" style={wrapperStyle}>
-              <Link to="/usecase/list-some?system=Hadoop" className="item text-white">
-                <div style={Object.assign({},blockStyle, {backgroundColor: '#66ccff'})}>
-                  <span>Hadoop</span>
-                </div>
-              </Link>
-            </div>
-            <div className="wide column text-center" style={wrapperStyle}>
-              <Link to="/usecase/list-some?system=Other" className="item text-white">
+              <Link to="/usecase/list-some?system=Others" className="item text-white">
                 <div style={Object.assign({},blockStyle)}>
-                  <span>Other</span>
+                  <span>Others</span>
                 </div>
               </Link>
             </div>

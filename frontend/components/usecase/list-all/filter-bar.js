@@ -30,6 +30,7 @@ export default  class FilterBar extends Component {
       epsilon: 1.0,
       startTime: moment().add(-1, 'w').toDate(),
       endTime: moment().toDate(),
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       modelType: "Holistic",
       modelTypeText: "Holistic",
       modelTypeTextMap: {}
@@ -200,7 +201,7 @@ export default  class FilterBar extends Component {
             // </div>
 
   render() {
-    const {startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
+    const {systemNames, startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
@@ -267,9 +268,9 @@ export default  class FilterBar extends Component {
                   }
 
                   let shouldShow = true;
-                  if (system && ['Cassandra', 'Hadoop'].indexOf(system) >= 0 && system != sys) {
+                  if (system && systemNames.indexOf(system) >= 0 && system != sys) {
                     shouldShow = false
-                  } else if (system == 'Other' && ['Cassandra', 'Hadoop'].indexOf(sys) >= 0) {
+                  } else if (system == 'Others' && systemNames.indexOf(sys) >= 0) {
                     shouldShow = false
                   }
 

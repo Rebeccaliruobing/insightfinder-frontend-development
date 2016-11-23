@@ -23,6 +23,7 @@ class ShareModal extends React.Component {
       ownerOnly: false,
       sharedUsernames: '',
       showOther: false,
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       other: 'Unknown'
     };
 
@@ -46,7 +47,7 @@ class ShareModal extends React.Component {
     data['metaData'] = JSON.stringify({
       name: name,
       desc: description,
-      system: system == 'Other' ? other : system
+      system: system == 'Others' ? other : system
     });
     
     data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
@@ -62,12 +63,12 @@ class ShareModal extends React.Component {
   handleSystemChange(v) {
     this.setState({
       system: v,
-      showOther: v == 'Other'
+      showOther: v == 'Others'
     });
   }
 
   render() {
-    let {showOther} = this.state;
+    let {showOther,systemNames} = this.state;
     let disabled = !this.state.name || !this.state.description || !this.state.system;
 
     return (
@@ -92,9 +93,12 @@ class ShareModal extends React.Component {
               <Dropdown mode="select" value={this.state.system} onChange={this.handleSystemChange.bind(this)}>
                 <i className="dropdown icon"/>
                 <div className="menu">
-                  <div className="item" data-value="Cassandra">Cassandra</div>
-                  <div className="item" data-value="Hadoop">Hadoop</div>
-                  <div className="item" data-value="Other">Other</div>
+                  { systemNames.map((system, index)=> {
+                    return(
+                      <div className="item" data-value={system}>{system}</div>
+                    )})
+                  }
+                  <div className="item" data-value="Others">Others</div>
                 </div>
               </Dropdown>
             {showOther &&
