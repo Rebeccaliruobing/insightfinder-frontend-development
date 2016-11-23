@@ -5,8 +5,9 @@ import {Console, Button} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
 
 import apis from '../../apis';
-import {GroupStatistics} from '../../components/statistics';
-import { LiveGroupSelection,NumberOfDays, EventSummaryModelType
+import {systemsAnomalyMetrics
+} from '../../components/statistics/systemsAnomalyMetrics';
+import { LiveProjectSelection, NumberOfDays, EventSummaryModelType
 } from '../../components/selections';
 
 class ExecutiveDashboard extends Component {
@@ -24,7 +25,7 @@ class ExecutiveDashboard extends Component {
         eventStats:{},
       },
       loading: true,
-      groupName: undefined,
+      projectName: undefined,
       selectedIncident: undefined,
       numberOfDays: "7",
       endTime: moment(),
@@ -34,35 +35,35 @@ class ExecutiveDashboard extends Component {
   }
 // TO-DO  Add concept of "groups"
   componentDidMount() {
-    let groups = (this.context.dashboardUservalues || {}).groupSettingsAllInfo || [];
-    //projects = projects.filter((item, index) => item.fileProjectType!=0);
+    let groups = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
-    if (groups.length > 0) {
-      let refreshName = store.get('lastUsedGroupName')?store.get('lastUsedGroupName'): groups[0].groupName;
-      this.handleGroupChange(refreshName, refreshName);
+    if (projects.length > 0) {
+      let refreshName = store.get('lastUsedProjectName')?store.get('lastUsedProjectName'): projects[0].projectName;
+      this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = `/newgroup/group-list/custom`;
+      const url = `/newgroup/project-list/custom`;
       window.open(url, '_self');
     }
   }
 
   @autobind
   handleModelTypeChange(value, modelType) {
-    let { groupName } = this.state;
+    let { projectName } = this.state;
     this.setState({
       modelType:modelType,
     }, () => {
-      this.refreshGroupName(groupName);
+      this.refreshProjectName(projectName);
     });
   }
 
   @autobind
   handleDayChange(value, numberOfDays) {
-    let { groupName } = this.state;
+    let { projectName } = this.state;
     this.setState({
       numberOfDays:numberOfDays.toString(),
     }, () => {
-      this.refreshGroupName(groupName);
+      this.refreshProjectName(projectName);
     });
   }
 
@@ -74,24 +75,25 @@ class ExecutiveDashboard extends Component {
       newEndTime = curTime;
     }
 
-    let { groupName } = this.state;
+    let { projectName } = this.state;
     this.setState({
       endTime: newEndTime,
     }, () => {
-      this.refreshGroupName(groupName);
+      this.refreshProjectName(projectName);
     });
   }
 
-  refreshGroupName(groupName) {
+  refreshProjectName(projectName) {
     const {numberOfDays,endTime,modelType} = this.state;
-    let groupParams = (this.context.dashboardUservalues || {}).groupModelAllInfo || [];
-    let groupParam = groupParams.find((p) => p.groupName == groupName);
-    let pvalue = groupParam ? groupParam.pvalue : "0.99";
-    let cvalue = groupParam ? groupParam.cvalue : "1";
+    let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    let projectParam = projectParams.find((p) => p.projectName == projectName);
+    let pvalue = projectParam ? projectParam.pvalue : "0.99";
+    let cvalue = projectParam ? projectParam.cvalue : "1";
     let endTimestamp = +moment(endTime);
-    store.set('mostRecentGroupName', groupName);
-    this.setState({ loading: true, groupName });
-    apis.getGroupStats(groupName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
+    store.set('mostRecentProjectName', projectName);
+    this.setState({ loading: true, projectName });
+		// TODO  Replace with appropriate API call
+    apis.getProjectStats(groupName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
       .then(data => {
         let anomalyRatioLists = data.incidents.map(function (value,index) {
           return value['anomalyRatio']
@@ -111,14 +113,14 @@ class ExecutiveDashboard extends Component {
   }
 
   @autobind
-  handleGroupChange(value,groupName){
+  handleGroupChange(value,projectName){
     this.setState({
       endTime: moment(),
       numberOfDays: "7",
       modelType:"Holistic",
       currentTreemapData: undefined,
     });
-    this.refreshGroupName(groupName);
+    this.refreshProjectName(projectName);
   }
 
   modelDateValidator(date) {
@@ -140,13 +142,13 @@ class ExecutiveDashboard extends Component {
   }
 
   render() {
-    let { loading, data, groupName,
+    let { loading, data, projectName,
       endTime, numberOfDays, modelType} = this.state;
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
-    let groupType = data['groupType']?data['groupType']:'';
+    let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content
         className={loading ? 'Loading...' : ''}
@@ -158,8 +160,8 @@ class ExecutiveDashboard extends Component {
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Group Name:</label>
-              <LiveGroupSelection value={groupName} onChange={this.handleGroupChange} style={{minWidth: 200}}/>
+              <label style={{ fontWeight: 'bold' }}>Project Name:</label>
+              <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
@@ -188,7 +190,7 @@ class ExecutiveDashboard extends Component {
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-            <GroupStatistics data={data} dur={numberOfDays} />
+            <ProjectStatistics data={data} dur={numberOfDays} />
           </div>
           <div
             className="ui vertical segment"

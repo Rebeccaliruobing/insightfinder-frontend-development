@@ -4,7 +4,7 @@ import AnomalyScore from './anomaly-score';
 import TotalAnomalies from './total-anomalies';
 import TotalAnomalyDuration from './total-anomaly-duration';
 
-const GroupAnomalies = ({data, dur}) => (
+const SystemsAnomalyMetrics = ({data, dur}) => (
   <div>
    <div className='ui compact equal width grid'>
     <AnomalyScore previousValue={1000} currentValue={2500} predictedValue={1800}
@@ -18,8 +18,8 @@ const GroupAnomalies = ({data, dur}) => (
   </div>
 );
 
-GroupAnomalies.propTypes = {
+SystemsAnomalyMetrics.propTypes = {
     data: T.object,
 };
 
-export default GroupAnomalies;
+export default SystemsAnomalyMetrics;

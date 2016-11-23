@@ -32,6 +32,35 @@ class ProjectSelection extends React.Component {
   }
 }
 
+class GroupSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    let s = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu"> 
+          {
+            groups.map((p) => {
+              return <div className="item" key={p.groupName}
+                          data-value={p.groupName}>{p.groupName}</div>
+            })
+          }
+        </div>
+      </Dropdown>
+    );
+  }
+}
+
 // include only and File Replay
 class LogFileReplayProjectSelection extends React.Component {
 
