@@ -19,13 +19,13 @@ const AnomalyScore = ({previousValue, duration='1d' }) => {
 							<span className="previousValue">{`${previousValueText}`}</span>
 						</td>
 						<td>
-							<span className={previousValueArrow}><i classname='fa FaLongRightArrow fa-2x'></i></span>
+							<span className={previousValueArrow}><i className='fa FaLongRightArrow fa-2x'></i></span>
 						</td>
       			<td>
 							<span className="currentValue">{`${currentValueText}`}</span>
 						</td>
 						<td>
-							<span className={predictedValueArrow}><i classname='fa FaLongRightArrow fa-2x'></i></span>
+							<span className={predictedValueArrow}><i className='fa FaLongRightArrow fa-2x'></i></span>
 						</td>
       			<td>
 							<span className="predictedValue">{`${predictedValueText}`}</span>

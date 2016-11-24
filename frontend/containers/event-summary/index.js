@@ -135,41 +135,43 @@ class EventSummary extends Component {
     let endTimestamp = +moment(endTime);
     // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
-    this.setState({ loading: true, projectName });
-    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
-      .then(data => {
-        let anomalyRatioLists = data.incidents.map(function (value,index) {
-          return value['anomalyRatio']
-        });
-        let maxAnomalyRatio = _.max(anomalyRatioLists);
-        let minAnomalyRatio = _.min(anomalyRatioLists);
-        this.setState({
-          loading: false,
-          // incidentsTreeMap: data.incidentsTreeMap,
-          data,
-          maxAnomalyRatio,
-          minAnomalyRatio,
-          startTimestamp: data.startTimestamp,
-          endTimestamp: data.endTimestamp,
-          showTenderModal: false,
-        }, ()=>{
-          let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-          let incidentDurationThreshold = 15;
-          let detectedIncidents = data.incidents.filter((incident, index) =>
-                  incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-          if(detectedIncidents.length>0){
-            this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
-          } else {
-            this.handleIncidentSelected();
-          }
-        })
-      })
+    this.setState({ loading: true, projectName },()=>{
+	    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
+	      .then(data => {
+ 	       let anomalyRatioLists = data.incidents.map(function (value,index) {
+ 	         return value['anomalyRatio']
+ 	       });
+ 	       let maxAnomalyRatio = _.max(anomalyRatioLists);
+ 	       let minAnomalyRatio = _.min(anomalyRatioLists);
+ 	       this.setState({
+ 	         loading: false,
+ 	         // incidentsTreeMap: data.incidentsTreeMap,
+ 	         data,
+ 	         maxAnomalyRatio,
+ 	         minAnomalyRatio,
+ 	         startTimestamp: data.startTimestamp,
+ 	         endTimestamp: data.endTimestamp,
+ 	         showTenderModal: false,
+ 	       }, ()=>{
+ 	         let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+ 	         let incidentDurationThreshold = 15;
+ 	         let detectedIncidents = data.incidents.filter((incident, index) =>
+ 	                 incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+ 	         if(detectedIncidents.length>0){
+ 	           this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
+ 	         } else {
+ 	           this.handleIncidentSelected();
+ 	         }
+ 	       })
+ 	     })
       .catch(msg => {
         this.setState({ loading: false });
         console.log(msg);
         // alert(msg);
       });
-  }
+		});
+	}
+  
 
   @autobind
   handleProjectChange(value,projectName){
