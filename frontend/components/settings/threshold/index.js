@@ -434,12 +434,12 @@ export default class ThresholdSettings extends React.Component {
 								<p>
 									You may specify your timeframe here as either a 
 									one-time or recurring period.  Examples include:
-									<ul>
-										<li>Recurring: Every Sunday</li>
-										<li>Recurring: Every Saturday 00:00-01:00 GMT</li>
-										<li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
-									</ul>
 								</p>
+								<ul>
+									<li>Recurring: Every Sunday</li>
+									<li>Recurring: Every Saturday 00:00-01:00 GMT</li>
+									<li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
+								</ul>
 								<p>
 									If you need assistance or have questions, please contact
 									us at support@insightfinder.com.
@@ -463,13 +463,11 @@ export default class ThresholdSettings extends React.Component {
 									trigger a notification via any configured External Service.
 								</p>
                 <div className="field">
-									// TODO  Add WaringButton with range and default settings
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.pvalue}
                                     onChange={this.handleValueChange('pvalue')}/>
                 </div>
                 <div className="field">
-									// TODO  Add WaringButton to explain number x duration
                   <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold key={data.projectName} value={data.cvalue}
                                      onChange={this.handleValueChange('cvalue')}/>
@@ -478,14 +476,13 @@ export default class ThresholdSettings extends React.Component {
 								<p>
 									This setting controls when InsightFinder will notify you via
 									email.
+								</p>
                 <div className="field">
-									// TODO  Add WaringButton from above
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.emailpvalue}
                                     onChange={this.handleValueChange('emailpvalue')}/>
                 </div>
                 <div className="field">
-									// TODO  Add WaringButton from above
                   <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold key={data.projectName} value={data.emailcvalue}
                                      onChange={this.handleValueChange('emailcvalue')}/>
@@ -560,7 +557,7 @@ export default class ThresholdSettings extends React.Component {
                   Settings</Button>
               </div>}
               {!isLogProject && <div className={tabStates0['grouping'] + ' ui tab'}>
-                <h3>Instance Grouping Settings </h3>
+                <h3>Instance Grouping Settings</h3>
                 <div className='ui vertical segment'>
                   <table className="ui celled table grouping-table">
                     <thead>
