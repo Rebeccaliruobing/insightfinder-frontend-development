@@ -1,28 +1,25 @@
 import React from 'react';
-import {Route, IndexRoute, IndexRedirect} from 'react-router';
+import { Route, IndexRedirect } from 'react-router';
 
-import {Console, Link} from '../../artui/react/index';
+import { Console } from '../../artui/react/index';
 import ThresholdSettings from './threshold/index';
+import { DataDisqualifiersSettings } from './project';
 import ExtSvc from './extsvc/index';
-import Projects from '../monitoring/projects/index';
 
 import Navbar from './navbar';
 
-export class Settings extends React.Component {
-  render() {
-    return (
-      <Console.Wrapper className="settings-page">
-        <Navbar/>
-        {this.props.children}
-      </Console.Wrapper>
-    )
-  }
-}
+export const Settings = ({ children }) => (
+  <Console.Wrapper className="settings-page">
+    <Navbar />
+    {children}
+  </Console.Wrapper>
+);
 
 export const settingsRoute = (
   <Route component={Settings} path="settings">
-    <IndexRedirect to="threshold"/>
-    <Route component={ThresholdSettings} path="threshold"/>
-    <Route component={ExtSvc} path="extsvc"/>
+    <IndexRedirect to="threshold" />
+    <Route component={DataDisqualifiersSettings} path="data-disqualifiers" />
+    <Route component={ThresholdSettings} path="threshold" />
+    <Route component={ExtSvc} path="extsvc" />
   </Route>
 );
