@@ -407,25 +407,43 @@ export default class ThresholdSettings extends React.Component {
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
               {!isLogProject && <a className={tabStates0['learning'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'learning')}>Learning Periods</a>}
+                                   onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'alert')}>Alert Thresholds</a>}
+                                   onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               <a className={tabStates0['sharing'] + ' item'}
-                 onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
+                 onClick={(e) => this.selectTab0(e, 'sharing')}>Data Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'threshold')}>Metric Thresholds</a>}
+                                   onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
               {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
                                   onClick={(e) => this.selectTab0(e, 'episodeword')}>Log Analysis</a>}
             </div>
             <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
                  style={{ 'paddingTop': '10px' }}>
               {!isLogProject && <div className={tabStates0['learning'] + ' ui tab'}>
-                <h3>Learning Skipping Period:
-                  <WaringButton labelStyle={labelStyle} labelTitle=""
-                                labelSpan="Eg. 'Every Sunday, Every Day 00:00-01:00 GMT, Christmas Day'"/>
-                </h3>
+                <h3>Time-Based Exclusions</h3>
+								<p>
+									As InsightFinder continuously learns about your 
+									environment, you will identify times that reflect
+									invalid data that should <i>not</i> be used to 
+									identify performance baselines for your systems. 
+									These periods may include service windows, scheduled
+									or unscheduled downtime, etc.
+								</p>
+								<p>
+									You may specify your timeframe here as either a 
+									one-time or recurring period.  Examples include:
+									<ul>
+										<li>Recurring: Every Sunday</li>
+										<li>Recurring: Every Saturday 00:00-01:00 GMT</li>
+										<li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
+									</ul>
+								</p>
+								<p>
+									If you need assistance or have questions, please contact
+									us at support@insightfinder.com.
+								</p>
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
@@ -439,25 +457,36 @@ export default class ThresholdSettings extends React.Component {
                 </div>
               </div>}
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
-                <h3>Real-time Report Alerts</h3>
+                <h3>Real-time Account Alerts</h3>
+								<p>
+									This setting controls when InsightFinder will attempt to 
+									trigger a notification via any configured External Service.
+								</p>
                 <div className="field">
-                  <label style={labelStyle}>Anomaly Threshold</label>
+									// TODO  Add WaringButton with range and default settings
+                  <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.pvalue}
                                     onChange={this.handleValueChange('pvalue')}/>
                 </div>
                 <div className="field">
-                  <label style={labelStyle}>Duration Threshold</label>
+									// TODO  Add WaringButton to explain number x duration
+                  <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold key={data.projectName} value={data.cvalue}
                                      onChange={this.handleValueChange('cvalue')}/>
                 </div>
-                <h3>Email Alerts</h3>
+                <h3>Email Notifications</h3>
+								<p>
+									This setting controls when InsightFinder will notify you via
+									email.
                 <div className="field">
-                  <label style={labelStyle}>Anomaly Threshold</label>
+									// TODO  Add WaringButton from above
+                  <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.emailpvalue}
                                     onChange={this.handleValueChange('emailpvalue')}/>
                 </div>
                 <div className="field">
-                  <label style={labelStyle}>Duration Threshold</label>
+									// TODO  Add WaringButton from above
+                  <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold key={data.projectName} value={data.emailcvalue}
                                      onChange={this.handleValueChange('emailcvalue')}/>
                 </div>
@@ -465,10 +494,16 @@ export default class ThresholdSettings extends React.Component {
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
               </div>}
               <div className={tabStates0['sharing'] + ' ui tab'}>
-                <h3>Sharing group:
-                  <WaringButton labelStyle={labelStyle} labelTitle=""
-                                labelSpan="comma separated usernames"/>
-                </h3>
+                <h3>Project Data Sharing</h3>
+								<p>
+									If you are collaborating with other users, you may invite
+									them to view data associated with your Projects.
+								</p>
+								<p>
+									To share your project data, enter their User ID(s) in the 
+									field below and click 'Update Sharing Settings'.  Those 
+									users will be able to view your data on their next login.
+								</p>
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
@@ -480,7 +515,16 @@ export default class ThresholdSettings extends React.Component {
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
               </div>
               {!isLogProject && <div className={tabStates0['threshold'] + ' ui tab'}>
-                <h3>Metric Settings (Optional)</h3>
+                <h3>Metric Override Thresholds</h3>
+								<p>
+									<i>Note: This setting is optional and is not required for
+									for basic alerting and notifications.</i>
+								</p>
+								<p>
+									If you have a negotiated SLA and would like InsightFinder
+									to notify you when that specific threshold value is 
+									violated, you may configure that value here.
+								</p>
                 <table className="ui celled table">
                   <thead>
                   <tr>
