@@ -70,7 +70,7 @@ class ProjectSettings extends Component {
             <div 
               className={cx('ui grid two columns form', loading ? 'loading' : '')}
               style={{ paddingTop: 10 }}
-             >
+            >
               {this.props.children}
             </div>
           </div>
