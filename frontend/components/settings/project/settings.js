@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import cx from 'classnames';
+import store from 'store';
 import { autobind } from 'core-decorators';
 import { Console, Link } from '../../../artui/react/index';
 
@@ -12,9 +12,8 @@ import {
 
 class ProjectSettings extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
-    root: React.PropTypes.object
+    root: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -22,16 +21,102 @@ class ProjectSettings extends Component {
 
     this.state = {
       currentProjectName: null,
+      saving: false,
       loading: false,
     };
   }
 
   componentDidMount() {
-    // TODO: Set the currentProjectName from store or first one.
+    // Get the current project from localstorage and verify it.
+    const { projectModelAllInfo } = this.context.dashboardUservalues;
+    const names = projectModelAllInfo.map(info => info.projectName);
+    const projectName = store.get('liveAnalysisProjectName') || names[0];
+    if (projectName) {
+      this.handleProjectChange(projectName);
+    }
   }
 
   @autobind
-  handleProjectChange(name) {
+  handleProjectChange(projectName) {
+    store.set('liveAnalysisProjectName', projectName);
+
+    const { dashboardUservalues } = this.context;
+    const { projectModelAllInfo, projectSettingsAllInfo,
+      projectString, sharedProjectString } = dashboardUservalues;
+
+    const project = projectModelAllInfo.find(
+      info => info.projectName === projectName);
+    const projectSetting = projectSettingsAllInfo.find(
+      info => info.projectName === projectName);
+    const metricSettings =
+      (projectSetting && projectSetting.metricSettings) || [];
+    const { cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, 
+      filterpvalue, minAnomalyRatioFilter, sharedUsernames 
+    } = project;
+
+    let projectStr = projectString.split(',').map(s => s.split(':')).find(v => v[0] === projectName);
+    if (!projectStr) {
+      projectStr = sharedProjectString.split(',')
+        .map(s => s.split(':'))
+        .find(v => `${v[0]}@${v[3]}` === projectName);
+    }
+    // // 前三部分是名称，数据类型dataType和云类型cloudType
+    const dataType = projectStr ? projectStr[1] : null;
+    const cloudType = projectStr ? projectStr[2] : '';
+    const instanceGrouping = {};
+
+    let projectType = '';
+    switch (dataType) {
+      case 'AWS':
+      case 'EC2':
+      case 'RDS':
+      case 'DynamoDB':
+        projectType = `${dataType}/CloudWatch`;
+        break;
+      case 'GAE':
+      case 'GCE':
+        projectType = `${dataType}/CloudMonitoring`;
+        break;
+      default:
+        projectType = `${cloudType}/Agent`;
+    }
+
+    this.setState({
+      currentProjectName: projectName,
+    });
+  }
+
+  @autobind
+  handleSaveProjectSetting(settings) {
+    this.setState({
+      saving: true,
+    }, () => {
+      const { projectName,
+        cvalue, pvalue,
+        emailcvalue, emailpvalue,
+        filtercvalue, filterpvalue,
+        minAnomalyRatioFilter,
+        sharedUsernames, projectHintMapFilename,
+      } = settings;
+      const { tempSharedUsernames, data } = this.state;
+
+      apis.postProjectSetting(
+        projectName,
+        cvalue, pvalue,
+        emailcvalue, emailpvalue,
+        filtercvalue, filterpvalue,
+        minAnomalyRatioFilter,
+        tempSharedUsernames,
+        projectHintMapFilename)
+        .then((resp) => {
+          if (!resp.success) {
+            window.alert(resp.message);
+          }
+          this.setState({
+            saving: false,
+          }, this.context.root.loadData);
+        });
+    });
   }
 
   render() {
