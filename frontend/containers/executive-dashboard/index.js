@@ -30,8 +30,8 @@ class ExecutiveDashboard extends Component {
     projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
     if (projects.length > 0) {
-      let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
-      this.handleProjectChange(refreshName, refreshName);
+      let projectName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
+      this.handleProjectChange(projectName, projectName);
     }
   }
 
@@ -43,6 +43,17 @@ class ExecutiveDashboard extends Component {
     }, () => {
       this.refreshProjectName(projectName);
     });
+  }
+
+  @autobind
+  handleProjectChange(value,projectName){
+    this.setState({
+      endTime: moment(),
+      numberOfDays: "7",
+      modelType:"Holistic",
+      currentTreemapData: undefined,
+    });
+    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -75,33 +86,29 @@ class ExecutiveDashboard extends Component {
     const {numberOfDays,endTime,modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
-    store.set('lastUsedProjectName', projectName);
+    store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName },()=>{
-	    apis.getExecDBStatisticsData(projectName, endTime, modelType, numberOfDays, true)
- 	     .then(data => {
- 	       this.setState({
- 	         loading: false,
- 	         data
+			if ( projectName !== undefined && projectName.length > 0 &&
+					 endTime !== undefined && endTime.length > 0 &&
+					 numberOfDays !== undefined && numberOfDays > 0 &&
+					 modelType !== undefined && modelType.length > 0 ) {
+	    	apis.getExecDBStatisticsData(projectName, endTime, modelType, numberOfDays, true)
+ 	     	.then(data => {
+ 	      	this.setState({
+ 	        	loading: false,
+ 	         	data
  	       	})  
-					})
- 	     .catch(msg => {
- 	       this.setState({ loading: false });
- 	       console.log(msg);
- 	       // alert(msg);
- 	     });
-		});
-  }
-
-  @autobind
-  handleGroupChange(value,projectName){
-    this.setState({
-      endTime: moment(),
-      numberOfDays: "7",
-      modelType:"Holistic",
-      currentTreemapData: undefined,
-    });
-    this.refreshProjectName(projectName);
-  }
+				})
+ 	     	.catch(msg => {
+ 	       	this.setState({ loading: false });
+ 	       	console.log(msg);
+ 	       	// alert(msg);
+ 	     	});
+			} else {
+				alert("Project, End Date, Number of Days, and Model Type must all be specified.");
+			}
+  	});
+	}
 
   modelDateValidator(date) {
     let timestamp = moment(date);
@@ -158,7 +165,7 @@ class ExecutiveDashboard extends Component {
                                     value={modelType} onChange={this.handleModelTypeChange}/>
             </div>
             <div className="field">
-              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
+              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(projectName)}>Refresh</div>
             </div>
           </div>
           <div
