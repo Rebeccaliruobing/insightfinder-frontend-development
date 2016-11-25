@@ -19,7 +19,7 @@ import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
-// import ExecutiveDashboard from './containers/executive-dashboard';
+import ExecutiveDashboard from './containers/executive-dashboard';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
 
@@ -255,6 +255,17 @@ const useCaseApp = function (props) {
   );
 };
 
+// Executive Dashboard Details
+const ExecutiveDashboardApp = function (props) {
+  let {location, params} = props;
+  return (
+    <Console>
+      <Console.Topbar logo={require('./images/logo.png')}/>
+      <ExecutiveDashboard location={location} params={params}/>
+    </Console>
+  );
+};
+
 const routes = (
   <Router history={browserHistory}>
     <Route component={App} path="/">
@@ -274,11 +285,11 @@ const routes = (
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
+    <Route component={ExecutiveDashboardApp} path="/executiveDashboard"/>
     <Redirect from="*" to="/"/>
   </Router>
 );
 
-    // <Route component={ExecutiveDashboard} path="/executiveDashboard"/>
 
 class AppRoute extends React.Component {
   constructor(props) {

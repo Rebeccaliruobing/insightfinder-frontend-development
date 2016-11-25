@@ -3,10 +3,9 @@ import store from 'store';
 import {autobind} from 'core-decorators';
 import {Console, Button} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
+import {ThreeValueBox} from "../../components/statistics";
 
 import apis from '../../apis';
-import {systemsAnomalyMetrics
-} from '../../components/statistics/systemsAnomalyMetrics';
 import { LiveProjectSelection, NumberOfDays, EventSummaryModelType
 } from '../../components/selections';
 
@@ -22,28 +21,17 @@ class ExecutiveDashboard extends Component {
       data: {
         statistics: {},
         summary: {},
-        eventStats:{},
       },
-      loading: true,
-      projectName: undefined,
-      selectedIncident: undefined,
-      numberOfDays: "7",
-      endTime: moment(),
-      modelType:"Holistic",
-      selectedInstance: undefined,
     };
   }
 // TO-DO  Add concept of "groups"
   componentDidMount() {
-    let groups = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
     if (projects.length > 0) {
-      let refreshName = store.get('lastUsedProjectName')?store.get('lastUsedProjectName'): projects[0].projectName;
-      this.handleProjectChange(refreshName, refreshName);
-    } else {
-      const url = `/newgroup/project-list/custom`;
-      window.open(url, '_self');
+      let projectName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
+      this.handleProjectChange(projectName, projectName);
     }
   }
 
@@ -55,6 +43,17 @@ class ExecutiveDashboard extends Component {
     }, () => {
       this.refreshProjectName(projectName);
     });
+  }
+
+  @autobind
+  handleProjectChange(value,projectName){
+    this.setState({
+      endTime: moment(),
+      numberOfDays: "7",
+      modelType:"Holistic",
+      currentTreemapData: undefined,
+    });
+    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -87,41 +86,29 @@ class ExecutiveDashboard extends Component {
     const {numberOfDays,endTime,modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
-    let pvalue = projectParam ? projectParam.pvalue : "0.99";
-    let cvalue = projectParam ? projectParam.cvalue : "1";
-    let endTimestamp = +moment(endTime);
-    store.set('mostRecentProjectName', projectName);
-    this.setState({ loading: true, projectName });
-		// TODO  Replace with appropriate API call
-    apis.getProjectStats(groupName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
-      .then(data => {
-        let anomalyRatioLists = data.incidents.map(function (value,index) {
-          return value['anomalyRatio']
-        });
-        this.setState({
-          loading: false,
-          data,
-					duration,
-          endTimestamp: data.endTimestamp
-        	}, ()=>{} 
-					}})
-      .catch(msg => {
-        this.setState({ loading: false });
-        console.log(msg);
-        // alert(msg);
-      });
-  }
-
-  @autobind
-  handleGroupChange(value,projectName){
-    this.setState({
-      endTime: moment(),
-      numberOfDays: "7",
-      modelType:"Holistic",
-      currentTreemapData: undefined,
-    });
-    this.refreshProjectName(projectName);
-  }
+    store.set('liveAnalysisProjectName', projectName);
+    this.setState({ loading: true, projectName },()=>{
+			if ( projectName !== undefined && projectName.length > 0 &&
+					 endTime !== undefined && endTime.length > 0 &&
+					 numberOfDays !== undefined && numberOfDays > 0 &&
+					 modelType !== undefined && modelType.length > 0 ) {
+	    	apis.getExecDBStatisticsData(projectName, endTime, modelType, numberOfDays, true)
+ 	     	.then(data => {
+ 	      	this.setState({
+ 	        	loading: false,
+ 	         	data
+ 	       	})  
+				})
+ 	     	.catch(msg => {
+ 	       	this.setState({ loading: false });
+ 	       	console.log(msg);
+ 	       	// alert(msg);
+ 	     	});
+			} else {
+				alert("Project, End Date, Number of Days, and Model Type must all be specified.");
+			}
+  	});
+	}
 
   modelDateValidator(date) {
     let timestamp = moment(date);
@@ -144,11 +131,6 @@ class ExecutiveDashboard extends Component {
   render() {
     let { loading, data, projectName,
       endTime, numberOfDays, modelType} = this.state;
-    let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-    let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
-    let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
-    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
-    let projectType = data['projectType']?data['projectType']:'';
     return (
       <Console.Content
         className={loading ? 'Loading...' : ''}
@@ -183,14 +165,15 @@ class ExecutiveDashboard extends Component {
                                     value={modelType} onChange={this.handleModelTypeChange}/>
             </div>
             <div className="field">
-              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(refreshName)}>Refresh</div>
+              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshProjectName(projectName)}>Refresh</div>
             </div>
           </div>
           <div
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-            <ProjectStatistics data={data} dur={numberOfDays} />
+            <ThreeValueBox title='Anomaly Score' duration={numberOfDays} previousValue={data.previousAnomalyScore}
+									 currentValue={data.currentAnomalyScore} predictValue={1000}	/>
           </div>
           <div
             className="ui vertical segment"
