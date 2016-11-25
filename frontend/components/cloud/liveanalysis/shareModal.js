@@ -36,7 +36,7 @@ class ShareModal extends React.Component {
     let data = Object.assign({}, this.context.location.query, rest);
     let {dp, latestDataTimestamp} = this.props;
     let startTimestamp = (data['startTime'])?data['startTime']:dp.startTimestamp;
-    let endTimestamp = (data['endTime'])?data['endTime']:dp.startTimestamp;
+    let endTimestamp = (data['endTime'])?data['endTime']:dp.endTimestamp;
     
     // Change the datetime format to epoch
     data['startTime'] = new Date(startTimestamp).getTime();

@@ -252,13 +252,14 @@ class EventSummary extends Component {
     let { loading, data, projectName,
       incidentsTreeMap, endTime, numberOfDays, modelType,
       treeMapCPUThreshold,treeMapAvailabilityThreshold,
-      treeMapScheme} = this.state;
+      treeMapScheme,selectedIncident,} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
+    let selectedIncidentPredicted = selectedIncident ? (selectedIncident.endTimestamp > latestTimestamp) : false;
     return (
       <Console.Content
         className={loading ? 'ui form loading' : ''}
@@ -343,7 +344,7 @@ class EventSummary extends Component {
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} endTime={endTime} 
                                     numberOfDays={numberOfDays} instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                                    feedbackData={this.feedbackData} />
+                                    feedbackData={this.feedbackData} predictedFlag={selectedIncidentPredicted} />
                 </div>
               </div>
             </div>

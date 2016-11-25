@@ -94,6 +94,7 @@ class IncidentsTreeMap extends Component {
       eventStartTime: d.eventStartTime,
       eventEndTime: d.eventEndTime,
       avgLabel,
+      predictedFlag: this.props.predictedFlag,
     };
     if (startTimestamp && endTimestamp) {
       params.startTimestamp = startTimestamp;
@@ -274,6 +275,7 @@ class IncidentsTreeMap extends Component {
       pvalue: pvalueParam,
       cvalue: cvalueParam,
       modelType,
+      predictedFlag: this.props.predictedFlag,
     };
     if (d.instanceName) {
       params.instanceName = d.instanceName;
