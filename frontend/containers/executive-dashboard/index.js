@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import store from 'store';
 import {autobind} from 'core-decorators';
+import moment from 'moment';
 import {Console, Button} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
 import {ThreeValueBox} from "../../components/statistics";
@@ -30,7 +31,7 @@ class ExecutiveDashboard extends Component {
     projects = projects.filter((item, index) => item.fileProjectType!=0);
     // remember select
     if (projects.length > 0) {
-      let projectName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
+      let projectName = store.get('liveAnalysisProjectName') || projects[0].projectName;
       this.handleProjectChange(projectName, projectName);
     }
   }
@@ -46,14 +47,16 @@ class ExecutiveDashboard extends Component {
   }
 
   @autobind
-  handleProjectChange(value,projectName){
+  handleProjectChange(value, projectName) {
     this.setState({
-      endTime: moment(),
+      projectName,
+      endTime: moment().endOf('day'),
       numberOfDays: "7",
       modelType:"Holistic",
       currentTreemapData: undefined,
+    }, () => {
+      this.refreshProjectName(projectName);
     });
-    this.refreshProjectName(projectName);
   }
 
   @autobind
@@ -84,15 +87,14 @@ class ExecutiveDashboard extends Component {
 
   refreshProjectName(projectName) {
     const {numberOfDays,endTime,modelType} = this.state;
-    let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-    let projectParam = projectParams.find((p) => p.projectName == projectName);
+    console.log(this.state);
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName },()=>{
 			if ( projectName !== undefined && projectName.length > 0 &&
-					 endTime !== undefined && endTime.length > 0 &&
+					 endTime !== undefined &&
 					 numberOfDays !== undefined && numberOfDays > 0 &&
 					 modelType !== undefined && modelType.length > 0 ) {
-	    	apis.getExecDBStatisticsData(projectName, endTime, modelType, numberOfDays, true)
+	    	apis.getExecDBStatisticsData(projectName, endTime.format('YYYY-MM-DD HH:mm'), modelType, numberOfDays, true)
  	     	.then(data => {
  	      	this.setState({
  	        	loading: false,
@@ -104,8 +106,6 @@ class ExecutiveDashboard extends Component {
  	       	console.log(msg);
  	       	// alert(msg);
  	     	});
-			} else {
-				alert("Project, End Date, Number of Days, and Model Type must all be specified.");
 			}
   	});
 	}

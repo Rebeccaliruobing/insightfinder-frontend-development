@@ -14,6 +14,7 @@ const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, dura
       </div>
       <div>
       	<table>
+					<tbody>
 					<tr>
 						<td>
 							<span className="previousValue">{`${previousValueText}`}</span>
@@ -38,6 +39,7 @@ const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, dura
 						<td></td>
 						<td><span className="valueSubLabel">Predicted Period</span></td>
 					</tr>
+					</tbody>
 				</table>
       </div>
     </div>
