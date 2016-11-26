@@ -127,7 +127,7 @@ const apis = {
     saveTriageActionRecord: saveTriageActionRecord,
     loadInstanceGrouping:loadInstanceGrouping,
     saveInstanceGrouping:saveInstanceGrouping,
-		getExecDBStatisticsData: getExecDBStatisticsData,
+	getExecDBStatisticsData: getExecDBStatisticsData,
     
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
@@ -399,7 +399,7 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, version, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version, userName = store.get('userName'), token = store.get('token')) {
         if(!version){
             version = "1";
         }
@@ -408,7 +408,7 @@ const apis = {
                 type: 'POST',
                 url: getEndpoint('liveAnalysis', version),
 //                url: $.fn.api.settings.api['live analysis'],
-                data: $.param({ userName, token, pvalue, cvalue, numberOfDays, endTimestamp, modelType, projectName,startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays , }),
+                data: $.param({ userName, token, pvalue, cvalue, numberOfDays, endTimestamp, modelType, projectName,startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -832,9 +832,9 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, userName = store.get('userName'), token = store.get('token')) {
-        let paramData = metricName?{projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, userName, token}:
-        {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, anomalyMetrics, userName, token};
+    postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, predictedFlag, userName = store.get('userName'), token = store.get('token')) {
+        let paramData = metricName?{projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, predictedFlag, userName, token}:
+        {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, anomalyMetrics, predictedFlag, userName, token};
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',

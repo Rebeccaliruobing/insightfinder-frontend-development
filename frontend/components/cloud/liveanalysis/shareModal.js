@@ -34,10 +34,10 @@ class ShareModal extends React.Component {
     
     let {name, description, system, showOther, other ,...rest} = this.state;
     let data = Object.assign({}, this.context.location.query, rest);
-    let {dp, latestDataTimestamp} = this.props;
+    let {dp, latestDataTimestamp, dataChunkName} = this.props;
     let startTimestamp = (data['startTime'])?data['startTime']:dp.startTimestamp;
-    let endTimestamp = (data['endTime'])?data['endTime']:dp.startTimestamp;
-    
+    let endTimestamp = (data['endTime'])?data['endTime']:dp.endTimestamp;
+
     // Change the datetime format to epoch
     data['startTime'] = new Date(startTimestamp).getTime();
     data['endTime'] = new Date(endTimestamp).getTime();
@@ -53,6 +53,7 @@ class ShareModal extends React.Component {
     data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
     data['rawData'] = dp ? dp.data.data : null;
     data['latestDataTimestamp'] = latestDataTimestamp;
+    data['dataChunkName'] = dataChunkName;
     apis.postDashboardUserValues('publishdata', data);
   }
 

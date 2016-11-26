@@ -494,8 +494,6 @@ class DataParser {
     this.stats = stats;
   }
 
-;
-
   _parseData() {
 
     if (this.seriesOptions) return;
@@ -504,7 +502,8 @@ class DataParser {
 
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
-    var lines = data.trim().split('\\n');
+    var lineStrings = data.trim().replace(/\\n/g,'\n').trim();    
+    var lines = lineStrings.split('\n');
     var ts1 = undefined;
     var ts2 = undefined;
     var tsN = undefined;

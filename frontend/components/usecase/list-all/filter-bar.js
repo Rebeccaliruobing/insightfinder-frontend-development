@@ -171,7 +171,8 @@ export default  class FilterBar extends Component {
         this.setState({
           loading: false,
           activeItem: undefined,
-          metricSettings: undefined
+          metricSettings: undefined,
+          description: '',
         }, this.handleRefresh);
       }else {
         alert(resp.message);
@@ -268,7 +269,7 @@ export default  class FilterBar extends Component {
                   }
 
                   let shouldShow = true;
-                  if (system && systemNames.indexOf(system) >= 0 && system != sys) {
+                  if (system != 'Others' && system != sys) {
                     shouldShow = false
                   } else if (system == 'Others' && systemNames.indexOf(sys) >= 0) {
                     shouldShow = false
