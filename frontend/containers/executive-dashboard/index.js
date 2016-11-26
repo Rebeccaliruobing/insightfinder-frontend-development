@@ -190,6 +190,7 @@ class ExecutiveDashboard extends Component {
             className="ui vertical segment"
             style={{ background: 'white', padding: 4 }}
           >
+						<HourlyHeatmap />
           </div>
           <div
             className="ui vertical segment"
