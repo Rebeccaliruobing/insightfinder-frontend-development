@@ -9,7 +9,8 @@ import FilterBar            from './filter-bar';
 
 export default class ListAll extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -46,30 +47,18 @@ export default class ListAll extends Component {
     })
   }
 
-  handleFilterChange(data) {
-    let startTime = moment(data.startTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-    let endTime = moment(data.endTime).utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
-
-    this.setState({loading: true}, () => {
-      apis.postCloudOutlierDetection(startTime, endTime, data.projectName, 'cloudoutlier').then((resp)=> {
-        if (resp.success) {
-          resp.data.splitByInstanceModelData = JSON.parse(resp.data.splitByInstanceModelData);
-          resp.data.holisticModelData = JSON.parse(resp.data.holisticModelData);
-          resp.data.splitByGroupModelData = JSON.parse(resp.data.splitByGroupModelData);
-          this.handleData(resp.data);
-          this.$filterPanel.slideUp()
-        }
-        this.setState({loading: false});
-      }).catch(()=> {
-        this.setState({loading: false});
-      })
-    });
-  }
-
   render() {
     const {view, showAddPanel, params, colors, systemNames} = this.state;
     const {userInstructions} = this.context;
-
+    let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
+    let allSystemNames = publishedData.map((item, index)=> {
+      return item.metaData.system;
+    }).filter(function (el, index, arr) {
+      return index === arr.indexOf(el);
+    });
+    let userSystemNames = allSystemNames.filter(function (el, index, arr) {
+      return systemNames.indexOf(el)==-1;
+    });
 
     const containerWidth = $("body").width() - 360;
 
@@ -92,6 +81,23 @@ export default class ListAll extends Component {
     return (
       <Console.Content>
         <div style={{padding: 20}}>
+          {userSystemNames && <div className="ui four column grid">
+            { userSystemNames.map((system, index)=> {
+                let color = colors[index % 5];
+                let link = "/usecase/list-some?system="+system;
+                return(
+                  <div className="wide column text-center" style={wrapperStyle}>
+                    <Link to={link} className="item text-white">
+                      <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
+                        <span>{system}</span>
+                      </div>
+                    </Link>
+                  </div>
+                )
+              })
+            }
+          </div>}
+          <hr/>
           <div className="ui four column grid">
             { systemNames.map((system, index)=> {
                 let color = colors[index % 5];
@@ -107,17 +113,18 @@ export default class ListAll extends Component {
                 )
               })
             }
-            <div className="wide column text-center" style={wrapperStyle}>
-              <Link to="/usecase/list-some?system=Others" className="item text-white">
-                <div style={Object.assign({},blockStyle)}>
-                  <span>Others</span>
-                </div>
-              </Link>
-            </div>
           </div>
         </div>
       </Console.Content>
     );
   }
-
 }
+
+
+            // <div className="wide column text-center" style={wrapperStyle}>
+            //   <Link to="/usecase/list-some?system=Others" className="item text-white">
+            //     <div style={Object.assign({},blockStyle)}>
+            //       <span>Others</span>
+            //     </div>
+            //   </Link>
+            // </div>

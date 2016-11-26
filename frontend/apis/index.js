@@ -127,7 +127,7 @@ const apis = {
     saveTriageActionRecord: saveTriageActionRecord,
     loadInstanceGrouping:loadInstanceGrouping,
     saveInstanceGrouping:saveInstanceGrouping,
-		getExecDBStatisticsData: getExecDBStatisticsData,
+	getExecDBStatisticsData: getExecDBStatisticsData,
     
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {

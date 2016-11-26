@@ -109,7 +109,7 @@ export default class ThresholdSettings extends React.Component {
 
   handleProjectChange(projectName) {
     let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString } = dashboardUservalues;
+    let { projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString,metricUnitMapping } = dashboardUservalues;
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
@@ -382,7 +382,7 @@ export default class ThresholdSettings extends React.Component {
       loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0
     } = this.state;
     let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo, projectSettingsAllInfo, projectString } = dashboardUservalues;
+    let { projectModelAllInfo, projectSettingsAllInfo, projectString,metricUnitMapping } = dashboardUservalues;
     let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
     let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
@@ -392,6 +392,13 @@ export default class ThresholdSettings extends React.Component {
         instanceGroupingArr.push(data.instanceGrouping[key]);
       });
       instanceGroupingArr = _.sortBy(instanceGroupingArr, "instanceId");
+    }
+
+    let metricUnitMap = {};
+    if(metricUnitMapping){
+      $.parseJSON(metricUnitMapping).map(function (item, index) {
+        metricUnitMap[item.metric] = item.unit;
+      });
     }
     let self = this;
     return (
@@ -526,17 +533,36 @@ export default class ThresholdSettings extends React.Component {
                   <thead>
                   <tr>
                     <th>Metric</th>
+                    <th>Unit</th>
                     <th>Normalization Group</th>
                     <th>Alert Threshold</th>
                     <th>No Alert Threshold</th>
                     <th>KPI</th>
+                    <th>Custom Metric</th>
                   </tr>
                   </thead>
                   <tbody>
                   {metricSettings.map((setting, index)=> {
+                    let smetric = setting.smetric;
+                    let pos = smetric.indexOf('/');
+                    if(pos!=-1){
+                      smetric = smetric.substring(0,pos);
+                    }
+                    let unit = metricUnitMap[smetric] || "";
+                    let pos2 = unit.indexOf('(');
+                    let pos3 = unit.indexOf(')');
+                    if(pos2!=-1&&pos3!=-1){
+                      unit = unit.substring(pos2+1,pos3);
+                    }
+                    let isCustomMetric = false;
+                    if((!$.isNumeric(setting.groupId) || ($.isNumeric(setting.groupId) && parseInt(setting.groupId)<1000)) && unit == ""){
+                      // has group id<1000 and not AWS/GAE metrics
+                      isCustomMetric = true;
+                    }
                     return (
                       <tr key={`${data.projectName}-${index}`}>
                         <td>{setting.smetric}</td>
+                        <td>{unit}</td>
                         <td><input value={setting.groupId}
                                    onChange={this.handleMetricSetting(index, 'groupId')}/></td>
                         <td><input value={setting.thresholdAlert}
@@ -547,6 +573,8 @@ export default class ThresholdSettings extends React.Component {
                         </td>
                         <td><input type='checkbox' defaultChecked={setting.isKPI}
                                    onChange={this.handleMetricSettingChecked(index, 'isKPI')}/>
+                        </td>
+                        <td><input type='checkbox' disabled defaultChecked={isCustomMetric}/>
                         </td>
                       </tr>
                     )
