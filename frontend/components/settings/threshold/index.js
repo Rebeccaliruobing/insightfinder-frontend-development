@@ -149,13 +149,13 @@ export default class ThresholdSettings extends React.Component {
         criteria: 'Criteria1',
         matchOp: 'contains',
         matchValue: 'value1',
-        seperateModel: '0',
+        seperateModel: 'no',
       }, {
         groupName: 'group2',
         criteria: 'Criteria2',
         matchOp: 'ge',
         matchValue: 'value1',
-        seperateModel: '1',
+        seperateModel: 'yes',
       }];
       const data = Object.assign({}, this.state.data, {
         projectName,
@@ -235,12 +235,23 @@ export default class ThresholdSettings extends React.Component {
       criteria: 'Criteria1',
       matchOp: 'contains',
       matchValue: '',
-      seperateModel: '0',
+      seperateModel: 'no',
     });
 
     this.setState({
       groupingRules,
     });
+  }
+
+  @autobind
+  handleRemoveGroupingRule(index) {
+    return () => {
+      let { groupingRules } = this.state;
+      groupingRules = _.filter(groupingRules, (v, i) => i !== index);
+      this.setState({
+        groupingRules,
+      });
+    };
   }
 
   @autobind
@@ -625,7 +636,7 @@ export default class ThresholdSettings extends React.Component {
                 <h3>Instance Grouping Settings</h3>
                 <Button className="orange" onClick={this.handleAddNewGroupingRule}>Add New</Button>
                 <div className='ui vertical segment' style={{ borderBottom: 0}}>
-                  <table className="ui celled table grouping-table">
+                  <table className="ui celled table grouping-table" style={{ tableLayout: 'fixed' }}>
                     <thead>
                     <tr>
                       <th>Group Name</th>
@@ -633,6 +644,7 @@ export default class ThresholdSettings extends React.Component {
                       <th>Key</th>
                       <th>Value Pattern</th>
                       <th>Separate model</th>
+                      <th width="40px"/>
                     </tr>
                     </thead>
                     <tbody>
@@ -640,6 +652,7 @@ export default class ThresholdSettings extends React.Component {
                       return (
                         <tr key={`${data.projectName}-${index}`}>
                           <td><input
+                            style={{ fontSize: 13 }}
                             value={rule.groupName}
                             onChange={this.handleGroupingRuleInputFieldChanged(rule, 'groupName')} /></td>
                           <td><GroupingCriteriaSelection
@@ -651,12 +664,18 @@ export default class ThresholdSettings extends React.Component {
                             onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'matchOp')}
                             style={{ width: '100%' }} /></td>
                           <td><input
+                            style={{ fontSize: 13 }}
                             value={rule.matchValue}
                             onChange={this.handleGroupingRuleInputFieldChanged(rule, 'matchValue')} /></td>
                           <td><GroupingSeperateModelSelection
                             value={rule.seperateModel}
                             onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'seperateModel')}
                             style={{ width: '100%' }} /></td>
+                          <td width="40px">
+                            <i
+                              className="icon remove" style={{ cursor: 'pointer', fontSize: 14, width: 20 }}
+                              onClick={this.handleRemoveGroupingRule(index)}
+                            /></td>
                         </tr>
                       );
                     })}

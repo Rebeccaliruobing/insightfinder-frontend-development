@@ -519,12 +519,12 @@ const GroupingMatchOpSelection = props => (
   <Dropdown mode="select" {...props}>
     <i className="dropdown icon" />
     <div className="menu">
-      <div className="item" data-value="equal">=</div>
-      <div className="item" data-value="ge">&gt;=</div>
-      <div className="item" data-value="le">&lt;=</div>
-      <div className="item" data-value="contains">contains</div>
-      <div className="item" data-value="startwith">startWith</div>
-      <div className="item" data-value="regex">regex</div>
+      <div className="item">equal</div>
+      <div className="item">ge</div>
+      <div className="item">le</div>
+      <div className="item">contains</div>
+      <div className="item">start_with</div>
+      <div className="item">regex</div>
     </div>
   </Dropdown>
 );
@@ -533,8 +533,8 @@ const GroupingSeperateModelSelection = props => (
   <Dropdown mode="select" {...props}>
     <i className="dropdown icon" />
     <div className="menu">
-      <div className="item" data-value='1'>Yes</div>
-      <div className="item" data-value='0'>No</div>
+      <div className="item">yes</div>
+      <div className="item">no</div>
     </div>
   </Dropdown>
 );
