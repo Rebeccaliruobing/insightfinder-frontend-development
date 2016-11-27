@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import cx from 'classnames';
+import _ from 'lodash';
 import store from 'store';
 import { autobind } from 'core-decorators';
 import { Console, Link } from '../../../artui/react/index';
@@ -20,94 +21,90 @@ class ProjectSettings extends Component {
     super(props);
 
     this.state = {
-      currentProjectName: null,
+      currentProjectName: store.get('liveAnalysisProjectName', null),
       saving: false,
       loading: false,
     };
   }
 
   componentDidMount() {
-    // Get the current project from localstorage and verify it.
+    // Get the current project from localstorage and use it as current project
+    // if it still exists, otherwise use the first project in the list.
     const { projectModelAllInfo } = this.context.dashboardUservalues;
     const names = projectModelAllInfo.map(info => info.projectName);
-    const projectName = store.get('liveAnalysisProjectName') || names[0];
+    let projectName = store.get('liveAnalysisProjectName');
+    if (!_.find(names, projectName)) {
+      projectName = names.length > 0 ? names[0] : null;
+    }
+
     if (projectName) {
       this.handleProjectChange(projectName);
     }
+  }
+
+  getProjectInfo(projectName) {
+    const { dashboardUservalues } = this.context;
+    const { projectModelAllInfo, projectSettingsAllInfo,
+      projectString, sharedProjectString, metricUnitMapping } = dashboardUservalues;
+
+    const modelInfo = projectModelAllInfo.find(i => i.projectName === projectName);
+    const settings = projectSettingsAllInfo.find(i => i.projectName === projectName);
+    const projectInfo = Object.assign({}, modelInfo, settings);
+
+    if (!projectInfo.metricSettings) {
+      projectInfo.metricSettings = [];
+    }
+
+    let projectStr = projectString.split(',').map(s => s.split(':')).find(v => v[0] === projectName);
+    if (!projectStr) {
+      projectStr = sharedProjectString.split(',').map(s => s.split(':')).find(v => `${v[0]}@${v[3]}` === projectName);
+    }
+    projectInfo.dataType = projectStr ? projectStr[1] : '';
+    projectInfo.cloudType = projectStr ? projectStr[2] : '';
+    projectInfo.isLogProject = projectInfo.fileProjectType === 0;
+
+    const metricUnitMap = {};
+    if (metricUnitMapping) {
+      JSON.parse(metricUnitMapping).forEach((item) => {
+        metricUnitMap[item.metric] = item.unit;
+      });
+    }
+
+    projectInfo.metricUnitMap = metricUnitMap;
+
+    return projectInfo;
   }
 
   @autobind
   handleProjectChange(projectName) {
     store.set('liveAnalysisProjectName', projectName);
 
-    const { dashboardUservalues } = this.context;
-    const { projectModelAllInfo, projectSettingsAllInfo,
-      projectString, sharedProjectString } = dashboardUservalues;
-
-    const project = projectModelAllInfo.find(
-      info => info.projectName === projectName);
-    const projectSetting = projectSettingsAllInfo.find(
-      info => info.projectName === projectName);
-    const metricSettings =
-      (projectSetting && projectSetting.metricSettings) || [];
-    const { cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, 
-      filterpvalue, minAnomalyRatioFilter, sharedUsernames 
-    } = project;
-
-    let projectStr = projectString.split(',').map(s => s.split(':')).find(v => v[0] === projectName);
-    if (!projectStr) {
-      projectStr = sharedProjectString.split(',')
-        .map(s => s.split(':'))
-        .find(v => `${v[0]}@${v[3]}` === projectName);
-    }
-    // // 前三部分是名称，数据类型dataType和云类型cloudType
-    const dataType = projectStr ? projectStr[1] : null;
-    const cloudType = projectStr ? projectStr[2] : '';
-    const instanceGrouping = {};
-
-    let projectType = '';
-    switch (dataType) {
-      case 'AWS':
-      case 'EC2':
-      case 'RDS':
-      case 'DynamoDB':
-        projectType = `${dataType}/CloudWatch`;
-        break;
-      case 'GAE':
-      case 'GCE':
-        projectType = `${dataType}/CloudMonitoring`;
-        break;
-      default:
-        projectType = `${cloudType}/Agent`;
-    }
+    const projectInfo = this.getProjectInfo(projectName);
 
     this.setState({
       currentProjectName: projectName,
+      currentProjectInfo: projectInfo,
+      isLogProject: projectInfo.isLogProject,
     });
   }
 
   @autobind
-  handleSaveProjectSetting(settings) {
+  handleSaveProjectInfo(changes) {
+    const { currentProjectInfo } = this.state;
+    const info = Object.assign({}, _.cloneDeep(currentProjectInfo), changes);
+
     this.setState({
       saving: true,
     }, () => {
-      const { projectName,
-        cvalue, pvalue,
-        emailcvalue, emailpvalue,
-        filtercvalue, filterpvalue,
-        minAnomalyRatioFilter,
-        sharedUsernames, projectHintMapFilename,
-      } = settings;
-      const { tempSharedUsernames, data } = this.state;
-
+      // Submit to server
       apis.postProjectSetting(
-        projectName,
-        cvalue, pvalue,
-        emailcvalue, emailpvalue,
-        filtercvalue, filterpvalue,
-        minAnomalyRatioFilter,
-        tempSharedUsernames,
-        projectHintMapFilename)
+        info.projectName,
+        info.cvalue, info.pvalue,
+        info.emailcvalue, info.emailpvalue,
+        info.filtercvalue, info.filterpvalue,
+        info.minAnomalyRatioFilter,
+        info.tempSharedUsernames,
+        info.projectHintMapFilename)
         .then((resp) => {
           if (!resp.success) {
             window.alert(resp.message);
@@ -120,7 +117,7 @@ class ProjectSettings extends Component {
   }
 
   render() {
-    const { loading, currentProjectName, isLogProject } = this.state;
+    const { loading, currentProjectName, isLogProject, currentProjectInfo } = this.state;
     return (
       <Console.Content className={loading ? 'ui form loading' : ''}>
         <div className="ui main tiny container">
@@ -156,7 +153,10 @@ class ProjectSettings extends Component {
               className={cx('ui grid two columns form', loading ? 'loading' : '')}
               style={{ paddingTop: 10 }}
             >
-              {this.props.children}
+              {React.cloneElement(this.props.children, {
+                projectInfo: currentProjectInfo || {},
+                saveProjectInfo: this.handleSaveProjectInfo,
+              })}
             </div>
           </div>
         </div>

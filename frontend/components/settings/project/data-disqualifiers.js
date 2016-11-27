@@ -1,17 +1,55 @@
-import React from 'react';
+import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import { Button } from '../../../artui/react/index';
 
 class DataDisqualifiers extends React.Component {
 
+  static propTypes = {
+    projectInfo: T.object,
+    saving: T.bool,
+    saveProjectInfo: T.func,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
+      learningSkippingPeriod: props.projectInfo.learningSkippingPeriod,
     };
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { projectInfo } = nextProps;
+    if (projectInfo) {
+      this.setState({
+        learningSkippingPeriod: projectInfo.learningSkippingPeriod,
+      });
+    }
+  }
+
+  @autobind
+  handleLearningSkippingPeriodChange(e) {
+    const v = e.target.value;
+    this.setState({
+      learningSkippingPeriod: v,
+    });
+  }
+
+  @autobind
+  handleSaveProjectSetting() {
+    const { saveProjectInfo } = this.props;
+    const { learningSkippingPeriod } = this.state;
+    if (saveProjectInfo) {
+      saveProjectInfo({
+        learningSkippingPeriod,
+      });
+    }
+  }
+
   render() {
+    const { saving } = this.props;
+    const { learningSkippingPeriod } = this.state;
+
     return (
       <div className="active ui tab">
         <h3>Time-Based Exclusions</h3>
@@ -38,11 +76,19 @@ class DataDisqualifiers extends React.Component {
         </p>
         <div className="field">
           <div className="ui input">
-            <input type="text" />
+            <input
+              type="text"
+              value={learningSkippingPeriod}
+              onChange={this.handleLearningSkippingPeriodChange}
+            />
           </div>
         </div>
         <div className="wide column">
-          <Button className="blue">Update Learning Settings</Button>
+          <Button
+            className="blue"
+            disabled={saving}
+            onClick={this.handleSaveProjectSetting}
+          >Update Learning Settings</Button>
         </div>
       </div>
     );
