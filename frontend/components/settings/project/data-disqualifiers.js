@@ -14,7 +14,7 @@ class DataDisqualifiers extends React.Component {
     super(props);
 
     this.state = {
-      learningSkippingPeriod: props.projectInfo.learningSkippingPeriod,
+      learningSkippingPeriod: props.projectInfo.learningSkippingPeriod || '',
     };
   }
 
@@ -22,13 +22,14 @@ class DataDisqualifiers extends React.Component {
     const { projectInfo } = nextProps;
     if (projectInfo) {
       this.setState({
-        learningSkippingPeriod: projectInfo.learningSkippingPeriod,
+        learningSkippingPeriod: projectInfo.learningSkippingPeriod || '',
       });
     }
   }
 
   @autobind
   handleLearningSkippingPeriodChange(e) {
+    console.log(e);
     const v = e.target.value;
     this.setState({
       learningSkippingPeriod: v,

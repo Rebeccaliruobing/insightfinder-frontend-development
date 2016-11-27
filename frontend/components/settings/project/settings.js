@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import cx from 'classnames';
 import _ from 'lodash';
 import store from 'store';
 import { autobind } from 'core-decorators';
@@ -23,7 +22,6 @@ class ProjectSettings extends Component {
     this.state = {
       currentProjectName: store.get('liveAnalysisProjectName', null),
       saving: false,
-      loading: false,
     };
   }
 
@@ -117,9 +115,9 @@ class ProjectSettings extends Component {
   }
 
   render() {
-    const { loading, currentProjectName, isLogProject, currentProjectInfo } = this.state;
+    const { currentProjectName, saving, isLogProject, currentProjectInfo } = this.state;
     return (
-      <Console.Content className={loading ? 'ui form loading' : ''}>
+      <Console.Content>
         <div className="ui main tiny container">
           <div className="ui right aligned vertical inline segment" style={{ zIndex: 200 }}>
             <div className="field">
@@ -149,12 +147,13 @@ class ProjectSettings extends Component {
                 <Link className="item" to="/settings/log-analysis">Log Analysis</Link>
               }
             </div>
-            <div 
-              className={cx('ui grid two columns form', loading ? 'loading' : '')}
+            <div
+              className="ui grid two columns form"
               style={{ paddingTop: 10 }}
             >
               {React.cloneElement(this.props.children, {
                 projectInfo: currentProjectInfo || {},
+                saving,
                 saveProjectInfo: this.handleSaveProjectInfo,
               })}
             </div>
