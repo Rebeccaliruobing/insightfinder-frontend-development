@@ -15,6 +15,9 @@ import {
   DurationThreshold,
   AnomalyThreshold,
   EnvironmentSelect,
+  GroupingCriteriaSelection,
+  GroupingMatchOpSelection,
+  GroupingSeperateModelSelection,
 } from '../../selections';
 
 const baseUrl = window.API_BASE_URL || '/api/v1/';
@@ -63,9 +66,10 @@ export default class ThresholdSettings extends React.Component {
       wordList: [],
       tabStates: {
         episode: 'active',
-        word: ''
+        word: '',
       },
       tabStates0,
+      groupingRules: [],
     };
   }
 
@@ -122,7 +126,6 @@ export default class ThresholdSettings extends React.Component {
     let dataType = projectStr ? projectStr[1] : null;
     let cloudType = projectStr ? projectStr[2] : '';
     let projectType = "";
-    let instanceGrouping = {};
     let self = this;
     switch (dataType) {
       case 'AWS':
@@ -139,8 +142,22 @@ export default class ThresholdSettings extends React.Component {
         projectType = `${cloudType}/Agent`;
     }
     apis.loadInstanceGrouping(projectName).then((resp)=> {
-      instanceGrouping = resp.instanceGrouping;
-      let data = Object.assign({}, this.state.data, {
+      // TODO: Change to the real grouping rules from server.
+      // const groupingRules = resp.instanceGrouping;
+      const groupingRules = [{
+        groupName: 'group1',
+        criteria: 'Criteria1',
+        matchOp: 'contains',
+        matchValue: 'value1',
+        seperateModel: '0',
+      }, {
+        groupName: 'group2',
+        criteria: 'Criteria2',
+        matchOp: 'ge',
+        matchValue: 'value1',
+        seperateModel: '1',
+      }];
+      const data = Object.assign({}, this.state.data, {
         projectName,
         projectType,
         cvalue,
@@ -151,11 +168,11 @@ export default class ThresholdSettings extends React.Component {
         filterpvalue,
         minAnomalyRatioFilter,
         sharedUsernames,
-        instanceGrouping,
       });
       this.setState({
         metricSettings: metricSettings,
         data: data,
+        groupingRules,
         tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
         tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
         loading: projectSetting['fileProjectType'] == 0,
@@ -170,37 +187,6 @@ export default class ThresholdSettings extends React.Component {
         }
       });
     });
-    /*
-    let data = Object.assign({}, this.state.data, {
-      projectName,
-      projectType,
-      cvalue,
-      pvalue,
-      emailcvalue,
-      emailpvalue,
-      filtercvalue,
-      filterpvalue,
-      minAnomalyRatioFilter,
-      sharedUsernames,
-      instanceGrouping,
-    });
-    this.setState({
-      metricSettings: metricSettings,
-      data: data,
-      tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
-      tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
-      loading: projectSetting['fileProjectType'] == 0,
-    }, ()=> {
-      projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
-      let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
-      if (isLogProject) {
-        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-      } else {
-        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-        store.set('liveAnalysisProjectName', projectName);
-      }
-    });
-    */
   }
 
   getLogAnalysisList(projectName, project) {
@@ -214,16 +200,73 @@ export default class ThresholdSettings extends React.Component {
     });
   }
 
-  handleValueChangeDummy(name) {
-    return;
+  @autobind
+  handleGroupingRuleSelectionFieldChanged(rule, field) {
+    return (value) => {
+      const { groupingRules } = this.state;
+      rule[field] = value;
+      // Reset state to update ui
+      this.setState({
+        groupingRules,
+      });
+    };
+  }
+
+  @autobind
+  handleGroupingRuleInputFieldChanged(rule, field) {
+    return (e) => {
+      const value = e.target.value;
+      const { groupingRules } = this.state;
+      rule[field] = value;
+      // Reset state to update ui
+      this.setState({
+        groupingRules,
+      });
+    };
+  }
+
+  @autobind
+  handleAddNewGroupingRule() {
+    let { groupingRules } = this.state;
+
+    groupingRules = groupingRules.concat({
+      // TODO: Need to choose the default value for the new rule.
+      groupName: '',
+      criteria: 'Criteria1',
+      matchOp: 'contains',
+      matchValue: '',
+      seperateModel: '0',
+    });
+
+    this.setState({
+      groupingRules,
+    });
+  }
+
+  @autobind
+  handleSaveGroupingRules() {
+    const { groupingRules } = this.state;
+    const invalid = _.find(groupingRules, (rule) => {
+      return !!_.findKey(rule, (value) => {
+        return value === null || value === undefined || value === '';
+      });
+    });
+
+    if (invalid) {
+      alert('Please input all fields');
+      return;
+    }
+
+    // TODO: Call api to update the grouping rule to server.
+    console.log(groupingRules);
   }
 
   handleValueChange(name) {
     return (v) => {
       this.setState({
         data: Object.assign({}, this.state.data, _.fromPairs([[name, v]]))
-      })
-    }
+      });
+    };
   }
 
   handleLearningSkippingPeriodChange(e) {
@@ -379,20 +422,14 @@ export default class ThresholdSettings extends React.Component {
     let labelStyle = {};
     let {
       data, tempSharedUsernames, tempLearningSkippingPeriod,
-      loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0
+      loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0,
+      groupingRules,
     } = this.state;
     let { dashboardUservalues } = this.context;
     let { projectModelAllInfo, projectSettingsAllInfo, projectString,metricUnitMapping } = dashboardUservalues;
     let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
     let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
-    let instanceGroupingArr = [];
-    if (data.instanceGrouping) {
-      Object.keys(data.instanceGrouping).map(function (key, index) {
-        instanceGroupingArr.push(data.instanceGrouping[key]);
-      });
-      instanceGroupingArr = _.sortBy(instanceGroupingArr, "instanceId");
-    }
 
     let metricUnitMap = {};
     if(metricUnitMapping){
@@ -403,7 +440,7 @@ export default class ThresholdSettings extends React.Component {
     let self = this;
     return (
       <Console.Content className={loading ? "ui form loading" : ""}>
-        <div className="ui main tiny container" ref={c => this._el = c}>
+        <div className="ui main tiny container project-settings" ref={c => this._el = c}>
           <div className="ui right aligned vertical inline segment" style={{ zIndex: 200 }}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
@@ -586,38 +623,47 @@ export default class ThresholdSettings extends React.Component {
               </div>}
               {!isLogProject && <div className={tabStates0['grouping'] + ' ui tab'}>
                 <h3>Instance Grouping Settings</h3>
-                <div className='ui vertical segment'>
+                <Button className="orange" onClick={this.handleAddNewGroupingRule}>Add New</Button>
+                <div className='ui vertical segment' style={{ borderBottom: 0}}>
                   <table className="ui celled table grouping-table">
                     <thead>
                     <tr>
-                      <th>Instance ID</th>
-                      <th>Instance Name</th>
-                      <th>Environment</th>
-                      <th>Service Name</th>
-                      <th>Team</th>
-                      <th>Business Unit</th>
+                      <th>Group Name</th>
+                      <th>Grouping Criteria</th>
+                      <th>Key</th>
+                      <th>Value Pattern</th>
+                      <th>Separate model</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {instanceGroupingArr.map((grouping, index)=> {
+                    {groupingRules.map((rule, index) => {
                       return (
                         <tr key={`${data.projectName}-${index}`}>
-                          <td>{grouping.instanceId}</td>
-                          <td><input value={grouping.instanceName}
-                                     onChange={this.handleValueChangeDummy('instanceName')}/></td>
-                          <td><EnvironmentSelect key={data.projectName} value={grouping.environment}
-                                                 onChange={this.handleValueChangeDummy('environment')}
-                                                 style={{ width: '100%' }}/></td>
-                          <td><input onChange={this.handleValueChangeDummy('service')}/></td>
-                          <td><input onChange={this.handleValueChangeDummy('team')}/></td>
-                          <td><input onChange={this.handleValueChangeDummy('businessUnit')}/></td>
+                          <td><input
+                            value={rule.groupName}
+                            onChange={this.handleGroupingRuleInputFieldChanged(rule, 'groupName')} /></td>
+                          <td><GroupingCriteriaSelection
+                            value={rule.criteria}
+                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'criteria')}
+                            style={{ width: '100%' }} /></td>
+                          <td><GroupingMatchOpSelection
+                            value={rule.matchOp}
+                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'matchOp')}
+                            style={{ width: '100%' }} /></td>
+                          <td><input
+                            value={rule.matchValue}
+                            onChange={this.handleGroupingRuleInputFieldChanged(rule, 'matchValue')} /></td>
+                          <td><GroupingSeperateModelSelection
+                            value={rule.seperateModel}
+                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'seperateModel')}
+                            style={{ width: '100%' }} /></td>
                         </tr>
-                      )
+                      );
                     })}
                     </tbody>
                   </table>
                 </div>
-                <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Instance
+                <Button className="blue" onClick={this.handleSaveGroupingRules}>Update Instance
                   Grouping</Button>
               </div>}
               {isLogProject && <div className={tabStates0['episodeword'] + ' ui tab'} style={{ 'paddingTop': '40px' }}>

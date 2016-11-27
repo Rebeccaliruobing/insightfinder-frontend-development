@@ -504,6 +504,41 @@ const EnvironmentSelect = (props) => {
   )
 };
 
+const GroupingCriteriaSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item">Criteria1</div>
+      <div className="item">Criteria2</div>
+      <div className="item">Criteria3</div>
+    </div>
+  </Dropdown>
+);
+
+const GroupingMatchOpSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item" data-value="equal">=</div>
+      <div className="item" data-value="ge">&gt;=</div>
+      <div className="item" data-value="le">&lt;=</div>
+      <div className="item" data-value="contains">contains</div>
+      <div className="item" data-value="startwith">startWith</div>
+      <div className="item" data-value="regex">regex</div>
+    </div>
+  </Dropdown>
+);
+
+const GroupingSeperateModelSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item" data-value='1'>Yes</div>
+      <div className="item" data-value='0'>No</div>
+    </div>
+  </Dropdown>
+);
+
 export {
   ProjectSelection,
   LiveProjectSelection,
@@ -528,4 +563,7 @@ export {
   TreeMapSchemeSelect,
   ForecastIntervalHour,
   EnvironmentSelect,
+  GroupingCriteriaSelection,
+  GroupingMatchOpSelection,
+  GroupingSeperateModelSelection,
 };
