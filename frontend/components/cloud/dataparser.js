@@ -87,6 +87,7 @@ class DataParser {
       var pos3 = item.indexOf("(");
       var pos4 = item.indexOf("(",pos3+1);
       var pos5 = item.indexOf(")",pos4+1);
+      var pos6 = item.indexOf(":",pos5+1);
       var metr = item.substring(pos1 + 1, pos2);
       metricList.push(metr);
       if(pos3!=-1 && pos4!=-1){
@@ -513,13 +514,22 @@ class DataParser {
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
             // cpu#% [node1]: 1
-            var cats = item.trim().split(/\[|\]|\:/);
+            item = item.trim();
+            var pos1 = item.indexOf("[");
+            var pos2 = item.indexOf("]");
+            var pos3 = item.indexOf(":",pos2+1);
+            var metric = item.substring(0, pos1);
+            var node = item.substring(pos1+1, pos2);
+            var groupid = "";
+            if(pos3!=-1){
+              groupid = item.substring(pos3+1);
+            }
             soptions[seriesNo - 1] = {
               name: item,
               data: [],
-              metric: cats[0].trim(),
-              node: cats[1].trim(),
-              groupId: cats[3] ? cats[3].trim() : ''
+              metric: metric,
+              node: node,
+              groupId: groupid
             };
           }
         });

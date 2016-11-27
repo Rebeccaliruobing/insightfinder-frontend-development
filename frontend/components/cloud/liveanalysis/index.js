@@ -364,7 +364,7 @@ class LiveAnalysisCharts extends React.Component {
                             </Button>}
                             <Button className="orange labeled icon"
                                     onClick={() => this.setState({ showDebug: true })} style={{display: settingData?'':'none'}}>
-                                <i className="zoom icon"/>Syscall Results
+                                <i className="zoom icon"/>Faulty Localization Result
                             </Button>
                             {!isForecast && <ButtonGroup className="right floated basic icon">
                                 {!bugId && <Button onClick={()=> this.setState({ showSettingModal: true })}>

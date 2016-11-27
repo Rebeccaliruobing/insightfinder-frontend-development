@@ -13,7 +13,6 @@ class NewRelicProjectModal extends React.Component {
     super(props);
     this._dropdown = null;
     this.state = {
-      hasAgentData:false
     }
   }
 
@@ -24,14 +23,14 @@ class NewRelicProjectModal extends React.Component {
   }
 
   handleSubmit() {
-    let {projectName, instanceType, zone, access_key, secrete_key, hasAgentData} = this.state;
+    let {projectName, instanceType, samplingInterval, apikey} = this.state;
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
     alert("This feature is coming soon...");
     this.props.onCancel();
-    // apis.postAddAWSProject(projectName, instanceType, zone, access_key, secrete_key, hasAgentData).then((resp)=> {
+    // apis.postAddAWSProject(projectName, instanceType, samplingInterval, apikey).then((resp)=> {
     //   if(resp.success) {
     //     window.alert(resp.message);
     //     this.context.root.loadData();
@@ -55,7 +54,19 @@ class NewRelicProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>API Key*</label>
-              <input type="text" name="api_key" onChange={(e)=>this.setState({api_key: e.target.value})}/>
+              <input type="text" name="apikey" onChange={(e)=>this.setState({apikey: e.target.value})}/>
+            </div>
+            <div className="field">
+              <label>Sampling Interval</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({samplingInterval: e.target.value})}>
+                <option className="item">Sampling Interval</option>
+                <option className="item" value="1">1 minute</option>
+                <option className="item" value="5">5 minutes</option>
+                <option className="item" value="10">10 minutes</option>
+                <option className="item" value="15">15 minutes</option>
+                <option className="item" value="30">30 minutes</option>
+                <option className="item" value="60">60 minutes</option>
+              </select>
             </div>
           </form>
         </div>

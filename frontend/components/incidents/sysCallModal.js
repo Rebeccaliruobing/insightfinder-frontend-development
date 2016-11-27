@@ -71,9 +71,9 @@ class SysCallModal extends React.Component {
                                     <div>
                                         <div className="ui pointing secondary menu">
                                             <a className={tabStates['time'] + ' item'}
-                                               onClick={(e) => this.selectTab(e, 'time')}>By Time</a>
+                                               onClick={(e) => this.selectTab(e, 'time')}>By Execution Time</a>
                                             <a className={tabStates['freq'] + ' item'}
-                                               onClick={(e) => this.selectTab(e, 'freq')}>By Freq</a>
+                                               onClick={(e) => this.selectTab(e, 'freq')}>By Execution Frequency</a>
                                         </div>
 
                                         <div className={tabStates['time'] + ' ui tab '}>

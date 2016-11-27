@@ -47,6 +47,8 @@ $.fn.api.settings.api = {
     'published detection': `${baseUrl}publishedDetection`,
     'post mortem': `${baseUrl}postMortem`,
     'log analysis': `${baseUrl}logAnalysis`,
+    'add datadog project': `${baseUrl}add-datadog-project`,
+    'add new relic project': `${baseUrl}add-newrelic-project`,
     'add custom project': `${baseUrl}add-custom-project`,
     'add aws project': `${baseUrl}add-amazon-project`,
     'add google project': `${baseUrl}add-google-project`,
@@ -618,6 +620,79 @@ const apis = {
                     userName,
                     token
                 }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddDataDogProject(projectName, projectCloudType, samplingInterval, appkey, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add datadog project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    appkey,
+                    apikey,
+                    email, 
+                    userName, 
+                    token }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddNewRelicProject(projectName, projectCloudType, samplingInterval, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add new relic project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    apikey,
+                    email, 
+                    userName, 
+                    token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }

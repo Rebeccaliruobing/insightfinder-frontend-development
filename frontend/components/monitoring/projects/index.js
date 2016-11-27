@@ -61,7 +61,16 @@ class Projects extends React.Component {
             projectGroupByType.Google.push({name, dataType, cloudType,zone,agentDataEnabled});
             break;
           default:
-            projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
+            switch(cloudType) {
+              case 'DataDog':
+                projectGroupByType.datadog.push({name, dataType, cloudType,zone,agentDataEnabled});
+                break;
+              case 'NewRelic':
+                projectGroupByType.newrelic.push({name, dataType, cloudType,zone,agentDataEnabled});
+                break;
+              default:
+                projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
+            }
         }
       });
     }
@@ -87,14 +96,23 @@ class Projects extends React.Component {
             projectGroupByType.Google.push({name, dataType, cloudType,zone,agentDataEnabled, flag});
             break;
           default:
-            projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled, flag});
+            switch(cloudType) {
+              case 'DataDog':
+                projectGroupByType.datadog.push({name, dataType, cloudType,zone,agentDataEnabled});
+                break;
+              case 'NewRelic':
+                projectGroupByType.newrelic.push({name, dataType, cloudType,zone,agentDataEnabled});
+                break;
+              default:
+                projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
+            }
         }
       });
     }
     return projectGroupByType;
   }
-  render() {
 
+  render() {
     var tabStates = this.state['tabStates'];
     var userInstructions = this.context.userInstructions;
     let {projectString, sharedProjectString,incidentAllInfo, dataAllInfo,projectSettingsAllInfo} = this.context.dashboardUservalues;

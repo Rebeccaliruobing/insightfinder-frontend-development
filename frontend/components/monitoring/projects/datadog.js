@@ -82,6 +82,26 @@ class DataDogProjects extends React.Component {
                         <td style={{width: '16%'}}>Monitoring Type</td>
                         <td style={{width: '16%'}}></td>
                     </tr>
+                    {
+                      this.props.projects.map(({name, dataType, zone, cloudType,flag}, index)=> {
+                        if(cloudType==='FileReplay'){
+                          cloudType='File';
+                        }else if(cloudType==='PrivateCloud'){
+                          cloudType='Private';
+                        }
+                        return (
+                          <tr key={index}>
+                            <td style={{width: '16%'}}>{name}</td>
+                            <td style={{width: '16%'}}>{cloudType}</td>
+                            <td style={{width: '16%'}}>{zone}</td>
+                            <td style={{width: '16%'}}>DataDog</td>
+                            <td style={{width: '16%'}}>
+                              <button className="ui mini red button" onClick={this.handleRemoveProject(name)}>{flag?"Unshare":"Remove"}</button>
+                            </td>
+                          </tr>
+                        )
+                      })
+                    }
                     </tbody>
                 </table>
                 {
