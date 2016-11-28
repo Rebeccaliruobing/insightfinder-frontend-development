@@ -71,6 +71,16 @@ export default class ThresholdSettings extends React.Component {
       tabStates0,
       groupingRules: [],
     };
+
+    this.matchOpMap = {};
+    this.matchOpMap["contains"]="contains";
+    this.matchOpMap["startwith"]="start with";
+    this.matchOpMap["equal"]="=";
+    this.matchOpMap["ge"]=">=";
+    this.matchOpMap["gt"]=">";
+    this.matchOpMap["le"]="<=";
+    this.matchOpMap["lt"]="<";
+    this.matchOpMap["regex"]="regex";
   }
 
   componentDidMount() {
@@ -145,17 +155,17 @@ export default class ThresholdSettings extends React.Component {
       // TODO: Change to the real grouping rules from server.
       // const groupingRules = resp.instanceGrouping;
       const groupingRules = [{
-        groupName: 'group1',
-        criteria: 'Criteria1',
+        groupName: 'EnvGroup',
+        criteria: 'Environment',
         matchOp: 'contains',
-        matchValue: 'value1',
-        seperateModel: 'no',
-      }, {
-        groupName: 'group2',
-        criteria: 'Criteria2',
-        matchOp: 'ge',
-        matchValue: 'value1',
+        matchValue: 'PROD',
         seperateModel: 'yes',
+      }, {
+        groupName: 'ServiceGroup',
+        criteria: 'Service Name',
+        matchOp: 'equal',
+        matchValue: 'MySQL',
+        seperateModel: 'no',
       }];
       const data = Object.assign({}, this.state.data, {
         projectName,
@@ -232,7 +242,7 @@ export default class ThresholdSettings extends React.Component {
     groupingRules = groupingRules.concat({
       // TODO: Need to choose the default value for the new rule.
       groupName: '',
-      criteria: 'Criteria1',
+      criteria: '',
       matchOp: 'contains',
       matchValue: '',
       seperateModel: 'no',
@@ -649,6 +659,7 @@ export default class ThresholdSettings extends React.Component {
                     </thead>
                     <tbody>
                     {groupingRules.map((rule, index) => {
+                      let matchOpText = self.matchOpMap[rule.matchOp];
                       return (
                         <tr key={`${data.projectName}-${index}`}>
                           <td><input
@@ -661,6 +672,7 @@ export default class ThresholdSettings extends React.Component {
                             style={{ width: '100%' }} /></td>
                           <td><GroupingMatchOpSelection
                             value={rule.matchOp}
+                            text={matchOpText}
                             onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'matchOp')}
                             style={{ width: '100%' }} /></td>
                           <td><input

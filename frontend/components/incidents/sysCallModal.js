@@ -28,7 +28,7 @@ class SysCallModal extends React.Component {
 
     render() {
         let {dataArray, timeRanking, freqRanking, ...rest} = this.props;
-        let pieChartCanvasStyle = {height: '200px', width: '230px'};
+        let pieChartCanvasStyle = {height: '200px', width: '200px'};
         let titleStyle = {'width': '27%', 'margin': '0 auto'};
         let optionCenterStyle = ['65%', '50%'];
         const { tabStates } = this.state;
@@ -38,7 +38,7 @@ class SysCallModal extends React.Component {
         freqFuncList = (_.keysIn(freqFuncList)).length != 0 ? freqFuncList : [];
         console.log(dataArray, timeRanking, freqRanking);
         return (
-            <Modal {...rest} size="big" closable={true}>
+            <Modal {...rest} size="normal" closable={true}>
                 {
                     dataArray ?
                         <div className="content">
@@ -57,7 +57,7 @@ class SysCallModal extends React.Component {
                                     else if (value == "numAffectedThread") {
                                         name = "Number of Affected Threads";
                                     }
-                                    let radius = [60,78];
+                                    let radius = [52,70];
                                     return (
                                         <PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={radius} key={index}
                                                   optionCenterStyle={optionCenterStyle} colorChart="#3398DB"

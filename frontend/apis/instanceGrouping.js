@@ -4,7 +4,7 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-export function loadInstanceGrouping(projectName) {
+export function loadInstanceGrouping(projectName, operation = 'load') {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -12,7 +12,7 @@ export function loadInstanceGrouping(projectName) {
     $.ajax({
       type: 'POST',
       url: getEndpoint('instanceGrouping', 1),
-      data: $.param({ userName, token, projectName, operation:'load' }),
+      data: $.param({ userName, token, projectName, operation }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }

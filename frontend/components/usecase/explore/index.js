@@ -54,10 +54,14 @@ export default class ListAll extends Component {
     let allSystemNames = publishedData.map((item, index)=> {
       return item.metaData.system;
     }).filter(function (el, index, arr) {
-      return index === arr.indexOf(el);
+      return (el != undefined && index === arr.indexOf(el));
     });
     let userSystemNames = allSystemNames.filter(function (el, index, arr) {
-      return systemNames.indexOf(el)==-1;
+      return (systemNames.indexOf(el)==-1);
+    });
+    let userOtherSystemNames = allSystemNames.filter(function (el, index, arr) {
+      return (systemNames.indexOf(el)==-1 && 
+        (el.toLowerCase() != 'other' || el.toLowerCase() != 'others' || el.toLowerCase() != 'unknown'));
     });
 
     const containerWidth = $("body").width() - 360;

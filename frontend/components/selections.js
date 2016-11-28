@@ -508,9 +508,9 @@ const GroupingCriteriaSelection = props => (
   <Dropdown mode="select" {...props}>
     <i className="dropdown icon" />
     <div className="menu">
-      <div className="item">Criteria1</div>
-      <div className="item">Criteria2</div>
-      <div className="item">Criteria3</div>
+      <div className="item">Service Name</div>
+      <div className="item">Security Group</div>
+      <div className="item">Environment</div>
     </div>
   </Dropdown>
 );
@@ -519,12 +519,14 @@ const GroupingMatchOpSelection = props => (
   <Dropdown mode="select" {...props}>
     <i className="dropdown icon" />
     <div className="menu">
-      <div className="item">equal</div>
-      <div className="item">ge</div>
-      <div className="item">le</div>
-      <div className="item">contains</div>
-      <div className="item">start_with</div>
-      <div className="item">regex</div>
+      <div className="item" data-value="contains">contains</div>
+      <div className="item" data-value="startwith">start with</div>
+      <div className="item" data-value="equal">=</div>
+      <div className="item" data-value="ge">&gt;=</div>
+      <div className="item" data-value="gt">&gt;</div>
+      <div className="item" data-value="le">&lt;=</div>
+      <div className="item" data-value="lt">&lt;</div>
+      <div className="item" data-value="regex">regex</div>
     </div>
   </Dropdown>
 );

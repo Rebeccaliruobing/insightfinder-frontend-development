@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import store from 'store';
 import {autobind} from 'core-decorators';
-import {Console, Button} from '../../artui/react';
+import {Console, Button, Dropdown} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
 
 import apis from '../../apis';
@@ -45,6 +45,8 @@ class EventSummary extends Component {
       endTime: moment(),
       modelType:"Holistic",
       selectedInstance: undefined,
+      instanceGroups: [],
+      selectedInstanceGroup: "",
     };
   }
 
@@ -127,6 +129,24 @@ class EventSummary extends Component {
   }
 
   refreshProjectName(projectName) {
+    apis.loadInstanceGrouping(projectName, "getGrouping")
+    .then((resp)=> {
+      if(resp.groupingString){
+        let groups = resp.groupingString.split(',').sort();
+        this.setState({instanceGroups:groups},()=>{
+          this.refreshProjectNameOld(projectName);
+        });
+      }
+    });
+  }
+
+  @autobind
+  handleInstanceGroupChange(value) {
+    const { projectName, selectedGroup } = this.state;
+    this.refreshProjectNameOld(projectName);
+  }
+
+  refreshProjectNameOld(projectName) {
     const {numberOfDays,endTime,modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
@@ -136,41 +156,41 @@ class EventSummary extends Component {
     // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName },()=>{
-	    apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
-	      .then(data => {
- 	       let anomalyRatioLists = data.incidents.map(function (value,index) {
- 	         return value['anomalyRatio']
- 	       });
- 	       let maxAnomalyRatio = _.max(anomalyRatioLists);
- 	       let minAnomalyRatio = _.min(anomalyRatioLists);
- 	       this.setState({
- 	         loading: false,
- 	         // incidentsTreeMap: data.incidentsTreeMap,
- 	         data,
- 	         maxAnomalyRatio,
- 	         minAnomalyRatio,
- 	         startTimestamp: data.startTimestamp,
- 	         endTimestamp: data.endTimestamp,
- 	         showTenderModal: false,
- 	       }, ()=>{
- 	         let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
- 	         let incidentDurationThreshold = 15;
- 	         let detectedIncidents = data.incidents.filter((incident, index) =>
- 	                 incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
- 	         if(detectedIncidents.length>0){
- 	           this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
- 	         } else {
- 	           this.handleIncidentSelected();
- 	         }
- 	       })
- 	     })
+      apis.retrieveLiveAnalysis(projectName, modelType, pvalue, cvalue, endTimestamp, numberOfDays, 2)
+        .then(data => {
+         let anomalyRatioLists = data.incidents.map(function (value,index) {
+           return value['anomalyRatio']
+         });
+         let maxAnomalyRatio = _.max(anomalyRatioLists);
+         let minAnomalyRatio = _.min(anomalyRatioLists);
+         this.setState({
+           loading: false,
+           // incidentsTreeMap: data.incidentsTreeMap,
+           data,
+           maxAnomalyRatio,
+           minAnomalyRatio,
+           startTimestamp: data.startTimestamp,
+           endTimestamp: data.endTimestamp,
+           showTenderModal: false,
+         }, ()=>{
+           let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
+           let incidentDurationThreshold = 15;
+           let detectedIncidents = data.incidents.filter((incident, index) =>
+                   incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+           if(detectedIncidents.length>0){
+             this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
+           } else {
+             this.handleIncidentSelected();
+           }
+         })
+       })
       .catch(msg => {
         this.setState({ loading: false });
         console.log(msg);
         // alert(msg);
       });
-		});
-	}
+    });
+  }
   
 
   @autobind
@@ -214,31 +234,6 @@ class EventSummary extends Component {
     }
   }
 
-  // showInstanceChart() {
-  //   let { selectedIncident,selectedInstance,projectName,modelType } = this.state;
-  //   let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-  //   let projectParam = projectParams.find((p) => p.projectName == projectName);
-  //   let cvalueParam = projectParam ? projectParam.cvalue : "1";
-  //   let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
-  //   let params = {
-  //     version:2,
-  //     pvalue:pvalueParam,
-  //     cvalue:cvalueParam,
-  //     modelType:modelType,
-  //     projectName:projectName,
-  //   };
-  //   if(selectedInstance){
-  //     params['instanceName'] = selectedInstance;
-  //   }
-  //   if(selectedIncident){
-  //     params['startTimestamp'] = selectedIncident.startTimestamp;
-  //     params['endTimestamp'] = selectedIncident.endTimestamp;
-  //   }
-
-  //   const url = `/liveMonitoring?${$.param(params)}`;
-  //   window.open(url, '_blank');
-  // }
-
   getTreeMapSchemeText(scheme){
     if(scheme == 'anomaly'){
       return "Anomaly";
@@ -251,10 +246,9 @@ class EventSummary extends Component {
   }
 
   render() {
-    let { loading, data, projectName,
-      incidentsTreeMap, endTime, numberOfDays, modelType,
-      treeMapCPUThreshold,treeMapAvailabilityThreshold,
-      treeMapScheme,selectedIncident,} = this.state;
+    let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType,
+      treeMapCPUThreshold,treeMapAvailabilityThreshold, treeMapScheme,selectedIncident,
+      instanceGroups,selectedInstanceGroup,} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
@@ -275,6 +269,27 @@ class EventSummary extends Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
+            </div>
+            <div className="field">
+              <label style={{ fontWeight: 'bold' }}>Group:</label>
+              <Dropdown
+                key={projectName}
+                mode="select"
+                value={selectedInstanceGroup}
+                onChange={this.handleMetricSelectionChange}
+                style={{ minWidth: 200 }}
+              >
+                <div className="menu">
+                  {
+                    instanceGroups.map(g => (
+                      <div
+                        className="item" key={g}
+                        data-value={g}
+                      >{g}</div>
+                    ))
+                  }
+                </div>
+              </Dropdown>
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
