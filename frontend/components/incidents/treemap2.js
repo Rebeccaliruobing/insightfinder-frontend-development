@@ -362,11 +362,11 @@ class IncidentsTreeMap extends Component {
         .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight })
         .datum(data.parent).on('click', this.handleTileClick);
       navbar.append('rect')
-        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
+        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight, class: 'navbar-button', })
         .datum(data).on('click', this.showInstanceChart);
       navbar.append('text')
         .attr({ x: width - twidth + 20, y: 12 - navHeight, dy: '1em' })
-        .text('All Metric Charts');
+        .text('Line Charts');
     } else {
       navbar.append('rect')
         .attr({ y: -navHeight, width, height: navHeight })

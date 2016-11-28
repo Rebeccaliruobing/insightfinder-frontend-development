@@ -278,7 +278,7 @@ class IncidentsList extends Component {
     return (
       <div>
         <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
-          {(userName === 'admin' || userName === 'guest') &&
+          {false && (userName === 'admin' || userName === 'guest') &&
           <Button
             className="orange"
             style={{ position: 'absolute', right: 0, top: 5 }}
@@ -287,7 +287,7 @@ class IncidentsList extends Component {
           }
           <Button
             className="orange"
-            style={{ position: 'absolute', right: 100, top: 5 }} title="Causal Graph"
+            style={{ position: 'absolute', right: 0, top: 5 }} title="Causal Graph"
             onClick={(e) => {
               e.stopPropagation();
               this.setState({
