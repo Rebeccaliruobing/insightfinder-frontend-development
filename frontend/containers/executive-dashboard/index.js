@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import Reactable from 'reactable';
 import store from 'store';
 import {autobind} from 'core-decorators';
 import moment from 'moment';
@@ -133,11 +132,6 @@ class ExecutiveDashboard extends Component {
   render() {
     let { loading, data, projectName,
       endTime, numberOfDays, modelType} = this.state;
-		var Grid = Reactable.Table,
-				Ghead = Reactable.Thead,
-				Gh = Reactable.Th,
-				Gr = Reactable.Tr,
-				Gd = Reactable.Td;
     return (
       <Console.Content
         className={loading ? 'Loading...' : ''}
@@ -177,460 +171,38 @@ class ExecutiveDashboard extends Component {
           </div>
           <div
             className="ui vertical segment"
+            style={{ background: 'white', margin: '8px 0', borderBottom: 0 }}
+          >
+						<div className="ui compact equal width grid">
+							<div className="ui statistic column">
+ 		           	<ThreeValueBox title='Anomaly Score' duration={numberOfDays}  
+									previousValue={data.previousAnomalyScore}
+								  currentValue={data.currentAnomalyScore} predictValue={1000}	/
+								>
+							</div>
+							<div className="ui statistic column">
+	 	           	<ThreeValueBox title='Total Anomaly Events' 
+									duration={numberOfDays} 
+									previousValue={data.previousAnomalyScore}
+									currentValue={data.currentAnomalyScore} predictValue={1000}	/
+								>
+							</div>
+							<div className="ui statistic column">
+ 		           	<ThreeValueBox title='Total Anomalies' duration={numberOfDays} 
+									previousValue={data.previousAnomalyScore}
+									currentValue={data.currentAnomalyScore} predictValue={1000}	/
+								>
+							</div>
+						</div>
+					</div>
+          <div
+            className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-            <ThreeValueBox title='Anomaly Score' duration={numberOfDays} previousValue={data.previousAnomalyScore}
-									 currentValue={data.currentAnomalyScore} predictValue={1000}	/>
-            <ThreeValueBox title='Total Anomaly Events' duration={numberOfDays} previousValue={data.previousAnomalyScore}
-									 currentValue={data.currentAnomalyScore} predictValue={1000}	/>
-            <ThreeValueBox title='Total Anomalies' duration={numberOfDays} previousValue={data.previousAnomalyScore}
-									 currentValue={data.currentAnomalyScore} predictValue={1000}	/>
+						<div style={{ background: 'white', padding: 4 }} >
+							<HourlyHeatmap />
+         		</div>
           </div>
-          <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 4 }}
-          >
-						<HourlyHeatmap />
-          </div>
-          <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 4 }}
-          >
-						<Grid className="table" id="gridHeatmap">
-							<Ghead>
-								<Gh column="11/24">
-									11/24
-								</Gh>
-								<Gh column="11/25">
-									11/25
-								</Gh>
-								<Gh column="11/26">
-									11/26
-								</Gh>
-								<Gh column="11/27">
-									11/27
-								</Gh>
-								<Gh column="11/28">
-									11/28
-								</Gh>
-								<Gh column="11/29">
-									11/29
-								</Gh>
-								<Gh column="11/30">
-									11/30
-								</Gh>
-								<Gh column="12/01">
-									12/01
-								</Gh>
-								<Gh column="12/02">
-									12/02
-								</Gh>
-								<Gh column="12/03">
-									12/03
-								</Gh>
-								<Gh column="12/04">
-									12/04
-								</Gh>
-								<Gh column="12/05">
-									12/05
-								</Gh>
-								<Gh column="12/06">
-									12/06
-								</Gh>
-								<Gh column="12/07">
-									12/07
-								</Gh>
-							</Ghead>
-							<Gr>
-								<Gd column="11/24" style={{ 'backgroundColor':'#d0d0d0',
-																						'padding':[0,5,0,5] }}
-								>
-									&nbsp;
-								</Gd>
-								<Gd column="11/25" style={{ 'backgroundColor':'#d0d0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="11/26" style={{ 'backgroundColor':'#d0d000','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="11/27" style={{ 'backgroundColor':'#d000d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="11/28" style={{ 'backgroundColor':'#00d0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="11/29" style={{ 'backgroundColor':'#d0d0df','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="11/30" style={{ 'backgroundColor':'#d0dfd0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/01" style={{ 'backgroundColor':'#dfd0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/02" style={{ 'backgroundColor':'#d0d030','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/03" style={{ 'backgroundColor':'#d030d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/04" style={{ 'backgroundColor':'#30d0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/05" style={{ 'backgroundColor':'#d0d0f0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/06" style={{ 'backgroundColor':'#d0f0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-								<Gd column="12/07" style={{ 'backgroundColor':'#f0d0d0','padding':'2 0 2' }}>&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-							<Gr>
-								<Gd column="11/24">&nbsp;</Gd>
-								<Gd column="11/25">&nbsp;</Gd>
-								<Gd column="11/26">&nbsp;</Gd>
-								<Gd column="11/27">&nbsp;</Gd>
-								<Gd column="11/28">&nbsp;</Gd>
-								<Gd column="11/29">&nbsp;</Gd>
-								<Gd column="11/30">&nbsp;</Gd>
-								<Gd column="12/01">&nbsp;</Gd>
-								<Gd column="12/02">&nbsp;</Gd>
-								<Gd column="12/03">&nbsp;</Gd>
-								<Gd column="12/04">&nbsp;</Gd>
-								<Gd column="12/05">&nbsp;</Gd>
-								<Gd column="12/06">&nbsp;</Gd>
-								<Gd column="12/07">&nbsp;</Gd>
-							</Gr>
-						</Grid>
-         	</div>
         </div>
       </Console.Content>
     )

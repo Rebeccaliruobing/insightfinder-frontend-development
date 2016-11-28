@@ -2,42 +2,42 @@ import React, {PropTypes as T} from 'react';
 
 const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, duration='1d' }) => {
   const previousValueText = previousValue !== undefined ? previousValue.toFixed(1).toString() : '-';
-  const previousValueArrow = _.isFinite(previousValue) && currentValue > previousValue ? 'rotateDown45' : 'rotateUp45';
+  const previousValueArrow = _.isFinite(previousValue) && currentValue > previousValue ? 'transform:rotate(45deg),color:red' : 'trasnform:rotate(-45deg),color:green';
   const currentValueText = currentValue !== undefined ? currentValue.toFixed(1).toString() : '-';
-  const predictedValueArrow = _.isFinite(predictedValue) && currentValue > predictedValue ? 'rotateDown45' : 'rotateUp45';
+  const predictedValueArrow = _.isFinite(predictedValue) && currentValue > predictedValue ? 'transform:rotate(45deg),color:red' : 'transform:rotate(-45deg),color:green';
   const predictedValueText = predictedValue !== undefined ? predictedValue.toFixed(1).toString() : '-';
   return (
-    <div className="ui statistic three wide column">
+    <div>
       <div>
         <span className="title">{title}</span>
-        <span className="meta">{duration}</span>
+        <span className="meta">{duration}d</span>
       </div>
       <div>
-      	<table>
+      	<table className="valueThreeTable">
 					<tbody>
 					<tr>
-						<td>
-							<span className="previousValue">{`${previousValueText}`}</span>
+						<td style={{width:"26%"}}>
+							<span className="value" style={{display:"block"}}>{`${previousValueText}`}</span>
 						</td>
-						<td>
-							<span className={previousValueArrow}><i className='long arrow right icon'></i></span>
+						<td style={{width:"8%"}}>
+							<span><i className='long arrow right icon' style={{previousValueArrow}}></i></span>
 						</td>
-      			<td>
-							<span className="currentValue">{`${currentValueText}`}</span>
+      			<td style={{width:"40%"}}>
+							<span className="value">{`${currentValueText}`}</span>
 						</td>
-						<td>
-							<span className={predictedValueArrow}><i className='long arrow right icon'></i></span>
+						<td style={{width:"8%"}}>
+							<span><i className='long arrow right icon' style={{predictedValueArrow}}></i></span>
 						</td>
-      			<td>
-							<span className="predictedValue">{`${predictedValueText}`}</span>
+      			<td style={{width:"26%"}}>
+							<span className="value">{`${predictedValueText}`}</span>
 						</td>
 					</tr>
 					<tr>
-						<td><span className="valueSubLabel">Previous Period</span></td>
+						<td><span className="valueThreeTableSubLabel">PREVIOUS</span></td>
 						<td></td>
-						<td><span className="valueSubLabel">Current Period</span></td>
+						<td><span className="valueThreeTableSubLabel">CURRENT</span></td>
 						<td></td>
-						<td><span className="valueSubLabel">Predicted Period</span></td>
+						<td><span className="valueThreeTableSubLabel">PREDICTED</span></td>
 					</tr>
 					</tbody>
 				</table>
