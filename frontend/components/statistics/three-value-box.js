@@ -1,11 +1,12 @@
 import React, {PropTypes as T} from 'react';
+import _ from 'lodash';
 
 const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, duration='1d' }) => {
   const previousValueText = previousValue !== undefined ? previousValue.toFixed(1).toString() : '-';
-  const previousValueArrow = _.isFinite(previousValue) && currentValue > previousValue ? 'transform:rotate(45deg),color:red' : 'trasnform:rotate(-45deg),color:green';
   const currentValueText = currentValue !== undefined ? currentValue.toFixed(1).toString() : '-';
-  const predictedValueArrow = _.isFinite(predictedValue) && currentValue > predictedValue ? 'transform:rotate(45deg),color:red' : 'transform:rotate(-45deg),color:green';
+  const previousValueArrow = _.isFinite(previousValueText) && currentValueText > previousValueText ? 'transform:rotate(45deg),color:red' : 'trasnform:rotate(-45deg),color:green';
   const predictedValueText = predictedValue !== undefined ? predictedValue.toFixed(1).toString() : '-';
+  const predictedValueArrow = _.isFinite(predictedValueText) && currentValue > predictedValue ? 'transform:rotate(45deg),color:red' : 'transform:rotate(-45deg),color:green';
   return (
     <div>
       <div>
@@ -16,19 +17,19 @@ const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, dura
       	<table className="valueThreeTable">
 					<tbody>
 					<tr>
-						<td style={{width:"26%"}}>
-							<span className="value" style={{display:"block"}}>{`${previousValueText}`}</span>
+						<td style={{width:"30%"}}>
+							<span className="value">{`${previousValueText}`}</span>
 						</td>
-						<td style={{width:"8%"}}>
+						<td style={{width:"5%"}}>
 							<span><i className='long arrow right icon' style={{previousValueArrow}}></i></span>
 						</td>
-      			<td style={{width:"40%"}}>
+      			<td style={{width:"30%"}}>
 							<span className="value">{`${currentValueText}`}</span>
 						</td>
-						<td style={{width:"8%"}}>
+						<td style={{width:"5%"}}>
 							<span><i className='long arrow right icon' style={{predictedValueArrow}}></i></span>
 						</td>
-      			<td style={{width:"26%"}}>
+      			<td style={{width:"30%"}}>
 							<span className="value">{`${predictedValueText}`}</span>
 						</td>
 					</tr>

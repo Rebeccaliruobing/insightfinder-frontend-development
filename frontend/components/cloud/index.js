@@ -36,7 +36,7 @@ export const cloudRoute = (
       <Route component={InsightReport} path="insight-report" />
       <Route component={EventSummary} path="monitoring" />
       <Route component={EventSummary2} path="monitoring0" />
-      <Route component={ExecutiveDashboard} path="executiveDashboard" />
+      <Route component={ExecutiveDashboard} path="executive-dashboard" />
       <Route component={AppForecast} path="app-forecast" />
       <Route component={HistoricalReport} path="historical-report" />
       <Route component={IncidentAnalysis} path="incident-analysis" />
