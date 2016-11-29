@@ -4,7 +4,7 @@
   "description": "insightfinder web ui",
   "main": "index.js",
   "scripts": {
-    "dev": "./node_modules/.bin/webpack-dev-server --colors --debug --progress --display-error-details --config webpack/development.js",
+    "dev": "webpack-dev-server --colors --debug --progress --display-error-details --config webpack/development.js",
     "devserver": "export FLASK_CONFIG=development && export WEBPACK_DEV_SERVER=1 && python manage.py runserver",
     "stage": "rm -rf ./static && webpack --config webpack/stage.js -d --progress --colors --display-error-details",
     "stageserver": "export FLASK_CONFIG=development && python manage.py runserver",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:xiaohuigu/web.git"
+    "url": "git+ssh://git@github.com/xiaohuigu/web.git"
   },
   "author": "",
   "license": "MIT",
@@ -78,5 +78,9 @@
     "reactable": "^0.14.1",
     "store": "git+https://github.com/marcuswestin/store.js.git",
     "valuelink": "^1.3.10"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/xiaohuigu/web/issues"
+  },
+  "homepage": "https://github.com/xiaohuigu/web#readme"
 }
