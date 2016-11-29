@@ -29,7 +29,7 @@ class SysCallModal extends React.Component {
     render() {
         let {dataArray, timeRanking, freqRanking, ...rest} = this.props;
         let pieChartCanvasStyle = {height: '200px', width: '200px'};
-        let titleStyle = {'width': '27%', 'margin': '0 auto'};
+        let titleStyle = {'width': '33%', 'margin': '0 auto'};
         let optionCenterStyle = ['65%', '50%'];
         const { tabStates } = this.state;
         let timeFuncList = timeRanking.functionlist;
@@ -38,7 +38,7 @@ class SysCallModal extends React.Component {
         freqFuncList = (_.keysIn(freqFuncList)).length != 0 ? freqFuncList : [];
         console.log(dataArray, timeRanking, freqRanking);
         return (
-            <Modal {...rest} size="normal" closable={true}>
+            <Modal {...rest} size="big" closable={true}>
                 {
                     dataArray ?
                         <div className="content">
