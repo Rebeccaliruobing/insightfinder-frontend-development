@@ -2,18 +2,18 @@ import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 import Reactable from 'reactable';
 
-export default class Top5Grid extends React.Component {
-	static defaultProps = { title:"Top 5 Projects", 
+var Table = Reactable.Table,
+		Thead = Reactable.Thead,
+		Th = Reactable.Th,
+		Tr = Reactable.Tr,
+		Td = Reactable.Td;
+
+const Top5Grid = ({title, parentType, parentName, duration }) => {
+	const defaultProps = { title:"Top 5 Projects", 
 										parentType:"Project", 
 										parentName:"All", 
 										duration:'7' };
 				
-	var (Table = Reactable.Table,
-			Thead = Reactable.Thead,
-			Th = Reactable.Th,
-			Tr = Reactable.Tr,
-			Td = Reactable.Td);
-
   return (
     <div>
       <Table>
@@ -126,7 +126,7 @@ Top5Grid.propTypes = {
 	title: T.string,
   parentType: T.string,
   parentName: T.string,
-  duration: T.number,
+  duration: T.number
 };
 
 export default Top5Grid;
