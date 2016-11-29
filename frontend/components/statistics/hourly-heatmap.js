@@ -4,9 +4,9 @@ import d3 from 'd3';
 export default class HourlyHeatmap extends React.Component {
 	static defaultProps = { data: [], duration: '7d' };
 	drawHeatmap() {
-      var margin = { top: 20, right: 50, bottom: 25, left: 50 },
-          width = 624 - margin.left - margin.right,
-          height = 360 - margin.top - margin.bottom,
+      var margin = { top: 50, right: 0, bottom: 50, left: 50 },
+          width = 600 - margin.left - margin.right,
+          height = 430 - margin.top - margin.bottom,
           gridSize = Math.floor(width / 24),
           legendElementWidth = gridSize*2,
           buckets = 9,
@@ -49,6 +49,7 @@ export default class HourlyHeatmap extends React.Component {
             .attr("class", function (d, i) { return ((i >= 0 && i <= 4) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
       var heatmapChart = function(error, data) {
+					console.log(Date.now().toString());
           var colorScale = d3.scale.quantile()
               .domain([0, buckets - 1, d3.max(data, function (d) { return d.value; })])
               .range(colors);
@@ -76,7 +77,7 @@ export default class HourlyHeatmap extends React.Component {
           cards.exit().remove();
 
           var legend = svg.selectAll(".legend")
-              .data([0].concat(colorScale.quantiles()), function(d) { return d; });
+             .data([0].concat(colorScale.quantiles()), function(d) { return d; });
 
           legend.enter().append("g")
               .attr("class", "legend");
@@ -98,23 +99,24 @@ export default class HourlyHeatmap extends React.Component {
 
       };
 
-      heatmapChart(null, dataset);
+      heatmapChart(false, dataset);
       
-      var datasetpicker = d3.select("#dataset-picker").selectAll(".dataset-button")
-        .data(datasets);
+      //var datasetpicker = d3.select("#dataset-picker").selectAll(".dataset-button")
+      //  .data(datasets);
 
-      datasetpicker.enter()
-        .append("input")
-        .attr("value", function(d){ return "Dataset " + d })
-        .attr("type", "button")
-        .attr("class", "dataset-button")
-        .on("click", function(d) {
-          //heatmapChart(d);
-        });
+      //datasetpicker.enter()
+      //  .append("input")
+      //  .attr("value", function(d){ return "Dataset " + d })
+      //  .attr("type", "button")
+      //  .attr("class", "dataset-button")
+      //  .on("click", function(d) {
+      //    //heatmapChart(d);
+      //  });
 
 	}
 
 	render() {
+		console.log("In render() function");
 	  return (
     	<div id="chart">
 				{this.drawHeatmap()}
