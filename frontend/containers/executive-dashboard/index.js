@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import moment from 'moment';
 import {Console, Button} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
-import {ThreeValueBox,HourlyHeatmap} from "../../components/statistics";
+import {ThreeValueBox,HourlyHeatmap,Top5Grid} from "../../components/statistics";
 
 import apis from '../../apis';
 import { LiveProjectSelection, NumberOfDays, EventSummaryModelType
@@ -195,6 +195,14 @@ class ExecutiveDashboard extends Component {
 							</div>
 						</div>
 					</div>
+          <div
+            className="ui vertical segment"
+            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
+          >
+						<div style={{ background: 'white', padding: 4 }} >
+							<Top5Grid />
+         		</div>
+          </div>
           <div
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
