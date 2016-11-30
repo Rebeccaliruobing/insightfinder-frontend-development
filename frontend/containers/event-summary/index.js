@@ -443,7 +443,8 @@ class EventSummary extends Component {
                   <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} endTime={endTime} 
                                     numberOfDays={numberOfDays} instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                                    feedbackData={this.feedbackData} predictedFlag={selectedIncidentPredicted} />
+                                    feedbackData={this.feedbackData} predictedFlag={selectedIncidentPredicted}
+                                    selectedGroup={selectedGroup} />
                 </div>
               </div>
             </div>

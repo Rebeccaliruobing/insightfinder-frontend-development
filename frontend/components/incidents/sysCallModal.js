@@ -4,6 +4,7 @@ import store from 'store';
 import _ from "lodash";
 import {Modal, Dropdown} from '../../artui/react';
 import {PieChart} from '../share/echarts-charts';
+import "./incident.less";
 
 class SysCallModal extends React.Component {
 
@@ -79,7 +80,7 @@ class SysCallModal extends React.Component {
                                         <div className={tabStates['time'] + ' ui tab '}>
                                             {tabStates['time'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>
@@ -104,7 +105,7 @@ class SysCallModal extends React.Component {
                                         <div className={tabStates['freq'] + ' ui tab '}>
                                             {tabStates['freq'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>

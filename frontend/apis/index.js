@@ -401,7 +401,9 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, selectedGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
+        groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version, 
+        userName = store.get('userName'), token = store.get('token')) {
         if(!version){
             version = "1";
         }
@@ -409,8 +411,9 @@ const apis = {
             $.ajax({
                 type: 'POST',
                 url: getEndpoint('liveAnalysis', version),
-//                url: $.fn.api.settings.api['live analysis'],
-                data: $.param({ userName, token, pvalue, cvalue, numberOfDays, endTimestamp, modelType, projectName,startTimestamp,groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, }),
+                data: $.param({ userName, token, projectName, selectedGroup, modelType, pvalue, cvalue, numberOfDays, 
+                    startTimestamp,endTimestamp, groupId,instanceName,metricName, 
+                    avgEndTimestamp, avgNumberOfDays, predictedFlag, }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
