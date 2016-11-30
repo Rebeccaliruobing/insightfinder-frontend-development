@@ -4,6 +4,7 @@ import store from 'store';
 import _ from "lodash";
 import {Modal, Dropdown} from '../../artui/react';
 import {PieChart} from '../share/echarts-charts';
+import "./incident.less";
 
 class SysCallModal extends React.Component {
 
@@ -29,7 +30,7 @@ class SysCallModal extends React.Component {
     render() {
         let {dataArray, timeRanking, freqRanking, ...rest} = this.props;
         let pieChartCanvasStyle = {height: '200px', width: '200px'};
-        let titleStyle = {'width': '27%', 'margin': '0 auto'};
+        let titleStyle = {'width': '33%', 'margin': '0 auto'};
         let optionCenterStyle = ['65%', '50%'];
         const { tabStates } = this.state;
         let timeFuncList = timeRanking.functionlist;
@@ -38,7 +39,7 @@ class SysCallModal extends React.Component {
         freqFuncList = (_.keysIn(freqFuncList)).length != 0 ? freqFuncList : [];
         console.log(dataArray, timeRanking, freqRanking);
         return (
-            <Modal {...rest} size="normal" closable={true}>
+            <Modal {...rest} size="big" closable={true}>
                 {
                     dataArray ?
                         <div className="content">
@@ -79,7 +80,7 @@ class SysCallModal extends React.Component {
                                         <div className={tabStates['time'] + ' ui tab '}>
                                             {tabStates['time'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>
@@ -104,7 +105,7 @@ class SysCallModal extends React.Component {
                                         <div className={tabStates['freq'] + ' ui tab '}>
                                             {tabStates['freq'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>
