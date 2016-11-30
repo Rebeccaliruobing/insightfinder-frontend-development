@@ -63,7 +63,7 @@ class AmazonProjectModal extends React.Component {
               </select>
             </div>
             <div className="field">
-              <label>Availability Zone</label>
+              <label>Region</label>
               <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
                 <option className="item"></option>
                 <option className="item" value="us-east-1">us-east-1</option>
