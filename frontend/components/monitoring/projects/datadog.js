@@ -78,7 +78,7 @@ class DataDogProjects extends React.Component {
                     <tr className="bold">
                         <td style={{width: '16%'}}>Project Name</td>
                         <td style={{width: '16%'}}>Instance Type</td>
-                        <td style={{width: '16%'}}>Zone</td>
+                        <td style={{width: '16%'}}>Region</td>
                         <td style={{width: '16%'}}>Monitoring Type</td>
                         <td style={{width: '16%'}}></td>
                     </tr>
