@@ -65,7 +65,7 @@ class EventSummary2 extends Component {
     const {projectName, data, numberOfDays} = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id;
+      let caption = "Event #"+incident.id;
       let stats = incident.instanceMetricJson || {};
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;

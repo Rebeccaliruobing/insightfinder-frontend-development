@@ -511,6 +511,8 @@ const GroupingCriteriaSelection = props => (
       <div className="item">Service Name</div>
       <div className="item">Security Group</div>
       <div className="item">Environment</div>
+      <div className="item">Business Unit</div>
+      <div className="item">Location</div>
     </div>
   </Dropdown>
 );

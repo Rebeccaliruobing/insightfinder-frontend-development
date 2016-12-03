@@ -262,7 +262,7 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showInstanceChart(d) {
-    const { endTime, numberOfDays, selectedGroup } = this.props;
+    const { endTime, numberOfDays, instanceGroup } = this.props;
     const projectName = d.projectName;
     const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     const projectParam = projectParams.find(p => p.projectName == projectName);
@@ -271,7 +271,7 @@ class IncidentsTreeMap extends Component {
     const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
     const params = {
       projectName,
-      selectedGroup,
+      instanceGroup,
       version: 3,
       pvalue: pvalueParam,
       cvalue: cvalueParam,

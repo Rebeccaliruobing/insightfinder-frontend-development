@@ -29,7 +29,7 @@ const ProjectDetails = class extends React.Component {
   updateLiveAnalysis() {
 
     let { query } = this.props.location;
-    let { projectName, selectedGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
+    let { projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
       groupId,instanceName,metricName,avgEndTimestamp, avgNumberOfDays, predictedFlag, version } = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
     if(!version){
@@ -38,7 +38,7 @@ const ProjectDetails = class extends React.Component {
     this.props.clearTimeout(this.timeout);
 
     this.setState({ loading: true });
-    apis.postLiveAnalysis(projectName, selectedGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
+    apis.postLiveAnalysis(projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
       groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version)
       .then(resp => {
         let update = {};

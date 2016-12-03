@@ -196,44 +196,45 @@ class IncidentsList extends Component {
 
     if (text.indexOf('- network') >= 0) {
       return (
-        <rect key={index} fill={`rgb(${color})`} eventtype='network'
+        <rect key={index} fill={`rgb(${color})`} 
               x={cx - size} y={cy - size * 0.6} width={size * 1.9} height={size * 1.2}/>
       );
     } else if(text.indexOf('- disk') >=0 ){
       return (
         <rect
-          key={index} fill={`rgb(${color})`} eventtype='disk'
+          key={index} fill={`rgb(${color})`}
           x={cx - size * 0.6} y={cy - size} width={size * 1.2} height={size * 2}/>
       );
     } else if(text.indexOf('- workload') >= 0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`} eventtype='workload'
+          key={index} fill={`rgb(${color})`}
           points={`${cx},${cy - 7} ${cx - 5},${cy + 4} ${cx + 5},${cy + 4}`}
         />
       );
     } else if(text.indexOf('- new instance') >= 0) {
       return (
-        <circle key={index} fill={`rgb(${color})`} eventtype='new' 
+        <circle key={index} fill={`rgb(${color})`}
           cx={cx} cy={cy} r={size * 0.95} />
       );
     } else if(text.indexOf('- instance down') >= 0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`} eventtype='down'
+          key={index} fill={`rgb(${color})`} 
           points={`${cx-5},${cy-4} ${cx+5},${cy-4} ${cx},${cy+7}`}
         />
       );
     } else if(text.indexOf('- high cpu') >=0) {
       return (
         <polygon
-          key={index} fill={`rgb(${color})`} eventtype='cpu'
+          key={index} fill={`rgb(${color})`} 
           points={`${cx},${cy-6} ${cx+6},${cy} ${cx},${cy+6} ${cx-6},${cy}`}
         />
       );
     } else  {
       return (
-        <circle key={index} fill={`rgb(${color})`} eventtype='others' cx={cx} cy={cy} r={size * 0.95} />
+        <circle key={index} fill={`rgb(${color})`} 
+          cx={cx} cy={cy} r={size * 0.95} />
       );
     }
   }

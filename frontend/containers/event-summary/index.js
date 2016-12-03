@@ -46,7 +46,7 @@ class EventSummary extends Component {
       modelType:"Holistic",
       selectedInstance: undefined,
       instanceGroups: [],
-      selectedGroup: "",
+      instanceGroup: "",
     };
   }
 
@@ -68,7 +68,7 @@ class EventSummary extends Component {
     const {projectName, data, numberOfDays, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
-      let caption = "Incident #"+incident.id;
+      let caption = "Event #"+incident.id;
       let stats = incident.instanceMetricJson || {};
       stats['startTimestamp'] = incident.startTimestamp;
       stats['endTimestamp'] = incident.endTimestamp;
@@ -91,25 +91,25 @@ class EventSummary extends Component {
 
   @autobind
   handleModelTypeChange(value, modelType) {
-    let { projectName,selectedGroup } = this.state;
+    let { projectName,instanceGroup } = this.state;
     this.setState({
       modelType:modelType,
       currentTreemapData: undefined,
     }, () => {
       // this.refreshProjectName(projectName);
-      this.refreshInstanceGroup(selectedGroup);
+      this.refreshInstanceGroup(instanceGroup);
     });
   }
 
   @autobind
   handleDayChange(value, numberOfDays) {
-    let { projectName,selectedGroup } = this.state;
+    let { projectName,instanceGroup } = this.state;
     this.setState({
       numberOfDays:numberOfDays.toString(),
       currentTreemapData: undefined,
     }, () => {
       // this.refreshProjectName(projectName);      
-      this.refreshInstanceGroup(selectedGroup);
+      this.refreshInstanceGroup(instanceGroup);
     });
   }
 
@@ -121,13 +121,13 @@ class EventSummary extends Component {
       newEndTime = curTime;
     }
 
-    let { projectName,selectedGroup } = this.state;
+    let { projectName,instanceGroup } = this.state;
     this.setState({
       endTime: newEndTime,
       currentTreemapData: undefined,
     }, () => {
       // this.refreshProjectName(projectName);
-      this.refreshInstanceGroup(selectedGroup);
+      this.refreshInstanceGroup(instanceGroup);
     });
   }
 
@@ -143,7 +143,7 @@ class EventSummary extends Component {
   //       this.setState({
   //         projectName:projectName,
   //         instanceGroups:groups,
-  //         selectedGroup:firstGroup,
+  //         instanceGroup:firstGroup,
   //       },()=>{
   //         this.handleInstanceGroupChange(firstGroup);
   //       });
@@ -161,7 +161,7 @@ class EventSummary extends Component {
   }
 
   @autobind
-  refreshInstanceGroup(selectedGroup) {
+  refreshInstanceGroup(instanceGroup) {
     const { projectName, numberOfDays,endTime,modelType} = this.state;
     let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
     let projectParam = projectParams.find((p) => p.projectName == projectName);
@@ -172,10 +172,10 @@ class EventSummary extends Component {
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ 
       loading: true, 
-      selectedGroup:selectedGroup, 
+      instanceGroup:instanceGroup, 
       projectName,
     },()=>{
-      apis.retrieveLiveAnalysis(projectName, modelType, selectedGroup, pvalue, cvalue, endTimestamp, numberOfDays, 3)
+      apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup, pvalue, cvalue, endTimestamp, numberOfDays, 3)
         .then(data => {
          let anomalyRatioLists = data.incidents.map(function (inc,index) {
            return inc['anomalyRatio']
@@ -277,7 +277,7 @@ class EventSummary extends Component {
           this.setState({
             projectName:projectName,
             instanceGroups:groups,
-            selectedGroup:firstGroup,
+            instanceGroup:firstGroup,
           },()=>{
             this.handleInstanceGroupChange(firstGroup);
           });
@@ -330,7 +330,7 @@ class EventSummary extends Component {
   render() {
     let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType,
       treeMapCPUThreshold,treeMapAvailabilityThreshold, treeMapScheme,selectedIncident,
-      instanceGroups,selectedGroup,} = this.state;
+      instanceGroups,instanceGroup,} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
@@ -357,7 +357,7 @@ class EventSummary extends Component {
               <Dropdown
                 key={projectName}
                 mode="select"
-                value={selectedGroup}
+                value={instanceGroup}
                 onChange={this.handleInstanceGroupChange}
                 style={{ minWidth: 200 }}
               >
@@ -393,7 +393,7 @@ class EventSummary extends Component {
                                     value={modelType} onChange={this.handleModelTypeChange}/>
             </div>
             <div className="field">
-              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshInstanceGroup(selectedGroup)}>Refresh</div>
+              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshInstanceGroup(instanceGroup)}>Refresh</div>
             </div>
           </div>
           <div
@@ -444,7 +444,7 @@ class EventSummary extends Component {
                                     numberOfDays={numberOfDays} instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
                                     treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
                                     feedbackData={this.feedbackData} predictedFlag={selectedIncidentPredicted}
-                                    selectedGroup={selectedGroup} />
+                                    instanceGroup={instanceGroup} />
                 </div>
               </div>
             </div>
