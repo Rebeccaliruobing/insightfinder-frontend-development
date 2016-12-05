@@ -85,8 +85,8 @@ class IncidentsList extends Component {
   }
 
   @autobind
-  handleIncidentSelected(incident) {
-    this.props.onIncidentSelected(incident);
+  handleIncidentSelected(incident,tab) {
+    this.props.onIncidentSelected(incident,tab);
     let incidentState = { activeIncident: incident };
     this.setState(incidentState);
   }
@@ -137,7 +137,7 @@ class IncidentsList extends Component {
     this.setState(stateIncidents);
   }
 
-  selectTab(e, tab) {
+  selectTab(e, tab, incidents) {
 
     let angleIconStyleSelect = 'angleIconStyleStartTime';
     let angleIconStyle = {
@@ -153,6 +153,11 @@ class IncidentsList extends Component {
     });
     tabStates[tab] = 'active';
     this.setState({ tabStates: tabStates, angleIconStyleSelect: angleIconStyleSelect, angleIconStyle: angleIconStyle });
+    let firstIncident = undefined;
+    if(incidents && incidents.length>0){
+      firstIncident = incidents[0];
+    }
+    this.handleIncidentSelected(firstIncident, tab);
   }
 
   changeAngleStyle(angleIconStyleSelect) {
@@ -300,9 +305,9 @@ class IncidentsList extends Component {
           >Causal Graph</Button>
           <div className="ui pointing secondary menu">
             <a className={tabStates['detected'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'detected')}>Detected Events</a>
+               onClick={(e) => this.selectTab(e, 'detected', detectedIncidents)}>Detected Events</a>
             <a className={tabStates['predicted'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'predicted')}>Predicted Events</a>
+               onClick={(e) => this.selectTab(e, 'predicted', predictedIncidents)}>Predicted Events</a>
           </div>
         </div>
         <div className={tabStates['predicted'] + ' ui tab '}>
@@ -391,7 +396,7 @@ class IncidentsList extends Component {
                 }
                 return (
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={()=>self.handleIncidentSelected(incident)}
+                      onClick={()=>self.handleIncidentSelected(incident,'predicted')}
                       className={cx({ 'active': incident === self.state.activeIncident })}
                       title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>
@@ -519,7 +524,7 @@ class IncidentsList extends Component {
                 }
                 return (
                   <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={()=>self.handleIncidentSelected(incident)}
+                      onClick={()=>self.handleIncidentSelected(incident,'detected')}
                       className={cx({ 'active': incident === self.state.activeIncident })}
                       title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
                     <td>{incident.id}</td>

@@ -64,7 +64,7 @@ class EventSummary extends Component {
   }
 
   @autobind()
-  handleIncidentSelected(incident) {
+  handleIncidentSelected(incident,type) {
     const {projectName, data, numberOfDays, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap = undefined;
     if(incident){
@@ -86,6 +86,7 @@ class EventSummary extends Component {
       selectedIncident:incident,
       treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
+      lineChartType:type,
     });
   }
 
@@ -197,9 +198,9 @@ class EventSummary extends Component {
            let detectedIncidents = data.incidents.filter((incident, index) =>
                    incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
            if(detectedIncidents.length>0){
-             this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
+             this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1], 'detected');
            } else {
-             this.handleIncidentSelected();
+             this.handleIncidentSelected(undefined, 'detected');
            }
          })
        })
@@ -209,54 +210,7 @@ class EventSummary extends Component {
         // alert(msg);
       });
     });
-  }
-
-  // refreshProjectNameOld(projectName) {
-  //   const {numberOfDays,endTime,modelType} = this.state;
-  //   let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-  //   let projectParam = projectParams.find((p) => p.projectName == projectName);
-  //   let pvalue = projectParam ? projectParam.pvalue : "0.99";
-  //   let cvalue = projectParam ? projectParam.cvalue : "1";
-  //   let endTimestamp = +moment(endTime);
-  //   // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
-  //   store.set('liveAnalysisProjectName', projectName);
-  //   this.setState({ loading: true, projectName },()=>{
-  //     apis.retrieveLiveAnalysis(projectName, modelType, undefined, pvalue, cvalue, endTimestamp, numberOfDays, 2)
-  //       .then(data => {
-  //        let anomalyRatioLists = data.incidents.map(function (value,index) {
-  //          return value['anomalyRatio']
-  //        });
-  //        let maxAnomalyRatio = _.max(anomalyRatioLists);
-  //        let minAnomalyRatio = _.min(anomalyRatioLists);
-  //        this.setState({
-  //          loading: false,
-  //          // incidentsTreeMap: data.incidentsTreeMap,
-  //          data,
-  //          maxAnomalyRatio,
-  //          minAnomalyRatio,
-  //          startTimestamp: data.startTimestamp,
-  //          endTimestamp: data.endTimestamp,
-  //          showTenderModal: false,
-  //        }, ()=>{
-  //          let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
-  //          let incidentDurationThreshold = 15;
-  //          let detectedIncidents = data.incidents.filter((incident, index) =>
-  //                  incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
-  //          if(detectedIncidents.length>0){
-  //            this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1]);
-  //          } else {
-  //            this.handleIncidentSelected();
-  //          }
-  //        })
-  //      })
-  //     .catch(msg => {
-  //       this.setState({ loading: false });
-  //       console.log(msg);
-  //       // alert(msg);
-  //     });
-  //   });
-  // }
-  
+  }  
 
   @autobind
   handleProjectChange(value,projectName){
@@ -270,6 +224,11 @@ class EventSummary extends Component {
       .then((resp)=> {
         if(resp.groupingString){
           let groups = resp.groupingString.split(',').sort();
+          let pos = groups.indexOf('All');
+          if(pos!=-1){
+            let len = groups.length;
+            groups = groups.slice(1,len).concat(groups.slice(0,1));
+          }
           let firstGroup = "";
           if(groups && groups.length>0){
             firstGroup = groups[0];
@@ -330,7 +289,7 @@ class EventSummary extends Component {
   render() {
     let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType,
       treeMapCPUThreshold,treeMapAvailabilityThreshold, treeMapScheme,selectedIncident,
-      instanceGroups,instanceGroup,} = this.state;
+      instanceGroups,instanceGroup,lineChartType,} = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
@@ -338,6 +297,9 @@ class EventSummary extends Component {
     let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
     let projectType = data['projectType']?data['projectType']:'';
     let selectedIncidentPredicted = selectedIncident ? (selectedIncident.endTimestamp > latestTimestamp) : false;
+    if(!selectedIncident && lineChartType && lineChartType=='predicted'){
+      selectedIncidentPredicted = true;
+    }
     return (
       <Console.Content
         className={loading ? 'ui form loading' : ''}
