@@ -524,8 +524,9 @@ export default class ThresholdSettings extends React.Component {
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
                 <h3>Real-time Account Alerts</h3>
 								<p>
-									This setting controls when InsightFinder will attempt to 
-									trigger a notification via any configured External Service.
+									This setting controls the sensitivity with which  
+									InsightFinder will detect and create anomaly events and 
+									display them in the Dashboard.
 								</p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
@@ -537,10 +538,10 @@ export default class ThresholdSettings extends React.Component {
                   <DurationThreshold key={data.projectName} value={data.cvalue}
                                      onChange={this.handleValueChange('cvalue')}/>
                 </div>
-                <h3>Email Notifications</h3>
+                <h3>Notifications</h3>
 								<p>
 									This setting controls when InsightFinder will notify you via
-									email.
+									email and any configured External Service.
 								</p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
