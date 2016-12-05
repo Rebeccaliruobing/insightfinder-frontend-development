@@ -135,7 +135,6 @@ class IncidentsList extends Component {
       actionTime: +moment(),
     };
     this.setState(stateIncidents);
-    selectTab(null,'detected',undefined);
   }
 
   selectTab(e, tab, incidents) {
