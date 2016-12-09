@@ -527,7 +527,9 @@ class IncidentsList extends Component {
                       onClick={()=>self.handleIncidentSelected(incident,'detected')}
                       className={cx({ 'active': incident === self.state.activeIncident })}
                       title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
-                    <td>{incident.id}</td>
+                    <td>
+                      {incident.id}
+                    </td>
                     <td>
                       {self.renderEventSeverity(incident)}
                     </td>
@@ -539,10 +541,13 @@ class IncidentsList extends Component {
                       incident.duration + " min"
                       }
                     </td>
-                    <td className="code">{incident.rootCauseJson.rootCauseTypes} {sysCallEnabled && incident.syscallFlag &&
-                    <i className="zoom icon" onClick={(e) => {
-                      self.handleLoadSysCall(incident)
-                    }}/>}</td>
+                    <td className="code">{incident.rootCauseJson.rootCauseTypes} 
+                      {incident.repeatedEventFlag && <i className="repeat icon"/>}
+                      {sysCallEnabled && incident.syscallFlag &&
+                        <i className="zoom icon" onClick={(e) => {
+                          self.handleLoadSysCall(incident)
+                        }}/>}
+                    </td>
                     <td>
                       { incident.anomalyRatio == 0 ?
                         "N/A"

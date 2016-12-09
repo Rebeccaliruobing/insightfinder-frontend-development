@@ -57,11 +57,12 @@ export default class ListAll extends Component {
       return (el != undefined && index === arr.indexOf(el));
     });
     let userSystemNames = allSystemNames.filter(function (el, index, arr) {
-      return (systemNames.indexOf(el)==-1);
+      return (systemNames.indexOf(el)==-1 && 
+        !(el.toLowerCase() == 'other' || el.toLowerCase() == 'others' || el.toLowerCase() == 'unknown'));
     });
     let userOtherSystemNames = allSystemNames.filter(function (el, index, arr) {
       return (systemNames.indexOf(el)==-1 && 
-        (el.toLowerCase() != 'other' || el.toLowerCase() != 'others' || el.toLowerCase() != 'unknown'));
+        (el.toLowerCase() == 'other' || el.toLowerCase() == 'others' || el.toLowerCase() == 'unknown'));
     });
 
     const containerWidth = $("body").width() - 360;
@@ -85,6 +86,17 @@ export default class ListAll extends Component {
     return (
       <Console.Content>
         <div style={{padding: 20}}>
+          {userSystemNames && 
+            <div className="ui four column grid">
+              <div className="wide column text-center" style={wrapperStyle}>
+                <Link to="/usecase/list-some?system=Others" className="item text-white">
+                  <div style={Object.assign({},blockStyle, {backgroundColor: colors[4]})}>
+                    <span>Others</span>
+                  </div>
+                </Link>
+              </div> 
+            </div>
+          }
           {userSystemNames && <div className="ui four column grid">
             { userSystemNames.map((system, index)=> {
                 let color = colors[index % 5];
