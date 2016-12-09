@@ -14,9 +14,9 @@ export default class HourlyHeatmap extends React.Component {
           colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4",
 										"#1d91c0","#225ea8","#253494","#081d58"], 
 										// alternatively colorbrewer.YlGnBu[9]
-          days = ["11/25", "11/26", "11/27", "11/28", "11/29", "11/30", 
-									"12/1", "12/2", "12/3", "12/4", "12/5", 
-									"12/6", "12/7", "12/8"],
+          days = ["11/25", "11/26", "11/27", "11/28", "11/29", 
+									"11/30", "12/1", "12/2", "12/3", "12/4", 
+									"12/5", "12/6", "12/7", "12/8"],
           times = ["12a", "", "", "3a", "", "", "6a", "", "", "9a",
 				 						"", "", "12p", "", "", "3p", "", "", "6p", 
 										"", "", "9p", "", ""],
@@ -38,9 +38,8 @@ export default class HourlyHeatmap extends React.Component {
             .text(function(d) { return d; })
             .attr("x", function(d, i) { return i * gridSize; })
             .attr("y", 0)
-						//  What anchor point does text-anchor support?  left?  begin?  VVVVVVVVVVVV
-            .style("text-anchor", "")
-            .attr("transform", "translate(" + gridSize / 4 + ", -6)")
+            .style("text-anchor", "start")
+            .attr("transform", "translate(" + gridSize / 8 + ", -6)")
             .attr("class", function(d, i) { return ((i >= 7 && i <= 16) ? "dayLabel mono axis axis-workweek" : "dayLabel mono axis"); });
 
       var timeLabels = svg.selectAll(".timeLabel")

@@ -1,12 +1,15 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, duration='1d' }) => {
+const ThreeValueBox = ({title, previousValue, currentValue, predictedValue, duration=7 }) => {
   const previousValueText = previousValue !== undefined ? previousValue.toFixed(1).toString() : '-';
   const currentValueText = currentValue !== undefined ? currentValue.toFixed(1).toString() : '-';
-  const previousValueArrow = _.isFinite(previousValueText) && currentValueText > previousValueText ? 'transform:rotate(45deg),color:red' : 'trasnform:rotate(-45deg),color:green';
+  const previousValueArrow = _.isFinite(previousValueText) && 
+					currentValueText > previousValueText ? 'transform:rotate(45deg),color:red' : 
+					'trasnform:rotate(-45deg),color:green';
   const predictedValueText = predictedValue !== undefined ? predictedValue.toFixed(1).toString() : '-';
-  const predictedValueArrow = _.isFinite(predictedValueText) && currentValue > predictedValue ? 'transform:rotate(45deg),color:red' : 'transform:rotate(-45deg),color:green';
+  const predictedValueArrow = _.isFinite(predictedValueText) && currentValue > predictedValue ? 
+					'transform:rotate(45deg),color:red' : 'transform:rotate(-45deg),color:green';
   return (
     <div>
       <div>

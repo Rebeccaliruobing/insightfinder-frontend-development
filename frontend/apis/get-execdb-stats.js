@@ -4,7 +4,7 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-export function getExecDBStatisticsData(projectName, endDate, modelType, duration) {
+export function getExecDBStatisticsData(projectName, endDate, modelType, duration, collectionType = "project") {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -13,7 +13,7 @@ export function getExecDBStatisticsData(projectName, endDate, modelType, duratio
       type: 'POST',
       url: getEndpoint('SystemsStatsDataServlet', 1),
       data: $.param({ userName, token, projectName, endDate,
-											modelType, duration, operation:'get' }),
+											modelType, duration, operation:'post' }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }
@@ -37,7 +37,7 @@ export function getExecDBStatisticsData(projectName, endDate, modelType, duratio
   });
 }
 
-export function retrieveAppNames(projectName) {
+export function retrieveAppNames(projectName, collectionType = "project") {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -69,7 +69,7 @@ export function retrieveAppNames(projectName) {
   });
 }
 
-export function retrieveAppMetricForecastData(projectName, appName, interval) {
+export function retrieveAppMetricForecastData(projectName, appName, interval, collectionType = "project") {
   const userName = store.get('userName');
   const token = store.get('token');
 

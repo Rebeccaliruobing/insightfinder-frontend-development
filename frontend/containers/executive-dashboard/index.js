@@ -4,7 +4,7 @@ import {autobind} from 'core-decorators';
 import moment from 'moment';
 import {Console, Button} from '../../artui/react';
 import DateTimePicker from "../../components/ui/datetimepicker/index";
-import {ThreeValueBox,HourlyHeatmap,Top5Grid} from "../../components/statistics";
+import {ThreeValueBox,HourlyHeatmap,Top5Grid,AutoFixHistory} from "../../components/statistics";
 
 import apis from '../../apis';
 import { LiveProjectSelection, NumberOfDays, EventSummaryModelType
@@ -30,6 +30,13 @@ class ExecutiveDashboard extends Component {
   componentDidMount() {
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     projects = projects.filter((item, index) => item.fileProjectType!=0);
+		
+		// Adding two dummy groups and an "All" placeholder
+		projects.unshift({ projectName:"All Instances" });
+		projects.push({ projectName:"GroupName1" },{ projectName:"GroupName2" });
+
+		this.context.dashboardUserValues = projects;
+		//
     // remember select
     if (projects.length > 0) {
       let projectName = store.get('liveAnalysisProjectName') || projects[0].projectName;
@@ -143,7 +150,7 @@ class ExecutiveDashboard extends Component {
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Project Name:</label>
+              <label style={{ fontWeight: 'bold' }}>Project/Group Name:</label>
               <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
             <div className="field">
@@ -171,44 +178,57 @@ class ExecutiveDashboard extends Component {
           </div>
           <div
             className="ui vertical segment"
-            style={{ background: 'white', margin: '8px 0', borderBottom: 0 }}
+            style={{ background: 'white', margin: '5px 0px', borderBottom: 0 }}
           >
+						<h2>&nbsp;Detected/Predicted Anomaly Overview</h2>
 						<div className="ui compact equal width grid">
 							<div className="ui statistic column">
  		           	<ThreeValueBox title='Anomaly Score' duration={numberOfDays}  
-									previousValue={data.previousAnomalyScore}
-								  currentValue={data.currentAnomalyScore} predictValue={1000}	/
+									previousValue={data.prevTotalAnomalyScore}
+								  currentValue={data.totalAnomalyScore} predictValue={data.predAnomalyScore}	/
 								>
 							</div>
 							<div className="ui statistic column">
 	 	           	<ThreeValueBox title='Total Anomaly Events' 
 									duration={numberOfDays} 
-									previousValue={data.previousAnomalyScore}
-									currentValue={data.currentAnomalyScore} predictValue={1000}	/
+									previousValue={data.prevTotalAnomalyEventCount}
+									currentValue={data.totalAnomalyEventCount} 
+									predictValue={data.predAnomalyEventCount}	/
 								>
 							</div>
 							<div className="ui statistic column">
  		           	<ThreeValueBox title='Total Anomalies' duration={numberOfDays} 
-									previousValue={data.previousAnomalyScore}
-									currentValue={data.currentAnomalyScore} predictValue={1000}	/
+									previousValue={data.prevTotalAnomalyCount}
+									currentValue={data.totalAnomalyCount} predictValue={data.predTotalAnomalyCount}	/
 								>
 							</div>
 						</div>
 					</div>
           <div
             className="ui vertical segment"
-            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
+            style={{ background: 'white', padding: 0, margin: '20px 0', borderBottom: 0 }}
           >
 						<div style={{ background: 'white', padding: 4 }} >
+						<h2>Top 5 Projects / Groups</h2>
 							<Top5Grid />
          		</div>
           </div>
           <div
             className="ui vertical segment"
-            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
+            style={{ background: 'white', padding: 0, margin: '20px 0', borderBottom: 0 }}
           >
 						<div style={{ background: 'white', padding: 4 }} >
+						<h2>Hourly Heatmap of Anomalies Detected & Predicted</h2>
 							<HourlyHeatmap />
+         		</div>
+          </div>
+          <div
+            className="ui vertical segment"
+            style={{ background: 'white', padding: 0, margin: '20px 0', borderBottom: 0 }}
+          >
+						<div style={{ background: 'white', padding: 4 }} >
+						<h2>AutoFix Action History</h2>
+							<AutoFixHistory />
          		</div>
           </div>
         </div>
