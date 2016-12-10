@@ -86,7 +86,7 @@ export default class ListAll extends Component {
     return (
       <Console.Content>
         <div style={{padding: 20}}>
-          {userSystemNames && 
+          {!userSystemNames && userOtherSystemNames && 
             <div className="ui four column grid">
               <div className="wide column text-center" style={wrapperStyle}>
                 <Link to="/usecase/list-some?system=Others" className="item text-white">
@@ -97,7 +97,7 @@ export default class ListAll extends Component {
               </div> 
             </div>
           }
-          {userSystemNames && <div className="ui four column grid">
+          {!userOtherSystemNames && userSystemNames && <div className="ui four column grid">
             { userSystemNames.map((system, index)=> {
                 let color = colors[index % 5];
                 let link = "/usecase/list-some?system="+system;
@@ -112,7 +112,33 @@ export default class ListAll extends Component {
                 )
               })
             }
-          </div>}
+            </div>
+          }
+          {userSystemNames && userOtherSystemNames && 
+            <div className="ui four column grid">
+              <div className="wide column text-center" style={wrapperStyle}>
+                <Link to="/usecase/list-some?system=Others" className="item text-white">
+                  <div style={Object.assign({},blockStyle, {backgroundColor: colors[4]})}>
+                    <span>Others</span>
+                  </div>
+                </Link>
+              </div> 
+            { userSystemNames.map((system, index)=> {
+                let color = colors[index % 5];
+                let link = "/usecase/list-some?system="+system;
+                return(
+                  <div className="wide column text-center" style={wrapperStyle}>
+                    <Link to={link} className="item text-white">
+                      <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
+                        <span>{system}</span>
+                      </div>
+                    </Link>
+                  </div>
+                )
+              })
+            }
+            </div>
+          }
           <hr/>
           <div className="ui four column grid">
             { systemNames.map((system, index)=> {

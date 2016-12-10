@@ -196,7 +196,7 @@ class EventSummary extends Component {
            let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
            let incidentDurationThreshold = 15;
            let detectedIncidents = data.incidents.filter((incident, index) =>
-                   incident.endTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
+                   incident.startTimestamp<=latestTimestamp && incident.duration>=parseInt(incidentDurationThreshold) );
            if(detectedIncidents.length>0){
              this.handleIncidentSelected(detectedIncidents[detectedIncidents.length-1], 'detected');
            } else {

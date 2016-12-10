@@ -542,7 +542,6 @@ class IncidentsList extends Component {
                       }
                     </td>
                     <td className="code">{incident.rootCauseJson.rootCauseTypes} 
-                      {incident.repeatedEventFlag && <i className="repeat icon"/>}
                       {sysCallEnabled && incident.syscallFlag &&
                         <i className="zoom icon" onClick={(e) => {
                           self.handleLoadSysCall(incident)
