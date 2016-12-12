@@ -7,7 +7,7 @@ import DateTimePicker from "../../components/ui/datetimepicker/index";
 import apis from '../../apis';
 import {ProjectStatistics} from '../../components/statistics';
 import {IncidentsList} from '../../components/incidents';
-import IncidentsTreeMap from '../../components/incidents/treemap2';
+import IncidentsTreeMap from '../../components/incidents/treemap';
 import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect,
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
