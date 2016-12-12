@@ -15,7 +15,6 @@ import SummaryReport from './summary-report';
 import BehaviorChangeDetection from './behavior-change-detection';
 import DisplayModel from './display-model';
 import EventSummary from '../../containers/event-summary';
-import EventSummary2 from '../../containers/event-summary2';
 import ExecutiveDashboard from '../../containers/executive-dashboard';
 import AppForecast from '../../containers/app-forecast';
 
@@ -35,7 +34,6 @@ export const cloudRoute = (
       <IndexRedirect to="monitoring" />
       <Route component={InsightReport} path="insight-report" />
       <Route component={EventSummary} path="monitoring" />
-      <Route component={EventSummary2} path="monitoring0" />
       <Route component={ExecutiveDashboard} path="executive-dashboard" />
       <Route component={AppForecast} path="app-forecast" />
       <Route component={HistoricalReport} path="historical-report" />
