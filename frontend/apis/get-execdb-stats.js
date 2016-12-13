@@ -4,7 +4,7 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-export function getExecDBStatisticsData(projectName, endDate, modelType, duration, collectionType = "project") {
+export function getExecDBStatisticsData(projectName, endTimestamp, modelType, numberOfDays) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -12,8 +12,8 @@ export function getExecDBStatisticsData(projectName, endDate, modelType, duratio
     $.ajax({
       type: 'POST',
       url: getEndpoint('SystemsStatsDataServlet', 1),
-      data: $.param({ userName, token, projectName, endDate,
-											modelType, duration, operation:'post' }),
+      data: $.param({ userName, token, projectName, endTimestamp,
+											modelType, numberOfDays, operation:'post' }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }

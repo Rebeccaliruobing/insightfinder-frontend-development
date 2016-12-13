@@ -545,6 +545,7 @@ const GroupingSeperateModelSelection = props => (
 
 export {
   ProjectSelection,
+  GroupSelection,
   LiveProjectSelection,
   OperationOptionsSelect,
   ModelNameSelection,

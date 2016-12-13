@@ -7,7 +7,7 @@ import DateTimePicker from "../../components/ui/datetimepicker/index";
 import {ThreeValueBox,HourlyHeatmap,Top5Grid,AutoFixHistory} from "../../components/statistics";
 
 import apis from '../../apis';
-import { LiveProjectSelection, NumberOfDays, EventSummaryModelType
+import { LiveProjectSelection, ProjectSelection, GroupSelection, NumberOfDays, EventSummaryModelType
 } from '../../components/selections';
 
 class ExecutiveDashboard extends Component {
@@ -58,7 +58,7 @@ class ExecutiveDashboard extends Component {
   handleProjectChange(value, projectName) {
     this.setState({
       projectName,
-      endTime: moment().endOf('day'),
+      endTimestamp: moment().endOf('day'),
       numberOfDays: "7",
       modelType:"Holistic",
       currentTreemapData: undefined,
@@ -78,7 +78,7 @@ class ExecutiveDashboard extends Component {
   }
 
   @autobind
-  handleEndTimeChange(value, endTime) {
+  handleEndTimeChange(value, endTimestamp) {
     let newEndTime = moment(value).endOf('day');
     let curTime = moment();
     if(newEndTime>curTime){
@@ -87,22 +87,22 @@ class ExecutiveDashboard extends Component {
 
     let { projectName } = this.state;
     this.setState({
-      endTime: newEndTime,
+      endTimestamp: newEndTime,
     }, () => {
       this.refreshProjectName(projectName);
     });
   }
 
   refreshProjectName(projectName) {
-    const {numberOfDays,endTime,modelType} = this.state;
+    const {numberOfDays,endTimestamp,modelType} = this.state;
     console.log(this.state);
     store.set('liveAnalysisProjectName', projectName);
     this.setState({ loading: true, projectName },()=>{
 			if ( projectName !== undefined && projectName.length > 0 &&
-					 endTime !== undefined &&
+					 endTimestamp !== undefined &&
 					 numberOfDays !== undefined && numberOfDays > 0 &&
 					 modelType !== undefined && modelType.length > 0 ) {
-	    	apis.getExecDBStatisticsData(projectName, endTime.format('YYYY-MM-DD HH:mm'), modelType, numberOfDays, true)
+	    	apis.getExecDBStatisticsData(projectName, endTimestamp.format('YYYY-MM-DD HH:mm'), modelType, numberOfDays, true)
  	     	.then(data => {
  	      	this.setState({
  	        	loading: false,
@@ -137,8 +137,10 @@ class ExecutiveDashboard extends Component {
   }
 
   render() {
-    let { loading, data, projectName,
-      endTime, numberOfDays, modelType} = this.state;
+
+	let { loading, data, projectName,
+      endTimestamp, numberOfDays, modelType} = this.state;
+
     return (
       <Console.Content
         className={loading ? 'Loading...' : ''}
@@ -150,15 +152,15 @@ class ExecutiveDashboard extends Component {
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Project/Group Name:</label>
-              <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
+              <label style={{ fontWeight: 'bold' }}>Project Name:</label>
+              <ProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
                 <div className="ui input">
                   <DateTimePicker className='ui input' style={{'width': '50%'}}
                               dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={endTime}
+                              dateTimeFormat='YYYY-MM-DD' value={endTimestamp}
                               onChange={this.handleEndTimeChange}/>
                 </div>
             </div>
