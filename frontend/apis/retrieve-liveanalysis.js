@@ -22,6 +22,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
   const endTimestamp = statistics['endTimestamp'];
   const maxAnomalyRatio = statistics['maxAnomalyRatio'];
   const minAnomalyRatio = statistics['minAnomalyRatio'];
+  const instanceTypeMap = statistics['instanceTypeJson'] || {};
 
   _.forEach(insts, (inst) => {
 
@@ -49,6 +50,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         active: true,
         projectName: projectName,
         instanceName: inst,
+        instanceType: instanceTypeMap[inst],
         name: mn,
         eventStartTime,
         eventEndTime,
@@ -74,6 +76,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         active: !_.find(newInsts, i => i === inst),
         projectName: projectName,
         instanceName: inst,
+        instanceType: instanceTypeMap[inst],
         value: 1,
         children,
       };
@@ -92,6 +95,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
           name: iname,
           projectName: projectName,
           instanceName: inst,
+          instanceType: instanceTypeMap[inst],
           containers: 1,
           score: 0,
           eventType: eventType3,
@@ -115,6 +119,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         type: 'instance',
         projectName: projectName,
         instanceName: inst,
+        instanceType: instanceTypeMap[inst],
         active: !_.find(newInsts, i => i === inst),
         score: 0,
         eventType: eventType4,
