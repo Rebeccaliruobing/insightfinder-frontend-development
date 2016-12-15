@@ -1,6 +1,8 @@
 import $ from 'jquery';
 import React from 'react';
+import {autobind} from 'core-decorators';
 import {Modal} from '../../../artui/react';
+import {Dropdown} from '../../../artui/react/index';
 import apis from '../../../apis';
 
 
@@ -13,7 +15,8 @@ class AmazonProjectModal extends React.Component {
     super(props);
     this._dropdown = null;
     this.state = {
-      hasAgentData:false
+      hasAgentData:false,
+      instanceType:[],
     }
   }
 
@@ -25,11 +28,16 @@ class AmazonProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, instanceType, zone, access_key, secrete_key, hasAgentData} = this.state;
+    if(projectName==null){
+      alert("Project name cannot be empty.");
+      return false;
+    }
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    apis.postAddAWSProject(projectName, instanceType, zone, access_key, secrete_key, hasAgentData).then((resp)=> {
+
+    apis.postAddAWSProject(projectName, instanceType.toString(), zone, access_key, secrete_key, hasAgentData).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
         this.context.root.loadData();
@@ -39,8 +47,20 @@ class AmazonProjectModal extends React.Component {
     }).catch((e)=> {
       console.error(e);
     });
+  }
 
-
+  @autobind
+  handleInstanceTypeChange(value, text){
+    let { instanceType } = this.state;
+    if(value){
+      instanceType.push(text);
+    } else if(!value){
+      let index = instanceType.indexOf(text);
+      if(index!=-1){
+        instanceType.splice(index,1);
+      }
+    }
+    this.setState({ instanceType });
   }
 
   render() {
@@ -55,12 +75,14 @@ class AmazonProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>Instance Type</label>
-              <select className="ui dropdown" onChange={(e)=>this.setState({instanceType: e.target.value})}>
-                <option className="item"></option>
-                <option className="item" value='EC2'>EC2</option>
-                <option className="item" value='RDS'>RDS</option>
-                <option className="item" value='DynamoDB'>DynamoDB</option>
-              </select>
+              <Dropdown mode="select" multiple={true} onChange={this.handleInstanceTypeChange} >
+                <i className="dropdown icon" />
+                <div className="menu">
+                  <div className="item" data-value="EC2">EC2</div>
+                  <div className="item" data-value="RDS">RDS</div>
+                  <div className="item" data-value="DynamoDB">DynamoDB</div>
+                </div>
+              </Dropdown>
             </div>
             <div className="field">
               <label>Region</label>

@@ -43,18 +43,20 @@ class Projects extends React.Component {
     history.pushState({title: tab},'detail',pushTab);
     this.setState({tabStates: tabStates});
   }
+
   projectList(projectString,projectGroupByType,projectInfoArray){
     if(projectString.length>0){
       projectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
         let [name, dataType, cloudType] = project;
         let zone = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[1]):"N/A";
         let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[2]):false;
+        let instanceType = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[3]):false;
         switch (dataType) {
           case 'AWS':
           case 'EC2':
           case 'RDS':
           case 'DynamoDB':
-            projectGroupByType.AWS.push({name, dataType, cloudType,zone,agentDataEnabled});
+            projectGroupByType.AWS.push({name, dataType:instanceType, cloudType,zone,agentDataEnabled});
             break;
           case 'GAE':
           case 'GCE':
@@ -82,6 +84,7 @@ class Projects extends React.Component {
         let [name, dataType, cloudType, master] = project;
         let zone = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[1]):"N/A";
         let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[2]):false;
+        let instanceType = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[3]):false;
         name = name+"@"+master;
         let flag = true;
         switch (dataType) {
@@ -89,7 +92,7 @@ class Projects extends React.Component {
           case 'EC2':
           case 'RDS':
           case 'DynamoDB':
-            projectGroupByType.AWS.push({name, dataType, cloudType,zone,agentDataEnabled, flag});
+            projectGroupByType.AWS.push({name, dataType:instanceType, cloudType,zone,agentDataEnabled, flag});
             break;
           case 'GAE':
           case 'GCE':
@@ -116,7 +119,7 @@ class Projects extends React.Component {
     var tabStates = this.state['tabStates'];
     var userInstructions = this.context.userInstructions;
     let {projectString, sharedProjectString,incidentAllInfo, dataAllInfo,projectSettingsAllInfo} = this.context.dashboardUservalues;
-    let projectInfoArray = projectSettingsAllInfo.map((s)=> [s.projectName,s.zone,s.agentDataEnabled]);
+    let projectInfoArray = projectSettingsAllInfo.map((s)=> [s.projectName,s.zone,s.agentDataEnabled,s.instanceType]);
     let projectGroupByType = {'AWS': [], 'Google': [], 'custom': [], 'datadog': [], 'newrelic': []};
 
     this.projectList(projectString,projectGroupByType,projectInfoArray);

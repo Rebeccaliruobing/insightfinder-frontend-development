@@ -26,6 +26,10 @@ export function loadInstanceGrouping(projectName, operation = 'load') {
           reject(`Data Error: ${e.message}`)
         }
       } else {
+        if(resp.message.startsWith("Failed to load project")){
+          store.remove('liveAnalysisProjectName');
+          window.location.reload();
+        }
         reject(resp.message);
       }
     }).fail(function (resp) {

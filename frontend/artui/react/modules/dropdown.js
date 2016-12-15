@@ -96,7 +96,7 @@ class Dropdown extends BaseComponent {
 
     const classes = classNames('ui', {
       search: searchable,
-      multiple,
+      multiple: multiple,
       selection: mode === 'select',
     }, className, 'dropdown');
 

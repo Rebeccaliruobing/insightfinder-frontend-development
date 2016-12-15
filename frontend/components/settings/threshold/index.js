@@ -476,7 +476,7 @@ export default class ThresholdSettings extends React.Component {
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               <a className={tabStates0['sharing'] + ' item'}
-                 onClick={(e) => this.selectTab0(e, 'sharing')}>Data Sharing</a>
+                 onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
@@ -557,15 +557,15 @@ export default class ThresholdSettings extends React.Component {
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
               </div>}
               <div className={tabStates0['sharing'] + ' ui tab'}>
-                <h3>Project Data Sharing</h3>
+                <h3>Project Sharing</h3>
 								<p>
 									If you are collaborating with other users, you may invite
 									them to view data associated with your Projects.
 								</p>
 								<p>
-									To share your project data, enter their User ID(s) in the 
+									To share your project, enter their User ID(s) in the 
 									field below and click 'Update Sharing Settings'.  Those 
-									users will be able to view your data on their next login.
+									users will be able to view your project on their next login.
 								</p>
                 <div className="field">
                   <div className="ui input">

@@ -55,7 +55,8 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="settings icon"></i>
                 <h3>Settings</h3>
-                <Link to="/settings/threshold" className="item">&bull; Anomaly detection and metric threshold settings. </Link>
+                <Link to="/settings/project" className="item">&bull; Anomaly detection and metric threshold settings. </Link>
+                <Link to="/settings/project" className="item">&bull; Project sharing with collaborators. </Link>
                 <Link to="/settings/extsvc" className="item">&bull; Third party incident reporting service. </Link>
               </div>
             </div>

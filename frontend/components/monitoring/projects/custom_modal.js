@@ -25,6 +25,10 @@ class CustomProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key} = this.state;
+    if(projectName==null){
+      alert("Project name cannot be empty.");
+      return false;
+    }
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;

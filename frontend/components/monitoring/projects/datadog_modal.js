@@ -24,6 +24,10 @@ class DataDogProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, instanceType, samplingInterval, appkey, apikey } = this.state;
+    if(projectName==null){
+      alert("Project name cannot be empty.");
+      return false;
+    }
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;
