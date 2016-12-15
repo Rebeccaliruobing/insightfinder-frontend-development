@@ -1,17 +1,18 @@
-import store from 'store';
-import React, {Component, PropTypes as T} from 'react';
-import {autobind} from 'core-decorators';
-import {Button} from '../../artui/react';
+import React from 'react';
 import cx from 'classnames';
-import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
-import "./incident.less";
-import thumbupImg from '../../images/green-thumbup.png';
+import moment from 'moment';
 import _ from 'lodash';
+import { autobind } from 'core-decorators';
+import { Button } from '../../artui/react';
+import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
+import { getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
 import apis from '../../apis';
+import './incident.less';
+import thumbupImg from '../../images/green-thumbup.png';
 
-class IncidentsList extends Component {
+class IncidentsList extends React.Component {
 
   constructor(props) {
     super(props);
@@ -35,20 +36,20 @@ class IncidentsList extends Component {
       startTimestamp: undefined,
       endTimestamp: undefined,
       activeIncident: undefined,
-      actionTime: +moment(),
+      actionTime: moment(),
       angleIconStyleSelect: 'angleIconStyleStartTime',
       angleIconStyle: {
-        angleIconStyleId: 'down',
-        angleIconStyleSeverity: 'down',
+        angleIconStyleId: '',
+        angleIconStyleSeverity: '',
         angleIconStyleEvent: 'down',
-        angleIconStyleStartTime: 'down',
-        angleIconStyleDuration: 'down'
+        angleIconStyleStartTime: '',
+        angleIconStyleDuration: '',
       },
       tabStates: {
         predicted: '',
-        detected: 'active'
-      }
-    }
+        detected: 'active',
+      },
+    };
   }
 
   componentDidMount() {
@@ -66,7 +67,7 @@ class IncidentsList extends Component {
     if (activeIncident) {
       let startTimestamp = activeIncident.startTimestamp;
       let endTimestamp = activeIncident.endTimestamp;
-      apis.postSysCallResult(projectName, startTimestamp, endTimestamp).then((resp)=> {
+      apis.postSysCallResult(projectName, startTimestamp, endTimestamp).then((resp) => {
         console.log(resp);
         if (resp.success) {
           self.setState({
@@ -80,13 +81,13 @@ class IncidentsList extends Component {
         }
       });
     } else {
-      alert("Cannot find incident to retrieve syscall data for.");
+      alert('Cannot find incident to retrieve syscall data for.');
     }
   }
 
   @autobind
-  handleIncidentSelected(incident,tab) {
-    this.props.onIncidentSelected(incident,tab);
+  handleIncidentSelected(incident, tab) {
+    this.props.onIncidentSelected(incident, tab);
     let incidentState = { activeIncident: incident };
     this.setState(incidentState);
   }
@@ -108,7 +109,7 @@ class IncidentsList extends Component {
   }
 
   handleLinkToAgentWiki() {
-    const url = `https://github.com/insightfinder/InsightAgent/wiki`;
+    const url = 'https://github.com/insightfinder/InsightAgent/wiki';
     window.open(url, '_blank');
   }
 
@@ -138,23 +139,22 @@ class IncidentsList extends Component {
   }
 
   selectTab(e, tab, incidents) {
-
-    let angleIconStyleSelect = 'angleIconStyleStartTime';
-    let angleIconStyle = {
-      angleIconStyleId: 'down',
-      angleIconStyleSeverity: 'down',
+    const angleIconStyleSelect = 'angleIconStyleStartTime';
+    const angleIconStyle = {
+      angleIconStyleId: '',
+      angleIconStyleSeverity: '',
       angleIconStyleEvent: 'down',
-      angleIconStyleStartTime: 'down',
-      angleIconStyleDuration: 'down'
+      angleIconStyleStartTime: '',
+      angleIconStyleDuration: '',
     };
-    let tabStates = this.state['tabStates'];
-    tabStates = _.mapValues(tabStates, function (val) {
-      return '';
-    });
+    let tabStates = this.state.tabStates;
+    tabStates = _.mapValues(tabStates, () => '');
     tabStates[tab] = 'active';
-    this.setState({ tabStates: tabStates, angleIconStyleSelect: angleIconStyleSelect, angleIconStyle: angleIconStyle });
+    this.setState({
+      tabStates, angleIconStyleSelect, angleIconStyle,
+    });
     let firstIncident = undefined;
-    if(incidents && incidents.length>0){
+    if (incidents && incidents.length > 0) {
       firstIncident = incidents[0];
     }
     this.handleIncidentSelected(firstIncident, tab);
@@ -162,135 +162,102 @@ class IncidentsList extends Component {
 
   changeAngleStyle(angleIconStyleSelect) {
     let { angleIconStyle } = this.state;
-    angleIconStyle[angleIconStyleSelect] = angleIconStyle[angleIconStyleSelect] === 'up' ? 'down' : 'up';
-    this.setState({ angleIconStyle: angleIconStyle, angleIconStyleSelect: angleIconStyleSelect });
+    const selectStyle = angleIconStyle[angleIconStyleSelect];
+
+    // Show only one up/down
+    angleIconStyle = _.mapValues(angleIconStyle, () => '');
+    angleIconStyle[angleIconStyleSelect] = selectStyle === 'up' ? 'down' : 'up';
+    this.setState({ angleIconStyle, angleIconStyleSelect });
   }
-
-  calculateRGB(anomalyRatio, size) {
-    let { maxAnomalyRatio, minAnomalyRatio } = this.state;
-    if (minAnomalyRatio >= 0) {
-      minAnomalyRatio = 0;
-    }
-    let range = maxAnomalyRatio - minAnomalyRatio;
-    let val = (anomalyRatio == 0) ? 0 : (anomalyRatio);
-    let gcolorMax = 205;
-    var rcolor, gcolor, bcolor = 0;
-    if (val == 0) {
-      rcolor = Math.floor(255 * val);
-      gcolor = gcolorMax;
-    } else if (val <= 1) {
-      // if (val < 0) val = 0;
-      val = 1;
-      rcolor = Math.floor(255 * val);
-      gcolor = gcolorMax;
-    } else {
-      // if (val > 10) val = 10;
-      rcolor = 255;
-      gcolor = Math.floor(gcolorMax - (val - minAnomalyRatio) / range * gcolorMax);
-    }
-    return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
-  }
-
-  @autobind
-  getEventShapeType(text, index, color) {
-    const size = 5;
-    const height = 26;
-    const cx = index * size * 2 + size;
-    const cy = height / 2;
-    text = text.toLowerCase();
-
-    if (text.indexOf('- network') >= 0) {
-      return (
-        <rect key={index} fill={`rgb(${color})`} 
-              x={cx - size} y={cy - size * 0.6} width={size * 1.9} height={size * 1.2}/>
-      );
-    } else if(text.indexOf('- disk') >=0 ){
-      return (
-        <rect
-          key={index} fill={`rgb(${color})`}
-          x={cx - size * 0.6} y={cy - size} width={size * 1.2} height={size * 2}/>
-      );
-    } else if(text.indexOf('- workload') >= 0) {
-      return (
-        <polygon
-          key={index} fill={`rgb(${color})`}
-          points={`${cx},${cy - 7} ${cx - 5},${cy + 4} ${cx + 5},${cy + 4}`}
-        />
-      );
-    } else if(text.indexOf('- new instance') >= 0) {
-      return (
-        <circle key={index} fill={`rgb(${color})`}
-          cx={cx} cy={cy} r={size * 0.95} />
-      );
-    } else if(text.indexOf('- instance down') >= 0) {
-      return (
-        <polygon
-          key={index} fill={`rgb(${color})`} 
-          points={`${cx-5},${cy-4} ${cx+5},${cy-4} ${cx},${cy+7}`}
-        />
-      );
-    } else if(text.indexOf('- high cpu') >=0) {
-      return (
-        <polygon
-          key={index} fill={`rgb(${color})`} 
-          points={`${cx},${cy-6} ${cx+6},${cy} ${cx},${cy+6} ${cx-6},${cy}`}
-        />
-      );
-    } else  {
-      return (
-        <circle key={index} fill={`rgb(${color})`} 
-          cx={cx} cy={cy} r={size * 0.95} />
-      );
-    }
-  }
-
-
-  unique(array){
-      var len = array.length;
-      for(var i = 0; i < len; i++) 
-        for(var j = i + 1; j < len; j++) 
-          if(array[j].props.eventtype != 'others' && array[j].props.eventtype == array[i].props.eventtype){
-            array.splice(j,1);
-            j--;
-            len--;
-          }
-      return array;
-  }
-
 
   @autobind
   renderEventSeverity(incident) {
+    const { maxAnomalyRatio, minAnomalyRatio } = this.state;
+    const color = calculateRGBByAnomaly(
+      incident.anomalyRatio, maxAnomalyRatio, minAnomalyRatio,
+      incident.numberOfAnomalies);
 
-    const color = this.calculateRGB(incident.anomalyRatio, incident.numberOfAnomalies);
-    const eventTypes = incident.rootCauseJson.rootCauseTypes.split('\n');
+    let eventTypes = incident.rootCauseJson.rootCauseTypes.split('\n');
+    eventTypes = _.filter(eventTypes, s => s && s.trim() !== '');
+    eventTypes = _.map(eventTypes, s => getEventType(s));
+    // TODO: Need to keep multiple others type?
+    eventTypes = _.uniq(eventTypes);
+
     return (
       <svg width={70} height={26}>
-        {this.unique(eventTypes.map((event, index) => {
-          return this.getEventShapeType(event, index, color);
-        }))}
+        {eventTypes.map((event, index) => createEventShape(event, index, color))}
       </svg>
     );
   }
 
+  @autobind
+  getIncidentOrderParams() {
+    const { angleIconStyle, angleIconStyleSelect } = this.state;
+    const order = angleIconStyle[angleIconStyleSelect] === 'up' ? 'asc' : 'desc';
+
+    let iteratees = [i => i.rootCauseJson.rootCauseTypes];
+
+    if (angleIconStyleSelect === 'angleIconStyleId') {
+      iteratees = ['id'];
+    }
+    if (angleIconStyleSelect === 'angleIconStyleSeverity') {
+      iteratees = ['anomalyRatio'];
+    }
+    if (angleIconStyleSelect === 'angleIconStyleStartTime') {
+      iteratees = ['startTimestamp'];
+    }
+    if (angleIconStyleSelect === 'angleIconStyleDuration') {
+      iteratees = ['duration'];
+    }
+
+    return { order, iteratees };
+  }
+
+  @autobind
+  renderTableHead() {
+    const { angleIconStyle } = this.state;
+    return (
+      <thead style={{ display: 'block', width: '100%' }}>
+        <tr style={{ display: 'inline-table', width: '100%' }}>
+          <th onClick={() => this.changeAngleStyle('angleIconStyleId')}>Id
+            <i className={`angle ${angleIconStyle.angleIconStyleId} icon`} />
+          </th>
+          <th onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}>Severity
+            <i className={`angle ${angleIconStyle.angleIconStyleSeverity} icon`} />
+          </th>
+          <th onClick={() => this.changeAngleStyle('angleIconStyleStartTime')}>Start Time
+            <i className={`angle ${angleIconStyle.angleIconStyleStartTime} icon`} />
+          </th>
+          <th onClick={() => this.changeAngleStyle('angleIconStyleDuration')}>Duration
+            <i className={`angle ${angleIconStyle.angleIconStyleDuration} icon`} />
+          </th>
+          <th onClick={() => this.changeAngleStyle('angleIconStyleEvent')}>Event Type
+            <i className={`angle ${angleIconStyle.angleIconStyleEvent} icon`} />
+          </th>
+          <th>Control</th>
+        </tr>
+      </thead>
+    );
+  }
+
   render() {
-    const userName = store.get('userName');
-    let { projectType, incidents, latestTimestamp, active, tabStates, angleIconStyle, angleIconStyleSelect, maxAnomalyRatio, minAnomalyRatio } = this.state;
-    let detectedIncidents = incidents.filter((incident, index) =>
-    incident.startTimestamp <= latestTimestamp);
-    let predictedIncidents = incidents.filter((incident, index) =>
-    incident.endTimestamp > latestTimestamp);
-    let sysCallEnabled = (projectType == 'CUSTOM');
-    let self = this;
+    const { projectType, incidents, latestTimestamp, tabStates } = this.state;
+
+    // Get the order params and sort incidents
+    const { order, iteratees } = this.getIncidentOrderParams();
+    let detectedIncidents = incidents.filter(
+      incident => incident.startTimestamp <= latestTimestamp);
+    detectedIncidents = _.orderBy(detectedIncidents, iteratees, order);
+
+    let predictedIncidents = incidents.filter(
+      incident => incident.endTimestamp > latestTimestamp);
+    predictedIncidents = _.orderBy(predictedIncidents, iteratees, order);
+
+    const sysCallEnabled = (projectType.toLowerCase() === 'custom');
+    const self = this;
     return (
       <div>
         <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
-          {false && (userName === 'admin' || userName === 'guest') &&
-          <Button
-            className="orange"
-            style={{ position: 'absolute', right: 0, top: 5 }}
-            onClick={this.handleProjectChartsView}
-          >Line Charts</Button>
-          }
           <Button
             className="orange"
             style={{ position: 'absolute', right: 0, top: 5 }} title="Causal Graph"
@@ -304,293 +271,152 @@ class IncidentsList extends Component {
             }}
           >Causal Graph</Button>
           <div className="ui pointing secondary menu">
-            <a className={tabStates['detected'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'detected', detectedIncidents)}>Detected Events</a>
-            <a className={tabStates['predicted'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'predicted', predictedIncidents)}>Predicted Events</a>
+            <a
+              className={`${tabStates.detected} item`}
+              onClick={e => this.selectTab(e, 'detected', detectedIncidents)}
+            >Detected Events</a>
+            <a
+              className={`${tabStates.predicted} item`}
+              onClick={e => this.selectTab(e, 'predicted', predictedIncidents)}
+            >Predicted Events</a>
           </div>
         </div>
-        <div className={tabStates['predicted'] + ' ui tab '}>
+        <div className={`${tabStates.predicted} ui tab`}>
           {(predictedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
-              <thead style={{ 'display': 'block', 'width': '100%' }}>
-              <tr style={{ display: 'inline-table', 'width': '100%' }}>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleId'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleSeverity'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleStartTime'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleDuration'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleEvent'] + " icon"}/></th>
-                <th>Control</th>
-              </tr>
-              </thead>
+              {this.renderTableHead()}
               <tbody style={{ width: '100%', 'height': '450px', 'overflow': 'auto', 'display': 'block' }}>
-              {predictedIncidents.sort(function (a, b) {
-                // reverse ordering
-                if (angleIconStyleSelect == 'angleIconStyleId') {
-                  let aid = parseInt(a.id);
-                  let bid = parseInt(b.id);
-                  let returnId = angleIconStyle['angleIconStyleId'] === 'up' ? -1 : 1;
-                  if (aid < bid) {
-                    return returnId;
-                  } else if (aid > bid) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
+                {predictedIncidents.map(function (incident, index) {
+                  let anomalyRatioString = "";
+                  if (incident.anomalyRatio > 0) {
+                    anomalyRatioString = "Event Anomaly Score: " + (Math.round(incident.anomalyRatio * 10) / 10) + "\n";
                   }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleSeverity') {
-                  let aAnomalyRatio = parseInt(a.anomalyRatio);
-                  let bAnomalyRatio = parseInt(b.anomalyRatio);
-                  let returnId = angleIconStyle['angleIconStyleSeverity'] === 'up' ? -1 : 1;
-                  if (aAnomalyRatio < bAnomalyRatio) {
-                    return returnId;
-                  } else if (aAnomalyRatio > bAnomalyRatio) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleStartTime') {
-                  let aStartTime = parseInt(a.startTimestamp);
-                  let bStartTime = parseInt(b.startTimestamp);
-                  let returnId = angleIconStyle['angleIconStyleStartTime'] === 'up' ? -1 : 1;
-                  if (aStartTime <= bStartTime) {
-                    return returnId;
-                  } else if (aStartTime > bStartTime) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleDuration') {
-                  let aDuration = parseInt(a.duration);
-                  let bDuration = parseInt(b.duration);
-                  let returnId = angleIconStyle['angleIconStyleDuration'] === 'up' ? -1 : 1;
-                  if (aDuration <= bDuration) {
-                    return returnId;
-                  } else if (aDuration > bDuration) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else {
-                  let aname = a.rootCauseJson.rootCauseTypes;
-                  let bname = b.rootCauseJson.rootCauseTypes;
-                  let returnId = angleIconStyle['angleIconStyleEvent'] === 'up' ? -1 : 1;
-                  if (aname > bname) {
-                    return returnId;
-                  } else if (aname < bname) {
-                    return returnId * -1;
-                  }
-                }
-              }).map(function (incident, index) {
-                let anomalyRatioString = "";
-                if(incident.anomalyRatio>0){
-                  anomalyRatioString = "Event Anomaly Score: "+(Math.round(incident.anomalyRatio*10)/10)+"\n";                
-                }
-                return (
-                  <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={()=>self.handleIncidentSelected(incident,'predicted')}
+                  return (
+                    <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
+                      onClick={() => self.handleIncidentSelected(incident, 'predicted')}
                       className={cx({ 'active': incident === self.state.activeIncident })}
                       title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
-                    <td>{incident.id}</td>
-                    <td>
-                      {self.renderEventSeverity(incident)}
-                    </td>
-                    <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-                    <td>
-                      { incident.anomalyRatio == 0 ?
-                        "N/A"
-                        :
-                      incident.duration + " min"
-                      }
-                    </td>
-                    <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-                    <td>
-                      { incident.anomalyRatio == 0 ?
-                        "N/A"
-                        :
-                        <Button className="blue" onClick={(e) => {
-                          e.stopPropagation();
-                          self.setState({
-                            activeIncident: incident,
-                            showTakeActionModal: true,
-                            actionTime: +moment(),
-                          });
-                        }}
-                                style={{ paddingLeft: 2, paddingRight: 2 }}>
-                          Action
-                        </Button> }
-                    </td>
-                  </tr>
-                )
-              })}
+                      <td>{incident.id}</td>
+                      <td>
+                        {self.renderEventSeverity(incident)}
+                      </td>
+                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
+                      <td>
+                        {incident.anomalyRatio == 0 ?
+                          "N/A"
+                          :
+                          incident.duration + " min"
+                        }
+                      </td>
+                      <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
+                      <td>
+                        {incident.anomalyRatio == 0 ?
+                          "N/A"
+                          :
+                          <Button className="blue" onClick={(e) => {
+                            e.stopPropagation();
+                            self.setState({
+                              activeIncident: incident,
+                              showTakeActionModal: true,
+                              actionTime: +moment(),
+                            });
+                          } }
+                            style={{ paddingLeft: 2, paddingRight: 2 }}>
+                            Action
+                        </Button>}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
             :
-            <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal in prediction.
+            <h5><img alt="normal" height='40px' src={thumbupImg} />Congratulations! Everything is normal in prediction.
             </h5>
           }
         </div>
         <div className={tabStates['detected'] + ' ui tab '}>
           {(detectedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
-              <thead style={{ 'display': 'block', 'width': '100%' }}>
-              <tr style={{ display: 'inline-table', 'width': '100%' }}>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleId')}>Id<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleId'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleSeverity')}>Severity<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleSeverity'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleStartTime')}>Start Time<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleStartTime'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleDuration')}>Duration<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleDuration'] + " icon"}/></th>
-                <th onClick={()=>this.changeAngleStyle('angleIconStyleEvent')}>Event Type<i
-                  className={"angle " + this.state.angleIconStyle['angleIconStyleEvent'] + " icon"}/></th>
-                <th>Control</th>
-              </tr>
-              </thead>
-              <tbody style={{ width: '100%', 'height': '444px', 'overflow': 'auto', 'display': 'block' }}>
-              {detectedIncidents.sort(function (a, b) {
-                // reverse ordering
-                if (angleIconStyleSelect == 'angleIconStyleId') {
-                  let aid = parseInt(a.id);
-                  let bid = parseInt(b.id);
-                  let returnId = angleIconStyle['angleIconStyleId'] === 'up' ? -1 : 1;
-                  if (aid < bid) {
-                    return returnId;
-                  } else if (aid > bid) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
+              {this.renderTableHead()}
+              <tbody style={{ width: '100%', height: 444, overflow: 'auto', display: 'block' }}>
+                {detectedIncidents.map(function (incident, index) {
+                  let anomalyRatioString = "";
+                  if (incident.anomalyRatio > 0) {
+                    anomalyRatioString = "Event Anomaly Score: " + (Math.round(incident.anomalyRatio * 10) / 10) + "\n";
                   }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleSeverity') {
-                  let aAnomalyRatio = parseInt(a.anomalyRatio);
-                  let bAnomalyRatio = parseInt(b.anomalyRatio);
-                  let returnId = angleIconStyle['angleIconStyleSeverity'] === 'up' ? -1 : 1;
-                  if (aAnomalyRatio < bAnomalyRatio) {
-                    return returnId;
-                  } else if (aAnomalyRatio > bAnomalyRatio) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleStartTime') {
-                  let aStartTime = parseInt(a.startTimestamp);
-                  let bStartTime = parseInt(b.startTimestamp);
-                  let returnId = angleIconStyle['angleIconStyleStartTime'] === 'up' ? -1 : 1;
-                  if (aStartTime <= bStartTime) {
-                    return returnId;
-                  } else if (aStartTime > bStartTime) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else if (angleIconStyleSelect == 'angleIconStyleDuration') {
-                  let aDuration = parseInt(a.duration);
-                  let bDuration = parseInt(b.duration);
-                  let returnId = angleIconStyle['angleIconStyleDuration'] === 'up' ? -1 : 1;
-                  if (aDuration <= bDuration) {
-                    return returnId;
-                  } else if (aDuration > bDuration) {
-                    return returnId * -1;
-                  } else {
-                    return 0;
-                  }
-                }
-                else {
-                  let aname = a.rootCauseJson.rootCauseTypes;
-                  let bname = b.rootCauseJson.rootCauseTypes;
-                  let returnId = angleIconStyle['angleIconStyleEvent'] === 'up' ? -1 : 1;
-                  if (aname > bname) {
-                    return returnId;
-                  } else if (aname < bname) {
-                    return returnId * -1;
-                  }
-                }
-              }).map(function (incident, index) {
-                let anomalyRatioString = "";
-                if(incident.anomalyRatio>0){
-                  anomalyRatioString = "Event Anomaly Score: "+(Math.round(incident.anomalyRatio*10)/10)+"\n";                
-                }
-                return (
-                  <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={()=>self.handleIncidentSelected(incident,'detected')}
+                  return (
+                    <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
+                      onClick={() => self.handleIncidentSelected(incident, 'detected')}
                       className={cx({ 'active': incident === self.state.activeIncident })}
                       title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
-                    <td>
-                      {incident.id}
-                    </td>
-                    <td>
-                      {self.renderEventSeverity(incident)}
-                    </td>
-                    <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-                    <td>
-                      { incident.anomalyRatio == 0 ?
-                        "N/A"
-                        :
-                      incident.duration + " min"
-                      }
-                    </td>
-                    <td className="code">{incident.rootCauseJson.rootCauseTypes} 
-                      {sysCallEnabled && incident.syscallFlag &&
-                        <i className="zoom icon" onClick={(e) => {
-                          self.handleLoadSysCall(incident)
-                        }}/>}
-                    </td>
-                    <td>
-                      { incident.anomalyRatio == 0 ?
-                        "N/A"
-                        :
-                        <Button className="blue" onClick={(e) => {
-                          e.stopPropagation();
-                          self.setState({
-                            activeIncident: incident,
-                            showTakeActionModal: true,
-                            actionTime: +moment(),
-                          });
-                        }}
-                                style={{ paddingLeft: 2, paddingRight: 2 }}>
-                          Action
-                        </Button> }
-                    </td>
-                  </tr>
-                )
-              })}
+                      <td>
+                        {incident.id}
+                      </td>
+                      <td>
+                        {self.renderEventSeverity(incident)}
+                      </td>
+                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
+                      <td>
+                        {incident.anomalyRatio == 0 ?
+                          "N/A"
+                          :
+                          incident.duration + " min"
+                        }
+                      </td>
+                      <td className="code">{incident.rootCauseJson.rootCauseTypes}
+                        {sysCallEnabled && incident.syscallFlag &&
+                          <i className="zoom icon" onClick={(e) => {
+                            self.handleLoadSysCall(incident)
+                          } } />}
+                      </td>
+                      <td>
+                        {incident.anomalyRatio == 0 ?
+                          "N/A"
+                          :
+                          <Button className="blue" onClick={(e) => {
+                            e.stopPropagation();
+                            self.setState({
+                              activeIncident: incident,
+                              showTakeActionModal: true,
+                              actionTime: +moment(),
+                            });
+                          } }
+                            style={{ paddingLeft: 2, paddingRight: 2 }}>
+                            Action
+                        </Button>}
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
             :
-            <h5><img alt="normal" height='40px' src={thumbupImg}/>Congratulations! Everything is normal.</h5>
+            <h5><img alt="normal" height='40px' src={thumbupImg} />Congratulations! Everything is normal.</h5>
           }
         </div>
-        { this.state.showTenderModal &&
-        <TenderModal dataArray={this.state.causalDataArray} types={this.state.causalTypes}
-                     endTimestamp={this.state.endTimestamp}
-                     startTimestamp={this.state.startTimestamp}
-                     onClose={() => this.setState({ showTenderModal: false })}/>
+        {this.state.showTenderModal &&
+          <TenderModal
+            dataArray={this.state.causalDataArray} types={this.state.causalTypes}
+            endTimestamp={this.state.endTimestamp}
+            startTimestamp={this.state.startTimestamp}
+            onClose={() => this.setState({ showTenderModal: false })} />
         }
-        { this.state.showTakeActionModal &&
-        <TakeActionModal incident={this.state.activeIncident}
-                         projectName={this.state.projectName}
-                         actionTime={this.state.actionTime}
-                         onClose={() => this.setState({ showTakeActionModal: false })}/>
+        {this.state.showTakeActionModal &&
+          <TakeActionModal
+            incident={this.state.activeIncident}
+            projectName={this.state.projectName}
+            actionTime={this.state.actionTime}
+            onClose={() => this.setState({ showTakeActionModal: false })} />
         }
-        { this.state.showSysCall &&
-        <SysCallModal timeRanking={this.state.timeRanking} freqRanking={this.state.freqRanking}
-                      dataArray={this.state.debugData}
-                      onClose={() => this.setState({ showSysCall: false })}/>
+        {this.state.showSysCall &&
+          <SysCallModal
+            timeRanking={this.state.timeRanking} freqRanking={this.state.freqRanking}
+            dataArray={this.state.debugData}
+            onClose={() => this.setState({ showSysCall: false })} />
         }
       </div>
-    )
+    );
   }
 }
 
