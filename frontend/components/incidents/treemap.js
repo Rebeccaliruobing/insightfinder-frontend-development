@@ -392,17 +392,17 @@ class IncidentsTreeMap extends Component {
       g.append('rect').attr('class', d => `parent ${d.type}`)
         .call(rect)
         .append('title')
-        .text(d => `${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}\n${d.eventType}`);
+        .text(d => `${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${d.eventType}`);
     } else if (schema === 'cpu') {
       g.append('rect').attr('class', d => `parent ${d.type}`)
         .call(rect)
         .append('title')
-        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}\n${stats[d.name] ? `Average CPU Utilization: ${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : ''}`) : '');
+        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${stats[d.name] ? `Average CPU Utilization: ${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : ''}`) : '');
     } else if (schema === 'availability') {
       g.append('rect').attr('class', d => `parent ${d.type}`)
         .call(rect)
         .append('title')
-        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}\n${stats[d.name] ? `Average Instance Availability: ${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : ''}`) : '');
+        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${stats[d.name] ? `Average Instance Availability: ${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : ''}`) : '');
     }
 
     g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d, props));
