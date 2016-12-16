@@ -27,6 +27,7 @@ class IncidentsList extends React.Component {
       modelType: props.modelType,
       projectName: props.projectName,
       projectType: props.projectType,
+      shownMergedIncidentIds: [],
       showTenderModal: false,
       showTakeActionModal: false,
       showSysCall: false,
@@ -37,11 +38,11 @@ class IncidentsList extends React.Component {
       endTimestamp: undefined,
       activeIncident: undefined,
       actionTime: moment(),
-      angleIconStyleSelect: 'angleIconStyleStartTime',
+      angleIconStyleSelect: 'angleIconStyleId',
       angleIconStyle: {
-        angleIconStyleId: '',
+        angleIconStyleId: 'down',
         angleIconStyleSeverity: '',
-        angleIconStyleEvent: 'down',
+        angleIconStyleEvent: '',
         angleIconStyleStartTime: '',
         angleIconStyleDuration: '',
       },
@@ -125,11 +126,11 @@ class IncidentsList extends React.Component {
   }
 
   selectTab(e, tab, incidents) {
-    const angleIconStyleSelect = 'angleIconStyleStartTime';
+    const angleIconStyleSelect = 'angleIconStyleId';
     const angleIconStyle = {
-      angleIconStyleId: '',
+      angleIconStyleId: 'down',
       angleIconStyleSeverity: '',
-      angleIconStyleEvent: 'down',
+      angleIconStyleEvent: '',
       angleIconStyleStartTime: '',
       angleIconStyleDuration: '',
     };
@@ -227,34 +228,96 @@ class IncidentsList extends React.Component {
   }
 
   @autobind
+  toggleMergedIncidents(incident) {
+    return (e) => {
+      e.stopPropagation();
+      const { shownMergedIncidentIds } = this.state;
+      let ids;
+      // If any merged id exists in shownMergedIncidentIds, we need to hidden incidents.
+      if (incident._mergedIds && incident._mergedIds.length > 0) {
+        if (_.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0) {
+          ids = _.without(shownMergedIncidentIds, ...incident._mergedIds);
+        } else {
+          ids = _.concat(shownMergedIncidentIds, incident._mergedIds);
+        }
+
+        this.setState({
+          shownMergedIncidentIds: ids,
+        });
+      }
+    };
+  }
+
+  @autobind
   renderTableBody(incidents, type) {
     // The type should be 'detected' or 'predicted'.
     // TODO: predicted needs to add syscall button?
-    const { projectType } = this.state;
-    const sysCallEnabled = (projectType.toLowerCase() === 'custom');
     const self = this;
+    const { projectType, shownMergedIncidentIds, angleIconStyleSelect } = this.state;
+    const sysCallEnabled = (projectType.toLowerCase() === 'custom');
+    const needMerge = angleIconStyleSelect === 'angleIconStyleId';
+    // Get the order params and sort incidents
+    const { order, iteratees } = this.getIncidentOrderParams();
+    // The incidents is order by id by default, so we can add the merge flags
+    // before sorting.
+    if (needMerge) {
+      let mainIncident = null;
+      _.forEach(incidents, (incident) => {
+        incident._mergedIds = [];
+        incident._mergedDuration = (incident.anomalyRatio === 0 ? 0 : incident.duration);
+        if (!mainIncident) {
+          mainIncident = incident;
+        } else if (_.isEqual(mainIncident.rootCauseByInstanceJson,
+          incident.rootCauseByInstanceJson) && incident.repeatedEventFlag) {
+          // If root cause (instance, event type) are same, and has repeatedEventFlag,
+          // we need to merge it.
+          incident._mergable = true;
+          mainIncident._mergedIds.push(incident.id);
+          mainIncident._lastMergedId = incident.id;
+          mainIncident._mergedDuration += (incident.anomalyRatio === 0 ? 0 : incident.duration);
+        } else {
+          mainIncident = incident;
+        }
+      });
+    }
+
+    incidents = _.orderBy(incidents, iteratees, order);
 
     return (
       <tbody style={{ width: '100%', height: 445, overflow: 'auto', display: 'block' }}>
-        {incidents.map((incident, index) => {
+        {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
           if (incident.anomalyRatio > 0) {
             anomalyRatioString =
               `Event Anomaly Score: ${Math.round(incident.anomalyRatio * 10) / 10}\n`;
           }
+          const hidden = needMerge && incident._mergable &&
+            _.indexOf(shownMergedIncidentIds, incident.id) < 0;
+          const mergedShown = needMerge && incident._mergedIds.length > 0 &&
+            _.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0;
+          const mergedArrow = mergedShown ? (order === 'asc' ? 'down' : 'up') : 'right';
 
           return (
             <tr
-              style={{ display: 'inline-table', width: '100%' }} key={index}
+              style={{ display: hidden ? 'none' : 'inline-table', width: '100%' }} key={incident.id}
               onClick={() => this.handleIncidentSelected(incident, type)}
               className={cx({ active: incident === self.state.activeIncident })}
               title={`${anomalyRatioString}Event details: \n ${incident.rootCauseJson.rootCauseDetails}`}
             >
-              <td>{incident.id}</td>
+              <td>
+                {needMerge && incident._lastMergedId && !mergedShown ? `${incident.id}-${incident._lastMergedId}` : incident.id}
+                {needMerge && incident._lastMergedId && <i
+                  onClick={self.toggleMergedIncidents(incident)}
+                  style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
+                />}
+              </td>
               <td>{this.renderEventSeverity(incident)}</td>
               <td className="code">{moment(incident.startTimestamp).format('MM-DD HH:mm')}</td>
-              <td>{incident.anomalyRatio === 0 ? 'N/A' : `${incident.duration} min`}</td>
+              <td>
+                {!mergedShown && `${incident._mergedDuration} min`}
+                {mergedShown && (incident.anomalyRatio === 0 ? 'N/A' : `${incident.duration} min`)}
+              </td>
               <td className="code">{incident.rootCauseJson.rootCauseTypes}
                 {sysCallEnabled && incident.syscallFlag &&
                   <i className="zoom icon" onClick={this.handleLoadSysCall(incident)} />}
@@ -284,15 +347,10 @@ class IncidentsList extends React.Component {
   render() {
     const { incidents, latestTimestamp, tabStates } = this.state;
 
-    // Get the order params and sort incidents
-    const { order, iteratees } = this.getIncidentOrderParams();
-    let detectedIncidents = incidents.filter(
+    const detectedIncidents = incidents.filter(
       incident => incident.startTimestamp <= latestTimestamp);
-    detectedIncidents = _.orderBy(detectedIncidents, iteratees, order);
-
-    let predictedIncidents = incidents.filter(
+    const predictedIncidents = incidents.filter(
       incident => incident.endTimestamp > latestTimestamp);
-    predictedIncidents = _.orderBy(predictedIncidents, iteratees, order);
 
     return (
       <div>
