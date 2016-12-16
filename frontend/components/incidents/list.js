@@ -60,29 +60,31 @@ class IncidentsList extends React.Component {
     this.setIncidentsList(nextProps);
   }
 
+  @autobind
   handleLoadSysCall(activeIncident) {
-    let { projectName } = this.state;
-    let instanceId = undefined;
-    let self = this;
-    if (activeIncident) {
-      let startTimestamp = activeIncident.startTimestamp;
-      let endTimestamp = activeIncident.endTimestamp;
-      apis.postSysCallResult(projectName, startTimestamp, endTimestamp).then((resp) => {
-        console.log(resp);
-        if (resp.success) {
-          self.setState({
-            debugData: resp.data.syscallResults,
-            timeRanking: resp.data.freqFunctionList,
-            freqRanking: resp.data.timeFunctionList,
-            showSysCall: true
-          });
-        } else {
-          alert(resp.message);
-        }
-      });
-    } else {
-      alert('Cannot find incident to retrieve syscall data for.');
-    }
+    // Return funtion as the click event handler
+    return () => {
+      const { projectName } = this.state;
+      const self = this;
+      if (activeIncident) {
+        const startTimestamp = activeIncident.startTimestamp;
+        const endTimestamp = activeIncident.endTimestamp;
+        apis.postSysCallResult(projectName, startTimestamp, endTimestamp).then((resp) => {
+          if (resp.success) {
+            self.setState({
+              debugData: resp.data.syscallResults,
+              timeRanking: resp.data.freqFunctionList,
+              freqRanking: resp.data.timeFunctionList,
+              showSysCall: true,
+            });
+          } else {
+            alert(resp.message);
+          }
+        });
+      } else {
+        alert('Cannot find incident to retrieve syscall data for.');
+      }
+    };
   }
 
   @autobind
@@ -90,22 +92,6 @@ class IncidentsList extends React.Component {
     this.props.onIncidentSelected(incident, tab);
     let incidentState = { activeIncident: incident };
     this.setState(incidentState);
-  }
-
-  @autobind
-  handleProjectChartsView() {
-    const { projectName, endTime, numberOfDays, modelType } = this.state;
-    let endTimestamp = +moment(endTime);
-    if (projectName) {
-      let projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-      let projectParam = projectParams.find((p) => p.projectName == projectName);
-      let cvalueParam = projectParam ? projectParam.cvalue : "1";
-      let pvalueParam = projectParam ? projectParam.pvalue : "0.99";
-      // let modelType = (projectParam && projectParam.modelType) ? projectParam.modelType : "Holistic";
-
-      const url = `/liveMonitoring?version=2&pvalue=${pvalueParam}&cvalue=${cvalueParam}&endTimestamp=${endTimestamp}&numberOfDays=${numberOfDays}&modelType=${modelType}&projectName=${projectName}`;
-      window.open(url, '_blank');
-    }
   }
 
   handleLinkToAgentWiki() {
@@ -240,8 +226,63 @@ class IncidentsList extends React.Component {
     );
   }
 
+  @autobind
+  renderTableBody(incidents, type) {
+    // The type should be 'detected' or 'predicted'.
+    // TODO: predicted needs to add syscall button?
+    const { projectType } = this.state;
+    const sysCallEnabled = (projectType.toLowerCase() === 'custom');
+    const self = this;
+
+    return (
+      <tbody style={{ width: '100%', height: 445, overflow: 'auto', display: 'block' }}>
+        {incidents.map((incident, index) => {
+          // Display the anomaly string in title.
+          let anomalyRatioString = '';
+          if (incident.anomalyRatio > 0) {
+            anomalyRatioString =
+              `Event Anomaly Score: ${Math.round(incident.anomalyRatio * 10) / 10}\n`;
+          }
+
+          return (
+            <tr
+              style={{ display: 'inline-table', width: '100%' }} key={index}
+              onClick={() => this.handleIncidentSelected(incident, type)}
+              className={cx({ active: incident === self.state.activeIncident })}
+              title={`${anomalyRatioString}Event details: \n ${incident.rootCauseJson.rootCauseDetails}`}
+            >
+              <td>{incident.id}</td>
+              <td>{this.renderEventSeverity(incident)}</td>
+              <td className="code">{moment(incident.startTimestamp).format('MM-DD HH:mm')}</td>
+              <td>{incident.anomalyRatio === 0 ? 'N/A' : `${incident.duration} min`}</td>
+              <td className="code">{incident.rootCauseJson.rootCauseTypes}
+                {sysCallEnabled && incident.syscallFlag &&
+                  <i className="zoom icon" onClick={this.handleLoadSysCall(incident)} />}
+              </td>
+              <td>{
+                incident.anomalyRatio === 0 ?
+                  'N/A' :
+                  <Button
+                    className="blue" onClick={(e) => {
+                      e.stopPropagation();
+                      this.setState({
+                        activeIncident: incident,
+                        showTakeActionModal: true,
+                        actionTime: moment(),
+                      });
+                    }}
+                    style={{ paddingLeft: 2, paddingRight: 2 }}
+                  >Action</Button>}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    );
+  }
+
   render() {
-    const { projectType, incidents, latestTimestamp, tabStates } = this.state;
+    const { incidents, latestTimestamp, tabStates } = this.state;
 
     // Get the order params and sort incidents
     const { order, iteratees } = this.getIncidentOrderParams();
@@ -253,8 +294,6 @@ class IncidentsList extends React.Component {
       incident => incident.endTimestamp > latestTimestamp);
     predictedIncidents = _.orderBy(predictedIncidents, iteratees, order);
 
-    const sysCallEnabled = (projectType.toLowerCase() === 'custom');
-    const self = this;
     return (
       <div>
         <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
@@ -285,114 +324,20 @@ class IncidentsList extends React.Component {
           {(predictedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}
-              <tbody style={{ width: '100%', 'height': '450px', 'overflow': 'auto', 'display': 'block' }}>
-                {predictedIncidents.map(function (incident, index) {
-                  let anomalyRatioString = "";
-                  if (incident.anomalyRatio > 0) {
-                    anomalyRatioString = "Event Anomaly Score: " + (Math.round(incident.anomalyRatio * 10) / 10) + "\n";
-                  }
-                  return (
-                    <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={() => self.handleIncidentSelected(incident, 'predicted')}
-                      className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
-                      <td>{incident.id}</td>
-                      <td>
-                        {self.renderEventSeverity(incident)}
-                      </td>
-                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-                      <td>
-                        {incident.anomalyRatio == 0 ?
-                          "N/A"
-                          :
-                          incident.duration + " min"
-                        }
-                      </td>
-                      <td className="code">{incident.rootCauseJson.rootCauseTypes}</td>
-                      <td>
-                        {incident.anomalyRatio == 0 ?
-                          "N/A"
-                          :
-                          <Button className="blue" onClick={(e) => {
-                            e.stopPropagation();
-                            self.setState({
-                              activeIncident: incident,
-                              showTakeActionModal: true,
-                              actionTime: +moment(),
-                            });
-                          } }
-                            style={{ paddingLeft: 2, paddingRight: 2 }}>
-                            Action
-                        </Button>}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
+              {this.renderTableBody(predictedIncidents, 'predicted')}
             </table>
             :
-            <h5><img alt="normal" height='40px' src={thumbupImg} />Congratulations! Everything is normal in prediction.
-            </h5>
+            <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal in prediction.</h5>
           }
         </div>
-        <div className={tabStates['detected'] + ' ui tab '}>
+        <div className={`${tabStates.detected} ui tab`}>
           {(detectedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}
-              <tbody style={{ width: '100%', height: 444, overflow: 'auto', display: 'block' }}>
-                {detectedIncidents.map(function (incident, index) {
-                  let anomalyRatioString = "";
-                  if (incident.anomalyRatio > 0) {
-                    anomalyRatioString = "Event Anomaly Score: " + (Math.round(incident.anomalyRatio * 10) / 10) + "\n";
-                  }
-                  return (
-                    <tr style={{ display: 'inline-table', 'width': '100%' }} key={index}
-                      onClick={() => self.handleIncidentSelected(incident, 'detected')}
-                      className={cx({ 'active': incident === self.state.activeIncident })}
-                      title={anomalyRatioString + "Event details: \n" + incident.rootCauseJson.rootCauseDetails}>
-                      <td>
-                        {incident.id}
-                      </td>
-                      <td>
-                        {self.renderEventSeverity(incident)}
-                      </td>
-                      <td className="code">{moment(incident.startTimestamp).format("MM-DD HH:mm")}</td>
-                      <td>
-                        {incident.anomalyRatio == 0 ?
-                          "N/A"
-                          :
-                          incident.duration + " min"
-                        }
-                      </td>
-                      <td className="code">{incident.rootCauseJson.rootCauseTypes}
-                        {sysCallEnabled && incident.syscallFlag &&
-                          <i className="zoom icon" onClick={(e) => {
-                            self.handleLoadSysCall(incident)
-                          } } />}
-                      </td>
-                      <td>
-                        {incident.anomalyRatio == 0 ?
-                          "N/A"
-                          :
-                          <Button className="blue" onClick={(e) => {
-                            e.stopPropagation();
-                            self.setState({
-                              activeIncident: incident,
-                              showTakeActionModal: true,
-                              actionTime: +moment(),
-                            });
-                          } }
-                            style={{ paddingLeft: 2, paddingRight: 2 }}>
-                            Action
-                        </Button>}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
+              {this.renderTableBody(detectedIncidents, 'detected')}
             </table>
             :
-            <h5><img alt="normal" height='40px' src={thumbupImg} />Congratulations! Everything is normal.</h5>
+            <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal.</h5>
           }
         </div>
         {this.state.showTenderModal &&
@@ -400,20 +345,23 @@ class IncidentsList extends React.Component {
             dataArray={this.state.causalDataArray} types={this.state.causalTypes}
             endTimestamp={this.state.endTimestamp}
             startTimestamp={this.state.startTimestamp}
-            onClose={() => this.setState({ showTenderModal: false })} />
+            onClose={() => this.setState({ showTenderModal: false })}
+          />
         }
         {this.state.showTakeActionModal &&
           <TakeActionModal
             incident={this.state.activeIncident}
             projectName={this.state.projectName}
             actionTime={this.state.actionTime}
-            onClose={() => this.setState({ showTakeActionModal: false })} />
+            onClose={() => this.setState({ showTakeActionModal: false })}
+          />
         }
         {this.state.showSysCall &&
           <SysCallModal
             timeRanking={this.state.timeRanking} freqRanking={this.state.freqRanking}
             dataArray={this.state.debugData}
-            onClose={() => this.setState({ showSysCall: false })} />
+            onClose={() => this.setState({ showSysCall: false })}
+          />
         }
       </div>
     );
