@@ -142,7 +142,7 @@ class IncidentsList extends React.Component {
     });
     let firstIncident = undefined;
     if (incidents && incidents.length > 0) {
-      firstIncident = incidents[0];
+      firstIncident = _.orderBy(incidents, '[id]', 'desc')[0];
     }
     this.handleIncidentSelected(firstIncident, tab);
   }

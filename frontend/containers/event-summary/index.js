@@ -319,6 +319,7 @@ class EventSummary extends Component {
               <Dropdown
                 key={projectName}
                 mode="select"
+                searchable={true} 
                 value={instanceGroup}
                 onChange={this.handleInstanceGroupChange}
                 style={{ minWidth: 200 }}
