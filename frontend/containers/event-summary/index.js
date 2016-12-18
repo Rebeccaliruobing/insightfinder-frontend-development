@@ -263,18 +263,6 @@ class EventSummary extends Component {
     return timestamp<=curTimestamp;
   }
 
-  @autobind
-  feedbackData(data) {
-    if(data){
-      this.setState({
-        currentTreemapData: data,
-        selectedInstance: data.instanceName,
-        startTimestamp: data.startTimestamp,
-        endTimestamp: data.endTimestamp,
-      });
-    }
-  }
-
   getTreeMapSchemeText(scheme){
     if(scheme == 'anomaly'){
       return "Anomaly";
@@ -403,11 +391,13 @@ class EventSummary extends Component {
                     }}>
                     All Metric Chart
                   </Button>}
-                  <IncidentsTreeMap data={incidentsTreeMap} instanceMetaData={instanceMetaData} endTime={endTime} 
-                                    numberOfDays={numberOfDays} instanceStatsJson={instanceStatsMap} treeMapScheme={treeMapScheme}
-                                    treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                                    feedbackData={this.feedbackData} predictedFlag={selectedIncidentPredicted}
-                                    instanceGroup={instanceGroup} />
+                  <IncidentsTreeMap
+                    data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                    endTime={endTime} numberOfDays={numberOfDays}
+                    instanceStatsJson={instanceStatsMap}
+                    treeMapScheme={treeMapScheme}
+                    treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                    predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup} />
                 </div>
               </div>
             </div>

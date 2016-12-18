@@ -10,22 +10,22 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
   // If no container, instance => metric.
 
   const root = [];
-  const rootCauseByInstanceJson = incident ? (incident['rootCauseByInstanceJson'] || {}) : {};
-  const eventStartTime = incident ? incident['startTimestamp'] : null;
-  const eventEndTime = incident ? incident['endTimestamp'] : null;
+  const rootCauseByInstanceJson = incident ? (incident.rootCauseByInstanceJson || {}) : {};
+  const eventStartTime = incident ? incident.startTimestamp : null;
+  const eventEndTime = incident ? incident.endTimestamp : null;
 
   // FIXME: instances, metrics is a string instead of json array.
-  const insts = _.filter((statistics['instances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
-  const newInsts = _.filter((statistics['newInstances'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
-  const metrics = _.filter((statistics['metrics'] || '').replace(/[\[\]]/g, '').split(','), s => !!s);
-  const startTimestamp = statistics['startTimestamp'];
-  const endTimestamp = statistics['endTimestamp'];
-  const maxAnomalyRatio = statistics['maxAnomalyRatio'];
-  const minAnomalyRatio = statistics['minAnomalyRatio'];
-  const instanceTypeMap = statistics['instanceTypeJson'] || {};
+  const insts = _.filter((statistics.instances || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const newInsts = _.filter((statistics.newInstances || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const metrics = _.filter((statistics.metrics || '').replace(/[\[\]]/g, '').split(','), s => !!s);
+  const startTimestamp = statistics.startTimestamp;
+  const endTimestamp = statistics.endTimestamp;
+  const maxAnomalyRatio = statistics.maxAnomalyRatio;
+  const minAnomalyRatio = statistics.minAnomalyRatio;
+  const instanceTypeMap = statistics.instanceTypeJson || {};
+  const typeMetricMap = statistics.typeMetricMap || {};
 
   _.forEach(insts, (inst) => {
-
     inst = inst.trim();
     const anomalies = anomaliesList[inst] || {};
 
@@ -34,12 +34,18 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     const iname = isContainer ? names[1] : names[0];
     const cname = isContainer ? names[0] : '';
 
-    const children = _.map(metrics, (m) => {
+    const instanceType = instanceTypeMap[inst];
+    let instanceMetrics = metrics;
+    if (instanceType && typeMetricMap[instanceType]) {
+      instanceMetrics = typeMetricMap[instanceType] || [];
+    }
+
+    const children = _.map(instanceMetrics, (m) => {
       const mn = m.trim();
       const val = parseFloat(anomalies[mn]);
-      let eventType1 = rootCauseByInstanceJson[mn] ? rootCauseByInstanceJson[mn]+"":"";
-      let pos1 = eventType1.indexOf(":");
-      if(pos1>0){
+      let eventType1 = rootCauseByInstanceJson[mn] || '';
+      const pos1 = eventType1.indexOf(':');
+      if (pos1 > 0) {
         // remove repeated instance name
         eventType1 = eventType1.slice(0, pos1);
       }
@@ -48,7 +54,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         id: mn,
         type: 'metric',
         active: true,
-        projectName: projectName,
+        projectName,
         instanceName: inst,
         instanceType: instanceTypeMap[inst],
         name: mn,
@@ -62,9 +68,9 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     });
 
     if (isContainer) {
-      let eventType2 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
-      let pos2 = eventType2.indexOf(":");
-      if(pos2>0){
+      let eventType2 = rootCauseByInstanceJson[inst] || '';
+      const pos2 = eventType2.indexOf(':');
+      if (pos2 > 0) {
         // remove repeated instance name
         eventType2 = eventType2.slice(0, pos2);
       }
@@ -74,28 +80,28 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         score: 0,
         eventType: eventType2,
         active: !_.find(newInsts, i => i === inst),
-        projectName: projectName,
+        projectName,
         instanceName: inst,
-        instanceType: instanceTypeMap[inst],
+        instanceType,
         value: 1,
         children,
       };
 
       // Find the instance by name, and add container to children.
-      let instance = _.find(root, o => o.name === iname);
+      const instance = _.find(root, o => o.name === iname);
       if (!instance) {
-        let eventType3 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
-        let pos3 = eventType3.indexOf(":");
-        if(pos3>0){
+        let eventType3 = rootCauseByInstanceJson[inst] || '';
+        const pos3 = eventType3.indexOf(':');
+        if (pos3 > 0) {
           // remove repeated instance name
           eventType3 = eventType3.slice(0, pos3);
         }
         root.push({
           type: 'instance',
           name: iname,
-          projectName: projectName,
+          projectName,
           instanceName: inst,
-          instanceType: instanceTypeMap[inst],
+          instanceType,
           containers: 1,
           score: 0,
           eventType: eventType3,
@@ -108,18 +114,18 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         instance.children.push(container);
       }
     } else {
-      let eventType4 = rootCauseByInstanceJson[inst]?rootCauseByInstanceJson[inst]+"":"";
-      let pos4 = eventType4.indexOf(":");
-      if(pos4>0){
+      let eventType4 = rootCauseByInstanceJson[inst] || '';
+      const pos4 = eventType4.indexOf(':');
+      if (pos4 > 0) {
         // remove repeated instance name
         eventType4 = eventType4.slice(0, pos4);
       }
       root.push({
         containers: 0,
         type: 'instance',
-        projectName: projectName,
+        projectName,
         instanceName: inst,
-        instanceType: instanceTypeMap[inst],
+        instanceType,
         active: !_.find(newInsts, i => i === inst),
         score: 0,
         eventType: eventType4,
@@ -134,9 +140,9 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     type: 'project',
     name: incidentName || projectName,
     score: 0,
-        eventType:"",
+    eventType: '',
     children: root,
-    projectName: projectName,
+    projectName,
     startTimestamp,
     endTimestamp,
     maxAnomalyRatio,
