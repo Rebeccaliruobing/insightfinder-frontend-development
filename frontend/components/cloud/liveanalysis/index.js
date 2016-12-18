@@ -42,14 +42,16 @@ class LiveAnalysisCharts extends React.Component {
     };
 
     constructor(props) {
-
         super(props);
-
         this.dp = null;
+        let initView = 'grid';
+        if(props && props.predictedFlag && props.predictedFlag == "true"){
+          initView = 'list';
+        }
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            view: (store.get(DefaultView, initView)).toLowerCase(),
             columns: (store.get(GridColumns, 'four')).toLowerCase(),
             showSummaryFlag: (store.get(ShowSummaryFlag, 'no')),
             selectedGroupId: undefined,
