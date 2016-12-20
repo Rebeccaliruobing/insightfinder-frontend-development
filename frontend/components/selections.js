@@ -293,6 +293,24 @@ class ModelType extends React.Component{
   }
 };
 
+// <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
+class BenchmarkModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">IF Anomaly Detection</div>
+          <div className="item" data-value="DBScan">Clustering (DBScan)</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
 class FileModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -552,6 +570,7 @@ export {
   InstanceProjectSelection,
   LogFileReplayProjectSelection,
   ModelType,
+  BenchmarkModelType,
   FileModelType,
   LogModelType,
   ModelTypeSimple,

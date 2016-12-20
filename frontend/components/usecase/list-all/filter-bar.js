@@ -5,6 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
 import {
   ModelType,
+  BenchmarkModelType,
   AnomalyThreshold,
   DurationThreshold,
 } from '../../selections';
@@ -35,10 +36,10 @@ export default  class FilterBar extends Component {
       modelTypeText: "Holistic",
       modelTypeTextMap: {}
     };
-    this.state.modelTypeTextMap["Holistic"]= "Holistic";
-    this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
-    this.state.modelTypeTextMap["Split"]= "Split";
-    this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
+    this.state.modelTypeTextMap["Holistic"]= "IF Anomaly Detection";
+    // this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
+    // this.state.modelTypeTextMap["Split"]= "Split";
+    // this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
     this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
     this.handleRefresh = this.handleRefresh.bind(this);
   }
@@ -214,7 +215,7 @@ export default  class FilterBar extends Component {
 
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>Model Type</label>
-              <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
+              <BenchmarkModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
             </div>
             {modelType == 'DBScan'?
               <div className="field" style={{'width': '100%','marginBottom': '16px'}}>

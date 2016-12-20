@@ -471,18 +471,18 @@ export default class ThresholdSettings extends React.Component {
           </div>
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
+              {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
+                                    onClick={(e) => this.selectTab0(e, 'episodeword')}>Episode and Word Selection</a>}
               {!isLogProject && <a className={tabStates0['learning'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
-              <a className={tabStates0['sharing'] + ' item'}
-                 onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
+                                    onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
+              <a className={tabStates0['sharing'] + ' item'} 
+                                    onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
+                                    onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
-              {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
-                                  onClick={(e) => this.selectTab0(e, 'episodeword')}>Log Analysis</a>}
+                                    onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
             </div>
             <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
                  style={{ 'paddingTop': '10px' }}>
@@ -522,7 +522,7 @@ export default class ThresholdSettings extends React.Component {
                 </div>
               </div>}
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
-                <h3>Real-time Account Alerts</h3>
+                <h3>Dashboard Alert</h3>
 								<p>
 									This setting controls the sensitivity with which  
 									InsightFinder will detect and create anomaly events and 
@@ -538,7 +538,7 @@ export default class ThresholdSettings extends React.Component {
                   <DurationThreshold key={data.projectName} value={data.cvalue}
                                      onChange={this.handleValueChange('cvalue')}/>
                 </div>
-                <h3>Notifications</h3>
+                <h3>Email Alert</h3>
 								<p>
 									This setting controls when InsightFinder will notify you via
 									email and any configured External Service.
@@ -698,8 +698,7 @@ export default class ThresholdSettings extends React.Component {
                 <Button className="blue" onClick={this.handleSaveGroupingRules}>Update Instance
                   Grouping</Button>
               </div>}
-              {isLogProject && <div className={tabStates0['episodeword'] + ' ui tab'} style={{ 'paddingTop': '40px' }}>
-                <h3>Episode and Word Selection</h3>
+              {isLogProject && <div className={tabStates0['episodeword'] + ' ui tab'} style={{ 'paddingTop': '10px' }}>
                 <Button className={indexLoading ? "loading blue" : "blue"}
                         onClick={this.handleSaveMapArrSetting.bind(this)}> Submit</Button>
                 <div className="ui pointing secondary menu">
