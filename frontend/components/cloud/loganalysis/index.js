@@ -7,7 +7,7 @@ import SettingModal from './settingModal';
 import "./logevent.less";
 import {autobind} from 'core-decorators';
 
-import {DataSummaryChart} from '../../share/charts';
+import {DataSummaryChart, DataChart} from '../../share/charts';
 
 class EventTableGroup extends React.Component {
 
@@ -134,8 +134,9 @@ class LogAnalysisCharts extends React.Component {
       selectedAnnotation: null,
       showSettingModal: false,
       tabStates: {
-        event: 'active',
-        vector: ''
+        event: '',
+        anomaly: '',
+        freq: 'active',
       }
     };
   }
@@ -153,6 +154,7 @@ class LogAnalysisCharts extends React.Component {
       this.dp.getSummaryData();
       this.dp.getMetricsData();
       this.dp.parseLogAnalysisData();
+      this.dp.getFreqVectorData();
       this.calculateEventTableData();
 
       // Sort the grouped data
@@ -430,6 +432,128 @@ class LogAnalysisCharts extends React.Component {
       )
     }
   }
+  
+  getFreqVectorAnnotations(top1FreqData, top1NidData, label){
+    return _.map(top1FreqData, freq => {
+      let ts = +moment(freq[0]);
+      let nid = top1NidData[ts];
+      return {
+        series: label,
+        x: ts.valueOf(),
+        shortText: (nid==null)?'':(nid),
+        text: (nid==null)?'':('Neuron Id '+nid),
+      };
+    });
+  }
+
+// .sort(function (a, b) {
+//               // reverse ordering
+//               let aid = parseInt(a.count);
+//               let bid = parseInt(b.count);
+//               if (aid < bid) {
+//                 return 1;
+//               } else if (aid > bid) {
+//                 return -1;
+//               } else {
+//                 return 0;
+//               }
+//             })
+        // <div>
+        //   <table className="vector-table">
+        //     <tbody>
+        //     <tr>
+        //       <td>Word</td>
+        //       <td>Count</td>
+        //     </tr>
+        //     {topKFreqData.map((topKFreqItem, vNo) => {
+        //       let timestamp = moment(topKFreqItem.timestamp).format("YYYY-MM-DD HH:mm");
+        //       let topKFreqArr = topKFreqItem.topKFreqArr;
+        //       let topKFreqString = "";
+        //       _.each(topKFreqArr, function (topKFreq, fNo) {
+        //         if(fNo>0){
+        //           topKFreqString += ", ";
+        //         }
+        //         topKFreqString += "Pattern #"+topKFreq.nid+":"+topKFreq.freq;
+        //       });
+        //       let cleanWord = word.pattern.replace(/"/g, "");
+        //       return (
+        //         <tr key={i}>
+        //           <td>{timestamp}</td>
+        //           <td>{topKFreqString}</td>
+        //         </tr>
+        //       )
+        //     })}
+        //     </tbody>
+        //   </table>
+        // </div>
+        
+  renderFreqCharts(){
+    if (!this.dp) return;
+    let { totalFreqData, topKFreqData, top1FreqData, top2FreqData, top3FreqData, top1NidData, 
+      top2NidData, top3NidData} = this.dp.freqVectorData;
+    let emptyAnnotations = [];
+
+    let totalFreqChartData = {
+      sdata: totalFreqData,
+      sname:['Time Window Start','Total Frequency'],
+    };
+
+    let top1FreqChartData = {
+      sdata: top1FreqData,
+      sname:['Time Window Start','Top 1 Frequency'],
+    };
+
+    let top2FreqChartData = {
+      sdata: top2FreqData,
+      sname:['Time Window Start','Top 2 Frequency'],
+    };
+
+    let top3FreqChartData = {
+      sdata: top3FreqData,
+      sname:['Time Window Start','Top 3 Frequency'],
+    };
+
+    let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
+    let top2Annotations = this.getFreqVectorAnnotations(top2FreqData,top2NidData,'Top 2 Frequency');
+    let top3Annotations = this.getFreqVectorAnnotations(top3FreqData,top3NidData,'Top 3 Frequency');
+
+    return (
+      <div>
+        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+          <h4 className="ui header">Total Frequency</h4>
+          <DataChart
+            chartType='bar'
+            data={totalFreqChartData}
+            annotations={emptyAnnotations}
+          />
+        </div>
+        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+          <h4 className="ui header">Top 1 Frequency</h4>
+          <DataChart
+            chartType='bar'
+            data={top1FreqChartData}
+            annotations={top1Annotations}
+          />
+        </div>
+        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+          <h4 className="ui header">Top 2 Frequency</h4>
+          <DataChart
+            chartType='bar'
+            data={top2FreqChartData}
+            annotations={top2Annotations}
+          />
+        </div>
+        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+          <h4 className="ui header">Top 3 Frequency</h4>
+          <DataChart
+            chartType='bar'
+            data={top3FreqChartData}
+            annotations={top3Annotations}
+          />
+        </div>
+      </div>
+    )
+  }
 
   renderEventTable() {
 
@@ -484,6 +608,8 @@ class LogAnalysisCharts extends React.Component {
                onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
             <a className={tabStates['anomaly'] + ' item'}
                onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
+            <a className={tabStates['freq'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'freq')}>Frequency</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (
@@ -493,6 +619,11 @@ class LogAnalysisCharts extends React.Component {
           <div className={tabStates['anomaly'] + ' ui tab '}>
             {tabStates['anomaly'] === 'active' ? (
               self.renderAnomalyTable()
+            ) : null}
+          </div>
+          <div className={tabStates['freq'] + ' ui tab '}>
+            {tabStates['freq'] === 'active' ? (
+              self.renderFreqCharts()
             ) : null}
           </div>
         </div>

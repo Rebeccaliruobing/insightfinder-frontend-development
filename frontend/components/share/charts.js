@@ -128,11 +128,12 @@ export class DataChart extends React.Component {
   }
 
   render() {
-    const { data, enableAnnotations, enableTriangleHighlight, chartType,
+    let { data, enableAnnotations, enableTriangleHighlight, chartType,
       onDateWindowChange, dateWindow,latestDataTimestamp,
-      eventEndTime, eventStartTime, 
+      eventEndTime, eventStartTime, annotations,
     } = this.props;
-    const annotations = this.setWeekdaysForBarChar(data);
+    const dowAnnotations = this.setWeekdaysForBarChar(data);
+    annotations = annotations || dowAnnotations;
     const listenDrawCallback = !!onDateWindowChange;
     return (
       <Dygraph

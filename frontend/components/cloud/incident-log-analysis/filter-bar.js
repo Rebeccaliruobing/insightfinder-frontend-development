@@ -409,8 +409,8 @@ export default  class FilterBar extends Component {
                 let medstr = med.format("YYYY-MM-DD HH:mm");
                 let recsuffix = recorded?"(recorded)":"(manual)";
                 let selected = incident === selectedIncident;
-                let tooltipcontent = "Incident: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
-                  +medstr+"], "+modelType+" "+recsuffix;
+                let tooltipcontent = "Log: ["+isdstr+", "+iedstr+"], model: ["+msdstr+", "
+                  +medstr+"] ";
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className={"item " + (selected ? 'selected' : '')}
@@ -420,7 +420,7 @@ export default  class FilterBar extends Component {
                       <a className="header padding5 incident-item"
                          title={tooltipcontent}
                          style={{'minWidth': '574px', paddingLeft: 10}}>
-                        Incident: [{isdstr}, {iedstr}] {recsuffix}
+                        Log: [{isdstr}, {iedstr}] 
                       </a>
                     </div>
                     <Button className="ui mini red button" style={{'top': index==0?'1px':'5px','position': 'absolute','right': 0}} onClick={()=>self.handleRemoveRow(incident)}>Remove</Button>

@@ -628,6 +628,68 @@ class DataParser {
     return this.summaryData;
   }
 
+  getFreqVectorData(){
+    if (this.freqVectorData) return this.freqVectorData;
+    // totalFreqData, topKFreqData
+    let freqVectorArr = this.data['freqVectorArr'];
+    let totalFreqData = [];
+    let top1FreqData = [];
+    let top2FreqData = [];
+    let top3FreqData = [];
+    let top1NidData = {};
+    let top2NidData = {};
+    let top3NidData = {};
+    let topKFreqData = [];
+    _.each(freqVectorArr, function (freqVector, vNo) {
+      let timestamp = freqVector['timestamp']
+      let ts = new Date(timestamp);
+      totalFreqData.push([ts, freqVector['totalFreq']]);
+
+      let topKFreqString = freqVector['topKFreqString'];
+      let items = topKFreqString.split(',');
+      let topKFreqArr = [];
+      // "1:2,408:1,418:1"
+      _.each(items, function (item, iNo) {
+        let parts = item.split(":");
+        let freq = 0;
+        let nid = '';
+        if(parts.length>1){ 
+          freq = parseInt(parts[1]);
+          nid = parts[0];
+        }
+        if(iNo == 0){
+          top1FreqData.push([ts, freq]);
+          top1NidData[timestamp] = nid;
+        } else if(iNo == 1){
+          top2FreqData.push([ts, freq]);
+          top2NidData[timestamp] = nid;
+        } else if(iNo == 2){
+          top3FreqData.push([ts, freq]);
+          top3NidData[timestamp] = nid;
+        }
+        topKFreqArr.push({
+          nid,
+          freq,
+        });
+      });
+      topKFreqData.push({
+        timestamp,
+        topKFreqArr,
+      });
+    });
+
+    this.freqVectorData = {
+      totalFreqData,
+      topKFreqData,
+      top1FreqData,
+      top2FreqData,
+      top3FreqData,
+      top1NidData,
+      top2NidData,
+      top3NidData
+    };
+  }
+
   getGroupsData() {
 
     if (this.groupsData) return this.groupsData;
