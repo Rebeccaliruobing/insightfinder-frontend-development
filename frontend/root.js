@@ -289,7 +289,7 @@ const routes = (
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
     <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis">
-      <IndexRedirect to="frequency" />
+      <IndexRoute component={LogAnalysisCharts} />
       <Route path="clustering" component={LogAnalysisClusteringResult} />
       <Route path="events" component={LogAnalysisEvents} />
       <Route path="frequency" component={LogAnalysisFrequency} />
@@ -300,6 +300,7 @@ const routes = (
   </Router>
 );
 
+      // <IndexRedirect to="frequency" />
 
 class AppRoute extends React.Component {
   constructor(props) {

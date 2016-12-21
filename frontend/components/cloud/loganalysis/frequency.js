@@ -151,10 +151,6 @@ class LogAnalysisFrequency extends React.Component {
 
         // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
         // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
-        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-        groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
-        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-        groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
         groupData.data = [[timestamp, event.rawData]];
         eventTableData.push(groupData);
       } else {
@@ -183,68 +179,39 @@ class LogAnalysisFrequency extends React.Component {
         
   renderFreqCharts(){
     if (!this.dp) return;
-    let { totalFreqData, topKFreqData, top1FreqData, top2FreqData, top3FreqData, top1NidData, 
-      top2NidData, top3NidData} = this.dp.freqVectorData;
+    let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
     let emptyAnnotations = [];
-
     let totalFreqChartData = {
       sdata: totalFreqData,
-      sname:['Time Window Start','Total Frequency'],
+      sname: ['Time Window Start','Total Frequency'],
     };
 
-    let top1FreqChartData = {
-      sdata: top1FreqData,
-      sname:['Time Window Start','Top 1 Frequency'],
-    };
-
-    let top2FreqChartData = {
-      sdata: top2FreqData,
-      sname:['Time Window Start','Top 2 Frequency'],
-    };
-
-    let top3FreqChartData = {
-      sdata: top3FreqData,
-      sname:['Time Window Start','Top 3 Frequency'],
-    };
-
-    let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
-    let top2Annotations = this.getFreqVectorAnnotations(top2FreqData,top2NidData,'Top 2 Frequency');
-    let top3Annotations = this.getFreqVectorAnnotations(top3FreqData,top3NidData,'Top 3 Frequency');
-
+    let nonZeroFreqChartDatas = [];
+    for (var colName in nonZeroFreqVectors) {
+      let nonZeroFreqChartData = {
+        sdata: nonZeroFreqVectors[colName],
+        sname: ['Time Window Start', colName],
+      };
+      nonZeroFreqChartDatas.push(nonZeroFreqChartData);
+    }
+    
     return (
       <div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Total Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={totalFreqChartData}
-            annotations={emptyAnnotations}
-          />
-        </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 1 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top1FreqChartData}
-            annotations={top1Annotations}
-          />
-        </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 2 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top2FreqChartData}
-            annotations={top2Annotations}
-          />
-        </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 3 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top3FreqChartData}
-            annotations={top3Annotations}
-          />
-        </div>
+        {nonZeroFreqChartDatas && 
+          nonZeroFreqChartDatas.map((nonZeroFreqChartData, idx) => {
+            let title = nonZeroFreqChartData.sname[1];
+            return (
+              <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+                <h4 className="ui header">{title}</h4>
+                <DataChart
+                  chartType='bar'
+                  data={nonZeroFreqChartData}
+                  annotations={emptyAnnotations}
+                />
+              </div>
+            )
+          })
+        }
       </div>
     )
   }

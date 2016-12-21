@@ -76,6 +76,7 @@ class EventTableGroup extends React.Component {
       <tbody>
       <tr key="0">
         <td rowSpan={group.rowSpan}>
+          Pattern {group.nid} <br />
           Number of events: {group.nEvents} <br />
           {topKWords.length > 0 ? "Top words: " : ""}
           {
@@ -232,6 +233,7 @@ class LogAnalysisClusteringResult extends React.Component {
         groupData = {};
         let iGroup = neuronIdList.indexOf(event.nid) + 1;
         groupData.iGroup = iGroup;
+        groupData.nid = event.nid;
         groupData.rowSpan = neuronValue[showNumber];
         groupData.nEvents = neuronValue[iGroup - 1];
 

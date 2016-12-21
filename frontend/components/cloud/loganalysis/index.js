@@ -77,6 +77,7 @@ class EventTableGroup extends React.Component {
       <tbody>
       <tr key="0">
         <td rowSpan={group.rowSpan}>
+          Pattern {group.nid} <br />
           Number of events: {group.nEvents} <br />
           {topKWords.length > 0 ? "Top words: " : ""}
           {
@@ -238,6 +239,7 @@ class LogAnalysisCharts extends React.Component {
       if (showNumber != -1) {
         groupData = {};
         let iGroup = neuronIdList.indexOf(event.nid) + 1;
+        groupData.nid = event.nid;
         groupData.iGroup = iGroup;
         groupData.rowSpan = neuronValue[showNumber];
         groupData.nEvents = neuronValue[iGroup - 1];
@@ -498,31 +500,16 @@ class LogAnalysisCharts extends React.Component {
     for (var colName in nonZeroFreqVectors) {
       let nonZeroFreqChartData = {
         sdata: nonZeroFreqVectors[colName],
-        sname: ['Time Window Start',],
+        sname: ['Time Window Start', colName],
       };
       nonZeroFreqChartDatas.push(nonZeroFreqChartData);
     }
-
-
-    // let top1FreqChartData = {
-    //   sdata: top1FreqData,
-    //   sname:['Time Window Start','Top 1 Frequency'],
-    // };
-    // let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
-
+    
     return (
       <div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Total Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={totalFreqChartData}
-            annotations={emptyAnnotations}
-          />
-        </div>
         {nonZeroFreqChartDatas && 
           nonZeroFreqChartDatas.map((nonZeroFreqChartData, idx) => {
-            let title = nonZeroFreqChartData.sname;
+            let title = nonZeroFreqChartData.sname[1];
             return (
               <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
                 <h4 className="ui header">{title}</h4>
@@ -538,6 +525,8 @@ class LogAnalysisCharts extends React.Component {
       </div>
     )
   }
+
+        
 
   renderEventTable() {
 
