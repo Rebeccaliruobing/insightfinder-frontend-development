@@ -486,36 +486,31 @@ class LogAnalysisCharts extends React.Component {
         //     </tbody>
         //   </table>
         // </div>
-        
+
   renderFreqCharts(){
     if (!this.dp) return;
-    let { totalFreqData, topKFreqData, top1FreqData, top2FreqData, top3FreqData, top1NidData, 
-      top2NidData, top3NidData} = this.dp.freqVectorData;
+    let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
     let emptyAnnotations = [];
-
     let totalFreqChartData = {
       sdata: totalFreqData,
-      sname:['Time Window Start','Total Frequency'],
+      sname: ['Time Window Start','Total Frequency'],
     };
 
-    let top1FreqChartData = {
-      sdata: top1FreqData,
-      sname:['Time Window Start','Top 1 Frequency'],
-    };
+    let nonZeroFreqChartDatas = [];
+    for (var colName in nonZeroFreqVectors) {
+      let nonZeroFreqChartData = {
+        sdata: nonZeroFreqVectors[colName],
+        sname: ['Time Window Start',],
+      };
+      nonZeroFreqChartDatas.push(nonZeroFreqChartData);
+    }
 
-    let top2FreqChartData = {
-      sdata: top2FreqData,
-      sname:['Time Window Start','Top 2 Frequency'],
-    };
 
-    let top3FreqChartData = {
-      sdata: top3FreqData,
-      sname:['Time Window Start','Top 3 Frequency'],
-    };
-
-    let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
-    let top2Annotations = this.getFreqVectorAnnotations(top2FreqData,top2NidData,'Top 2 Frequency');
-    let top3Annotations = this.getFreqVectorAnnotations(top3FreqData,top3NidData,'Top 3 Frequency');
+    // let top1FreqChartData = {
+    //   sdata: top1FreqData,
+    //   sname:['Time Window Start','Top 1 Frequency'],
+    // };
+    // let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
 
     return (
       <div>
@@ -527,30 +522,21 @@ class LogAnalysisCharts extends React.Component {
             annotations={emptyAnnotations}
           />
         </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 1 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top1FreqChartData}
-            annotations={top1Annotations}
-          />
-        </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 2 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top2FreqChartData}
-            annotations={top2Annotations}
-          />
-        </div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Top 3 Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={top3FreqChartData}
-            annotations={top3Annotations}
-          />
-        </div>
+        {nonZeroFreqChartDatas && 
+          nonZeroFreqChartDatas.map((nonZeroFreqChartData, idx) => {
+            let title = nonZeroFreqChartData.sname;
+            return (
+              <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+                <h4 className="ui header">{title}</h4>
+                <DataChart
+                  chartType='bar'
+                  data={nonZeroFreqChartData}
+                  annotations={emptyAnnotations}
+                />
+              </div>
+            )
+          })
+        }
       </div>
     )
   }
