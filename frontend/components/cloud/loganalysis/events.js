@@ -1,106 +1,11 @@
 import React from 'react';
 import moment from 'moment';
 import shallowCompare from 'react-addons-shallow-compare';
-import { autobind } from 'core-decorators';
-import { Console, Button } from '../../../artui/react';
+import { Console, Button, Link } from '../../../artui/react';
 import DataParser from '../dataparser';
-import { DataChart } from '../../share/charts';
 import './logevent.less';
 
-class EventTableGroup extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedWords: '',
-    };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
-  }
-
-  parseTopWords(wordsStr) {
-    let ret = [];
-    let words = wordsStr ? wordsStr.split(',') : [];
-    _.forEach(words, (w_str) => {
-      let match = w_str.match(/'(.*)'.*\((\d*)\)*/);
-      // The second and third match contains the words and count.
-      if (match && match.length >= 3) {
-        ret.push([match[1], match[2]]);
-      }
-    });
-
-    return ret;
-  }
-
-  @autobind
-  handleHighlight(word) {
-    return () => {
-      const current = this.state.selectedWords;
-      this.setState({
-        selectedWords: word === current ? '' : word,
-      });
-    }
-  }
-
-  @autobind
-  highlightKWord(rawData) {
-    const word = this.state.selectedWords;
-    if (!!word) {
-      var regex = new RegExp( '\\b(' + word + ')\\b', 'mgi' );
-      return rawData.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    return rawData;
-  }
-
-  render() {
-    let group = this.props.groupData;
-    let data = group.data;
-    let rows = [];
-    let topKEpisodes = group.topKEpisodes.length > 0
-      ? "Top frequent episodes: " + group.topKEpisodes : "";
-
-    let topKWords = this.parseTopWords(group.topKWords);
-
-    for (let i = 1; i < data.length; ++i) {
-      let timestamp = data[i][0];
-      let rawData = data[i][1];
-      rows.push((<tr key={i}>
-        <td>{timestamp}</td>
-        <td dangerouslySetInnerHTML={{__html: this.highlightKWord(rawData)}} />
-      </tr>));
-    }
-
-    return (
-      <tbody>
-      <tr key="0">
-        <td rowSpan={group.rowSpan}>
-          Number of events: {group.nEvents} <br />
-          {topKWords.length > 0 ? "Top words: " : ""}
-          {
-            _.map(topKWords, (kword, index) => {
-              const word = kword[0];
-              const count = kword[1];
-              return <span style={{cursor: 'pointer', color: 'blue'}}
-                key={index}
-                onClick={this.handleHighlight(word)}>'{word}'({count}),</span>
-            })
-          }
-          <br />
-          {topKEpisodes}
-        </td>
-        <td>{data[0][0]}</td>
-        <td dangerouslySetInnerHTML={{__html: this.highlightKWord(data[0][1])}} />
-      </tr>
-      {rows}
-      </tbody>
-    );
-  }
-}
-
-class LogAnalysisCharts extends React.Component {
+class LogAnalysisEvents extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.object
@@ -116,8 +21,7 @@ class LogAnalysisCharts extends React.Component {
   static defaultProps = {
     loading: true,
     enablePublish: false,
-    onRefresh: () => {
-    }
+    onRefresh: () => {},
   };
 
   constructor(props) {
@@ -131,11 +35,6 @@ class LogAnalysisCharts extends React.Component {
       summarySelected: false,
       selectedAnnotation: null,
       showSettingModal: false,
-      tabStates: {
-        event: '',
-        anomaly: '',
-        freq: 'active',
-      }
     };
   }
 
@@ -152,11 +51,11 @@ class LogAnalysisCharts extends React.Component {
       this.dp.getSummaryData();
       this.dp.getMetricsData();
       this.dp.parseLogAnalysisData();
-      this.dp.getFreqVectorData();
+      // this.dp.getFreqVectorData();
       this.calculateEventTableData();
 
       // Sort the grouped data
-      this.summary = this.dp.summaryData;
+      // this.summary = this.dp.summaryData;
       this._data = data;
     }
   }
@@ -259,45 +158,6 @@ class LogAnalysisCharts extends React.Component {
     this.logEventArr = logEventArr;
     this.neuronValue = neuronValue;
     this.eventTableData = eventTableData;
-  }
-
-  renderWordCountTable() {
-    if (!this.dp) return;
-    let wordCountArr = this.dp.wordCountArr;
-    if (wordCountArr) {
-      return (
-        <div>
-          <table className="vector-table">
-            <tbody>
-            <tr>
-              <td>Word</td>
-              <td>Count</td>
-            </tr>
-            {wordCountArr.sort(function (a, b) {
-              // reverse ordering
-              let aid = parseInt(a.count);
-              let bid = parseInt(b.count);
-              if (aid < bid) {
-                return 1;
-              } else if (aid > bid) {
-                return -1;
-              } else {
-                return 0;
-              }
-            }).map((word, i) => {
-              let cleanWord = word.pattern.replace(/"/g, "");
-              return (
-                <tr key={i}>
-                  <td>{cleanWord}</td>
-                  <td>{word.count}</td>
-                </tr>
-              )
-            })}
-            </tbody>
-          </table>
-        </div>
-      )
-    }
   }
 
   renderEpisodeMapTable() {
@@ -430,185 +290,39 @@ class LogAnalysisCharts extends React.Component {
       )
     }
   }
-  
-  getFreqVectorAnnotations(top1FreqData, top1NidData, label){
-    return _.map(top1FreqData, freq => {
-      let ts = +moment(freq[0]);
-      let nid = top1NidData[ts];
-      return {
-        series: label,
-        x: ts.valueOf(),
-        shortText: (nid==null)?'':(nid),
-        text: (nid==null)?'':('Neuron Id '+nid),
-      };
-    });
-  }
-
-// .sort(function (a, b) {
-//               // reverse ordering
-//               let aid = parseInt(a.count);
-//               let bid = parseInt(b.count);
-//               if (aid < bid) {
-//                 return 1;
-//               } else if (aid > bid) {
-//                 return -1;
-//               } else {
-//                 return 0;
-//               }
-//             })
-        // <div>
-        //   <table className="vector-table">
-        //     <tbody>
-        //     <tr>
-        //       <td>Word</td>
-        //       <td>Count</td>
-        //     </tr>
-        //     {topKFreqData.map((topKFreqItem, vNo) => {
-        //       let timestamp = moment(topKFreqItem.timestamp).format("YYYY-MM-DD HH:mm");
-        //       let topKFreqArr = topKFreqItem.topKFreqArr;
-        //       let topKFreqString = "";
-        //       _.each(topKFreqArr, function (topKFreq, fNo) {
-        //         if(fNo>0){
-        //           topKFreqString += ", ";
-        //         }
-        //         topKFreqString += "Pattern #"+topKFreq.nid+":"+topKFreq.freq;
-        //       });
-        //       let cleanWord = word.pattern.replace(/"/g, "");
-        //       return (
-        //         <tr key={i}>
-        //           <td>{timestamp}</td>
-        //           <td>{topKFreqString}</td>
-        //         </tr>
-        //       )
-        //     })}
-        //     </tbody>
-        //   </table>
-        // </div>
-
-  renderFreqCharts(){
-    if (!this.dp) return;
-    let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
-    let emptyAnnotations = [];
-    let totalFreqChartData = {
-      sdata: totalFreqData,
-      sname: ['Time Window Start','Total Frequency'],
-    };
-
-    let nonZeroFreqChartDatas = [];
-    for (var colName in nonZeroFreqVectors) {
-      let nonZeroFreqChartData = {
-        sdata: nonZeroFreqVectors[colName],
-        sname: ['Time Window Start',],
-      };
-      nonZeroFreqChartDatas.push(nonZeroFreqChartData);
-    }
-
-
-    // let top1FreqChartData = {
-    //   sdata: top1FreqData,
-    //   sname:['Time Window Start','Top 1 Frequency'],
-    // };
-    // let top1Annotations = this.getFreqVectorAnnotations(top1FreqData,top1NidData,'Top 1 Frequency');
-
-    return (
-      <div>
-        <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-          <h4 className="ui header">Total Frequency</h4>
-          <DataChart
-            chartType='bar'
-            data={totalFreqChartData}
-            annotations={emptyAnnotations}
-          />
-        </div>
-        {nonZeroFreqChartDatas && 
-          nonZeroFreqChartDatas.map((nonZeroFreqChartData, idx) => {
-            let title = nonZeroFreqChartData.sname;
-            return (
-              <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-                <h4 className="ui header">{title}</h4>
-                <DataChart
-                  chartType='bar'
-                  data={nonZeroFreqChartData}
-                  annotations={emptyAnnotations}
-                />
-              </div>
-            )
-          })
-        }
-      </div>
-    )
-  }
-
-  renderEventTable() {
-
-    const logEventArr = this.logEventArr;
-    const neuronValue = this.neuronValue;
-    const eventTableData = this.eventTableData;
-
-    if (logEventArr) {
-      return (
-        <div>
-          <div className="ui header">
-            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
-          </div>
-          <table className="event-table">
-            <thead>
-            <tr>
-              <td>Event Type</td>
-              <td>Time</td>
-              <td>Event</td>
-            </tr>
-            </thead>
-            {eventTableData.map((group, iGroup) => {
-              return (
-                <EventTableGroup key={iGroup} groupData={group} />
-              );
-            })}
-          </table>
-        </div>
-      )
-    }
-  }
-
-  selectTab(e, tab) {
-    var tabStates = this.state['tabStates'];
-    tabStates = _.mapValues(tabStates, function (val) {
-      return '';
-    });
-    tabStates[tab] = 'active';
-    this.setState({ tabStates: tabStates });
-  }
 
   renderList() {
-    let self = this;
-    let { tabStates } = this.state;
-    const summary = this.summary;
+    const self = this;
+    const { query } = this.props;
 
     return (
       <div className="ui grid">
         <div className="sixteen wide column">
           <div className="ui pointing secondary menu">
-            <a className={tabStates['event'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
-            <a className={tabStates['anomaly'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
-            <a className={tabStates['freq'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'freq')}>Frequency</a>
+            <Link
+              className="item"
+              to={{
+                pathname: '/incidentLogAnalysis/clustering',
+                query,
+              }}
+            >Clustering Result</Link>
+            <Link
+              className="item"
+              to={{
+                pathname: '/incidentLogAnalysis/events',
+                query,
+              }}
+            >Rare Events</Link>
+            <Link
+              className="item"
+              to={{
+                pathname: '/incidentLogAnalysis/frequency',
+                query,
+              }}
+            >Frequency</Link>
           </div>
-          <div className={tabStates['event'] + ' ui tab '}>
-            {tabStates['event'] === 'active' ? (
-              self.renderEventTable()
-            ) : null}
-          </div>
-          <div className={tabStates['anomaly'] + ' ui tab '}>
-            {tabStates['anomaly'] === 'active' ? (
-              self.renderAnomalyTable()
-            ) : null}
-          </div>
-          <div className={tabStates['freq'] + ' ui tab '}>
-            {tabStates['freq'] === 'active' ? (
-              self.renderFreqCharts()
-            ) : null}
+          <div className="active ui tab">
+            {self.renderAnomalyTable()}
           </div>
         </div>
       </div>
@@ -629,11 +343,11 @@ class LogAnalysisCharts extends React.Component {
         <Console.Content style={contentStyle} className={contentClass}>
           <div className="ui main tiny container" style={{ minHeight: '100%' }}>
             {!loading &&
-            <div className="ui vertical segment">
-              <Button className="labeled icon" onClick={() => onRefresh()}>
-                <i className="icon refresh"/>Refresh
+              <div className="ui vertical segment">
+                <Button className="labeled icon" onClick={() => onRefresh()}>
+                  <i className="icon refresh" />Refresh
               </Button>
-            </div>
+              </div>
             }
             <div className="ui vertical segment">
               {!loading && this.renderList()}
@@ -641,8 +355,8 @@ class LogAnalysisCharts extends React.Component {
           </div>
         </Console.Content>
       </Console.Wrapper>
-    )
+    );
   }
 }
 
-export default LogAnalysisCharts;
+export default LogAnalysisEvents;

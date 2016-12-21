@@ -22,6 +22,10 @@ import UseCaseDetails from './components/usecase/details';
 import ExecutiveDashboard from './containers/executive-dashboard';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
+import LogAnalysisCharts from './components/cloud/loganalysis';
+import LogAnalysisClusteringResult from './components/cloud/loganalysis/clustering';
+import LogAnalysisEvents from './components/cloud/loganalysis/events';
+import LogAnalysisFrequency from './components/cloud/loganalysis/frequency';
 
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
@@ -224,11 +228,12 @@ const incidentAnalysisApp = function (props) {
 
 // Incident Analysis Details Log
 const incidentLogAnalysisApp = function (props) {
-  let {location, params} = props;
+  const { location, params, children } = props;
   return (
     <Console>
-      <Console.Topbar logo={require('./images/logo.png')}/>
-      <IncidentLogDetails location={location} params={params}/>
+      <IncidentLogDetails location={location} params={params} >
+      {children}
+      </IncidentLogDetails>
     </Console>
   );
 };
@@ -280,13 +285,18 @@ const routes = (
     </Route>
     <Route component={liveMonitoringApp} path="/liveMonitoring"/>
     <Route component={FilesMonitoringApp} path="/filesMonitoring"/>
-    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring"/>
+    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring" />
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
-    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
+    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis">
+      <IndexRedirect to="frequency" />
+      <Route path="clustering" component={LogAnalysisClusteringResult} />
+      <Route path="events" component={LogAnalysisEvents} />
+      <Route path="frequency" component={LogAnalysisFrequency} />
+    </Route>
     <Route component={useCaseApp} path="/useCaseDetails"/>
     <Route component={ExecutiveDashboardApp} path="/executiveDashboard"/>
-    <Redirect from="*" to="/"/>
+    <Redirect from="*" to="/" />
   </Router>
 );
 

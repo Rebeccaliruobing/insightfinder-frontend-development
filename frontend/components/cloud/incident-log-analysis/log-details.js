@@ -65,26 +65,33 @@ const ProjectLogDetails = class extends React.Component {
     }
     
     return (
-    <Console>
-      <Console.Topbar logo={require('../../../images/logo.png')}>
-        <div className="topbar-text">
-          <div className="title">
-            Please view anomaly detection result for <b>{projectName}</b><br/>
-            with model type <b>{modelType}</b>, anomaly threshold <b>{pvalue}</b>, duration threshold: <b>{cvalue}</b>. 
+      <Console>
+        <Console.Topbar logo={require('../../../images/logo_white.png')}>
+          <div className="topbar-text">
+            <div className="title">
+              Please view anomaly detection result for <b>{projectName}</b><br />
+              with model type <b>{modelType}</b>, anomaly threshold <b>{pvalue}</b>,
+              duration threshold: <b>{cvalue}</b>.
           </div>
-          <div className="legend">
-            <div>Anomaly color map:</div>
-            <div className="colormap2">
-              <div style={{float:'left'}}>Normal</div>
-              <div style={{float:'right'}}>Abnormal</div>
+            <div className="legend">
+              <div>Anomaly color map:</div>
+              <div className="colormap2">
+                <div style={{ float: 'left' }}>Normal</div>
+                <div style={{ float: 'right' }}>Abnormal</div>
+              </div>
             </div>
           </div>
-        </div>
-      </Console.Topbar>
-      <LogAnalysisCharts {...query} enablePublish={true} data={data} loading={loading} onRefresh={() => this.updateData()}/>
-    </Console>
+        </Console.Topbar>
+        {React.cloneElement(this.props.children, {
+          query,
+          enablePublish: true,
+          data,
+          loading,
+          onRefresh: () => this.updateData(),
+        })}
+      </Console>
     );
   }
 };
 
-export default ReactTimeout(ProjectLogDetails);
+export default ProjectLogDetails;
