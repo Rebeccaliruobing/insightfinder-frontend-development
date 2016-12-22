@@ -149,7 +149,7 @@ export default class ThresholdSettings extends React.Component {
         projectType = `${dataType}/CloudMonitoring`;
         break;
       case 'Log':
-        projectType = `${dataType}/Log`;
+        projectType = `Log`;
         break;
       default:
         projectType = `${cloudType}/Agent`;

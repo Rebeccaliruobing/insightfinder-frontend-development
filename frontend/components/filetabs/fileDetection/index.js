@@ -88,7 +88,7 @@ export default class FileDetection extends Component {
                 update.projectType = `${dataType}/CloudMonitoring`;
                 break;
             case 'Log':
-                update.projectType = `${dataType}/Log`;
+                update.projectType = `Log`;
                 break;
             default:
                 update.projectType = `${cloudType}/Agent`;
