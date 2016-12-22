@@ -1,29 +1,21 @@
-import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
+import React, { PropTypes as T } from 'react';
 import moment from 'moment';
-import {Link, IndexLink} from 'react-router';
-import store from 'store';
-
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
+import { autobind } from 'core-decorators';
+import { Button } from '../../../artui/react';
 import {
   LogFileReplayProjectSelection,
   LogModelType,
-  DurationHour,
+  DurationThreshold,
   AnomalyThreshold,
-  DurationThreshold
 } from '../../selections';
-
 import apis from '../../../apis';
-
-import DateTimePicker from "../../ui/datetimepicker/index";
+import DateTimePicker from '../../ui/datetimepicker';
 import WaringButton from '../monitoring/waringButton';
 
-
-export default  class FilterBar extends Component {
+class LogAnalysis extends React.Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object,
-    root: React.PropTypes.object
+    dashboardUservalues: T.object,
+    root: T.object,
   };
 
   constructor(props) {
@@ -60,7 +52,7 @@ export default  class FilterBar extends Component {
     } else {
       let projects0 = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
       projects0 = projects0.filter((item, index) => item.fileProjectType!=0);
-      if (projects0.length == 0) {
+      if (projects0.length === 0) {
         // no log no live => fallback to register
         const url = `/newproject/project-list/custom`;
         window.open(url, '_self');
@@ -102,7 +94,7 @@ export default  class FilterBar extends Component {
       pvalue: 0.9,
       cvalue: 1,
       minPts: 5,
-      epsilon: 1.0
+      epsilon: 1.0,
     };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
@@ -125,9 +117,8 @@ export default  class FilterBar extends Component {
     update.availableDataRanges = this.parseDataRanges(projectInfo.availableDataRanges);
     update.isStationary = projectInfo.isStationary;
     update.incident = null;
-    
-    //debugger;
-    this.setState({isExistentIncident:false});
+
+    this.setState({ isExistentIncident:false });
     this.setState(update);
   }
 
@@ -298,14 +289,20 @@ export default  class FilterBar extends Component {
     })
   }
 
+  @autobind
   handleRefresh() {
+    const { projectName } = this.state;
     this.setState({loading: true}, ()=> {
       this.context.root.loadIncident().then(()=> {
         this.setState({loading: false}, ()=> {
-          let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-          projects = projects.filter((item,index) =>  item.fileProjectType == 0);
-          if (projects.length > 0) {
-            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+          if (projectName) {
+            this.handleProjectChange(projectName, projectName);
+          } else {
+            let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+            projects = projects.filter((item,index) =>  item.fileProjectType == 0);
+            if (projects.length > 0) {
+              this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+            }
           }
         });
       })
@@ -327,10 +324,6 @@ export default  class FilterBar extends Component {
       let min = max -  3600000*24*7*6;
       return moment(timestamp).endOf('day') >= min && moment(timestamp).startOf('day') <= max;
     }
-  }
-
-  _incidentsRef(c) {
-
   }
 
   render() {
@@ -391,7 +384,7 @@ export default  class FilterBar extends Component {
           <div className="field">
           </div>
         </div>
-          <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
+          <div className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
             <div className="ui header">List of Logs</div>
             <div className="ui middle aligned divided list padding10"
                  style={{height: 200, overflow: 'auto'}}>
@@ -480,3 +473,5 @@ export default  class FilterBar extends Component {
     )
   }
 }
+
+export default LogAnalysis;
