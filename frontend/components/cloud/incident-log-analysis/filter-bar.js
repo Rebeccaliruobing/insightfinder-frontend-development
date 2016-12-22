@@ -1,21 +1,29 @@
-import React, { PropTypes as T } from 'react';
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import moment from 'moment';
-import { autobind } from 'core-decorators';
-import { Button } from '../../../artui/react';
+import {Link, IndexLink} from 'react-router';
+import store from 'store';
+
+import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';
 import {
   LogFileReplayProjectSelection,
   LogModelType,
-  DurationThreshold,
+  DurationHour,
   AnomalyThreshold,
+  DurationThreshold
 } from '../../selections';
+
 import apis from '../../../apis';
-import DateTimePicker from '../../ui/datetimepicker';
+
+import DateTimePicker from "../../ui/datetimepicker/index";
 import WaringButton from '../monitoring/waringButton';
 
-class LogAnalysis extends React.Component {
+
+export default  class FilterBar extends Component {
   static contextTypes = {
-    dashboardUservalues: T.object,
-    root: T.object,
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object,
+    root: React.PropTypes.object
   };
 
   constructor(props) {
@@ -52,7 +60,7 @@ class LogAnalysis extends React.Component {
     } else {
       let projects0 = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
       projects0 = projects0.filter((item, index) => item.fileProjectType!=0);
-      if (projects0.length === 0) {
+      if (projects0.length == 0) {
         // no log no live => fallback to register
         const url = `/newproject/project-list/custom`;
         window.open(url, '_self');
@@ -94,7 +102,7 @@ class LogAnalysis extends React.Component {
       pvalue: 0.9,
       cvalue: 1,
       minPts: 5,
-      epsilon: 1.0,
+      epsilon: 1.0
     };
     update.modelType = "Holistic";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
@@ -120,8 +128,9 @@ class LogAnalysis extends React.Component {
     update.availableDataRanges = this.parseDataRanges(projectInfo.availableDataRanges);
     update.isStationary = projectInfo.isStationary;
     update.incident = null;
-
-    this.setState({ isExistentIncident:false });
+    
+    //debugger;
+    this.setState({isExistentIncident:false});
     this.setState(update);
   }
 
@@ -230,49 +239,42 @@ class LogAnalysis extends React.Component {
         this.setState({
           incident,
           dataChunkName,
-          startTime: isd,
-          endTime: ied,
+          startTime:isd,
+          endTime:ied,
           modelStartTime,
           modelEndTime,
-          epsilon: pValue,
-          minPts: cValue,
+          epsilon:pValue,
+          minPts:cValue,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
-          isExistentIncident: true
-        });
+          isExistentIncident:true
+        })        
       } else {
         this.setState({
           incident,
           dataChunkName,
-          startTime: isd,
-          endTime: ied,
+          startTime:isd,
+          endTime:ied,
           modelStartTime,
           modelEndTime,
-          pvalue: pValue,
-          cvalue: cValue,
+          pvalue:pValue,
+          cvalue:cValue,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
-          isExistentIncident: true,
-        });
-      }     
+          isExistentIncident:true
+        })
+      }        
     }
   }
 
   handleSubmit() {
-    const { projectName, modelType, startTime, endTime,
-      pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
-    } = this.state;
-
-    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit({
-      projectName, modelType, startTime, endTime, pvalue, cvalue,
-      modelStartTime, modelEndTime, isExistentIncident,
-    });
+    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
   }
 
   handleRemoveRow(incident){
@@ -299,20 +301,14 @@ class LogAnalysis extends React.Component {
     })
   }
 
-  @autobind
   handleRefresh() {
-    const { projectName } = this.state;
     this.setState({loading: true}, ()=> {
       this.context.root.loadIncident().then(()=> {
         this.setState({loading: false}, ()=> {
-          if (projectName) {
-            this.handleProjectChange(projectName, projectName);
-          } else {
-            let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-            projects = projects.filter((item,index) =>  item.fileProjectType == 0);
-            if (projects.length > 0) {
-              this.handleProjectChange(projects[0].projectName, projects[0].projectName);
-            }
+          let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+          projects = projects.filter((item,index) =>  item.fileProjectType == 0);
+          if (projects.length > 0) {
+            this.handleProjectChange(projects[0].projectName, projects[0].projectName);
           }
         });
       })
@@ -334,6 +330,10 @@ class LogAnalysis extends React.Component {
       let min = max -  3600000*24*7*6;
       return moment(timestamp).endOf('day') >= min && moment(timestamp).startOf('day') <= max;
     }
+  }
+
+  _incidentsRef(c) {
+
   }
 
   render() {
@@ -394,7 +394,7 @@ class LogAnalysis extends React.Component {
           <div className="field">
           </div>
         </div>
-          <div className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
+          <div ref={this._incidentsRef} className="padding10" style={{'width':'64%','float':'right',border: '1px solid #e0e0e0'}}>
             <div className="ui header">List of Logs</div>
             <div className="ui middle aligned divided list padding10"
                  style={{height: 200, overflow: 'auto'}}>
@@ -483,5 +483,3 @@ class LogAnalysis extends React.Component {
     )
   }
 }
-
-export default LogAnalysis;

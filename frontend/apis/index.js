@@ -49,6 +49,7 @@ $.fn.api.settings.api = {
     'log analysis': `${baseUrl}logAnalysis`,
     'add datadog project': `${baseUrl}add-datadog-project`,
     'add new relic project': `${baseUrl}add-newrelic-project`,
+    'add log project': `${baseUrl}add-log-project`,
     'add custom project': `${baseUrl}add-custom-project`,
     'add aws project': `${baseUrl}add-amazon-project`,
     'add google project': `${baseUrl}add-google-project`,
@@ -693,6 +694,44 @@ const apis = {
                     projectCloudType, 
                     samplingInterval, 
                     apikey,
+                    email, 
+                    userName, 
+                    token }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddLogProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add log project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    zone,
+                    'access-key': access_key,
+                    'secrete-key': secrete_key,
                     email, 
                     userName, 
                     token }),

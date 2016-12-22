@@ -148,60 +148,67 @@ export default class ThresholdSettings extends React.Component {
       case 'GCE':
         projectType = `${dataType}/CloudMonitoring`;
         break;
+      case 'Log':
+        projectType = `${dataType}/Log`;
+        break;
       default:
         projectType = `${cloudType}/Agent`;
     }
-    apis.loadInstanceGrouping(projectName).then((resp)=> {
+    // apis.loadInstanceGrouping(projectName).then((resp)=> {
       // TODO: Change to the real grouping rules from server.
       // const groupingRules = resp.instanceGrouping;
-      const groupingRules = [{
-        groupName: 'EnvGroup',
-        criteria: 'Environment',
-        matchOp: 'contains',
-        matchValue: 'PROD',
-        seperateModel: 'yes',
-      }, {
-        groupName: 'ServiceGroup',
-        criteria: 'Service Name',
-        matchOp: 'equal',
-        matchValue: 'MySQL',
-        seperateModel: 'no',
-      }];
-      const data = Object.assign({}, this.state.data, {
-        projectName,
-        projectType,
-        cvalue,
-        pvalue,
-        emailcvalue,
-        emailpvalue,
-        filtercvalue,
-        filterpvalue,
-        minAnomalyRatioFilter,
-        sharedUsernames,
-      });
-      this.setState({
-        metricSettings: metricSettings,
-        data: data,
-        groupingRules,
-        tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
-        tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
-        loading: projectSetting['fileProjectType'] == 0,
-      }, ()=> {
-        projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
-        let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
-        if (isLogProject) {
-          this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-        } else {
-          this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-          store.set('liveAnalysisProjectName', projectName);
-        }
-      });
+    // });
+    const groupingRules = [{
+      groupName: 'EnvGroup',
+      criteria: 'Environment',
+      matchOp: 'contains',
+      matchValue: 'PROD',
+      seperateModel: 'yes',
+    }, {
+      groupName: 'ServiceGroup',
+      criteria: 'Service Name',
+      matchOp: 'equal',
+      matchValue: 'MySQL',
+      seperateModel: 'no',
+    }];
+    const data = Object.assign({}, this.state.data, {
+      projectName,
+      projectType,
+      cvalue,
+      pvalue,
+      emailcvalue,
+      emailpvalue,
+      filtercvalue,
+      filterpvalue,
+      minAnomalyRatioFilter,
+      sharedUsernames,
+    });
+    this.setState({
+      metricSettings: metricSettings,
+      data: data,
+      groupingRules,
+      tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+      tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+      loading: projectSetting['fileProjectType'] == 0,
+    }, ()=> {
+      projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
+      let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
+      if (isLogProject) {
+        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
+      } else {
+        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
+        store.set('liveAnalysisProjectName', projectName);
+      }
     });
   }
 
   getLogAnalysisList(projectName, project) {
     let self = this;
     apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
+      if(!resp.data){
+        alert(resp);
+        return;
+      }
       self.setState({
         episodeList: resp.data['episodeMapArr'],
         wordList: resp.data['wordCountArr'],
