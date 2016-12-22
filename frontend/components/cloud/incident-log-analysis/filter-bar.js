@@ -57,6 +57,14 @@ export default  class FilterBar extends Component {
     projects = projects.filter((item,index) =>  item.fileProjectType == 0);
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
+    } else {
+      let projects0 = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+      projects0 = projects0.filter((item, index) => item.fileProjectType!=0);
+      if (projects0.length == 0) {
+        // no log no live => fallback to register
+        const url = `/newproject/project-list/custom`;
+        window.open(url, '_self');
+      }
     }
   }
   parseDataRanges(str){

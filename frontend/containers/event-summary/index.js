@@ -58,7 +58,7 @@ class EventSummary extends Component {
       let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = `/newproject/project-list/custom`;
+      const url = `/cloud/incident-log-analysis`;
       window.open(url, '_self');
     }
   }
