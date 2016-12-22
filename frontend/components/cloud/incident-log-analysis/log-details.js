@@ -1,28 +1,20 @@
 import React from 'react';
-import store from 'store';
-import ReactTimeout from 'react-timeout'
-import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../../artui/react';
-import {Dygraph} from '../../../artui/react/dataviz';
+import { Console } from '../../../artui/react';
 import apis from '../../../apis';
-import LogAnalysisCharts from '../loganalysis/index'
-import {ChartsRefreshInterval} from '../../storeKeys';
-
 
 const ProjectLogDetails = class extends React.Component {
 
   static propTypes = {
-    updateData: React.PropTypes.func
+    updateData: React.PropTypes.func,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      view: 'four',
-      viewText: 4,
       loading: false,
-      selectedGroup: ''
-    }
+      selectedGroup: '',
+    };
   }
 
   componentDidMount() {
@@ -30,14 +22,23 @@ const ProjectLogDetails = class extends React.Component {
   }
 
   updateData() {
-
-    let {query} = this.props.location;
-    let {projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, groupId, isExistentIncident} = query;
-    let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
-    this.setState({loading: true}, ()=> {
-      apis.postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, "")
-        .then(resp => {
-          let update = {};
+    const { query } = this.props.location;
+    const { projectName,
+      pvalue, cvalue,
+      modelType,
+      startTime, endTime,
+      modelStartTime, modelEndTime,
+      isExistentIncident,
+    } = query;
+    this.setState({ loading: true }, () => {
+      apis.postLogAnalysis(
+        projectName,
+        pvalue, cvalue,
+        modelType,
+        startTime, endTime,
+        modelStartTime, modelEndTime, isExistentIncident, '')
+        .then((resp) => {
+          const update = {};
           if (resp.success) {
             update.data = resp.data;
           } else {
@@ -45,25 +46,21 @@ const ProjectLogDetails = class extends React.Component {
           }
           update.loading = false;
           this.setState(update);
-          if (refreshInterval > 0) {
-            // this.timeout = this.props.setTimeout(this.updateData.bind(this), refreshInterval * 1000 * 60);
-          }
         })
-        .catch(msg=> {
+        .catch((msg) => {
           console.error(msg);
         });
     });
-
   }
 
   render() {
-    let {query} = this.props.location;
-    let {projectName, modelName, pvalue, cvalue, modelType} = query;
-    let {data, groupId, loading} = this.state;
+    let { query } = this.props.location;
+    let { projectName, modelName, pvalue, cvalue, modelType } = query;
+    let { data, groupId, loading } = this.state;
     if (projectName === '') {
       projectName = modelName;
     }
-    
+
     return (
       <Console>
         <Console.Topbar logo={require('../../../images/logo_white.png')}>

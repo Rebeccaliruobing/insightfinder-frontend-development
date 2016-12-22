@@ -227,42 +227,49 @@ class LogAnalysis extends React.Component {
         this.setState({
           incident,
           dataChunkName,
-          startTime:isd,
-          endTime:ied,
+          startTime: isd,
+          endTime: ied,
           modelStartTime,
           modelEndTime,
-          epsilon:pValue,
-          minPts:cValue,
+          epsilon: pValue,
+          minPts: cValue,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
-          isExistentIncident:true
-        })        
+          isExistentIncident: true
+        });
       } else {
         this.setState({
           incident,
           dataChunkName,
-          startTime:isd,
-          endTime:ied,
+          startTime: isd,
+          endTime: ied,
           modelStartTime,
           modelEndTime,
-          pvalue:pValue,
-          cvalue:cValue,
+          pvalue: pValue,
+          cvalue: cValue,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
           holisticModelKeys,
           splitModelKeys,
-          isExistentIncident:true
-        })
-      }        
+          isExistentIncident: true,
+        });
+      }     
     }
   }
 
   handleSubmit() {
-    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit(this.state);
+    const { projectName, modelType, startTime, endTime,
+      pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
+    } = this.state;
+
+    this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit({
+      projectName, modelType, startTime, endTime, pvalue, cvalue,
+      modelStartTime, modelEndTime, isExistentIncident,
+    });
   }
 
   handleRemoveRow(incident){
