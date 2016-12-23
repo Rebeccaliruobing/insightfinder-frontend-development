@@ -78,15 +78,17 @@ class AmazonProjects extends React.Component {
                     <tr className="bold">
                         <td style={{width: '16%'}}>Project Name</td>
                         <td style={{width: '16%'}}>Instance Type</td>
+                        <td style={{width: '16%'}}>Data Type</td>
                         <td style={{width: '16%'}}>Region</td>
                         <td style={{width: '16%'}}>Monitoring Type</td>
                         <td style={{width: '16%'}}></td>
                     </tr>
                     {
-                        projectsList.map(({name, dataType, zone, cloudType, agentDataEnabled, flag}, index)=> {
+                        projectsList.map(({name, projectType, zone, cloudType, dataType, agentDataEnabled, flag}, index)=> {
                             return (
                                 <tr key={index}>
                                     <td style={{width: '16%'}}>{name}</td>
+                                    <td style={{width: '16%'}}>{projectType}</td>
                                     <td style={{width: '16%'}}>{dataType}</td>
                                     <td style={{width: '16%'}}>{zone}</td>
                                     <td style={{width: '16%'}}>{cloudType}</td>

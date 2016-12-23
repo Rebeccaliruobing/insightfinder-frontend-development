@@ -66,12 +66,13 @@ class CustomProjects extends React.Component {
           <tr className="bold">
             <td style={{width: '16%'}}>Project Name</td>
             <td style={{width: '16%'}}>Instance Type</td>
+            <td style={{width: '16%'}}>Data Type</td>
             <td style={{width: '16%'}}>Region</td>
             <td style={{width: '16%'}}>Monitoring Type</td>
             <td style={{width: '16%'}}></td>
           </tr>
           {
-            this.props.projects.map(({name, dataType, zone, cloudType,flag}, index)=> {
+            this.props.projects.map(({name, projectType, dataType, zone, cloudType,flag}, index)=> {
               if(cloudType==='FileReplay'){
                 cloudType='File';
               }else if(cloudType==='PrivateCloud'){
@@ -81,6 +82,7 @@ class CustomProjects extends React.Component {
                 <tr key={index}>
                   <td style={{width: '16%'}}>{name}</td>
                   <td style={{width: '16%'}}>{cloudType}</td>
+                  <td style={{width: '16%'}}>{dataType}</td>
                   <td style={{width: '16%'}}>{zone}</td>
                   <td style={{width: '16%'}}>Agent</td>
                   <td style={{width: '16%'}}>

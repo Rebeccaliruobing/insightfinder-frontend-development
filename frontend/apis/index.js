@@ -758,7 +758,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postAddCustomProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+    postAddCustomProject(projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -766,6 +766,7 @@ const apis = {
                 data: $.param({ 
                     projectName, 
                     projectCloudType, 
+                    dataType,
                     samplingInterval, 
                     zone,
                     'access-key': access_key,

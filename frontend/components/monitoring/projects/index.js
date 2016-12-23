@@ -7,7 +7,6 @@ import ProjectsGoogle from './google';
 import CustomProjects from './custom';
 import DataDogProjects from './datadog';
 import NewRelicProjects from './newrelic';
-import LogProjects from './log';
 
 
 class Projects extends React.Component {
@@ -22,15 +21,14 @@ class Projects extends React.Component {
     super(props);
     this.selectTab.bind(this);
     this._el = null;
-    let tabStates = ["custom","log","amazon","google","datadog","newrelic"].indexOf(_.last(location.pathname.split('/')));
+    let tabStates = ["custom","amazon","google","datadog","newrelic"].indexOf(_.last(location.pathname.split('/')));
     this.state = {
       tabStates: {
         custom: [-1, 0].indexOf(tabStates)!=-1?'active':'',
-        log: tabStates == 1?'active':'',
-        amazon: tabStates == 2?'active':'',
-        google: tabStates == 3?'active':'',
-        datadog: tabStates == 4?'active':'',
-        newrelic: tabStates == 5?'active':'',
+        amazon: tabStates == 1?'active':'',
+        google: tabStates == 2?'active':'',
+        datadog: tabStates == 3?'active':'',
+        newrelic: tabStates == 4?'active':'',
       }
     }
   }
@@ -49,37 +47,31 @@ class Projects extends React.Component {
   projectList(projectString,projectGroupByType,projectInfoArray){
     if(projectString.length>0){
       projectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
-        let [name, dataType, cloudType] = project;
+        let [name, projectType, cloudType, dataType] = project;
         let zone = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[1]):"N/A";
         let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[2]):false;
         let instanceType = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[3]):false;
-        switch (dataType) {
+        switch (projectType) {
           case 'AWS':
           case 'EC2':
           case 'RDS':
           case 'DynamoDB':
-            projectGroupByType.AWS.push({name, dataType:instanceType, cloudType,zone,agentDataEnabled});
+            projectGroupByType.AWS.push({name, projectType:instanceType, cloudType,dataType,zone,agentDataEnabled});
             break;
           case 'GAE':
           case 'GCE':
-            projectGroupByType.Google.push({name, dataType, cloudType,zone,agentDataEnabled});
-            break;
-          case 'Log':
-            projectGroupByType.log.push({name, dataType, cloudType,zone,agentDataEnabled});
+            projectGroupByType.Google.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
             break;
           default:
             switch(cloudType) {
               case 'DataDog':
-                projectGroupByType.datadog.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.datadog.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
                 break;
               case 'NewRelic':
-                projectGroupByType.newrelic.push({name, dataType, cloudType,zone,agentDataEnabled});
-                break;
-              case 'Log':
-                projectGroupByType.log.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.newrelic.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
                 break;
               default:
-                projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.custom.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
             }
         }
       });
@@ -89,39 +81,33 @@ class Projects extends React.Component {
   sharedProjectList(sharedProjectString,projectGroupByType,projectInfoArray){
     if(sharedProjectString.length>0){
       sharedProjectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
-        let [name, dataType, cloudType, master] = project;
+        let [name, projectType, cloudType, master, dataType] = project;
         let zone = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[1]):"N/A";
         let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[2]):false;
         let instanceType = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[3]):false;
         name = name+"@"+master;
         let flag = true;
-        switch (dataType) {
+        switch (projectType) {
           case 'AWS':
           case 'EC2':
           case 'RDS':
           case 'DynamoDB':
-            projectGroupByType.AWS.push({name, dataType:instanceType, cloudType,zone,agentDataEnabled, flag});
+            projectGroupByType.AWS.push({name, projectType:instanceType, cloudType,dataType,zone,agentDataEnabled, flag});
             break;
           case 'GAE':
           case 'GCE':
-            projectGroupByType.Google.push({name, dataType, cloudType,zone,agentDataEnabled, flag});
-            break;
-          case 'Log':
-            projectGroupByType.log.push({name, dataType, cloudType,zone,agentDataEnabled});
+            projectGroupByType.Google.push({name, projectType, cloudType,dataType,zone,agentDataEnabled, flag});
             break;
           default:
             switch(cloudType) {
               case 'DataDog':
-                projectGroupByType.datadog.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.datadog.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
                 break;
               case 'NewRelic':
-                projectGroupByType.newrelic.push({name, dataType, cloudType,zone,agentDataEnabled});
-                break;
-              case 'Log':
-                projectGroupByType.log.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.newrelic.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
                 break;
               default:
-                projectGroupByType.custom.push({name, dataType, cloudType,zone,agentDataEnabled});
+                projectGroupByType.custom.push({name, projectType, cloudType,dataType,zone,agentDataEnabled});
             }
         }
       });
@@ -134,7 +120,7 @@ class Projects extends React.Component {
     var userInstructions = this.context.userInstructions;
     let {projectString, sharedProjectString,incidentAllInfo, dataAllInfo,projectSettingsAllInfo} = this.context.dashboardUservalues;
     let projectInfoArray = projectSettingsAllInfo.map((s)=> [s.projectName,s.zone,s.agentDataEnabled,s.instanceType]);
-    let projectGroupByType = {'AWS': [], 'Google': [], 'custom': [], 'datadog': [], 'newrelic': [], 'log': []};
+    let projectGroupByType = {'AWS': [], 'Google': [], 'custom': [], 'datadog': [], 'newrelic': []};
 
     this.projectList(projectString,projectGroupByType,projectInfoArray);
     this.sharedProjectList(sharedProjectString,projectGroupByType,projectInfoArray);
@@ -147,8 +133,6 @@ class Projects extends React.Component {
           <div className="ui pointing secondary menu">
             <a className={tabStates['custom'] + ' item'}
                onClick={(e) => this.selectTab(e, 'custom')}>Insight Agent</a>
-            <a className={tabStates['log'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'log')}>Log Analysis</a>
             <a className={tabStates['amazon'] + ' item'}
                onClick={(e) => this.selectTab(e, 'amazon')}>AWS CloudWatch</a>
             <a className={tabStates['google'] + ' item'}
@@ -166,9 +150,6 @@ class Projects extends React.Component {
           </div>
           <div className={tabStates['custom'] + ' ui tab '}>
             {tabStates['custom'] === 'active' ? <CustomProjects projects={projectGroupByType.custom}/> : null}
-          </div>
-          <div className={tabStates['log'] + ' ui tab '}>
-            {tabStates['log'] === 'active' ? <LogProjects projects={projectGroupByType.log}/> : null}
           </div>
           <div className={tabStates['datadog'] + ' ui tab '}>
             {tabStates['datadog'] === 'active' ? <DataDogProjects projects={projectGroupByType.datadog}/> : null}

@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import React from 'react';
-import {Modal} from '../../../artui/react/index';
+import {autobind} from 'core-decorators';
+import {Modal,Dropdown} from '../../../artui/react/index';
 import apis from '../../../apis';
 
 
@@ -13,7 +14,8 @@ class CustomProjectModal extends React.Component {
     super(props);
     this._dropdown = null;
     this.state = {
-      projectCloudType:""
+      projectCloudType:"",
+      dataType:[]
     };
   }
 
@@ -23,17 +25,32 @@ class CustomProjectModal extends React.Component {
     }
   }
 
+  @autobind
+  handleDataTypeChange(value, text){
+    let { dataType } = this.state;
+    if(value){
+      dataType.push(text);
+    } else if(!value){
+      let index = dataType.indexOf(text);
+      if(index!=-1){
+        dataType.splice(index,1);
+      }
+    }
+    this.setState({ dataType });
+  }
+
   handleSubmit() {
-    let {projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key} = this.state;
+    let {projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key} = this.state;
     if(projectName==null){
       alert("Project name cannot be empty.");
       return false;
     }
+    let dataTypeString = dataType.sort().toString().replace(",","+");
     if(/[\s_:@,]/g.test(projectName)){
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    apis.postAddCustomProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key).then((resp)=> {
+    apis.postAddCustomProject(projectName, projectCloudType, dataTypeString, samplingInterval, zone, access_key, secrete_key).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
         // this.setState({message:resp.message});
@@ -48,8 +65,11 @@ class CustomProjectModal extends React.Component {
   }
 
   render() {
-    let {projectCloudType} = this.state;
-    let disabledInterval=(projectCloudType=="LogFile");
+    let {projectCloudType,dataType} = this.state;
+    let disabledInterval=(projectCloudType=="LogFile")||(dataType.length==1&&dataType.indexOf('Log')!=-1);
+    if(projectCloudType=="MetricFile"){
+      disabledInterval = false;
+    }
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="content">
@@ -68,6 +88,16 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="MetricFile">Metric File Replay</option>
                 <option className="item" value="LogFile">Log File Replay</option>
               </select>
+            </div>
+            <div className="field">
+              <label>Data Type</label>
+              <Dropdown mode="select" multiple={true} onChange={this.handleDataTypeChange} >
+                <i className="dropdown icon" />
+                <div className="menu">
+                  <div className="item" data-value="Metric">Metric</div>
+                  <div className="item" data-value="Log">Log</div>
+                </div>
+              </Dropdown>
             </div>
             <div className="field">
               <label>Sampling Interval</label>
