@@ -589,7 +589,7 @@ class LogAnalysisCharts extends React.Component {
               />
             </div>
           }
-          { eventsInRangeFreqVector && eventsInRangeFreqVector.length && 
+          { (eventsInRangeFreqVector && eventsInRangeFreqVector.length) ? 
             <table className="freq-event-table">
               <thead>
               <tr>
@@ -606,6 +606,7 @@ class LogAnalysisCharts extends React.Component {
                 ))}
               </tbody>
             </table>
+            : null
           }
         </div>
       </div>
