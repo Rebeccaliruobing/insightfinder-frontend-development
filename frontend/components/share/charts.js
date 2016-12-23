@@ -55,6 +55,13 @@ export class DataChart extends React.Component {
   }
 
   @autobind
+  handleClick(e, x) {
+    if (this.props.onClick) {
+      this.props.onClick(x);
+    }
+  }
+
+  @autobind
   handleDrawCallback(g) {
     const { onDateWindowChange } = this.props;
     if (onDateWindowChange) {
@@ -121,7 +128,7 @@ export class DataChart extends React.Component {
         });
       }
 
-      return annotations
+      return annotations;
     }
 
     return data.annotations;
@@ -130,7 +137,7 @@ export class DataChart extends React.Component {
   render() {
     let { data, enableAnnotations, enableTriangleHighlight, chartType,
       onDateWindowChange, dateWindow,latestDataTimestamp,
-      eventEndTime, eventStartTime, annotations,
+      eventEndTime, eventStartTime, annotations, onClick,
     } = this.props;
     const dowAnnotations = this.setWeekdaysForBarChar(data);
     annotations = annotations || dowAnnotations;
@@ -144,7 +151,7 @@ export class DataChart extends React.Component {
         highlightCircleSize={2} strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
-        includeZero={true}
+        includeZero
         data={data.sdata}
         ylabel={data.unit}
         labels={data.sname}
@@ -155,11 +162,12 @@ export class DataChart extends React.Component {
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         dateWindow={dateWindow}
         annotations={enableAnnotations || chartType === 'bar' ? annotations : null}
-        plotter={chartType == 'bar' ? this.barChartPlotter : null}
+        plotter={chartType === 'bar' ? this.barChartPlotter : null}
         onAnnotationClick={chartType === 'bar' ? null : this.handleAnnotationClick}
         enableTriangleHighlight={enableTriangleHighlight}
+        onClick={onClick ? this.handleClick: null}
       />
-    )
+    );
   }
 }
 

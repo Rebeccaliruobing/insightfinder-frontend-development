@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
@@ -488,12 +489,19 @@ class LogAnalysisCharts extends React.Component {
         //   </table>
         // </div>
 
-  handlePatternSelected(){
-
+  @autobind
+  handlePatternPointClick(x) {
+    const { selectedPatternChartData } = this.state;
+    if (selectedPatternChartData) {
+      const sdata = selectedPatternChartData.sdata;
+      const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === x);
+      console.log(`TODO: Add click function for sdata[${idx}]`);
+    }
   }
+
   @autobind()
   handlePatternSelected(pattern) {
-    const { nonZeroFreqChartDatas, patterns, } = this.state;
+    const { nonZeroFreqChartDatas, patterns } = this.state;
     let pos = patterns.indexOf(pattern);
     let selectedPatternChartData = nonZeroFreqChartDatas[pos];
     this.setState({
@@ -544,6 +552,7 @@ class LogAnalysisCharts extends React.Component {
           //   </table>
           // }
 
+  @autobind
   renderFreqCharts(){
     if (!this.dp) return;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData } = this.state;
@@ -586,6 +595,7 @@ class LogAnalysisCharts extends React.Component {
                 chartType='bar'
                 data={selectedPatternChartData}
                 annotations={emptyAnnotations}
+                onClick={this.handlePatternPointClick}
               />
             </div>
           }
