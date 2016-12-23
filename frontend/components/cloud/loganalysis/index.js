@@ -155,6 +155,7 @@ class LogAnalysisCharts extends React.Component {
       this.dp.parseLogAnalysisData();
       this.dp.getFreqVectorData();
       this.calculateEventTableData();
+      this.calculateFreqVectorData();
 
       // Sort the grouped data
       this.summary = this.dp.summaryData;
@@ -487,41 +488,108 @@ class LogAnalysisCharts extends React.Component {
         //   </table>
         // </div>
 
-  renderFreqCharts(){
+  handlePatternSelected(){
+
+  }
+  @autobind()
+  handlePatternSelected(pattern) {
+    const { nonZeroFreqChartDatas, patterns, } = this.state;
+    let pos = patterns.indexOf(pattern);
+    let selectedPatternChartData = nonZeroFreqChartDatas[pos];
+    this.setState({
+      selectedPattern: pattern,
+      selectedPatternChartData,
+    });
+  }
+  
+  calculateFreqVectorData(){
     if (!this.dp) return;
     let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
-    let emptyAnnotations = [];
     let totalFreqChartData = {
       sdata: totalFreqData,
       sname: ['Time Window Start','Total Frequency'],
     };
 
+    let patterns = [];
     let nonZeroFreqChartDatas = [];
-    for (var colName in nonZeroFreqVectors) {
+    for (var pattern in nonZeroFreqVectors) {
       let nonZeroFreqChartData = {
-        sdata: nonZeroFreqVectors[colName],
-        sname: ['Time Window Start', colName],
+        sdata: nonZeroFreqVectors[pattern],
+        sname: ['Time Window Start', pattern],
       };
       nonZeroFreqChartDatas.push(nonZeroFreqChartData);
+      patterns.push(pattern);
     }
-    
+    this.setState({
+      nonZeroFreqChartDatas,
+      patterns,
+    });
+  }
+
+  
+          // { showFreqVectorLog && 
+          //   <table className="event-table">
+          //     <thead>
+          //     <tr>
+          //       <td>Event Type</td>
+          //       <td>Time</td>
+          //       <td>Event</td>
+          //     </tr>
+          //     </thead>
+          //     {eventTableData.map((group, iGroup) => {
+          //       return (
+          //         <EventTableGroup key={iGroup} groupData={group} />
+          //       );
+          //     })}
+          //   </table>
+          // }
+
+  renderFreqCharts(){
+    if (!this.dp) return;
+    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData } = this.state;
+    let emptyAnnotations = [];
+    let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
+
+    // <br />(sorted by CPU usage)
     return (
-      <div>
-        {nonZeroFreqChartDatas && 
-          nonZeroFreqChartDatas.map((nonZeroFreqChartData, idx) => {
-            let title = nonZeroFreqChartData.sname[1];
-            return (
-              <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-                <h4 className="ui header">{title}</h4>
-                <DataChart
-                  chartType='bar'
-                  data={nonZeroFreqChartData}
-                  annotations={emptyAnnotations}
-                />
-              </div>
-            )
-          })
-        }
+      <div className="ui grid">
+        <div className="three wide column">
+          <table className="ui selectable celled table">
+            <thead>
+              <tr>
+                <th><span
+                  style={{ fontWeight: 'bold' }}
+                >Pattern List</span>
+            </th>
+              </tr>
+            </thead>
+            <tbody>
+              {patterns.map((pattern, i) => (
+                <tr
+                  key={i}
+                  onClick={() => this.handlePatternSelected(pattern)}
+                  className={cx(
+                { active: patterns === this.state.selectedPattern })
+              } style={{ cursor: 'pointer' }}
+                >
+                  <td>{pattern}</td>
+                </tr>
+          ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="thirteen wide column">
+          { selectedPattern && selectedPatternChartData &&
+            <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+              <h4 className="ui header">{title}</h4>
+              <DataChart
+                chartType='bar'
+                data={selectedPatternChartData}
+                annotations={emptyAnnotations}
+              />
+            </div>
+          }
+        </div>
       </div>
     )
   }
