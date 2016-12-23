@@ -628,8 +628,98 @@ class DataParser {
     return this.summaryData;
   }
 
+  _parseDerivedAnomalyString(){
+    let arr = this.data['derivedAnomalyString'];
+    let rawHintMapping = this.data['hintMapping'];
+    let hintMapping = {};
+    if (rawHintMapping) {
+      try {
+        hintMapping = $.parseJSON(rawHintMapping);
+      } catch (err) {
+      }
+    }
+    let anomalyTexts = [];
+    let anomalyByMetricObjArr = [];
+    // let causalDataArray = [];
+    // let causalTypes = [];
+
+    if (arr) {
+      _.each(arr, function (a, i) {
+        var atext = [];
+        let anomalyByMetricObj = {};
+        if (a.anomalies && a.anomalies != "") {
+          var lines = a.anomalies.split('\\n');
+          _.each(lines, function (line, lineNo) {
+            if (!line || line === '') return;
+            var items = line.split(',',4);
+
+            //prepare causality chart data
+            var thisAnomaly = [];
+            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
+            thisAnomaly.push(timeString + "," + items[1]);
+            let hintString = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hintString = items[3];
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
+              if(hints.length>1){
+                // further parse hints[1], eg. 1.Change_inflicted(min)(1.0)(20); 2.Sub_cause_type[node0](4.0)(1.0); 3.Sub_cause_subset[node0](4.0)
+                var hintss = hints[1].trim().split(';');
+                // var newhints = "";
+                _.each(hintss, function (hint, ihint) {
+                  // 1.Change_inflicted(min)[node0](1.0)(10.0);
+                  // 0=#.metric, 1=node, 2=(val), 3=(pct)
+                  let hintObj = {};
+                  var hintparts = hint.split(/\(/);
+                  var metric = hintparts[0].split('.')[1];
+                  try {
+                    var valparts = hintparts[1].split(/\(|\)/)[1].split('.');
+                    var newval = hintparts[1].split(/\(|\)/)[0];
+                    hintObj['timestamp'] = parseInt(items[0]);
+                    hintObj['metric'] = metric;
+                    hintObj['val'] = newval;
+                    // newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
+                    var pct = hintparts[2].split(/\(|\)/)[0];
+                    // newhints += "("+pct+")";
+                    hintObj['pct'] = pct;
+                    // if (ihint < hintss.length - 1) {
+                    //   newhints = newhints + "; ";
+                    // }
+                  } catch (err) {
+                    newhints = hints[1];
+                  }
+                  let anomalyThisMetric = anomalyByMetricObj[metric];
+                  if(anomalyThisMetric==undefined){
+                    anomalyThisMetric = [];
+                  }
+                  anomalyThisMetric.push(hintObj);
+                  anomalyByMetricObj[metric] = anomalyThisMetric;
+                });
+  
+                // atext[parseInt(items[0])] = newhints;
+              }
+            }
+            // causalDataArray.push(thisAnomaly);
+          });
+          // causalTypes = causalTypes.filter(function (el, index, arr) {
+          //   return index === arr.indexOf(el);
+          // });
+        }
+        anomalyTexts.push(atext);
+        anomalyByMetricObjArr.push(anomalyByMetricObj);
+      });
+    }
+    // this.causalDataArray = causalDataArray;
+    // this.causalTypes = causalTypes;
+    this.anomalyByMetricObjArr = anomalyByMetricObjArr;
+  }
+
   getFreqVectorData(){
     if (this.freqVectorData) return this.freqVectorData;
+    // process freqVectorObj for charts
     let totalFreqVectorArr = this.data['totalFreqVectorArr'];
     let freqVectorObj = this.data['freqVectorObj'];
     let totalFreqData = [];
@@ -659,6 +749,9 @@ class DataParser {
         nonZeroFreqVectors[colName] = nonZeroFreqVectorData;
       }
     }
+
+    // process derivedAnomalyString for highlighting chart
+    this._parseDerivedAnomalyString();
 
     this.freqVectorData = {
       totalFreqData,

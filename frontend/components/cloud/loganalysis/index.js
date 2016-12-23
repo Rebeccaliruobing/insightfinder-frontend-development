@@ -17,6 +17,7 @@ class EventTableGroup extends React.Component {
       eventsInRangeFreqVector:[],
       selectedPattern:'', 
       selectedPatternChartData:{},
+      derivedAnomalyByMetric:{},
     };
   }
 
@@ -451,47 +452,6 @@ class LogAnalysisCharts extends React.Component {
     });
   }
 
-// .sort(function (a, b) {
-//               // reverse ordering
-//               let aid = parseInt(a.count);
-//               let bid = parseInt(b.count);
-//               if (aid < bid) {
-//                 return 1;
-//               } else if (aid > bid) {
-//                 return -1;
-//               } else {
-//                 return 0;
-//               }
-//             })
-        // <div>
-        //   <table className="vector-table">
-        //     <tbody>
-        //     <tr>
-        //       <td>Word</td>
-        //       <td>Count</td>
-        //     </tr>
-        //     {topKFreqData.map((topKFreqItem, vNo) => {
-        //       let timestamp = moment(topKFreqItem.timestamp).format("YYYY-MM-DD HH:mm");
-        //       let topKFreqArr = topKFreqItem.topKFreqArr;
-        //       let topKFreqString = "";
-        //       _.each(topKFreqArr, function (topKFreq, fNo) {
-        //         if(fNo>0){
-        //           topKFreqString += ", ";
-        //         }
-        //         topKFreqString += "Pattern #"+topKFreq.nid+":"+topKFreq.freq;
-        //       });
-        //       let cleanWord = word.pattern.replace(/"/g, "");
-        //       return (
-        //         <tr key={i}>
-        //           <td>{timestamp}</td>
-        //           <td>{topKFreqString}</td>
-        //         </tr>
-        //       )
-        //     })}
-        //     </tbody>
-        //   </table>
-        // </div>
-
   @autobind
   handlePatternPointClick(startTs) {
     const { selectedPatternChartData, selectedPattern } = this.state;
@@ -519,17 +479,21 @@ class LogAnalysisCharts extends React.Component {
 
   @autobind()
   handlePatternSelected(pattern) {
-    const { nonZeroFreqChartDatas, patterns } = this.state;
+    const { nonZeroFreqChartDatas, patterns, derivedAnomalyByMetric } = this.state;
     let pos = patterns.indexOf(pattern);
     let selectedPatternChartData = nonZeroFreqChartDatas[pos];
+    let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
     this.setState({
       selectedPattern: pattern,
       selectedPatternChartData,
+      derivedAnomaly,
+      eventsInRangeFreqVector:[],
     });
   }
   
   calculateFreqVectorData(){
     if (!this.dp) return;
+    let derivedAnomalyByMetric = this.dp.anomalyByMetricObjArr && this.dp.anomalyByMetricObjArr[0] ? this.dp.anomalyByMetricObjArr[0] : {};
     let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
     let totalFreqChartData = {
       sdata: totalFreqData,
@@ -549,6 +513,7 @@ class LogAnalysisCharts extends React.Component {
     this.setState({
       nonZeroFreqChartDatas,
       patterns,
+      derivedAnomalyByMetric,
     },()=>{
       pattern && this.handlePatternSelected(patterns[0]);
     });
@@ -559,8 +524,29 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
-    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector } = this.state;
+    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector,derivedAnomaly } = this.state;
     let emptyAnnotations = [];
+    let annotations = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
+      let ts = +moment(datapoint[0]);
+      let thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
+      if(thisHint){
+        let pct = parseFloat(thisHint.pct);
+        let pctString = pct && ((pct>0?"+":"")+Math.round(pct*10)/10+"%");
+        return {
+          series: selectedPatternChartData.sname[1],
+          x: ts.valueOf(),
+          shortText: pctString,
+          text: pctString,
+        };
+      } else {
+        return {
+          series: '',
+          x: ts.valueOf(),
+          shortText: '',
+          text: '',
+        }
+      }
+    }) : emptyAnnotations;
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
     // <br />(sorted by CPU usage)
@@ -577,7 +563,7 @@ class LogAnalysisCharts extends React.Component {
               </tr>
             </thead>
             <tbody>
-              {patterns.map((pattern, i) => (
+              {patterns && patterns.map((pattern, i) => (
                 <tr
                   key={i}
                   onClick={() => this.handlePatternSelected(pattern)}
@@ -598,12 +584,12 @@ class LogAnalysisCharts extends React.Component {
               <DataChart
                 chartType='bar'
                 data={selectedPatternChartData}
-                annotations={emptyAnnotations}
+                annotations={annotations}
                 onClick={this.handlePatternPointClick}
               />
             </div>
           }
-          { eventsInRangeFreqVector && 
+          { eventsInRangeFreqVector && eventsInRangeFreqVector.length && 
             <table className="freq-event-table">
               <thead>
               <tr>
@@ -613,7 +599,7 @@ class LogAnalysisCharts extends React.Component {
               </thead>
               <tbody>
                 {eventsInRangeFreqVector.map((event, iEvent) => (
-                  <tr>
+                  <tr key={iEvent}>
                     <td>{event[0]}</td>
                     <td>{event[1]}</td>
                   </tr>
@@ -625,8 +611,6 @@ class LogAnalysisCharts extends React.Component {
       </div>
     )
   }
-
-        
 
   renderEventTable() {
 
