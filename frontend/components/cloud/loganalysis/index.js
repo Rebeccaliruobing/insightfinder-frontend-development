@@ -14,6 +14,9 @@ class EventTableGroup extends React.Component {
     super(props);
     this.state = {
       selectedWords: '',
+      eventsInRangeFreqVector:[],
+      selectedPattern:'', 
+      selectedPatternChartData:{},
     };
   }
 
@@ -252,10 +255,10 @@ class LogAnalysisCharts extends React.Component {
         groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
         groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
         groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
-        groupData.data = [[timestamp, event.rawData]];
+        groupData.data = [[timestamp, event.rawData, event.timestamp]];
         eventTableData.push(groupData);
       } else {
-        groupData.data.push([timestamp, event.rawData]);
+        groupData.data.push([timestamp, event.rawData, event.timestamp]);
       }
     });
 
@@ -490,12 +493,24 @@ class LogAnalysisCharts extends React.Component {
         // </div>
 
   @autobind
-  handlePatternPointClick(x) {
-    const { selectedPatternChartData } = this.state;
-    if (selectedPatternChartData) {
+  handlePatternPointClick(startTs) {
+    const { selectedPatternChartData, selectedPattern } = this.state;
+    const eventTableData = this.eventTableData;
+    let patternIndex = selectedPattern.replace("Pattern ","");
+    let eventList = eventTableData[patternIndex].data;
+    if (selectedPatternChartData && eventList) {      
       const sdata = selectedPatternChartData.sdata;
-      const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === x);
-      console.log(`TODO: Add click function for sdata[${idx}]`);
+      const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === startTs);
+      let endTs = sdata[sdata.length-1][0];
+      if(idx==sdata.length){
+        alert("end");
+      } else {
+        endTs = sdata[idx+1][0]-1;
+      }
+      let eventsInRangeFreqVector = eventList.filter(function (el, index, arr) {
+        return (el[2]>=startTs && el[2]<=endTs);
+      });
+      this.setState({eventsInRangeFreqVector});
     }
   }
 
@@ -531,31 +546,17 @@ class LogAnalysisCharts extends React.Component {
     this.setState({
       nonZeroFreqChartDatas,
       patterns,
+    },()=>{
+      pattern && this.handlePatternSelected(patterns[0]);
     });
   }
 
   
-          // { showFreqVectorLog && 
-          //   <table className="event-table">
-          //     <thead>
-          //     <tr>
-          //       <td>Event Type</td>
-          //       <td>Time</td>
-          //       <td>Event</td>
-          //     </tr>
-          //     </thead>
-          //     {eventTableData.map((group, iGroup) => {
-          //       return (
-          //         <EventTableGroup key={iGroup} groupData={group} />
-          //       );
-          //     })}
-          //   </table>
-          // }
 
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
-    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData } = this.state;
+    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector } = this.state;
     let emptyAnnotations = [];
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
@@ -598,6 +599,24 @@ class LogAnalysisCharts extends React.Component {
                 onClick={this.handlePatternPointClick}
               />
             </div>
+          }
+          { eventsInRangeFreqVector && 
+            <table className="freq-event-table">
+              <thead>
+              <tr>
+                <td>Time</td>
+                <td>Event</td>
+              </tr>
+              </thead>
+              <tbody>
+                {eventsInRangeFreqVector.map((event, iEvent) => (
+                  <tr>
+                    <td>{event[0]}</td>
+                    <td>{event[1]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           }
         </div>
       </div>
