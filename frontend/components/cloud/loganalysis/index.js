@@ -496,21 +496,24 @@ class LogAnalysisCharts extends React.Component {
   handlePatternPointClick(startTs) {
     const { selectedPatternChartData, selectedPattern } = this.state;
     const eventTableData = this.eventTableData;
-    let patternIndex = selectedPattern.replace("Pattern ","");
-    let eventList = eventTableData[patternIndex].data;
-    if (selectedPatternChartData && eventList) {      
-      const sdata = selectedPatternChartData.sdata;
-      const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === startTs);
-      let endTs = sdata[sdata.length-1][0];
-      if(idx==sdata.length){
-        alert("end");
-      } else {
-        endTs = sdata[idx+1][0]-1;
+    let nid = parseInt(selectedPattern.replace("Pattern ",""));
+    let selectedEventTableData = _.find(eventTableData, event => event.nid == nid)
+    if(selectedEventTableData){
+      let eventList = selectedEventTableData.data;
+      if (selectedPatternChartData && eventList) {      
+        const sdata = selectedPatternChartData.sdata;
+        const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === startTs);
+        let endTs = sdata[sdata.length-1][0];
+        if(idx==sdata.length){
+          alert("end");
+        } else {
+          endTs = sdata[idx+1][0]-1;
+        }
+        let eventsInRangeFreqVector = eventList.filter(function (el, index, arr) {
+          return (el[2]>=startTs && el[2]<=endTs);
+        });
+        this.setState({eventsInRangeFreqVector});
       }
-      let eventsInRangeFreqVector = eventList.filter(function (el, index, arr) {
-        return (el[2]>=startTs && el[2]<=endTs);
-      });
-      this.setState({eventsInRangeFreqVector});
     }
   }
 
