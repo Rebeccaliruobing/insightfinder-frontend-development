@@ -526,6 +526,16 @@ class LogAnalysisCharts extends React.Component {
     if (!this.dp) return;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector,derivedAnomaly } = this.state;
     let emptyAnnotations = [];
+
+    // Create the bar colors for time series. time => colstring.
+    const sdata = selectedPatternChartData ? selectedPatternChartData.sdata || [] : [];
+    const barColors = {};
+    _.forEach(sdata, (d, idx) => {
+      // TODO: Set the colstring based on ts.
+      const ts = +moment(d[0]).valueOf();
+      barColors[ts] = idx % 3 === 0 ? 'red' : 'blue';
+    });
+
     let annotations = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
       let ts = +moment(datapoint[0]);
       let thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
@@ -585,6 +595,7 @@ class LogAnalysisCharts extends React.Component {
               <DataChart
                 chartType='bar'
                 data={selectedPatternChartData}
+                barColors={barColors}
                 annotations={annotations}
                 onClick={this.handlePatternPointClick}
               />

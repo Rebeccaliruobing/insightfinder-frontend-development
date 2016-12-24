@@ -76,28 +76,30 @@ export class DataChart extends React.Component {
 
   @autobind
   barChartPlotter(e) {
-    var ctx = e.drawingContext;
-    var points = e.points;
-    var y_bottom = e.dygraph.toDomYCoord(0);
-
-    ctx.fillStyle = e.color;
+    const { barColors } = this.props;
+    const ctx = e.drawingContext;
+    const points = e.points;
+    const yBottom = e.dygraph.toDomYCoord(0);
 
     // Find the minimum separation between x-values.
     // This determines the bar width.
-    var min_sep = Infinity;
-    for (var i = 1; i < points.length; i++) {
-      var sep = points[i].canvasx - points[i - 1].canvasx;
-      if (sep < min_sep) min_sep = sep;
+    let minSep = Infinity;
+    for (let i = 1; i < points.length; i++) {
+      const sep = points[i].canvasx - points[i - 1].canvasx;
+      if (sep < minSep) minSep = sep;
     }
-    var bar_width = Math.floor(2.0 / 3 * min_sep);
+    const barWidth = Math.floor((2.0 / 3) * minSep);
 
     // Do the actual plotting.
-    for (var i = 0; i < points.length; i++) {
-      var p = points[i];
-      var center_x = p.canvasx;
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const centerX = p.canvasx;
 
-      ctx.fillRect(center_x, p.canvasy, bar_width, y_bottom - p.canvasy);
-      ctx.strokeRect(center_x, p.canvasy, bar_width, y_bottom - p.canvasy);
+      ctx.fillStyle = !barColors ? e.color : barColors[p.xval] || e.color;
+      ctx.strokeStyle = !barColors ? e.color : barColors[p.xval] || e.color;
+
+      ctx.fillRect(centerX, p.canvasy, barWidth, yBottom - p.canvasy);
+      ctx.strokeRect(centerX, p.canvasy, barWidth, yBottom - p.canvasy);
     }
   }
 
