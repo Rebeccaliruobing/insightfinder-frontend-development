@@ -531,9 +531,8 @@ class LogAnalysisCharts extends React.Component {
     const sdata = selectedPatternChartData ? selectedPatternChartData.sdata || [] : [];
     const barColors = {};
     _.forEach(sdata, (d, idx) => {
-      // TODO: Set the colstring based on ts.
       const ts = +moment(d[0]).valueOf();
-      barColors[ts] = idx % 3 === 0 ? 'red' : 'blue';
+      barColors[ts] = 'teal'
     });
 
     let annotations = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
@@ -543,6 +542,7 @@ class LogAnalysisCharts extends React.Component {
         let pct = parseFloat(thisHint.pct);
         let pctString = pct && ((pct>0?"+":"")+Math.round(pct*10)/10+"%");
         let signString = pct && ((pct>0)?"+":"-");
+        barColors[ts] = 'red';
         return {
           series: selectedPatternChartData.sname[1],
           x: ts.valueOf(),
@@ -550,6 +550,7 @@ class LogAnalysisCharts extends React.Component {
           text: pctString,
         };
       } else {
+        barColors[ts] = 'teal';
         return {
           series: '',
           x: ts.valueOf(),
