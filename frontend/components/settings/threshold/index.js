@@ -41,6 +41,7 @@ export default class ThresholdSettings extends React.Component {
       sharing: '',
       threshold: '',
       episodeword: '',
+      logthreshold: '',
       grouping: '',
     };
     tabStates0[selectedTab] = 'active';
@@ -88,7 +89,7 @@ export default class ThresholdSettings extends React.Component {
     let { projectModelAllInfo, projectString } = dashboardUservalues;
     let projectNames = projectModelAllInfo.map((info)=>info.projectName);
 
-    let refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectNames[0];
+    let refreshName = store.get('settingsProjectName') ? store.get('settingsProjectName') : projectNames[0];
     if (projectNames.length > 0) {
       this.handleProjectChange(refreshName);
     }
@@ -127,7 +128,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let { cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames } = project;
+    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames } = project;
     let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
     if (!projectStr) {
       projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
@@ -176,6 +177,7 @@ export default class ThresholdSettings extends React.Component {
       projectType,
       cvalue,
       pvalue,
+      derivedpvalue,
       emailcvalue,
       emailpvalue,
       filtercvalue,
@@ -193,12 +195,8 @@ export default class ThresholdSettings extends React.Component {
     }, ()=> {
       projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
       let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
-      if (isLogProject) {
-        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-      } else {
-        this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-        store.set('liveAnalysisProjectName', projectName);
-      }
+      this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
+      store.set('settingsProjectName', projectName);
     });
   }
 
@@ -403,10 +401,10 @@ export default class ThresholdSettings extends React.Component {
   }
 
   handleSaveProjectSetting() {
-    let { projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
+    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
     let { tempSharedUsernames, data } = this.state;
     this.setState({ settingLoading: true }, ()=> {
-      apis.postProjectSetting(projectName, cvalue, pvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
+      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
         if (!resp.success) {
           window.alert(resp.message);
         }
@@ -472,14 +470,15 @@ export default class ThresholdSettings extends React.Component {
           <div className="ui right aligned vertical inline segment" style={{ zIndex: 200 }}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
-              <ProjectSelection key={data.projectName} value={data.projectName} style={{ minWidth: 200 }}
-                                onChange={this.handleProjectChange.bind(this)}/>
+              <ProjectSelection key={data.projectName} value={data.projectName} style={{ minWidth: 200 }} onChange={this.handleProjectChange.bind(this)}/>
             </div>
           </div>
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
               {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'episodeword')}>Episode and Word Selection</a>}
+              {isLogProject && <a className={tabStates0['logthreshold'] + ' item'}
+                                    onClick={(e) => this.selectTab0(e, 'logthreshold')}>Sensitivity Settings</a>}
               {!isLogProject && <a className={tabStates0['learning'] + ' item'}
                                    onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
@@ -493,6 +492,35 @@ export default class ThresholdSettings extends React.Component {
             </div>
             <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
                  style={{ 'paddingTop': '10px' }}>
+              {isLogProject && <div className={tabStates0['logthreshold'] + ' ui tab'}>
+                <h3>Clustering Sensitivity</h3>
+                <p>
+                  This setting controls the sensitivity with which  
+                  InsightFinder will cluster logs and detect anomalous 
+                  logs. 
+                </p>
+                <div className="field">
+                  <label style={labelStyle}>Anomaly Sensitivity</label>
+                  <AnomalyThreshold key={data.projectName} value={data.pvalue}
+                                    onChange={this.handleValueChange('pvalue')}/>
+                </div>
+                <div className="field">
+                  <label style={labelStyle}>Number of Samples</label>
+                  <DurationThreshold key={data.projectName} value={data.cvalue}
+                                     onChange={this.handleValueChange('cvalue')}/>
+                </div>
+                <h3>Frequency Anomaly Detection Sensitivity</h3>
+                <p>
+                  This setting controls sensitivity InsightFinder will 
+                  alert on frequency anomaly in given a time window.
+                </p>
+                <div className="field">
+                  <AnomalyThreshold key={data.projectName} value={data.derivedpvalue}
+                                    onChange={this.handleValueChange('derivedpvalue')}/>
+                </div>
+                <Button className="blue"
+                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+              </div>}
               {!isLogProject && <div className={tabStates0['learning'] + ' ui tab'}>
                 <h3>Time-Based Exclusions</h3>
 								<p>
@@ -530,11 +558,11 @@ export default class ThresholdSettings extends React.Component {
               </div>}
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
                 <h3>Dashboard Alert</h3>
-								<p>
-									This setting controls the sensitivity with which  
-									InsightFinder will detect and create anomaly events and 
-									display them in the Dashboard.
-								</p>
+                <p>
+                  This setting controls the sensitivity with which  
+                  InsightFinder will detect and create anomaly events and 
+                  display them in the Dashboard.
+                </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.pvalue}
@@ -546,10 +574,10 @@ export default class ThresholdSettings extends React.Component {
                                      onChange={this.handleValueChange('cvalue')}/>
                 </div>
                 <h3>Email Alert</h3>
-								<p>
-									This setting controls when InsightFinder will notify you via
-									email and any configured External Service.
-								</p>
+                <p>
+                  This setting controls when InsightFinder will notify you via
+                  email and any configured External Service.
+                </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThreshold key={data.projectName} value={data.emailpvalue}

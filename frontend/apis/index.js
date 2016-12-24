@@ -906,7 +906,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+    postProjectSetting(projectName, cvalue, pvalue, derivedPvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -915,6 +915,7 @@ const apis = {
                     projectName,
                     cvalue,
                     pvalue,
+                    derivedPvalue,
                     'cvalue-email': cvalueEmail,
                     'pvalue-email': pvalueEmail,
                     'cvalue-filter': cvalueFilter,

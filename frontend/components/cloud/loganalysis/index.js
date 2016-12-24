@@ -532,10 +532,11 @@ class LogAnalysisCharts extends React.Component {
       if(thisHint){
         let pct = parseFloat(thisHint.pct);
         let pctString = pct && ((pct>0?"+":"")+Math.round(pct*10)/10+"%");
+        let signString = pct && ((pct>0)?"+":"-");
         return {
           series: selectedPatternChartData.sname[1],
           x: ts.valueOf(),
-          shortText: pctString,
+          shortText: signString,
           text: pctString,
         };
       } else {
