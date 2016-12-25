@@ -136,6 +136,7 @@ class LogAnalysisCharts extends React.Component {
       selectedGroupId: undefined,
       summarySelected: false,
       selectedAnnotation: null,
+      selectedBarColors: [],
       showSettingModal: false,
       tabStates: {
         event: '',
@@ -203,11 +204,39 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
-    // filter out anomaly and small cluster and run again
-    let newLogEventArr = logEventArr.filter(function (el, index, arr) {
+    let allEventTableData = [];
+    let groupData = {};
+    logEventArr.map((event, iEvent) => {
+      let showNumber = neuronList.indexOf(iEvent);
+      let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+
+      // Find a new group.
+      if (showNumber != -1) {
+        groupData = {};
+        let iGroup = neuronIdList.indexOf(event.nid) + 1;
+        groupData.nid = event.nid;
+        groupData.iGroup = iGroup;
+        groupData.rowSpan = neuronValue[showNumber];
+        groupData.nEvents = neuronValue[iGroup - 1];
+
+        // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
+        // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
+        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
+        groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
+        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
+        groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
+        groupData.data = [[timestamp, event.rawData, event.timestamp]];
+        allEventTableData.push(groupData);
+      } else {
+        groupData.data.push([timestamp, event.rawData, event.timestamp]);
+      }
+    });
+
+    // make a copy, and filter out anomaly and small cluster, and run again
+    let allLogEventArr = logEventArr.slice();
+    logEventArr = logEventArr.filter(function (el, index, arr) {
       return (neuronValue[neuronIdList.indexOf(el.nid)] > 3)
     });
-    logEventArr = newLogEventArr;
     neuronListNumber = {};
     neuronValue = [];
     nidList = _.map(logEventArr, function (o) {
@@ -234,9 +263,6 @@ class LogAnalysisCharts extends React.Component {
     });
 
     let eventTableData = [];
-    // let realAnomalies = _.filter(anomalies, a => a.val > 0);
-    let groupData;
-
     logEventArr.map((event, iEvent) => {
       let showNumber = neuronList.indexOf(iEvent);
       let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
@@ -263,6 +289,8 @@ class LogAnalysisCharts extends React.Component {
       }
     });
 
+    this.allLogEventArr = allLogEventArr;
+    this.allEventTableData = allEventTableData;
 
     this.logEventArr = logEventArr;
     this.neuronValue = neuronValue;
@@ -454,8 +482,8 @@ class LogAnalysisCharts extends React.Component {
 
   @autobind
   handlePatternPointClick(startTs) {
-    const { selectedPatternChartData, selectedPattern } = this.state;
-    const eventTableData = this.eventTableData;
+    const { selectedPatternChartData, selectedPattern, selectedAnnotation, selectedBarColors } = this.state;
+    const eventTableData = this.allEventTableData;
     let nid = parseInt(selectedPattern.replace("Pattern ",""));
     let selectedEventTableData = _.find(eventTableData, event => event.nid == nid)
     if(selectedEventTableData){
@@ -472,7 +500,12 @@ class LogAnalysisCharts extends React.Component {
         let eventsInRangeFreqVector = eventList.filter(function (el, index, arr) {
           return (el[2]>=startTs && el[2]<=endTs);
         });
-        this.setState({eventsInRangeFreqVector});
+        let selectedSelectedAnnotation = _.find(selectedAnnotation, a => a.x == startTs);
+        let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText;
+        this.setState({
+          eventsInRangeFreqVector,
+          selectedDetailedText,
+        });
       }
     }
   }
@@ -483,11 +516,52 @@ class LogAnalysisCharts extends React.Component {
     let pos = patterns.indexOf(pattern);
     let selectedPatternChartData = nonZeroFreqChartDatas[pos];
     let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
+
+    // Create the bar colors for time series. time => colstring.
+    const sdata = selectedPatternChartData ? selectedPatternChartData.sdata || [] : [];
+    const barColors = {};
+    _.forEach(sdata, (d, idx) => {
+      const ts = +moment(d[0]).valueOf();
+      barColors[ts] = 'teal';
+    });
+
+    let selectedAnnotation = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
+      let ts = +moment(datapoint[0]);
+      let thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
+      if(thisHint){
+        let pct = parseFloat(thisHint.pct);
+        pct = Math.round(pct*10)/10;
+        let detailedText = "Frequency of this pattern is " + Math.abs(pct) + "% " + ((pct>0)?"higher":"lower") + " than normal.";
+        let pctString = pct && ((pct>0?"+":"")+pct+"%");
+        let signString = pct && ((pct>0)?"+":"-");
+        barColors[ts] = ((pct>0)?"red":"blue");
+        return {
+          series: selectedPatternChartData.sname[1],
+          x: ts.valueOf(),
+          shortText: signString,
+          text: pctString,
+          detailedText,
+        };
+      } else {
+        barColors[ts] = 'teal';
+        return {
+          series: '',
+          x: ts.valueOf(),
+          shortText: '',
+          text: '',
+          detailedText: '',
+        };
+      }
+    }) : [];
+
     this.setState({
       selectedPattern: pattern,
       selectedPatternChartData,
+      selectedAnnotation,
+      selectedBarColors: barColors, 
       derivedAnomaly,
       eventsInRangeFreqVector:[],
+      selectedDetailedText:'',
     });
   }
   
@@ -524,41 +598,10 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
-    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector,derivedAnomaly } = this.state;
+    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
+      derivedAnomaly, selectedDetailedText, selectedAnnotation, selectedBarColors} = this.state;
     let emptyAnnotations = [];
 
-    // Create the bar colors for time series. time => colstring.
-    const sdata = selectedPatternChartData ? selectedPatternChartData.sdata || [] : [];
-    const barColors = {};
-    _.forEach(sdata, (d, idx) => {
-      const ts = +moment(d[0]).valueOf();
-      barColors[ts] = 'teal'
-    });
-
-    let annotations = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
-      let ts = +moment(datapoint[0]);
-      let thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
-      if(thisHint){
-        let pct = parseFloat(thisHint.pct);
-        let pctString = pct && ((pct>0?"+":"")+Math.round(pct*10)/10+"%");
-        let signString = pct && ((pct>0)?"+":"-");
-        barColors[ts] = 'red';
-        return {
-          series: selectedPatternChartData.sname[1],
-          x: ts.valueOf(),
-          shortText: signString,
-          text: pctString,
-        };
-      } else {
-        barColors[ts] = 'teal';
-        return {
-          series: '',
-          x: ts.valueOf(),
-          shortText: '',
-          text: '',
-        }
-      }
-    }) : emptyAnnotations;
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
     // <br />(sorted by CPU usage)
@@ -596,13 +639,24 @@ class LogAnalysisCharts extends React.Component {
               <DataChart
                 chartType='bar'
                 data={selectedPatternChartData}
-                barColors={barColors}
-                annotations={annotations}
+                barColors={selectedBarColors}
+                annotations={emptyAnnotations}
                 onClick={this.handlePatternPointClick}
               />
             </div>
           }
+          { (selectedDetailedText && selectedDetailedText.length) ? 
+            <div>
+              {selectedDetailedText}
+            </div>
+            : 
+            <div>
+              &nbsp;
+            </div>
+          }
           { (eventsInRangeFreqVector && eventsInRangeFreqVector.length) ? 
+            <div>
+            <h4>Event List</h4>
             <table className="freq-event-table">
               <thead>
               <tr>
@@ -619,6 +673,7 @@ class LogAnalysisCharts extends React.Component {
                 ))}
               </tbody>
             </table>
+            </div>
             : null
           }
         </div>
