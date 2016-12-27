@@ -173,15 +173,15 @@ class LogAnalysisCharts extends React.Component {
 
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
-    let logEventArr = this.dp.logEventArr;
-    logEventArr = logEventArr.filter(function (el, index, arr) {
+    let allLogEventArr = this.dp.logEventArr;
+    allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
       return el.nid != -1
     });
     let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
     let clusterTopWordArr = this.dp.clusterTopWordArr;
     let neuronListNumber = {};
     let neuronValue = [];
-    let nidList = _.map(logEventArr, function (o) {
+    let nidList = _.map(allLogEventArr, function (o) {
       return o['nid']
     });
     let neuronList = nidList.filter(function (el, index, arr) {
@@ -189,7 +189,7 @@ class LogAnalysisCharts extends React.Component {
     });
 
     _.forEach(neuronList, function (value, key) {
-      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
+      neuronListNumber[value] = (_.partition(allLogEventArr, function (o) {
         return o['nid'] == value
       })[0]).length;
     });
@@ -206,7 +206,7 @@ class LogAnalysisCharts extends React.Component {
 
     let allEventTableData = [];
     let groupData = {};
-    logEventArr.map((event, iEvent) => {
+    allLogEventArr.map((event, iEvent) => {
       let showNumber = neuronList.indexOf(iEvent);
       let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
 
@@ -233,8 +233,7 @@ class LogAnalysisCharts extends React.Component {
     });
 
     // make a copy, and filter out anomaly and small cluster, and run again
-    let allLogEventArr = logEventArr.slice();
-    logEventArr = logEventArr.filter(function (el, index, arr) {
+    let logEventArr = allLogEventArr.filter(function (el, index, arr) {
       return (neuronValue[neuronIdList.indexOf(el.nid)] > 3)
     });
     neuronListNumber = {};
@@ -293,8 +292,8 @@ class LogAnalysisCharts extends React.Component {
     this.allEventTableData = allEventTableData;
 
     this.logEventArr = logEventArr;
-    this.neuronValue = neuronValue;
     this.eventTableData = eventTableData;
+    this.neuronValue = neuronValue;
   }
 
   renderWordCountTable() {
@@ -577,6 +576,9 @@ class LogAnalysisCharts extends React.Component {
     let patterns = [];
     let nonZeroFreqChartDatas = [];
     for (var pattern in nonZeroFreqVectors) {
+      if(pattern == 'Pattern -1'){
+        continue; // skip anomaly result: neuronId==-1
+      }
       let nonZeroFreqChartData = {
         sdata: nonZeroFreqVectors[pattern],
         sname: ['Time Window Start', pattern],
@@ -598,7 +600,7 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
-    const eventTableData = this.eventTableData;
+    const eventTableData = this.allEventTableData;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
       derivedAnomaly, selectedDetailedText, selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
     let emptyAnnotations = [];
