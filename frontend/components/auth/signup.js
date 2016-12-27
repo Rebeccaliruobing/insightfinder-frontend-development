@@ -111,7 +111,7 @@ class Signup extends BaseComponent {
               </div>
               <div className="inline field" style={{fontSize: 13}}>
                 <div className="ui checkbox">
-                  <input type="checkbox" tabIndex="0" className="hidden" checked={checked}
+                  <input type="checkbox" tabIndex="0" class="hidden" checked={checked}
                          onChange={(e) => this.setState({error: '', checked: e.target.checked})} />
                   <label>I agree to
                     <a href="https://insightfinder.com/terms-of-use" target="_blank">&nbsp;Terms of Use</a> and

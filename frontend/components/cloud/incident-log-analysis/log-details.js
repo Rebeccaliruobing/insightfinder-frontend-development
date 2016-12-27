@@ -23,7 +23,7 @@ const ProjectLogDetails = class extends React.Component {
 
   updateData() {
     const { query } = this.props.location;
-    const { projectName,
+    const { projectName, derivedPvalue,
       pvalue, cvalue,
       modelType,
       startTime, endTime,
@@ -32,7 +32,7 @@ const ProjectLogDetails = class extends React.Component {
     } = query;
     this.setState({ loading: true }, () => {
       apis.postLogAnalysis(
-        projectName,
+        projectName, derivedPvalue,
         pvalue, cvalue,
         modelType,
         startTime, endTime,
@@ -55,7 +55,7 @@ const ProjectLogDetails = class extends React.Component {
 
   render() {
     let { query } = this.props.location;
-    let { projectName, modelName, pvalue, cvalue, modelType } = query;
+    let { projectName, modelName, derivedPvalue, pvalue, cvalue, modelType } = query;
     let { data, groupId, loading } = this.state;
     if (projectName === '') {
       projectName = modelName;
@@ -67,8 +67,8 @@ const ProjectLogDetails = class extends React.Component {
           <div className="topbar-text">
             <div className="title">
               Please view anomaly detection result for <b>{projectName}</b><br />
-              with model type <b>{modelType}</b>, anomaly threshold <b>{pvalue}</b>,
-              duration threshold: <b>{cvalue}</b>.
+              with model type <b>{modelType}</b>, clustering sensitivity <b>{pvalue}</b>,
+              frequency anomaly detection sensitivity <b>{derivedPvalue}</b>.
           </div>
             <div className="legend">
               <div>Anomaly color map:</div>

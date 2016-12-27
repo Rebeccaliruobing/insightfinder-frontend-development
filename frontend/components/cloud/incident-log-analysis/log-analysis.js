@@ -22,6 +22,7 @@ class LogAnalysis extends React.Component {
     super(props);
     this.state = {
       projectName: '',
+      derivedPvalue: 0.9,
       pvalue: 0.99,
       cvalue: 1,
       minPts: 5,
@@ -91,6 +92,7 @@ class LogAnalysis extends React.Component {
       projectName,
       modelType: 'Holistic',
       modelTypeText: 'Holistic',
+      derivedPvalue: 0.9,
       pvalue: 0.9,
       cvalue: 1,
       minPts: 5,
@@ -218,7 +220,7 @@ class LogAnalysis extends React.Component {
 
   handleClickIncident(incident) {
     return (e) => {
-      let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, pValue, cValue, holisticModelKeys, splitModelKeys, recorded} = incident;
+      let {incidentStartTime, incidentEndTime, dataChunkName, modelStartTime, modelEndTime, modelType, derivedPvalue, pValue, cValue, holisticModelKeys, splitModelKeys, recorded} = incident;
       let isd = moment(incidentStartTime);
       let ied = moment(incidentEndTime);
       let msd = moment(modelStartTime);
@@ -248,8 +250,9 @@ class LogAnalysis extends React.Component {
           endTime: ied,
           modelStartTime,
           modelEndTime,
+          derivedPvalue: derivedPvalue||0.9, 
           pvalue: pValue,
-          cvalue: cValue,
+          cvalue: 1,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
           recorded,
@@ -262,12 +265,12 @@ class LogAnalysis extends React.Component {
   }
 
   handleSubmit() {
-    const { projectName, modelType, startTime, endTime,
+    const { projectName, modelType, startTime, endTime, derivedPvalue,
       pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
     } = this.state;
 
     this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit({
-      projectName, modelType, startTime, endTime, pvalue, cvalue,
+      projectName, modelType, startTime, endTime, derivedPvalue, pvalue, cvalue,
       modelStartTime, modelEndTime, isExistentIncident,
     });
   }
@@ -335,7 +338,7 @@ class LogAnalysis extends React.Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, pvalue, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
+      projectName, incident, startTime, endTime, derivedPvalue, pvalue, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -368,7 +371,7 @@ class LogAnalysis extends React.Component {
             </div>
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-              <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold" labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
+              <WaringButton labelStyle={labelStyle} labelTitle="Clustering Sensitivity" labelSpan="choose a number in [0,1) to configure clustering sensitivity. This setting controls the sensitivity with which InsightFinder will cluster logs and detect anomalous logs."/>
               <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
             </div>
           }
@@ -379,8 +382,8 @@ class LogAnalysis extends React.Component {
             </div>
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-              <label style={labelStyle}>Duration Threshold (Sample Number)</label>
-              <DurationThreshold value={cvalue} onChange={(v, t)=>this.setState({cvalue: t})}/>
+              <WaringButton labelStyle={labelStyle} labelTitle="Frequency Anomaly Detection Sensitivity" labelSpan="This setting controls sensitivity InsightFinder will alert on frequency anomaly in given a time window. "/>
+              <AnomalyThreshold value={derivedPvalue} onChange={(v, t)=>this.setState({derivedPvalue: t})}/>
             </div>
           }
 

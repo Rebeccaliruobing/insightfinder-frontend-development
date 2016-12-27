@@ -598,8 +598,9 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
+    const eventTableData = this.eventTableData;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
-      derivedAnomaly, selectedDetailedText, selectedAnnotation, selectedBarColors} = this.state;
+      derivedAnomaly, selectedDetailedText, selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
     let emptyAnnotations = [];
 
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
@@ -618,17 +619,31 @@ class LogAnalysisCharts extends React.Component {
               </tr>
             </thead>
             <tbody>
-              {patterns && patterns.map((pattern, i) => (
-                <tr
-                  key={i}
-                  onClick={() => this.handlePatternSelected(pattern)}
-                  className={cx(
-                { active: patterns === this.state.selectedPattern })
-              } style={{ cursor: 'pointer' }}
-                >
-                  <td>{pattern}</td>
-                </tr>
-          ))}
+              {patterns && patterns.map((pattern, i) => {
+                let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
+                let anomalyCount = "";
+                if(derivedAnomaly && derivedAnomaly.length>0){
+                  anomalyCount = " (Anomaly count: "+derivedAnomaly.length+")";
+                }
+                let patternNo = parseInt(pattern.replace("Pattern ",""));
+                let group = _.find(eventTableData, group => group.nid == patternNo);
+                let topKEpisodes = "";
+                let topKWords = "";
+                if(group){
+                  topKEpisodes = group.topKEpisodes.length > 0
+                    ? "Top frequent episodes: " + group.topKEpisodes.replace(/\(\d+\)/g,"") : "";
+                  topKWords = group.topKWords.length > 0
+                    ? "Top keywords: " + group.topKWords.replace(/\(\d+\)/g,"") : ""; 
+                }
+                return (<tr
+                    key={i}
+                    onClick={() => this.handlePatternSelected(pattern)}
+                    className={cx({ active: patterns === this.state.selectedPattern })} 
+                      style={{ cursor: 'pointer' }}
+                  >
+                    <td><b>{pattern}</b>{anomalyCount}<br />{topKWords}<br />{topKEpisodes}</td>
+                  </tr>)
+              })}
             </tbody>
           </table>
         </div>
