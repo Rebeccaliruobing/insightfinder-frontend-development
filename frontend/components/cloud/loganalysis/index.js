@@ -1,5 +1,6 @@
 import React from 'react';
 import moment from 'moment';
+import $ from 'jquery';
 import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
@@ -480,7 +481,7 @@ class LogAnalysisCharts extends React.Component {
   }
 
   @autobind
-  handlePatternPointClick(startTs) {
+  handlePatternPointClick(startTs, position) {
     const { selectedPatternChartData, selectedPattern, selectedAnnotation, selectedBarColors } = this.state;
     const eventTableData = this.allEventTableData;
     let nid = parseInt(selectedPattern.replace("Pattern ",""));
@@ -500,10 +501,14 @@ class LogAnalysisCharts extends React.Component {
           return (el[2]>=startTs && el[2]<=endTs);
         });
         let selectedSelectedAnnotation = _.find(selectedAnnotation, a => a.x == startTs);
-        let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText;
+        let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText || '';
+        // Make sure the text position is not out of the screen
+        const selectedDetailedTextLeftPosition =
+          Math.min(position.x, $(window).width() - selectedDetailedText.length * 12);
         this.setState({
           eventsInRangeFreqVector,
           selectedDetailedText,
+          selectedDetailedTextLeftPosition,
         });
       }
     }
@@ -561,6 +566,7 @@ class LogAnalysisCharts extends React.Component {
       derivedAnomaly,
       eventsInRangeFreqVector:[],
       selectedDetailedText:'',
+      selectedDetailedTextLeftPosition: 0,
     });
   }
   
@@ -602,7 +608,8 @@ class LogAnalysisCharts extends React.Component {
     if (!this.dp) return;
     const eventTableData = this.allEventTableData;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
-      derivedAnomaly, selectedDetailedText, selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
+      derivedAnomaly, selectedDetailedText, selectedDetailedTextLeftPosition,
+      selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
     let emptyAnnotations = [];
 
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
@@ -663,11 +670,11 @@ class LogAnalysisCharts extends React.Component {
             </div>
           }
           { (selectedDetailedText && selectedDetailedText.length) ? 
-            <div>
+            <div style={{position: 'fixed', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
               {selectedDetailedText}
             </div>
             : 
-            <div>
+            <div style={{position: 'fixed', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
               &nbsp;
             </div>
           }

@@ -59,7 +59,7 @@ export class DataChart extends React.Component {
     e.stopPropagation();
     e.preventDefault();
     if (this.props.onClick) {
-      this.props.onClick(x);
+      this.props.onClick(x, { x: e.clientX, y: e.clientY });
     }
   }
 
