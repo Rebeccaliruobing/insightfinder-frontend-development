@@ -640,7 +640,7 @@ class LogAnalysisCharts extends React.Component {
                 return (<tr
                     key={i}
                     onClick={() => this.handlePatternSelected(pattern)}
-                    className={cx({ active: patterns === this.state.selectedPattern })} 
+                    className={cx({ active: pattern === this.state.selectedPattern })} 
                       style={{ cursor: 'pointer' }}
                   >
                     <td><b>{pattern}</b>{anomalyCount}<br />{topKWords}<br />{topKEpisodes}</td>
