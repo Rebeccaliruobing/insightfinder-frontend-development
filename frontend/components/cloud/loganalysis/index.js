@@ -503,8 +503,8 @@ class LogAnalysisCharts extends React.Component {
         let selectedSelectedAnnotation = _.find(selectedAnnotation, a => a.x == startTs);
         let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText || '';
         // Make sure the text position is not out of the screen
-        const selectedDetailedTextLeftPosition =
-          Math.min(position.x, $(window).width() - selectedDetailedText.length * 8);
+        const selectedDetailedTextLeftPosition = position.x;
+          // Math.min(position.x, $(window).width() - selectedDetailedText.length * 8);
         this.setState({
           eventsInRangeFreqVector,
           selectedDetailedText,
@@ -602,7 +602,21 @@ class LogAnalysisCharts extends React.Component {
   }
 
   
-
+// .sort(function (a, b) {
+//                 let aPatternNo = parseInt(a.replace("Pattern ",""));
+//                 let bPatternNo = parseInt(b.replace("Pattern ",""));
+//                 let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+//                 let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
+//                 let aid = aGroup.nEvents;
+//                 let bid = bGroup.nEvents;
+//                 if (aid > bid) {
+//                   return 1;
+//                 } else if (aid < bid) {
+//                   return -1;
+//                 } else {
+//                   return 0;
+//                 }
+//               })
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
@@ -670,11 +684,11 @@ class LogAnalysisCharts extends React.Component {
             </div>
           }
           { (selectedDetailedText && selectedDetailedText.length) ? 
-            <div style={{position: 'fixed', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
+            <div style={{position: 'fixed', color:'red', fontSize:'1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
               {selectedDetailedText}
             </div>
             : 
-            <div style={{position: 'fixed', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
+            <div style={{position: 'fixed', color:'red', fontSize:'1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
               &nbsp;
             </div>
           }
