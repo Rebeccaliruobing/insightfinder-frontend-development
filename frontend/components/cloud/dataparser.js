@@ -731,22 +731,24 @@ class DataParser {
 
     let timestamps = [];
     let nonZeroFreqVectors = {};
-    let timestampContent = freqVectorObj['timestamp'];
-    let timestampParts = timestampContent.split(',');
-    _.each(timestampParts, function (part, idx) {
-      timestamps.push(parseInt(part))
-    });
-    for (var colName in freqVectorObj) {
-      let content = freqVectorObj[colName];
-      let parts = content.split(',');
-      let timeseries = [];
-      if(colName != 'timestamp'){
-        let nonZeroFreqVectorData = [];
-        _.each(parts, function (part, idx) {
-          let ts = new Date(timestamps[idx]);
-          nonZeroFreqVectorData.push([ts,parseInt(part)]);
-        });
-        nonZeroFreqVectors[colName] = nonZeroFreqVectorData;
+    if(freqVectorObj!=undefined){
+      let timestampContent = freqVectorObj['timestamp'];
+      let timestampParts = timestampContent.split(',');
+      _.each(timestampParts, function (part, idx) {
+        timestamps.push(parseInt(part))
+      });
+      for (var colName in freqVectorObj) {
+        let content = freqVectorObj[colName];
+        let parts = content.split(',');
+        let timeseries = [];
+        if(colName != 'timestamp'){
+          let nonZeroFreqVectorData = [];
+          _.each(parts, function (part, idx) {
+            let ts = new Date(timestamps[idx]);
+            nonZeroFreqVectorData.push([ts,parseInt(part)]);
+          });
+          nonZeroFreqVectors[colName] = nonZeroFreqVectorData;
+        }
       }
     }
 

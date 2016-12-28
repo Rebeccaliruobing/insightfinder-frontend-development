@@ -504,7 +504,7 @@ class LogAnalysisCharts extends React.Component {
         let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText || '';
         // Make sure the text position is not out of the screen
         const selectedDetailedTextLeftPosition =
-          Math.min(position.x, $(window).width() - selectedDetailedText.length * 12);
+          Math.min(position.x, $(window).width() - selectedDetailedText.length * 8);
         this.setState({
           eventsInRangeFreqVector,
           selectedDetailedText,

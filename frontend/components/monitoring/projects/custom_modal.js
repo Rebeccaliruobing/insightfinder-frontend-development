@@ -96,6 +96,7 @@ class CustomProjectModal extends React.Component {
                 <div className="menu">
                   <div className="item" data-value="Metric">Metric</div>
                   <div className="item" data-value="Log">Log</div>
+                  <div className="item" data-value="SysCall">SysCall</div>
                 </div>
               </Dropdown>
             </div>
