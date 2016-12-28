@@ -56,6 +56,8 @@ export class DataChart extends React.Component {
 
   @autobind
   handleClick(e, x) {
+    e.stopPropagation();
+    e.preventDefault();
     if (this.props.onClick) {
       this.props.onClick(x);
     }
@@ -162,7 +164,7 @@ export class DataChart extends React.Component {
         highlightEndTime={eventEndTime}
         latestDataTimestamp={latestDataTimestamp}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
-        dateWindow={dateWindow}
+        {...dateWindow ? { dateWindow } : {}}
         annotations={enableAnnotations || chartType === 'bar' ? annotations : null}
         plotter={chartType === 'bar' ? this.barChartPlotter : null}
         onAnnotationClick={chartType === 'bar' ? null : this.handleAnnotationClick}
