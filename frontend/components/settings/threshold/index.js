@@ -202,7 +202,7 @@ export default class ThresholdSettings extends React.Component {
 
   getLogAnalysisList(projectName, project) {
     let self = this;
-    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
+    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
       if(!resp.data){
         alert(resp);
         return;
@@ -754,7 +754,7 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {episodeList.slice(0, 200).map((value, index)=> {
+                    {episodeList && episodeList.slice(0, 200).map((value, index)=> {
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>
@@ -780,7 +780,7 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {wordList.slice(0, 200).map((value, index)=> {
+                    {wordList && wordList.slice(0, 200).map((value, index)=> {
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>

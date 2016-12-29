@@ -27,6 +27,32 @@
   }
 }
 
+.event-right-table {
+  border: 2px solid black;
+  width: 80%;
+  td{
+    border-right: 1px solid black;
+    border-top: 1px solid black;
+    text-align: left;
+    vertical-align: top;
+  }
+  thead > tr {
+    border-top: none;
+    font-weight: bold;
+    td {
+      &:nth-child(1) {
+        width: 10%;
+      }
+      &:nth-child(2) {
+        width: 60%;
+      }
+      &:nth-child(3) {
+        width: 20%;
+      }
+    }
+  }
+}
+
 .rare-event-table {
   border: 2px solid black;
   width: 60%;
