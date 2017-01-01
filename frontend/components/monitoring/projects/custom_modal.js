@@ -14,8 +14,10 @@ class CustomProjectModal extends React.Component {
     super(props);
     this._dropdown = null;
     this.state = {
+      projectName:"",
       projectCloudType:"",
-      dataType:[]
+      processName:"",
+      dataType:[],
     };
   }
 
@@ -40,7 +42,7 @@ class CustomProjectModal extends React.Component {
   }
 
   handleSubmit() {
-    let {projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key} = this.state;
+    let {projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, processName} = this.state;
     if(projectName==null){
       alert("Project name cannot be empty.");
       return false;
@@ -50,7 +52,7 @@ class CustomProjectModal extends React.Component {
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    apis.postAddCustomProject(projectName, projectCloudType, dataTypeString, samplingInterval, zone, access_key, secrete_key).then((resp)=> {
+    apis.postAddCustomProject(projectName, projectCloudType, dataTypeString, samplingInterval, zone, access_key, secrete_key, processName).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
         // this.setState({message:resp.message});
@@ -67,6 +69,7 @@ class CustomProjectModal extends React.Component {
   render() {
     let {projectCloudType,dataType} = this.state;
     let disabledInterval=(projectCloudType=="LogFile")||(dataType.length==1&&dataType.indexOf('Log')!=-1);
+    let enableProcessName = (dataType.indexOf("SysCall")!=-1);
     if(projectCloudType=="MetricFile"){
       disabledInterval = false;
     }
@@ -112,6 +115,11 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="60">60 minutes</option>
               </select>
             </div>
+            {enableProcessName ? <div className="field">
+              <label>Process Names (comma separated)</label>
+              <label>eg. "httpd,apache"</label>
+              <input type="text" name="processName" onChange={(e)=>this.setState({processName: e.target.value})}/>
+            </div> : null}
           </form>
         </div>
         <div className="actions">
