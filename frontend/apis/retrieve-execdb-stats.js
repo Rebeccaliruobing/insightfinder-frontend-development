@@ -10,7 +10,7 @@ const retrieveExecDBStatisticsData = (projectName, endTimestamp, modelType, numb
   return new Promise((resolve, reject) => {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('SystemsStatsDataServlet', 1),
+      url: getEndpoint('eventStats'),
       data: $.param({
         userName, token, projectName, endTimestamp, modelType, numberOfDays, operation: 'post',
       }),

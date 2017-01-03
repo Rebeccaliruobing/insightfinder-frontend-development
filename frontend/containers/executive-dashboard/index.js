@@ -74,6 +74,7 @@ class ExecutiveDashboard extends React.Component {
           </div>
           <div className="ui vertical segment">
             <h3>Top 5 Projects / Groups</h3>
+            <Top5Grid />
           </div>
           <div className="ui vertical segment">
             <h3>Hourly Heatmap of Anomalies Detected & Predicted</h3>
