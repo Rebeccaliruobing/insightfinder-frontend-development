@@ -28,7 +28,7 @@ class LogAnalysis extends React.Component {
       minPts: 5,
       epsilon: 1.0,
       durationHours: 24,
-      modelType: "Holistic",
+      modelType: "holisticLog",
       modelTypeText: 'Holistic',
       projectType: '',
       availableDataRanges:[],
@@ -38,9 +38,7 @@ class LogAnalysis extends React.Component {
       modelTypeTextMap: {}
     };
     this.state.modelTypeTextMap["Holistic"]= "Holistic";
-    this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
-    this.state.modelTypeTextMap["Split"]= "Split";
-    this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
+    this.state.modelTypeTextMap["holisticLog"]= "Holistic";
     this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
   }
 
@@ -90,7 +88,7 @@ class LogAnalysis extends React.Component {
     let [name, dataType, cloudType] = project;
     let update = {
       projectName,
-      modelType: 'Holistic',
+      modelType: 'holisticLog',
       modelTypeText: 'Holistic',
       derivedPvalue: 0.9,
       pvalue: 0.9,
@@ -98,7 +96,7 @@ class LogAnalysis extends React.Component {
       minPts: 5,
       epsilon: 1.0,
     };
-    update.modelType = "Holistic";
+    update.modelType = "holisticLog";
     update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
       case 'AWS':
