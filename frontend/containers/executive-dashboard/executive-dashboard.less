@@ -11,6 +11,60 @@
       margin-bottom: 8px;
     }
 
+    table.toplist {
+      width: 100%;
+      thead {
+        height: 50px;
+        background: #566f84;
+        color: white;
+        font-size: 14px;
+        border-bottom: 1px solid #d7d7d7;
+        th {
+          border-right: 1px solid #d7d7d7;
+          line-height: 26px;
+          font-weight: normal;
+          &.subheader {
+            border-bottom: 1px solid #d7d7d7;
+          }
+        }
+      }
+      tbody {
+        tr {
+          font-size: 14px;
+          line-height: 40px;
+
+          &.project {
+            border-top: 1px solid #d7d7d7;
+            cursor: pointer;
+          }
+          &:last-child {
+            border-bottom: 1px solid #d7d7d7;
+          }
+
+          td:first-child {
+            padding: 0 0.5em;
+          }
+          &:hover {
+            background: rgba(33, 150, 243, 0.1);
+          }
+          &:nth-child(odd) {
+            // background: rgba(33, 150, 243, 0.05);
+          }
+
+          td.number {
+            text-align: center;
+            .avg, .total {
+              margin: 0 2px;
+            }
+          }
+          td .name {
+            cursor: pointer;
+            color: #4183C4;
+          }
+        }
+      }
+    }
+
     .ui.statistic {
       border-color: white;
       padding: 0;
