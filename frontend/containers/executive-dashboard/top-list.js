@@ -35,10 +35,6 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
       <td className="number">{normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 1)}</td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'), 1)}</td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
-
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
@@ -46,6 +42,11 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
+
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
+
     </tr>
   );
 };
@@ -124,9 +125,9 @@ class TopList extends React.Component {
               }}
             >Project/Group Name</th>
             <th className="subheader" colSpan={3} width="20%">Anomaly Score</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Event</th>
             <th className="subheader" colSpan={3} width="20%">Anomaly Duration</th>
             <th className="subheader" colSpan={3} width="20%">Anomaly Count</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Events</th>
           </tr>
           <tr>
             <th>Previous</th>
