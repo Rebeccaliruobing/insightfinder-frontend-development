@@ -15,7 +15,6 @@ const normalizeValue = (val) => {
 
 const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = true }) => {
   const { name, stats, color } = data;
-  console.log(color);
   return (
     <tr
       style={{

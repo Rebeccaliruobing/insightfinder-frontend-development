@@ -72,6 +72,7 @@ class ExecutiveDashboard extends React.Component {
 
     this.state = {
       eventStats: [],
+      loading: true,
     };
   }
 
@@ -82,6 +83,7 @@ class ExecutiveDashboard extends React.Component {
       .then((data) => {
         this.setState({
           eventStats: normalizeStats(data, 'current.totalAnomalyScore'),
+          loading: false,
         });
       }).catch((msg) => {
         console.log(msg);
@@ -89,11 +91,13 @@ class ExecutiveDashboard extends React.Component {
   }
 
   render() {
-    const { eventStats } = this.state;
+    const { loading, eventStats } = this.state;
 
     return (
-      <Console.Content className="executive-dashboard">
-        <div className="ui main tiny container">
+      <Console.Content
+        className={`executive-dashboard ${loading ? 'ui form loading' : ''}`}
+      >
+        <div className="ui main tiny container" style={{ display: loading && 'none' }}>
           <div className="ui vertical segment">
             <h3>Detected/Predicted Anomaly Overview</h3>
             <TopList stats={eventStats} />
