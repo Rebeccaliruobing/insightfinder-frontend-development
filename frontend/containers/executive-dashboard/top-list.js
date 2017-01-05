@@ -1,7 +1,6 @@
 import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import _ from 'lodash';
-import store from 'store';
 
 const normalizeValue = (val, fractionDigits = 0) => {
   if (_.isFinite(val)) {
@@ -62,6 +61,7 @@ class TopList extends React.Component {
   static propTypes = {
     stats: T.array,
     autoExpandCount: T.number,
+    onRowOpen: T.func,
   };
 
   static defaultProps = {
@@ -99,13 +99,11 @@ class TopList extends React.Component {
   }
 
   @autobind
-  handleProjectClick(name, groupName) {
+  handleProjectClick(projectName, groupName) {
     return (e) => {
       e.stopPropagation();
       e.preventDefault();
-      store.set('liveAnalysisProjectName', name);
-      store.set('currentProjectGroup', groupName);
-      window.open('/cloud/monitoring', '_target');
+      this.props.onRowOpen(projectName, groupName);
     };
   }
 

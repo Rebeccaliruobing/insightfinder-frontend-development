@@ -1,5 +1,6 @@
 import React from 'react';
 import store from 'store';
+import { withRouter } from 'react-router';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import { Console, Button, Dropdown } from '../../artui/react';
@@ -61,7 +62,7 @@ class EventSummary extends React.Component {
       let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = `/cloud/incident-log-analysis`;
+      const url = '/cloud/incident-log-analysis';
       window.open(url, '_self');
     }
   }
@@ -134,26 +135,6 @@ class EventSummary extends React.Component {
       this.refreshInstanceGroup(instanceGroup);
     });
   }
-
-  // refreshProjectName(projectName) {
-  //   apis.loadInstanceGrouping(projectName, "getGrouping")
-  //   .then((resp)=> {
-  //     if(resp.groupingString){
-  //       let groups = resp.groupingString.split(',').sort();
-  //       let firstGroup = "";
-  //       if(groups && groups.length>0){
-  //         firstGroup = groups[0];
-  //       }
-  //       this.setState({
-  //         projectName:projectName,
-  //         instanceGroups:groups,
-  //         instanceGroup:firstGroup,
-  //       },()=>{
-  //         this.handleInstanceGroupChange(firstGroup);
-  //       });
-  //     }
-  //   });
-  // }
 
   @autobind
   handleInstanceGroupChange(value) {
@@ -248,16 +229,16 @@ class EventSummary extends React.Component {
     });
   }
 
-  handleTreeMapAvailabilityThreshold(value){
-    this.setState({treeMapAvailabilityThreshold: value});
+  handleTreeMapAvailabilityThreshold(value) {
+    this.setState({ treeMapAvailabilityThreshold: value });
   }
 
-  handleTreeMapCPUThreshold(value){
-    this.setState({treeMapCPUThreshold: value});
+  handleTreeMapCPUThreshold(value) {
+    this.setState({ treeMapCPUThreshold: value });
   }
 
-  handleTreeMapScheme(value){
-    this.setState({treeMapScheme: value});
+  handleTreeMapScheme(value) {
+    this.setState({ treeMapScheme: value });
   }
 
   modelDateValidator(date) {
@@ -417,4 +398,4 @@ class EventSummary extends React.Component {
   }
 }
 
-export default EventSummary;
+export default withRouter(EventSummary);

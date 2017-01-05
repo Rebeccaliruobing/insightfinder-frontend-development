@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 import React, { PropTypes as T } from 'react';
+import store from 'store';
+import $ from 'jquery';
 import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
 import moment from 'moment';
@@ -102,6 +104,18 @@ class ExecutiveDashboard extends React.Component {
     this.refreshData();
   }
 
+  @autobind
+  handleListRowOpen(projectName, groupName) {
+    const { location } = this.props;
+    const query = applyDefaultParams({
+      ...location.query,
+      projectName,
+      groupName,
+    });
+    store.set('liveAnalysisProjectName', name);
+    window.open(`/cloud/monitoring?${$.param(query)}`, '_target');
+  }
+
   render() {
     const { location } = this.props;
     const { endTime, numberOfDays, modelType } = applyDefaultParams(location.query);
@@ -150,7 +164,7 @@ class ExecutiveDashboard extends React.Component {
           </div>
           <div className="ui vertical segment">
             <h3>Detected/Predicted Anomaly Overview</h3>
-            <TopList stats={eventStats} />
+            <TopList stats={eventStats} onRowOpen={this.handleListRowOpen} />
           </div>
         </div>
       </Console.Content>
