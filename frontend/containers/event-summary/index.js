@@ -376,7 +376,7 @@ class EventSummary extends React.Component {
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-            <ProjectStatistics data={data} dur={numberOfDays} />
+          {true && <ProjectStatistics data={data} dur={numberOfDays} />}
           </div>
           <div
             className="ui vertical segment"

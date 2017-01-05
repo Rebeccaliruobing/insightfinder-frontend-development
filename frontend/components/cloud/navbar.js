@@ -25,6 +25,10 @@ export default function (props) {
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
+        <Link to="/cloud/executive-dashboard" className="item text-white">
+          <i className="server icon"></i>
+          <span> Executive Dashboard </span>
+        </Link>
         <Link to="/cloud/monitoring" className="item text-white">
           <i className="zoom icon"></i>
           <span> Live Analysis </span>

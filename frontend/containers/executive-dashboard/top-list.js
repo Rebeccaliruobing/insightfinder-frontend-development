@@ -125,7 +125,7 @@ class TopList extends React.Component {
   };
 
   static defaultProps = {
-    autoExpandCount: 1,
+    autoExpandCount: 0,
     stats: [],
   };
 
@@ -210,7 +210,6 @@ class TopList extends React.Component {
               (<ListRow
                 key={name} data={data} isProject expanded={expanded}
                 onRowToggle={this.toggleProjectRow(name)}
-                onClick={this.handleProjectClick(name, 'All')}
               />),
             ];
 

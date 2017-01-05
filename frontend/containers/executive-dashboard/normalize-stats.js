@@ -19,20 +19,50 @@ const normalizeStats = (stats = {}, orderBy) => {
     const name = o[0];
     const stat = o[1];
 
+    // create sum group to be put on top row
+    let sumStat = {"previous":{"totalAnomalyEventCount":0,"avgDailyAnomalyCount":0,"totalAnomalyScore":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"totalAnomalyCount":0,"avgDailyAnomalyEventCount":0,"avgDailyAnomalyDuration":0},"current":{"totalAnomalyEventCount":0,"avgDailyAnomalyCount":0,"totalAnomalyScore":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"totalAnomalyCount":0,"avgDailyAnomalyEventCount":0,"avgDailyAnomalyDuration":0},"predicted":{"totalAnomalyEventCount":0,"avgDailyAnomalyCount":0,"totalAnomalyScore":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"totalAnomalyCount":0,"avgDailyAnomalyEventCount":0,"avgDailyAnomalyDuration":0}};
+
+    _.each(stat, function (s, i) {
+      if(s['previous'] && s['previous']['totalAnomalyCount']) sumStat['previous']['totalAnomalyCount'] += s['previous']['totalAnomalyCount'];
+      if(s['previous'] && s['previous']['totalAnomalyDuration']) sumStat['previous']['totalAnomalyDuration'] += s['previous']['totalAnomalyDuration'];
+      if(s['previous'] && s['previous']['totalAnomalyEventCount']) sumStat['previous']['totalAnomalyEventCount'] += s['previous']['totalAnomalyEventCount'];
+      if(s['previous'] && s['previous']['totalAnomalyScore']) sumStat['previous']['totalAnomalyScore'] += s['previous']['totalAnomalyScore'];
+      if(s['previous'] && s['previous']['avgDailyAnomalyCount']) sumStat['previous']['avgDailyAnomalyCount'] += s['previous']['avgDailyAnomalyCount'];
+      if(s['previous'] && s['previous']['avgDailyAnomalyDuration']) sumStat['previous']['avgDailyAnomalyDuration'] += s['previous']['avgDailyAnomalyDuration'];
+      if(s['previous'] && s['previous']['avgDailyAnomalyEventCount']) sumStat['previous']['avgDailyAnomalyEventCount'] += s['previous']['avgDailyAnomalyEventCount'];
+      if(s['previous'] && s['previous']['avgDailyAnomalyScore']) sumStat['previous']['avgDailyAnomalyScore'] += s['previous']['avgDailyAnomalyScore'];
+      if(s['current'] && s['current']['totalAnomalyCount']) sumStat['current']['totalAnomalyCount'] += s['current']['totalAnomalyCount'];
+      if(s['current'] && s['current']['totalAnomalyDuration']) sumStat['current']['totalAnomalyDuration'] += s['current']['totalAnomalyDuration'];
+      if(s['current'] && s['current']['totalAnomalyEventCount']) sumStat['current']['totalAnomalyEventCount'] += s['current']['totalAnomalyEventCount'];
+      if(s['current'] && s['current']['totalAnomalyScore']) sumStat['current']['totalAnomalyScore'] += s['current']['totalAnomalyScore'];
+      if(s['current'] && s['current']['avgDailyAnomalyCount']) sumStat['current']['avgDailyAnomalyCount'] += s['current']['avgDailyAnomalyCount'];
+      if(s['current'] && s['current']['avgDailyAnomalyDuration']) sumStat['current']['avgDailyAnomalyDuration'] += s['current']['avgDailyAnomalyDuration'];
+      if(s['current'] && s['current']['avgDailyAnomalyEventCount']) sumStat['current']['avgDailyAnomalyEventCount'] += s['current']['avgDailyAnomalyEventCount'];
+      if(s['current'] && s['current']['avgDailyAnomalyScore']) sumStat['current']['avgDailyAnomalyScore'] += s['current']['avgDailyAnomalyScore'];
+      if(s['predicted'] && s['predicted']['totalAnomalyCount']) sumStat['predicted']['totalAnomalyCount'] += s['predicted']['totalAnomalyCount'];
+      if(s['predicted'] && s['predicted']['totalAnomalyDuration']) sumStat['predicted']['totalAnomalyDuration'] += s['predicted']['totalAnomalyDuration'];
+      if(s['predicted'] && s['predicted']['totalAnomalyEventCount']) sumStat['predicted']['totalAnomalyEventCount'] += s['predicted']['totalAnomalyEventCount'];
+      if(s['predicted'] && s['predicted']['totalAnomalyScore']) sumStat['predicted']['totalAnomalyScore'] += s['predicted']['totalAnomalyScore'];
+      if(s['predicted'] && s['predicted']['avgDailyAnomalyCount']) sumStat['predicted']['avgDailyAnomalyCount'] += s['predicted']['avgDailyAnomalyCount'];
+      if(s['predicted'] && s['predicted']['avgDailyAnomalyDuration']) sumStat['predicted']['avgDailyAnomalyDuration'] += s['predicted']['avgDailyAnomalyDuration'];
+      if(s['predicted'] && s['predicted']['avgDailyAnomalyEventCount']) sumStat['predicted']['avgDailyAnomalyEventCount'] += s['predicted']['avgDailyAnomalyEventCount'];
+      if(s['predicted'] && s['predicted']['avgDailyAnomalyScore']) sumStat['predicted']['avgDailyAnomalyScore'] += s['predicted']['avgDailyAnomalyScore'];
+    });
+
     // Use the all stat as the group stat.
-    const { All: allStats, ...subStats } = stat;
-    const score = _.get(allStats, orderBy);
+    // const { All: allStats, ...subStats } = stat;
+    const score = _.get(sumStat, orderBy);
     const color = calculateRGBByAnomaly(score, maxScore, minScore);
     const project = {
       name,
-      stats: allStats,
+      stats: sumStat,
       groups: [],
       color,
     };
 
     // Order the group stat
     const orderedSubStats = _.reverse(_.sortBy(
-      _.toPairs(subStats),
+      _.toPairs(stat),
       o => _.get(o[1], orderBy),
     ));
 
