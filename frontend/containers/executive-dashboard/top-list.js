@@ -12,6 +12,28 @@ const normalizeValue = (val, fractionDigits = 0) => {
   return <span className="total">-</span>;
 };
 
+const getArrowStyles = (left, right, reverse = false) => {
+  const up = {
+    transform: 'rotate(-90deg)',
+    color: 'red',
+  };
+  const down = {
+    transform: 'rotate(90deg)',
+    color: 'green',
+  };
+
+  if (left !== undefined && right !== undefined) {
+    if (left > right) {
+      return !reverse ? down : up;
+    } else if (left === right) {
+      return { visibility: 'hidden' };
+    }
+    return !reverse ? up : down;
+  }
+
+  return { visibility: 'hidden' };
+};
+
 const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = true }) => {
   const { name, stats, color } = data;
   return (
@@ -31,20 +53,56 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         <span className="name" onClick={onClick} >{name}</span>
       </td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'), 1)}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 1)}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'))}</td>
+      <td className="number trend">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.avgDailyAnomalyScore'),
+            _.get(stats, 'current.avgDailyAnomalyScore'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'))}
+      </td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}</td>
+      <td className="number trend">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.totalAnomalyDuration'),
+            _.get(stats, 'current.totalAnomalyDuration'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}
+      </td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}</td>
+      <td className="number trend">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.totalAnomalyCount'),
+            _.get(stats, 'current.totalAnomalyCount'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
+      </td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
+      <td className="number trend">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.totalAnomalyEventCount'),
+            _.get(stats, 'current.totalAnomalyEventCount'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}
+      </td>
       <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
     </tr>
@@ -124,8 +182,8 @@ class TopList extends React.Component {
                 borderLeft: '2px solid #566f84',
               }}
             >Project/Group Name</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Score</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Duration</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Score ( Daily Avg )</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Duration ( Minute )</th>
             <th className="subheader" colSpan={3} width="20%">Anomaly Count</th>
             <th className="subheader" colSpan={3} width="20%">Anomaly Events</th>
           </tr>
