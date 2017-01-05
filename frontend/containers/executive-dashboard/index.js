@@ -78,7 +78,7 @@ class ExecutiveDashboard extends React.Component {
   componentDidMount() {
     const endTimestamp = moment().endOf('day').valueOf();
     const modelType = 'Holistic';
-    retrieveExecDBStatisticsData(modelType, endTimestamp, '1')
+    retrieveExecDBStatisticsData(modelType, endTimestamp, '3')
       .then((data) => {
         this.setState({
           eventStats: normalizeStats(data, 'current.totalAnomalyScore'),
