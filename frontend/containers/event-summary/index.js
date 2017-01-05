@@ -1,24 +1,27 @@
-import React, {Component} from 'react';
+import React from 'react';
 import store from 'store';
-import {autobind} from 'core-decorators';
-import {Console, Button, Dropdown} from '../../artui/react';
-import DateTimePicker from "../../components/ui/datetimepicker/index";
+import moment from 'moment';
+import { autobind } from 'core-decorators';
+import { Console, Button, Dropdown } from '../../artui/react';
+import DateTimePicker from '../../components/ui/datetimepicker/index';
 
 import apis from '../../apis';
-import {ProjectStatistics} from '../../components/statistics';
-import {IncidentsList} from '../../components/incidents';
+import { ProjectStatistics } from '../../components/statistics';
+import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
-import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect,
+import {
+  LiveProjectSelection,
+  NumberOfDays, TreeMapSchemeSelect,
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
-  EventSummaryModelType
+  EventSummaryModelType,
 } from '../../components/selections';
-import {buildTreemap} from '../../apis/retrieve-liveanalysis';
+import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 
-class EventSummary extends Component {
+class EventSummary extends React.Component {
   static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
+    dashboardUservalues: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -28,25 +31,25 @@ class EventSummary extends Component {
       treeMapCPUThreshold: '0',
       treeMapAvailabilityThreshold: '90',
       treeMapScheme: 'anomaly', // utilization view flag
-      treeMapText: "Utilization",
+      treeMapText: 'Utilization',
       data: {
         statistics: {},
         summary: {},
         incidents: [],
         incidentsTreeMap: [],
         instanceMetaData: {},
-        eventStats:{},
+        eventStats: {},
       },
       loading: true,
       projectName: undefined,
       showTenderModal: false,
       selectedIncident: undefined,
-      numberOfDays: "7",
+      numberOfDays: '7',
       endTime: moment(),
-      modelType:"Holistic",
+      modelType: 'Holistic',
       selectedInstance: undefined,
       instanceGroups: [],
-      instanceGroup: "",
+      instanceGroup: '',
     };
   }
 

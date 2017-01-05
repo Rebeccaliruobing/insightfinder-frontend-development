@@ -1,71 +1,34 @@
 /* eslint-disable no-console */
-import React from 'react';
+import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
 import moment from 'moment';
-import _ from 'lodash';
 import { Console } from '../../artui/react';
 import TopList from './top-list';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
-import { calculateRGBByAnomaly } from '../../components/utils';
 import { NumberOfDays, EventSummaryModelType } from '../../components/selections';
+import normalizeStats from './normalize-stats';
 
-const normalizeStats = (stats = {}, orderBy) => {
-  const ret = [];
-  const orderedStats = _.reverse(_.sortBy(
-    _.toPairs(stats),
-    o => _.get(o[1].All, orderBy),
-  ));
-
-  // Get the max/min score for all project
-  const maxScore = orderedStats.length > 0 ?
-    _.get(orderedStats[0][1].All, orderBy) : 0;
-  let minScore = orderedStats.length > 0 ?
-    _.get(orderedStats[orderedStats.length - 1][1].All, orderBy) : 0;
-  minScore = maxScore === minScore ? 0.0 : minScore;
-
-  _.forEach(orderedStats, (o) => {
-    const name = o[0];
-    const stat = o[1];
-
-    // Use the all stat as the group stat.
-    const { All: allStats, ...subStats } = stat;
-    const score = _.get(allStats, orderBy);
-    const color = calculateRGBByAnomaly(score, maxScore, minScore);
-    const project = {
-      name,
-      stats: allStats,
-      groups: [],
-      color,
-    };
-
-    // Order the group stat
-    const orderedSubStats = _.reverse(_.sortBy(
-      _.toPairs(subStats),
-      o => _.get(o[1], orderBy),
-    ));
-
-    _.forEach(orderedSubStats, (subObj) => {
-      const subName = subObj[0];
-      const subStats = subObj[1];
-
-      project.groups.push({
-        name: subName,
-        stats: subStats,
-        color,
-      });
-    });
-    ret.push(project);
-  });
-
-  return ret;
-};
+const modelDateValidator = date => moment(date) <= moment();
+const applyDefaultParams = params => ({
+  endTime: +moment(),
+  numberOfDays: 7,
+  modelType: 'Holistic',
+  ...params,
+});
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
     dashboardUservalues: React.PropTypes.object,
+  };
+
+  static propTypes = {
+    location: T.object,
+    router: T.shape({
+      push: T.func.isRequired,
+    }).isRequired,
   };
 
   constructor(props) {
@@ -84,7 +47,7 @@ class ExecutiveDashboard extends React.Component {
   @autobind
   refreshData() {
     const { location } = this.props;
-    const query = this.applyDefaultParams(location.query);
+    const query = applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
     this.setState({
       loading: true,
@@ -102,18 +65,11 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  modelDateValidator(date) {
-    const timestamp = moment(date);
-    const curTimestamp = moment();
-    return timestamp <= curTimestamp;
-  }
-
-  @autobind
   handleModelTypeChange(value, modelType) {
     const { location, router } = this.props;
     router.push({
       pathname: location.pathname,
-      query: this.applyDefaultParams({
+      query: applyDefaultParams({
         ...location.query, modelType,
       }),
     });
@@ -126,7 +82,7 @@ class ExecutiveDashboard extends React.Component {
     const { location, router } = this.props;
     router.push({
       pathname: location.pathname,
-      query: this.applyDefaultParams({
+      query: applyDefaultParams({
         ...location.query, numberOfDays: numberOfDays.toString(),
       }),
     });
@@ -140,25 +96,15 @@ class ExecutiveDashboard extends React.Component {
     const { location, router } = this.props;
     router.push({
       pathname: location.pathname,
-      query: this.applyDefaultParams({ ...location.query, endTime }),
+      query: applyDefaultParams({ ...location.query, endTime }),
     });
 
     this.refreshData();
   }
 
-  @autobind
-  applyDefaultParams(params) {
-    return {
-      endTime: +moment(),
-      numberOfDays: 7,
-      modelType: 'Holistic',
-      ...params,
-    };
-  }
-
   render() {
     const { location } = this.props;
-    const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
+    const { endTime, numberOfDays, modelType } = applyDefaultParams(location.query);
     const { loading, eventStats } = this.state;
 
     return (
@@ -175,7 +121,7 @@ class ExecutiveDashboard extends React.Component {
               <div className="ui input">
                 <DateTimePicker
                   className="ui input" style={{ width: '50%' }}
-                  dateValidator={this.modelDateValidator}
+                  dateValidator={modelDateValidator}
                   dateTimeFormat="YYYY-MM-DD" value={endTime}
                   onChange={this.handleEndTimeChange}
                 />

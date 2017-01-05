@@ -3,12 +3,12 @@ import { autobind } from 'core-decorators';
 import _ from 'lodash';
 import store from 'store';
 
-const normalizeValue = (val) => {
+const normalizeValue = (val, fractionDigits = 0) => {
   if (_.isFinite(val)) {
     if (val > 0) {
-      return (<span className="total"><b>{val.toFixed(1).toString()}</b></span>);
+      return (<span className="total"><b>{val.toFixed(fractionDigits).toString()}</b></span>);
     }
-    return (<span className="total">{val.toFixed(1).toString()}</span>);
+    return (<span className="total">{val.toFixed(fractionDigits).toString()}</span>);
   }
   return <span className="total">-</span>;
 };
@@ -31,9 +31,9 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         <span className="name" onClick={onClick} >{name}</span>
       </td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyScore'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyScore'))}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyScore'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyScore'), 1)}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
