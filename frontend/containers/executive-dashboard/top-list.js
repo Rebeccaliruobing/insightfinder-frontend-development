@@ -54,7 +54,7 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
       </td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'))}</td>
-      <td className="number trend">
+      <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
@@ -64,10 +64,10 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         />
         {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'))}
       </td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>
+      <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>
-      <td className="number trend">
+      <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
@@ -77,10 +77,10 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         />
         {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}
       </td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
+      <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
-      <td className="number trend">
+      <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
@@ -90,10 +90,10 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         />
         {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
       </td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
+      <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
-      <td className="number trend">
+      <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
@@ -103,7 +103,7 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         />
         {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}
       </td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
+      <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
     </tr>
   );
