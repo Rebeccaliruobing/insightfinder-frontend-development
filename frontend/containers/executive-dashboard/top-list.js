@@ -27,12 +27,13 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
         {!isProject && <i className="icon" />}
+        {!isProject && <i className="icon" />}
         <span className="name" onClick={onClick} >{name}</span>
       </td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyScore'), 1)}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyScore'), 1)}</td>
-      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'), 1)}</td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
       <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
