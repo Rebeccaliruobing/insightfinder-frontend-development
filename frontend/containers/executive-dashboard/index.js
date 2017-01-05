@@ -113,12 +113,12 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleListRowOpen(projectName, groupName) {
+  handleListRowOpen(projectName, instanceGroup) {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
       projectName,
-      groupName,
+      instanceGroup,
     });
     store.set('liveAnalysisProjectName', name);
     window.open(`/cloud/monitoring?${$.param(query)}`, '_target');
