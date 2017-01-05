@@ -3,13 +3,25 @@ import { autobind } from 'core-decorators';
 import _ from 'lodash';
 import store from 'store';
 
-const normalizeValue = val => (_.isFinite(val) ? val.toFixed(1).toString() : '-');
+const normalizeValue = (val) => {
+  if (_.isFinite(val)) {
+    if (val > 0) {
+      return (<span className="total"><b>{val.toFixed(1).toString()}</b></span>);
+    }
+    return (<span className="total">{val.toFixed(1).toString()}</span>);
+  }
+  return <span className="total">-</span>;
+};
 
 const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = true }) => {
-  const { name, stats } = data;
+  const { name, stats, color } = data;
+  console.log(color);
   return (
     <tr
-      style={{ display: !isProject && !expanded ? 'none' : '' }}
+      style={{
+        display: !isProject && !expanded ? 'none' : '',
+        borderLeft: `2px solid rgb(${color})`,
+      }}
       className={isProject ? 'project' : 'group'}
       {...isProject ? { onClick: onRowToggle } : {}}
     >
@@ -20,69 +32,21 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         <span className="name" onClick={onClick} >{name}</span>
       </td>
 
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.previous.avgDailyAnomalyScore)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.previous.totalAnomalyScore)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.current.avgDailyAnomalyScore)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.current.totalAnomalyScore)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.predicted.avgDailyAnomalyScore)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.predicted.totalAnomalyScore)}</span>
-      </td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyScore'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyScore'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyScore'))}</td>
 
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.previous.avgDailyAnomalyEventCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.previous.totalAnomalyEventCount)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.current.avgDailyAnomalyEventCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.current.totalAnomalyEventCount)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.predicted.avgDailyAnomalyEventCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.predicted.totalAnomalyEventCount)}</span>
-      </td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.previous.avgDailyAnomalyDuration)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.previous.totalAnomalyDuration)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.current.avgDailyAnomalyDuration)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.current.totalAnomalyDuration)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.predicted.avgDailyAnomalyDuration)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.predicted.totalAnomalyDuration)}</span>
-      </td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.previous.avgDailyAnomalyCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.previous.totalAnomalyCount)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.current.avgDailyAnomalyCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.current.totalAnomalyCount)}</span>
-      </td>
-      <td className="number">
-        <span className="avg">{normalizeValue(stats.predicted.avgDailyAnomalyCount)}</span>
-        <span className="divider">/</span>
-        <span className="total">{normalizeValue(stats.predicted.totalAnomalyCount)}</span>
-      </td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
     </tr>
   );
 };
@@ -131,7 +95,6 @@ class TopList extends React.Component {
       } else {
         expandedProjects = [name, ...expandedProjects];
       }
-      console.log(expandedProjects);
       this.setState({ expandedProjects });
     };
   }
@@ -155,15 +118,21 @@ class TopList extends React.Component {
       <table className="toplist">
         <thead>
           <tr>
-            <th rowSpan={2} style={{ paddingLeft: '0.5em', textAlign: 'left' }}>Project/Group Name</th>
-            <th className="subheader" colSpan={3} width="18%">Anomaly Score  (Avg/Total)</th>
-            <th className="subheader" colSpan={3} width="18%">Anomaly Event  (Avg/Total)</th>
-            <th className="subheader" colSpan={3} width="18%">Anomaly Duration  (Avg/Total)</th>
-            <th className="subheader" colSpan={3} width="18%">Anomaly Count  (Avg/Total)</th>
+            <th
+              rowSpan={2} style={{
+                paddingLeft: '0.5em',
+                textAlign: 'left',
+                borderLeft: '2px solid #566f84',
+              }}
+            >Project/Group Name</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Score</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Event</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Duration</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Count</th>
           </tr>
           <tr>
             <th>Previous</th>
-            <th>Current</th>
+            <th>Current<i className="dropdown icon" /></th>
             <th>Predicted</th>
             <th>Previous</th>
             <th>Current</th>

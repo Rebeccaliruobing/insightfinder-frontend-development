@@ -4,18 +4,26 @@ import { autobind } from 'core-decorators';
 import moment from 'moment';
 import _ from 'lodash';
 import { Console } from '../../artui/react';
-import { HourlyHeatmap, AutoFixHistory }
-  from '../../components/statistics';
 import TopList from './top-list';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import './executive-dashboard.less';
+import { calculateRGBByAnomaly } from '../../components/utils';
 
-const normalizeStats = (stats = {}) => {
+const normalizeStats = (stats = {}, orderBy) => {
   const ret = [];
   const orderedStats = _.reverse(_.sortBy(
     _.toPairs(stats),
-    o => o[1].All.predicted.avgDailyAnomalyScore,
+    o => _.get(o[1].All, orderBy),
   ));
+
+  // Get the max/min score for all project
+  const maxScore = orderedStats.length > 0 ?
+    _.get(orderedStats[0][1].All, orderBy) : 0;
+  let minScore = orderedStats.length > 0 ?
+    _.get(orderedStats[orderedStats.length - 1][1].All, orderBy) : 0;
+  minScore = maxScore === minScore ? 0.0 : minScore;
+  console.log(minScore);
+  console.log(maxScore);
 
   _.forEach(orderedStats, (o) => {
     const name = o[0];
@@ -23,16 +31,19 @@ const normalizeStats = (stats = {}) => {
 
     // Use the all stat as the group stat.
     const { All: allStats, ...subStats } = stat;
+    const score = _.get(allStats, orderBy);
+    const color = calculateRGBByAnomaly(score, maxScore, minScore);
     const project = {
       name,
       stats: allStats,
       groups: [],
+      color,
     };
 
     // Order the group stat
     const orderedSubStats = _.reverse(_.sortBy(
       _.toPairs(subStats),
-      o => o[1].predicted.avgDailyAnomalyScore,
+      o => _.get(o[1], orderBy),
     ));
 
     _.forEach(orderedSubStats, (subObj) => {
@@ -42,6 +53,7 @@ const normalizeStats = (stats = {}) => {
       project.groups.push({
         name: subName,
         stats: subStats,
+        color,
       });
     });
     ret.push(project);
@@ -69,7 +81,7 @@ class ExecutiveDashboard extends React.Component {
     retrieveExecDBStatisticsData(modelType, endTimestamp, '1')
       .then((data) => {
         this.setState({
-          eventStats: normalizeStats(data),
+          eventStats: normalizeStats(data, 'current.totalAnomalyScore'),
         });
       }).catch((msg) => {
         console.log(msg);
@@ -85,12 +97,6 @@ class ExecutiveDashboard extends React.Component {
           <div className="ui vertical segment">
             <h3>Detected/Predicted Anomaly Overview</h3>
             <TopList stats={eventStats} />
-          </div>
-          <div className="ui vertical segment">
-            <h3>Hourly Heatmap of Anomalies Detected & Predicted</h3>
-          </div>
-          <div className="ui vertical segment">
-            <h3>AutoFix Action History</h3>
           </div>
         </div>
       </Console.Content>
