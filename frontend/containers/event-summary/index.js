@@ -1,24 +1,28 @@
-import React, {Component} from 'react';
+import React from 'react';
 import store from 'store';
-import {autobind} from 'core-decorators';
-import {Console, Button, Dropdown} from '../../artui/react';
-import DateTimePicker from "../../components/ui/datetimepicker/index";
+import { withRouter } from 'react-router';
+import moment from 'moment';
+import { autobind } from 'core-decorators';
+import { Console, Button, Dropdown } from '../../artui/react';
+import DateTimePicker from '../../components/ui/datetimepicker/index';
 
 import apis from '../../apis';
-import {ProjectStatistics} from '../../components/statistics';
-import {IncidentsList} from '../../components/incidents';
+import { ProjectStatistics } from '../../components/statistics';
+import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
-import { LiveProjectSelection,NumberOfDays,TreeMapSchemeSelect,
+import {
+  LiveProjectSelection,
+  NumberOfDays, TreeMapSchemeSelect,
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
-  EventSummaryModelType
+  EventSummaryModelType,
 } from '../../components/selections';
-import {buildTreemap} from '../../apis/retrieve-liveanalysis';
+import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 
-class EventSummary extends Component {
+class EventSummary extends React.Component {
   static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
+    dashboardUservalues: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -28,25 +32,25 @@ class EventSummary extends Component {
       treeMapCPUThreshold: '0',
       treeMapAvailabilityThreshold: '90',
       treeMapScheme: 'anomaly', // utilization view flag
-      treeMapText: "Utilization",
+      treeMapText: 'Utilization',
       data: {
         statistics: {},
         summary: {},
         incidents: [],
         incidentsTreeMap: [],
         instanceMetaData: {},
-        eventStats:{},
+        eventStats: {},
       },
       loading: true,
       projectName: undefined,
       showTenderModal: false,
       selectedIncident: undefined,
-      numberOfDays: "7",
+      numberOfDays: '7',
       endTime: moment(),
-      modelType:"Holistic",
+      modelType: 'Holistic',
       selectedInstance: undefined,
       instanceGroups: [],
-      instanceGroup: "",
+      instanceGroup: '',
     };
   }
 
@@ -58,7 +62,7 @@ class EventSummary extends Component {
       let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = `/cloud/incident-log-analysis`;
+      const url = '/cloud/incident-log-analysis';
       window.open(url, '_self');
     }
   }
@@ -131,26 +135,6 @@ class EventSummary extends Component {
       this.refreshInstanceGroup(instanceGroup);
     });
   }
-
-  // refreshProjectName(projectName) {
-  //   apis.loadInstanceGrouping(projectName, "getGrouping")
-  //   .then((resp)=> {
-  //     if(resp.groupingString){
-  //       let groups = resp.groupingString.split(',').sort();
-  //       let firstGroup = "";
-  //       if(groups && groups.length>0){
-  //         firstGroup = groups[0];
-  //       }
-  //       this.setState({
-  //         projectName:projectName,
-  //         instanceGroups:groups,
-  //         instanceGroup:firstGroup,
-  //       },()=>{
-  //         this.handleInstanceGroupChange(firstGroup);
-  //       });
-  //     }
-  //   });
-  // }
 
   @autobind
   handleInstanceGroupChange(value) {
@@ -245,16 +229,16 @@ class EventSummary extends Component {
     });
   }
 
-  handleTreeMapAvailabilityThreshold(value){
-    this.setState({treeMapAvailabilityThreshold: value});
+  handleTreeMapAvailabilityThreshold(value) {
+    this.setState({ treeMapAvailabilityThreshold: value });
   }
 
-  handleTreeMapCPUThreshold(value){
-    this.setState({treeMapCPUThreshold: value});
+  handleTreeMapCPUThreshold(value) {
+    this.setState({ treeMapCPUThreshold: value });
   }
 
-  handleTreeMapScheme(value){
-    this.setState({treeMapScheme: value});
+  handleTreeMapScheme(value) {
+    this.setState({ treeMapScheme: value });
   }
 
   modelDateValidator(date) {
@@ -414,4 +398,4 @@ class EventSummary extends Component {
   }
 }
 
-export default EventSummary;
+export default withRouter(EventSummary);
