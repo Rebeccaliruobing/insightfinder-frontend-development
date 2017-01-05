@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable class-methods-use-this */
 import React, { PropTypes as T } from 'react';
 import store from 'store';
 import $ from 'jquery';
@@ -12,14 +13,6 @@ import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
 import { NumberOfDays, EventSummaryModelType } from '../../components/selections';
 import normalizeStats from './normalize-stats';
-
-const modelDateValidator = date => moment(date) <= moment();
-const applyDefaultParams = params => ({
-  endTime: +moment(),
-  numberOfDays: 7,
-  modelType: 'Holistic',
-  ...params,
-});
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
@@ -46,10 +39,23 @@ class ExecutiveDashboard extends React.Component {
     this.refreshData();
   }
 
+  modelDateValidator(date) {
+    return moment(date) <= moment();
+  }
+
+  applyDefaultParams(params) {
+    return {
+      endTime: moment().endOf('day').format('YYYY-MM-DD'),
+      numberOfDays: 7,
+      modelType: 'Holistic',
+      ...params,
+    };
+  }
+
   @autobind
   refreshData() {
     const { location } = this.props;
-    const query = applyDefaultParams(location.query);
+    const query = this.applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
     this.setState({
       loading: true,
@@ -69,11 +75,12 @@ class ExecutiveDashboard extends React.Component {
   @autobind
   handleModelTypeChange(value, modelType) {
     const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query, modelType,
+    });
     router.push({
       pathname: location.pathname,
-      query: applyDefaultParams({
-        ...location.query, modelType,
-      }),
+      query,
     });
 
     this.refreshData();
@@ -82,11 +89,12 @@ class ExecutiveDashboard extends React.Component {
   @autobind
   handleDayChange(value, numberOfDays) {
     const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query, numberOfDays: numberOfDays.toString(),
+    });
     router.push({
       pathname: location.pathname,
-      query: applyDefaultParams({
-        ...location.query, numberOfDays: numberOfDays.toString(),
-      }),
+      query,
     });
 
     this.refreshData();
@@ -98,7 +106,7 @@ class ExecutiveDashboard extends React.Component {
     const { location, router } = this.props;
     router.push({
       pathname: location.pathname,
-      query: applyDefaultParams({ ...location.query, endTime }),
+      query: this.applyDefaultParams({ ...location.query, endTime }),
     });
 
     this.refreshData();
@@ -107,7 +115,7 @@ class ExecutiveDashboard extends React.Component {
   @autobind
   handleListRowOpen(projectName, groupName) {
     const { location } = this.props;
-    const query = applyDefaultParams({
+    const query = this.applyDefaultParams({
       ...location.query,
       projectName,
       groupName,
@@ -118,7 +126,7 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { endTime, numberOfDays, modelType } = applyDefaultParams(location.query);
+    const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
     const { loading, eventStats } = this.state;
 
     return (
@@ -135,7 +143,7 @@ class ExecutiveDashboard extends React.Component {
               <div className="ui input">
                 <DateTimePicker
                   className="ui input" style={{ width: '50%' }}
-                  dateValidator={modelDateValidator}
+                  dateValidator={this.modelDateValidator}
                   dateTimeFormat="YYYY-MM-DD" value={endTime}
                   onChange={this.handleEndTimeChange}
                 />
