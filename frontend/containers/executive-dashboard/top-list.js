@@ -210,7 +210,7 @@ class TopList extends React.Component {
               (<ListRow
                 key={name} data={data} isProject expanded={expanded}
                 onRowToggle={this.toggleProjectRow(name)}
-                onClick={this.handleProjectClick(name)}
+                onClick={this.handleProjectClick(name, 'All')}
               />),
             ];
 

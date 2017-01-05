@@ -1,5 +1,7 @@
-import React from 'react';
+/* eslint-disable class-methods-use-this */
+import React, { PropTypes as T } from 'react';
 import store from 'store';
+import _ from 'lodash';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
@@ -25,13 +27,20 @@ class EventSummary extends React.Component {
     dashboardUservalues: React.PropTypes.object,
   };
 
+  static propTypes = {
+    location: T.object,
+    router: T.shape({
+      push: T.func.isRequired,
+    }).isRequired,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
       treeMapCPUThreshold: '0',
       treeMapAvailabilityThreshold: '90',
-      treeMapScheme: 'anomaly', // utilization view flag
+      treeMapScheme: 'anomaly',
       treeMapText: 'Utilization',
       data: {
         statistics: {},
@@ -42,29 +51,49 @@ class EventSummary extends React.Component {
         eventStats: {},
       },
       loading: true,
-      projectName: undefined,
       showTenderModal: false,
       selectedIncident: undefined,
+      instanceGroups: [],
+      projectName: undefined,
       numberOfDays: '7',
       endTime: moment(),
       modelType: 'Holistic',
-      selectedInstance: undefined,
-      instanceGroups: [],
       instanceGroup: '',
+      selectedInstance: undefined,
     };
   }
 
   componentDidMount() {
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item, index) => item.fileProjectType!=0);
-    // remember select
-    if (projects.length > 0) {
-      let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projects[0].projectName;
-      this.handleProjectChange(refreshName, refreshName);
+    const { router, location } = this.props;
+    const projects = this.getLiveProjectInfos();
+
+    if (projects.length === 0) {
+      router.push('/cloud/incident-log-analysis');
     } else {
-      const url = '/cloud/incident-log-analysis';
-      window.open(url, '_self');
+      let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
+      if (!projectName ||
+        (projectName && !projects.find(item => item.projectName === projectName))) {
+        projectName = projects[0].projectName;
+      }
+      this.handleProjectChange(projectName);
     }
+  }
+
+  getLiveProjectInfos() {
+    // exclude GCP and File Replay
+    let pinfos = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    pinfos = pinfos.filter(item => item.fileProjectType !== 0);
+    return pinfos;
+  }
+
+  applyDefaultParams(params) {
+    return {
+      endTime: moment().endOf('day').format('YYYY-MM-DD'),
+      numberOfDays: 7,
+      modelType: 'Holistic',
+      instanceGroup: 'All',
+      ...params,
+    };
   }
 
   @autobind()
@@ -194,38 +223,48 @@ class EventSummary extends React.Component {
         // alert(msg);
       });
     });
-  }  
+  }
 
   @autobind
-  handleProjectChange(value,projectName){
+  handleProjectChange(projectName) {
     this.setState({
-      endTime: moment(),
-      numberOfDays: "7",
-      modelType:"Holistic",
+      loading: true,
       currentTreemapData: undefined,
-    },()=>{
-      apis.loadInstanceGrouping(projectName, "getGrouping")
-      .then((resp)=> {
-        if(resp.groupingString){
-          let groups = resp.groupingString.split(',').sort();
-          let pos = groups.indexOf('All');
-          if(pos!=-1){
-            let len = groups.length;
-            groups = groups.slice(1,len).concat(groups.slice(0,1));
+    }, () => {
+      apis.loadInstanceGrouping(projectName, 'getGrouping')
+        .then((resp) => {
+          if (resp.groupingString) {
+            let groups = resp.groupingString.split(',').sort();
+            const pos = groups.indexOf('All');
+            if (pos !== -1) {
+              const len = groups.length;
+              groups = groups.slice(1, len).concat(groups.slice(0, 1));
+            }
+
+            // Get the group to display
+            const { location } = this.props;
+            const query = this.applyDefaultParams({
+              ...location.query,
+            });
+
+            let instanceGroup = query.instanceGroup;
+            if (groups && groups.length > 0) {
+              if (instanceGroup && groups.indexOf(instanceGroup) < 0) {
+                instanceGroup = groups[0];
+              }
+            } else {
+              instanceGroup = '';
+            }
+
+            this.setState({
+              projectName,
+              instanceGroups: groups,
+              instanceGroup,
+            }, () => {
+              this.handleInstanceGroupChange(instanceGroup);
+            });
           }
-          let firstGroup = "";
-          if(groups && groups.length>0){
-            firstGroup = groups[0];
-          }
-          this.setState({
-            projectName:projectName,
-            instanceGroups:groups,
-            instanceGroup:firstGroup,
-          },()=>{
-            this.handleInstanceGroupChange(firstGroup);
-          });
-        }
-      });
+        });
     });
   }
 
@@ -260,16 +299,16 @@ class EventSummary extends React.Component {
 
   render() {
     let { loading, data, projectName, incidentsTreeMap, endTime, numberOfDays, modelType,
-      treeMapCPUThreshold,treeMapAvailabilityThreshold, treeMapScheme,selectedIncident,
-      instanceGroups,instanceGroup,lineChartType,} = this.state;
+      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
+      instanceGroups, instanceGroup, lineChartType, } = this.state;
     let treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     let latestTimestamp = data['instanceMetricJson'] ? data['instanceMetricJson']['latestDataTimestamp'] : undefined;
     let instanceStatsMap = data['instanceMetricJson'] ? data['instanceMetricJson']['instanceStatsJson'] : {};
     let instanceMetaData = data['instanceMetaData'] ? data['instanceMetaData'] : {};
-    let refreshName = store.get('liveAnalysisProjectName')?store.get('liveAnalysisProjectName'): projectName;
-    let projectType = data['projectType']?data['projectType']:'';
+    let refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectName;
+    let projectType = data['projectType'] ? data['projectType'] : '';
     let selectedIncidentPredicted = selectedIncident ? (selectedIncident.endTimestamp > latestTimestamp) : false;
-    if(!selectedIncident && lineChartType && lineChartType=='predicted'){
+    if (!selectedIncident && lineChartType && lineChartType == 'predicted') {
       selectedIncidentPredicted = true;
     }
     return (
@@ -284,14 +323,16 @@ class EventSummary extends React.Component {
           >
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
-              <LiveProjectSelection value={projectName} onChange={this.handleProjectChange} style={{minWidth: 200}}/>
+              <LiveProjectSelection
+                style={{ minWidth: 200 }} value={projectName} onChange={this.handleProjectChange}
+              />
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Group:</label>
               <Dropdown
                 key={projectName}
                 mode="select"
-                searchable={true} 
+                searchable
                 value={instanceGroup}
                 onChange={this.handleInstanceGroupChange}
                 style={{ minWidth: 200 }}
@@ -299,10 +340,7 @@ class EventSummary extends React.Component {
                 <div className="menu">
                   {
                     instanceGroups.map(g => (
-                      <div
-                        className="item" key={g}
-                        data-value={g}
-                      >{g}</div>
+                      <div className="item" key={g} data-value={g}>{g}</div>
                     ))
                   }
                 </div>
@@ -310,25 +348,28 @@ class EventSummary extends React.Component {
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
-                <div className="ui input">
-                  <DateTimePicker className='ui input' style={{'width': '50%'}}
-                              dateValidator={this.modelDateValidator.bind(this)}
-                              dateTimeFormat='YYYY-MM-DD' value={endTime}
-                              onChange={this.handleEndTimeChange}/>
-                </div>
+              <div className="ui input">
+                <DateTimePicker className='ui input' style={{ 'width': '50%' }}
+                  dateValidator={this.modelDateValidator.bind(this)}
+                  dateTimeFormat='YYYY-MM-DD' value={endTime}
+                  onChange={this.handleEndTimeChange} />
+              </div>
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
-              <NumberOfDays style={{width: 120}}
-                                    value={numberOfDays} onChange={this.handleDayChange}/>
+              <NumberOfDays style={{ width: 120 }}
+                value={numberOfDays} onChange={this.handleDayChange} />
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Model Type:</label>
-              <EventSummaryModelType style={{width: 120}}
-                                    value={modelType} onChange={this.handleModelTypeChange}/>
+              <EventSummaryModelType style={{ width: 120 }}
+                value={modelType} onChange={this.handleModelTypeChange} />
             </div>
             <div className="field">
-              <div className="ui orange button" tabIndex="0" onClick={()=>this.refreshInstanceGroup(instanceGroup)}>Refresh</div>
+              <div
+                className="ui orange button" tabIndex="0"
+                onClick={() => this.refreshInstanceGroup(instanceGroup)}
+              >Refresh</div>
             </div>
           </div>
           <div
@@ -344,57 +385,57 @@ class EventSummary extends React.Component {
             <div className="ui incidents grid">
               <div className="row" style={{ height: 600, paddingTop: 0 }}>
                 <div className="seven wide column" style={{ height: 500, paddingRight: 0 }}>
-                  <IncidentsList projectName={refreshName}
-                                 projectType={projectType}
-                                 endTime={endTime}
-                                 numberOfDays={numberOfDays}
-                                 modelType={modelType}
-                                 onIncidentSelected={this.handleIncidentSelected}
-                                 incidents={data.incidents}
-                                 causalDataArray={data.causalDataArray}
-                                 causalTypes={data.causalTypes} latestTimestamp={latestTimestamp} />
+                  <IncidentsList
+                    projectName={refreshName} projectType={projectType}
+                    endTime={endTime} numberOfDays={numberOfDays} modelType={modelType}
+                    onIncidentSelected={this.handleIncidentSelected}
+                    incidents={data.incidents}
+                    causalDataArray={data.causalDataArray}
+                    causalTypes={data.causalTypes} latestTimestamp={latestTimestamp}
+                  />
                 </div>
-                <div className="nine wide column" style={{ height: 500, 'paddingTop': 20 }}>
-                  {treeMapScheme=='anomaly'?
-                  <b>Show event by:&nbsp;&nbsp;</b>
-                  :
-                  <b>Show instance by:&nbsp;&nbsp;</b>
+                <div className="nine wide column" style={{ height: 500, paddingTop: 20 }}>
+                  {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
+                  {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
+                  <TreeMapSchemeSelect
+                    style={{ width: 130 }} value={treeMapScheme}
+                    text={treeMapSchemeText}
+                    onChange={(value) => this.handleTreeMapScheme(value)}
+                  />
+                  {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
+                    style={{ minWidth: 10 }} value={treeMapCPUThreshold}
+                    text={`<=${treeMapCPUThreshold}%`}
+                    onChange={(value) => this.handleTreeMapCPUThreshold(value)}
+                  />}
+                  {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
+                    style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
+                    text={'<=' + treeMapAvailabilityThreshold + '%'}
+                    onChange={(value) => this.handleTreeMapAvailabilityThreshold(value)}
+                  />
                   }
-                  <TreeMapSchemeSelect style={{ width: 130 }} value={treeMapScheme} text={treeMapSchemeText} onChange={(value)=>this.handleTreeMapScheme(value)}/>
-                  {treeMapScheme=='cpu'?
-                    <TreeMapCPUThresholdSelect style={{ minWidth: 10 }} value={treeMapCPUThreshold} text={'<='+treeMapCPUThreshold+'%'} onChange={(value)=>this.handleTreeMapCPUThreshold(value)}/>
-                  :
-                  null}
-                  {treeMapScheme=='availability'?
-                    <TreeMapAvailabilityThresholdSelect style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold} text={'<='+treeMapAvailabilityThreshold+'%'} onChange={(value)=>this.handleTreeMapAvailabilityThreshold(value)}/>
-                  :
-                  null}
-                  {false && <Button className="orange button" style={{ 'float':'right' }} onClick={(e)=>{
-                      e.stopPropagation();
-                      this.showInstanceChart();
-                    }}>
-                    All Metric Chart
-                  </Button>}
                   <IncidentsTreeMap
                     data={incidentsTreeMap} instanceMetaData={instanceMetaData}
                     endTime={endTime} numberOfDays={numberOfDays}
                     instanceStatsJson={instanceStatsMap}
                     treeMapScheme={treeMapScheme}
-                    treeMapCPUThreshold={treeMapCPUThreshold} treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                    predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup} />
+                    treeMapCPUThreshold={treeMapCPUThreshold}
+                    treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                    predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
-        { this.state.showTenderModal &&
-            <TenderModal dataArray={data.causalDataArray} types={data.causalTypes}
-                      endTimestamp={latestTimestamp}
-                      startTimestamp={latestTimestamp}
-                      onClose={() => this.setState({ showTenderModal: false })}/>
+        {this.state.showTenderModal &&
+          <TenderModal
+            dataArray={data.causalDataArray} types={data.causalTypes}
+            endTimestamp={latestTimestamp}
+            startTimestamp={latestTimestamp}
+            onClose={() => this.setState({ showTenderModal: false })} />
         }
       </Console.Content>
-    )
+    );
   }
 }
 

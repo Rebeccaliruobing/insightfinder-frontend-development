@@ -121,7 +121,7 @@ class ExecutiveDashboard extends React.Component {
       instanceGroup,
     });
     store.set('liveAnalysisProjectName', name);
-    window.open(`/cloud/monitoring?${$.param(query)}`, '_target');
+    window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
   }
 
   render() {
