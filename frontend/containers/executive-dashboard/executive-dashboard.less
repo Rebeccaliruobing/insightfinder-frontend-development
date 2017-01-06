@@ -13,6 +13,7 @@
 
     table.toplist {
       width: 100%;
+      table-layout: fixed;
       thead {
         height: 50px;
         background: #566f84;
@@ -31,7 +32,9 @@
       tbody {
         tr {
           font-size: 14px;
-          line-height: 40px;
+          td {
+            padding: 13px 0;
+          }
 
           &.project {
             border-top: 1px solid #d7d7d7;
@@ -66,6 +69,11 @@
           }
           td.number.predicted {
             background: rgba(0, 0, 0, 0.05);
+          }
+          td.name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           td .name {
             cursor: pointer;

@@ -1,6 +1,8 @@
 import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import _ from 'lodash';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
 const normalizeValue = (val, fractionDigits = 0) => {
   if (_.isFinite(val)) {
@@ -36,7 +38,7 @@ const getArrowStyles = (left, right, reverse = false) => {
 
 const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded = true }) => {
   const { stats, color } = data;
-  let projectStyle = isProject ? { fontWeight:'bold' } : {};
+  const projectStyle = isProject ? { fontWeight: 'bold' } : {};
   return (
     <tr
       style={{
@@ -46,10 +48,15 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
       className={isProject ? 'project' : 'group'}
       {...isProject ? { onClick: onRowToggle } : {}}
     >
-      <td>
+      <td className="name">
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
-        <span className="name" onClick={onClick} style={projectStyle}>{name}</span>
+        <OverlayTrigger placement="right" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
+          <span
+            className="name"
+            onClick={onClick} style={projectStyle}
+          >{name}</span>
+        </OverlayTrigger>
       </td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'))}</td>
@@ -121,6 +128,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
 };
 
 ListRow.propTypes = {
+  name: T.string,
   data: T.object,
   expanded: T.bool,
   isProject: T.bool,
