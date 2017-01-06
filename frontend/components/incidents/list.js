@@ -357,7 +357,7 @@ class IncidentsList extends React.Component {
         <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', right: 0, top: 5 }} title="Causal Graph"
+            style={{ position: 'absolute', left: 300, top: 5 }} title="Causal Graph"
             onClick={(e) => {
               e.stopPropagation();
               this.setState({

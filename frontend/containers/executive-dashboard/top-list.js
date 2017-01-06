@@ -34,8 +34,9 @@ const getArrowStyles = (left, right, reverse = false) => {
   return { visibility: 'hidden' };
 };
 
-const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = true }) => {
-  const { name, stats, color } = data;
+const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded = true }) => {
+  const { stats, color } = data;
+  let projectStyle = isProject ? { fontWeight:'bold' } : {};
   return (
     <tr
       style={{
@@ -48,9 +49,7 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
       <td>
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
-        {!isProject && <i className="icon" />}
-        {!isProject && <i className="icon" />}
-        <span className="name" onClick={onClick} >{name}</span>
+        <span className="name" onClick={onClick} style={projectStyle}>{name}</span>
       </td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'))}</td>
@@ -79,19 +78,6 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
-      <td className="number current">
-        <i
-          className="long arrow right icon"
-          style={getArrowStyles(
-            _.get(stats, 'previous.totalAnomalyCount'),
-            _.get(stats, 'current.totalAnomalyCount'),
-          )}
-        />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
-      </td>
-      <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyCount'))}</td>
-
       <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>
       <td className="number current">
         <i
@@ -104,6 +90,31 @@ const ListRow = ({ data, onRowToggle, onClick, isProject = false, expanded = tru
         {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
+
+
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
+      <td className="number current">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.totalAnomalyCount'),
+            _.get(stats, 'current.totalAnomalyCount'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
+      </td>
+
+      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
+      <td className="number current">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'previous.totalAnomalyCount'),
+            _.get(stats, 'current.totalAnomalyCount'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
+      </td>
 
     </tr>
   );
@@ -167,6 +178,14 @@ class TopList extends React.Component {
     };
   }
 
+  chopString(str, n) {
+    if (str.length <= n + 2) {
+      return str;
+    } else {
+      return `${str.slice(0, n)}..`;
+    }
+  }
+
   render() {
     const { stats } = this.props;
     const { expandedProjects } = this.state;
@@ -182,10 +201,11 @@ class TopList extends React.Component {
                 borderLeft: '2px solid #566f84',
               }}
             >Project/Group Name</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Score ( Daily Avg )</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Duration ( Minute )</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Count</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Events</th>
+            <th className="subheader" colSpan={3} width="20%">Anomaly Score (Daily Avg)</th>
+            <th className="subheader" colSpan={3} width="18%">Anomaly Duration (Minute)</th>
+            <th className="subheader" colSpan={3} width="18%">Consolidated Abnormal Events</th>
+            <th className="subheader" colSpan={2} width="12%">CPU Utilization (%)</th>
+            <th className="subheader" colSpan={2} width="12%">Availability (%)</th>
           </tr>
           <tr>
             <th>Previous</th>
@@ -199,25 +219,32 @@ class TopList extends React.Component {
             <th>Predicted</th>
             <th>Previous</th>
             <th>Current</th>
-            <th>Predicted</th>
+            <th>Previous</th>
+            <th>Current</th>
           </tr>
         </thead>
         <tbody>
           {stats.map((data) => {
+            const { groups } = data;
+            let count = 0;
+            if(groups){
+              count = groups.length;
+            }
             const name = data.name;
             const expanded = _.indexOf(expandedProjects, name) >= 0;
+            const title = data.name + " ("+groups.length+")";
             const elems = [
               (<ListRow
-                key={name} data={data} isProject expanded={expanded}
+                key={name} name={title} data={data} isProject expanded={expanded}
                 onRowToggle={this.toggleProjectRow(name)}
               />),
             ];
 
-            const { groups } = data;
             groups.forEach((group, index) => {
+              let title = this.chopString(group.name, 25);
               elems.push(
                 (<ListRow
-                  key={`${name}-${index}`} data={group} expanded={expanded}
+                  key={`${name}-${index}`} name={title} data={group} expanded={expanded}
                   onClick={this.handleProjectClick(name, group.name)}
                 />),
               );

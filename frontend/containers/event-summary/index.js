@@ -124,8 +124,11 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleModelTypeChange(value, modelType) {
-    let { projectName,instanceGroup } = this.state;
+  handleModelTypeChange(value, mt) {
+    let { projectName,instanceGroup,modelType} = this.state;
+    if(mt == modelType){
+      return; // no change
+    }
     this.setState({
       modelType:modelType,
       currentTreemapData: undefined,
@@ -136,10 +139,13 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleDayChange(value, numberOfDays) {
-    let { projectName,instanceGroup } = this.state;
+  handleDayChange(value, NoD) {
+    let { projectName, instanceGroup, numberOfDays } = this.state;
+    if(NoD.toString() == numberOfDays){
+      return; // no change
+    }
     this.setState({
-      numberOfDays:numberOfDays.toString(),
+      numberOfDays: NoD.toString(),
       currentTreemapData: undefined,
     }, () => {
       // this.refreshProjectName(projectName);      
@@ -148,11 +154,16 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleEndTimeChange(value, endTime) {
+  handleEndTimeChange(value, eTime) {
+    let { endTime } = this.state;
     let newEndTime = moment(value).endOf('day');
     let curTime = moment();
     if(newEndTime>curTime){
       newEndTime = curTime;
+    }
+
+    if(newEndTime.format('YYYYMMDD') == endTime.format('YYYYMMDD')){
+      return; // no change
     }
 
     let { projectName,instanceGroup } = this.state;
@@ -372,12 +383,12 @@ class EventSummary extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div
+          {false && <div
             className="ui vertical segment"
             style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
           >
-          {true && <ProjectStatistics data={data} dur={numberOfDays} />}
-          </div>
+            <ProjectStatistics data={data} dur={numberOfDays} />
+          </div>}
           <div
             className="ui vertical segment"
             style={{ background: 'white', padding: 4 }}
