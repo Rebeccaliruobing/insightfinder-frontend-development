@@ -5,7 +5,7 @@ const normalizeStats = (stats = {}, orderBy) => {
   const ret = [];
   const orderedStats = _.reverse(_.sortBy(
     _.toPairs(stats),
-    o => _.get(o[1].All, orderBy),
+    o => _.get(o[1].All, orderBy, 0),
   ));
 
   // Get the max/min score for all project
@@ -36,7 +36,7 @@ const normalizeStats = (stats = {}, orderBy) => {
 
     // Use the all stat as the group stat.
     // const { All: allStats, ...subStats } = stat;
-    const score = _.get(sumStat, orderBy);
+    const score = _.get(sumStat, orderBy, 0);
     const color = calculateRGBByAnomaly(score, maxScore, minScore);
     const project = {
       name,
