@@ -102,14 +102,16 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleEndTimeChange(value) {
-    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
     const { location, router } = this.props;
-    router.push({
-      pathname: location.pathname,
-      query: this.applyDefaultParams({ ...location.query, endTime }),
-    });
+    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
+    if (location.query.endTime !== endTime) {
+      router.push({
+        pathname: location.pathname,
+        query: this.applyDefaultParams({ ...location.query, endTime }),
+      });
 
-    this.refreshData();
+      this.refreshData();
+    }
   }
 
   @autobind
