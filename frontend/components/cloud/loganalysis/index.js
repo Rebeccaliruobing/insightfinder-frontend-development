@@ -191,9 +191,9 @@ class LogAnalysisCharts extends React.Component {
       selectedBarColors: [],
       showSettingModal: false,
       tabStates: {
-        event: '',
+        event: 'active',
         anomaly: '',
-        freq: 'active',
+        freq: '',
       }
     };
   }
