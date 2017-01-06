@@ -4,14 +4,18 @@ import _ from 'lodash';
 import { Tooltip } from 'pui-react-tooltip';
 import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
-const normalizeValue = (val, fractionDigits = 0) => {
+const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
+  let className="";
+  if(needTotal){
+    className="total";
+  }
   if (_.isFinite(val)) {
     if (val > 0) {
-      return (<span className="total"><b>{val.toFixed(fractionDigits).toString()}</b></span>);
+      return (<span className={className}><b>{val.toFixed(fractionDigits).toString()}</b></span>);
     }
-    return (<span className="total">{val.toFixed(fractionDigits).toString()}</span>);
+    return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
   }
-  return <span className="total">-</span>;
+  return <span className={className}>-</span>;
 };
 
 const getArrowStyles = (left, right, reverse = false) => {
@@ -50,6 +54,8 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
       <td className="name">
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
+        {!isProject && <i className="icon" />}   
+        {!isProject && <i className="icon" />}   
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span
             className="name"
@@ -67,7 +73,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.avgDailyAnomalyScore'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'))}
+        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'),0,false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>
 
@@ -80,7 +86,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.totalAnomalyDuration'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'))}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'),0,false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
@@ -93,7 +99,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.totalAnomalyEventCount'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'))}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'),0,false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
@@ -107,7 +113,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.AvgCPUUtilization'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'),1)}
+        {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'),1,false)}
       </td>
 
       <td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime')*100)}</td>
@@ -119,7 +125,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.AvgInstanceUptime'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.AvgInstanceUptime')*100)}
+        {normalizeValue(_.get(stats, 'current.AvgInstanceUptime')*100,0,false)}
       </td>
 
     </tr>
@@ -231,10 +237,14 @@ class TopList extends React.Component {
           </tr>
         </thead>
           {stats.map((data) => {
-            const { groups } = data;
+            const { groups, thisStat } = data;
             const name = data.name;
             const expanded = _.indexOf(expandedProjects, name) >= 0;
-            const title = `${data.name} (${groups.length})`;
+            let groupText = "group";
+            if(groups.length>1){
+              groupText = "groups";
+            }
+            const title = `${data.name} (${groups.length} ${groupText})`;
             const elems = [
               (<tbody key={name}><ListRow
                 key={name} name={title} data={data} isProject expanded={expanded}
@@ -242,12 +252,31 @@ class TopList extends React.Component {
               /></tbody>),
             ];
 
-            const childElems = groups.map((group, index) => (
-              <ListRow
-                key={`${name}-${index}`} name={group.name} data={group} expanded={expanded}
-                onClick={this.handleProjectClick(name, group.name)}
-              />
-            ));
+            const childElems = groups.map((group, index) => {
+              let numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
+              let numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
+              let title = group.name;
+              let suffix = "";
+              if(numberOfInstances!=undefined){
+                suffix += numberOfInstances + " instance" + (numberOfInstances>1?"s":"");
+              }
+              if(numberOfMetrics!=undefined){
+                if(suffix.length>0){
+                  suffix += ", ";
+                }
+                suffix += numberOfMetrics + " metric" + (numberOfMetrics>1?"s":"");
+              }
+              if(suffix.length>0){
+                suffix = " (" + suffix + ")";
+              }
+              title += suffix;
+              return(
+                <ListRow
+                  key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                  onClick={this.handleProjectClick(name, group.name)}
+                />
+              )
+            });
             elems.push((
               <tbody
                 style={{ display: !expanded ? 'none' : '' }}

@@ -35,7 +35,7 @@ export default function (props) {
         </Link>
         <Link to="/cloud/app-forecast" className="item text-white">
           <i className="line chart icon"></i>
-          <span> Application Forecast </span>
+          <span> Resouce Usage Forecast </span>
         </Link>
         {(userName=='guest'||userName=='admin') && <Link to="/cloud/behavior-change-detection" className="item text-white">
           <i className="checkmark box icon"/>
