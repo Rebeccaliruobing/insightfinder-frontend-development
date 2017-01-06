@@ -284,7 +284,7 @@ class IncidentsList extends React.Component {
     incidents = _.orderBy(incidents, iteratees, order);
 
     return (
-      <tbody style={{ width: '100%', height: 445, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: 480, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';

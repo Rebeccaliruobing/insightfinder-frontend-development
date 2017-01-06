@@ -394,8 +394,8 @@ class EventSummary extends React.Component {
             style={{ background: 'white', padding: 4 }}
           >
             <div className="ui incidents grid">
-              <div className="row" style={{ height: 600, paddingTop: 0 }}>
-                <div className="seven wide column" style={{ height: 500, paddingRight: 0 }}>
+              <div className="row" style={{ height: 700, paddingTop: 0 }}>
+                <div className="seven wide column" style={{ height: 600, paddingRight: 0 }}>
                   <IncidentsList
                     projectName={refreshName} projectType={projectType}
                     endTime={endTime} numberOfDays={numberOfDays} modelType={modelType}
@@ -405,7 +405,7 @@ class EventSummary extends React.Component {
                     causalTypes={data.causalTypes} latestTimestamp={latestTimestamp}
                   />
                 </div>
-                <div className="nine wide column" style={{ height: 500, paddingTop: 20 }}>
+                <div className="nine wide column" style={{ height: 600, paddingTop: 20 }}>
                   {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
                   {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
                   <TreeMapSchemeSelect

@@ -92,28 +92,28 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgCPUUtilization'),1)}</td>
       <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
-            _.get(stats, 'previous.totalAnomalyCount'),
-            _.get(stats, 'current.totalAnomalyCount'),
+            _.get(stats, 'previous.AvgCPUUtilization'),
+            _.get(stats, 'current.AvgCPUUtilization'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
+        {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'),1)}
       </td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyCount'))}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime'),1)}</td>
       <td className="number current">
         <i
           className="long arrow right icon"
           style={getArrowStyles(
-            _.get(stats, 'previous.totalAnomalyCount'),
-            _.get(stats, 'current.totalAnomalyCount'),
+            _.get(stats, 'previous.AvgInstanceUptime'),
+            _.get(stats, 'current.AvgInstanceUptime'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyCount'))}
+        {normalizeValue(_.get(stats, 'current.AvgInstanceUptime'),1)}
       </td>
 
     </tr>
