@@ -42,7 +42,6 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
   return (
     <tr
       style={{
-        display: !isProject && !expanded ? 'none' : '',
         borderLeft: `2px solid rgb(${color})`,
       }}
       className={isProject ? 'project' : 'group'}
@@ -51,7 +50,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
       <td className="name">
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
-        <OverlayTrigger placement="right" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
+        <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span
             className="name"
             onClick={onClick} style={projectStyle}
@@ -231,36 +230,33 @@ class TopList extends React.Component {
             <th>Current</th>
           </tr>
         </thead>
-        <tbody>
           {stats.map((data) => {
             const { groups } = data;
-            let count = 0;
-            if(groups){
-              count = groups.length;
-            }
             const name = data.name;
             const expanded = _.indexOf(expandedProjects, name) >= 0;
-            const title = data.name + " ("+groups.length+")";
+            const title = `${data.name} (${groups.length})`;
             const elems = [
-              (<ListRow
+              (<tbody key={name}><ListRow
                 key={name} name={title} data={data} isProject expanded={expanded}
                 onRowToggle={this.toggleProjectRow(name)}
-              />),
+              /></tbody>),
             ];
 
-            groups.forEach((group, index) => {
-              let title = this.chopString(group.name, 25);
-              elems.push(
-                (<ListRow
-                  key={`${name}-${index}`} name={title} data={group} expanded={expanded}
-                  onClick={this.handleProjectClick(name, group.name)}
-                />),
-              );
-            });
+            const childElems = groups.map((group, index) => (
+              <ListRow
+                key={`${name}-${index}`} name={group.name} data={group} expanded={expanded}
+                onClick={this.handleProjectClick(name, group.name)}
+              />
+            ));
+            elems.push((
+              <tbody
+                style={{ display: !expanded ? 'none' : '' }}
+                key={`${name}-children`}
+              >{childElems}</tbody>
+            ));
 
             return elems;
           })}
-        </tbody>
       </table>
     );
   }
