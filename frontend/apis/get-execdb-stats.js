@@ -11,7 +11,7 @@ export function getExecDBStatisticsData(projectName, endTimestamp, modelType, nu
   return new Promise(function (resolve, reject) {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('SystemsStatsDataServlet', 1),
+      url: getEndpoint('execDashboard', 1),
       data: $.param({ userName, token, projectName, endTimestamp,
 											modelType, numberOfDays, operation:'post' }),
       beforeSend: function (request) {

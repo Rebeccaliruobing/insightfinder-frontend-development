@@ -10,7 +10,7 @@ const retrieveExecDBStatisticsData = (modelType, endTimestamp, numberOfDays) => 
   return new Promise((resolve, reject) => {
     $.ajax({
       type: 'POST',
-      url: getEndpoint('eventStats'),
+      url: getEndpoint('execDashboard'),
       data: $.param({
         userName, token, endTimestamp, modelType, numberOfDays,
       }),
