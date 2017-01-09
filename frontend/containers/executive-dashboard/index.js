@@ -63,7 +63,7 @@ class ExecutiveDashboard extends React.Component {
       retrieveExecDBStatisticsData(query.modelType, endTime, query.numberOfDays)
         .then((data) => {
           this.setState({
-            eventStats: normalizeStats(data, 'current.totalAnomalyScore'),
+            eventStats: normalizeStats(data),
             loading: false,
           });
         }).catch((msg) => {

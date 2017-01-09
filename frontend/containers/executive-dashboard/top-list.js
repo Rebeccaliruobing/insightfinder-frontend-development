@@ -5,10 +5,7 @@ import { Tooltip } from 'pui-react-tooltip';
 import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
 const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
-  let className="";
-  if(needTotal){
-    className="total";
-  }
+  const className = needTotal ? 'total' : '';
   if (_.isFinite(val)) {
     if (val > 0) {
       return (<span className={className}><b>{val.toFixed(fractionDigits).toString()}</b></span>);
@@ -270,12 +267,12 @@ class TopList extends React.Component {
                 suffix = " (" + suffix + ")";
               }
               title += suffix;
-              return(
+              return (
                 <ListRow
                   key={`${name}-${index}`} name={title} data={group} expanded={expanded}
                   onClick={this.handleProjectClick(name, group.name)}
                 />
-              )
+              );
             });
             elems.push((
               <tbody
