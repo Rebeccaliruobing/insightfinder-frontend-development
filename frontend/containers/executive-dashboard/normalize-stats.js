@@ -20,30 +20,38 @@ const normalizeStats = (stats = {}, orderBy) => {
     const stat = o[1];
 
     // create sum group to be put on top row
-    let sumStat = {"previous":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"AvgCPUUtilization":0,"AvgInstanceUptime":0},"current":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0},"predicted":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"AvgCPUUtilization":0,"AvgInstanceUptime":0}};
+    let sumStat = {"previous":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"AvgCPUUtilization":0,"AvgInstanceUptime":0},"current":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0,"AvgCPUUtilization":0,"AvgInstanceUptime":0},"predicted":{"totalAnomalyEventCount":0,"avgDailyAnomalyScore":0,"totalAnomalyDuration":0}};
 
-    let statsCountCurrent = 0;
-    let statsCountPrevious = 0;
+    let cpuCountCurrent = 0;
+    let cpuCountPrevious = 0;
+    let availCountCurrent = 0;
+    let availCountPrevious = 0;
     _.each(stat, function (s, i) {
       if(s['previous']){
         if(s['previous']['totalAnomalyDuration']) sumStat['previous']['totalAnomalyDuration'] += s['previous']['totalAnomalyDuration'];
         if(s['previous']['totalAnomalyEventCount']) sumStat['previous']['totalAnomalyEventCount'] += s['previous']['totalAnomalyEventCount'];
         if(s['previous']['avgDailyAnomalyScore']) sumStat['previous']['avgDailyAnomalyScore'] += s['previous']['avgDailyAnomalyScore'];
-        if(s['previous']['AvgInstanceUptime']) sumStat['previous']['AvgInstanceUptime'] += s['previous']['AvgInstanceUptime'];
-        if(s['previous']['AvgCPUUtilization']) {
+        if(s['previous']['AvgCPUUtilization']!=undefined) {
           sumStat['previous']['AvgCPUUtilization'] += s['previous']['AvgCPUUtilization'];
-          statsCountPrevious += 1;
+          cpuCountPrevious += 1;
         } 
+        if(s['previous']['AvgInstanceUptime']!=undefined) {
+          sumStat['previous']['AvgInstanceUptime'] += s['previous']['AvgInstanceUptime'];
+          availCountPrevious += 1;
+        }
       }
       if(s['current']){
         if(s['current']['totalAnomalyDuration']) sumStat['current']['totalAnomalyDuration'] += s['current']['totalAnomalyDuration'];
         if(s['current']['totalAnomalyEventCount']) sumStat['current']['totalAnomalyEventCount'] += s['current']['totalAnomalyEventCount'];
         if(s['current']['avgDailyAnomalyScore']) sumStat['current']['avgDailyAnomalyScore'] += s['current']['avgDailyAnomalyScore'];
-        if(s['current']['AvgInstanceUptime']) sumStat['current']['AvgInstanceUptime'] += s['current']['AvgInstanceUptime'];
-        if(s['current']['AvgCPUUtilization']) {
+        if(s['current']['AvgCPUUtilization']!=undefined) {
           sumStat['current']['AvgCPUUtilization'] += s['current']['AvgCPUUtilization'];
-          statsCountCurrent += 1;
+          cpuCountCurrent += 1;
         } 
+        if(s['current']['AvgInstanceUptime']!=undefined) {
+          sumStat['current']['AvgInstanceUptime'] += s['current']['AvgInstanceUptime'];
+          availCountCurrent += 1;
+        }
       }
       if(s['predicted']){
         if(s['predicted']['totalAnomalyDuration']) sumStat['predicted']['totalAnomalyDuration'] += s['predicted']['totalAnomalyDuration'];
@@ -52,17 +60,21 @@ const normalizeStats = (stats = {}, orderBy) => {
       }
     });
 
-    if(sumStat['current'] && sumStat['current']['AvgCPUUtilization']){
-      if(statsCountCurrent==0){
-        sumStat['current']['AvgCPUUtilization'] = undefined;  
+    if(sumStat['current']){
+      if(sumStat['current']['AvgCPUUtilization'] != undefined && cpuCountCurrent!=0){
+        sumStat['current']['AvgCPUUtilization'] = sumStat['current']['AvgCPUUtilization']/cpuCountCurrent;
       }
-      sumStat['current']['AvgCPUUtilization'] = sumStat['current']['AvgCPUUtilization']/statsCountCurrent;
+      if(sumStat['current']['AvgInstanceUptime'] != undefined && availCountCurrent!=0){
+        sumStat['current']['AvgInstanceUptime'] = sumStat['current']['AvgInstanceUptime']/availCountCurrent;
+      }
     }
-    if(sumStat['previous'] && sumStat['previous']['AvgCPUUtilization']){
-      if(statsCountPrevious==0){
-        sumStat['previous']['AvgCPUUtilization'] = undefined;  
+    if(sumStat['previous']){
+      if(sumStat['previous']['AvgCPUUtilization'] != undefined && cpuCountPrevious!=0){
+        sumStat['previous']['AvgCPUUtilization'] = sumStat['previous']['AvgCPUUtilization']/cpuCountPrevious;
       }
-      sumStat['previous']['AvgCPUUtilization'] = sumStat['previous']['AvgCPUUtilization']/statsCountPrevious;
+      if(sumStat['previous']['AvgInstanceUptime'] != undefined && availCountPrevious!=0){
+        sumStat['previous']['AvgInstanceUptime'] = sumStat['previous']['AvgInstanceUptime']/availCountPrevious;
+      }
     }
 
     // Use the all stat as the group stat.

@@ -325,7 +325,7 @@ class EventSummary extends React.Component {
       instanceGroups, lineChartType } = this.state;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
-    const latestTimestamp = _.get(data, 'datainstanceMetricJson.latestDataTimestamp');
+    const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
