@@ -23,8 +23,8 @@ const normalizeStats = (stats = {}, orderBy = 'current.avgDailyAnomalyScore') =>
         _.forEach(selectedMetrics, (mname) => {
           const val = _.get(stat, `${gname}.${tname}.${mname}`, undefined);
           if (_.isFinite(val)) {
-            totals[tname][mname] = (totals[tname][mname] || 0) + val;
-            counts[tname][mname] = (totals[tname][mname] || 0) + 1;
+            totals[tname][mname] = (totals[tname][mname] || 0.0) + val;
+            counts[tname][mname] = (counts[tname][mname] || 0) + 1;
           }
         });
       });

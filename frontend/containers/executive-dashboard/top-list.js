@@ -70,7 +70,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.avgDailyAnomalyScore'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'),0,false)}
+        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 0, false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>
 
@@ -83,7 +83,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.totalAnomalyDuration'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'),0,false)}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), 0, false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>
 
@@ -96,12 +96,12 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.totalAnomalyEventCount'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'),0,false)}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), 0, false)}
       </td>
       <td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>
 
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgCPUUtilization'),1)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgCPUUtilization'), 1)}</td>
       <td className="number current">
         <i
           className="long arrow right icon"
@@ -110,10 +110,10 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.AvgCPUUtilization'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'),1,false)}
+        {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
       </td>
 
-      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime')*100)}</td>
+      <td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}</td>
       <td className="number current">
         <i
           className="long arrow right icon"
@@ -122,7 +122,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
             _.get(stats, 'current.AvgInstanceUptime'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.AvgInstanceUptime')*100,0,false)}
+        {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
       </td>
 
     </tr>
