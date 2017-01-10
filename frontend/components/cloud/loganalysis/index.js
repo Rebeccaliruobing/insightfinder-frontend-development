@@ -209,7 +209,12 @@ class LogAnalysisCharts extends React.Component {
 
   calculateData(props) {
     // Cache the data, and recalculate it if changed.
-    const { data, loading, onRefresh, ...rest } = props;
+    const { data, loading, onRefresh, query, ...rest } = props;
+
+    this.rareEventThreshold = parseInt(query.rareEventThreshold);
+    if(!this.rareEventThreshold){
+      this.rareEventThreshold = 3;
+    }
 
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
@@ -231,6 +236,7 @@ class LogAnalysisCharts extends React.Component {
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
+    let rareEventThreshold = this.rareEventThreshold;
     allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
       return el.nid != -1
     });
@@ -291,7 +297,7 @@ class LogAnalysisCharts extends React.Component {
 
     // make a copy, and filter out anomaly and small cluster, and run again
     let logEventArr = allLogEventArr.filter(function (el, index, arr) {
-      return (neuronValue[neuronIdList.indexOf(el.nid)] > 3)
+      return (neuronValue[neuronIdList.indexOf(el.nid)] > rareEventThreshold)
     });
     neuronListNumber = {};
     neuronValue = [];
@@ -440,6 +446,7 @@ class LogAnalysisCharts extends React.Component {
     let logEventArr = this.dp.logEventArr;
     let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
     let clusterTopWordArr = this.dp.clusterTopWordArr;
+    let rareEventThreshold = this.rareEventThreshold;
     let neuronListNumber = {};
     let neuronValue = [];
     let nidList = _.map(logEventArr, function (o) {
@@ -464,8 +471,8 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
     logEventArr = logEventArr.filter(function (el, index, arr) {
-      // return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3) || (el.nid == -1)
-      return (neuronValue[neuronIdList.indexOf(el.nid)] <= 3)
+      // return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold) || (el.nid == -1)
+      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
     });
 
     if (logEventArr) {

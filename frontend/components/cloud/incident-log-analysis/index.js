@@ -15,7 +15,7 @@ class IncidentLogAnalysis extends React.Component {
     const endTime = moment(data.endTime).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
     const modelStartTime = moment(data.modelStartTime).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
     const modelEndTime = moment(data.modelEndTime).utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-    let { derivedPvalue, pvalue, cvalue } = data;
+    let { derivedPvalue, rareEventThreshold, pvalue, cvalue } = data;
     if (modelType === 'DBScan') {
       pvalue = epsilon;
       cvalue = minPts;
@@ -26,6 +26,7 @@ class IncidentLogAnalysis extends React.Component {
       startTime,
       endTime,
       derivedPvalue, 
+      rareEventThreshold,
       pvalue,
       cvalue,
       modelStartTime,

@@ -324,6 +324,12 @@ class EventSummary extends React.Component {
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
       instanceGroups, lineChartType } = this.state;
 
+    let realEndTime = moment(endTime).endOf('day');
+    let curTime = moment();
+    if(realEndTime>curTime){
+      realEndTime = curTime;
+    }
+
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
@@ -348,7 +354,7 @@ class EventSummary extends React.Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection
-                style={{ minWidth: 200 }} value={projectName} onChange={this.handleProjectChange}
+                style={{ minWidth: 120 }} value={projectName} onChange={this.handleProjectChange}
               />
             </div>
             <div className="field">
@@ -384,14 +390,14 @@ class EventSummary extends React.Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
               <NumberOfDays
-                style={{ width: 120 }}
+                style={{ width: 80 }}
                 value={numberOfDays} onChange={this.handleDayChange}
               />
             </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Model Type:</label>
               <EventSummaryModelType
-                style={{ width: 120 }}
+                style={{ width: 100 }}
                 value={modelType} onChange={this.handleModelTypeChange}
               />
             </div>
@@ -417,7 +423,7 @@ class EventSummary extends React.Component {
                 <div className="seven wide column" style={{ height: 600, paddingRight: 0 }}>
                   <IncidentsList
                     projectName={projectName} projectType={projectType}
-                    endTime={endTime} numberOfDays={numberOfDays} modelType={modelType}
+                    endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                     onIncidentSelected={this.handleIncidentSelected}
                     incidents={data.incidents}
                     causalDataArray={data.causalDataArray}
@@ -445,7 +451,7 @@ class EventSummary extends React.Component {
                   }
                   <IncidentsTreeMap
                     data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                    endTime={endTime} numberOfDays={numberOfDays}
+                    endTime={realEndTime} numberOfDays={numberOfDays}
                     instanceStatsJson={instanceStatsMap}
                     treeMapScheme={treeMapScheme}
                     treeMapCPUThreshold={treeMapCPUThreshold}

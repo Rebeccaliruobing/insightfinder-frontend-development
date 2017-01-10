@@ -8,6 +8,7 @@ import {
   DurationThreshold,
   AnomalyThreshold,
   AnomalyThresholdSensitivity,
+  RareEventSensitivity,
 } from '../../selections';
 import apis from '../../../apis';
 import DateTimePicker from '../../ui/datetimepicker';
@@ -24,9 +25,11 @@ class LogAnalysis extends React.Component {
     this.state = {
       projectName: '',
       derivedPvalue: 0.9,
-      pvalue: 0.99,
+      pvalue: 0.95,
       derivedPvalueText: "Medium High",
-      pvalueText: "Low",
+      pvalueText: "Medium",
+      rareEventThreshold: 3,
+      rareEventThresholdText: "Medium",
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
@@ -40,6 +43,7 @@ class LogAnalysis extends React.Component {
       incidentList: [],
       modelTypeTextMap: {},
       sensitivityMap:{},
+      rareEventMap:{},
     };
     this.state.modelTypeTextMap["Holistic"] = "Holistic";
     this.state.modelTypeTextMap["holisticLog"] = "Holistic";
@@ -49,6 +53,11 @@ class LogAnalysis extends React.Component {
     this.state.sensitivityMap["0.95"] = "Medium";
     this.state.sensitivityMap["0.9"] = "Medium High";
     this.state.sensitivityMap["0.5"] = "High";
+    this.state.rareEventMap["1"] = "Low";
+    this.state.rareEventMap["2"] = "Medium Low";
+    this.state.rareEventMap["3"] = "Medium";
+    this.state.rareEventMap["4"] = "Medium High";
+    this.state.rareEventMap["5"] = "High";
   }
 
   componentDidMount() {
@@ -100,9 +109,11 @@ class LogAnalysis extends React.Component {
       modelType: 'holisticLog',
       modelTypeText: 'Holistic',
       derivedPvalue: 0.9,
-      pvalue: 0.9,
+      pvalue: 0.95,
       derivedPvalueText: "Medium High",
-      pvalueText: "Medium High",
+      pvalueText: "Medium",
+      rareEventThreshold: 3,
+      rareEventThresholdText: "Medium",
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
@@ -263,6 +274,8 @@ class LogAnalysis extends React.Component {
           pvalue: pValue,
           derivedPvalueText: this.state.sensitivityMap[derivedPvalue||0.9],
           pvalueText: this.state.sensitivityMap[pValue],
+          rareEventThreshold: 3,
+          rareEventThresholdText: "Medium",
           cvalue: 1,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
@@ -276,13 +289,11 @@ class LogAnalysis extends React.Component {
   }
 
   handleSubmit() {
-    const { projectName, modelType, startTime, endTime, derivedPvalue,
-      pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
+    const { projectName, modelType, startTime, endTime, derivedPvalue, rareEventThreshold, pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
     } = this.state;
 
     this.validateStartEnd(this.state) && this.props.onSubmit && this.props.onSubmit({
-      projectName, modelType, startTime, endTime, derivedPvalue, pvalue, cvalue,
-      modelStartTime, modelEndTime, isExistentIncident,
+      projectName, modelType, startTime, endTime, derivedPvalue, rareEventThreshold, pvalue, cvalue, modelStartTime, modelEndTime, isExistentIncident,
     });
   }
 
@@ -349,7 +360,8 @@ class LogAnalysis extends React.Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, derivedPvalue, pvalue, pvalueText, derivedPvalueText, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
+      projectName, incident, startTime, endTime, derivedPvalue, pvalue, pvalueText, derivedPvalueText, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList, 
+      rareEventThreshold, rareEventThresholdText,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -383,7 +395,7 @@ class LogAnalysis extends React.Component {
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <WaringButton labelStyle={labelStyle} labelTitle="Rare Event Detection Sensitivity" labelSpan="Rare event detection sensitivity controls the sensitivity with which InsightFinder will cluster logs and detect anomalous logs."/>
-              <AnomalyThresholdSensitivity value={pvalue} text={pvalueText} onChange={(v, t)=>this.setState({pvalue:v, pvalueText:t})}/>
+              <RareEventSensitivity value={rareEventThreshold} text={rareEventThresholdText} onChange={(v, t)=>this.setState({rareEventThreshold:v, rareEventThresholdText:t})}/>
             </div>
           }
           {modelType == 'DBScan'?

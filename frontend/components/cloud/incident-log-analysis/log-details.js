@@ -55,7 +55,7 @@ const ProjectLogDetails = class extends React.Component {
 
   render() {
     let { query } = this.props.location;
-    let { projectName, modelName, derivedPvalue, pvalue, cvalue, modelType } = query;
+    let { projectName, modelName, derivedPvalue, rareEventThreshold, pvalue, cvalue, modelType } = query;
     let { data, groupId, loading } = this.state;
     if (projectName === '') {
       projectName = modelName;
@@ -67,7 +67,7 @@ const ProjectLogDetails = class extends React.Component {
           <div className="topbar-text">
             <div className="title">
               Please view anomaly detection result for <b>{projectName}</b><br />
-              with model type <b>{modelType}</b>, clustering sensitivity <b>{pvalue}</b>,
+              with model type <b>{modelType}</b>, rare event detection sensitivity <b>{rareEventThreshold}</b>,
               frequency anomaly detection sensitivity <b>{derivedPvalue}</b>.
           </div>
             <div className="legend">
