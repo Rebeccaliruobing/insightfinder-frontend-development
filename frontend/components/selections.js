@@ -369,6 +369,21 @@ class EventSummaryModelType extends React.Component{
   }
 };
 
+const  AnomalyThresholdSensitivity = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" data-value="0.99">Low</div>
+        <div className="item" data-value="0.97">Medium Low</div>
+        <div className="item" data-value="0.95">Medium</div>
+        <div className="item" data-value="0.9">Medium High</div>
+        <div className="item" data-value="0.5">High</div>
+      </div>
+    </Dropdown>
+  );
+};
+
 const  AnomalyThreshold = (props) => {
   return (
     <Dropdown mode="select" {...props}>
@@ -576,6 +591,7 @@ export {
   ModelTypeSimple,
   EventSummaryModelType,
   AnomalyThreshold,
+  AnomalyThresholdSensitivity,
   DurationThreshold,
   WindowWithWeek,
   DurationHour,

@@ -98,9 +98,9 @@ class EventTableGroup extends React.Component {
               let aid = a.nEvents;
               let bid = b.nEvents;
               if (aid > bid) {
-                return 1;
-              } else if (aid < bid) {
                 return -1;
+              } else if (aid < bid) {
+                return 1;
               } else {
                 let aaid = a.nid;
                 let bbid = b.nid;
@@ -340,7 +340,6 @@ class LogAnalysisCharts extends React.Component {
       }
     });
 
-    this.allLogEventArr = allLogEventArr;
     this.allEventTableData = allEventTableData;
 
     this.logEventArr = logEventArr;
@@ -369,9 +368,9 @@ class LogAnalysisCharts extends React.Component {
               let aid = parseInt(a.count);
               let bid = parseInt(b.count);
               if (aid < bid) {
-                return 1;
-              } else if (aid > bid) {
                 return -1;
+              } else if (aid > bid) {
+                return 1;
               } else {
                 return 0;
               }
@@ -634,7 +633,7 @@ class LogAnalysisCharts extends React.Component {
   
   calculateFreqVectorData(){
     if (!this.dp) return;
-    const eventTableData = this.allEventTableData;
+    const eventTableData = this.eventTableData;
     let derivedAnomalyByMetric = this.dp.anomalyByMetricObjArr && this.dp.anomalyByMetricObjArr[0] ? this.dp.anomalyByMetricObjArr[0] : {};
     let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
     let totalFreqChartData = {
@@ -647,6 +646,11 @@ class LogAnalysisCharts extends React.Component {
     for (var pattern in nonZeroFreqVectors) {
       if(pattern == 'Pattern -1'){
         continue; // skip anomaly result: neuronId==-1
+      }
+      let patternNo = parseInt(a.replace("Pattern ",""));
+      let pGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+      if(pGroup == undefined){
+        continue; // needs to be in eventTableData
       }
       let nonZeroFreqChartData = {
         sdata: nonZeroFreqVectors[pattern],
@@ -663,9 +667,9 @@ class LogAnalysisCharts extends React.Component {
                 let aid = aGroup.nEvents;
                 let bid = bGroup.nEvents;
                 if (aid > bid) {
-                  return 1;
-                } else if (aid < bid) {
                   return -1;
+                } else if (aid < bid) {
+                  return 1;
                 } else {
                   let aaid = aGroup.nid;
                   let bbid = bGroup.nid;
@@ -833,7 +837,7 @@ class LogAnalysisCharts extends React.Component {
             <a className={tabStates['anomaly'] + ' item'}
                onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
             <a className={tabStates['freq'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'freq')}>Frequency</a>
+               onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (

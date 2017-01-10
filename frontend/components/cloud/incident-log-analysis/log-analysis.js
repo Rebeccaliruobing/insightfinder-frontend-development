@@ -7,6 +7,7 @@ import {
   LogModelType,
   DurationThreshold,
   AnomalyThreshold,
+  AnomalyThresholdSensitivity,
 } from '../../selections';
 import apis from '../../../apis';
 import DateTimePicker from '../../ui/datetimepicker';
@@ -24,6 +25,8 @@ class LogAnalysis extends React.Component {
       projectName: '',
       derivedPvalue: 0.9,
       pvalue: 0.99,
+      derivedPvalueText: "Medium High",
+      pvalueText: "Low",
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
@@ -35,11 +38,17 @@ class LogAnalysis extends React.Component {
       isStationary:false,
       isExistentIncident: false,
       incidentList: [],
-      modelTypeTextMap: {}
+      modelTypeTextMap: {},
+      sensitivityMap:{},
     };
-    this.state.modelTypeTextMap["Holistic"]= "Holistic";
-    this.state.modelTypeTextMap["holisticLog"]= "Holistic";
-    this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
+    this.state.modelTypeTextMap["Holistic"] = "Holistic";
+    this.state.modelTypeTextMap["holisticLog"] = "Holistic";
+    this.state.modelTypeTextMap["DBScan"] = "Clustering (DBScan)";
+    this.state.sensitivityMap["0.99"] = "Low";
+    this.state.sensitivityMap["0.97"] = "Medium Low";
+    this.state.sensitivityMap["0.95"] = "Medium";
+    this.state.sensitivityMap["0.9"] = "Medium High";
+    this.state.sensitivityMap["0.5"] = "High";
   }
 
   componentDidMount() {
@@ -92,12 +101,14 @@ class LogAnalysis extends React.Component {
       modelTypeText: 'Holistic',
       derivedPvalue: 0.9,
       pvalue: 0.9,
+      derivedPvalueText: "Medium High",
+      pvalueText: "Medium High",
       cvalue: 1,
       minPts: 5,
       epsilon: 1.0,
     };
-    update.modelType = "holisticLog";
-    update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
+    // update.modelType = "holisticLog";
+    // update.modelTypeText = this.state.modelTypeTextMap[update.modelType];
     switch (dataType) {
       case 'AWS':
       case 'EC2':
@@ -250,6 +261,8 @@ class LogAnalysis extends React.Component {
           modelEndTime,
           derivedPvalue: derivedPvalue||0.9, 
           pvalue: pValue,
+          derivedPvalueText: this.state.sensitivityMap[derivedPvalue||0.9],
+          pvalueText: this.state.sensitivityMap[pValue],
           cvalue: 1,
           modelType,
           modelTypeText: this.state.modelTypeTextMap[modelType],
@@ -336,7 +349,7 @@ class LogAnalysis extends React.Component {
 
   render() {
     const {
-      projectName, incident, startTime, endTime, derivedPvalue, pvalue, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
+      projectName, incident, startTime, endTime, derivedPvalue, pvalue, pvalueText, derivedPvalueText, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList,
       modelStartTime, modelEndTime
     } = this.state;
     const {dashboardUservalues} = this.context;
@@ -369,8 +382,8 @@ class LogAnalysis extends React.Component {
             </div>
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
-              <WaringButton labelStyle={labelStyle} labelTitle="Clustering Sensitivity" labelSpan="choose a number in [0,1) to configure clustering sensitivity. This setting controls the sensitivity with which InsightFinder will cluster logs and detect anomalous logs."/>
-              <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+              <WaringButton labelStyle={labelStyle} labelTitle="Rare Event Detection Sensitivity" labelSpan="Rare event detection sensitivity controls the sensitivity with which InsightFinder will cluster logs and detect anomalous logs."/>
+              <AnomalyThresholdSensitivity value={pvalue} text={pvalueText} onChange={(v, t)=>this.setState({pvalue:v, pvalueText:t})}/>
             </div>
           }
           {modelType == 'DBScan'?
@@ -381,7 +394,7 @@ class LogAnalysis extends React.Component {
             :
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <WaringButton labelStyle={labelStyle} labelTitle="Frequency Anomaly Detection Sensitivity" labelSpan="This setting controls sensitivity InsightFinder will alert on frequency anomaly in given a time window. "/>
-              <AnomalyThreshold value={derivedPvalue} onChange={(v, t)=>this.setState({derivedPvalue: t})}/>
+              <AnomalyThresholdSensitivity value={derivedPvalue} text={derivedPvalueText} onChange={(v, t)=>this.setState({derivedPvalue:v, derivedPvalueText:t})}/>
             </div>
           }
 
