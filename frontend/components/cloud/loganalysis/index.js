@@ -196,15 +196,20 @@ class LogAnalysisCharts extends React.Component {
         freq: '',
       }
     };
+    this.calculateData(props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.calculateData(nextProps);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState);
   }
 
-  calculateData() {
+  calculateData(props) {
     // Cache the data, and recalculate it if changed.
-    let { data, loading, onRefresh, ...rest } = this.props;
+    const { data, loading, onRefresh, ...rest } = props;
 
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
@@ -647,8 +652,8 @@ class LogAnalysisCharts extends React.Component {
       if(pattern == 'Pattern -1'){
         continue; // skip anomaly result: neuronId==-1
       }
-      let patternNo = parseInt(a.replace("Pattern ",""));
-      let pGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+      let patternNo = parseInt(pattern.replace("Pattern ",""));
+      let pGroup = _.find(eventTableData, group => group.nid == patternNo);
       if(pGroup == undefined){
         continue; // needs to be in eventTableData
       }
@@ -866,7 +871,7 @@ class LogAnalysisCharts extends React.Component {
     let contentStyle = { paddingLeft: 0 };
     let contentClass = loading ? 'ui form loading' : '';
 
-    this.calculateData();
+    // this.calculateData();
 
     return (
       <Console.Wrapper>
