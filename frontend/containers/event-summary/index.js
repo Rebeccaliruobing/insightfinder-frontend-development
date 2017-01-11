@@ -177,7 +177,12 @@ class EventSummary extends React.Component {
   refreshInstanceGroup() {
     const { location } = this.props;
     const query = this.applyDefaultParams(location.query);
-    const endTime = moment(query.endTime).valueOf();
+    let realEndTime = moment(query.endTime).endOf('day');
+    let curTime = moment();
+    if(realEndTime>curTime){
+      realEndTime = curTime;
+    }
+
     const { projectName, instanceGroup, numberOfDays, modelType } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
@@ -190,7 +195,7 @@ class EventSummary extends React.Component {
       loading: true,
     }, () => {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
-        pvalue, cvalue, endTime, numberOfDays, 3)
+        pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
         .then((data) => {
           const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
           const maxAnomalyRatio = _.max(anomalyRatioLists);

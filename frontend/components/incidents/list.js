@@ -357,7 +357,7 @@ class IncidentsList extends React.Component {
         <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', left: 300, top: 5 }} title="Causal Graph"
+            style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
             onClick={(e) => {
               e.stopPropagation();
               this.setState({
@@ -375,7 +375,7 @@ class IncidentsList extends React.Component {
             <a
               className={`${tabStates.predicted} item`}
               onClick={e => this.selectTab(e, 'predicted', predictedIncidents)}
-            >Predicted Events</a>
+            >Predicted Events (4 Hr)</a>
           </div>
         </div>
         <div className={`${tabStates.predicted} ui tab`}>

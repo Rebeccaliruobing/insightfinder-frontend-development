@@ -14,6 +14,7 @@ import {
   ProjectSelection,
   DurationThreshold,
   AnomalyThreshold,
+  AnomalyThresholdSensitivity,
   EnvironmentSelect,
   GroupingCriteriaSelection,
   GroupingMatchOpSelection,
@@ -82,6 +83,13 @@ export default class ThresholdSettings extends React.Component {
     this.matchOpMap["le"]="<=";
     this.matchOpMap["lt"]="<";
     this.matchOpMap["regex"]="regex";
+
+    this.sensitivityMap = {};
+    this.sensitivityMap["0.99"] = "Low";
+    this.sensitivityMap["0.97"] = "Medium Low";
+    this.sensitivityMap["0.95"] = "Medium";
+    this.sensitivityMap["0.9"] = "Medium High";
+    this.sensitivityMap["0.5"] = "High";
   }
 
   componentDidMount() {
@@ -184,6 +192,9 @@ export default class ThresholdSettings extends React.Component {
       filterpvalue,
       minAnomalyRatioFilter,
       sharedUsernames,
+      pvalueText:this.sensitivityMap[pvalue], 
+      derivedpvalueText:this.sensitivityMap[derivedpvalue],
+      emailpvalueText:this.sensitivityMap[emailpvalue],
     });
     this.setState({
       metricSettings: metricSettings,
@@ -291,6 +302,14 @@ export default class ThresholdSettings extends React.Component {
     return (v) => {
       this.setState({
         data: Object.assign({}, this.state.data, _.fromPairs([[name, v]]))
+      });
+    };
+  }
+
+  handleValueTextChange(val, text) {
+    return (v,t) => {
+      this.setState({
+        data: Object.assign({}, this.state.data, _.fromPairs([[val, v],[text, t]]))
       });
     };
   }
@@ -497,12 +516,12 @@ export default class ThresholdSettings extends React.Component {
                 <p>
                   This setting controls the sensitivity with which  
                   InsightFinder will cluster logs and detect anomalous 
-                  logs. 
+                  logs. With higher sensitivity, system detects more anomalies. 
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThreshold key={data.projectName} value={data.pvalue}
-                                    onChange={this.handleValueChange('pvalue')}/>
+                  <AnomalyThresholdSensitivity key={data.projectName} value={data.pvalue} text={data.pvalueText} 
+                                    onChange={this.handleValueTextChange('pvalue','pvalueText')}/>
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
@@ -512,11 +531,12 @@ export default class ThresholdSettings extends React.Component {
                 <h3>Frequency Anomaly Detection Sensitivity</h3>
                 <p>
                   This setting controls sensitivity InsightFinder will 
-                  alert on frequency anomaly in given a time window.
+                  alert on frequency anomaly in given a time window. 
+                  With higher sensitivity, system detects more anomalies. 
                 </p>
                 <div className="field">
-                  <AnomalyThreshold key={data.projectName} value={data.derivedpvalue}
-                                    onChange={this.handleValueChange('derivedpvalue')}/>
+                  <AnomalyThresholdSensitivity key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText} 
+                                    onChange={this.handleValueTextChange('derivedpvalue','derivedpvalueText')}/>
                 </div>
                 <Button className="blue"
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
@@ -561,12 +581,13 @@ export default class ThresholdSettings extends React.Component {
                 <p>
                   This setting controls the sensitivity with which  
                   InsightFinder will detect and create anomaly events and 
-                  display them in the Dashboard.
+                  display them in the Dashboard. With higher sensitivity, 
+                  system detects more anomalies. 
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThreshold key={data.projectName} value={data.pvalue}
-                                    onChange={this.handleValueChange('pvalue')}/>
+                  <AnomalyThresholdSensitivity key={data.projectName} value={data.pvalue} text={data.pvalueText}
+                                    onChange={this.handleValueTextChange('pvalue','pvalueText')}/>
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
@@ -576,12 +597,13 @@ export default class ThresholdSettings extends React.Component {
                 <h3>Email Alert</h3>
                 <p>
                   This setting controls when InsightFinder will notify you via
-                  email and any configured External Service.
+                  email and any configured External Service. With higher sensitivity, 
+                  system detects more anomalies. 
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThreshold key={data.projectName} value={data.emailpvalue}
-                                    onChange={this.handleValueChange('emailpvalue')}/>
+                  <AnomalyThresholdSensitivity key={data.projectName} value={data.emailpvalue} text={data.emailpvalueText}
+                                    onChange={this.handleValueTextChange('emailpvalue','emailpvalueText')}/>
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>

@@ -549,7 +549,7 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   handlePatternPointClick(startTs, position) {
     const { selectedPatternChartData, selectedPattern, selectedAnnotation, selectedBarColors } = this.state;
-    const eventTableData = this.allEventTableData;
+    const eventTableData = this.eventTableData;
     let nid = parseInt(selectedPattern.replace("Pattern ",""));
     let selectedEventTableData = _.find(eventTableData, event => event.nid == nid)
     if(selectedEventTableData){
@@ -708,7 +708,7 @@ class LogAnalysisCharts extends React.Component {
   @autobind
   renderFreqCharts(){
     if (!this.dp) return;
-    const eventTableData = this.allEventTableData;
+    const eventTableData = this.eventTableData;
     let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
       derivedAnomaly, selectedDetailedText, selectedDetailedTextLeftPosition,
       selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
