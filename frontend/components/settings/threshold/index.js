@@ -13,9 +13,7 @@ import apis from '../../../apis';
 import {
   ProjectSelection,
   DurationThreshold,
-  AnomalyThreshold,
   AnomalyThresholdSensitivity,
-  EnvironmentSelect,
   GroupingCriteriaSelection,
   GroupingMatchOpSelection,
   GroupingSeperateModelSelection,
@@ -520,13 +518,17 @@ export default class ThresholdSettings extends React.Component {
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThresholdSensitivity key={data.projectName} value={data.pvalue} text={data.pvalueText} 
-                                    onChange={this.handleValueTextChange('pvalue','pvalueText')}/>
+                  <AnomalyThresholdSensitivity
+                    style={{width: 180}}
+                    key={data.projectName} value={data.pvalue} text={data.pvalueText}
+                    onChange={this.handleValueTextChange('pvalue', 'pvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
-                  <DurationThreshold key={data.projectName} value={data.cvalue}
-                                     onChange={this.handleValueChange('cvalue')}/>
+                  <DurationThreshold
+                    style={{width: 180}}
+                    key={data.projectName} value={data.cvalue}
+                    onChange={this.handleValueChange('cvalue')} />
                 </div>
                 <h3>Frequency Anomaly Detection Sensitivity</h3>
                 <p>
@@ -535,8 +537,10 @@ export default class ThresholdSettings extends React.Component {
                   With higher sensitivity, system detects more anomalies. 
                 </p>
                 <div className="field">
-                  <AnomalyThresholdSensitivity key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText} 
-                                    onChange={this.handleValueTextChange('derivedpvalue','derivedpvalueText')}/>
+                  <AnomalyThresholdSensitivity
+                    style={{width: 180}}
+                    key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText}
+                    onChange={this.handleValueTextChange('derivedpvalue', 'derivedpvalueText')} />
                 </div>
                 <Button className="blue"
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
@@ -586,13 +590,17 @@ export default class ThresholdSettings extends React.Component {
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThresholdSensitivity key={data.projectName} value={data.pvalue} text={data.pvalueText}
-                                    onChange={this.handleValueTextChange('pvalue','pvalueText')}/>
+                  <AnomalyThresholdSensitivity
+                    style={{width: 180}}
+                    key={data.projectName} value={data.pvalue} text={data.pvalueText}
+                    onChange={this.handleValueTextChange('pvalue', 'pvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
-                  <DurationThreshold key={data.projectName} value={data.cvalue}
-                                     onChange={this.handleValueChange('cvalue')}/>
+                  <DurationThreshold
+                    style={{width: 180}}
+                    key={data.projectName} value={data.cvalue}
+                    onChange={this.handleValueChange('cvalue')} />
                 </div>
                 <h3>Email Alert</h3>
                 <p>
@@ -602,13 +610,17 @@ export default class ThresholdSettings extends React.Component {
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
-                  <AnomalyThresholdSensitivity key={data.projectName} value={data.emailpvalue} text={data.emailpvalueText}
-                                    onChange={this.handleValueTextChange('emailpvalue','emailpvalueText')}/>
+                  <AnomalyThresholdSensitivity
+                    style={{width: 180}}
+                    key={data.projectName} value={data.emailpvalue} text={data.emailpvalueText}
+                    onChange={this.handleValueTextChange('emailpvalue', 'emailpvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
-                  <DurationThreshold key={data.projectName} value={data.emailcvalue}
-                                     onChange={this.handleValueChange('emailcvalue')}/>
+                  <DurationThreshold
+                    style={{width: 180}}
+                    key={data.projectName} value={data.emailcvalue}
+                    onChange={this.handleValueChange('emailcvalue')} />
                 </div>
                 <Button className="blue"
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
