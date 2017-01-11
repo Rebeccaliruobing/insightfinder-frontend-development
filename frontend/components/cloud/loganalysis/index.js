@@ -591,7 +591,7 @@ class LogAnalysisCharts extends React.Component {
   handlePatternSelected(pattern) {
     const { nonZeroFreqChartDatas, patterns, derivedAnomalyByMetric } = this.state;
     let pos = patterns.indexOf(pattern);
-    let selectedPatternChartData = nonZeroFreqChartDatas[pos];
+    let selectedPatternChartData = _.find(nonZeroFreqChartDatas, a => a.pattern == pattern);
     let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
 
     // Create the bar colors for time series. time => colstring.
@@ -667,6 +667,7 @@ class LogAnalysisCharts extends React.Component {
       let nonZeroFreqChartData = {
         sdata: nonZeroFreqVectors[pattern],
         sname: ['Time Window Start', pattern],
+        pattern,
       };
       nonZeroFreqChartDatas.push(nonZeroFreqChartData);
       patterns.push(pattern);

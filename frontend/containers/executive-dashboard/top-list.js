@@ -15,23 +15,27 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
   return <span className={className}>-</span>;
 };
 
-const getArrowStyles = (left, right, reverse = false) => {
-  const up = {
+const getArrowStyles = (left, right, reverseColor = false, reverseDirection = false) => {
+  let up = {
     transform: 'rotate(-90deg)',
     color: 'red',
   };
-  const down = {
+  let down = {
     transform: 'rotate(90deg)',
     color: 'green',
   };
+  if(reverseColor){
+    up.color='green';
+    down.color='red';
+  }
 
   if (left !== undefined && right !== undefined) {
     if (left > right) {
-      return !reverse ? down : up;
+      return !reverseDirection ? down : up;
     } else if (left === right) {
       return { visibility: 'hidden' };
     }
-    return !reverse ? up : down;
+    return !reverseDirection ? up : down;
   }
 
   return { visibility: 'hidden' };
@@ -107,7 +111,8 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
           className="long arrow right icon"
           style={getArrowStyles(
             _.get(stats, 'previous.AvgCPUUtilization'),
-            _.get(stats, 'current.AvgCPUUtilization'),
+            _.get(stats, 'current.AvgCPUUtilization'), 
+            true,
           )}
         />
         {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
@@ -120,6 +125,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, isProject = false, expanded
           style={getArrowStyles(
             _.get(stats, 'previous.AvgInstanceUptime'),
             _.get(stats, 'current.AvgInstanceUptime'),
+            true,
           )}
         />
         {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
