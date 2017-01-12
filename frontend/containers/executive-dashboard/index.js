@@ -53,9 +53,9 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  refreshData() {
+  refreshData(params) {
     const { location } = this.props;
-    const query = this.applyDefaultParams(location.query);
+    const query = params || this.applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
     this.setState({
       loading: true,
@@ -83,7 +83,7 @@ class ExecutiveDashboard extends React.Component {
       query,
     });
 
-    this.refreshData();
+    this.refreshData(query);
   }
 
   @autobind
@@ -97,20 +97,21 @@ class ExecutiveDashboard extends React.Component {
       query,
     });
 
-    this.refreshData();
+    this.refreshData(query);
   }
 
   @autobind
   handleEndTimeChange(value) {
     const { location, router } = this.props;
     const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
+    const query = this.applyDefaultParams({ ...location.query, endTime });
     if (location.query.endTime !== endTime) {
       router.push({
         pathname: location.pathname,
-        query: this.applyDefaultParams({ ...location.query, endTime }),
+        query,
       });
 
-      this.refreshData();
+      this.refreshData(query);
     }
   }
 

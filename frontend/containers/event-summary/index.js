@@ -128,7 +128,7 @@ class EventSummary extends React.Component {
       query,
     });
 
-    this.refreshInstanceGroup();
+    this.refreshInstanceGroup(query);
   }
 
   @autobind
@@ -142,20 +142,21 @@ class EventSummary extends React.Component {
       query,
     });
 
-    this.refreshInstanceGroup();
+    this.refreshInstanceGroup(query);
   }
 
   @autobind
   handleEndTimeChange(value) {
     const { location, router } = this.props;
     const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
+    const query = this.applyDefaultParams({ ...location.query, endTime });
     if (location.query.endTime !== endTime) {
       router.push({
         pathname: location.pathname,
-        query: this.applyDefaultParams({ ...location.query, endTime }),
+        query,
       });
 
-      this.refreshInstanceGroup();
+      this.refreshInstanceGroup(query);
     }
   }
 
@@ -170,16 +171,16 @@ class EventSummary extends React.Component {
       query,
     });
 
-    this.refreshInstanceGroup();
+    this.refreshInstanceGroup(query);
   }
 
   @autobind
-  refreshInstanceGroup() {
+  refreshInstanceGroup(params) {
     const { location } = this.props;
-    const query = this.applyDefaultParams(location.query);
+    const query = params || this.applyDefaultParams(location.query);
     let realEndTime = moment(query.endTime).endOf('day');
-    let curTime = moment();
-    if(realEndTime>curTime){
+    const curTime = moment();
+    if (realEndTime > curTime) {
       realEndTime = curTime;
     }
 
@@ -250,7 +251,7 @@ class EventSummary extends React.Component {
 
             // Get the group to display
             const { location, router } = this.props;
-            const query = this.applyDefaultParams({
+            let query = this.applyDefaultParams({
               ...location.query,
             });
 
@@ -262,19 +263,20 @@ class EventSummary extends React.Component {
             } else {
               instanceGroup = '';
             }
+            query = this.applyDefaultParams({
+              ...location.query,
+              projectName,
+              instanceGroup,
+            });
             router.push({
               pathname: location.pathname,
-              query: this.applyDefaultParams({
-                ...location.query,
-                projectName,
-                instanceGroup,
-              }),
+              query,
             });
 
             this.setState({
               instanceGroups: groups,
             }, () => {
-              this.refreshInstanceGroup();
+              this.refreshInstanceGroup(query);
             });
           }
         });
