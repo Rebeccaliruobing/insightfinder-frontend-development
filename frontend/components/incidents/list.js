@@ -13,6 +13,11 @@ import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
 
 class IncidentsList extends React.Component {
+  static contextTypes = {
+    userInstructions: React.PropTypes.object,
+    dashboardUservalues: React.PropTypes.object,
+    root: React.PropTypes.object
+  };
 
   constructor(props) {
     super(props);
@@ -345,7 +350,11 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { incidents, latestTimestamp, tabStates } = this.state;
+    const { incidents, latestTimestamp, tabStates, projectName } = this.state;
+    let { dashboardUservalues } = this.context;
+    let { projectModelAllInfo } = dashboardUservalues;
+    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
+    let { predictionWindow } = project;
 
     const detectedIncidents = incidents.filter(
       incident => incident.startTimestamp <= latestTimestamp);
@@ -375,7 +384,7 @@ class IncidentsList extends React.Component {
             <a
               className={`${tabStates.predicted} item`}
               onClick={e => this.selectTab(e, 'predicted', predictedIncidents)}
-            >Predicted Events (4 Hr)</a>
+            >Predicted Events ({predictionWindow} Hr)</a>
           </div>
         </div>
         <div className={`${tabStates.predicted} ui tab`}>

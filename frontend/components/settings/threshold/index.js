@@ -132,7 +132,7 @@ export default class ThresholdSettings extends React.Component {
 
   handleProjectChange(projectName) {
     let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString,metricUnitMapping } = dashboardUservalues;
+    let { projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString, metricUnitMapping } = dashboardUservalues;
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
