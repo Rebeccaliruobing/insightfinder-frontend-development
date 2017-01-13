@@ -13,6 +13,7 @@ import apis from '../../../apis';
 import {
   ProjectSelection,
   DurationThreshold,
+  PredictionWindowHour,
   AnomalyThresholdSensitivity,
   GroupingCriteriaSelection,
   GroupingMatchOpSelection,
@@ -39,6 +40,7 @@ export default class ThresholdSettings extends React.Component {
       alert: '',
       sharing: '',
       threshold: '',
+      prediction: '',
       episodeword: '',
       logthreshold: '',
       grouping: '',
@@ -134,7 +136,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames } = project;
+    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames } = project;
     let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
     if (!projectStr) {
       projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
@@ -188,6 +190,7 @@ export default class ThresholdSettings extends React.Component {
       emailpvalue,
       filtercvalue,
       filterpvalue,
+      predictionWindow,
       minAnomalyRatioFilter,
       sharedUsernames,
       pvalueText:this.sensitivityMap[pvalue], 
@@ -418,10 +421,10 @@ export default class ThresholdSettings extends React.Component {
   }
 
   handleSaveProjectSetting() {
-    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
+    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
     let { tempSharedUsernames, data } = this.state;
     this.setState({ settingLoading: true }, ()=> {
-      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
+      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
         if (!resp.success) {
           window.alert(resp.message);
         }
@@ -500,6 +503,8 @@ export default class ThresholdSettings extends React.Component {
                                    onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
+              {!isLogProject && <a className={tabStates0['prediction'] + ' item'}
+                                    onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
               <a className={tabStates0['sharing'] + ' item'} 
                                     onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
@@ -509,6 +514,18 @@ export default class ThresholdSettings extends React.Component {
             </div>
             <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
                  style={{ 'paddingTop': '10px' }}>
+              {!isLogProject && <div className={tabStates0['prediction'] + ' ui tab'}>
+                <h3>Prediction Settings</h3>
+                <div className="field">
+                  <label style={labelStyle}>Prediction Window (Hour)</label>
+                  <PredictionWindowHour
+                    style={{width: 180}}
+                    key={data.projectName} value={data.predictionWindow} 
+                    onChange={this.handleValueChange('predictionWindow')} />
+                </div>
+                <Button className="blue"
+                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+              </div>}
               {isLogProject && <div className={tabStates0['logthreshold'] + ' ui tab'}>
                 <h3>Clustering Sensitivity</h3>
                 <p>
