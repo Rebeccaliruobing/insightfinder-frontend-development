@@ -13,12 +13,6 @@ import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
 
 class IncidentsList extends React.Component {
-  static contextTypes = {
-    userInstructions: React.PropTypes.object,
-    dashboardUservalues: React.PropTypes.object,
-    root: React.PropTypes.object
-  };
-
   constructor(props) {
     super(props);
 
@@ -32,6 +26,7 @@ class IncidentsList extends React.Component {
       modelType: props.modelType,
       projectName: props.projectName,
       projectType: props.projectType,
+      predictionWindow: props.predictionWindow,
       shownMergedIncidentIds: [],
       showTenderModal: false,
       showTakeActionModal: false,
@@ -121,6 +116,7 @@ class IncidentsList extends React.Component {
       causalDataArray: props.causalDataArray,
       causalTypes: props.causalTypes,
       latestTimestamp: props.latestTimestamp,
+      predictionWindow: props.predictionWindow,
       showTenderModal: false,
       showTakeActionModal: false,
       startTimestamp: undefined,
@@ -350,11 +346,7 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { incidents, latestTimestamp, tabStates, projectName } = this.state;
-    let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
-    let { predictionWindow } = project;
+    const { incidents, latestTimestamp, predictionWindow, tabStates, projectName } = this.state;
 
     const detectedIncidents = incidents.filter(
       incident => incident.startTimestamp <= latestTimestamp);

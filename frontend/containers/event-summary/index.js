@@ -235,8 +235,14 @@ class EventSummary extends React.Component {
 
   @autobind
   handleProjectChange(projectName) {
+    let { dashboardUservalues } = this.context;
+    let { projectModelAllInfo } = dashboardUservalues;
+    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
+    let { predictionWindow } = project;
+
     this.setState({
       loading: true,
+      predictionWindow,
       currentTreemapData: undefined,
     }, () => {
       apis.loadInstanceGrouping(projectName, 'getGrouping')
@@ -327,7 +333,7 @@ class EventSummary extends React.Component {
     const { location } = this.props;
     const { projectName, instanceGroup, endTime, numberOfDays, modelType } =
       this.applyDefaultParams(location.query);
-    const { loading, data, incidentsTreeMap,
+    const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
       instanceGroups, lineChartType } = this.state;
 
@@ -361,7 +367,7 @@ class EventSummary extends React.Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection
-                style={{ minWidth: 120 }} value={projectName} onChange={this.handleProjectChange}
+                style={{ minWidth: 150 }} value={projectName} onChange={this.handleProjectChange}
               />
             </div>
             <div className="field">
@@ -372,7 +378,7 @@ class EventSummary extends React.Component {
                 searchable
                 value={instanceGroup}
                 onChange={this.handleInstanceGroupChange}
-                style={{ minWidth: 200 }}
+                style={{ minWidth: 150 }}
               >
                 <div className="menu">
                   {
@@ -434,7 +440,9 @@ class EventSummary extends React.Component {
                     onIncidentSelected={this.handleIncidentSelected}
                     incidents={data.incidents}
                     causalDataArray={data.causalDataArray}
-                    causalTypes={data.causalTypes} latestTimestamp={latestTimestamp}
+                    causalTypes={data.causalTypes}
+                    latestTimestamp={latestTimestamp}
+                    predictionWindow={predictionWindow}
                   />
                 </div>
                 <div className="nine wide column" style={{ height: 600, paddingTop: 20 }}>

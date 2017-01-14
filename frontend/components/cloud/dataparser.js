@@ -329,12 +329,13 @@ class DataParser {
                   let pos0 = item.indexOf(".");
                   let pos1 = item.indexOf("[");
                   let pos2 = item.indexOf("]");
+                  let pos23 = item.indexOf("(");
                   let pos3 = item.indexOf(")");
                   let pos4 = item.indexOf(")",pos3+1);
                   let rootcause = item.substring(pos3+2,pos4);
-                  let valString = item.substring(pos2+2,pos3);
+                  let valString = item.substring(pos23+1,pos3);
                   if(valString != 'missing'){
-                    let val = parseFloat(item.substring(pos2+2,pos3));
+                    let val = parseFloat(item.substring(pos23+1,pos3));
                     let roundedVal = Math.round(val*100)/100;
                     valString = roundedVal.toString();
                   }
