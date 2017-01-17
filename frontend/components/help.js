@@ -16,7 +16,7 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="info circle icon"></i>
                 <h3>How to get started?</h3>
-                <Link to="/newproject/project-list" className="item">Step 1: Register your project according to data source types.</Link>
+                <Link to="/settings/project-list" className="item">Step 1: Register your project according to data source types.</Link>
                 <Link to="/cloud/" className="item">Step 2: View anomaly detection and diagnosis results in Dashboard.</Link>
                 <Link to="/settings/threshold" className="item">Step 3: Configure your projects in settings.</Link>
               </div>
@@ -34,27 +34,23 @@ export default class Help extends React.Component {
               <div className="card">
                 <i className="dashboard icon"></i>
                 <h3>Dashboard</h3>
+                <Link to="/cloud/executive-dashboard" className="item">&bull; View and compare group level anomaly or resource statistics of your projects.</Link>
                 <Link to="/cloud/monitoring" className="item">&bull; View realtime anomaly detection and root cause analysis results.</Link>
                 <Link to="/cloud/app-forecast" className="item">&bull; View application level forecast for resource planning.</Link>
-                <Link to="/cloud/incident-log-analysis" className="item">&bull; View log analysis for patterns and anomalies in log.</Link>
               </div>
             </div>
             <div className="column">
               <div className="card">
-                <i className="add to calendar icon"></i>
-                <h3>Projects</h3>
-                <Link to="/newproject/project-list" className="item">See a list of existing projects, and register/remove project. Currently available project types include:</Link>
-                <Link to="/newproject/project-list/custom" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; Insight Agent Project </Link>
-                <Link to="/newproject/project-list/amazon" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; AWS CloudWatch Project</Link>
-                <Link to="/newproject/project-list/google" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; Google Cloud Monitoring Project</Link>
-                <Link to="/newproject/project-list/datadog" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; DataDog Project </Link>
-                <Link to="/newproject/project-list/newrelic" className="item">&nbsp;&nbsp;&nbsp;&nbsp;&bull; New Relic Project </Link>
+                <i className="file text icon"></i>
+                <h3>Log</h3>
+                <Link to="/log/incident-log-analysis" className="item">View log analysis for patterns and anomalies in log files.</Link>
               </div>
             </div>
             <div className="column">
               <div className="card">
                 <i className="settings icon"></i>
                 <h3>Settings</h3>
+                <Link to="/settings/project-list" className="item">&bull; See a list of existing projects, and register/remove project. </Link>
                 <Link to="/settings/project" className="item">&bull; Anomaly detection and metric threshold settings. </Link>
                 <Link to="/settings/project" className="item">&bull; Project sharing with collaborators. </Link>
                 <Link to="/settings/extsvc" className="item">&bull; Third party incident reporting service. </Link>
@@ -63,8 +59,8 @@ export default class Help extends React.Component {
             <div className="column">
               <div className="card">
                 <i className="find icon"></i>
-                <h3>Benchmarks</h3>
-                <Link to="/usecase" className="item">You can find various anomaly benchmark data shared with you by either us or other InsightFinder users. We encourage everyone to share their anomaly benchmark data with the community. </Link>
+                <h3>Bug Repository</h3>
+                <Link to="/usecase" className="item">You can find various anomaly/bug data shared with you by either us or other InsightFinder users. We encourage everyone to share their anomaly data with the community. </Link>
               </div>
             </div>
           </div>

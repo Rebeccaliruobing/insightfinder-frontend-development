@@ -69,7 +69,7 @@ class EventSummary extends React.Component {
     const projects = this.getLiveProjectInfos();
 
     if (projects.length === 0) {
-      router.push('/cloud/incident-log-analysis');
+      router.push('/log/incident-log-analysis');
     } else {
       let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
       if (!projectName ||

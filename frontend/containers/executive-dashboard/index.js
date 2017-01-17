@@ -7,7 +7,7 @@ import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import { Console } from '../../artui/react';
-import TopList from './top-list';
+import { TopListAnomaly, TopListResource } from './top-list';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
@@ -149,10 +149,10 @@ class ExecutiveDashboard extends React.Component {
           >
             <div className="field" style={{ float: 'left' }}>
               <div
-                className={`ui ${view === 'view1' ? 'grey' : 'orange'} button`}
+                className={`ui ${view === 'anomaly' ? 'grey' : 'orange'} button`}
                 style={{ borderRadius: 0, marginRight: 0 }}
-                onClick={() => this.setState({ view: 'view1' })}
-              >View1</div>
+                onClick={() => this.setState({ view: 'anomaly' })}
+              >Anomaly View</div>
               <div
                 className={`ui ${view === 'resource' ? 'grey' : 'orange'} button`}
                 style={{ borderRadius: 0, marginLeft: 0 }}
@@ -186,11 +186,11 @@ class ExecutiveDashboard extends React.Component {
           </div>
           <div className="ui vertical segment">
             <h3>Detected/Predicted Anomaly Overview</h3>
-            {view === 'view1' &&
-              <TopList stats={eventStats} onRowOpen={this.handleListRowOpen} />
+            {view === 'anomaly' &&
+              <TopListAnomaly stats={eventStats} onRowOpen={this.handleListRowOpen} />
             }
             {view === 'resource' &&
-              <div>Resource</div>
+              <TopListResource stats={eventStats} onRowOpen={this.handleListRowOpen} />
             }
           </div>
         </div>
