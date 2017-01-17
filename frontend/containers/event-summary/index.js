@@ -356,7 +356,7 @@ class EventSummary extends React.Component {
 
     return (
       <Console.Content
-        className={loading ? 'ui form loading' : ''}
+        className={`event-summary ${loading ? 'ui form loading' : ''}`}
         style={{ background: '#f5f5f5' }}
       >
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>

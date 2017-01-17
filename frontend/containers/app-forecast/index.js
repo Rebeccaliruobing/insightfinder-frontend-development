@@ -248,7 +248,7 @@ class AppForecast extends Component {
     } = this.state;
     const refreshName = store.get('liveAnalysisProjectName') || projectName;
     return (
-      <Console.Content className={loading ? 'ui form loading' : ''}>
+      <Console.Content className={`app-forecast ${loading ? 'ui form loading' : ''}`}>
         <div
           className="ui main tiny container"
           style={{ minHeight: '100%', display: loading && 'none' }}

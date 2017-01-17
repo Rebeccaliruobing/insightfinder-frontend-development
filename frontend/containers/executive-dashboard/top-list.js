@@ -216,9 +216,9 @@ class TopListAnomaly extends React.Component {
                 borderLeft: '2px solid #566f84',
               }}
             >Project/Group Name</th>
-            <th className="subheader" colSpan={3} width="20%">Anomaly Score (Daily Avg)</th>
-            <th className="subheader" colSpan={3} width="18%">Anomaly Duration (Minute)</th>
-            <th className="subheader" colSpan={3} width="18%">Consolidated Abnormal Events</th>
+            <th className="subheader" colSpan={3} width="26%">Anomaly Score (Daily Avg)</th>
+            <th className="subheader" colSpan={3} width="26%">Anomaly Duration (Minute)</th>
+            <th className="subheader" colSpan={3} width="26%">Consolidated Abnormal Events</th>
           </tr>
           <tr>
             <th>Previous</th>
@@ -360,8 +360,8 @@ class TopListResource extends React.Component {
                 borderLeft: '2px solid #566f84',
               }}
             >Project/Group Name</th>
-            <th className="subheader" colSpan={2} width="12%">CPU Utilization (%)</th>
-            <th className="subheader" colSpan={2} width="12%">Availability (%)</th>
+            <th className="subheader" colSpan={2} width="39%">CPU Utilization (%)</th>
+            <th className="subheader" colSpan={2} width="39%">Availability (%)</th>
           </tr>
           <tr>
             <th>Previous</th>

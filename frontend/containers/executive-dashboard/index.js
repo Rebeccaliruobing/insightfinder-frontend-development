@@ -32,7 +32,7 @@ class ExecutiveDashboard extends React.Component {
     this.state = {
       eventStats: [],
       loading: true,
-      view: 'resource',
+      view: 'anomaly',
     };
   }
 
@@ -122,15 +122,25 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleListRowOpen(projectName, instanceGroup) {
+  handleListRowOpenAnomaly(projectName, instanceGroup) {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
       projectName,
       instanceGroup,
     });
-    store.set('liveAnalysisProjectName', name);
+    store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
+  }
+
+  @autobind
+  handleListRowOpenResource(projectName, instanceGroup) {
+    const { location } = this.props;
+    const query = this.applyDefaultParams({
+      projectName,
+    });
+    store.set('liveAnalysisProjectName', projectName);
+    window.open(`/cloud/app-forecast?${$.param(query)}`, '_blank');
   }
 
   render() {
@@ -185,12 +195,11 @@ class ExecutiveDashboard extends React.Component {
             </div>
           </div>
           <div className="ui vertical segment">
-            <h3>Detected/Predicted Anomaly Overview</h3>
             {view === 'anomaly' &&
-              <TopListAnomaly stats={eventStats} onRowOpen={this.handleListRowOpen} />
+              <TopListAnomaly stats={eventStats} onRowOpen={this.handleListRowOpenAnomaly} />
             }
             {view === 'resource' &&
-              <TopListResource stats={eventStats} onRowOpen={this.handleListRowOpen} />
+              <TopListResource stats={eventStats} onRowOpen={this.handleListRowOpenResource} />
             }
           </div>
         </div>
