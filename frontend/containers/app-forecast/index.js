@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
+import { withRouter } from 'react-router';
 import cx from 'classnames';
 import store from 'store';
-import _ from 'lodash'
+import _ from 'lodash';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { LiveProjectSelection } from '../../components/selections';
@@ -84,16 +85,26 @@ class AppForecast extends Component {
   }
 
   componentDidMount() {
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter(item => item.fileProjectType !== 0);
-    // remember select
-    if (projects.length > 0) {
-      const refreshName = store.get('liveAnalysisProjectName') || projects[0].projectName;
-      this.handleProjectChange(refreshName, refreshName);
+    const { router, location } = this.props;
+    const projects = this.getLiveProjectInfos();
+
+    if (projects.length === 0) {
+      router.push('/settings/project-list/custom');
     } else {
-      const url = '/settings/project-list/custom';
-      window.open(url, '_self');
+      let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
+      if (!projectName ||
+        (projectName && !projects.find(item => item.projectName === projectName))) {
+        projectName = projects[0].projectName;
+      }
+      this.handleProjectChange(projectName, projectName);
     }
+  }
+
+  getLiveProjectInfos() {
+    // exclude GCP and File Replay
+    let pinfos = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    pinfos = pinfos.filter(item => item.fileProjectType !== 0);
+    return pinfos;
   }
 
   @autobind()
@@ -142,6 +153,17 @@ class AppForecast extends Component {
     const self = this;
     let selectedMetrics = store.get(`${projectName}-forecast-metrics`, '');
     store.set('liveAnalysisProjectName', projectName);
+
+    // Get the group to display
+    const { location, router } = this.props;
+    const query = {
+      projectName,
+    };
+    router.push({
+      pathname: location.pathname,
+      query,
+    });
+
     this.setState({
       loading: true,
       projectName,
@@ -333,4 +355,4 @@ class AppForecast extends Component {
   }
 }
 
-export default AppForecast;
+export default withRouter(AppForecast);
