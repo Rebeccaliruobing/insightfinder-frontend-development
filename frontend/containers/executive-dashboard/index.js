@@ -32,6 +32,7 @@ class ExecutiveDashboard extends React.Component {
     this.state = {
       eventStats: [],
       loading: true,
+      view: 'resource',
     };
   }
 
@@ -135,7 +136,7 @@ class ExecutiveDashboard extends React.Component {
   render() {
     const { location } = this.props;
     const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
-    const { loading, eventStats } = this.state;
+    const { loading, eventStats, view } = this.state;
 
     return (
       <Console.Content
@@ -146,6 +147,18 @@ class ExecutiveDashboard extends React.Component {
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
+            <div className="field" style={{ float: 'left' }}>
+              <div
+                className={`ui ${view === 'view1' ? 'grey' : 'orange'} button`}
+                style={{ borderRadius: 0, marginRight: 0 }}
+                onClick={() => this.setState({ view: 'view1' })}
+              >View1</div>
+              <div
+                className={`ui ${view === 'resource' ? 'grey' : 'orange'} button`}
+                style={{ borderRadius: 0, marginLeft: 0 }}
+                onClick={() => this.setState({ view: 'resource' })}
+              >Resource View</div>
+            </div>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>End date:</label>
               <div className="ui input">
@@ -173,7 +186,12 @@ class ExecutiveDashboard extends React.Component {
           </div>
           <div className="ui vertical segment">
             <h3>Detected/Predicted Anomaly Overview</h3>
-            <TopList stats={eventStats} onRowOpen={this.handleListRowOpen} />
+            {view === 'view1' &&
+              <TopList stats={eventStats} onRowOpen={this.handleListRowOpen} />
+            }
+            {view === 'resource' &&
+              <div>Resource</div>
+            }
           </div>
         </div>
       </Console.Content>
