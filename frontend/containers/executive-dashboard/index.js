@@ -165,13 +165,6 @@ class ExecutiveDashboard extends React.Component {
               />
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Model Type:</label>
-              <EventSummaryModelType
-                style={{ width: 120 }}
-                value={modelType} onChange={this.handleModelTypeChange}
-              />
-            </div>
-            <div className="field">
               <div
                 className="ui orange button" tabIndex="0"
                 onClick={this.handleRefreshClick}

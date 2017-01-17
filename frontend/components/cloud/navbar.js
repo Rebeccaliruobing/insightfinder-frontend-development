@@ -41,10 +41,6 @@ export default function (props) {
           <i className="checkmark box icon"/>
           <span> Behavior Change Detection</span>
         </Link>}
-        <Link to="/cloud/incident-log-analysis" className="item text-white">
-          <i className="file text icon"></i>
-          <span> Log Analysis </span>
-        </Link>
       </div>
     </Console.Navbar>
   )

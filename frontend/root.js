@@ -8,24 +8,20 @@ import {Console, Link} from './artui/react';
 
 import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
+import {logRoute} from './components/log';
 import {settingsRoute} from './components/settings';
-import {newProjectRoute} from './components/monitoring';
 import {useCaseRoute} from './components/usecase/index';
 import {fileTabsRoute} from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import FileDetails from './components/cloud/monitoring/files';
 import FileDetectionDetails from './components/cloud/monitoring/filedetection';
 import IncidentDetails from './components/cloud/incident-analysis/details';
-import IncidentLogDetails from './components/cloud/incident-log-analysis/log-details';
+import IncidentLogDetails from './components/log/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import ExecutiveDashboard from './containers/executive-dashboard';
 import Help from './components/help';
 import AccountInfo from './components/account-info';
-import LogAnalysisCharts from './components/cloud/loganalysis';
-import LogAnalysisClusteringResult from './components/cloud/loganalysis/clustering';
-import LogAnalysisEvents from './components/cloud/loganalysis/events';
-import LogAnalysisFrequency from './components/cloud/loganalysis/frequency';
 
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
@@ -173,9 +169,9 @@ class App extends React.Component {
       <Console className={cx({'ui form loading': loading})}>
         <Console.Topbar logo={require('./images/logo_white.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
-          <Link to="/newproject" className="item">Projects</Link>
+          <Link to="/log" className="item">Log Analysis</Link>
           <Link to="/settings" className="item">Settings</Link>
-          <Link to="/usecase" className="item">Profiles</Link>
+          <Link to="/usecase" className="item">Bug Repository</Link>
           {['admin','guest'].indexOf(store.get('userName'))!=-1?<Link to="/filetabs" className="item">File Analysis</Link>:null}
           <Link to="/help" className="item">Help</Link>
           <div className="right menu">
@@ -276,8 +272,8 @@ const routes = (
     <Route component={App} path="/">
       <IndexRedirect to="/cloud"/>
       {cloudRoute}
+      {logRoute}
       {settingsRoute}
-      {newProjectRoute}
       {useCaseRoute}
       {fileTabsRoute}
       <Route component={Help} path="help"/>
@@ -288,19 +284,12 @@ const routes = (
     <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring" />
     <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
     <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
-    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis">
-      <IndexRoute component={LogAnalysisCharts} />
-      <Route path="clustering" component={LogAnalysisClusteringResult} />
-      <Route path="events" component={LogAnalysisEvents} />
-      <Route path="frequency" component={LogAnalysisFrequency} />
-    </Route>
+    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
     <Route component={useCaseApp} path="/useCaseDetails"/>
     <Route component={ExecutiveDashboardApp} path="/executiveDashboard"/>
     <Redirect from="*" to="/" />
   </Router>
 );
-
-      // <IndexRedirect to="frequency" />
 
 class AppRoute extends React.Component {
   constructor(props) {

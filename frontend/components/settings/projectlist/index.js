@@ -128,8 +128,6 @@ class Projects extends React.Component {
     return (
       <Console.Content className="projects">
         <div className="ui main tiny container" ref={c => this._el = c}>
-          <div className="ui clearing vertical segment">
-          </div>
           <div className="ui pointing secondary menu">
             <a className={tabStates['custom'] + ' item'}
                onClick={(e) => this.selectTab(e, 'custom')}>Insight Agent</a>

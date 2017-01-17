@@ -189,7 +189,6 @@ class LogAnalysisCharts extends React.Component {
       summarySelected: false,
       selectedAnnotation: null,
       selectedBarColors: [],
-      showSettingModal: false,
       tabStates: {
         event: 'active',
         anomaly: '',

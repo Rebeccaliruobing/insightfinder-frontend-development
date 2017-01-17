@@ -8,6 +8,7 @@ import { DataDisqualifiersSettings, AlertSensitivitySettings,
   ThresholdSettings, LogAnalysisSettings,
 } from './project';
 import ExtSvc from './extsvc/index';
+import Projects from './projectlist/index';
 
 import Navbar from './navbar';
 
@@ -29,5 +30,7 @@ export const settingsRoute = (
     <Route component={LogAnalysisSettings} path="log-analysis" />
     <Route component={ThresholdSettingsOld} path="project" />
     <Route component={ExtSvc} path="extsvc" />
+    <Route component={Projects} path="project-list"/>
+    <Route component={Projects} path="project-list/:tabId"/>
   </Route>
 );

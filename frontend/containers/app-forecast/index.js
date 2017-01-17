@@ -91,7 +91,7 @@ class AppForecast extends Component {
       const refreshName = store.get('liveAnalysisProjectName') || projects[0].projectName;
       this.handleProjectChange(refreshName, refreshName);
     } else {
-      const url = '/newproject/project-list/custom';
+      const url = '/settings/project-list/custom';
       window.open(url, '_self');
     }
   }

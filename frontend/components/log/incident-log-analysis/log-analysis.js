@@ -12,7 +12,7 @@ import {
 } from '../../selections';
 import apis from '../../../apis';
 import DateTimePicker from '../../ui/datetimepicker';
-import WaringButton from '../monitoring/waringButton';
+import WaringButton from '../../cloud/monitoring/waringButton';
 
 class LogAnalysis extends React.Component {
   static contextTypes = {
@@ -71,7 +71,7 @@ class LogAnalysis extends React.Component {
       projects0 = projects0.filter((item, index) => item.fileProjectType!=0);
       if (projects0.length === 0) {
         // no log no live => fallback to register
-        const url = `/newproject/project-list/custom`;
+        const url = `/settings/project-list/custom`;
         window.open(url, '_self');
       }
     }
