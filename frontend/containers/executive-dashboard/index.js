@@ -160,13 +160,29 @@ class ExecutiveDashboard extends React.Component {
             <div className="field" style={{ float: 'left' }}>
               <div
                 className={`ui ${view === 'anomaly' ? 'grey' : 'orange'} button`}
-                style={{ borderRadius: 0, marginRight: 0 }}
-                onClick={() => this.setState({ view: 'anomaly' })}
+                style={{
+                  borderRadius: 0,
+                  marginRight: 0,
+                  ...{
+                    cursor: `${view === 'anomaly' ? 'default' : 'pointer'}`,
+                  },
+                }}
+                {...view === 'anomaly' ? {} : {
+                  onClick: () => this.setState({ view: 'anomaly' }),
+                }}
               >Anomaly View</div>
               <div
                 className={`ui ${view === 'resource' ? 'grey' : 'orange'} button`}
-                style={{ borderRadius: 0, marginLeft: 0 }}
-                onClick={() => this.setState({ view: 'resource' })}
+                style={{
+                  borderRadius: 0,
+                  marginRight: 0,
+                  ...{
+                    cursor: `${view === 'resource' ? 'default' : 'pointer'}`,
+                  },
+                }}
+                {...view === 'resource' ? {} : {
+                  onClick: () => this.setState({ view: 'resource' }),
+                }}
               >Resource View</div>
             </div>
             <div className="field">
@@ -195,12 +211,16 @@ class ExecutiveDashboard extends React.Component {
             </div>
           </div>
           <div className="ui vertical segment">
-            {view === 'anomaly' &&
-              <TopListAnomaly stats={eventStats} onRowOpen={this.handleListRowOpenAnomaly} />
-            }
-            {view === 'resource' &&
-              <TopListResource stats={eventStats} onRowOpen={this.handleListRowOpenResource} />
-            }
+            <TopListAnomaly
+              stats={eventStats}
+              onRowOpen={this.handleListRowOpenAnomaly}
+              {...view === 'anomaly' ? {} : { style: { display: 'none' } }}
+            />
+            <TopListResource
+              stats={eventStats}
+              onRowOpen={this.handleListRowOpenResource}
+              {...view === 'resource' ? {} : { style: { display: 'none' } }}
+            />
           </div>
         </div>
       </Console.Content>

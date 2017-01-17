@@ -148,11 +148,13 @@ class TopListAnomaly extends React.Component {
     stats: T.array,
     autoExpandCount: T.number,
     onRowOpen: T.func,
+    style: T.object,
   };
 
   static defaultProps = {
     autoExpandCount: 0,
     stats: [],
+    style: {},
   };
 
   constructor(props) {
@@ -202,11 +204,11 @@ class TopListAnomaly extends React.Component {
   }
 
   render() {
-    const { stats } = this.props;
+    const { stats, style } = this.props;
     const { expandedProjects } = this.state;
 
     return (
-      <table className="toplist">
+      <table className="toplist" style={style}>
         <thead>
           <tr>
             <th
@@ -292,11 +294,13 @@ class TopListResource extends React.Component {
     stats: T.array,
     autoExpandCount: T.number,
     onRowOpen: T.func,
+    style: T.object,
   };
 
   static defaultProps = {
     autoExpandCount: 0,
     stats: [],
+    style: {},
   };
 
   constructor(props) {
@@ -346,11 +350,11 @@ class TopListResource extends React.Component {
   }
 
   render() {
-    const { stats } = this.props;
+    const { stats, style} = this.props;
     const { expandedProjects } = this.state;
 
     return (
-      <table className="toplist">
+      <table className="toplist" style={style}>
         <thead>
           <tr>
             <th
