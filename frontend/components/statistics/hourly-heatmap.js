@@ -46,7 +46,7 @@ export default class HourlyHeatmap extends React.Component {
           .enter().append('text')
             .text((d) => { return d; })
             .attr('x', 0)
-            .attr('y', (d, i) => { return i * gridSize; })
+            .attr('y', (d, i) => { return i * 1.5 * gridSize; })
             .style('text-anchor', 'end')
             .attr('transform', 'translate(-6,' + gridSize / 1.5 + ')')
             .attr('class', (d, i) => { return ((i >= 0 && i <= 4) ? 'timeLabel mono axis axis-workday' : 'timeLabel mono axis'); });
@@ -63,12 +63,12 @@ export default class HourlyHeatmap extends React.Component {
 
         cards.enter().append('rect')
               .attr('x', (d) => { return (d.day - 1) * gridSize; })
-              .attr('y', (d) => { return (d.period - 1) * gridSize; })
+              .attr('y', (d) => { return (d.period - 1) * 1.5 * gridSize; })
               .attr('rx', 4)
               .attr('ry', 4)
               .attr('class', 'day bordered')
               .attr('width', gridSize)
-              .attr('height', gridSize)
+              .attr('height', 1.5 * gridSize)
               .style('fill', colors[0]);
 
         cards.transition().duration(1500)
@@ -102,21 +102,21 @@ export default class HourlyHeatmap extends React.Component {
 
   heatmapChart(false, dataset);
 
-      // var datasetpicker = d3.select("#dataset-picker").selectAll(".dataset-button")
-      //  .data(datasets);
+       var datasetpicker = d3.select("#dataset-picker").selectAll(".dataset-button")
+        .data(datasets);
 
-      // datasetpicker.enter()
-      //  .append("input")
-      //  .attr("value", function(d){ return "Dataset " + d })
-      //  .attr("type", "button")
-      //  .attr("class", "dataset-button")
-      //  .on("click", function(d) {
-      //    //heatmapChart(d);
-      //  });
+       datasetpicker.enter()
+        .append("input")
+        .attr("value", function(d){ return "Dataset " + d })
+        .attr("type", "button")
+        .attr("class", "dataset-button")
+        .on("click", function(d) {
+          //heatmapChart(d);
+        });
   }
 
   render() {
-//    console.log('In render() function');
+    console.log(this.state);
 	  return (
       <div id="chart">
        {this.drawHeatmap()}
