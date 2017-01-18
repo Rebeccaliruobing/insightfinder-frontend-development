@@ -116,6 +116,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
       </td>}
+      {type=='resource'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.AvgCPUUtilization'), 1)}</td>}
 
       {type=='resource'&&<td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}</td>}
       {type=='resource'&&<td className="number current">
@@ -129,6 +130,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
       </td>}
+      {type=='resource'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}</td>}
 
     </tr>
   );
@@ -364,14 +366,16 @@ class TopListResource extends React.Component {
                 borderLeft: '2px solid #566f84',
               }}
             >Project/Group Name</th>
-            <th className="subheader" colSpan={2} width="39%">CPU Utilization (%)</th>
-            <th className="subheader" colSpan={2} width="39%">Availability (%)</th>
+            <th className="subheader" colSpan={3} width="35%">CPU Utilization (%)</th>
+            <th className="subheader" colSpan={3} width="35%">Availability (%)</th>
           </tr>
           <tr>
             <th>Previous</th>
             <th>Current</th>
+            <th>Predicted</th>
             <th>Previous</th>
             <th>Current</th>
+            <th>Predicted</th>
           </tr>
         </thead>
           {stats.map((data) => {

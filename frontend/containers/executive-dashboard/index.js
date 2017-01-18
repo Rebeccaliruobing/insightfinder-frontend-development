@@ -165,6 +165,7 @@ class ExecutiveDashboard extends React.Component {
                   marginRight: 0,
                   ...{
                     cursor: `${view === 'anomaly' ? 'default' : 'pointer'}`,
+                    fontWeight: `${view === 'anomaly' ? 'bolder' : 'lighter'}`,
                   },
                 }}
                 {...view === 'anomaly' ? {} : {
@@ -178,6 +179,7 @@ class ExecutiveDashboard extends React.Component {
                   marginRight: 0,
                   ...{
                     cursor: `${view === 'resource' ? 'default' : 'pointer'}`,
+                    fontWeight: `${view === 'resource' ? 'bolder' : 'lighter'}`,
                   },
                 }}
                 {...view === 'resource' ? {} : {
@@ -210,16 +212,19 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div className="ui vertical segment">
+          <div className="ui vertical segment" style={{ 
+                  ...{
+                    width: `${view === 'anomaly' ? '100%' : '75%'}`
+                  } }}>
             <TopListAnomaly
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
-              {...view === 'anomaly' ? {} : { style: { display: 'none' } }}
+              {...view === 'anomaly' ? { } : { style: { display: 'none' } }}
             />
             <TopListResource
               stats={eventStats}
               onRowOpen={this.handleListRowOpenResource}
-              {...view === 'resource' ? {} : { style: { display: 'none' } }}
+              {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
           </div>
         </div>
