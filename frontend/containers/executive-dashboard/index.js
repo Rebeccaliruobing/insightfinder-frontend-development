@@ -138,6 +138,7 @@ class ExecutiveDashboard extends React.Component {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       projectName,
+      instanceGroup,
     });
     store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/app-forecast?${$.param(query)}`, '_blank');
