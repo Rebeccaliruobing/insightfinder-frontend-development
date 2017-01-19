@@ -1,6 +1,7 @@
 import React from 'react';
 import { Console } from '../../../artui/react';
 import apis from '../../../apis';
+import LogAnalysisCharts from '../loganalysis';
 
 const ProjectLogDetails = class extends React.Component {
 
@@ -79,13 +80,10 @@ const ProjectLogDetails = class extends React.Component {
             </div>
           </div>
         </Console.Topbar>
-        {React.cloneElement(this.props.children, {
-          query,
-          enablePublish: true,
-          data,
-          loading,
-          onRefresh: () => this.updateData(),
-        })}
+        <LogAnalysisCharts
+          query={query} enablePublish data={data} loading={loading}
+          onRefresh={() => this.updateData()}
+        />
       </Console>
     );
   }
