@@ -93,9 +93,11 @@ class EventSummary extends React.Component {
     const { projectName, numberOfDays } = this.applyDefaultParams(location.query);
     const { data, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap;
+    let groupIdMap = {};
     if (incident) {
       const caption = `Event #${incident.id}`;
       const stats = incident.instanceMetricJson || {};
+      groupIdMap = stats.groupIdMap;
       stats.startTimestamp = incident.startTimestamp;
       stats.endTimestamp = incident.endTimestamp;
       stats.maxAnomalyRatio = maxAnomalyRatio;
@@ -103,6 +105,7 @@ class EventSummary extends React.Component {
       incidentsTreeMap =
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
     } else {
+      groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
       data.statistics.maxAnomalyRatio = maxAnomalyRatio;
       data.statistics.minAnomalyRatio = minAnomalyRatio;
@@ -110,6 +113,7 @@ class EventSummary extends React.Component {
     }
     this.setState({
       incidentsTreeMap,
+      groupIdMap, 
       selectedIncident: incident,
       treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
@@ -335,7 +339,7 @@ class EventSummary extends React.Component {
       this.applyDefaultParams(location.query);
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType } = this.state;
+      instanceGroups, lineChartType, groupIdMap } = this.state;
 
     let realEndTime = moment(endTime).endOf('day');
     let curTime = moment();
@@ -468,7 +472,7 @@ class EventSummary extends React.Component {
                     data={incidentsTreeMap} instanceMetaData={instanceMetaData}
                     endTime={realEndTime} numberOfDays={numberOfDays}
                     instanceStatsJson={instanceStatsMap}
-                    treeMapScheme={treeMapScheme}
+                    treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
                     treeMapCPUThreshold={treeMapCPUThreshold}
                     treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
                     predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}

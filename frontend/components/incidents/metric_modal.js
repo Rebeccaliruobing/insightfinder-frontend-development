@@ -30,12 +30,12 @@ class MetricModal extends React.Component {
   }
 
   componentDidMount() {
-    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, grouping } = this.props;
+    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, groupId, grouping } = this.props;
     this.setState({ 
       loading: true,
     });
     apis.postProjectData(
-      projectName, undefined, undefined, startTimestamp, endTimestamp, undefined,
+      projectName, undefined, undefined, startTimestamp, endTimestamp, groupId,
       instanceName, metricName, undefined, undefined, grouping)
       .then(resp => {
         if (resp.success) {
