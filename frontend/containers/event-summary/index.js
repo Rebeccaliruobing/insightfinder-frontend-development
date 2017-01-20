@@ -361,12 +361,12 @@ class EventSummary extends React.Component {
     return (
       <Console.Content
         className={`event-summary ${loading ? 'ui form loading' : ''}`}
-        style={{ background: '#f5f5f5' }}
+        style={{ background: '#f5f5f5', paddingLeft: 0 }}
       >
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
           <div
             className="ui right aligned vertical inline segment"
-            style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
+            style={{ zIndex: 1, margin: '0 -16px 10px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
