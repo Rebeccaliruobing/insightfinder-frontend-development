@@ -179,6 +179,11 @@ class EventSummary extends React.Component {
   }
 
   @autobind
+  handleRefreshClick() {
+    this.refreshInstanceGroup();
+  }
+
+  @autobind
   refreshInstanceGroup(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
@@ -421,7 +426,7 @@ class EventSummary extends React.Component {
             <div className="field">
               <div
                 className="ui orange button" tabIndex="0"
-                onClick={this.refreshInstanceGroup}
+                onClick={this.handleRefreshClick}
               >Refresh</div>
             </div>
           </div>
