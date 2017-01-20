@@ -315,7 +315,10 @@ class AppForecast extends Component {
       thisPeriodMap, showErrorMsg, selectedMetrics, hideGroupSelector,
     } = this.state;
     return (
-      <Console.Content className={`app-forecast ${loading ? 'ui form loading' : ''}`}>
+      <Console.Content
+        className={`app-forecast ${loading ? 'ui form loading' : ''}`}
+        style={{ paddingLeft: 0 }}
+      >
         <div
           className="ui main tiny container"
           style={{ minHeight: '100%', display: loading && 'none' }}
