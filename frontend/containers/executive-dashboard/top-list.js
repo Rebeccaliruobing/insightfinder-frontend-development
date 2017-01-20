@@ -17,11 +17,11 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
 
 const getArrowStyles = (left, right, reverseColor = false, reverseDirection = false) => {
   let up = {
-    transform: 'rotate(-90deg)',
+    transform: 'rotate(-45deg)',
     color: 'red',
   };
   let down = {
-    transform: 'rotate(90deg)',
+    transform: 'rotate(45deg)',
     color: 'green',
   };
   if(reverseColor){

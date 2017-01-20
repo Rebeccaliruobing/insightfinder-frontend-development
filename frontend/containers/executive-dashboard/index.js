@@ -152,6 +152,7 @@ class ExecutiveDashboard extends React.Component {
     return (
       <Console.Content
         className={`executive-dashboard ${loading ? 'ui form loading' : ''}`}
+        style={{ paddingLeft: 0 }}
       >
         <div className="ui main tiny container" style={{ display: loading && 'none' }}>
           <div
