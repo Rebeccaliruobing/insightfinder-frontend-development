@@ -24,6 +24,10 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
     transform: 'rotate(45deg)',
     color: 'green',
   };
+  let flat = {
+    // transform: 'rotate(45deg)',
+    color: 'black',
+  };
   if(reverseColor){
     up.color='green';
     down.color='red';
@@ -32,12 +36,13 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
   if (left !== undefined && right !== undefined) {
     if (left > right) {
       return !reverseDirection ? down : up;
+    } else if (left < right) {
+      return !reverseDirection ? up : down;
     } else if (left === right) {
+      // return flat; 
       return { visibility: 'hidden' };
     }
-    return !reverseDirection ? up : down;
   }
-
   return { visibility: 'hidden' };
 };
 
@@ -76,7 +81,15 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 0, false)}
       </td>}
-      {type=='anomaly'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>}
+      {type=='anomaly'&&<td className="number predicted">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'current.avgDailyAnomalyScore'),
+            _.get(stats, 'predicted.avgDailyAnomalyScore'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}</td>}
 
       {type=='anomaly'&&<td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>}
       {type=='anomaly'&&<td className="number current">
@@ -89,7 +102,15 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), 0, false)}
       </td>}
-      {type=='anomaly'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>}
+      {type=='anomaly'&&<td className="number predicted">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'current.totalAnomalyDuration'),
+            _.get(stats, 'predicted.totalAnomalyDuration'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}</td>}
 
       {type=='anomaly'&&<td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}</td>}
       {type=='anomaly'&&<td className="number current">
@@ -102,7 +123,15 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), 0, false)}
       </td>}
-      {type=='anomaly'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>}
+      {type=='anomaly'&&<td className="number predicted">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'current.totalAnomalyEventCount'),
+            _.get(stats, 'predicted.totalAnomalyEventCount'),
+          )}
+        />
+        {normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}</td>}
 
       {type=='resource'&&<td className="number">{normalizeValue(_.get(stats, 'previous.AvgCPUUtilization'), 1)}</td>}
       {type=='resource'&&<td className="number current">
@@ -116,7 +145,16 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
       </td>}
-      {type=='resource'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.AvgCPUUtilization'), 1)}</td>}
+      {type=='resource'&&<td className="number predicted">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'current.AvgCPUUtilization'),
+            _.get(stats, 'predicted.AvgCPUUtilization'), 
+            true,
+          )}
+        />
+        {normalizeValue(_.get(stats, 'predicted.AvgCPUUtilization'), 1)}</td>}
 
       {type=='resource'&&<td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}</td>}
       {type=='resource'&&<td className="number current">
@@ -130,7 +168,16 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         />
         {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
       </td>}
-      {type=='resource'&&<td className="number predicted">{normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}</td>}
+      {type=='resource'&&<td className="number predicted">
+        <i
+          className="long arrow right icon"
+          style={getArrowStyles(
+            _.get(stats, 'current.AvgInstanceUptime'),
+            _.get(stats, 'predicted.AvgInstanceUptime'),
+            true,
+          )}
+        />
+        {normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}</td>}
 
     </tr>
   );
