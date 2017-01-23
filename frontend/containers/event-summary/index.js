@@ -93,9 +93,11 @@ class EventSummary extends React.Component {
     const { projectName, numberOfDays } = this.applyDefaultParams(location.query);
     const { data, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap;
+    let groupIdMap = {};
     if (incident) {
       const caption = `Event #${incident.id}`;
       const stats = incident.instanceMetricJson || {};
+      groupIdMap = stats.groupIdMap;
       stats.startTimestamp = incident.startTimestamp;
       stats.endTimestamp = incident.endTimestamp;
       stats.maxAnomalyRatio = maxAnomalyRatio;
@@ -103,6 +105,7 @@ class EventSummary extends React.Component {
       incidentsTreeMap =
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
     } else {
+      groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
       data.statistics.maxAnomalyRatio = maxAnomalyRatio;
       data.statistics.minAnomalyRatio = minAnomalyRatio;
@@ -110,6 +113,7 @@ class EventSummary extends React.Component {
     }
     this.setState({
       incidentsTreeMap,
+      groupIdMap, 
       selectedIncident: incident,
       treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
@@ -172,6 +176,11 @@ class EventSummary extends React.Component {
     });
 
     this.refreshInstanceGroup(query);
+  }
+
+  @autobind
+  handleRefreshClick() {
+    this.refreshInstanceGroup();
   }
 
   @autobind
@@ -335,7 +344,7 @@ class EventSummary extends React.Component {
       this.applyDefaultParams(location.query);
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType } = this.state;
+      instanceGroups, lineChartType, groupIdMap } = this.state;
 
     let realEndTime = moment(endTime).endOf('day');
     let curTime = moment();
@@ -357,12 +366,12 @@ class EventSummary extends React.Component {
     return (
       <Console.Content
         className={`event-summary ${loading ? 'ui form loading' : ''}`}
-        style={{ background: '#f5f5f5' }}
+        style={{ background: '#f5f5f5', paddingLeft: 0 }}
       >
         <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
           <div
             className="ui right aligned vertical inline segment"
-            style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
+            style={{ zIndex: 1, margin: '0 -16px 10px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
@@ -417,7 +426,7 @@ class EventSummary extends React.Component {
             <div className="field">
               <div
                 className="ui orange button" tabIndex="0"
-                onClick={this.refreshInstanceGroup}
+                onClick={this.handleRefreshClick}
               >Refresh</div>
             </div>
           </div>
@@ -468,7 +477,7 @@ class EventSummary extends React.Component {
                     data={incidentsTreeMap} instanceMetaData={instanceMetaData}
                     endTime={realEndTime} numberOfDays={numberOfDays}
                     instanceStatsJson={instanceStatsMap}
-                    treeMapScheme={treeMapScheme}
+                    treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
                     treeMapCPUThreshold={treeMapCPUThreshold}
                     treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
                     predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}

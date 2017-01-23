@@ -5,7 +5,7 @@ import _ from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
-import DataParser from '../dataparser';
+import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
 import './logevent.less';
 

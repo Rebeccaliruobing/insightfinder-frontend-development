@@ -97,7 +97,7 @@ export default class ThresholdSettings extends React.Component {
     let { projectModelAllInfo, projectString } = dashboardUservalues;
     let projectNames = projectModelAllInfo.map((info)=>info.projectName);
 
-    let refreshName = store.get('settingsProjectName') ? store.get('settingsProjectName') : projectNames[0];
+    let refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectNames[0];
     if (projectNames.length > 0) {
       this.handleProjectChange(refreshName);
     }
@@ -208,7 +208,7 @@ export default class ThresholdSettings extends React.Component {
       projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
       let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
       this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-      store.set('settingsProjectName', projectName);
+      store.set('liveAnalysisProjectName', projectName);
     });
   }
 

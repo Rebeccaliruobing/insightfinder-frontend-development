@@ -4,7 +4,7 @@ import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
 import moment from 'moment';
 
-export function retrieveAppForecastData(projectName) {
+export function retrieveAppForecastData(projectName, instanceGroup) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -12,7 +12,7 @@ export function retrieveAppForecastData(projectName) {
     $.ajax({
       type: 'POST',
       url: getEndpoint('appForecast', 1),
-      data: $.param({ userName, token, projectName, operation:'get' }),
+      data: $.param({ userName, token, projectName, instanceGroup, operation:'get' }),
       beforeSend: function (request) {
         request.setRequestHeader("Accept", 'application/json');
       }

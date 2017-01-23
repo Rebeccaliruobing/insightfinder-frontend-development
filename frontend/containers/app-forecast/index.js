@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-console */
 import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
@@ -69,6 +71,7 @@ class AppForecast extends Component {
     this.state = {
       data: {},
       loading: true,
+      instanceGroups: [],
       projectName: undefined,
       selectedAppName: undefined,
       appNames: [],
@@ -96,7 +99,7 @@ class AppForecast extends Component {
         (projectName && !projects.find(item => item.projectName === projectName))) {
         projectName = projects[0].projectName;
       }
-      this.handleProjectChange(projectName, projectName);
+      this.handleProjectChange(projectName);
     }
   }
 
@@ -149,20 +152,19 @@ class AppForecast extends Component {
   }
 
   @autobind
-  refreshProjectName(projectName) {
+  handleRefreshClick() {
+    this.refreshInstanceGroup();
+  }
+
+  @autobind
+  refreshInstanceGroup(params) {
+    const { location } = this.props;
+    const query = params || this.applyDefaultParams(location.query);
+    const { projectName, instanceGroup } = query;
+
     const self = this;
     let selectedMetrics = store.get(`${projectName}-forecast-metrics`, '');
     store.set('liveAnalysisProjectName', projectName);
-
-    // Get the group to display
-    const { location, router } = this.props;
-    const query = {
-      projectName,
-    };
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
 
     this.setState({
       loading: true,
@@ -170,7 +172,7 @@ class AppForecast extends Component {
       selectedMetrics,
       hideGroupSelector: true,
     }, () => {
-      apis.retrieveAppForecastData(projectName)
+      apis.retrieveAppForecastData(projectName, instanceGroup)
         .then((resp) => {
           let appNames = resp.appNames;
           const appObj = resp.appObj;
@@ -182,7 +184,6 @@ class AppForecast extends Component {
           let thisPeriodMap = null;
           let appGroups = null;
           let selectedGroups = null;
-
 
           appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
           if (appNames.length > 0) {
@@ -225,8 +226,66 @@ class AppForecast extends Component {
   }
 
   @autobind
-  handleProjectChange(value, projectName) {
-    this.refreshProjectName(projectName);
+  handleInstanceGroupChange(instanceGroup) {
+    const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query, instanceGroup,
+    });
+    router.push({
+      pathname: location.pathname,
+      query,
+    });
+
+    this.refreshInstanceGroup(query);
+  }
+
+  @autobind
+  handleProjectChange(projectName) {
+    this.setState({
+      loading: true,
+    }, () => {
+      apis.loadInstanceGrouping(projectName, 'getGrouping')
+        .then((resp) => {
+          if (resp.groupingString) {
+            let groups = resp.groupingString.split(',').sort();
+            const pos = groups.indexOf('All');
+            if (pos !== -1) {
+              const len = groups.length;
+              groups = groups.slice(1, len).concat(groups.slice(0, 1));
+            }
+
+            // Get the group to display
+            const { location, router } = this.props;
+            let query = this.applyDefaultParams({
+              ...location.query,
+            });
+
+            let instanceGroup = query.instanceGroup;
+            if (groups && groups.length > 0) {
+              if (instanceGroup && groups.indexOf(instanceGroup) < 0) {
+                instanceGroup = groups[0];
+              }
+            } else {
+              instanceGroup = '';
+            }
+            query = this.applyDefaultParams({
+              ...location.query,
+              projectName,
+              instanceGroup,
+            });
+            router.push({
+              pathname: location.pathname,
+              query,
+            });
+
+            this.setState({
+              instanceGroups: groups,
+            }, () => {
+              this.refreshInstanceGroup(query);
+            });
+          }
+        });
+    });
   }
 
   @autobind
@@ -241,14 +300,25 @@ class AppForecast extends Component {
     });
   }
 
+  applyDefaultParams(params) {
+    return {
+      instanceGroup: 'All',
+      ...params,
+    };
+  }
+
   render() {
+    const { location } = this.props;
+    const { projectName, instanceGroup } = this.applyDefaultParams(location.query);
     const {
-      loading, data, projectName, appNames, appGroups, selectedGroups,
+      loading, data, instanceGroups, appNames, appGroups, selectedGroups,
       thisPeriodMap, showErrorMsg, selectedMetrics, hideGroupSelector,
     } = this.state;
-    const refreshName = store.get('liveAnalysisProjectName') || projectName;
     return (
-      <Console.Content className={`app-forecast ${loading ? 'ui form loading' : ''}`}>
+      <Console.Content
+        className={`app-forecast ${loading ? 'ui form loading' : ''}`}
+        style={{ paddingLeft: 0 }}
+      >
         <div
           className="ui main tiny container"
           style={{ minHeight: '100%', display: loading && 'none' }}
@@ -265,9 +335,28 @@ class AppForecast extends Component {
               />
             </div>
             <div className="field">
+              <label style={{ fontWeight: 'bold' }}>Group:</label>
+              <Dropdown
+                key={projectName}
+                mode="select"
+                searchable
+                value={instanceGroup}
+                onChange={this.handleInstanceGroupChange}
+                style={{ minWidth: 200 }}
+              >
+                <div className="menu">
+                  {
+                    instanceGroups.map(g => (
+                      <div className="item" key={g} data-value={g}>{g}</div>
+                    ))
+                  }
+                </div>
+              </Dropdown>
+            </div>
+            <div className="field">
               <div
                 className="ui orange button" tabIndex="0"
-                onClick={() => this.refreshProjectName(refreshName)}
+                onClick={this.handleRefreshClick}
               >Refresh
               </div>
             </div>
