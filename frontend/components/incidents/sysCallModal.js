@@ -4,6 +4,7 @@ import store from 'store';
 import _ from "lodash";
 import {Modal, Dropdown} from '../../artui/react';
 import {PieChart} from '../share/echarts-charts';
+import "./incident.less";
 
 class SysCallModal extends React.Component {
 
@@ -28,8 +29,8 @@ class SysCallModal extends React.Component {
 
     render() {
         let {dataArray, timeRanking, freqRanking, ...rest} = this.props;
-        let pieChartCanvasStyle = {height: '200px', width: '230px'};
-        let titleStyle = {'width': '27%', 'margin': '0 auto'};
+        let pieChartCanvasStyle = {height: '200px', width: '200px'};
+        let titleStyle = {'width': '33%', 'margin': '0 auto'};
         let optionCenterStyle = ['65%', '50%'];
         const { tabStates } = this.state;
         let timeFuncList = timeRanking.functionlist;
@@ -57,7 +58,7 @@ class SysCallModal extends React.Component {
                                     else if (value == "numAffectedThread") {
                                         name = "Number of Affected Threads";
                                     }
-                                    let radius = [60,78];
+                                    let radius = [52,70];
                                     return (
                                         <PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={radius} key={index}
                                                   optionCenterStyle={optionCenterStyle} colorChart="#3398DB"
@@ -71,15 +72,15 @@ class SysCallModal extends React.Component {
                                     <div>
                                         <div className="ui pointing secondary menu">
                                             <a className={tabStates['time'] + ' item'}
-                                               onClick={(e) => this.selectTab(e, 'time')}>By Time</a>
+                                               onClick={(e) => this.selectTab(e, 'time')}>By Execution Time</a>
                                             <a className={tabStates['freq'] + ' item'}
-                                               onClick={(e) => this.selectTab(e, 'freq')}>By Freq</a>
+                                               onClick={(e) => this.selectTab(e, 'freq')}>By Execution Frequency</a>
                                         </div>
 
                                         <div className={tabStates['time'] + ' ui tab '}>
                                             {tabStates['time'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>
@@ -104,7 +105,7 @@ class SysCallModal extends React.Component {
                                         <div className={tabStates['freq'] + ' ui tab '}>
                                             {tabStates['freq'] === 'active' ?
                                                 <div>
-                                                    <table className="word-table ui celled table">
+                                                    <table className="syscall-table ui celled table">
                                                         <thead>
                                                         <tr style={{'textAlign': 'center'}}>
                                                             <th>Rank</th>

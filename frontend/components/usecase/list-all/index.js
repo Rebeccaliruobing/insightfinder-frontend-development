@@ -28,7 +28,8 @@ export default class ListAll extends Component {
         weeks: weeks,
         endTime: moment(new Date()).toDate(),
         startTime: moment(new Date()).add(-7 * weeks, 'days')
-      }
+      },
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
     };
   }
 
@@ -49,19 +50,19 @@ export default class ListAll extends Component {
 
   handleFilterChange(data) {
     let {cvalue, pvalue, minPts, epsilon, modelType} = data;
-    let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime} = data.activeItem;
-    metaData = JSON.stringify(metaData);
+    let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp} = data.activeItem;
+    let bugId = metaData.name;
     if(modelType=='DBScan'){
       cvalue = minPts;
       pvalue = epsilon;
     }
 
     window.open(`/useCaseDetails?${$.param(Object.assign({}, {
-      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime
+      pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, modelStartTime, modelEndTime,latestDataTimestamp, bugId
     }))}`, '_blank');
 
     // this.setState({loading: true}, ()=>{
-    //   apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData).then((resp)=>{
+    //   apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName).then((resp)=>{
     //     resp.loading = false;
     //     this.setState(resp);
     //   }).catch((err)=>{
@@ -78,12 +79,11 @@ export default class ListAll extends Component {
   }
 
   render() {
-    const {view, showAddPanel, params} = this.state;
+    const {view, showAddPanel, params, systemNames} = this.state;
     const {userInstructions, router} = this.context;
     const panelIconStyle = showAddPanel ? 'angle double up icon' : 'angle double down icon';
-
     let system = this.props.location.query.system;
-
+    
     return (
       <Console.ContentNoPadding>
         <div className="ui main tiny container" ref={c => this._el = c}>
@@ -104,10 +104,6 @@ export default class ListAll extends Component {
           <div className="ui vertical segment filterPanel"
                ref={(c)=>this.$filterPanel = $(ReactDOM.findDOMNode(c))}>
             <FilterBar loading={this.state.loading} {...this.props} onSubmit={this.handleFilterChange.bind(this)}/>
-          </div>
-
-          <div className="ui vertical segment">
-            {this.state.success && <LiveAnalysisCharts loading={false} data={this.state.data}/>}
           </div>
         </div>
       </Console.ContentNoPadding>

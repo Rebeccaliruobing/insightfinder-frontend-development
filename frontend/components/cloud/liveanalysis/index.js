@@ -13,8 +13,9 @@ import SettingDebug from './debug';
 import ShareModal from './shareModal';
 import CommentsModal from './commentsModal';
 import { PieChart } from '../insight-report';
+import SysCallModal from '../../incidents/sysCallModal';
 
-import {GridColumns, DefaultView} from '../../storeKeys';
+import {GridColumns, DefaultView, ShowSummaryFlag} from '../../storeKeys';
 import {DataSummaryChart, DataGroupCharts} from '../../share/charts';
 
 
@@ -28,26 +29,31 @@ class LiveAnalysisCharts extends React.Component {
         data: React.PropTypes.object,
         loading: React.PropTypes.bool,
         enablePublish: React.PropTypes.bool,
-        onRefresh: React.PropTypes.func
+        onRefresh: React.PropTypes.func,
+        chartType: React.PropTypes.string,
     };
 
     static defaultProps = {
         loading: true,
         enablePublish: false,
+        chartType: 'line',
         onRefresh: () => {
         }
     };
 
     constructor(props) {
-
         super(props);
-
         this.dp = null;
+        let initView = 'grid';
+        if(props && props.predictedFlag && props.predictedFlag == "true"){
+          initView = 'list';
+        }
 
         this.state = {
             instanceName: false,
-            view: (store.get(DefaultView, 'grid')).toLowerCase(),
+            view: (store.get(DefaultView, initView)).toLowerCase(),
             columns: (store.get(GridColumns, 'four')).toLowerCase(),
+            showSummaryFlag: (store.get(ShowSummaryFlag, 'no')),
             selectedGroupId: undefined,
             selectedAnnotation: null,
             showSettingModal: false,
@@ -58,12 +64,18 @@ class LiveAnalysisCharts extends React.Component {
             showDebug: false,
             startTimestamp: undefined,
             endTimestamp: undefined,
+            isForecast: false,
             tabStates: {
                 rootcause: '',
                 chart: 'active',
                 heatmap: ''
             }
         };
+
+        if(props.isForecast && !!props.isForecast){
+          this.state.isForecast = true;
+          this.state.view = 'list';
+        }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -77,9 +89,7 @@ class LiveAnalysisCharts extends React.Component {
         if (this._data !== data && !!data) {
             this.dp = new DataParser(data, rest);
             this.dp.getSummaryData();
-
-            // FIXME: getGroupsData vs getGroupsDataTest?
-            this.dp.getGroupsDataTest();
+            this.dp.getMetricsData();
 
             // Sort the grouped data
             this.summary = this.dp.summaryData;
@@ -112,6 +122,19 @@ class LiveAnalysisCharts extends React.Component {
               }
             }
           } 
+        }
+        if(instanceName && data){
+          let metricAvgRaw = data['instanceMetricJson'] && data['instanceMetricJson']['instanceStatsJson'] && data['instanceMetricJson']['instanceStatsJson'][instanceName] && data['instanceMetricJson']['instanceStatsJson'][instanceName]['statsByMetricJson'];
+          let avgNumberOfDays = data['instanceMetricJson'] && data['instanceMetricJson']['avgNumberOfDays'];
+          if(metricAvgRaw && avgNumberOfDays) {
+            let metricAvg = {}
+            Object.keys(metricAvgRaw).forEach(function(key){
+              if(metricAvgRaw[key] && metricAvgRaw[key]['avg']!=undefined){
+                metricAvg[key] = ' (' + avgNumberOfDays + 'd avg: ' + metricAvgRaw[key]['avg'].toPrecision(3) + ')';
+              }
+            });
+            this.metricAvg = metricAvg;
+          }
         }
     }
 
@@ -155,6 +178,24 @@ class LiveAnalysisCharts extends React.Component {
     };
 
     exportData(){
+        let data = this.dp.data.data;
+        let fname = 'data.csv';
+        var csvString = data.split('\\n').join("\r\n");
+        let csvData = new Blob([csvString], { type: 'text/csv' }); 
+        var csvUrl = URL.createObjectURL(csvData);
+        var a = document.createElement('a');
+        document.body.appendChild(a);
+        a.innerHTML = "Click here";
+        a.href =  csvUrl;
+        // a.href     = 'data:application/csv;charset=utf-8,' + encodeURIComponent(csvString);
+        a.target   = '_blank';
+        a.method   = 'POST';
+        a.download = fname;
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    exportDataOld(){
         let data = this.dp.data.data;
         let fname = 'data.csv';
         var csvString = data.split('\\n').join("\r\n");
@@ -243,20 +284,22 @@ class LiveAnalysisCharts extends React.Component {
 
     render() {
 
-        let { loading, onRefresh, enablePublish, enableComments, debugData, timeMockup, freqMockup, projectName} = this.props;
-        const { view, columns,tabStates } = this.state;
+        let { loading, onRefresh, enablePublish, enableComments, debugData, timeRanking, freqRanking, projectName, 
+          periodMap, data, chartType, alertMissingData, bugId } = this.props;
+        const { view, columns,showSummaryFlag,tabStates,isForecast } = this.state;
         debugData = debugData || [];
-        timeMockup = timeMockup || [];
-        freqMockup = freqMockup || [];
+        timeRanking = timeRanking || [];
+        freqRanking = freqRanking || [];
         this.calculateData();
         let self = this;
-
+        let isFileDetection = (data && data.caller && data.caller == 'fileDetection');
         const summary = this.summary;
         const dataArray = this.causalDataArray;
         const types = this.causalTypes;
         const groups = this.groups;
         const errorMsg = this.errorMsg;
-        let settingData = (_.keysIn(debugData)).length != 0 || timeMockup.length != 0 || freqMockup != 0;
+        const metricAvg = this.metricAvg;
+        let settingData = (_.keysIn(debugData)).length != 0 || timeRanking.length != 0 || freqRanking != 0;
         let radius = [60,85];
         let propsData = this.props.data?this.props.data['instanceMetricJson']:{};
         let latestDataTimestamp = propsData?propsData['latestDataTimestamp']:"";
@@ -264,6 +307,18 @@ class LiveAnalysisCharts extends React.Component {
         let basicStatsKeys = ["AvgCPUUtilization","AvgInstanceUptime","NumberOfInstances","NumberOfContainers","NumberOfMetrics","BillingEstimate"];
         // incident table
         let incidents = [];
+        let dataChunkName = data && data.dataChunkName;
+        let metricTags = {};
+        if(data && data.anomalyMetrics){
+          let anomalyMetrics = data.anomalyMetrics.split(",");
+          _.each(anomalyMetrics,function(am,index){
+            metricTags[am] = " (Anomaly Detected) ";
+          });
+        }
+        if(projectName && projectName.indexOf('@')!=-1){
+          enablePublish=false;
+        }
+
         if(summary){
             incidents =  _.map(summary.incidentSummary, a => {
               let incidentObj = this._getRootCauseNameFromHints(a.text);
@@ -292,10 +347,6 @@ class LiveAnalysisCharts extends React.Component {
                                     onClick={() => this.setState({ showTenderModal: true })} style={{'display': 'none'}}>
                                 <i className="icon random"/>Causal Graph
                             </Button>
-                            <Button className="orange labeled icon"
-                                    onClick={() => this.setState({ showDebug: true })} style={{display: settingData?'':'none'}}>
-                                <i className="icon random"/>Syscall Results
-                            </Button>
                             <Button className="labeled icon" style={{ display: !enablePublish && 'none' }}
                                     onClick={()=> this.setState({ showShareModal: true })}>
                                 <i className="icon share alternate"/>Publish
@@ -304,19 +355,23 @@ class LiveAnalysisCharts extends React.Component {
                                     onClick={() => this.setState({ showComments: true })}>
                                 <i className="icon comments"/>Comments
                             </Button>
-                            <Button className="labeled icon" onClick={() => onRefresh()}>
+                            {!bugId && !isForecast && <Button className="labeled icon" onClick={() => onRefresh()}>
                                 <i className="icon refresh"/>Refresh
-                            </Button>
-                            <Button className="labeled icon" onClick={() => this.exportData()}>
+                            </Button>}
+                            {!isForecast && <Button className="labeled icon" onClick={() => this.exportData()}>
                                 <i className="icon download"/>Export
-                            </Button>
+                            </Button>}
                             {projectName!=undefined && <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
                                 <i className="icon cloud"/>Save To Storage
                             </Button>}
-                            <ButtonGroup className="right floated basic icon">
-                                <Button onClick={()=> this.setState({ showSettingModal: true })}>
+                            <Button className="orange labeled icon"
+                                    onClick={() => this.setState({ showDebug: true })} style={{display: settingData?'':'none'}}>
+                                <i className="zoom icon"/>Faulty Localization Result
+                            </Button>
+                            {!isForecast && <ButtonGroup className="right floated basic icon">
+                                {!bugId && <Button onClick={()=> this.setState({ showSettingModal: true })}>
                                     <i className="icon setting"/>
-                                </Button>
+                                </Button>}
                                 <Button active={view === 'list'}
                                         onClick={()=>this.setState({ view: 'list' })}>
                                     <i className="align justify icon"/>
@@ -325,7 +380,7 @@ class LiveAnalysisCharts extends React.Component {
                                         onClick={()=>this.setState({ view: 'grid' })}>
                                     <i className="grid layout icon"/>
                                 </Button>
-                            </ButtonGroup>
+                            </ButtonGroup>}
                         </div>
                         <div className="ui vertical segment">
                             { false && <div className="ui pointing secondary menu">
@@ -339,10 +394,10 @@ class LiveAnalysisCharts extends React.Component {
                             }
                             {tabStates['chart'] === 'active' ?
                                 <div className="ui grid">
-                                    {!summary && (!groups || groups.length==0) &&
+                                    {(!summary) && (!groups || groups.length==0) &&
                                       <h3>{errorMsg}</h3>
                                     }
-                                    {!!summary && 
+                                    {showSummaryFlag.toLowerCase()=='yes' && !!summary && 
                                     <DataSummaryChart
                                         key="summary_chart"
                                         summary={summary}
@@ -354,8 +409,13 @@ class LiveAnalysisCharts extends React.Component {
 
                                     {!!groups &&
                                     <DataGroupCharts
-                                        key={view + '_group_charts'}
+                                        chartType={chartType}
+                                        key={view + '_group_charts'} metricTags={metricTags}
                                         groups={groups} view={view} columns={columns}
+                                        latestDataTimestamp={latestDataTimestamp}
+                                        alertMissingData={alertMissingData}
+                                        periodMap={periodMap}
+                                        metricAvg={metricAvg}
                                         onDateWindowChange={this.handleDateWindowSync}
                                         dateWindow={this.state['chartDateWindow']}
                                         />
@@ -469,7 +529,7 @@ class LiveAnalysisCharts extends React.Component {
                     <SettingModal onClose={() => this.setState({ showSettingModal: false })}/>
                     }
                     { this.state.showDebug &&
-                    <SettingDebug timeMockup={timeMockup} freqMockup={freqMockup} dataArray={debugData} onClose={() => this.setState({ showDebug: false })}/>
+                    <SysCallModal timeRanking={timeRanking} freqRanking={freqRanking} dataArray={debugData} onClose={() => this.setState({ showDebug: false })}/>
                     }
                     { this.state.showTenderModal &&
                     <TenderModal dataArray={dataArray} types={types}
@@ -478,7 +538,7 @@ class LiveAnalysisCharts extends React.Component {
                                  onClose={() => this.setState({ showTenderModal: false })}/>
                     }
                     { this.state.showShareModal &&
-                    <ShareModal dataArray={dataArray} types={types} dp={this.dp}
+                    <ShareModal dataArray={dataArray} types={types} dp={this.dp} dataChunkName={dataChunkName} latestDataTimestamp={latestDataTimestamp}
                                 onClose={() => this.setState({ showShareModal: false })}/>
                     }
                     { this.state.showComments &&

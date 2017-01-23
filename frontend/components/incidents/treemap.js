@@ -1,351 +1,454 @@
-import React, {Component, PropTypes as T} from 'react';
-import {autobind} from 'core-decorators';
+import React, { Component, PropTypes as T } from 'react';
+import { autobind } from 'core-decorators';
 import _ from 'lodash';
-import * as d3 from 'd3';
+import d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
 
-// Remove lighten color from RdYlGn11
-const RdYlGn11 = ["#a50026","#d73027","#f46d43","#fdae61","#fee08b",
-  "#d9ef8b","#a6d96a","#66bd63","#1a9850","#006837"].reverse();
+import MetricModal from './metric_modal';
 
 class IncidentsTreeMap extends Component {
+
+  static propTypes = {
+    treeMapScheme: T.oneOf(['anomaly', 'cpu', 'availability']),
+    treeMapCPUThreshold: T.string,
+    treeMapAvailabilityThreshold: T.string,
+  };
+
+  static defaultProps = {
+    treeMapScheme: 'anomaly',
+    treeMapCPUThreshold: '0',
+    treeMapAvailabilityThreshold: '90',
+  };
 
   constructor(props) {
     super(props);
 
     this.$container = null;
-    this.navHeight = 28;
-
-    // D3 treemap layout settings.
-    this.treemap = d3.layout.treemap()
-      .children((d, depth) => depth ? null : d._children)
-      .sort((a, b) => a.name - b.name)
-      .ratio(0.3 * (1 + Math.sqrt(5)))
-      .round(false);
-    this.color = null;
+    this.navHeight = 40;
 
     this.state = {
-      treeMapChange: false,
       faux: null,
-      startTimestamp:undefined,
-      endTimestamp:undefined,
-      treeMapValue:"0",
-      cpuUtilizationByInstance:props.cpuUtilizationByInstance,
-      instanceMetaData:props.instanceMetaData
-    }
+      showMetricModal: false,
+      metricModalProps: {},
+    };
+
+    this.colors = {
+      lightBlue: '#88bbee',
+      blue: '#0066cc',
+      yellow: '#ffcc00',
+      green: '#00cd00',
+      grey: '#808080',
+    };
+
+    // Set D3 treemap layout settings.
+    this.treemap = d3.layout.treemap()
+      .children((d, depth) => depth ? null : d._children)
+      .sort((a, b) => this.sortTile(a, b))
+      .ratio(0.3 * (1 + Math.sqrt(5)))
+      .round(false);
+  }
+
+  sortTile(a, b) {
+    const { instanceMetaData: meta } = this.props;
+    const an = a.name;
+    const bn = b.name;
+
+    const aName = meta[an] && meta[an].tagName ? meta[an].tagName : an;
+    const bName = meta[bn] && meta[bn].tagName ? meta[bn].tagName : bn;
+
+    return bName.localeCompare(aName);
   }
 
   componentDidMount() {
-    if (!_.isEmpty(this.props.data) && this.$container) {
-      const root = _.cloneDeep(this.props.data);
-      this.transformData(root);
-      this.setState({
-        startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp
-      });
-      this.displayData(root);
+    this.displayData(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.displayData(nextProps);
+  }
+
+  @autobind
+  displayData(props) {
+    const data = props.data;
+    if (data && !_.isEmpty(data) && this.$container) {
+      const d = _.cloneDeep(data);
+      this.transformData(d, props);
+      this.setTreemap(d, props);
     }
   }
 
   @autobind
   showMetricChart(d) {
-    let { startTimestamp,endTimestamp } = this.state;
-    let params = {
-      projectName: d['projectName'],
-      metricName: d['name'],
-      instanceName: d['instanceName']
-    };
-    if(startTimestamp && endTimestamp){
-      params['startTimestamp'] = startTimestamp;
-      params['endTimestamp'] = endTimestamp;
+    const { endTime, numberOfDays, instanceGroup, groupIdMap } = this.props;
+    const { startTimestamp, endTimestamp } = this.props.data || {};
+    let avgLabel;
+    const metricAvg = (this.props.instanceStatsJson && this.props.instanceStatsJson[d.instanceName] && this.props.instanceStatsJson[d.instanceName].statsByMetricJson && this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name] && this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name].avg);
+    if (metricAvg != undefined) {
+      avgLabel = ` (${numberOfDays}d avg: ${metricAvg.toPrecision(3)})`;
     }
-    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
+    const params = {
+      projectName: d.projectName,
+      metricName: d.name,
+      groupId: groupIdMap[d.name],
+      instanceName: d.instanceName,
+      eventStartTime: d.eventStartTime,
+      eventEndTime: d.eventEndTime,
+      avgLabel,
+      grouping: instanceGroup,
+      predictedFlag: this.props.predictedFlag,
+    };
+    if (startTimestamp && endTimestamp) {
+      params.startTimestamp = startTimestamp;
+      params.endTimestamp = endTimestamp;
+    }
+
+    this.setState({
+      showMetricModal: true,
+      metricModalProps: params,
+    });
   }
 
   @autobind
-  showInstanceChart(d) {
-    let { startTimestamp,endTimestamp } = this.state;
-    let params = {
-      projectName: d['projectName'],
-      instanceName: d['instanceName']
-    };
-    if(startTimestamp && endTimestamp){
-      params['startTimestamp'] = startTimestamp;
-      params['endTimestamp'] = endTimestamp;
-    }
-    window.open(`/projectDataOnly?${$.param(params)}`, '_blank');
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (!_.isEmpty(nextProps.data) && this.$container) {
-      const root = _.cloneDeep(nextProps.data);
-      this.transformData(root);
-      this.displayData(root);
-      this.setState({
-        startTimestamp:root.startTimestamp,
-        endTimestamp:root.endTimestamp,
-        instanceMetaData:nextProps.instanceMetaData
-      });
-      if(typeof nextProps.treeMapChange == 'boolean'){
-        this.setState({
-          treeMapChange:nextProps.treeMapChange
-        });
-      }
-      if(typeof nextProps.treeMapValue == 'string'){
-        this.setState({
-          treeMapValue:nextProps.treeMapValue
-        });        
-      }
-      if(typeof nextProps.cpuUtilizationByInstance == 'object'){
-        this.setState({
-          cpuUtilizationByInstance:nextProps.cpuUtilizationByInstance
-        });        
-      }
-    }
+  hideMetricModal() {
+    this.setState({
+      showMetricModal: false,
+      metricModalProps: {},
+    });
   }
 
   /**
    * Transform the data into the format used by d3 treemap.
-   * @param root: The root of the data tree.
+   * The value of the node affect the size the rect.
+   * @param data: The root of the data tree.
    */
-  transformData(root) {
+  @autobind
+  transformData(data, props) {
+    const schema = props.treeMapScheme || this.props.treeMapScheme;
+    const stats = props.instanceStatsJson || this.props.instanceStatsJson;
 
-    const sumScore = d => {
+    const sumScore = (d) => {
       let s = 0;
       if (d.children) {
-        s = d3.sum(d.children, c => sumScore(c))
+        s = d3.sum(d.children, c => sumScore(c));
       } else {
         s = d.score;
       }
       d.score = s;
-      return s;
-    };
-    sumScore(root);
-
-    const scale = 1.25;
-    const num = 3;
-    // Accumulate the node value to the count of children.
-    const accumulate = d => {
-      return (d._children = d.children)
-        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
-        return p + accumulate(v);
-      }, 0)
-        : (Math.log10(d.score) > num ? scale : 1) * d.value;
-    };
-    accumulate(root);
-
-    // We get the max score on the root, so we can setup the color.
-    this.color = this.severityToRGBHex;
-    //this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
-  }
-
-  transformDataOld(root) {
-
-    const maxScore = d => {
-      let s = 0;
-      if (d.children) {
-        s = d3.max(d.children, c => maxScore(c))
-      } else {
-        s = d.score;
+      if (d.type === 'instance') {
+        d.avg_cpu = 0;
+        d.avg_avail = 0;
+        if (stats[d.instanceName] && stats[d.instanceName].AvgCPUUtilization) {
+          d.avg_cpu = Math.log10(stats[d.instanceName].AvgCPUUtilization * 100);
+        }
+        if (stats[d.instanceName] && stats[d.instanceName].AvgInstanceUptime) {
+          d.avg_avail = Math.log10(stats[d.instanceName].AvgInstanceUptime * 1000);
+        }
       }
-      d.score = s;
       return s;
     };
-    maxScore(root);
+    sumScore(data);
 
     const scale = 1.25;
     const num = 3;
     // Accumulate the node value to the count of children.
-    const accumulate = d => {
-      return (d._children = d.children)
-        ? d.value = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(function (p, v) {
-        return p + accumulate(v);
-      }, 0)
-        : (Math.log10(d.score) > num ? scale : 1) * d.value;
-    };
-    accumulate(root);
+    const accumulate = (d) => {
+      d._children = d.children;
+      let val = 0;
 
-    // We get the max score on the root, so we can setup the color.
-    this.color = d3.scale.quantize().domain([0, Math.log(root.score || 1) || 1]).range(RdYlGn11);
+      if (d._children) {
+        val = (Math.log10(d.score) > num ? scale : 1) * d.children.reduce(
+            (p, v) => p + accumulate(v), 0);
+      }
+
+      if (d.type === 'instance' && schema === 'cpu') {
+        d.value = d.avg_cpu;
+      } else if (d.type === 'instance' && schema === 'availability') {
+        d.value = d.avg_avail;
+      } else if (d._children) {
+        d.value = val;
+      } else {
+        d.value = (Math.log10(d.score) > num ? scale : 1) * d.value;
+      }
+      return d.value;
+    };
+    accumulate(data);
   }
 
-  chopString(str,n){
-    if(str.length<=n+2){
+  chopString(str, n) {
+    if (str.length <= n + 2) {
       return str;
-    }else{
-      return str.slice(0,n)+'..';
-    }
-  }
-
-  rootToRGBHex(root) {
-    let val = root.score / root.value;
-    return severityToRGBHex(val);
-  }
-
-  severityToRGBHex(d) {
-    let {cpuUtilizationByInstance,treeMapValue} = this.state;
-    let val = d.score;
-    let gcolorMax = 205;
-    var rcolor, gcolor, bcolor = 0;
-    let threshold = parseInt(treeMapValue);
-    if (this.state.treeMapChange) {
-      if(d.type == 'metric' && d.name.toLowerCase().indexOf('cpu') != -1
-        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else if(d.type == 'instance' 
-        && threshold >= cpuUtilizationByInstance[d.name]) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else if(d.type == 'container' 
-        && threshold >= cpuUtilizationByInstance[d.instanceName]) {
-          rcolor = 173;
-          gcolor = 216;
-          bcolor = 230;
-      } else {
-          rcolor = 0;
-          gcolor = gcolorMax;
-          bcolor = 0;
-      }
     } else {
-      if (val <= 1) {
-        if (val < 0)
-          val = 0;
-        if (val > 0)
-          val = 1;
-        rcolor = Math.floor(255 * val);
-        gcolor = gcolorMax;
-      } else {
-        if (val > 10)
-          val = 10;
-        rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
-      }
+      return `${str.slice(0, n)}..`;
     }
-    return "#" + ((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1);
   }
 
   /**
-   * Display the data. Data maybe a child node in the tree.
-   * @param data
+   * Get the fill color of the node, based on severity and type of event.
+   * @param d. The node data.
+   * @param props. The props of the component, might be the nextProps.
+   * @returns {string} Color hex string.
    */
   @autobind
-  displayData(data) {
-    let {instanceMetaData} = this.state;
-    let self = this;
-    this.setState({},()=>{
-      if (!data) return;
+  getNodeFillColor(d, props) {
+    const schema = props.treeMapScheme || this.props.treeMapScheme;
+    const stats = props.instanceStatsJson || this.props.instanceStatsJson;
+    const treeMapCPUThreshold = props.treeMapCPUThreshold
+      || this.props.treeMapCPUThreshold;
+    const treeMapAvailabilityThreshold = props.treeMapAvailabilityThreshold
+      || this.props.treeMapAvailabilityThreshold;
 
-      const navHeight = this.navHeight;
-      const width = this.$container.width();
-      const height = this.$container.height() - navHeight;
+    const cpuThreshold = parseInt(treeMapCPUThreshold);
+    const availabilityThreshold = parseFloat(treeMapAvailabilityThreshold) / 100.0;
 
-      const x = d3.scale.linear().domain([0, width]).range([0, width]);
-      const y = d3.scale.linear().domain([0, height]).range([0, height]);
+    let val = Math.abs(d.score);
 
-      data.x = data.y = 0;
-      data.dx = width;
-      data.dy = height;
-      data.depth = 0;
+    const gcolorMax = 205;
+    let rcolor,
+      gcolor,
+      bcolor = 0;
 
-      const layout = d => {
-        if (d._children) {
-          this.treemap.nodes({ _children: d._children });
-          d._children.forEach(function (c) {
-            c.x = d.x + c.x * d.dx;
-            c.y = d.y + c.y * d.dy;
-            c.dx *= d.dx;
-            c.dy *= d.dy;
-            c.parent = d;
-            layout(c);
-          });
-        }
-      };
-      const rect = r => {
-        r.attr("x", d => x(d.x))
-          .attr("y", d => y(d.y))
-          .attr("width", d => x(d.x + d.dx) - x(d.x))
-          .attr("height", d => y(d.y + d.dy) - y(d.y));
-      };
-      const text = t => {
-      };
-      const name = d => (d.parent ? name(d.parent) + " / " + ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name) : ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name));
-
-      // Set up the new layout for the data
-      layout(data);
-
-      const faux = ReactFauxDOM.createElement('svg');
-      const svg = d3.select(faux)
-        .attr({ width, height: height + navHeight })
-        .append("g")
-        .attr("transform", `translate(0, ${navHeight})`);
-
-      // Display navbar to back to parent node on click
-      const navbar = svg.append("g").attr("class", "navbar");
-      const twidth = 180;
-
-      // Add a link to open instance chart view
-      if ((data.type === 'instance' && data.containers == 0) || data.type === 'container') {
-        navbar.append("rect")
-          .attr({ y: -navHeight, width: width - twidth, height: navHeight, })
-          .datum(data.parent).on('click', this.displayData);
-        navbar.append("rect")
-          .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight })
-          .datum(data).on('click', this.showInstanceChart);
-        navbar.append("text")
-          .attr({x: width - twidth + 20, y: 6 - navHeight, dy: '1em' })
-          .text('All Metric Charts');
-      } else {
-        navbar.append("rect")
-          .attr({ y: -navHeight, width: width, height: navHeight, })
-          .datum(data.parent).on('click', this.displayData);
+    if (schema == 'anomaly') {
+      // New instances
+      if (d.eventType.toLowerCase().indexOf('- new') >= 0) {
+        return this.colors.lightBlue;
       }
 
-      navbar.append("text")
-        .attr({x: 6, y: 6 - navHeight, dy: '1em'})
-        .text(name(data));
+      if (val <= 1) {
+        if (val < 0) {
+          val = 0;
+        }
+        if (val > 0) {
+          val = 1;
+        }
+        rcolor = Math.floor(255 * val);
+        gcolor = gcolorMax;
+      } else {
+        if (val > 10) {
+          val = 10;
+        }
+        rcolor = 255;
+        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      }
+    } else if (schema == 'cpu') {
+      let overAvg = false;
+      if (stats[d.instanceName] && stats[d.instanceName].AvgCPUUtilization) {
+        overAvg = cpuThreshold >= stats[d.instanceName].AvgCPUUtilization;
+      }
+      if (d.type === 'metric') {
+        // For metric, display grey for non-cpu related metrics.
+        if (d.name.toLowerCase().indexOf('cpu') >= 0) {
+          return overAvg ? this.colors.blue : this.colors.green;
+        } else {
+          return this.colors.green;
+        }
+      } else {
+        return overAvg ? this.colors.blue : this.colors.green;
+      }
+    } else if (schema == 'availability') {
+      let overAvg = false;
+      if (stats[d.instanceName] && stats[d.instanceName].AvgInstanceUptime) {
+        overAvg = availabilityThreshold >= stats[d.instanceName].AvgInstanceUptime;
+      }
+      return overAvg ? this.colors.yellow : this.colors.green;
+    }
+    return `#${((1 << 24) + (rcolor << 16) + (gcolor << 8) + bcolor).toString(16).slice(1)}`;
+  }
 
-      const g1 = svg.insert("g", '.navbar').datum(data).attr("class", "depth");
-      const g = g1.selectAll("g").data(data._children).enter().append("g");
+  @autobind
+  handleTileClick(data) {
+    if (data) {
+      this.setTreemap(data, this.props);
+    }
+  }
 
-      g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.displayData);
-      g.selectAll(".child").data(d => d._children || [d])
-        .enter().append('rect')
-        .attr('class', 'child')
-        .call(rect);
+  @autobind
+  showInstanceChart(d) {
+    const { endTime, numberOfDays, instanceGroup } = this.props;
+    const projectName = d.projectName;
+    const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    const projectParam = projectParams.find(p => p.projectName == projectName);
+    const modelType = 'Holistic';
+    const cvalueParam = projectParam ? projectParam.cvalue : '1';
+    const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
+    const params = {
+      projectName,
+      instanceGroup,
+      version: 3,
+      pvalue: pvalueParam,
+      cvalue: cvalueParam,
+      modelType,
+      predictedFlag: this.props.predictedFlag,
+    };
+    if (d.instanceName) {
+      params.instanceName = d.instanceName;
+      params.avgEndTimestamp = +endTime;
+      params.avgNumberOfDays = numberOfDays;
+    }
+    if (d.startTimestamp && d.endTimestamp) {
+      params.startTimestamp = d.startTimestamp;
+      params.endTimestamp = d.endTimestamp;
+    } else if (d.parent && d.parent.startTimestamp && d.parent.endTimestamp) {
+      params.startTimestamp = d.parent.startTimestamp;
+      params.endTimestamp = d.parent.endTimestamp;
+    } else if (d.parent && d.parent.parent
+        && d.parent.parent.startTimestamp && d.parent.parent.endTimestamp) {
+      params.startTimestamp = d.parent.parent.startTimestamp;
+      params.endTimestamp = d.parent.parent.endTimestamp;
+    }
 
-      // this is mouse over popup text, no chopping
-      g.append("rect").attr("class", d => "parent " + d.type)
+    const url = `/liveMonitoring?${$.param(params)}`;
+    window.open(url, '_blank');
+  }
+
+  /**
+   * Set the treemap state based on the data. The data maybe a child node in the tree.
+   * @param data
+   */
+  setTreemap(data, props) {
+    const schema = props.treeMapScheme || this.props.treeMapScheme;
+    const meta = props.instanceMetaData || this.props.instanceMetaData;
+    const stats = props.instanceStatsJson || this.props.instanceStatsJson;
+
+    const navHeight = this.navHeight;
+    const width = this.$container.width();
+    const height = this.$container.height() - navHeight;
+
+    const x = d3.scale.linear().domain([0, width]).range([0, width]);
+    const y = d3.scale.linear().domain([0, height]).range([0, height]);
+
+    data.x = data.y = 0;
+    data.dx = width;
+    data.dy = height;
+    data.depth = 0;
+
+    const layout = (d) => {
+      if (d._children) {
+        this.treemap.nodes({ _children: d._children });
+        d._children.forEach((c) => {
+          c.x = d.x + c.x * d.dx;
+          c.y = d.y + c.y * d.dy;
+          c.dx *= d.dx;
+          c.dy *= d.dy;
+          c.parent = d;
+          layout(c);
+        });
+      }
+    };
+    const rect = (r) => {
+      r.attr('x', d => x(d.x))
+        .attr('y', d => y(d.y))
+        .attr('width', d => x(d.x + d.dx) - x(d.x))
+        .attr('height', d => y(d.y + d.dy) - y(d.y));
+    };
+    const name = d => (d.parent ? `${name(d.parent)
+    } / ${
+    (meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}` : ((meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name));
+
+    // Set up the new layout for the data
+    layout(data);
+
+    const faux = ReactFauxDOM.createElement('svg');
+    const svg = d3.select(faux)
+      .attr({ width, height: height + navHeight })
+      .append('g')
+      .attr('transform', `translate(0, ${navHeight})`);
+
+    // Display navbar to back to parent node on click
+    const navbar = svg.append('g').attr('class', 'navbar');
+    // const twidth = 180;
+    const twidth = 180;
+
+    // Add a link to open instance chart view
+    if (true || (data.type === 'instance' && data.containers === 0) || data.type === 'container') {
+      navbar.append('rect')
+        .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight })
+        .datum(data.parent).on('click', this.handleTileClick);
+      navbar.append('rect')
+        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight, class: 'navbar-button', })
+        .datum(data).on('click', this.showInstanceChart);
+      navbar.append('text')
+        .attr({ x: width - twidth + 20, y: 12 - navHeight, dy: '1em' })
+        .text('Line Charts');
+    } else {
+      navbar.append('rect')
+        .attr({ y: -navHeight, width, height: navHeight })
+        .datum(data.parent).on('click', this.handleTileClick);
+    }
+
+    navbar.append('text')
+      .attr({ x: 12, y: 12 - navHeight, dy: '1em' })
+      .text(name(data));
+
+    const g1 = svg.insert('g', '.navbar').datum(data).attr('class', 'depth');
+    const g = g1.selectAll('g').data(data._children).enter().append('g');
+
+    g.filter(d => !_.isEmpty(d._children)).classed('children', true).on('click', this.handleTileClick);
+    g.selectAll('.child').data(d => d._children || [d])
+      .enter().append('rect')
+      .attr('class', 'child')
+      .call(rect);
+
+    // this is mouse over popup text, no chopping
+    if (schema === 'anomaly') {
+      g.append('rect').attr('class', d => `parent ${d.type}`)
         .call(rect)
-        .append("title").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(instanceMetaData[d.name]['tagName']):d.name)+"\n"+d.eventType);
-      g.selectAll('.parent').attr('fill', d => this.color(d));
-  //    g.selectAll('.parent').attr('fill', d => this.color(Math.log(d.score || 1)));
-      g.append("text").attr("dy", ".75em").text(d => ((instanceMetaData[d.name] && instanceMetaData[d.name]['tagName'])?(this.chopString(instanceMetaData[d.name]['tagName'],8)):d.name)).call( t => {
-        t.attr("x", d => x(d.x) + 6).attr("y", d => y(d.y) + 6);
-      });
-      g.append("text").attr("dy", ".75em").text(d => this.chopString(d.eventType,10)).call( t => {
-        t.attr({x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2)});
-      });
+        .append('title')
+        .text(d => `${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${d.eventType}`);
+    } else if (schema === 'cpu') {
+      g.append('rect').attr('class', d => `parent ${d.type}`)
+        .call(rect)
+        .append('title')
+        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${stats[d.name] ? `Average CPU Utilization: ${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : ''}`) : '');
+    } else if (schema === 'availability') {
+      g.append('rect').attr('class', d => `parent ${d.type}`)
+        .call(rect)
+        .append('title')
+        .text(d => (d.dx > 0 && d.dy > 0) ? (`${(meta[d.name] && meta[d.name].tagName) ? (meta[d.name].tagName) : d.name}${(d.type === 'instance' && d.instanceType) ? (":"+d.instanceType) : ""} \n ${stats[d.name] ? `Average Instance Availability: ${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : ''}`) : '');
+    }
 
-      // Bind event for metric
-      g.selectAll('.metric').on('click', this.showMetricChart);
-
-      this.setState({faux: faux.toReact()});
+    g.selectAll('.parent').attr('fill', d => this.getNodeFillColor(d, props));
+    g.append('text').attr('dy', '.75em').text(
+      d => ((d.dx > 0 && d.dy > 0) ? ((meta[d.name] && meta[d.name].tagName) ?
+        (this.chopString(meta[d.name].tagName, 8)) : d.name) : ''),
+    ).call((t) => {
+      t.attr('x', d => x(d.x) + 6).attr('y', d => y(d.y) + 6);
     });
+    if (schema == 'anomaly') {
+      g.append('text').attr('dy', '.75em').text(d => this.chopString(d.eventType, 10)).call((t) => {
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+      });
+    } else if (schema == 'cpu') {
+      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : '')).call((t) => {
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+      });
+    } else if (schema == 'availability') {
+      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : '')).call((t) => {
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+      });
+    }
+
+    // Bind event for metric
+    g.selectAll('.metric').on('click', this.showMetricChart);
+
+    this.setState({ faux: faux.toReact() });
   }
 
   render() {
+    const { faux, showMetricModal, metricModalProps } = this.state;
     return (
-      <div className="incidents treemap"  style={{ marginTop: 10 }}>
-        <div ref={c => this.$container = $(c)}
-             style={{ padding: 4, height: '100%', width: '100%' }}>
-          {this.state.faux}
-        </div>
+      <div className="incidents treemap" style={{ marginTop: 4 }}>
+        <div
+          ref={(c) => {
+            this.$container = $(c);
+          }}
+          style={{ paddingTop: 10, height: '100%', width: '100%' }}
+        >{faux}</div>
+        { showMetricModal &&
+        <MetricModal {...metricModalProps} onClose={this.hideMetricModal} />
+        }
       </div>
-    )
+    );
   }
 }
 

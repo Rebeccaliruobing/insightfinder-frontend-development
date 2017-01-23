@@ -1,1 +1,1 @@
-module.exports = require('exports?Dygraph!dygraphs/dygraph-combined-dev');
+module.exports = require('dygraphs/dygraph-combined-dev');

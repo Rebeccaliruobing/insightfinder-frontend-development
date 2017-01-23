@@ -3,7 +3,7 @@ import React from 'react';
 import store from 'store';
 
 import {Modal, Dropdown} from '../../../artui/react';
-import {ChartsRefreshInterval, GridColumns, DefaultView} from '../../storeKeys';
+import {ChartsRefreshInterval, GridColumns, DefaultView, ShowSummaryFlag} from '../../storeKeys';
 
 class SettingModal extends React.Component {
 
@@ -12,7 +12,8 @@ class SettingModal extends React.Component {
     this.state = {
       refreshInterval: store.get(ChartsRefreshInterval),
       columns: store.get(GridColumns),
-      defaultView: store.get(DefaultView)
+      defaultView: store.get(DefaultView),
+      showSummaryFlag: store.get(ShowSummaryFlag),
     };
 
     this.columnMap = {
@@ -25,7 +26,7 @@ class SettingModal extends React.Component {
   }
 
   handleSubmit() {
-    let {refreshInterval, columns, defaultView} = this.state;
+    let {refreshInterval, columns, defaultView, showSummaryFlag} = this.state;
     let changed = false;
 
     if (defaultView)  {
@@ -40,6 +41,10 @@ class SettingModal extends React.Component {
       store.set(GridColumns, columns);
       changed = true;
     }
+    if (showSummaryFlag) {
+      store.set(ShowSummaryFlag,showSummaryFlag);
+      changed = true;
+    }
 
     if (changed) {
       window.location.reload();
@@ -47,7 +52,7 @@ class SettingModal extends React.Component {
   }
 
   render() {
-    let {refreshInterval, columns, defaultView} = this.state;
+    let {refreshInterval, columns, defaultView, showSummaryFlag, } = this.state;
     let refreshIntervalText =
       refreshInterval && parseInt(refreshInterval) === 0 ? 'Manually': refreshInterval;
     let columnText = columns ? this.columnMap[columns] : columns;
@@ -56,6 +61,17 @@ class SettingModal extends React.Component {
       <Modal {...this.props} size="mini" closable={false} >
         <div className="content">
           <form className="ui form">
+            <div className="field">
+              <label>Show Summary Chart</label>
+              <Dropdown mode="select" value={showSummaryFlag} text={showSummaryFlag}
+                        onChange={(v, t) => this.setState({showSummaryFlag:v})}>
+                <i className="dropdown icon"/>
+                <div className="menu">
+                  <div className="item">yes</div>
+                  <div className="item">no</div>
+                </div>
+              </Dropdown>
+            </div>
             <div className="field">
               <label>Refresh Interval (minutes)</label>
               <Dropdown mode="select" value={refreshInterval} text={refreshIntervalText}

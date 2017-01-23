@@ -23,6 +23,7 @@ class ShareModal extends React.Component {
       ownerOnly: false,
       sharedUsernames: '',
       showOther: false,
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       other: 'Unknown'
     };
 
@@ -33,10 +34,10 @@ class ShareModal extends React.Component {
     
     let {name, description, system, showOther, other ,...rest} = this.state;
     let data = Object.assign({}, this.context.location.query, rest);
-    let {dp} = this.props;
+    let {dp, latestDataTimestamp, dataChunkName} = this.props;
     let startTimestamp = (data['startTime'])?data['startTime']:dp.startTimestamp;
-    let endTimestamp = (data['endTime'])?data['endTime']:dp.startTimestamp;
-    
+    let endTimestamp = (data['endTime'])?data['endTime']:dp.endTimestamp;
+
     // Change the datetime format to epoch
     data['startTime'] = new Date(startTimestamp).getTime();
     data['endTime'] = new Date(endTimestamp).getTime();
@@ -46,12 +47,13 @@ class ShareModal extends React.Component {
     data['metaData'] = JSON.stringify({
       name: name,
       desc: description,
-      system: system == 'Other' ? other : system
+      system: system == 'Others' ? other : system
     });
     
     data['gmpairs'] = dp ? JSON.stringify(dp.gmpairs) : null;
     data['rawData'] = dp ? dp.data.data : null;
-
+    data['latestDataTimestamp'] = latestDataTimestamp;
+    data['dataChunkName'] = dataChunkName;
     apis.postDashboardUserValues('publishdata', data);
   }
 
@@ -62,12 +64,12 @@ class ShareModal extends React.Component {
   handleSystemChange(v) {
     this.setState({
       system: v,
-      showOther: v == 'Other'
+      showOther: v == 'Others'
     });
   }
 
   render() {
-    let {showOther} = this.state;
+    let {showOther,systemNames} = this.state;
     let disabled = !this.state.name || !this.state.description || !this.state.system;
 
     return (
@@ -92,9 +94,12 @@ class ShareModal extends React.Component {
               <Dropdown mode="select" value={this.state.system} onChange={this.handleSystemChange.bind(this)}>
                 <i className="dropdown icon"/>
                 <div className="menu">
-                  <div className="item" data-value="Cassandra">Cassandra</div>
-                  <div className="item" data-value="Hadoop">Hadoop</div>
-                  <div className="item" data-value="Other">Other</div>
+                  { systemNames.map((system, index)=> {
+                    return(
+                      <div className="item" data-value={system}>{system}</div>
+                    )})
+                  }
+                  <div className="item" data-value="Others">Others</div>
                 </div>
               </Dropdown>
             {showOther &&

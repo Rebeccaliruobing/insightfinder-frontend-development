@@ -88,8 +88,8 @@ const HotMapCharts = React.createClass({
                     anomalyData = anomaly ? anomaly : 0.000001;
                     anomalyData > maxMap ? maxMap = anomalyData : null;
                 }
-                anomalyData = anomalyData.toFixed(2);
-                showData.push([i, j, anomalyData]);
+                anomalyData = Math.round(anomalyData*100)/100;
+                showData.push([i, j, anomalyData.toString()]);
             }
         }
         var data = showData;

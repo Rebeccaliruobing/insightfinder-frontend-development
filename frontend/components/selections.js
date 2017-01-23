@@ -32,6 +32,35 @@ class ProjectSelection extends React.Component {
   }
 }
 
+class GroupSelection extends React.Component {
+
+  static contextTypes = {
+    dashboardUservalues: React.PropTypes.object
+  };
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    let s = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu"> 
+          {
+            groups.map((p) => {
+              return <div className="item" key={p.groupName}
+                          data-value={p.groupName}>{p.groupName}</div>
+            })
+          }
+        </div>
+      </Dropdown>
+    );
+  }
+}
+
 // include only and File Replay
 class LogFileReplayProjectSelection extends React.Component {
 
@@ -77,7 +106,7 @@ class InstanceProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => (!(item.isStationary)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
+    projects = projects.filter((item,index) => ((item.fileProjectType!=0)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
     return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -108,7 +137,7 @@ class LiveProjectSelection extends React.Component {
   render() {
 
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => !(item.isStationary));
+    projects = projects.filter((item,index) => item.fileProjectType!=0);
     var projectNameList = [];
     return (
       <Dropdown mode="select" {...this.props}>
@@ -183,9 +212,31 @@ class OperationOptionsSelect extends React.Component {
   }
 }
 
-class TreemapOptionsSelect extends React.Component {
+class TreeMapCPUThresholdSelect extends React.Component {
   render(){
     let selectOption = [0, 1, 5, 10];
+      return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+          <div className="menu">
+            {
+              selectOption.map(function (value,index) {
+                return (
+                    <div className="item" key={index} data-value={value}>
+                      {'<='+value+'%'}
+                    </div>
+                )
+              })
+            }
+          </div>
+      </Dropdown>
+    );
+  }
+}
+
+class TreeMapAvailabilityThresholdSelect extends React.Component {
+  render(){
+    let selectOption = [90, 80, 50, 25];
       return (
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
@@ -214,7 +265,7 @@ class LogModelType extends React.Component{
       <Dropdown mode="select" {...this.props}>
         <i className="dropdown icon"/>
         <div className="menu">
-          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="holisticLog">Holistic</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
         </div>
       </Dropdown>
@@ -222,6 +273,7 @@ class LogModelType extends React.Component{
   }
 };
 
+// <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
 class ModelType extends React.Component{
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
@@ -232,7 +284,45 @@ class ModelType extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
-          <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
+          <div className="item" data-value="Split">Split</div>
+          <div className="item" data-value="Hybrid">Hybrid</div>
+          <div className="item" data-value="DBScan">Clustering (DBScan)</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
+// <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
+class BenchmarkModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">IF Anomaly Detection</div>
+          <div className="item" data-value="DBScan">Clustering (DBScan)</div>
+        </div>
+      </Dropdown>
+    );
+  }
+};
+
+class FileModelType extends React.Component{
+  componentDidMount() {
+    if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
+  }
+  render() {
+    return (
+      <Dropdown mode="select" {...this.props}>
+        <i className="dropdown icon"/>
+        <div className="menu">
+          <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="SplitByGroup">SplitByGroup</div>
+          <div className="item" data-value="SplitByService">SplitByService</div>
           <div className="item" data-value="Split">Split</div>
           <div className="item" data-value="Hybrid">Hybrid</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
@@ -252,6 +342,8 @@ class ModelTypeSimple extends React.Component{
         <i className="dropdown icon"/>
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
+          <div className="item" data-value="SplitByGroup">SplitByGroup</div>
+          <div className="item" data-value="SplitByService">SplitByService</div>
           <div className="item" data-value="Split">Split</div>
         </div>
       </Dropdown>
@@ -275,6 +367,36 @@ class EventSummaryModelType extends React.Component{
       </Dropdown>
     );
   }
+};
+
+const  RareEventSensitivity = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" data-value="1">Low</div>
+        <div className="item" data-value="2">Medium Low</div>
+        <div className="item" data-value="3">Medium</div>
+        <div className="item" data-value="4">Medium High</div>
+        <div className="item" data-value="5">High</div>
+      </div>
+    </Dropdown>
+  );
+};
+
+const  AnomalyThresholdSensitivity = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" data-value="0.99">Low</div>
+        <div className="item" data-value="0.97">Medium Low</div>
+        <div className="item" data-value="0.95">Medium</div>
+        <div className="item" data-value="0.9">Medium High</div>
+        <div className="item" data-value="0.5">High</div>
+      </div>
+    </Dropdown>
+  );
 };
 
 const  AnomalyThreshold = (props) => {
@@ -364,7 +486,7 @@ const IncidentActionTaken = (props) => {
     <Dropdown mode="select" {...props}>
       <i className="dropdown icon"/>
       <div className="menu">
-        <div className="item" selected>ignore</div>
+        <div className="item">ignore</div>
         <div className="item">scale-up</div>
         <div className="item">reboot</div>
         <div className="item">migration</div>
@@ -382,28 +504,137 @@ const NumberOfDays = (props) => {
         <div className="item">3</div>
         <div className="item">7</div>
         <div className="item">14</div>
+        <div className="item">30</div>
+        <div className="item">60</div>
+        <div className="item">90</div>
       </div>
     </Dropdown>
   )
 };
 
+const TreeMapSchemeSelect = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item" data-value='anomaly'>Anomaly</div>
+        <div className="item" data-value='cpu'>CPU Utilization</div>
+        <div className="item" data-value='availability'>Availability</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const PredictionWindowHour = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">4</div>
+        <div className="item">12</div>
+        <div className="item">24</div>
+        <div className="item">48</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const ForecastIntervalHour = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">3</div>
+        <div className="item">6</div>
+        <div className="item">12</div>
+        <div className="item">24</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const EnvironmentSelect = (props) => {
+  return (
+    <Dropdown mode="select" {...props}>
+      <i className="dropdown icon"/>
+      <div className="menu">
+        <div className="item">prod</div>
+        <div className="item">staging</div>
+        <div className="item">dev</div>
+      </div>
+    </Dropdown>
+  )
+};
+
+const GroupingCriteriaSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item">Service Name</div>
+      <div className="item">Security Group</div>
+      <div className="item">Environment</div>
+      <div className="item">Business Unit</div>
+      <div className="item">Location</div>
+    </div>
+  </Dropdown>
+);
+
+const GroupingMatchOpSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item" data-value="contains">contains</div>
+      <div className="item" data-value="startwith">start with</div>
+      <div className="item" data-value="equal">=</div>
+      <div className="item" data-value="ge">&gt;=</div>
+      <div className="item" data-value="gt">&gt;</div>
+      <div className="item" data-value="le">&lt;=</div>
+      <div className="item" data-value="lt">&lt;</div>
+      <div className="item" data-value="regex">regex</div>
+    </div>
+  </Dropdown>
+);
+
+const GroupingSeperateModelSelection = props => (
+  <Dropdown mode="select" {...props}>
+    <i className="dropdown icon" />
+    <div className="menu">
+      <div className="item">yes</div>
+      <div className="item">no</div>
+    </div>
+  </Dropdown>
+);
+
 export {
   ProjectSelection,
+  GroupSelection,
   LiveProjectSelection,
   OperationOptionsSelect,
   ModelNameSelection,
   InstanceProjectSelection,
   LogFileReplayProjectSelection,
   ModelType,
+  BenchmarkModelType,
+  FileModelType,
   LogModelType,
   ModelTypeSimple,
   EventSummaryModelType,
   AnomalyThreshold,
+  AnomalyThresholdSensitivity,
+  RareEventSensitivity,
   DurationThreshold,
   WindowWithWeek,
   DurationHour,
   IncidentDurationMinute,
   IncidentActionTaken,
   NumberOfDays,
-  TreemapOptionsSelect
+  TreeMapCPUThresholdSelect,
+  TreeMapAvailabilityThresholdSelect,
+  TreeMapSchemeSelect,
+  ForecastIntervalHour,
+  PredictionWindowHour,
+  EnvironmentSelect,
+  GroupingCriteriaSelection,
+  GroupingMatchOpSelection,
+  GroupingSeperateModelSelection,
 };

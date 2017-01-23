@@ -29,13 +29,39 @@ const ProjectDetails = class extends React.Component {
   updateData() {
 
     let {query} = this.props.location;
-    let {pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime} = query;
+    let {pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,latestDataTimestamp} = query;
+    let startTimestamp = undefined;
+    let endTimestamp = undefined;
+    if(dataChunkName && dataChunkName.split('_').length>4){
+      let parts = dataChunkName.split('_');
+      startTimestamp = +moment(parts[3]);
+      endTimestamp = +moment(parts[4]);
+    }
 
     this.setState({loading: true}, ()=> {
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime).then((resp)=> {
+      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp)
+      .then((resp)=> {
         resp.loading = false;
-        this.setState(resp);
-      }).catch((err)=> {
+        this.setState(resp, ()=>{
+          // fetch syscall results
+          if(projectName && startTimestamp && endTimestamp){
+            let projectName0 = projectName + "@" + fromUser;
+            apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then((resp2)=> {
+              if (resp2.success) {
+                this.setState({
+                  debugData: resp2.data.syscallResults,
+                  timeRanking: resp2.data.freqFunctionList,
+                  freqRanking: resp2.data.timeFunctionList,
+                  showSysCall: true
+                });
+              } else {
+                console.log(resp2.message+", start:"+startTimestamp+",end:"+endTimestamp);
+              }
+            });
+          }
+        });
+      })
+      .catch((err)=> {
         this.setState({loading: false});
       });
     });
@@ -43,9 +69,9 @@ const ProjectDetails = class extends React.Component {
   }
 
   render() {
+    let {data, loading,debugData,timeRanking,freqRanking} = this.state;
     let {query} = this.props.location;
-    let {projectName, modelName, pvalue, cvalue, modelType} = query;
-    let {data, loading} = this.state;
+    let {projectName, modelName, pvalue, cvalue, modelType, bugId} = query;
     if (projectName === '') {
       projectName = modelName;
     }
@@ -55,19 +81,11 @@ const ProjectDetails = class extends React.Component {
       <Console.Topbar logo={require('../../images/logo.png')}>
         <div className="topbar-text">
           <div className="title">
-            Please view anomaly detection result for project <b>{projectName}</b><br/>
-            with model type <b>{modelType}</b>, anomaly threshold <b>{pvalue}</b>, duration threshold: <b>{cvalue}</b>. 
-          </div>
-          <div className="legend">
-            <div>Anomaly color map:</div>
-            <div className="colormap2">
-              <div style={{float:'left'}}>Normal</div>
-              <div style={{float:'right'}}>Abnormal</div>
-            </div>
+            Please view incident name / bug ID: <b>{bugId}</b><br/>
           </div>
         </div>
       </Console.Topbar>
-      <LiveAnalysisCharts projectName={projectName} data={data} loading={loading}/>
+      <LiveAnalysisCharts projectName={projectName} data={data} debugData={debugData} timeRanking={timeRanking} freqRanking={freqRanking} bugId={bugId} loading={loading}/>
     </Console>
     );
   }

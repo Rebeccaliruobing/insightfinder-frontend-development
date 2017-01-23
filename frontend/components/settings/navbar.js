@@ -1,20 +1,20 @@
 import React from 'react';
-import {Console, Accordion, Link, IndexLink} from '../../artui/react';
+import { Console, Link } from '../../artui/react';
 
-export default function (props) {
+export default function () {
   return (
     <Console.Navbar>
       <div className="ui vertical menu text icon-menu">
         <Link to="/settings/project-list" className="item">
-          <i className="edit icon"></i> <span> Register Project</span>
+          <i className="list icon" /><span>Add/Remove Project</span>
         </Link>
-        <Link to="/settings/threshold" className="item">
-          <i className="icon iconfont icon-threshold "></i> <span>Project Settings</span>
+        <Link to="/settings/project" className="item">
+          <i className="icon iconfont icon-threshold" /><span>Project Settings</span>
         </Link>
         <Link to="/settings/extsvc" className="item">
-          <i className="icon iconfont icon-puzzlepiece1 "></i> <span>External Service</span>
+          <i className="icon iconfont icon-puzzlepiece1 " /> <span>External Service</span>
         </Link>
       </div>
     </Console.Navbar>
-  )
+  );
 }

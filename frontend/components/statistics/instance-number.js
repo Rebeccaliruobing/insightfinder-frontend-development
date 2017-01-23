@@ -1,8 +1,11 @@
 import React, {PropTypes as T} from 'react';
 import _ from 'lodash';
 
-const InstanceNumber = ({total, containerTotal, duration='1d' }) => {
-
+const InstanceNumber = ({total, containerTotal, duration='1d', width='two' }) => {
+  let className = "ui statistic "+width+" wide column";
+  if(width=='equal'){
+    className = "ui statistic column";
+  }
   const instanceText = _.isFinite(total) ? total.toString() : '-';
   const containerText = _.isFinite(containerTotal) ? containerTotal.toString() : '0';
   const hasContainer = _.isFinite(containerTotal) && containerTotal > 0;
@@ -11,7 +14,7 @@ const InstanceNumber = ({total, containerTotal, duration='1d' }) => {
   const label = hasContainer ? 'Container / Instance' : 'Instance';
 
   return (
-    <div className='ui statistic two wide column'>
+    <div className={className}>
       <div>
         <span className="title">{`Num of Instances`}</span>
         <span className="meta">{duration}</span>

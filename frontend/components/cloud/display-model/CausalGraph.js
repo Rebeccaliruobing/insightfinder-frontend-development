@@ -1,6 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import moment from 'moment'
 import {autobind} from 'core-decorators';
+import {Dropdown} from '../../../artui/react/index';
 
 class Point {
     inLines = [];
@@ -69,12 +71,15 @@ export default class CausalGraph extends React.Component {
                 });
             }
         });
+        this.points = [];
+        this.lines = [];
         this.state = {
             dataArray: newDataArray,
             types: Array.from(newTypesSet),
             startTimestamp:startTimestamp,
             endTimestamp:endTimestamp,
             svgWidthUpdate: 900,
+            threshold: '3',
             svg: {
                 width: 900,
                 height: 600,
@@ -82,8 +87,6 @@ export default class CausalGraph extends React.Component {
                     border: '1px solid #e0e0e0'
                 }
             },
-            points: [],
-            lines: [],
             selectRange: {},
             zoomRange: {
                 x1: 0, y1: 0,
@@ -93,13 +96,14 @@ export default class CausalGraph extends React.Component {
         }
     }
 
-    componentDidMount() {
-        let { dataArray, startTimestamp, endTimestamp, types } = this.state;
-        let state = this.state;
-        let { svg } = state;
-        state.points = [];
-        state.lines = [];
-        let self = this;
+    componentDidMount() {}
+
+    @autobind
+    calculateGraph() {
+        const { svg, dataArray, types } = this.state;
+        const threshold = parseInt(this.state.threshold);
+        const points = [];
+        const lines = [];
 
         let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
         let stageHeight = svg.height / Math.max(types.length, 1);
@@ -107,51 +111,56 @@ export default class CausalGraph extends React.Component {
         let modelWidth = 0;
         dataArray.forEach(([x, ...records], i) => {
             lastPoints[i] = [];
-            let recordTime = (new Date(x.split(',')[0])).getTime();
-                modelWidth += stageWidth;
-                records.map((text)=> {
-                    //var pos = text.indexOf('.');
-                    //var type = text.slice(pos + 1).split('(')[0];
-                    var pos = text.indexOf('[');
-                    var type = text.slice(pos + 1).split(']')[0];
-                    var x = stageWidth * i + stageWidth / 2;
-                    var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
+            const recordTime = moment((new Date(x.split(',')[0])).getTime());
+            const timeTag = recordTime.format('MM-DD hh:mm');
+            modelWidth += stageWidth;
+            records.map((text)=> {
+                //var pos = text.indexOf('.');
+                //var type = text.slice(pos + 1).split('(')[0];
+                var pos = text.indexOf('[');
+                var type = text.slice(pos + 1).split(']')[0];
+                var x = stageWidth * i + stageWidth / 2;
+                var y = stageHeight * types.indexOf(type) + stageHeight * 0.5;
 
-                    var point = new Point(x, y);
-                    // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
-                    let pos1 = text.indexOf(']');
-                    point.title = text.substring(0,pos1)+']';
-                    point.color = text.substring(pos1+1,text.length);
-                    // let pos1 = text.indexOf(".");
-                    // let pos2 = text.indexOf("[");
-                    // let pos3 = text.indexOf("(");
-                    // let pos4 = text.indexOf("(",pos3+1);
-                    // let metric = text.substring(pos1+1,pos2-1).trim();
-                    // let value = text.substring(pos3+1,pos4-2).trim();
-                    // point.title = "Metric:"+metric+", value:"+value;
+                var point = new Point(x, y);
+                // 1.NetworkPacketsIn [i-17951452](3810.0)(27869.994140625)
+                let pos1 = text.indexOf(']');
+                point.title = timeTag + ": " + text.substring(0,pos1)+']';
+                point.color = text.substring(pos1+1,text.length);
+                point.recordTime = recordTime;
+                // let pos1 = text.indexOf(".");
+                // let pos2 = text.indexOf("[");
+                // let pos3 = text.indexOf("(");
+                // let pos4 = text.indexOf("(",pos3+1);
+                // let metric = text.substring(pos1+1,pos2-1).trim();
+                // let value = text.substring(pos3+1,pos4-2).trim();
+                // point.title = "Metric:"+metric+", value:"+value;
 
-                    lastPoints[i].push(point);
-                    state.points.push(point);
-                    lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
-                        state.lines.push(new Line(p1, point))
-                    });
-                    return point;
+                lastPoints[i].push(point);
+                points.push(point);
+                lastPoints[i - 1] && lastPoints[i - 1].forEach((p1)=> {
+                    if (point.recordTime.diff(p1.recordTime, 'hours') < threshold) {
+                        lines.push(new Line(p1, point));
+                    }
                 });
+                return point;
+            });
         });
-        this.setState(state);
+        this.points = points;
+        this.lines = lines;
     }
 
     highLightPoint(point) {
         let $component = $(point.component);
-        $component.attr({ r: 8 }).css({
+        $component.css({
             strokeWidth: 1,
-            stroke: 'rgb(255, 127, 14)',
+            stroke: '#000000',
             cursor: 'pointer'
         });
 
         $(this.$showText).text(point.title).attr({
-            x: point.component.getAttribute('cx') + 10,
-            y: point.component.getAttribute('cy')
+            x: point.x + 15,
+            y: point.y + 10
         });
 
         point.outLines.forEach((line)=>this.highLightLine(line, 'blue'));
@@ -171,52 +180,150 @@ export default class CausalGraph extends React.Component {
         point.inLines.forEach((line)=>this.unHighLightLine(line));
     }
 
+    getZoomedX(x) {
+        const zoomRange = this.state.zoomRange;
+        return (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
+    }
+    getZoomedY(y) {
+        const zoomRange = this.state.zoomRange;
+        return (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
+    }
+
+    @autobind
     highLightLine(line, color) {
+        const $line = $(line.component);
+        const $cross = $(line.crossLine);
+
         let hex = ({ green: '#33ff66', blue: '#3366ff' })[color];
-        $(line.component).attr({ 'marker-end': `url(#arrow-${color})` }).css({
-            strokeWidth: 2,
-            stroke: hex,
-            cursor: 'pointer'
-        });
+        if($line && $cross) {
+            $line.attr({ 'marker-end': `url(#arrow-${color})` }).css({
+                strokeWidth: 1.4,
+                stroke: hex,
+                cursor: 'pointer'
+            });
+            if ( color === 'blue') {
+                $cross.attr({ 'visibility': 'visible'});
+            }
+        }
     }
 
+    @autobind
     unHighLightLine(line) {
-        $(line.component).attr({ 'marker-end': `url(#arrow)` }).css({
-            strokeWidth: 1,
-            stroke: "#999",
-            cursor: 'pointer'
-        });
+        const $line = $(line.component);
+        const $cross = $(line.crossLine);
+        if($line && $cross) {
+            $line.attr({ 'marker-end': `url(#arrow)` }).css({
+                strokeWidth: 1,
+                stroke: "#999",
+                cursor: 'pointer'
+            });
+            $cross.attr({ 'visibility': 'hidden'});
+        }
     }
 
-    renderPoint(point, index) {
-        let isHover = false;
+    @autobind
+    handleLineClick(line) {
+        $(line.component).remove();
+        $(line.crossLine).remove();
+        $(line.lineRect).remove();
+    }
 
+    getEventShapeType(text) {
+        text = text.toLowerCase();
+        if (text.indexOf('- network') >= 0)
+            return 'rect-x';
+        else if(text.indexOf('- disk') >=0 ){
+            return 'rect-y';
+        }
+        else if(text.indexOf('- workload increase') >= 0)
+            return 'up';
+        else if(text.indexOf('- instance down') >= 0)
+            return 'down';
+        else if(text.indexOf('- high cpu') >=0)
+            return 'diamond'
+        return 'circle';
+    }
+    renderPoint(point, index) {
         let { x, y } = point;
         let zoomRange = this.state.zoomRange;
+        const shape = this.getEventShapeType(point.title.toLowerCase());
 
         x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
         y = (y - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
 
-        return (
-            <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={(isHover ? 8 : 5)}
-                    cx={x} cy={y} fill={point.color}
-                    style={{ strokeWidth: 1, stroke: isHover ? point.color : '#fff', cursor: 'pointer' }}
+        if (shape === 'circle') {
+            return (
+              <circle ref={(c)=>point.component = c} key={point.id + index} className="node" r={5}
+                      cx={x} cy={y} fill={point.color}
+                      style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                      onMouseEnter={()=>this.highLightPoint(point)}
+                      onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </circle>
+            )
+        } else if (shape === 'rect-x') {
+            return (
+              <rect ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    x={x-5} y={y-3} width={10} height={6} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
                     onMouseEnter={()=>this.highLightPoint(point)}
                     onMouseLeave={()=>this.unHighLightPoint(point)}>
-                <title>{point.title}</title>
-            </circle>
-        );
+                  <title>{point.title}</title>
+              </rect>
+            )
+        } else if (shape === 'rect-y') {
+            return (
+              <rect ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    x={x-3} y={y-5} width={6} height={10} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                    onMouseEnter={()=>this.highLightPoint(point)}
+                    onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </rect>
+            )
+        } else if (shape === 'up'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                    points={`${x},${y-7} ${x-5},${y+4} ${x+5},${y+4}`} fill={point.color}
+                    style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                    onMouseEnter={()=>this.highLightPoint(point)}
+                    onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        } else if (shape === 'down'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                       points={`${x-5},${y-4} ${x+5},${y-4} ${x},${y+7}`} fill={point.color}
+                       style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                       onMouseEnter={()=>this.highLightPoint(point)}
+                       onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        } else if (shape === 'diamond'){
+            return (
+              <polygon ref={(c)=>point.component = c} key={point.id + index} className="node"
+                       points={`${x},${y-6} ${x+6},${y} ${x},${y+6} ${x-6},${y}`} fill={point.color}
+                       style={{ strokeWidth: 1, stroke: '#fff', cursor: 'pointer' }}
+                       onMouseEnter={()=>this.highLightPoint(point)}
+                       onMouseLeave={()=>this.unHighLightPoint(point)}>
+                  <title>{point.title}</title>
+              </polygon>
+            )
+        }
     }
 
     renderLine(line, index) {
-        let zoomRange = this.state.zoomRange;
         let { x: x1, y: y1 } = line.fromPoint;
         let { x: x2, y: y2 } = line.toPoint;
 
-        x1 = (x1 - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
-        x2 = (x2 - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
-        y1 = (y1 - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
-        y2 = (y2 - Math.min(zoomRange.y1, zoomRange.y2)) * zoomRange.zoomY;
+        x1 = this.getZoomedX(x1);
+        x2 = this.getZoomedX(x2);
+        y1 = this.getZoomedY(y1);
+        y2 = this.getZoomedY(y2);
+        const cx = (x2 - x1) / 2 + x1;
+        const cy = (y2 - y1) / 2 + y1;
 
         let style = {
             strokeWidth: 1,
@@ -227,9 +334,19 @@ export default class CausalGraph extends React.Component {
             <g key={line.id + index}>
                 <line ref={(c)=>line.component = c}
                       x1={x1} y1={y1} x2={x2} y2={y2} style={style}
+                      markerEnd={`url(#arrow)`}/>
+                <path ref={(c) => line.crossLine = c}
+                      stroke="red" strokeWidth={2}
+                      visibility='hidden'
+                      d={`M ${cx-5} ${cy-5} L ${cx+5} ${cy+5} M ${cx+5} ${cy-5} L ${cx-5} ${cy+5} Z`}
+                />
+                <path ref={(c) => line.lineRect= c}
+                      d={`M ${x1-4} ${y1} L ${x1+4} ${y1} L ${x2+4} ${y2} L ${x2-4} ${y2} Z`}
+                      style={{ strokeWidth: 8, stroke: 'transparent', fill:'transparent', cursor: 'pointer' }}
                       onMouseEnter={()=>this.highLightLine(line, 'blue')}
                       onMouseLeave={()=>this.unHighLightLine(line)}
-                      markerEnd={`url(#arrow)`}/>
+                      onClick={() => this.handleLineClick(line)}
+                />
             </g>
         )
     }
@@ -238,33 +355,6 @@ export default class CausalGraph extends React.Component {
         let ret = [];
         ret.push(text);
         return ret;
-        //return text.split(' ');
-        /*
-        if (text.length > maxLength && text.split(" ").length > 0) {
-            var s = '';
-            var list = text.split(" ");
-
-            if (list[0].length > maxLength) {
-                return [list.splice(0, 1), this.getWrapText(list)]
-            }
-
-
-            s = `${s} ${list.shift()}`;
-            while (s.length <= maxLength) {
-                s = `${s} ${list.shift()}`;
-            }
-
-            var currentList = s.split(" ");
-            list.unshift(currentList.pop());
-
-            // FIXME: What'is logical of this code!!!!
-            return [currentList.join(" ")];
-            // return [currentList.join(" ")].concat(this.getWrapText(list.join(" "), maxLength));
-
-        } else {
-            return [text]
-        }
-        */
     }
 
     handleMouseDown(e) {
@@ -316,13 +406,32 @@ export default class CausalGraph extends React.Component {
     }
 
     render() {
-        let { dataArray, types, startTimestamp, endTimestamp } = this.state;
-        let { svg, points, lines, selectRange, zoomRange } = this.state;
+        let { dataArray, types, threshold, startTimestamp, endTimestamp } = this.state;
+        let { svg, selectRange, zoomRange } = this.state;
         let stageHeight = svg.height / Math.max(types.length, 1);
         let stageWidth = (svg.width - 250) / Math.max(dataArray.length, 1);
+
+        this.calculateGraph();
         return (
             <div>
-                <span className="ui button mini green" onClick={this.reset}>Reset</span><br/>
+                <div style={{paddingBottom:8, marginBottom:8, borderBottom: '1px solid #ddd'}}>
+                    <span
+                      style={{display: 'inline-block', paddingRight: '1em', fontSize:12, fontWeight: 'bold'}}
+                    >Time Thresholds for Causal Relationships (hour):</span>
+                    <Dropdown mode="select" className="mini" value={threshold}
+                              onChange={(v, t) => this.setState({threshold: t})}>
+                        <i className="dropdown icon"/>
+                        <div className="menu">
+                            <div className="item">0.5</div>
+                            <div className="item">1</div>
+                            <div className="item">1.5</div>
+                            <div className="item">3</div>
+                            <div className="item">6</div>
+                        </div>
+                    </Dropdown>
+                    <span style={{float:'right'}}
+                          className="ui button mini green" onClick={this.reset}>Reset</span>
+                </div>
                 <div className="relative" style={{ display: 'flex' }}>
                     <svg {...{ width: 250, height: 600, }}>
                         {types.map((type, index)=> {
@@ -368,10 +477,10 @@ export default class CausalGraph extends React.Component {
                                          style={{ strokeWidth: 1, stroke: '#f1f1f1' }}/>
 
                         })}
-                        {lines.map(this.renderLine.bind(this))}
-                        {points.map(this.renderPoint.bind(this))}
+                        {this.lines.map(this.renderLine.bind(this))}
+                        {this.points.map(this.renderPoint.bind(this))}
 
-                        <text ref={(c)=>this.$showText = c}></text>
+                        <text ref={(c)=>this.$showText = c} />
                         <rect ref={(c)=>this.$selectReact = ReactDOM.findDOMNode(c)}
                               x={Math.min(selectRange.x1, selectRange.x2) || 0}
                               y={Math.min(selectRange.y1, selectRange.y2) || 0}
@@ -396,12 +505,16 @@ export default class CausalGraph extends React.Component {
                             var x = stageWidth * i + stageWidth / 2;
                             x = (x - Math.min(zoomRange.x1, zoomRange.x2)) * zoomRange.zoomX;
 
-                            let recordTime = (new Date(record.split(',')[0])).getTime();
-                            return <text className="no-select" key={'x-text' + i} x={x - 16}
-                                         y={svg.height - stageHeight / 4}>{record.substr(11, 5)}</text>
-
+                            const recordTime = moment(record.split(',')[0]);
+                            return [
+                            <text className="no-select" 
+                                key={'x-date' + i} x={x - 16} 
+                                y={svg.height - stageHeight / 4}>{recordTime.format('MMM DD')}</text>,
+                            <text className="no-select" 
+                                key={'x-time' + i} x={x - 9} 
+                                y={svg.height - stageHeight / 4 + 16}>{recordTime.format('HH:mm')}</text>,
+                            ]
                         })}
-
                     </svg>
                 </div>
             </div>

@@ -16,17 +16,20 @@
 //                'https://insightfinderui.appspot.com/api/v1/'; // Test
 //                'https://insightfindergae.appspot.com/api/v1'; // Stage
 //                'https://app.insightfinder.com/api/v1/'; // Prod
-                'https://insightfinderstaging.appspot.com/api/v1/'; // staging
+//                'https://insightfinderstaging.appspot.com/api/v1/'; // staging
 //                'https://insightfindertesting.appspot.com/api/v1/'; // staging
+                'http://localhost:8888/api/v1/'; // Local
         window.BASE_URL =
 //                'https://insightfinderui.appspot.com'; // Test
 //                'https://insightfindergae.appspot.com'; // Stage
 //                'https://app.insightfinder.com'; // Prod
-                'https://insightfinderstaging.appspot.com'; // staging
+//                'https://insightfinderstaging.appspot.com'; // staging
+                'http://localhost:8888'; // staging
 //                'https://insightfindertesting.appspot.com'; // staging
     </script>
 </head>
 <body>
+<div id="app"></div>
 <script src="<%= htmlWebpackPlugin.files.chunks.commons.entry %>" charset="utf-8"></script>
 <script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>" charset="utf-8"></script>
 </body>

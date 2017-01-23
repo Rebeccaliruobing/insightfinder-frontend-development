@@ -6,6 +6,7 @@ import {
     LiveProjectSelection,
     ModelNameSelection,
     ModelType,
+    FileModelType,
     DurationThreshold,
     AnomalyThreshold
 } from '../../selections';
@@ -86,6 +87,9 @@ export default class FileDetection extends Component {
             case 'GCE':
                 update.projectType = `${dataType}/CloudMonitoring`;
                 break;
+            case 'Log':
+                update.projectType = `Log`;
+                break;
             default:
                 update.projectType = `${cloudType}/Agent`;
         }
@@ -97,11 +101,15 @@ export default class FileDetection extends Component {
     }
 
     handleSubmit(e) {
-        let {modelString,modelType,anomalyThreshold,inputDurationThreshold,TestingData} = this.state;
-        let cvalue = inputDurationThreshold;
-        let pvalue = anomalyThreshold;
+        let {modelString,modelType,anomalyThreshold,inputDurationThreshold,TestingData,minPts,epsilon} = this.state;
         let modelName = modelString;
         let filename = TestingData;
+        let cvalue = inputDurationThreshold;
+        let pvalue = anomalyThreshold;
+        if(modelType == 'DBScan'){
+            cvalue = minPts;
+            pvalue = epsilon;
+        }
         let url = '/filesdetectionMonitoring?filename=' + filename+"&pvalue="+pvalue+"&cvalue="+cvalue+"&modelType="+modelType+"&modelName="+modelName;
         window.open(url, '_blank');
     }
@@ -127,7 +135,7 @@ export default class FileDetection extends Component {
                                 </div>
                                 <div className="field">
                                     <label>Model Type</label>
-                                    <ModelType value={modelType} text={modelTypeText}
+                                    <FileModelType value={modelType} text={modelTypeText}
                                                onChange={(value, text)=> this.setState({ modelType: value, modelTypeText: text })}/>
                                 </div>
                                 {modelType == 'DBScan' ?
@@ -154,7 +162,6 @@ export default class FileDetection extends Component {
                                     <div className="field">
                                         <WaringButton labelStyle={labelStyle} labelTitle="Duration Threshold"
                                                       labelSpan="number of continuous anomalies to trigger an alert."/>
-
                                         <div className="ui input" style={{'paddingLeft': '10px'}}>
                                             <DurationThreshold style={{'width': '100%'}} value={inputDurationThreshold} onChange={(v, t)=>this.setState({inputDurationThreshold: t})}/>
                                         </div>

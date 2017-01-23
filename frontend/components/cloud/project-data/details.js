@@ -32,10 +32,10 @@ const ProjectDetails = class extends React.Component {
   updateData() {
 
     let {query} = this.props.location;
-    let {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName} = query;
+    let {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, predictedFlag, } = query;
     let refreshInterval = parseInt(store.get(ChartsRefreshInterval, 0));
     this.setState({loading: true}, ()=> {
-      apis.postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName)
+      apis.postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, predictedFlag,)
         .then(resp => {
           let update = {};
           if (resp.success) {

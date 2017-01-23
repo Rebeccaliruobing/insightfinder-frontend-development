@@ -4,7 +4,10 @@ const baseUrl = window.API_BASE_URL || '/api/v1/';
 import getEndpoint from './get-endpoint';
 import parseCloudRollout from '../data/parseCloudRollout';
 import {retrieveLiveAnalysis} from './retrieve-liveanalysis';
-
+import {retrieveAppNames,retrieveAppMetricForecastData,retrieveAppForecastData} from './retrieve-forecast';
+import {loadTriageActionRecord, saveTriageActionRecord} from './retrieve-actions';
+import {loadInstanceGrouping, saveInstanceGrouping} from './instanceGrouping';
+import {getExecDBStatisticsData} from './get-execdb-stats';
 //
 // When we run frontend on localhost python web server and connect api with different host,
 // Chrome will report cross-domain error, we need to install the chrome plugin to avoid it:
@@ -44,6 +47,9 @@ $.fn.api.settings.api = {
     'published detection': `${baseUrl}publishedDetection`,
     'post mortem': `${baseUrl}postMortem`,
     'log analysis': `${baseUrl}logAnalysis`,
+    'add datadog project': `${baseUrl}add-datadog-project`,
+    'add new relic project': `${baseUrl}add-newrelic-project`,
+    'add log project': `${baseUrl}add-log-project`,
     'add custom project': `${baseUrl}add-custom-project`,
     'add aws project': `${baseUrl}add-amazon-project`,
     'add google project': `${baseUrl}add-google-project`,
@@ -116,7 +122,16 @@ let requestPost = function (action, data, resolve, reject) {
  UploadDetection,
  */
 const apis = {
-
+    retrieveLiveAnalysis: retrieveLiveAnalysis,
+    retrieveAppNames: retrieveAppNames,
+    retrieveAppMetricForecastData: retrieveAppMetricForecastData,
+    retrieveAppForecastData: retrieveAppForecastData,
+    loadTriageActionRecord: loadTriageActionRecord,
+    saveTriageActionRecord: saveTriageActionRecord,
+    loadInstanceGrouping:loadInstanceGrouping,
+    saveInstanceGrouping:saveInstanceGrouping,
+	getExecDBStatisticsData: getExecDBStatisticsData,
+    
     postLogin(userName, password) {
         return new Promise(function (resolve, reject) {
             requestPost('login', { userName, password }, resolve, reject);
@@ -387,7 +402,9 @@ const apis = {
      * @param projectName
      * @returns {Promise}
      */
-    postLiveAnalysis(projectName, modelType, pvalue, cvalue, version, userName = store.get('userName'), token = store.get('token')) {
+    postLiveAnalysis(projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
+        groupId,instanceName,metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version, 
+        userName = store.get('userName'), token = store.get('token')) {
         if(!version){
             version = "1";
         }
@@ -395,8 +412,9 @@ const apis = {
             $.ajax({
                 type: 'POST',
                 url: getEndpoint('liveAnalysis', version),
-//                url: $.fn.api.settings.api['live analysis'],
-                data: $.param({ userName, token, pvalue, cvalue, modelType, projectName }),
+                data: $.param({ userName, token, projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays, 
+                    startTimestamp,endTimestamp, groupId,instanceName,metricName, 
+                    avgEndTimestamp, avgNumberOfDays, predictedFlag, }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -409,7 +427,6 @@ const apis = {
             });
         });
     },
-    retrieveLiveAnalysis: retrieveLiveAnalysis,
 
     /**
      *
@@ -459,7 +476,7 @@ const apis = {
         });
     },
 
-    postLogAnalysis(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
+    postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -467,6 +484,7 @@ const apis = {
                 data: $.param({
                     userName,
                     token,
+                    derivedPvalue,
                     pvalue,
                     cvalue,
                     modelType,
@@ -586,7 +604,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, userName = store.get('userName'), token = store.get('token')) {
+    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -603,6 +621,7 @@ const apis = {
                     metaData,
                     modelStartTime,
                     modelEndTime,
+                    latestDataTimestamp,
                     userName,
                     token
                 }),
@@ -629,12 +648,134 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postAddCustomProject(projectName, projectCloudType, samplingInterval, email = '', userName = store.get('userName'), token = store.get('token')) {
+    postAddDataDogProject(projectName, projectCloudType, samplingInterval, appkey, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add datadog project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    appkey,
+                    apikey,
+                    email, 
+                    userName, 
+                    token }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddNewRelicProject(projectName, projectCloudType, samplingInterval, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add new relic project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    apikey,
+                    email, 
+                    userName, 
+                    token }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddLogProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                type: 'POST',
+                url: $.fn.api.settings.api['add log project'],
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    samplingInterval, 
+                    zone,
+                    'access-key': access_key,
+                    'secrete-key': secrete_key,
+                    email, 
+                    userName, 
+                    token }),
+                beforeSend: function (request) {
+                    request.setRequestHeader("Accept", 'application/json');
+                }
+            }).done(function (resp) {
+                resolve(resp);
+            }).fail(function (error) {
+                console.log(arguments);
+                console.log("Server Error", arguments);
+                reject(error);
+            });
+        });
+    },
+
+    /**
+     *
+     * @param projectName
+     * @param projectCloudType
+     * @param samplingInterval
+     * @param email
+     * @param userName
+     * @param token
+     * @returns {Promise}
+     */
+    postAddCustomProject(projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, processName, email = '', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
                 url: $.fn.api.settings.api['add custom project'],
-                data: $.param({ projectName, projectCloudType, samplingInterval, email, userName, token }),
+                data: $.param({ 
+                    projectName, 
+                    projectCloudType, 
+                    dataType,
+                    samplingInterval, 
+                    zone,
+                    'access-key': access_key,
+                    'secrete-key': secrete_key,
+                    processName,
+                    email, 
+                    userName, 
+                    token }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Accept", 'application/json');
                 }
@@ -660,7 +801,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postAddAWSProject(projectName, zone, instanceType, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
+    postAddAWSProject(projectName, instanceType, zone, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -767,7 +908,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectSetting(projectName, cvalue, pvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+    postProjectSetting(projectName, cvalue, pvalue, derivedPvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -776,10 +917,12 @@ const apis = {
                     projectName,
                     cvalue,
                     pvalue,
+                    derivedPvalue,
                     'cvalue-email': cvalueEmail,
                     'pvalue-email': pvalueEmail,
                     'cvalue-filter': cvalueFilter,
                     'pvalue-filter': pvalueFilter,
+                    predictionWindow, 
                     minAnomalyRatioFilter,
                     sharedUsernames,
                     projectHintMapFilename,
@@ -811,9 +954,9 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, userName = store.get('userName'), token = store.get('token')) {
-        let paramData = metricName?{projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, userName, token}:
-        {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, userName, token};
+    postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, predictedFlag, grouping, userName = store.get('userName'), token = store.get('token')) {
+        let paramData = metricName?{projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, predictedFlag, grouping, userName, token}:
+        {projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, anomalyMetrics, predictedFlag, grouping, userName, token};
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -1092,12 +1235,12 @@ const apis = {
      * @param userName
      * @returns {Promise}
      */
-    postAWSOperation(projectName, instanceId, operation = 'coldclone', userName = store.get('userName'), token = store.get('token')) {
+    postUserAction(projectName, instanceId, operation = 'coldclone', userName = store.get('userName'), token = store.get('token')) {
         let version = "1";
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
-                url: getEndpoint('awsOperationProxy', version),
+                url: getEndpoint('userAction', version),
                 data: $.param({ userName, token, projectName, instanceId, operation }),
                 beforeSend: function (request) {
                     request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');

@@ -16,27 +16,27 @@ class Login extends BaseComponent {
     this.state = {
       userName: '',
       password: '',
-      error: ''
-    }
+      error: '',
+    };
   }
 
   componentDidMount() {
     if (this._$el) {
-      this._$el.find('.ui.submit.button').api({
+      const apiSettings = {
         action: 'login',
         method: 'POST',
         beforeSend: (settings) => {
           this.setState({
-            error: ''
+            error: '',
           });
           settings.data = {
-            'userName': this.state['userName'],
-            'password': this.state['password']
+            userName: this.state.userName,
+            password: this.state.password,
           };
           return settings;
         },
-        beforeXHR: function(xhr) {
-          xhr.setRequestHeader ('accept', 'application/json');
+        beforeXHR: (xhr) => {
+          xhr.setRequestHeader('accept', 'application/json');
           return xhr;
         },
         onSuccess: (resp) => {
@@ -48,23 +48,35 @@ class Login extends BaseComponent {
         onFailure: (resp) => {
           if (resp && resp.message) {
             this.setState({
-              error: resp.message
+              error: resp.message,
             });
           }
+        },
+      };
+      this._$el.find('.ui.submit.button').api(apiSettings);
+      this._$el.find('input.password').keypress((e) => {
+        if (e.keyCode === 13) {
+          e.preventDefault();
+          this._$el.find('.ui.submit.button').api({
+            ...apiSettings,
+            on: 'now',
+          });
         }
-      })
+      });
     }
   }
 
   render() {
-    const {userName, password, error} = this.state;
-    let disabled = !userName || !password;
+    const { userName, password, error } = this.state;
+    const disabled = !userName || !password;
 
     return (
       <div className="auth ui middle center aligned container">
         <div>
-          <form className={cx('ui', {error: !!error}, 'form')}
-                ref={c=>this._$el = $(c)} >
+          <form 
+            className={cx('ui', {error: !!error}, 'form')} 
+            ref={c=>this._$el = $(c)}
+          >
             <h2 className="ui image header">
               <img src={logo} className="image"/>
             </h2>
@@ -83,10 +95,11 @@ class Login extends BaseComponent {
               <div className="field required">
                 <label>Password</label>
                 <div className="ui icon input">
-                  <i className="lock icon"/>
-                  <input type="password" name="password"
-                         value={password}
-                         onChange={(e) => this.setState({password: e.target.value})}/>
+                  <i className="lock icon" />
+                  <input
+                    type="password" name="password" className="password"
+                    value={password}
+                    onChange={(e) => this.setState({ password: e.target.value })} />
                 </div>
               </div>
               <div className="field" style={{textAlign: 'right'}}>

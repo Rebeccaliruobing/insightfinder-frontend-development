@@ -1,0 +1,118 @@
+.content.executive-dashboard {
+  background-color: #F5F5F5 !important;
+  > .ui.container {
+    > .ui.segment {
+      background-color: white;
+      border-radius: 2px;
+      margin: 8px 0 0;
+      padding: 8px;
+    }
+    &:last-child {
+      margin-bottom: 8px;
+    }
+
+    table.toplist {
+      width: 100%;
+      table-layout: fixed;
+      thead {
+        height: 50px;
+        background: #566f84;
+        color: white;
+        font-size: 14px;
+        border-bottom: 1px solid #d7d7d7;
+        th {
+          border-right: 1px solid #d7d7d7;
+          line-height: 26px;
+          font-weight: normal;
+          &.subheader {
+            border-bottom: 1px solid #d7d7d7;
+          }
+        }
+      }
+      tbody {
+        tr {
+          font-size: 14px;
+          td {
+            padding: 13px 0;
+          }
+
+          &.project {
+            border-top: 1px solid #d7d7d7;
+            border-bottom: 1px solid #d7d7d7;
+            cursor: pointer;
+          }
+          &:last-child {
+            border-bottom: 1px solid #d7d7d7;
+          }
+
+          td:first-child {
+            padding: 0 0.5em;
+          }
+          &:hover {
+            background: rgba(33, 150, 243, 0.1);
+          }
+          &:nth-child(odd) {
+            // background: rgba(33, 150, 243, 0.05);
+          }
+
+          td.number {
+            position: relative;
+            text-align: center;
+            padding-left: 10px;
+            padding-right: 10px;
+            > i.icon.arrow {
+              position: absolute;
+              left: -8px;
+              top: 14px;
+              font-size: 1.3rem;
+            }
+            .avg, .total {
+              margin: 0 2px;
+            }
+          }
+          td.number.current {
+            .avg, .total {
+              display: inline-block;
+              min-width: 48px;
+            }
+          }
+          td.number.predicted {
+            // background: rgba(0, 0, 0, 0.05);
+          }
+          td.name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          td .name {
+            cursor: pointer;
+            color: #4183C4;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+    #chart {
+      text-align: center;
+			span {
+			  display: inline-block;
+      }
+		}
+
+    .ui.statistic {
+      border-color: white;
+      padding: 0;
+      height: inherit;
+
+      .title {
+        font-size: 13px;
+      }
+      .meta {
+        top: 1px;
+        right: 3px;
+        left: inherit;
+        bottom: inherit;
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import React from 'react';
 import cx from 'classnames';
-import {BaseComponent, PropTypes, Input, Link} from '../../artui/react';
 import store from 'store';
+import {BaseComponent, PropTypes, Input, Link} from '../../artui/react';
 
 const logo = require('../../images/logo.png');
 
@@ -68,6 +68,7 @@ class ResetPassword extends BaseComponent {
           return xhr;
         },
         onSuccess: (resp) => {
+          store.clear();
           alert(resp.message);
           window.location.href = '/login';
         },

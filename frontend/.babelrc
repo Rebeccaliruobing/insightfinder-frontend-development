@@ -1,0 +1,10 @@
+// This .babelrc is for react-native, webpack, and gulp.
+// Browser babel configuration is in ./webpack/makeConfig.js.
+// https://github.com/facebook/react-native/tree/master/babel-preset
+//
+// TODO: Change to "react-native" after finishing migration to webpack2.
+{
+  "presets": [
+    "es2015", "react", "stage-0"
+  ]
+}

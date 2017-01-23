@@ -5,6 +5,7 @@ import {Link, IndexLink} from 'react-router';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
 import {
   ModelType,
+  BenchmarkModelType,
   AnomalyThreshold,
   DurationThreshold,
 } from '../../selections';
@@ -30,14 +31,15 @@ export default  class FilterBar extends Component {
       epsilon: 1.0,
       startTime: moment().add(-1, 'w').toDate(),
       endTime: moment().toDate(),
+      systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       modelType: "Holistic",
       modelTypeText: "Holistic",
       modelTypeTextMap: {}
     };
-    this.state.modelTypeTextMap["Holistic"]= "Holistic";
-    this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
-    this.state.modelTypeTextMap["Split"]= "Split";
-    this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
+    this.state.modelTypeTextMap["Holistic"]= "IF Anomaly Detection";
+    // this.state.modelTypeTextMap["HolisticCP"]= "Holistic + Filtering";
+    // this.state.modelTypeTextMap["Split"]= "Split";
+    // this.state.modelTypeTextMap["Hybrid"]= "Hybrid";
     this.state.modelTypeTextMap["DBScan"]= "Clustering (DBScan)";
     this.handleRefresh = this.handleRefresh.bind(this);
   }
@@ -170,7 +172,8 @@ export default  class FilterBar extends Component {
         this.setState({
           loading: false,
           activeItem: undefined,
-          metricSettings: undefined
+          metricSettings: undefined,
+          description: '',
         }, this.handleRefresh);
       }else {
         alert(resp.message);
@@ -200,7 +203,7 @@ export default  class FilterBar extends Component {
             // </div>
 
   render() {
-    const {startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
+    const {systemNames, startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
@@ -212,7 +215,7 @@ export default  class FilterBar extends Component {
 
             <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
               <label style={labelStyle}>Model Type</label>
-              <ModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
+              <BenchmarkModelType value={modelType} text={modelTypeText} onChange={(value, text)=> this.setState({modelType: value, modelTypeText: text})}/>
             </div>
             {modelType == 'DBScan'?
               <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
@@ -267,9 +270,9 @@ export default  class FilterBar extends Component {
                   }
 
                   let shouldShow = true;
-                  if (system && ['Cassandra', 'Hadoop'].indexOf(system) >= 0 && system != sys) {
+                  if (system != 'Others' && system != sys) {
                     shouldShow = false
-                  } else if (system == 'Other' && ['Cassandra', 'Hadoop'].indexOf(sys) >= 0) {
+                  } else if (system == 'Others' && systemNames.indexOf(sys) >= 0) {
                     shouldShow = false
                   }
 

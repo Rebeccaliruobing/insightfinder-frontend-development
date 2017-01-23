@@ -1,6 +1,7 @@
 import React from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import {Modal} from '../../artui/react';
+import {autobind} from 'core-decorators'
+import {Modal,Dropdown} from '../../artui/react';
 import {IncidentActionTaken} from '../selections';
 import apis from '../../apis';
 import "./incident.less";
@@ -14,33 +15,69 @@ class TakeActionModal extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      incident: props.incident,
-      projectName: props.projectName,
       action: "ignore",
-      actionMap:{}
+      oneTime:"one-time",
+      instanceId: undefined,
+      actionMap:{},
+      customAction:undefined,
+      textLoaded: false,
     };
-    this.state.actionMap["ignore"] = "";
+    this.state.actionMap["ignore"] = "ignore";
     this.state.actionMap["scale-up"] = "coldclone";
     this.state.actionMap["reboot"] = "filterreboot";
     this.state.actionMap["migrate"] = "dummy";
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.state.actionMap["custom"] = "custom";
+  }
+
+  componentDidMount() {
+    this.loadTriageAction(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.state = {
-      incident: nextProps.incident,
-      projectName: nextProps.projectName
-    };
+    this.loadTriageAction(nextProps);
   }
 
   handleActionChange(value) {
     this.setState({ action:value });
   }
 
+  loadTriageAction(props) {
+    let {incident, projectName} = props;
+    let eventType = incident.rootCauseJson.rootCauseTypes;
+    apis.loadTriageActionRecord(projectName, eventType).then((resp)=>{
+      if(resp.found){
+        this.setState({
+          customAction:resp.data.triageAction,
+          textLoaded: true,
+        });
+      }else{
+        this.setState({
+          action: "ignore",
+          instanceId: undefined,
+          customAction:undefined,
+          textLoaded: true,
+        });
+      }
+    });
+  }
+
+  @autobind
+  handleTriageSave() {
+    let {incident, projectName} = this.props;
+    let {customAction} = this.state;
+    let eventType = incident.rootCauseJson.rootCauseTypes;
+    if(customAction != undefined){
+      apis.saveTriageActionRecord(projectName, eventType, customAction).then((resp)=>{
+        alert(resp.message);
+      });
+    }
+  }
+
+  @autobind
   handleSubmit() {
-    let {incident, projectName, action} = this.state;
+    let {incident, projectName} = this.props;
+    let {instanceId, action} = this.state;
     let operation = "dummy";
-    let instanceId = undefined;
     if(this.state.actionMap[action]){
       operation = this.state.actionMap[action];
     }
@@ -48,7 +85,7 @@ class TakeActionModal extends React.Component {
       alert("Ignoring this event.");
       return;
     }
-    if(incident.anomalyMapJson){
+    if(!instanceId && incident.anomalyMapJson){
       for(var k in incident.anomalyMapJson){
         if(!(operation=='filterreboot' && instanceId=='i-55d26464')){
           instanceId = k;
@@ -57,7 +94,7 @@ class TakeActionModal extends React.Component {
       }
     }
     if(instanceId){
-      apis.postAWSOperation(projectName, instanceId, operation).then((resp)=>{
+      apis.postUserAction(projectName, instanceId, operation).then((resp)=>{
         console.log(resp);
         if(resp.success){
           alert("Success: action "+action+" was sent to instance "+instanceId);
@@ -71,24 +108,103 @@ class TakeActionModal extends React.Component {
   }
 
   render() {
-    let { incident, action, ...rest} = this.props;
+    let { incident, projectName, actionTime, ...rest} = this.props;
+    let { action, oneTime, instanceId, customAction, textLoaded} = this.state;
+    let instances = Object.keys(incident.rootCauseByInstanceJson);
+    let actions = [];
+    let self = this;
+    _.forEach(incident.suggestedActionsByInstanceJson, function (saInstance, key) {
+      let pos1 = saInstance.indexOf(" on ");
+      let pos2 = saInstance.indexOf(" instanceId ");
+      let tagName = "N/A";
+      let action = "";
+      if(pos1!=-1){
+        tagName = saInstance.substring(pos1+4,pos2);
+        action = saInstance.substring(2,pos1);
+      }else{
+        action = saInstance.substring(2,pos2);
+      }
+      actions.push({
+        action:action,
+        instanceId:key,
+        instanceName:tagName,
+      });
+    });
+
     return(
-      <Modal {...rest} size="mini" closable={false}>
+      <Modal {...rest} size="small" closable={true}>
         <div className="content">
           <h5>Suggested action: </h5>
-          <span className="code">{incident.rootCauseJson.suggestedActions}</span>
-        </div>
-        <div className="content">
-          <h5>Take action on this event:</h5>
-          <IncidentActionTaken value={action} onChange={(value)=>this.handleActionChange(value)}/>
-        </div>
-        <div className="actions">
-          <div className="ui button deny">Cancel</div>
-          <div className="ui button approve labeled">
-            <div className="ui button orange" onClick={this.handleSubmit.bind(this)}>
-              Confirm
+          <div style={{maxHeight: 300, overflow: 'auto'}}>
+            <table className="ui small table action-table">
+              <thead>
+              <tr className="bold">
+                <th>Suggested Action</th>
+                <th>Instance Name</th>
+                <th>Instance ID</th>
+              </tr>
+              </thead>
+              <tbody>
+              {actions.map((action, i) => {
+                return (
+                    <tr key={i}>
+                      <td>{action.action}</td>
+                      <td>{action.instanceName}</td>
+                      <td>{action.instanceId}</td>
+                    </tr>
+                )
+              })}
+              </tbody>
+            </table>
+          </div>
+        </div><hr/>
+        <div className="content" style={{padding:'0 20px'}}>
+          <h5>Take action on this event: </h5>
+          <div style={{display:'flex'}}>
+            <div className="content" style={{padding:10}}>
+              <div>Action</div>
+              <IncidentActionTaken value={action} onChange={(value)=>this.handleActionChange(value)} style={{minWidth: 120}} />
+            </div>
+            <div className="content" style={{padding:10}}>
+              <div style={{color:'white'}}>space</div>
+              <Dropdown mode="select" value={oneTime} text={oneTime}
+                        onChange={(v, t) => this.setState({oneTime: v})}  
+                        style={{minWidth: 120}}>
+                <i className="dropdown icon"/>
+                <div className="menu">
+                  <div className="item">one-time</div>
+                  <div className="item">always</div>
+                </div>
+              </Dropdown>
+            </div>
+            <div className="content" style={{padding:10}}>
+              <div>Instance Id</div>
+              <Dropdown mode="select" value={instanceId} text={instanceId}
+                        onChange={(v, t) => this.setState({instanceId: v})}  
+                        style={{minWidth: 150}}>
+                <i className="dropdown icon"/>
+                <div className="menu">
+                  {instances.map((instance, index) => {
+                    return <div className="item" key={index}>{instance}</div>
+                  })}
+                </div>
+              </Dropdown>
             </div>
           </div>
+            <div className="ui button orange" style={{float:'right', marginTop:'-44px',minWidth: 110}}
+                 onClick={this.handleSubmit}>Take Action</div>
+        </div><hr/>
+        <div className="content" style={{padding:'0 20px'}}>
+          <h5>Triage history:</h5>
+          <form className="ui reply form">
+            <div className="field">
+              <textarea value={customAction} rows="4" readOnly={!textLoaded}
+                        onChange={(e) => this.setState({customAction: e.target.value})}/>
+            </div>
+          </form>
+            <div className="ui button orange" style={{float:'right',minWidth: 110}} onClick={this.handleTriageSave}>
+              Save Triage
+            </div> 
         </div>
       </Modal>
       );

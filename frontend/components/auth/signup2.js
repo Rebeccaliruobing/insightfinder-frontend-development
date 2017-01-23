@@ -87,6 +87,10 @@ class SignupStep2 extends BaseComponent {
             $("#form_pass1_error").text("Password must be at least 8 characters long");
             isError = true;
         }
+        else if (!passwd.match(/[0-9]/)) {
+            $("#form_pass1_error").text("Password must have at least 1 number");
+            isError = true;
+        }
         else if (!passwd.match(/[a-z]/)) {
             $("#form_pass1_error").text("Password must have at least 1 lowercase letter");
             isError = true;

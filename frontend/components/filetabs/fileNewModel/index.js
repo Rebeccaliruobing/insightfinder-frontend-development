@@ -73,6 +73,9 @@ export default class FileNewModel extends Component {
             case 'GCE':
                 update.projectType = `${dataType}/CloudMonitoring`;
                 break;
+            case 'Log':
+                update.projectType = `Log`;
+                break;
             default:
                 update.projectType = `${cloudType}/Agent`;
         }

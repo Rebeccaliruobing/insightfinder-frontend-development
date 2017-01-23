@@ -78,6 +78,8 @@ class DataParser {
     var items = atext.split(';');
     var metricList = [];
     var percentageList = [];
+    var positiveList = [];
+    var isMissingValueList = [];
     var totalPercentage = 0;
     _.each(items, function (item, itemNo) {
       var pos1 = item.indexOf(".");
@@ -85,24 +87,41 @@ class DataParser {
       var pos3 = item.indexOf("(");
       var pos4 = item.indexOf("(",pos3+1);
       var pos5 = item.indexOf(")",pos4+1);
+      var pos6 = item.indexOf(":",pos5+1);
       var metr = item.substring(pos1 + 1, pos2);
       metricList.push(metr);
+      if(pos3!=-1 && pos4!=-1){
+        let valString = item.substring(pos3 + 1, pos4-1);
+        let isMissingValue = (valString == "missing");
+        isMissingValueList.push(isMissingValue);
+      } else {
+        isMissingValueList.push(true);
+      }
       if(pos4!=-1 && pos5!=-1){
         let percentageString = item.substring(pos4 + 1, pos5);
         let percentage = 0;
+        let positiveFlag = true;
         if(percentageString != "missing"){
-           percentage = parseFloat(percentageString);
+          let val = parseFloat(percentageString);
+          percentage = Math.abs(val);
+          positiveFlag = (val>=0);
         }
         
         percentageList.push(percentage);
+        positiveList.push(positiveFlag);
         totalPercentage += percentage;
       } else {
         percentageList.push(0);
+        positiveList.push(true);
       }
     });
     _.each(metricList, function (metric, imetric) {
       let allocatedPercentage = (totalPercentage==0) ? (1.0/metricList.length) : (percentageList[imetric]/totalPercentage);
-      retMap[metric] = allocatedPercentage;
+      retMap[metric] = {
+        allocatedPercentage:allocatedPercentage,
+        positiveFlag:positiveList[imetric],
+        isMissingValue:isMissingValueList[imetric],
+      };
     });
     return retMap;
   }
@@ -267,7 +286,7 @@ class DataParser {
       _.each(arr, function (a, i) {
         var atext = [];
         var intext = [];
-        if (a.anomaliesConsolidated) {
+        if (a.anomaliesConsolidated && a.anomaliesConsolidated != "") {
           var lines = a.anomaliesConsolidated.split('\\n');
           _.each(lines, function (line, lineNo) {
             if (!line || line === '') return;
@@ -300,27 +319,41 @@ class DataParser {
               var newhintsStr = "";
               var newhintsIncidentStr = "";
               _.each(newhintsArr,function(h,ih){
-                var parts = h.split(":",2);
+                var parts = h.split(":");
+                var hintsSeries = parts[1];
+                if(parts.length == 3){
+                  hintsSeries = parts[2];
+                }
                 var hintStr = "";
-                _.each(parts[1].split(";"),function(item,index){
+                _.each(hintsSeries.split(";"),function(item,index){
                   let pos0 = item.indexOf(".");
                   let pos1 = item.indexOf("[");
                   let pos2 = item.indexOf("]");
+                  let pos23 = item.indexOf("(");
                   let pos3 = item.indexOf(")");
                   let pos4 = item.indexOf(")",pos3+1);
                   let rootcause = item.substring(pos3+2,pos4);
-                  let valString = item.substring(pos2+2,pos3);
+                  let valString = item.substring(pos23+1,pos3);
                   if(valString != 'missing'){
-                    valString = parseFloat(item.substring(pos2+2,pos3)).toFixed(2);
+                    let val = parseFloat(item.substring(pos23+1,pos3));
+                    let roundedVal = Math.round(val*100)/100;
+                    valString = roundedVal.toString();
                   }
                   if(!hasPct){
                     rootcause = "";
                   } else {
                     if(valString != 'missing'){
+                      let changePct = parseFloat(rootcause);
+                      let roundedChangePtc = Math.round(changePct*10)/10;
+                      let direction = "higher";
+                      if(changePct<0){
+                        direction = "lower";
+                        changePct = -changePct;
+                      }
                       if(neuronId&&neuronId==-1){
-                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than threshold, ";  
+                        rootcause = roundedChangePtc.toString() + "% higher than threshold, ";  
                       } else {
-                        rootcause = parseFloat(rootcause).toFixed(1)+"% higher than normal, ";
+                        rootcause = roundedChangePtc.toString() + "% " + direction + " than normal, ";
                       }                      
                     } else {
                       rootcause = "missing value, "
@@ -339,17 +372,17 @@ class DataParser {
                   newhintsIncidentStr = newhintsStr;
                 }              
               });
-              if(newhintsStr.length>512){
-                newhintsStr = newhintsStr.substring(0,511)+"...";
-              }
+              // if(newhintsStr.length>750){
+              //   newhintsStr = newhintsStr.substring(0,750)+"...";
+              // }
               atext[parseInt(items[0])] = newhintsStr;
               var dur = Math.round(newhintsArr.length * interval / 60000);
               intext[parseInt(items[0])] = (neuronId?(neuronId+","):"") + "Duration:" + dur + " minute"+(dur>1?"s":"")+"\n" + newhintsIncidentStr;
             }
           });
+          anomalyConsolidatedTexts.push(atext);
+          anomalyConsolidatedIncidentTexts.push(intext);
         }
-        anomalyConsolidatedTexts.push(atext);
-        anomalyConsolidatedIncidentTexts.push(intext);
       });
     }
     this.anomalyConsolidatedTexts = anomalyConsolidatedTexts;
@@ -412,8 +445,8 @@ class DataParser {
                 time: new Date(ts),
                 timestamp: ts,
                 val: val,
-                text: (parseFloat(items[1]) > 0) ? atext[ts] : "",
-                metrs: (parseFloat(items[1]) > 0) ? (self._extractMetric(atext[ts])) : {}
+                text: (val > 0) ? atext[ts] : "",
+                metrs: (val > 0) ? (self._extractMetric(atext[ts])) : {}
               });
             }
             if(items[2] && $.isNumeric(items[2])){
@@ -463,8 +496,6 @@ class DataParser {
     this.stats = stats;
   }
 
-;
-
   _parseData() {
 
     if (this.seriesOptions) return;
@@ -473,7 +504,8 @@ class DataParser {
 
     // soptions[nMetrics]:{name,data[nTs]:[ts,val],metric,node}
     var soptions = {};
-    var lines = data.trim().split('\\n');
+    var lineStrings = data.trim().replace(/\\n/g,'\n').trim();    
+    var lines = lineStrings.split('\n');
     var ts1 = undefined;
     var ts2 = undefined;
     var tsN = undefined;
@@ -483,13 +515,22 @@ class DataParser {
         _.each(items, function (item, seriesNo) {
           if (seriesNo > 0) {
             // cpu#% [node1]: 1
-            var cats = item.trim().split(/\[|\]|\:/);
+            item = item.trim();
+            var pos1 = item.indexOf("[");
+            var pos2 = item.indexOf("]");
+            var pos3 = item.indexOf(":",pos2+1);
+            var metric = item.substring(0, pos1);
+            var node = item.substring(pos1+1, pos2);
+            var groupid = "";
+            if(pos3!=-1){
+              groupid = item.substring(pos3+1);
+            }
             soptions[seriesNo - 1] = {
               name: item,
               data: [],
-              metric: cats[0].trim(),
-              node: cats[1].trim(),
-              groupId: cats[3].trim()
+              metric: metric,
+              node: node,
+              groupId: groupid
             };
           }
         });
@@ -545,7 +586,10 @@ class DataParser {
       }
     });
 
-    let anomalyTexts = this.anomalyConsolidatedTexts || this.anomalyTexts;
+    let anomalyTexts = this.anomalyTexts;
+    if(this.anomalyConsolidatedTexts.length>0){
+      anomalyTexts = this.anomalyConsolidatedTexts;
+    }
     _.each(anomalyTexts, (o) => {
       _.forIn(o, (v, k) => {
         index++;
@@ -583,6 +627,140 @@ class DataParser {
       incidentSummary: incidentSummary
     };
     return this.summaryData;
+  }
+
+  _parseDerivedAnomalyString(){
+    let arr = this.data['derivedAnomalyString'];
+    let rawHintMapping = this.data['hintMapping'];
+    let hintMapping = {};
+    if (rawHintMapping) {
+      try {
+        hintMapping = $.parseJSON(rawHintMapping);
+      } catch (err) {
+      }
+    }
+    let anomalyTexts = [];
+    let anomalyByMetricObjArr = [];
+    // let causalDataArray = [];
+    // let causalTypes = [];
+
+    if (arr) {
+      _.each(arr, function (a, i) {
+        var atext = [];
+        let anomalyByMetricObj = {};
+        if (a.anomalies && a.anomalies != "") {
+          var lines = a.anomalies.split('\\n');
+          _.each(lines, function (line, lineNo) {
+            if (!line || line === '') return;
+            var items = line.split(',',4);
+
+            //prepare causality chart data
+            var thisAnomaly = [];
+            var timeString = moment(parseInt(items[0])).format("YYYY-MM-DD HH:mm")
+            thisAnomaly.push(timeString + "," + items[1]);
+            let hintString = undefined;
+            if(items.length == 3){
+              hintString = items[2];
+            }else if(items.length == 4){
+              hintString = items[3];
+            }
+            if (hintString) {
+              var hints = hintString.trim().split(':');
+              if(hints.length>1){
+                // further parse hints[1], eg. 1.Change_inflicted(min)(1.0)(20); 2.Sub_cause_type[node0](4.0)(1.0); 3.Sub_cause_subset[node0](4.0)
+                var hintss = hints[1].trim().split(';');
+                // var newhints = "";
+                _.each(hintss, function (hint, ihint) {
+                  // 1.Change_inflicted(min)[node0](1.0)(10.0);
+                  // 0=#.metric, 1=node, 2=(val), 3=(pct)
+                  let hintObj = {};
+                  var hintparts = hint.split(/\(/);
+                  var metric = hintparts[0].split('.')[1];
+                  try {
+                    var valparts = hintparts[1].split(/\(|\)/)[1].split('.');
+                    var newval = hintparts[1].split(/\(|\)/)[0];
+                    hintObj['timestamp'] = parseInt(items[0]);
+                    hintObj['metric'] = metric;
+                    hintObj['val'] = newval;
+                    // newhints = newhints + hintparts[0] + "[" + hintparts[1] + "](" + newval + ")";
+                    var pct = hintparts[2].split(/\(|\)/)[0];
+                    // newhints += "("+pct+")";
+                    hintObj['pct'] = pct;
+                    // if (ihint < hintss.length - 1) {
+                    //   newhints = newhints + "; ";
+                    // }
+                  } catch (err) {
+                    newhints = hints[1];
+                  }
+                  let anomalyThisMetric = anomalyByMetricObj[metric];
+                  if(anomalyThisMetric==undefined){
+                    anomalyThisMetric = [];
+                  }
+                  anomalyThisMetric.push(hintObj);
+                  anomalyByMetricObj[metric] = anomalyThisMetric;
+                });
+  
+                // atext[parseInt(items[0])] = newhints;
+              }
+            }
+            // causalDataArray.push(thisAnomaly);
+          });
+          // causalTypes = causalTypes.filter(function (el, index, arr) {
+          //   return index === arr.indexOf(el);
+          // });
+        }
+        anomalyTexts.push(atext);
+        anomalyByMetricObjArr.push(anomalyByMetricObj);
+      });
+    }
+    // this.causalDataArray = causalDataArray;
+    // this.causalTypes = causalTypes;
+    this.anomalyByMetricObjArr = anomalyByMetricObjArr;
+  }
+
+  getFreqVectorData(){
+    if (this.freqVectorData) return this.freqVectorData;
+    // process freqVectorObj for charts
+    let totalFreqVectorArr = this.data['totalFreqVectorArr'];
+    let freqVectorObj = this.data['freqVectorObj'];
+    let totalFreqData = [];
+    _.each(totalFreqVectorArr, function (freqVector, vNo) {
+      let timestamp = freqVector['timestamp']
+      let ts = new Date(timestamp);
+      totalFreqData.push([ts, freqVector['totalFreq']]);
+    });
+
+    let timestamps = [];
+    let nonZeroFreqVectors = {};
+    if(freqVectorObj!=undefined){
+      let timestampContent = freqVectorObj['timestamp'];
+      let timestampParts = timestampContent.split(',');
+      _.each(timestampParts, function (part, idx) {
+        timestamps.push(parseInt(part))
+      });
+      for (var colName in freqVectorObj) {
+        let content = freqVectorObj[colName];
+        let parts = content.split(',');
+        let timeseries = [];
+        if(colName != 'timestamp'){
+          let nonZeroFreqVectorData = [];
+          _.each(parts, function (part, idx) {
+            let ts = new Date(timestamps[idx]);
+            nonZeroFreqVectorData.push([ts,parseInt(part)]);
+          });
+          nonZeroFreqVectors[colName] = nonZeroFreqVectorData;
+        }
+      }
+    }
+
+    // process derivedAnomalyString for highlighting chart
+    this._parseDerivedAnomalyString();
+
+    this.freqVectorData = {
+      totalFreqData,
+      timestamps,
+      nonZeroFreqVectors,
+    };
   }
 
   getGroupsData() {
@@ -682,7 +860,7 @@ class DataParser {
     return this.groupsData;
   }
 
-  getGroupsDataTest() {
+  getMetricsData() {
 
     if (this.groupsData) return this.groupsData;
 
@@ -732,20 +910,31 @@ class DataParser {
       }
       let highlights = _.map(alies, a => {
         let newval = a.val < 0 ? 0 : Math.min(10, a.val);
-        let allocatedPercentage = a.metrs[value];
+        let allocatedPercentage = 0;
+        if(a.metrs[value].allocatedPercentage){
+          allocatedPercentage = a.metrs[value].allocatedPercentage;
+        }
         if(allocatedPercentage==0){
           // set missing to 100%
           allocatedPercentage = 1;
         }
         let allocatedVal = newval * allocatedPercentage;
+        let isMissingValue = false;
         // set floor for allocated value
         if(allocatedVal < 0.5){
           allocatedVal = 0.5;
         }
+        if(a.metrs[value].positiveFlag!=undefined && a.metrs[value].positiveFlag==false){
+          allocatedVal = -allocatedVal;
+        }
+        if(a.metrs[value].isMissingValue!=undefined){
+          isMissingValue = a.metrs[value].isMissingValue;
+        }
         return {
           start: a.timestamp,
           end: a.timestamp,
-          val: allocatedVal
+          val: allocatedVal,
+          isMissingValue: isMissingValue,
         }
       });
       // series name & data
