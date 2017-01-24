@@ -97,16 +97,17 @@ export default class HourlyHeatmap extends React.Component {
 
         legend.append('rect')
             .attr('x', (d, i) => { return legendElementWidth * i; })
-            .attr('y', height)
+            .attr('y', height - 10)
             .attr('width', legendElementWidth)
-            .attr('height', cellHeight / 2)
+            .attr('height', 20)
             .style('fill', (d, i) => { return colors[i]; });
 
         legend.append('text')
             .attr('class', 'mono')
             .text((d) => { return '≥ ' + Math.round(d); })
-            .attr('x', (d, i) => { return legendElementWidth * i; })
-            .attr('y', height + cellHeight);
+            .style('text-anchor', 'middle')
+            .attr('x', (d, i) => { return (legendElementWidth * i) + (.5 * legendElementWidth); })
+            .attr('y', 680 );
 
         legend.exit().remove();
       };
