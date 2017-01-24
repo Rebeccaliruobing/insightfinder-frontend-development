@@ -8,6 +8,7 @@ import { withRouter } from 'react-router';
 import moment from 'moment';
 import { Console } from '../../artui/react';
 import { TopListAnomaly, TopListResource } from './top-list';
+import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
@@ -228,6 +229,7 @@ class ExecutiveDashboard extends React.Component {
               onRowOpen={this.handleListRowOpenResource}
               {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
+            <HourlyHeatmap />
           </div>
         </div>
       </Console.Content>
