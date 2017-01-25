@@ -8,9 +8,15 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
   const className = needTotal ? 'total' : '';
   if (_.isFinite(val)) {
     if (val > 0) {
+      if(val < 0.5) {
+        fractionDigits = 2;
+      } else if(val < 5){
+        fractionDigits = 1;
+      } 
       return (<span className={className}><b>{val.toFixed(fractionDigits).toString()}</b></span>);
+    } else {
+      return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
     }
-    return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
   }
   return <span className={className}>-</span>;
 };
