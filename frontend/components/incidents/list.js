@@ -27,7 +27,10 @@ class IncidentsList extends React.Component {
       projectName: props.projectName,
       projectType: props.projectType,
       predictionWindow: props.predictionWindow,
-      shownMergedIncidentIds: [],
+      shownMergedIncidentIdsByType: {
+        predicted: [],
+        detected: [],
+      },
       showTenderModal: false,
       showTakeActionModal: false,
       showSysCall: false,
@@ -229,10 +232,11 @@ class IncidentsList extends React.Component {
   }
 
   @autobind
-  toggleMergedIncidents(incident) {
+  toggleMergedIncidents(incident, type) {
     return (e) => {
       e.stopPropagation();
-      const { shownMergedIncidentIds } = this.state;
+      const { shownMergedIncidentIdsByType } = this.state;
+      const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
       let ids;
       // If any merged id exists in shownMergedIncidentIds, we need to hidden incidents.
       if (incident._mergedIds && incident._mergedIds.length > 0) {
@@ -242,8 +246,10 @@ class IncidentsList extends React.Component {
           ids = _.concat(shownMergedIncidentIds, incident._mergedIds);
         }
 
+        const idsByType = _.cloneDeep(shownMergedIncidentIdsByType);
+        idsByType[type] = ids;
         this.setState({
-          shownMergedIncidentIds: ids,
+          shownMergedIncidentIdsByType: idsByType,
         });
       }
     };
@@ -254,7 +260,8 @@ class IncidentsList extends React.Component {
     // The type should be 'detected' or 'predicted'.
     // TODO: predicted needs to add syscall button?
     const self = this;
-    const { projectType, shownMergedIncidentIds, angleIconStyleSelect } = this.state;
+    const { projectType, shownMergedIncidentIdsByType, angleIconStyleSelect } = this.state;
+    const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
     const sysCallEnabled = (projectType.toLowerCase() === 'custom');
     const needMerge = angleIconStyleSelect === 'angleIconStyleId';
     // Get the order params and sort incidents
@@ -309,7 +316,7 @@ class IncidentsList extends React.Component {
               <td>
                 {needMerge && incident._lastMergedId && !mergedShown ? `${incident.id}-${incident._lastMergedId}` : incident.id}
                 {needMerge && incident._lastMergedId && <i
-                  onClick={self.toggleMergedIncidents(incident)}
+                  onClick={self.toggleMergedIncidents(incident, type)}
                   style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
                 />}
               </td>

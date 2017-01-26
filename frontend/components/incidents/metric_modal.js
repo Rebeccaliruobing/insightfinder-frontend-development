@@ -30,13 +30,13 @@ class MetricModal extends React.Component {
   }
 
   componentDidMount() {
-    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, groupId, grouping } = this.props;
+    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, groupId, grouping, predictedFlag } = this.props;
     this.setState({ 
       loading: true,
     });
     apis.postProjectData(
       projectName, undefined, undefined, startTimestamp, endTimestamp, groupId,
-      instanceName, metricName, undefined, undefined, grouping)
+      instanceName, metricName, undefined, predictedFlag, grouping, )
       .then(resp => {
         if (resp.success) {
           const data = this.calculateData(resp.data, instanceName);
@@ -69,8 +69,12 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose, eventEndTime, eventStartTime, avgLabel } = this.props;
+    const { onClose,  startTimestamp, endTimestamp, eventEndTime, eventStartTime, avgLabel, predictedFlag } = this.props;
     const { data,showErrorMsg,loading } = this.state;
+    let latestDataTimestamp = undefined;
+    if(predictedFlag){
+      latestDataTimestamp = +moment();
+    }
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
     if(avgLabel!=undefined){
@@ -88,7 +92,8 @@ class MetricModal extends React.Component {
             <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
             }
             {data  &&
-            <DataChart data={data}/>
+            <DataChart data={data} latestDataTimestamp={latestDataTimestamp}
+            />
             }
           </div>
         }

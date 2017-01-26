@@ -8,9 +8,18 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
   const className = needTotal ? 'total' : '';
   if (_.isFinite(val)) {
     if (val > 0) {
+      if(val < 0.5 && fractionDigits==2){
+        fractionDigits = 2;
+      } else if(val < 5 && fractionDigits==2){
+        fractionDigits = 1;
+      } else if(fractionDigits==2){
+        fractionDigits = 0;
+      }
       return (<span className={className}><b>{val.toFixed(fractionDigits).toString()}</b></span>);
+    } else {
+      fractionDigits = 0;
+      return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
     }
-    return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
   }
   return <span className={className}>-</span>;
 };
@@ -69,7 +78,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
         </OverlayTrigger>
       </td>
 
-      {type=='anomaly'&&<td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'))}</td>}
+      {type=='anomaly'&&<td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'),2)}</td>}
       {type=='anomaly'&&<td className="number current">
         <div>
         <i
@@ -79,7 +88,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
             _.get(stats, 'current.avgDailyAnomalyScore'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 0, false)}
+        {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 2, false)}
         </div>
       </td>}
       {type=='anomaly'&&<td className="number predicted">
@@ -91,7 +100,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
             _.get(stats, 'predicted.avgDailyAnomalyScore'),
           )}
         />
-        {normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'))}
+        {normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'),2)}
         </div>
       </td>}
 
@@ -105,7 +114,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
             _.get(stats, 'current.totalAnomalyDuration'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), 0, false)}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), false)}
         </div>
       </td>}
       {type=='anomaly'&&<td className="number predicted">
@@ -131,7 +140,7 @@ const ListRow = ({ name, data, onRowToggle, onClick, type, isProject = false, ex
             _.get(stats, 'current.totalAnomalyEventCount'),
           )}
         />
-        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), 0, false)}
+        {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), false)}
         </div>
       </td>}
       {type=='anomaly'&&<td className="number predicted">
