@@ -10,10 +10,12 @@ import { Console } from '../../artui/react';
 import { TopListAnomaly, TopListResource } from './top-list';
 import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
+import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
 import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
 import { NumberOfDays, EventSummaryModelType } from '../../components/selections';
 import normalizeStats from './normalize-stats';
+import aggregateToMultiHourData from './aggregate-to-multi-hour-data';
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
@@ -71,6 +73,16 @@ class ExecutiveDashboard extends React.Component {
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
+            loading: false,
+          });
+        }).catch((msg) => {
+          console.log(msg);
+        });
+			retrieveHeatmapData(query.modelType, endTime, query.numberOfDays,
+													"loadHourly")
+				.then((data) => {
+          this.setState({
+            heatmapData: aggregateToMultiHourData(data),
             loading: false,
           });
         }).catch((msg) => {
