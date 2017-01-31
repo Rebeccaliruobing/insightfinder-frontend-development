@@ -287,6 +287,7 @@ class LiveAnalysisCharts extends React.Component {
         let { loading, onRefresh, enablePublish, enableComments, debugData, timeRanking, freqRanking, projectName, 
           periodMap, data, chartType, alertMissingData, bugId } = this.props;
         const { view, columns,showSummaryFlag,tabStates,isForecast } = this.state;
+        let userName = store.get('userName');
         debugData = debugData || [];
         timeRanking = timeRanking || [];
         freqRanking = freqRanking || [];
@@ -315,8 +316,8 @@ class LiveAnalysisCharts extends React.Component {
             metricTags[am] = " (Anomaly Detected) ";
           });
         }
-        if(projectName && projectName.indexOf('@')!=-1){
-          enablePublish=false;
+        if(projectName && (userName!='admin' && projectName.indexOf('@')==-1)){
+          enablePublish=true;
         }
 
         if(summary){
@@ -538,7 +539,7 @@ class LiveAnalysisCharts extends React.Component {
                                  onClose={() => this.setState({ showTenderModal: false })}/>
                     }
                     { this.state.showShareModal &&
-                    <ShareModal dataArray={dataArray} types={types} dp={this.dp} dataChunkName={dataChunkName} latestDataTimestamp={latestDataTimestamp}
+                    <ShareModal dataArray={dataArray} types={types} dp={this.dp} dataChunkName={dataChunkName} latestDataTimestamp={latestDataTimestamp} fromUser={userName}
                                 onClose={() => this.setState({ showShareModal: false })}/>
                     }
                     { this.state.showComments &&
