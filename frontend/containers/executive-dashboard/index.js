@@ -82,7 +82,8 @@ class ExecutiveDashboard extends React.Component {
 													"loadHourly")
 				.then((data) => {
           this.setState({
-            heatmapData: aggregateToMultiHourData(data),
+            heatmapData: aggregateToMultiHourData(data, query.numberOfDays, 
+																				 3, endTime),
             loading: false,
           });
         }).catch((msg) => {

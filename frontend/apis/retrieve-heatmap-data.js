@@ -3,7 +3,7 @@ import store from 'store';
 import $ from 'jquery';
 import getEndpoint from './get-endpoint';
 
-const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays) => {
+const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays, operation=loadHourly) => {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -19,10 +19,10 @@ const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays) => {
       },
     }).done((resp) => {
       if (resp.success) {
+				console.log(resp);
         try {
           const data = resp.data;
           resolve(data);
-					console.log(resp);
         } catch (e) {
           console.log(e);
           reject(`Data Error: ${e.message}`);
