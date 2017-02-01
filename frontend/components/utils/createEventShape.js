@@ -4,7 +4,7 @@ import { EventTypes } from './getEventType';
 /*
  * Create an svg sharp based on the event type.
  */
-const createEventShape = (type, index, color, size = 5, height = 26) => {
+const createEventShape = (type, index = 0, color = '86,111,132', size = 5, height = 26) => {
 
   const cx = (index * size * 2) + size;
   const cy = height / 2;

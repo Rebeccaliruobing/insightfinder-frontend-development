@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
-import { getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
+import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
 import apis from '../../apis';
@@ -355,6 +355,42 @@ class IncidentsList extends React.Component {
     );
   }
 
+  @autobind
+  renderLegend() {
+    return (
+      <div className="list-legend">
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
+          <span className="title">Network</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
+          <span className="title">Disk</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
+          <span className="title">Workload</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance)}</svg>
+          <span className="title">New Instance</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.InstanceDown)}</svg>
+          <span className="title">Instance Down</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
+          <span className="title">High CPU</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Others)}</svg>
+          <span className="title">Others</span>
+        </div>
+      </div>
+    );
+  }
+
   render() {
     const { incidents, latestTimestamp, predictionWindow, tabStates, projectName } = this.state;
 
@@ -398,6 +434,7 @@ class IncidentsList extends React.Component {
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal in prediction.</h5>
           }
+          {(predictedIncidents.length > 0) && this.renderLegend() }
         </div>
         <div className={`${tabStates.detected} ui tab`}>
           {(detectedIncidents.length > 0) ?
@@ -408,6 +445,7 @@ class IncidentsList extends React.Component {
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal.</h5>
           }
+          {(detectedIncidents.length > 0) && this.renderLegend() }
         </div>
         {this.state.showTenderModal &&
           <TenderModal
