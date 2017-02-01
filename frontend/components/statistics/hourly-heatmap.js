@@ -23,7 +23,7 @@ export default class HourlyHeatmap extends React.Component {
         colors = historicColors,  // Setting default color scheme
         times = ['12a', '3a', '6a', '9a', '12p', '3p', '6p', '9p']; // FIXME : times is hardcoded and should be dynamic by period
     let days = dataset['dayLabels'];
-    if (days == undefined) {let days = [];}
+    void((days == undefined)&&(days = []));
 	// Remove the children if exist
     d3.select('#'+timeframe+' > svg').remove();
 
