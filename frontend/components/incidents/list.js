@@ -175,7 +175,7 @@ class IncidentsList extends React.Component {
     eventTypes = _.uniq(eventTypes);
 
     return (
-      <svg width={70} height={26}>
+      <svg width={eventTypes.length * 10} height={26}>
         {eventTypes.map((event, index) => createEventShape(event, index, color))}
       </svg>
     );
@@ -213,7 +213,10 @@ class IncidentsList extends React.Component {
           <th onClick={() => this.changeAngleStyle('angleIconStyleId')}>Id
             <i className={`angle ${angleIconStyle.angleIconStyleId} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}>Severity
+          <th
+            style={{ textAlign: 'center' }}
+            onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}
+          >Severity
             <i className={`angle ${angleIconStyle.angleIconStyleSeverity} icon`} />
           </th>
           <th onClick={() => this.changeAngleStyle('angleIconStyleStartTime')}>Start Time
@@ -320,7 +323,7 @@ class IncidentsList extends React.Component {
                   style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
                 />}
               </td>
-              <td>{this.renderEventSeverity(incident)}</td>
+              <td style={{ textAlign: 'center' }}>{this.renderEventSeverity(incident)}</td>
               <td className="code">{moment(incident.startTimestamp).format('MM-DD HH:mm')}</td>
               <td>
                 {!mergedShown && `${incident._mergedDuration} min`}
