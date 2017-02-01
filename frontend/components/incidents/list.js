@@ -125,6 +125,10 @@ class IncidentsList extends React.Component {
       startTimestamp: undefined,
       endTimestamp: undefined,
       actionTime: +moment(),
+      shownMergedIncidentIdsByType: {
+        predicted: [],
+        detected: [],
+      },
     };
     this.setState(stateIncidents);
   }
