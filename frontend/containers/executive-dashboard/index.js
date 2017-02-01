@@ -34,6 +34,7 @@ class ExecutiveDashboard extends React.Component {
 
     this.state = {
       eventStats: [],
+      heatmapData: {},
       loading: true,
       view: 'anomaly',
     };
