@@ -40,8 +40,8 @@ class ExecutiveDashboard extends React.Component {
   }
 
   componentDidMount() {
-    this.refreshData();
-  }
+	    this.refreshData();
+	  }
 
   modelDateValidator(date) {
     return moment(date) <= moment();
@@ -63,6 +63,7 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   refreshData(params) {
+	console.log("refreshData in index.js");
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
@@ -78,16 +79,16 @@ class ExecutiveDashboard extends React.Component {
         }).catch((msg) => {
           console.log(msg);
         });
-			retrieveHeatmapData(query.modelType, endTime, query.numberOfDays,
-													"loadHourly")
-				.then((data) => {
+	  retrieveHeatmapData(query.modelType, endTime, query.numberOfDays, "loadHourly")
+		.then((data) => {
+		  console.log("data: "+data);
           this.setState({
-            heatmapData: aggregateToMultiHourData(data, query.numberOfDays, 
-																				 3, endTime),
             loading: false,
+          }, () => {
+        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period=3);  
           });
         }).catch((msg) => {
-          console.log(msg);
+          console.log("Exception in retrieveHeatmapData call in index.js: "+msg);
         });
     });
   }
@@ -161,7 +162,7 @@ class ExecutiveDashboard extends React.Component {
   render() {
     const { location } = this.props;
     const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
-    const { loading, eventStats, view } = this.state;
+    const { loading, eventStats, view, heatmapData } = this.state;
 
     return (
       <Console.Content
@@ -242,7 +243,7 @@ class ExecutiveDashboard extends React.Component {
               onRowOpen={this.handleListRowOpenResource}
               {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
-            <HourlyHeatmap />
+            <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData}/>
           </div>
         </div>
       </Console.Content>

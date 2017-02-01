@@ -15,6 +15,7 @@ const aggregateToMultiHourData = (jsonResponse = {}, durationInDays = 7, periodI
   aggregates['duration'] = durationInDays;
   aggregates['endTimestamp'] = endTimestamp;
   aggregates['period'] = periodInHours;
+  aggregates['dayLabels'] = [];
   aggregates['totalEvents'] = 0;
   aggregates['totalAnomalyScore'] = 0;
   aggregates['totalAnomalyCount'] = 0;
@@ -193,6 +194,7 @@ const aggregateToMultiHourData = (jsonResponse = {}, durationInDays = 7, periodI
 		  if (periodCtr > (24 / periodInHours)) {
 			  periodCtr = 1;
 			  dayCtr++;
+			  aggregates['dayLabels'].push(entry.getMonth()+"/"+entry.getDate());
 		  }
       } else {
     	  hourCtr++;
