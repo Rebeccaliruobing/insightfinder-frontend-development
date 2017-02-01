@@ -69,9 +69,9 @@ class ShareModal extends React.Component {
   }
 
   render() {
-    let {showOther,systemNames} = this.state;
+    let { fromUser } = this.props;
+    let { showOther, systemNames } = this.state;
     let disabled = !this.state.name || !this.state.description || !this.state.system;
-
     return (
       <Modal {...this.props} size="mini" closable={false}>
         <div className="header">
@@ -110,7 +110,7 @@ class ShareModal extends React.Component {
             }
             </div>
             <div className="field">
-              <input type="checkbox" value={this.state.ownerOnly}
+              <input type="checkbox" value={this.state.ownerOnly} 
                      onChange={(e) => this.setState({ownerOnly: e.target.checked})}/>
               &nbsp;&nbsp;Visible to owner only
             </div>
