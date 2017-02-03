@@ -34,7 +34,7 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
     color: 'green',
   };
   let flat = {
-    color: 'black',
+    color: 'green',
   };
   if(reverseColor){
     up.color='green';
@@ -47,8 +47,8 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
     } else if (left < right) {
       return !reverseDirection ? up : down;
     } else if (left === right) {
-      // return flat; 
-      return { visibility: 'hidden' };
+      return flat
+      // return { visibility: 'hidden' };
     }
   }
   return { visibility: 'hidden' };
