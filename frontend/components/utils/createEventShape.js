@@ -61,9 +61,9 @@ const createEventShape = (type, index = 0, color = '86,111,132', size = 5, heigh
     );
   }
   return (
-    <circle
+    <ellipse 
       key={index} fill={`rgb(${color})`}
-      cx={cx} cy={cy} r={size * 0.95}
+      cx={cx} cy={cy} rx={size * 0.95} ry={size * 0.7}
     />
   );
 };

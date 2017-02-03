@@ -246,11 +246,11 @@ class IncidentsList extends React.Component {
       const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
       let ids;
       // If any merged id exists in shownMergedIncidentIds, we need to hidden incidents.
-      if (incident._mergedIds && incident._mergedIds.length > 0) {
-        if (_.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0) {
-          ids = _.without(shownMergedIncidentIds, ...incident._mergedIds);
+      if (incident[`_mergedIds_${type}`] && incident[`_mergedIds_${type}`].length > 0) {
+        if (_.indexOf(shownMergedIncidentIds, incident[`_mergedIds_${type}`][0]) >= 0) {
+          ids = _.without(shownMergedIncidentIds, ...incident[`_mergedIds_${type}`]);
         } else {
-          ids = _.concat(shownMergedIncidentIds, incident._mergedIds);
+          ids = _.concat(shownMergedIncidentIds, incident[`_mergedIds_${type}`]);
         }
 
         const idsByType = _.cloneDeep(shownMergedIncidentIdsByType);
@@ -278,7 +278,7 @@ class IncidentsList extends React.Component {
     if (needMerge) {
       let mainIncident = null;
       _.forEach(incidents, (incident) => {
-        incident._mergedIds = [];
+        incident[`_mergedIds_${type}`] = [];
         incident._mergedDuration = (incident.anomalyRatio === 0 ? 0 : incident.duration);
         if (!mainIncident) {
           mainIncident = incident;
@@ -287,7 +287,7 @@ class IncidentsList extends React.Component {
           // If root cause (instance, event type) are same, and has repeatedEventFlag,
           // we need to merge it.
           incident._mergable = true;
-          mainIncident._mergedIds.push(incident.id);
+          mainIncident[`_mergedIds_${type}`].push(incident.id);
           mainIncident._lastMergedId = incident.id;
           mainIncident._mergedDuration += (incident.anomalyRatio === 0 ? 0 : incident.duration);
         } else {
@@ -299,7 +299,7 @@ class IncidentsList extends React.Component {
     incidents = _.orderBy(incidents, iteratees, order);
 
     return (
-      <tbody style={{ width: '100%', height: 480, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: 420, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
@@ -309,8 +309,8 @@ class IncidentsList extends React.Component {
           }
           const hidden = needMerge && incident._mergable &&
             _.indexOf(shownMergedIncidentIds, incident.id) < 0;
-          const mergedShown = needMerge && incident._mergedIds.length > 0 &&
-            _.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0;
+          const mergedShown = needMerge && incident[`_mergedIds_${type}`].length > 0 &&
+            _.indexOf(shownMergedIncidentIds, incident[`_mergedIds_${type}`][0]) >= 0;
           const mergedArrow = mergedShown ? (order === 'asc' ? 'down' : 'up') : 'right';
 
           return (
