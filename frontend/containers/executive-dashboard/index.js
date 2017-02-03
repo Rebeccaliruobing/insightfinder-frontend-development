@@ -53,6 +53,7 @@ class ExecutiveDashboard extends React.Component {
       endTime: moment().endOf('day').format('YYYY-MM-DD'),
       numberOfDays: 7,
       modelType: 'Holistic',
+      period: 3,
       ...params,
     };
   }
@@ -64,10 +65,11 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   refreshData(params) {
-	console.log("refreshData in index.js");
+	// console.log("refreshData in index.js");
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
+    const period = 3; // FIXME - should be dynamic
     this.setState({
       loading: true,
     }, () => {
@@ -82,11 +84,11 @@ class ExecutiveDashboard extends React.Component {
         });
 	  retrieveHeatmapData(query.modelType, endTime, query.numberOfDays, "loadHourly")
 		.then((data) => {
-		  console.log("data: "+data);
           this.setState({
             loading: false,
           }, () => {
-        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period=3);  
+        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period); 
+            console.log("heatmapData: "+JSON.stringify(heatmapData)); 	
           });
         }).catch((msg) => {
           console.log("Exception in retrieveHeatmapData call in index.js: "+msg);
