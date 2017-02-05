@@ -364,28 +364,28 @@ class IncidentsList extends React.Component {
     return (
       <div className="list-legend">
         <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
+          <span className="title">CPU Surge</span>
+        </div>
+        <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
-          <span className="title">Network</span>
+          <span className="title">Network Congestion</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
-          <span className="title">Disk</span>
+          <span className="title">Disk Contention</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
-          <span className="title">Workload</span>
+          <span className="title">Workload Increase</span>
         </div>
         <div className="block">
-          <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance)}</svg>
+          <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance,0,'0,255,0')}</svg>
           <span className="title">New Instance</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.InstanceDown)}</svg>
           <span className="title">Instance Down</span>
-        </div>
-        <div className="block">
-          <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
-          <span className="title">High CPU</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Others)}</svg>
