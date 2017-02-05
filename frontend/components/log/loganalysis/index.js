@@ -1,12 +1,13 @@
 import React from 'react';
 import moment from 'moment';
-import $ from 'jquery';
 import _ from 'lodash';
+import cx from 'classnames';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
 import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
+import { InlineEditInput } from '../../ui/inlineedit';
 import './logevent.less';
 
 class EventTableGroup extends React.Component {
@@ -18,7 +19,8 @@ class EventTableGroup extends React.Component {
       eventsInRangeFreqVector:[],
       selectedPattern:'', 
       selectedPatternChartData:{},
-      derivedAnomalyByMetric:{},
+      derivedAnomalyByMetric: {},
+      patternNames: {},
     };
   }
 
@@ -61,11 +63,31 @@ class EventTableGroup extends React.Component {
     return rawData;
   }
 
+  @autobind
+  handleGroupNameChanged(nid) {
+    const self = this;
+    return (newValue) => {
+      const patternNames = {
+        ...this.state.patternNames,
+      };
+      patternNames[nid] = newValue;
+      self.setState({
+        patternNames,
+      });
+    };
+  }
+
+  @autobind
+  getPatternName(nid) {
+    const { patternNames } = this.state;
+    return patternNames[nid] || "Pattern " + nid;
+  }
+
   render() {
     let eventTableData = this.props.eventTableData;
     let group = this.props.selectedGroup;
     let data = group.data;
-    let title = "Pattern "+group.nid;
+    let title = this.getPatternName(group.nid);
     let rows = [];
     let topKEpisodes = group.topKEpisodes.length > 0
       ? "Top frequent episodes: " + group.topKEpisodes : "";
@@ -86,10 +108,9 @@ class EventTableGroup extends React.Component {
       <div className="three wide column">
         <table className="ui selectable celled table">
           <thead>
-            <tr>
-              <th><span
-                    style={{ fontWeight: 'bold' }}
-                  >Pattern List</span>
+              <tr>
+                <th>
+                  <span style={{ fontWeight: 'bold' }}>Pattern List</span>
               </th>
             </tr>
           </thead>
@@ -115,7 +136,7 @@ class EventTableGroup extends React.Component {
             }).map((grp, iGrp) => {
               let topKEpisodes = "";
               let topKWords = "";
-              let patternString = "Pattern "+grp.nid;
+              let patternString = this.getPatternName(grp.nid);
               let nEventString = "Number of events: "+grp.nEvents;
               if(grp){
                 topKEpisodes = grp.topKEpisodes.length > 0
@@ -124,13 +145,23 @@ class EventTableGroup extends React.Component {
                   ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
               }
               return (<tr
-                  key={iGrp}
-                  onClick={() => this.props.handleSelectedGroup(grp.nid)}
-                  className={cx({ active: grp.nid === group.nid })} 
-                    style={{ cursor: 'pointer' }}
-                  >
-                  <td><b>{patternString}</b><br />{nEventString}<br />{topKWords}<br />{topKEpisodes}</td>
-                </tr>)
+                key={iGrp}
+                onClick={() => this.props.handleSelectedGroup(grp.nid)}
+                className={cx({ active: grp.nid === group.nid })}
+                style={{ cursor: 'pointer' }}
+              >
+                <td>
+                  <InlineEditInput
+                    normalStyle={{ fontWeight: 'bold' }}
+                    value={patternString}
+                    onChange={this.handleGroupNameChanged(grp.nid)}
+                  />
+                  {nEventString}<br />
+                  {topKWords}<br />
+                  {topKEpisodes}
+                </td>
+              </tr>
+              );
             })}
           </tbody>
         </table>
