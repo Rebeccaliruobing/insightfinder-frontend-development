@@ -6,8 +6,9 @@ import _ from 'lodash';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
 import store from 'store';
 import WaringButton from '../../cloud/monitoring/waringButton';
+import ModelSettings from './model';
 
-import "./threshold.less";
+import './threshold.less';
 import apis from '../../../apis';
 
 import {
@@ -476,6 +477,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
     let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
+    const projectName = data.projectName;
 
     let metricUnitMap = {};
     if(metricUnitMapping){
@@ -505,6 +507,8 @@ export default class ThresholdSettings extends React.Component {
                                     onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               {!isLogProject && <a className={tabStates0['prediction'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
+              {!isLogProject && <a className={tabStates0['model'] + ' item'}
+                                    onClick={(e) => this.selectTab0(e, 'model')}>Model Picking</a>}
               <a className={tabStates0['sharing'] + ' item'} 
                                     onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
@@ -846,6 +850,12 @@ export default class ThresholdSettings extends React.Component {
                   </table>
                 </div>
               </div>}
+              {!isLogProject &&
+                <div className={tabStates0['model'] + ' ui tab'}>
+                  <h3>List of Models</h3>
+                  <ModelSettings projectName={projectName} />
+                </div>
+              }
             </div>
           </div>
         </div>

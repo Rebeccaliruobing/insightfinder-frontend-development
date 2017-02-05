@@ -59,3 +59,35 @@
       }
   }
 }
+
+.model-settings {
+  width: 600px;
+  .item {
+    line-height: 32px;
+    color: #4183C4;
+    padding: 0 1em 0 1em;
+    font-weight: bold;
+    position: relative;
+    .action {
+      cursor: pointer;
+      font-size: 14px;
+      color: #F2711C;
+      position: absolute;
+      top: 7px;
+      height: 20px;
+      margin-left: 1em;
+    }
+    &.selected:before {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 100%;
+      background-color: #F2711C;
+      top: 0;
+      left: 0;
+    }
+    &:hover {
+      background: rgba(0, 0, 0, 0.05) !important;
+    }
+  }
+}
