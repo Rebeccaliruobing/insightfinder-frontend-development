@@ -874,20 +874,29 @@ class LogAnalysisCharts extends React.Component {
     }
   }
 
+  chopString(str, n) {
+    if (str.length <= n + 2) {
+      return str;
+    } else {
+      return `${str.slice(0, n)}..`;
+    }
+  }
+
   renderClusterFETable(){
     if(!this.dp) return;
     const eventTableData = this.eventTableData;
     const logNidFE = this.dp.logNidFE;
+    const self = this;
     return(
       <div>
         <div className="ui header">
           Cluster frequent episodes:
         </div>
         <div>
-          <table style={{ width:'60%' }} className="episode-table ui celled table">
+          <table style={{ width:'90%' }} className="episode-table ui celled table">
             <thead>
             <tr>
-              <th>Pattern</th>
+              <th>Frequent Pattern Sequences</th>
               <th>Count</th>
             </tr>
             </thead>
@@ -920,19 +929,22 @@ class LogAnalysisCharts extends React.Component {
                       let grp = _.find(eventTableData, a => a.nid == nid);
                       let topKEpisodes = "";
                       let topKWords = "";
+                      let firstEvent = "";
                       if(grp){
                         topKWords = grp.topKWords.length > 0
                           ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
                         topKEpisodes = grp.topKEpisodes.length > 0
                           ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
+                        firstEvent = grp.data[0][1];
                       }
-                      let popupText = topKWords + ((topKWords.length>0)?",":"") + topKEpisodes;
+                      // let popupText = topKWords + ((topKWords.length>0)?",":"") + topKEpisodes;
+                      let popupText = self.chopString(firstEvent,148);
                       if(popupText.length>0){
-                        popupText = " ("+popupText+")";
+                        popupText = " (example log entry: "+popupText+")";
                       }
                       let nidText = nid + popupText;
                       return(
-                        <div>{nidText}</div>
+                        <div><b>Pattern {nid}</b>{popupText}</div>
                       )
                     })}
                   </td>

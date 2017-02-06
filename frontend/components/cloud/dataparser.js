@@ -127,18 +127,30 @@ class DataParser {
     return retMap;
   }
 
-  _calculateRGB(anomalyRatio, size){
-    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+  _calculateRGB(anomalyRatio,maxScore,minScore,size){
+    if (minScore >= 0) {
+      minScore = 0;
+    }
+    let val = !anomalyRatio ? 0 : anomalyRatio;
     let gcolorMax = 205;
+    const range = maxScore - minScore;
     var rcolor, gcolor, bcolor = 0;
-    if (val <= 1) {
-        if (val < 0) val = 0;
-        rcolor = Math.floor(255 * val);
-        gcolor = gcolorMax;
+    if (val === 0) {
+      rcolor = Math.floor(255 * val);
+      gcolor = gcolorMax;
+    } else if (val <= 1) {
+      // if (val < 0) val = 0;
+      val = 1;
+      rcolor = Math.floor(255 * val);
+      gcolor = gcolorMax;
     } else {
-        if (val > 10) val = 10;
-        rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      // if (val > 10) val = 10;
+      rcolor = 255;
+      if(range==0){
+        gcolor = 0;
+      }else{
+        gcolor = Math.floor(gcolorMax - (((val - minScore) / range) * gcolorMax));
+      }
     }
     return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
   }
@@ -151,6 +163,17 @@ class DataParser {
     let instanceMetaData = this.data['instanceMetaDataJson'];
     let self = this;
     if(incidents){
+      let minScore = 0;
+      let maxScore = 0;
+      _.each(incidents, function (incident, index) {
+        let score = incident.anomalyRatio;
+        if(score>maxScore){
+          maxScore = score;
+        }
+        if(score<minScore){
+          minScore = score;
+        }
+      });
       _.each(incidents, function (incident, index) {
         if(incident.rootCauseByInstanceJson){
           let thisAnomaly = [];
@@ -160,7 +183,7 @@ class DataParser {
             let instance = (instanceMetaData[k] && instanceMetaData[k]['tagName'])?(instanceMetaData[k]['tagName']):k;
             let rootcause = incident.rootCauseByInstanceJson[k];
             causalTypes.push(instance);
-            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
+            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,maxScore,minScore,incident.numberOfAnomalies)+')' );
           }
           causalDataArray.push(thisAnomaly);
         }

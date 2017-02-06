@@ -20,7 +20,11 @@ const calculateRGBByAnomaly = (ratio, max, min, count) => {
   } else {
     // if (val > 10) val = 10;
     rcolor = 255;
-    gcolor = Math.floor(gcolorMax - (((val - min) / range) * gcolorMax));
+    if(range==0){
+      gcolor = 0;
+    }else{
+      gcolor = Math.floor(gcolorMax - (((val - min) / range) * gcolorMax));
+    }
   }
   return `${rcolor},${gcolor},${bcolor}`;
 };
