@@ -225,6 +225,7 @@ class LogAnalysisCharts extends React.Component {
         event: 'active',
         anomaly: '',
         freq: '',
+        clusterfe: '',
       },
       logEventArr: [],
       allLogEventArr: [],
@@ -271,7 +272,6 @@ class LogAnalysisCharts extends React.Component {
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
-    let allLogEventArr2 = this.dp.logEventArr;
     let rareEventThreshold = this.rareEventThreshold;
     allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
       return el.nid != -1
@@ -873,6 +873,57 @@ class LogAnalysisCharts extends React.Component {
     }
   }
 
+  renderClusterFETable(){
+    if(!this.dp) return;
+
+    const logNidFE = this.dp.logNidFE;
+    return(
+      <div>
+        <div className="ui header">
+          Cluster frequent episodes:
+        </div>
+        <div>
+          <table className="episode-table ui celled table">
+            <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {logNidFE.sort(function (a, b) {
+              let aid = a.count;
+              let bid = b.count;
+              if (aid > bid) {
+                return -1;
+              } else if (aid < bid) {
+                return 1;
+              } else {
+                let aaid = a.pattern;
+                let bbid = b.pattern;
+                if (aaid > bbid) {
+                  return 1;
+                } else if (aaid < bbid) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              }
+            }).slice(0, 200).map((value, index)=> {
+              return (
+                <tr key={index}>
+                  <td>{value['pattern']}</td>
+                  <td>{value['count']}</td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
   selectTab(e, tab) {
     var tabStates = this.state['tabStates'];
     tabStates = _.mapValues(tabStates, function (val) {
@@ -897,6 +948,8 @@ class LogAnalysisCharts extends React.Component {
                onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
             <a className={tabStates['freq'] + ' item'}
                onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
+            <a className={tabStates['clusterfe'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'clusterfe')}>Cluster Frequent Episode</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (
@@ -911,6 +964,11 @@ class LogAnalysisCharts extends React.Component {
           <div className={tabStates['freq'] + ' ui tab '}>
             {tabStates['freq'] === 'active' ? (
               self.renderFreqCharts()
+            ) : null}
+          </div>
+          <div className={tabStates['clusterfe'] + ' ui tab '}>
+            {tabStates['clusterfe'] === 'active' ? (
+              self.renderClusterFETable()
             ) : null}
           </div>
         </div>

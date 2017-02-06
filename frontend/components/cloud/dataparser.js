@@ -30,6 +30,7 @@ class DataParser {
     this.nidMap = null;
     this.logEventArr = null;
     this.episodeMapArr = null;
+    this.logNidFE = null;
 
     this.mode = this._detectionModeAndParse();
   }
@@ -395,6 +396,9 @@ class DataParser {
     }
     if(this.data['episodeMapArr']){
       this.episodeMapArr = this.data['episodeMapArr'];
+    }
+    if(this.data['nidFE']){
+      this.logNidFE = this.data['nidFE'];
     }
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
