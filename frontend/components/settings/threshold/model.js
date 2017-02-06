@@ -23,6 +23,7 @@ class ModelLine extends React.Component {
     const modelKeyObj = {
       startTimestamp, endTimestamp, modelKey,
     };
+    this.props.onLoading(true);
 
     pickProjectModel(projectName, JSON.stringify(modelKeyObj)).then(() => {
       this.props.onUpdate();
@@ -61,6 +62,7 @@ class ModelSettings extends React.Component {
     super(props);
     this.state = {
       models: [],
+      loading: false,
     };
   }
 
@@ -78,6 +80,7 @@ class ModelSettings extends React.Component {
       getProjectModels(projectName).then((data) => {
         this.setState({
           models: data.modelKeys,
+          loading: false,
         });
       });
     }
@@ -89,16 +92,23 @@ class ModelSettings extends React.Component {
     this.reloadData(projectName);
   }
 
+  @autobind()
+  handleLoading(loading) {
+    this.setState({
+      loading,
+    });
+  }
+
   render() {
     const { projectName } = this.props;
-    const { models } = this.state;
+    const { models, loading } = this.state;
     return (
-      <div className="model-settings">
+      <div className={`model-settings ${loading ? 'ui loading form' : ''}`}>
         {models.map(model => (
           <ModelLine
             key={model.modelKey}
             projectName={projectName} {...model}
-            onUpdate={this.handleUpdate}
+            onUpdate={this.handleUpdate} onLoading={this.handleLoading}
           />
         ))}
       </div>
