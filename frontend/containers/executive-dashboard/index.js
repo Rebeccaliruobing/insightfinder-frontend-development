@@ -62,11 +62,16 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const endTime = moment(query.endTime).valueOf();
+    let realEndTime = moment(query.endTime).endOf('day');
+    const curTime = moment();
+    if (realEndTime > curTime) {
+      realEndTime = curTime;
+    }
+
     this.setState({
       loading: true,
     }, () => {
-      retrieveExecDBStatisticsData(query.modelType, endTime, query.numberOfDays)
+      retrieveExecDBStatisticsData(query.modelType, realEndTime.valueOf(), query.numberOfDays)
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),

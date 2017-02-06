@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
-import { getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
+import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
 import apis from '../../apis';
@@ -125,6 +125,10 @@ class IncidentsList extends React.Component {
       startTimestamp: undefined,
       endTimestamp: undefined,
       actionTime: +moment(),
+      shownMergedIncidentIdsByType: {
+        predicted: [],
+        detected: [],
+      },
     };
     this.setState(stateIncidents);
   }
@@ -175,7 +179,7 @@ class IncidentsList extends React.Component {
     eventTypes = _.uniq(eventTypes);
 
     return (
-      <svg width={70} height={26}>
+      <svg width={eventTypes.length * 10} height={26}>
         {eventTypes.map((event, index) => createEventShape(event, index, color))}
       </svg>
     );
@@ -213,7 +217,10 @@ class IncidentsList extends React.Component {
           <th onClick={() => this.changeAngleStyle('angleIconStyleId')}>Id
             <i className={`angle ${angleIconStyle.angleIconStyleId} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}>Severity
+          <th
+            style={{ textAlign: 'center' }}
+            onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}
+          >Severity
             <i className={`angle ${angleIconStyle.angleIconStyleSeverity} icon`} />
           </th>
           <th onClick={() => this.changeAngleStyle('angleIconStyleStartTime')}>Start Time
@@ -239,11 +246,11 @@ class IncidentsList extends React.Component {
       const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
       let ids;
       // If any merged id exists in shownMergedIncidentIds, we need to hidden incidents.
-      if (incident._mergedIds && incident._mergedIds.length > 0) {
-        if (_.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0) {
-          ids = _.without(shownMergedIncidentIds, ...incident._mergedIds);
+      if (incident[`_mergedIds_${type}`] && incident[`_mergedIds_${type}`].length > 0) {
+        if (_.indexOf(shownMergedIncidentIds, incident[`_mergedIds_${type}`][0]) >= 0) {
+          ids = _.without(shownMergedIncidentIds, ...incident[`_mergedIds_${type}`]);
         } else {
-          ids = _.concat(shownMergedIncidentIds, incident._mergedIds);
+          ids = _.concat(shownMergedIncidentIds, incident[`_mergedIds_${type}`]);
         }
 
         const idsByType = _.cloneDeep(shownMergedIncidentIdsByType);
@@ -271,7 +278,7 @@ class IncidentsList extends React.Component {
     if (needMerge) {
       let mainIncident = null;
       _.forEach(incidents, (incident) => {
-        incident._mergedIds = [];
+        incident[`_mergedIds_${type}`] = [];
         incident._mergedDuration = (incident.anomalyRatio === 0 ? 0 : incident.duration);
         if (!mainIncident) {
           mainIncident = incident;
@@ -280,7 +287,7 @@ class IncidentsList extends React.Component {
           // If root cause (instance, event type) are same, and has repeatedEventFlag,
           // we need to merge it.
           incident._mergable = true;
-          mainIncident._mergedIds.push(incident.id);
+          mainIncident[`_mergedIds_${type}`].push(incident.id);
           mainIncident._lastMergedId = incident.id;
           mainIncident._mergedDuration += (incident.anomalyRatio === 0 ? 0 : incident.duration);
         } else {
@@ -292,7 +299,7 @@ class IncidentsList extends React.Component {
     incidents = _.orderBy(incidents, iteratees, order);
 
     return (
-      <tbody style={{ width: '100%', height: 480, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: 420, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
@@ -302,8 +309,8 @@ class IncidentsList extends React.Component {
           }
           const hidden = needMerge && incident._mergable &&
             _.indexOf(shownMergedIncidentIds, incident.id) < 0;
-          const mergedShown = needMerge && incident._mergedIds.length > 0 &&
-            _.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0;
+          const mergedShown = needMerge && incident[`_mergedIds_${type}`].length > 0 &&
+            _.indexOf(shownMergedIncidentIds, incident[`_mergedIds_${type}`][0]) >= 0;
           const mergedArrow = mergedShown ? (order === 'asc' ? 'down' : 'up') : 'right';
 
           return (
@@ -320,7 +327,7 @@ class IncidentsList extends React.Component {
                   style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
                 />}
               </td>
-              <td>{this.renderEventSeverity(incident)}</td>
+              <td style={{ textAlign: 'center' }}>{this.renderEventSeverity(incident)}</td>
               <td className="code">{moment(incident.startTimestamp).format('MM-DD HH:mm')}</td>
               <td>
                 {!mergedShown && `${incident._mergedDuration} min`}
@@ -349,6 +356,42 @@ class IncidentsList extends React.Component {
           );
         })}
       </tbody>
+    );
+  }
+
+  @autobind
+  renderLegend() {
+    return (
+      <div className="list-legend">
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
+          <span className="title">CPU Surge</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
+          <span className="title">Network Congestion</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
+          <span className="title">Disk Contention</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
+          <span className="title">Workload Increase</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance,0,'0,255,0')}</svg>
+          <span className="title">New Instance</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.InstanceDown)}</svg>
+          <span className="title">Instance Down</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.Others)}</svg>
+          <span className="title">Others</span>
+        </div>
+      </div>
     );
   }
 
@@ -395,6 +438,7 @@ class IncidentsList extends React.Component {
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal in prediction.</h5>
           }
+          {(predictedIncidents.length > 0) && this.renderLegend() }
         </div>
         <div className={`${tabStates.detected} ui tab`}>
           {(detectedIncidents.length > 0) ?
@@ -405,6 +449,7 @@ class IncidentsList extends React.Component {
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal.</h5>
           }
+          {(detectedIncidents.length > 0) && this.renderLegend() }
         </div>
         {this.state.showTenderModal &&
           <TenderModal
