@@ -8,6 +8,7 @@ import { Console, Button } from '../../../artui/react';
 import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
 import { InlineEditInput } from '../../ui/inlineedit';
+import StatsNumber from '../../statistics/stats-number';
 import './logevent.less';
 
 class EventTableGroup extends React.Component {
@@ -224,7 +225,11 @@ class LogAnalysisCharts extends React.Component {
         event: 'active',
         anomaly: '',
         freq: '',
-      }
+      },
+      logEventArr: [],
+      allLogEventArr: [],
+      rareLogEventArr: [],
+      neuronValue: [],
     };
     this.calculateData(props);
   }
@@ -266,6 +271,7 @@ class LogAnalysisCharts extends React.Component {
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
+    let allLogEventArr2 = this.dp.logEventArr;
     let rareEventThreshold = this.rareEventThreshold;
     allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
       return el.nid != -1
@@ -329,6 +335,9 @@ class LogAnalysisCharts extends React.Component {
     let logEventArr = allLogEventArr.filter(function (el, index, arr) {
       return (neuronValue[neuronIdList.indexOf(el.nid)] > rareEventThreshold)
     });
+    let rareLogEventArr = allLogEventArr.filter(function (el, index, arr) {
+      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
+    });
     neuronListNumber = {};
     neuronValue = [];
     nidList = _.map(logEventArr, function (o) {
@@ -382,14 +391,21 @@ class LogAnalysisCharts extends React.Component {
     });
 
     this.allEventTableData = allEventTableData;
-
+    this.allLogEventArr = allLogEventArr;
     this.logEventArr = logEventArr;
     this.eventTableData = eventTableData;
-    this.neuronValue = neuronValue;
+    this.neuronValue = neuronValue; 
+    this.rareLogEventArr = rareLogEventArr; 
 
     if(eventTableData && eventTableData.length>0){
-      this.setState({selectedEventTableData:eventTableData[0]});
-    }
+      this.setState({
+        selectedEventTableData:eventTableData[0],
+        logEventArr: this.logEventArr,
+        allLogEventArr: this.allLogEventArr,
+        rareLogEventArr: this.rareLogEventArr,
+        neuronValue: this.neuronValue,
+      });
+    }   
   }
 
   renderWordCountTable() {
@@ -508,7 +524,7 @@ class LogAnalysisCharts extends React.Component {
     if (logEventArr) {
       return (
         <div>
-          <div className="ui header">Number of anomalies: {logEventArr.length}</div>
+          <div className="ui header">Number of rare events: {logEventArr.length}</div>
           <table className="rare-event-table">
             <thead>
             <tr>
@@ -703,28 +719,28 @@ class LogAnalysisCharts extends React.Component {
       patterns.push(pattern);
     }
     patterns = patterns.sort(function (a, b) {
-                let aPatternNo = parseInt(a.replace("Pattern ",""));
-                let bPatternNo = parseInt(b.replace("Pattern ",""));
-                let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
-                let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
-                let aid = aGroup.nEvents;
-                let bid = bGroup.nEvents;
-                if (aid > bid) {
-                  return -1;
-                } else if (aid < bid) {
-                  return 1;
-                } else {
-                  let aaid = aGroup.nid;
-                  let bbid = bGroup.nid;
-                  if (aaid > bbid) {
-                    return 1;
-                  } else if (aaid < bbid) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                }
-              });
+      let aPatternNo = parseInt(a.replace("Pattern ",""));
+      let bPatternNo = parseInt(b.replace("Pattern ",""));
+      let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+      let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
+      let aid = aGroup.nEvents;
+      let bid = bGroup.nEvents;
+      if (aid > bid) {
+        return -1;
+      } else if (aid < bid) {
+        return 1;
+      } else {
+        let aaid = aGroup.nid;
+        let bbid = bGroup.nid;
+        if (aaid > bbid) {
+          return 1;
+        } else if (aaid < bbid) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    });
     this.setState({
       nonZeroFreqChartDatas,
       patterns,
@@ -905,6 +921,7 @@ class LogAnalysisCharts extends React.Component {
   render() {
 
     let { loading, onRefresh } = this.props;
+    let { logEventArr, allLogEventArr, rareLogEventArr, neuronValue } = this.state;
 
     let contentStyle = { paddingLeft: 0 };
     let contentClass = loading ? 'ui form loading' : '';
