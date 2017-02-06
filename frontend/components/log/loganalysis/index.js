@@ -921,15 +921,18 @@ class LogAnalysisCharts extends React.Component {
                       let topKEpisodes = "";
                       let topKWords = "";
                       if(grp){
-                        topKEpisodes = grp.topKEpisodes.length > 0
-                          ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
                         topKWords = grp.topKWords.length > 0
                           ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
+                        topKEpisodes = grp.topKEpisodes.length > 0
+                          ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
                       }
-                      let popupText = topKEpisodes + ((topKEpisodes.length>0)?",":"") + topKWords;
-                      let nidText = nid + ((nididx==nids.length-1)?"":"; ");
+                      let popupText = topKWords + ((topKWords.length>0)?",":"") + topKEpisodes;
+                      if(popupText.length>0){
+                        popupText = " ("+popupText+")";
+                      }
+                      let nidText = nid + popupText;
                       return(
-                        <span title={popupText}>{nidText}</span>
+                        <div>{nidText}</div>
                       )
                     })}
                   </td>
