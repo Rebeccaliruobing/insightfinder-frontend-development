@@ -390,9 +390,9 @@ const  AnomalyThresholdSensitivity = (props) => {
       <i className="dropdown icon"/>
       <div className="menu">
         <div className="item" data-value="0.99">Low</div>
-        <div className="item" data-value="0.97">Medium Low</div>
-        <div className="item" data-value="0.95">Medium</div>
-        <div className="item" data-value="0.9">Medium High</div>
+        <div className="item" data-value="0.95">Medium Low</div>
+        <div className="item" data-value="0.9">Medium</div>
+        <div className="item" data-value="0.75">Medium High</div>
         <div className="item" data-value="0.5">High</div>
       </div>
     </Dropdown>

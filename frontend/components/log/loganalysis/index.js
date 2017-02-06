@@ -1,13 +1,16 @@
 import React from 'react';
 import moment from 'moment';
-import $ from 'jquery';
 import _ from 'lodash';
+import cx from 'classnames';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
 import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
+import { InlineEditInput } from '../../ui/inlineedit';
+import StatsNumber from '../../statistics/stats-number';
 import './logevent.less';
+import '../../settings/threshold/threshold.less';
 
 class EventTableGroup extends React.Component {
 
@@ -18,7 +21,8 @@ class EventTableGroup extends React.Component {
       eventsInRangeFreqVector:[],
       selectedPattern:'', 
       selectedPatternChartData:{},
-      derivedAnomalyByMetric:{},
+      derivedAnomalyByMetric: {},
+      patternNames: {},
     };
   }
 
@@ -61,11 +65,31 @@ class EventTableGroup extends React.Component {
     return rawData;
   }
 
+  @autobind
+  handleGroupNameChanged(nid) {
+    const self = this;
+    return (newValue) => {
+      const patternNames = {
+        ...this.state.patternNames,
+      };
+      patternNames[nid] = newValue;
+      self.setState({
+        patternNames,
+      });
+    };
+  }
+
+  @autobind
+  getPatternName(nid) {
+    const { patternNames } = this.state;
+    return patternNames[nid] || "Pattern " + nid;
+  }
+
   render() {
     let eventTableData = this.props.eventTableData;
     let group = this.props.selectedGroup;
     let data = group.data;
-    let title = "Pattern "+group.nid;
+    let title = this.getPatternName(group.nid);
     let rows = [];
     let topKEpisodes = group.topKEpisodes.length > 0
       ? "Top frequent episodes: " + group.topKEpisodes : "";
@@ -86,10 +110,9 @@ class EventTableGroup extends React.Component {
       <div className="three wide column">
         <table className="ui selectable celled table">
           <thead>
-            <tr>
-              <th><span
-                    style={{ fontWeight: 'bold' }}
-                  >Pattern List</span>
+              <tr>
+                <th>
+                  <span style={{ fontWeight: 'bold' }}>Pattern List</span>
               </th>
             </tr>
           </thead>
@@ -115,7 +138,7 @@ class EventTableGroup extends React.Component {
             }).map((grp, iGrp) => {
               let topKEpisodes = "";
               let topKWords = "";
-              let patternString = "Pattern "+grp.nid;
+              let patternString = this.getPatternName(grp.nid);
               let nEventString = "Number of events: "+grp.nEvents;
               if(grp){
                 topKEpisodes = grp.topKEpisodes.length > 0
@@ -124,13 +147,23 @@ class EventTableGroup extends React.Component {
                   ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
               }
               return (<tr
-                  key={iGrp}
-                  onClick={() => this.props.handleSelectedGroup(grp.nid)}
-                  className={cx({ active: grp.nid === group.nid })} 
-                    style={{ cursor: 'pointer' }}
-                  >
-                  <td><b>{patternString}</b><br />{nEventString}<br />{topKWords}<br />{topKEpisodes}</td>
-                </tr>)
+                key={iGrp}
+                onClick={() => this.props.handleSelectedGroup(grp.nid)}
+                className={cx({ active: grp.nid === group.nid })}
+                style={{ cursor: 'pointer' }}
+              >
+                <td>
+                  <InlineEditInput
+                    normalStyle={{ fontWeight: 'bold' }}
+                    value={patternString}
+                    onChange={this.handleGroupNameChanged(grp.nid)}
+                  />
+                  {nEventString}<br />
+                  {topKWords}<br />
+                  {topKEpisodes}
+                </td>
+              </tr>
+              );
             })}
           </tbody>
         </table>
@@ -193,7 +226,12 @@ class LogAnalysisCharts extends React.Component {
         event: 'active',
         anomaly: '',
         freq: '',
-      }
+        clusterfe: '',
+      },
+      logEventArr: [],
+      allLogEventArr: [],
+      rareLogEventArr: [],
+      neuronValue: [],
     };
     this.calculateData(props);
   }
@@ -298,6 +336,9 @@ class LogAnalysisCharts extends React.Component {
     let logEventArr = allLogEventArr.filter(function (el, index, arr) {
       return (neuronValue[neuronIdList.indexOf(el.nid)] > rareEventThreshold)
     });
+    let rareLogEventArr = allLogEventArr.filter(function (el, index, arr) {
+      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
+    });
     neuronListNumber = {};
     neuronValue = [];
     nidList = _.map(logEventArr, function (o) {
@@ -351,14 +392,21 @@ class LogAnalysisCharts extends React.Component {
     });
 
     this.allEventTableData = allEventTableData;
-
+    this.allLogEventArr = allLogEventArr;
     this.logEventArr = logEventArr;
     this.eventTableData = eventTableData;
-    this.neuronValue = neuronValue;
+    this.neuronValue = neuronValue; 
+    this.rareLogEventArr = rareLogEventArr; 
 
     if(eventTableData && eventTableData.length>0){
-      this.setState({selectedEventTableData:eventTableData[0]});
-    }
+      this.setState({
+        selectedEventTableData:eventTableData[0],
+        logEventArr: this.logEventArr,
+        allLogEventArr: this.allLogEventArr,
+        rareLogEventArr: this.rareLogEventArr,
+        neuronValue: this.neuronValue,
+      });
+    }   
   }
 
   renderWordCountTable() {
@@ -477,7 +525,7 @@ class LogAnalysisCharts extends React.Component {
     if (logEventArr) {
       return (
         <div>
-          <div className="ui header">Number of anomalies: {logEventArr.length}</div>
+          <div className="ui header">Number of rare events: {logEventArr.length}</div>
           <table className="rare-event-table">
             <thead>
             <tr>
@@ -672,28 +720,28 @@ class LogAnalysisCharts extends React.Component {
       patterns.push(pattern);
     }
     patterns = patterns.sort(function (a, b) {
-                let aPatternNo = parseInt(a.replace("Pattern ",""));
-                let bPatternNo = parseInt(b.replace("Pattern ",""));
-                let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
-                let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
-                let aid = aGroup.nEvents;
-                let bid = bGroup.nEvents;
-                if (aid > bid) {
-                  return -1;
-                } else if (aid < bid) {
-                  return 1;
-                } else {
-                  let aaid = aGroup.nid;
-                  let bbid = bGroup.nid;
-                  if (aaid > bbid) {
-                    return 1;
-                  } else if (aaid < bbid) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                }
-              });
+      let aPatternNo = parseInt(a.replace("Pattern ",""));
+      let bPatternNo = parseInt(b.replace("Pattern ",""));
+      let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+      let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
+      let aid = aGroup.nEvents;
+      let bid = bGroup.nEvents;
+      if (aid > bid) {
+        return -1;
+      } else if (aid < bid) {
+        return 1;
+      } else {
+        let aaid = aGroup.nid;
+        let bbid = bGroup.nid;
+        if (aaid > bbid) {
+          return 1;
+        } else if (aaid < bbid) {
+          return -1;
+        } else {
+          return 0;
+        }
+      }
+    });
     this.setState({
       nonZeroFreqChartDatas,
       patterns,
@@ -826,6 +874,76 @@ class LogAnalysisCharts extends React.Component {
     }
   }
 
+  renderClusterFETable(){
+    if(!this.dp) return;
+    const eventTableData = this.eventTableData;
+    const logNidFE = this.dp.logNidFE;
+    return(
+      <div>
+        <div className="ui header">
+          Cluster frequent episodes:
+        </div>
+        <div>
+          <table style={{ width:'60%' }} className="episode-table ui celled table">
+            <thead>
+            <tr>
+              <th>Pattern</th>
+              <th>Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            {logNidFE.sort(function (a, b) {
+              let aid = a.count;
+              let bid = b.count;
+              if (aid > bid) {
+                return -1;
+              } else if (aid < bid) {
+                return 1;
+              } else {
+                let aaid = a.pattern;
+                let bbid = b.pattern;
+                if (aaid > bbid) {
+                  return 1;
+                } else if (aaid < bbid) {
+                  return -1;
+                } else {
+                  return 0;
+                }
+              }
+            }).slice(0, 200).map((value, index)=> {
+              let pattern = value['pattern'];
+              let nids = pattern.split(',');
+              return (
+                <tr key={index}>
+                  <td>
+                    {nids.map((nid,nididx) => {
+                      let grp = _.find(eventTableData, a => a.nid == nid);
+                      let topKEpisodes = "";
+                      let topKWords = "";
+                      if(grp){
+                        topKEpisodes = grp.topKEpisodes.length > 0
+                          ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
+                        topKWords = grp.topKWords.length > 0
+                          ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
+                      }
+                      let popupText = topKEpisodes + ((topKEpisodes.length>0)?",":"") + topKWords;
+                      let nidText = nid + ((nididx==nids.length-1)?"":"; ");
+                      return(
+                        <span title={popupText}>{nidText}</span>
+                      )
+                    })}
+                  </td>
+                  <td>{value['count']}</td>
+                </tr>
+              )
+            })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
   selectTab(e, tab) {
     var tabStates = this.state['tabStates'];
     tabStates = _.mapValues(tabStates, function (val) {
@@ -850,6 +968,8 @@ class LogAnalysisCharts extends React.Component {
                onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
             <a className={tabStates['freq'] + ' item'}
                onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
+            <a className={tabStates['clusterfe'] + ' item'}
+               onClick={(e) => this.selectTab(e, 'clusterfe')}>Cluster Frequent Episode</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (
@@ -866,6 +986,11 @@ class LogAnalysisCharts extends React.Component {
               self.renderFreqCharts()
             ) : null}
           </div>
+          <div className={tabStates['clusterfe'] + ' ui tab '}>
+            {tabStates['clusterfe'] === 'active' ? (
+              self.renderClusterFETable()
+            ) : null}
+          </div>
         </div>
       </div>
     )
@@ -874,6 +999,7 @@ class LogAnalysisCharts extends React.Component {
   render() {
 
     let { loading, onRefresh } = this.props;
+    let { logEventArr, allLogEventArr, rareLogEventArr, neuronValue } = this.state;
 
     let contentStyle = { paddingLeft: 0 };
     let contentClass = loading ? 'ui form loading' : '';
