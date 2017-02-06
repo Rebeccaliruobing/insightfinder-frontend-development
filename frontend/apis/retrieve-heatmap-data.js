@@ -22,7 +22,7 @@ const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays, operation="l
       if (resp.success) {
         try {
           const data = resp.data;
-          console.log("resp.data: "+JSON.stringify(resp.data));
+          console.log("[retrieve-heatmap-data.js] resp.data: "+JSON.stringify(resp.data));
           resolve(data);
         } catch (e) {
           console.log(e);

@@ -195,7 +195,7 @@ const aggregateToMultiHourData = (jsonResponse, durationInDays = 7, periodInHour
 
 	  if (hourCtr % periodInHours == 0) {
 
-		  aggregates['heatmap'].push({'day':dayCtr, 'period':periodCtr, 'totalEvents':tempEvents,
+		  aggregates['heatmap'].push({'day':dayCtr, 'period':periodCtr, 'value': tempScore, 'totalEvents':tempEvents,
 				  						'totalAnomalyCount':tempCount, 'totalAnomalyScore': tempScore,
 				  						'totalEventDuration':tempDuration, 'totalDurationEvents':tempDurationEvents, 'title':""});
 		  hourCtr = 1;

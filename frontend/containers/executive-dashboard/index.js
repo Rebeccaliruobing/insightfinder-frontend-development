@@ -65,7 +65,6 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   refreshData(params) {
-	// console.log("refreshData in index.js");
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const endTime = moment(query.endTime).valueOf();
@@ -85,9 +84,10 @@ class ExecutiveDashboard extends React.Component {
 	  retrieveHeatmapData(query.modelType, endTime, query.numberOfDays, "loadHourly")
 		.then((data) => {
           this.setState({
-            loading: false,
+        	cl: console.log("[index.js] retrieveHeatmapData - endTime: "+endTime),
+        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period),
+          	loading: false,
           }, () => {
-        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period); 
             console.log("heatmapData: "+JSON.stringify(heatmapData)); 	
           });
         }).catch((msg) => {

@@ -5,7 +5,7 @@ export default class HourlyHeatmap extends React.Component {
   static defaultProps = { dataset: [], duration:7, endTime: new Date().getTime(), period:3 };
 
   drawHeatmap(timeframe="historic",duration=7,dataset) {
-	console.log("dataset['data']: "+JSON.stringify(dataset['data']));
+	console.log("[hourly-heatmap.js] dataset['data']: "+JSON.stringify(dataset['data']));
 /*	if (dataset['data'] === undefined) {
 		console.log("Heatmap dataset is undefined.");
 		return;
@@ -34,10 +34,27 @@ export default class HourlyHeatmap extends React.Component {
         colors = historicColors,  // Setting default color scheme
         times = ['12a', '3a', '6a', '9a', '12p', '3p', '6p', '9p']; // FIXME : 'times' is hardcoded and should be dynamic by period
     let days = dataset['dayLabels'];
-    void((days == undefined)&&(days = []));
+    let heatmapVals = dataset['heatmap'];
 	// Remove the children if exist
     d3.select('#'+timeframe+' > svg').remove();
-
+    
+//  if (days === undefined || days.length == 0) {
+  if (1) {
+    	console.log("days==undefined or empty");
+    	dataset['dayLabels'] = ['1/31', '2/1', '2/2', '2/3', '2/4', '2/5', '2/6'];
+    	days = dataset['dayLabels'];
+    	heatmapVals = [];
+    	for (var d=1;d<=7;d++){
+    		for (var p=1;p<=8;p++) {
+    			heatmapVals.push({'day': d, 'period': p, 'totalAnomalyScore': 0});
+    		}
+    	}
+    }
+    
+    dataset = heatmapVals;
+    
+    console.log("dataset['heatmap']: "+dataset['heatmap']);
+    console.log("days array: "+days);
     if (days.length > 0) {
 	    let svg = d3.select('#'+timeframe).append('svg')
 	          .attr('width', width + margin.left + margin.right)
