@@ -852,7 +852,7 @@ export default class ThresholdSettings extends React.Component {
               </div>}
               {!isLogProject &&
                 <div className={tabStates0['model'] + ' ui tab'}>
-                  <h3>List of Models</h3>
+                  <h3>List of Holistic Models</h3>
                   <ModelSettings projectName={projectName} />
                 </div>
               }

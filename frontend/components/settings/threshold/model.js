@@ -79,7 +79,7 @@ class ModelSettings extends React.Component {
     if (projectName) {
       getProjectModels(projectName).then((data) => {
         this.setState({
-          models: data.modelKeys,
+          models: data.modelKeys || [],
           loading: false,
         });
       });
