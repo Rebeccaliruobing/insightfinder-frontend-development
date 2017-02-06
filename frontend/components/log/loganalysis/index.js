@@ -10,6 +10,7 @@ import { DataChart } from '../../share/charts';
 import { InlineEditInput } from '../../ui/inlineedit';
 import StatsNumber from '../../statistics/stats-number';
 import './logevent.less';
+import '../../settings/threshold/threshold.less';
 
 class EventTableGroup extends React.Component {
 
@@ -875,7 +876,7 @@ class LogAnalysisCharts extends React.Component {
 
   renderClusterFETable(){
     if(!this.dp) return;
-
+    const eventTableData = this.eventTableData;
     const logNidFE = this.dp.logNidFE;
     return(
       <div>
@@ -883,7 +884,7 @@ class LogAnalysisCharts extends React.Component {
           Cluster frequent episodes:
         </div>
         <div>
-          <table className="episode-table ui celled table">
+          <table style={{ width:'60%' }} className="episode-table ui celled table">
             <thead>
             <tr>
               <th>Pattern</th>
@@ -910,9 +911,28 @@ class LogAnalysisCharts extends React.Component {
                 }
               }
             }).slice(0, 200).map((value, index)=> {
+              let pattern = value['pattern'];
+              let nids = pattern.split(',');
               return (
                 <tr key={index}>
-                  <td>{value['pattern']}</td>
+                  <td>
+                    {nids.map((nid,nididx) => {
+                      let grp = _.find(eventTableData, a => a.nid == nid);
+                      let topKEpisodes = "";
+                      let topKWords = "";
+                      if(grp){
+                        topKEpisodes = grp.topKEpisodes.length > 0
+                          ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
+                        topKWords = grp.topKWords.length > 0
+                          ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
+                      }
+                      let popupText = topKEpisodes + ((topKEpisodes.length>0)?",":"") + topKWords;
+                      let nidText = nid + ((nididx==nids.length-1)?"":"; ");
+                      return(
+                        <span title={popupText}>{nidText}</span>
+                      )
+                    })}
+                  </td>
                   <td>{value['count']}</td>
                 </tr>
               )
