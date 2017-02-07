@@ -249,7 +249,7 @@ class ExecutiveDashboard extends React.Component {
               onRowOpen={this.handleListRowOpenResource}
               {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
-            {heatmap &&
+            {heatmap === '1' &&
               <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
             }
           </div>
