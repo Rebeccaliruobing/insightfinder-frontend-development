@@ -244,13 +244,16 @@ class TopListAnomaly extends React.Component {
     const { stats, autoExpandCount } = this.props;
     this.state = {
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
+      expandedItemIndices: {},
     };
+    this.expandPageSize = 50;
   }
 
   componentWillReceiveProps(nextProps) {
     const { stats, autoExpandCount } = nextProps;
     this.setState({
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
+      expandedItemIndices: {},
     });
   }
 
@@ -276,17 +279,21 @@ class TopListAnomaly extends React.Component {
     };
   }
 
-  chopString(str, n) {
-    if (str.length <= n + 2) {
-      return str;
-    } else {
-      return `${str.slice(0, n)}..`;
-    }
+  @autobind
+  handleExpandMore(projectName) {
+    return () => {
+      const { expandedItemIndices } = this.state;
+      const index = expandedItemIndices[projectName] || 0;
+      expandedItemIndices[projectName] = index + this.expandPageSize;
+      this.setState({
+        expandedItemIndices,
+      });
+    };
   }
 
   render() {
     const { stats, style } = this.props;
-    const { expandedProjects } = this.state;
+    const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
       <table className="toplist" style={style}>
@@ -315,54 +322,72 @@ class TopListAnomaly extends React.Component {
             <th>Predicted</th>
           </tr>
         </thead>
-          {stats.map((data) => {
-            const { groups, thisStat } = data;
-            const name = data.name;
-            const expanded = _.indexOf(expandedProjects, name) >= 0;
-            let groupText = "group";
-            if(groups.length>1){
-              groupText = "groups";
-            }
-            const title = `${data.name} (${groups.length} ${groupText})`;
-            const elems = [
-              (<tbody key={name}><ListRow
-                key={name} name={title} data={data} isProject expanded={expanded}
-                onRowToggle={this.toggleProjectRow(name)} type='anomaly'
-              /></tbody>),
-            ];
+        {stats.map((data) => {
+          const { groups } = data;
+          const name = data.name;
+          const expanded = _.indexOf(expandedProjects, name) >= 0;
+          const expandedIndex = expandedItemIndices[name] || 0;
+          const groupText = groups.length > 1 ? 'groups' : 'group';
+          const title = `${data.name} (${groups.length} ${groupText})`;
+          const elems = [
+            (<tbody key={name}><ListRow
+              key={name} name={title} data={data} isProject expanded={expanded}
+              onRowToggle={this.toggleProjectRow(name)} type="anomaly"
+            /></tbody>),
+          ];
 
-            const childElems = groups.map((group, index) => {
-              let numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
-              let numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
-              let title = group.name;
-              let suffix = "";
-              if(numberOfInstances!=undefined){
-                suffix += numberOfInstances + " instance" + (numberOfInstances>1?"s":"");
-              }
-              if(numberOfMetrics!=undefined){
-                if(suffix.length>0){
-                  suffix += ", ";
-                }
-                suffix += numberOfMetrics + " metric" + (numberOfMetrics>1?"s":"");
-              }
-              if(suffix.length>0){
-                suffix = " (" + suffix + ")";
-              }
-              title += suffix;
-              return (
-                <ListRow
-                  key={`${name}-${index}`} name={title} data={group} expanded={expanded}
-                  onClick={this.handleProjectClick(name, group.name)} type='anomaly'
-                />
-              );
-            });
-            if (expanded) {
-              elems.push((
-                <tbody key={`${name}-children`}>{childElems}</tbody>
-              ));
+          const lastIndex = expandedIndex + this.expandPageSize;
+          const showLoadMore = lastIndex < groups.length;
+          const childElems = [];
+
+          groups.every((group, index) => {
+            if (index >= lastIndex) return false;
+
+            const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
+            const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
+            let title = group.name;
+            let suffix = '';
+            if (numberOfInstances !== undefined) {
+              suffix += `${numberOfInstances} instance${numberOfInstances > 1 ? 's' : ''}`;
             }
-            return elems;
-          })}
+            if (numberOfMetrics !== undefined) {
+              if (suffix.length > 0) {
+                suffix += ', ';
+              }
+              suffix += `${numberOfMetrics} metric${numberOfMetrics > 1 ? 's' : ''}`;
+            }
+            if (suffix.length > 0) {
+              suffix = ` (${suffix})`;
+            }
+            title += suffix;
+            childElems.push((
+              <ListRow
+                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                onClick={this.handleProjectClick(name, group.name)} type='anomaly'
+              />
+            ));
+            return true;
+          });
+
+          if (showLoadMore) {
+            childElems.push((
+              <tr key={`${name}-more}`}>
+                <td
+                  className="more" colSpan={10} onClick={this.handleExpandMore(name)}
+                ><i className="angle double down icon" />Load More</td>
+              </tr>
+            ));
+          }
+
+          elems.push((
+            <tbody
+              style={{ display: !expanded ? 'none' : '' }}
+              key={`${name}-children`}
+            >{childElems}</tbody>
+          ));
+
+          return elems;
+        })}
       </table>
     );
   }
@@ -388,13 +413,16 @@ class TopListResource extends React.Component {
     const { stats, autoExpandCount } = this.props;
     this.state = {
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
+      expandedItemIndices: {},
     };
+    this.expandPageSize = 50;
   }
 
   componentWillReceiveProps(nextProps) {
     const { stats, autoExpandCount } = nextProps;
     this.setState({
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
+      expandedItemIndices: {},
     });
   }
 
@@ -420,17 +448,21 @@ class TopListResource extends React.Component {
     };
   }
 
-  chopString(str, n) {
-    if (str.length <= n + 2) {
-      return str;
-    } else {
-      return `${str.slice(0, n)}..`;
-    }
+  @autobind
+  handleExpandMore(projectName) {
+    return () => {
+      const { expandedItemIndices } = this.state;
+      const index = expandedItemIndices[projectName] || 0;
+      expandedItemIndices[projectName] = index + this.expandPageSize;
+      this.setState({
+        expandedItemIndices,
+      });
+    };
   }
 
   render() {
-    const { stats, style} = this.props;
-    const { expandedProjects } = this.state;
+    const { stats, style } = this.props;
+    const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
       <table className="toplist" style={style}>
@@ -455,56 +487,71 @@ class TopListResource extends React.Component {
             <th>Predicted</th>
           </tr>
         </thead>
-          {stats.map((data) => {
-            const { groups, thisStat } = data;
-            const name = data.name;
-            const expanded = _.indexOf(expandedProjects, name) >= 0;
-            let groupText = "group";
-            if(groups.length>1){
-              groupText = "groups";
+        {stats.map((data) => {
+          const { groups } = data;
+          const name = data.name;
+          const expanded = _.indexOf(expandedProjects, name) >= 0;
+          const expandedIndex = expandedItemIndices[name] || 0;
+          const groupText = groups.length > 1 ? 'groups' : 'group';
+          const title = `${data.name} (${groups.length} ${groupText})`;
+          const elems = [
+            (<tbody key={name}><ListRow
+              key={name} name={title} data={data} isProject expanded={expanded}
+              onRowToggle={this.toggleProjectRow(name)} type="resource"
+            /></tbody>),
+          ];
+
+          const lastIndex = expandedIndex + this.expandPageSize;
+          const showLoadMore = lastIndex < groups.length;
+          const childElems = [];
+          groups.every((group, index) => {
+            if (index >= lastIndex) return false;
+
+            const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
+            const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
+            let title = group.name;
+            let suffix = '';
+            if (numberOfInstances !== undefined) {
+              suffix += `${numberOfInstances} instance${numberOfInstances > 1 ? 's' : ''}`;
             }
-            const title = `${data.name} (${groups.length} ${groupText})`;
-            const elems = [
-              (<tbody key={name}><ListRow
-                key={name} name={title} data={data} isProject expanded={expanded}
-                onRowToggle={this.toggleProjectRow(name)} type='resource'
-              /></tbody>),
-            ];
-
-            const childElems = groups.map((group, index) => {
-              let numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
-              let numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
-              let title = group.name;
-              let suffix = "";
-              if(numberOfInstances!=undefined){
-                suffix += numberOfInstances + " instance" + (numberOfInstances>1?"s":"");
+            if (numberOfMetrics !== undefined) {
+              if (suffix.length > 0) {
+                suffix += ', ';
               }
-              if(numberOfMetrics!=undefined){
-                if(suffix.length>0){
-                  suffix += ", ";
-                }
-                suffix += numberOfMetrics + " metric" + (numberOfMetrics>1?"s":"");
-              }
-              if(suffix.length>0){
-                suffix = " (" + suffix + ")";
-              }
-              title += suffix;
-              return (
-                <ListRow
-                  key={`${name}-${index}`} name={title} data={group} expanded={expanded}
-                  onClick={this.handleProjectClick(name, group.name)} type='resource'
-                />
-              );
-            });
-            elems.push((
-              <tbody
-                style={{ display: !expanded ? 'none' : '' }}
-                key={`${name}-children`}
-              >{childElems}</tbody>
+              suffix += `${numberOfMetrics} metric${numberOfMetrics > 1 ? 's' : ''}`;
+            }
+            if (suffix.length > 0) {
+              suffix = ` (${suffix})`;
+            }
+            title += suffix;
+            childElems.push((
+              <ListRow
+                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                onClick={this.handleProjectClick(name, group.name)} type="resource"
+              />
             ));
+            return true;
+          });
 
-            return elems;
-          })}
+          if (showLoadMore) {
+            childElems.push((
+              <tr key={`${name}-more}`}>
+                <td
+                  className="more" colSpan={7} onClick={this.handleExpandMore(name)}
+                ><i className="angle double down icon" />Load More</td>
+              </tr>
+            ));
+          }
+
+          elems.push((
+            <tbody
+              style={{ display: !expanded ? 'none' : '' }}
+              key={`${name}-children`}
+            >{childElems}</tbody>
+          ));
+
+          return elems;
+        })}
       </table>
     );
   }
