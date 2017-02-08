@@ -298,6 +298,9 @@ class TopListAnomaly extends React.Component {
           expandedItemIndices[projectName] = index + this.expandPageSize;
         }
         changed = true;
+      } else if (type === 'less') {
+        expandedItemIndices[projectName] = 0;
+        changed = true;
       }
 
       if (changed) {
@@ -357,6 +360,7 @@ class TopListAnomaly extends React.Component {
           const showLoadMore = groups.length > this.expandPageSize;
           const showNext = groups.length >= lastIndex;
           const showPrevious = expandedIndex > 0;
+          const showAll = expandedIndex !== -1;
           const childElems = [];
           let filteredGroups = groups;
           if (expandedIndex !== -1) {
@@ -399,12 +403,17 @@ class TopListAnomaly extends React.Component {
                       <i className="angle double up icon" />
                     </span>
                   }
-                  {showNext &&
+                  {showNext && showAll &&
                     <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
                       <i className="angle double down icon" />
                     </span>
                   }
-                  <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  {showAll &&
+                    <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  }
+                  {!showAll &&
+                    <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
+                  }
                 </td>
               </tr>
             ));
@@ -498,6 +507,9 @@ class TopListResource extends React.Component {
           expandedItemIndices[projectName] = index + this.expandPageSize;
         }
         changed = true;
+      } else if (type === 'less') {
+        expandedItemIndices[projectName] = 0;
+        changed = true;
       }
 
       if (changed) {
@@ -553,6 +565,7 @@ class TopListResource extends React.Component {
           const showLoadMore = groups.length > this.expandPageSize;
           const showNext = groups.length >= lastIndex;
           const showPrevious = expandedIndex > 0;
+          const showAll = expandedIndex !== -1;
           const childElems = [];
           let filteredGroups = groups;
           if (expandedIndex !== -1) {
@@ -595,12 +608,17 @@ class TopListResource extends React.Component {
                       <i className="angle double up icon" />
                     </span>
                   }
-                  {showNext &&
+                  {showNext && showAll &&
                     <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
                       <i className="angle double down icon" />
                     </span>
                   }
-                  <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  {showAll &&
+                    <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  }
+                  {!showAll &&
+                    <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
+                  }
                 </td>
               </tr>
             ));
