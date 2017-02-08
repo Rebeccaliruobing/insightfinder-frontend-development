@@ -233,12 +233,7 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div
-            className="ui vertical segment"
-            style={{
-              width: view === 'anomaly' ? '100%' : '75%',
-            }}
-          >
+          <div className="ui vertical segment">
             <TopListAnomaly
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
@@ -249,10 +244,12 @@ class ExecutiveDashboard extends React.Component {
               onRowOpen={this.handleListRowOpenResource}
               {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
-            {heatmap === '1' &&
-              <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
-            }
           </div>
+          {heatmap === '1' &&
+            <div className="ui vertical segment" style={{ width: '100%' }}>
+              <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
+            </div>
+          }
         </div>
       </Console.Content>
     );
