@@ -15,7 +15,7 @@ import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
 import { NumberOfDays } from '../../components/selections';
 import normalizeStats from './normalize-stats';
-import aggregateToMultiHourData from './aggregate-to-multi-hour-data';
+import { aggregateToMultiHourData } from './heatmap-data';
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
@@ -36,6 +36,7 @@ class ExecutiveDashboard extends React.Component {
       eventStats: [],
       heatmapData: {},
       loading: true,
+      heatmapLoading: true,
       view: 'anomaly',
     };
   }
@@ -69,12 +70,13 @@ class ExecutiveDashboard extends React.Component {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const endTimeOfDay = moment(query.endTime).endOf('day');
-    const period = 3; // FIXME - should be dynamic
     const curTime = moment();
     const realEndTime = (endTimeOfDay > curTime ? curTime : endTimeOfDay).valueOf();
 
     this.setState({
       loading: true,
+      heatmapLoading: true,
+      heatmapData: {},
     }, () => {
       retrieveExecDBStatisticsData(query.modelType, realEndTime, query.numberOfDays)
         .then((data) => {
@@ -90,7 +92,8 @@ class ExecutiveDashboard extends React.Component {
         .then((data) => {
           console.log(data);
           this.setState({
-            heatmapData: aggregateToMultiHourData(data, query.numberOfDays, realEndTime, period),
+            heatmapData: aggregateToMultiHourData(data, realEndTime, query.numberOfDays),
+            heatmapLoading: false,
           });
         }).catch((msg) => {
           console.log(msg);
@@ -166,14 +169,11 @@ class ExecutiveDashboard extends React.Component {
   render() {
     const { location } = this.props;
     const { endTime, numberOfDays, heatmap } = this.applyDefaultParams(location.query);
-    const { loading, eventStats, view, heatmapData } = this.state;
+    const { loading, eventStats, view, heatmapData, heatmapLoading } = this.state;
 
     return (
-      <Console.Content
-        className={`executive-dashboard ${loading ? 'ui form loading' : ''}`}
-        style={{ paddingLeft: 0 }}
-      >
-        <div className="ui main tiny container" style={{ display: loading && 'none' }}>
+      <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
+        <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
@@ -233,7 +233,7 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div className="ui vertical segment">
+          <div className={`ui vertical segment ${loading ? 'loading form' : ''}`}>
             <TopListAnomaly
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
@@ -246,7 +246,7 @@ class ExecutiveDashboard extends React.Component {
             />
           </div>
           {heatmap === '1' &&
-            <div className="ui vertical segment" style={{ width: '100%' }}>
+            <div className={`ui vertical segment ${heatmapLoading ? 'loading form' : ''}`}>
               <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
             </div>
           }
