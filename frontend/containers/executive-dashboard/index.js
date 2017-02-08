@@ -90,7 +90,6 @@ class ExecutiveDashboard extends React.Component {
 
       retrieveHeatmapData(query.modelType, realEndTime, query.numberOfDays, 'loadHourly')
         .then((data) => {
-          console.log(data);
           this.setState({
             heatmapData: aggregateToMultiHourData(data, realEndTime, query.numberOfDays),
             heatmapLoading: false,

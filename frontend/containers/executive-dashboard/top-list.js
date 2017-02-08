@@ -573,7 +573,6 @@ class TopListResource extends React.Component {
           }
 
           filteredGroups.every((group, index) => {
-            console.log(group);
             const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
             const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
             let title = group.name;
