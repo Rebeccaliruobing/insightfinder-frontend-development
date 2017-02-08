@@ -173,9 +173,9 @@ class App extends React.Component {
           <Link to="/settings" className="item">Settings</Link>
           <Link to="/usecase" className="item">Bug Repository</Link>
           {['admin','guest'].indexOf(store.get('userName'))!=-1?<Link to="/filetabs" className="item">File Analysis</Link>:null}
-          <Link to="/help" className="item">Help</Link>
+          <Link to="/misc/help" className="item">Help</Link>
           <div className="right menu">
-              <Link to="/account-info" className="item" title='Account Info'>
+              <Link to="/misc/account-info" className="item" title='Account Info'>
                 <i className="user icon circular teal inverted"/>
                 {userInfo.userName}
               </Link>
@@ -276,18 +276,10 @@ const routes = (
       {settingsRoute}
       {useCaseRoute}
       {fileTabsRoute}
-      <Route component={Help} path="help"/>
-      <Route component={AccountInfo} path="account-info"/>
+      <Route component={Help} path="/misc/help"/>
+      <Route component={AccountInfo} path="/misc/account-info"/>
     </Route>
-    <Route component={liveMonitoringApp} path="/liveMonitoring"/>
-    <Route component={FilesMonitoringApp} path="/filesMonitoring"/>
-    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring" />
-    <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
-    <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
-    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
-    <Route component={useCaseApp} path="/useCaseDetails"/>
-    <Route component={ExecutiveDashboardApp} path="/executiveDashboard"/>
-    <Redirect from="*" to="/" />
+    <Redirect from="*" to="auth" />
   </Router>
 );
 
