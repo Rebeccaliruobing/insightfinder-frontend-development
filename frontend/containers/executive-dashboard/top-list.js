@@ -387,7 +387,7 @@ class TopListAnomaly extends React.Component {
             title += suffix;
             childElems.push((
               <ListRow
-                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                key={`${group.name}`} name={title} data={group} expanded={expanded}
                 onClick={this.handleProjectClick(name, group.name)} type="anomaly"
               />
             ));
@@ -525,7 +525,7 @@ class TopListResource extends React.Component {
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
-      <table className="toplist" style={style}>
+      <table className="toplist resource" style={style}>
         <thead>
           <tr>
             <th
@@ -573,6 +573,7 @@ class TopListResource extends React.Component {
           }
 
           filteredGroups.every((group, index) => {
+            console.log(group);
             const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
             const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
             let title = group.name;
@@ -592,7 +593,7 @@ class TopListResource extends React.Component {
             title += suffix;
             childElems.push((
               <ListRow
-                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                key={`${group.name}`} name={title} data={group} expanded={expanded}
                 onClick={this.handleProjectClick(name, group.name)} type="resource"
               />
             ));
