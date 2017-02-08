@@ -13,9 +13,9 @@ import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
 import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
-import { NumberOfDays, EventSummaryModelType } from '../../components/selections';
+import { NumberOfDays } from '../../components/selections';
 import normalizeStats from './normalize-stats';
-import aggregateToMultiHourData from './aggregate-to-multi-hour-data';
+import { aggregateToMultiHourData } from './heatmap-data';
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
@@ -36,13 +36,14 @@ class ExecutiveDashboard extends React.Component {
       eventStats: [],
       heatmapData: {},
       loading: true,
+      heatmapLoading: true,
       view: 'anomaly',
     };
   }
 
   componentDidMount() {
-	    this.refreshData();
-	  }
+    this.refreshData();
+  }
 
   modelDateValidator(date) {
     return moment(date) <= moment();
@@ -54,6 +55,7 @@ class ExecutiveDashboard extends React.Component {
       numberOfDays: 7,
       modelType: 'Holistic',
       period: 3,
+      heatmap: 0,
       ...params,
     };
   }
@@ -67,18 +69,16 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const endTime = moment(query.endTime).valueOf();
-    const period = 3; // FIXME - should be dynamic
-    let realEndTime = moment(query.endTime).endOf('day');
+    const endTimeOfDay = moment(query.endTime).endOf('day');
     const curTime = moment();
-    if (realEndTime > curTime) {
-      realEndTime = curTime;
-    }
+    const realEndTime = (endTimeOfDay > curTime ? curTime : endTimeOfDay).valueOf();
 
     this.setState({
       loading: true,
+      heatmapLoading: true,
+      heatmapData: {},
     }, () => {
-      retrieveExecDBStatisticsData(query.modelType, realEndTime.valueOf(), query.numberOfDays)
+      retrieveExecDBStatisticsData(query.modelType, realEndTime, query.numberOfDays)
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
@@ -87,17 +87,15 @@ class ExecutiveDashboard extends React.Component {
         }).catch((msg) => {
           console.log(msg);
         });
-	  retrieveHeatmapData(query.modelType, endTime, query.numberOfDays, "loadHourly")
-		.then((data) => {
+
+      retrieveHeatmapData(query.modelType, realEndTime, query.numberOfDays, 'loadHourly')
+        .then((data) => {
           this.setState({
-        	cl: console.log("[index.js] retrieveHeatmapData - endTime: "+endTime),
-        	heatmapData: aggregateToMultiHourData(data, query.numberOfDays, endTime, period),
-          	loading: false,
-          }, () => {
-            console.log("heatmapData: "+JSON.stringify(heatmapData)); 	
+            heatmapData: aggregateToMultiHourData(data, realEndTime, query.numberOfDays),
+            heatmapLoading: false,
           });
         }).catch((msg) => {
-          console.log("Exception in retrieveHeatmapData call in index.js: "+msg);
+          console.log(msg);
         });
     });
   }
@@ -159,7 +157,6 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleListRowOpenResource(projectName, instanceGroup) {
-    const { location } = this.props;
     const query = this.applyDefaultParams({
       projectName,
       instanceGroup,
@@ -170,15 +167,12 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
-    const { loading, eventStats, view, heatmapData } = this.state;
+    const { endTime, numberOfDays, heatmap } = this.applyDefaultParams(location.query);
+    const { loading, eventStats, view, heatmapData, heatmapLoading } = this.state;
 
     return (
-      <Console.Content
-        className={`executive-dashboard ${loading ? 'ui form loading' : ''}`}
-        style={{ paddingLeft: 0 }}
-      >
-        <div className="ui main tiny container" style={{ display: loading && 'none' }}>
+      <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
+        <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
@@ -238,10 +232,7 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div className="ui vertical segment" style={{ 
-                  ...{
-                    width: `${view === 'anomaly' ? '100%' : '75%'}`
-                  } }}>
+          <div className={`ui vertical segment ${loading ? 'loading form' : ''}`}>
             <TopListAnomaly
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
@@ -252,8 +243,12 @@ class ExecutiveDashboard extends React.Component {
               onRowOpen={this.handleListRowOpenResource}
               {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
-            <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData}/>
           </div>
+          {heatmap === '1' &&
+            <div className={`ui vertical segment ${heatmapLoading ? 'loading form' : ''}`}>
+              <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
+            </div>
+          }
         </div>
       </Console.Content>
     );

@@ -3,7 +3,7 @@ import store from 'store';
 import $ from 'jquery';
 import getEndpoint from './get-endpoint';
 
-const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays, operation="loadHourly") => {
+const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays, operation = 'loadHourly') => {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -12,17 +12,15 @@ const retrieveHeatmapData = (modelType, endTimestamp, numberOfDays, operation="l
       type: 'POST',
       url: getEndpoint('execDashboard'),
       data: $.param({
-        userName, token, endTimestamp, modelType, numberOfDays, operation
+        userName, token, endTimestamp, modelType, numberOfDays, operation,
       }),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
       },
     }).done((resp) => {
-      console.log("Query Response: "+resp);
       if (resp.success) {
         try {
           const data = resp.data;
-          console.log("[retrieve-heatmap-data.js] resp.data: "+JSON.stringify(resp.data));
           resolve(data);
         } catch (e) {
           console.log(e);

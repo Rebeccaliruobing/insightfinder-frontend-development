@@ -246,7 +246,7 @@ class TopListAnomaly extends React.Component {
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
       expandedItemIndices: {},
     };
-    this.expandPageSize = 50;
+    this.expandPageSize = 10;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -280,14 +280,34 @@ class TopListAnomaly extends React.Component {
   }
 
   @autobind
-  handleExpandMore(projectName) {
+  handleExpandMore(projectName, type) {
     return () => {
       const { expandedItemIndices } = this.state;
       const index = expandedItemIndices[projectName] || 0;
-      expandedItemIndices[projectName] = index + this.expandPageSize;
-      this.setState({
-        expandedItemIndices,
-      });
+      let changed = false;
+      if (type === 'all' && index !== -1) {
+        expandedItemIndices[projectName] = -1;
+        changed = true;
+      } else if (type === 'up') {
+        expandedItemIndices[projectName] = Math.max(0, index - this.expandPageSize);
+        changed = true;
+      } else if (type === 'down') {
+        if (index === -1) {
+          expandedItemIndices[projectName] = 0;
+        } else {
+          expandedItemIndices[projectName] = index + this.expandPageSize;
+        }
+        changed = true;
+      } else if (type === 'less') {
+        expandedItemIndices[projectName] = 0;
+        changed = true;
+      }
+
+      if (changed) {
+        this.setState({
+          expandedItemIndices,
+        });
+      }
     };
   }
 
@@ -337,12 +357,17 @@ class TopListAnomaly extends React.Component {
           ];
 
           const lastIndex = expandedIndex + this.expandPageSize;
-          const showLoadMore = lastIndex < groups.length;
+          const showLoadMore = groups.length > this.expandPageSize;
+          const showNext = groups.length >= lastIndex;
+          const showPrevious = expandedIndex > 0;
+          const showAll = expandedIndex !== -1;
           const childElems = [];
+          let filteredGroups = groups;
+          if (expandedIndex !== -1) {
+            filteredGroups = groups.slice(expandedIndex, Math.min(groups.length, lastIndex));
+          }
 
-          groups.every((group, index) => {
-            if (index >= lastIndex) return false;
-
+          filteredGroups.every((group, index) => {
             const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
             const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
             let title = group.name;
@@ -362,8 +387,8 @@ class TopListAnomaly extends React.Component {
             title += suffix;
             childElems.push((
               <ListRow
-                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
-                onClick={this.handleProjectClick(name, group.name)} type='anomaly'
+                key={`${group.name}`} name={title} data={group} expanded={expanded}
+                onClick={this.handleProjectClick(name, group.name)} type="anomaly"
               />
             ));
             return true;
@@ -371,10 +396,25 @@ class TopListAnomaly extends React.Component {
 
           if (showLoadMore) {
             childElems.push((
-              <tr key={`${name}-more}`}>
-                <td
-                  className="more" colSpan={10} onClick={this.handleExpandMore(name)}
-                ><i className="angle double down icon" />Load More</td>
+              <tr key={`${name}-more}`} className="more">
+                <td colSpan={10}>
+                  {showPrevious &&
+                    <span onClick={this.handleExpandMore(name, 'up')}>{`Previous ${this.expandPageSize}`}
+                      <i className="angle double up icon" />
+                    </span>
+                  }
+                  {showNext && showAll &&
+                    <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
+                      <i className="angle double down icon" />
+                    </span>
+                  }
+                  {showAll &&
+                    <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  }
+                  {!showAll &&
+                    <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
+                  }
+                </td>
               </tr>
             ));
           }
@@ -415,7 +455,7 @@ class TopListResource extends React.Component {
       expandedProjects: _.take(_.map(stats, s => s.name), autoExpandCount),
       expandedItemIndices: {},
     };
-    this.expandPageSize = 50;
+    this.expandPageSize = 10;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -449,14 +489,34 @@ class TopListResource extends React.Component {
   }
 
   @autobind
-  handleExpandMore(projectName) {
+  handleExpandMore(projectName, type) {
     return () => {
       const { expandedItemIndices } = this.state;
       const index = expandedItemIndices[projectName] || 0;
-      expandedItemIndices[projectName] = index + this.expandPageSize;
-      this.setState({
-        expandedItemIndices,
-      });
+      let changed = false;
+      if (type === 'all' && index !== -1) {
+        expandedItemIndices[projectName] = -1;
+        changed = true;
+      } else if (type === 'up') {
+        expandedItemIndices[projectName] = Math.max(0, index - this.expandPageSize);
+        changed = true;
+      } else if (type === 'down') {
+        if (index === -1) {
+          expandedItemIndices[projectName] = 0;
+        } else {
+          expandedItemIndices[projectName] = index + this.expandPageSize;
+        }
+        changed = true;
+      } else if (type === 'less') {
+        expandedItemIndices[projectName] = 0;
+        changed = true;
+      }
+
+      if (changed) {
+        this.setState({
+          expandedItemIndices,
+        });
+      }
     };
   }
 
@@ -465,7 +525,7 @@ class TopListResource extends React.Component {
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
-      <table className="toplist" style={style}>
+      <table className="toplist resource" style={style}>
         <thead>
           <tr>
             <th
@@ -502,11 +562,17 @@ class TopListResource extends React.Component {
           ];
 
           const lastIndex = expandedIndex + this.expandPageSize;
-          const showLoadMore = lastIndex < groups.length;
+          const showLoadMore = groups.length > this.expandPageSize;
+          const showNext = groups.length >= lastIndex;
+          const showPrevious = expandedIndex > 0;
+          const showAll = expandedIndex !== -1;
           const childElems = [];
-          groups.every((group, index) => {
-            if (index >= lastIndex) return false;
+          let filteredGroups = groups;
+          if (expandedIndex !== -1) {
+            filteredGroups = groups.slice(expandedIndex, Math.min(groups.length, lastIndex));
+          }
 
+          filteredGroups.every((group, index) => {
             const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
             const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
             let title = group.name;
@@ -526,7 +592,7 @@ class TopListResource extends React.Component {
             title += suffix;
             childElems.push((
               <ListRow
-                key={`${name}-${index}`} name={title} data={group} expanded={expanded}
+                key={`${group.name}`} name={title} data={group} expanded={expanded}
                 onClick={this.handleProjectClick(name, group.name)} type="resource"
               />
             ));
@@ -535,10 +601,25 @@ class TopListResource extends React.Component {
 
           if (showLoadMore) {
             childElems.push((
-              <tr key={`${name}-more}`}>
-                <td
-                  className="more" colSpan={7} onClick={this.handleExpandMore(name)}
-                ><i className="angle double down icon" />Load More</td>
+              <tr key={`${name}-more}`} className="more">
+                <td colSpan={7}>
+                  {showPrevious &&
+                    <span onClick={this.handleExpandMore(name, 'up')}>{`Previous ${this.expandPageSize}`}
+                      <i className="angle double up icon" />
+                    </span>
+                  }
+                  {showNext && showAll &&
+                    <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
+                      <i className="angle double down icon" />
+                    </span>
+                  }
+                  {showAll &&
+                    <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                  }
+                  {!showAll &&
+                    <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
+                  }
+                </td>
               </tr>
             ));
           }
