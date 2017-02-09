@@ -187,7 +187,7 @@ class ExecutiveDashboard extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const timeInterval = `${startTime.format('MM-DD')} - ${endTime.format('MM-DD')}`;
+    const timeInterval = `${startTime.format('M/D')} - ${endTime.format('M/D')}`;
     // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
