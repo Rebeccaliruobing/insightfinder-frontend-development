@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
+import DatePicker from 'react-datepicker';
 import { Console, Dropdown } from '../../artui/react';
 
 import DateTimePicker from '../../components/ui/datetimepicker/index';
@@ -15,10 +16,9 @@ import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
 import {
   LiveProjectSelection,
-  NumberOfDays, TreeMapSchemeSelect,
+  TreeMapSchemeSelect,
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
-  EventSummaryModelType,
 } from '../../components/selections';
 import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
@@ -37,6 +37,9 @@ class EventSummary extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.defaultNumberOfDays = 7;
+    this.dateFormat = 'YYYY-MM-DD';
 
     this.state = {
       treeMapCPUThreshold: '0',
@@ -113,7 +116,7 @@ class EventSummary extends React.Component {
     }
     this.setState({
       incidentsTreeMap,
-      groupIdMap, 
+      groupIdMap,
       selectedIncident: incident,
       treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
@@ -122,11 +125,14 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleModelTypeChange(value, modelType) {
+  refreshDataByTime(startTime, endTime) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, modelType,
+      ...location.query,
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
     });
+
     router.push({
       pathname: location.pathname,
       query,
@@ -136,32 +142,37 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleDayChange(value, numberOfDays) {
-    const { location, router } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query, numberOfDays: numberOfDays.toString(),
-    });
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
+  handleStartTimeChange(newDate) {
+    const { location } = this.props;
+    const curTime = moment();
 
-    this.refreshInstanceGroup(query);
-  }
+    const startTime = newDate.clone().startOf('day');
+    let endTime = moment(location.query.endTime).endOf('day');
 
-  @autobind
-  handleEndTimeChange(value) {
-    const { location, router } = this.props;
-    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
-    const query = this.applyDefaultParams({ ...location.query, endTime });
-    if (location.query.endTime !== endTime) {
-      router.push({
-        pathname: location.pathname,
-        query,
-      });
-
-      this.refreshInstanceGroup(query);
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
+    if (endTime >= curTime) {
+      endTime = curTime.endOf('day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
+  }
+
+  @autobind
+  handleEndTimeChange(newDate) {
+    const { location } = this.props;
+
+    const endTime = newDate.clone().endOf('day');
+    let startTime = moment(location.query.startTime).startOf('day');
+
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+      startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
   }
 
   @autobind
@@ -187,13 +198,15 @@ class EventSummary extends React.Component {
   refreshInstanceGroup(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    let realEndTime = moment(query.endTime).endOf('day');
-    const curTime = moment();
-    if (realEndTime > curTime) {
-      realEndTime = curTime;
-    }
+    const modelType = query.modelType;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
 
-    const { projectName, instanceGroup, numberOfDays, modelType } = query;
+    const curTime = moment();
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+
+    const { projectName, instanceGroup } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
     const pvalue = pinfo ? pinfo.pvalue : '0.99';
@@ -313,10 +326,6 @@ class EventSummary extends React.Component {
     this.setState({ treeMapScheme: value });
   }
 
-  modelDateValidator(date) {
-    return moment(date) <= moment();
-  }
-
   getTreeMapSchemeText(scheme) {
     if (scheme === 'anomaly') {
       return 'Anomaly';
@@ -330,8 +339,9 @@ class EventSummary extends React.Component {
 
   applyDefaultParams(params) {
     return {
-      endTime: moment().endOf('day').format('YYYY-MM-DD'),
-      numberOfDays: 7,
+      startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day').format(this.dateFormat),
+      endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
       instanceGroup: 'All',
       ...params,
@@ -340,17 +350,21 @@ class EventSummary extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { projectName, instanceGroup, endTime, numberOfDays, modelType } =
-      this.applyDefaultParams(location.query);
+    const params = this.applyDefaultParams(location.query);
+    const { projectName, instanceGroup, modelType } = params;
+    let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
       instanceGroups, lineChartType, groupIdMap } = this.state;
 
-    let realEndTime = moment(endTime).endOf('day');
-    let curTime = moment();
-    if(realEndTime>curTime){
-      realEndTime = curTime;
-    }
+    // Convert startTime, endTime to moment object
+    startTime = moment(startTime, this.dateFormat);
+    endTime = moment(endTime, this.dateFormat);
+    const curTime = moment();
+    const maxEndTime = curTime;
+    const maxStartTime = curTime;
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
@@ -399,29 +413,25 @@ class EventSummary extends React.Component {
               </Dropdown>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>End date:</label>
               <div className="ui input">
-                <DateTimePicker
-                  className="ui input" style={{ width: '50%' }}
-                  dateValidator={this.modelDateValidator}
-                  dateTimeFormat="YYYY-MM-DD" value={endTime}
-                  onChange={this.handleEndTimeChange}
+                <DatePicker
+                  selected={startTime}
+                  dateFormat={this.dateFormat}
+                  maxDate={maxStartTime}
+                  onChange={this.handleStartTimeChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
-              <NumberOfDays
-                style={{ width: 80 }}
-                value={numberOfDays} onChange={this.handleDayChange}
-              />
-            </div>
-            <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Model Type:</label>
-              <EventSummaryModelType
-                style={{ width: 100 }}
-                value={modelType} onChange={this.handleModelTypeChange}
-              />
+              <label style={{ fontWeight: 'bold' }}>End Date:</label>
+              <div className="ui input">
+                <DatePicker
+                  selected={endTime}
+                  dateFormat={this.dateFormat}
+                  maxDate={maxEndTime}
+                  onChange={this.handleEndTimeChange}
+                />
+              </div>
             </div>
             <div className="field">
               <div

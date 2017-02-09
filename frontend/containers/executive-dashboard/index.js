@@ -12,9 +12,7 @@ import { TopListAnomaly, TopListResource } from './top-list';
 import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
-import DateTimePicker from '../../components/ui/datetimepicker';
 import './executive-dashboard.less';
-import { NumberOfDays } from '../../components/selections';
 import normalizeStats from './normalize-stats';
 import { aggregateToMultiHourData } from './heatmap-data';
 
@@ -47,10 +45,6 @@ class ExecutiveDashboard extends React.Component {
 
   componentDidMount() {
     this.refreshData();
-  }
-
-  modelDateValidator(date) {
-    return moment(date) <= moment();
   }
 
   @autobind
@@ -194,6 +188,8 @@ class ExecutiveDashboard extends React.Component {
     const maxEndTime = curTime;
     const maxStartTime = curTime;
     const timeInterval = `${startTime.format('MM-DD')} - ${endTime.format('MM-DD')}`;
+    // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     // Test switch for hourly heatmap
     const { heatmap } = params;
@@ -201,8 +197,11 @@ class ExecutiveDashboard extends React.Component {
     if (heatmap === '1') view = 'hourly';
 
     return (
-      <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
-        <div className={`ui main tiny container ${loading && heatmapLoading ? 'loading' : ''}`}>
+      <Console.Content
+        className={`executive-dashboard ${loading && heatmapLoading ? 'ui form loading' : ''}`}
+        style={{ paddingLeft: 0 }}
+      >
+        <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
@@ -274,7 +273,7 @@ class ExecutiveDashboard extends React.Component {
             className="ui vertical segment"
             {...view === 'hourly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
-            <HourlyHeatmap numberOfDays={7} endTime={endTime} dataset={heatmapData} />
+            <HourlyHeatmap numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData} />
           </div>
         </div>
       </Console.Content>
