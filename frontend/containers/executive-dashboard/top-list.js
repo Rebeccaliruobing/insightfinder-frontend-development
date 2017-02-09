@@ -312,7 +312,7 @@ class TopListAnomaly extends React.Component {
   }
 
   render() {
-    const { stats, style } = this.props;
+    const { stats, style, timeInterval } = this.props;
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
@@ -331,15 +331,24 @@ class TopListAnomaly extends React.Component {
             <th className="subheader" colSpan={3} width="26%">Consolidated Abnormal Events</th>
           </tr>
           <tr>
-            <th>Previous</th>
-            <th>Current<i className="dropdown icon" /></th>
-            <th>Predicted</th>
-            <th>Previous</th>
-            <th>Current</th>
-            <th>Predicted</th>
-            <th>Previous</th>
-            <th>Current</th>
-            <th>Predicted</th>
+            <th><span>Previous</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Current<i className="dropdown icon" /></span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Predicted</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Previous</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Current</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Predicted</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Previous</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Current</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Predicted</span>
+              <span className="interval">{timeInterval}</span></th>
           </tr>
         </thead>
         {stats.map((data) => {
@@ -521,7 +530,7 @@ class TopListResource extends React.Component {
   }
 
   render() {
-    const { stats, style } = this.props;
+    const { stats, style, timeInterval } = this.props;
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
@@ -539,12 +548,18 @@ class TopListResource extends React.Component {
             <th className="subheader" colSpan={3} width="35%">Availability (%)</th>
           </tr>
           <tr>
-            <th>Previous</th>
-            <th>Current</th>
-            <th>Predicted</th>
-            <th>Previous</th>
-            <th>Current</th>
-            <th>Predicted</th>
+            <th><span>Previous</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Current</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Predicted</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Previous</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Current</span>
+              <span className="interval">{timeInterval}</span></th>
+            <th><span>Predicted</span>
+              <span className="interval">{timeInterval}</span></th>
           </tr>
         </thead>
         {stats.map((data) => {

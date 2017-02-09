@@ -6,6 +6,7 @@ import $ from 'jquery';
 import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
 import moment from 'moment';
+import DatePicker from 'react-datepicker';
 import { Console } from '../../artui/react';
 import { TopListAnomaly, TopListResource } from './top-list';
 import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
@@ -32,10 +33,13 @@ class ExecutiveDashboard extends React.Component {
   constructor(props) {
     super(props);
 
+    this.defaultNumberOfDays = 7;
+    this.dateFormat = 'YYYY-MM-DD';
+
     this.state = {
+      loading: true,
       eventStats: [],
       heatmapData: {},
-      loading: true,
       heatmapLoading: true,
       view: 'anomaly',
     };
@@ -49,13 +53,13 @@ class ExecutiveDashboard extends React.Component {
     return moment(date) <= moment();
   }
 
+  @autobind
   applyDefaultParams(params) {
     return {
-      endTime: moment().endOf('day').format('YYYY-MM-DD'),
-      numberOfDays: 7,
+      startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day').format(this.dateFormat),
+      endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
-      period: 3,
-      heatmap: 0,
       ...params,
     };
   }
@@ -69,16 +73,20 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const endTimeOfDay = moment(query.endTime).endOf('day');
+    const modelType = query.modelType;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+
     const curTime = moment();
-    const realEndTime = (endTimeOfDay > curTime ? curTime : endTimeOfDay).valueOf();
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     this.setState({
       loading: true,
       heatmapLoading: true,
       heatmapData: {},
     }, () => {
-      retrieveExecDBStatisticsData(query.modelType, realEndTime, query.numberOfDays)
+      retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays)
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
@@ -88,10 +96,10 @@ class ExecutiveDashboard extends React.Component {
           console.log(msg);
         });
 
-      retrieveHeatmapData(query.modelType, realEndTime, query.numberOfDays, 'loadHourly')
+      retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
         .then((data) => {
           this.setState({
-            heatmapData: aggregateToMultiHourData(data, realEndTime, query.numberOfDays),
+            heatmapData: aggregateToMultiHourData(data, realEndTime, 7),
             heatmapLoading: false,
           });
         }).catch((msg) => {
@@ -101,11 +109,14 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleModelTypeChange(value, modelType) {
+  refreshDataByTime(startTime, endTime) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, modelType,
+      ...location.query,
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
     });
+
     router.push({
       pathname: location.pathname,
       query,
@@ -115,32 +126,37 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleDayChange(value, numberOfDays) {
-    const { location, router } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query, numberOfDays: numberOfDays.toString(),
-    });
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
+  handleStartTimeChange(newDate) {
+    const { location } = this.props;
+    const curTime = moment();
 
-    this.refreshData(query);
-  }
+    const startTime = newDate.clone().startOf('day');
+    let endTime = moment(location.query.endTime).endOf('day');
 
-  @autobind
-  handleEndTimeChange(value) {
-    const { location, router } = this.props;
-    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
-    const query = this.applyDefaultParams({ ...location.query, endTime });
-    if (location.query.endTime !== endTime) {
-      router.push({
-        pathname: location.pathname,
-        query,
-      });
-
-      this.refreshData(query);
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
+    if (endTime >= curTime) {
+      endTime = curTime.endOf('day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
+  }
+
+  @autobind
+  handleEndTimeChange(newDate) {
+    const { location } = this.props;
+
+    const endTime = newDate.clone().endOf('day');
+    let startTime = moment(location.query.startTime).startOf('day');
+
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+      startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
   }
 
   @autobind
@@ -167,63 +183,65 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { endTime, numberOfDays, heatmap } = this.applyDefaultParams(location.query);
-    const { loading, eventStats, view, heatmapData, heatmapLoading } = this.state;
+    const params = this.applyDefaultParams(location.query);
+    let { startTime, endTime } = params;
+    const { loading, eventStats, heatmapLoading, heatmapData } = this.state;
+
+    // Convert startTime, endTime to moment object
+    startTime = moment(startTime, this.dateFormat);
+    endTime = moment(endTime, this.dateFormat);
+    const curTime = moment();
+    const maxEndTime = curTime;
+    const maxStartTime = curTime;
+    const timeInterval = `${startTime.format('MM-DD')} - ${endTime.format('MM-DD')}`;
+
+    // Test switch for hourly heatmap
+    const { heatmap } = params;
+    let { view } = this.state;
+    if (heatmap === '1') view = 'hourly';
 
     return (
       <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
-        <div className="ui main tiny container">
+        <div className={`ui main tiny container ${loading && heatmapLoading ? 'loading' : ''}`}>
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
-            <div className="field" style={{ float: 'left' }}>
+            <div className="field view-switch" style={{ float: 'left' }}>
               <div
-                className={`ui ${view === 'anomaly' ? 'grey' : 'orange'} button`}
-                style={{
-                  borderRadius: 0,
-                  marginRight: 0,
-                  ...{
-                    cursor: `${view === 'anomaly' ? 'default' : 'pointer'}`,
-                    fontWeight: `${view === 'anomaly' ? 'bolder' : 'lighter'}`,
-                  },
-                }}
+                className={`ui ${view === 'anomaly' ? 'grey active' : 'orange'} button`}
                 {...view === 'anomaly' ? {} : {
                   onClick: () => this.setState({ view: 'anomaly' }),
                 }}
               >Anomaly View</div>
               <div
-                className={`ui ${view === 'resource' ? 'grey' : 'orange'} button`}
-                style={{
-                  borderRadius: 0,
-                  marginRight: 0,
-                  ...{
-                    cursor: `${view === 'resource' ? 'default' : 'pointer'}`,
-                    fontWeight: `${view === 'resource' ? 'bolder' : 'lighter'}`,
-                  },
-                }}
+                className={`ui ${view === 'resource' ? 'grey active' : 'orange'} button`}
                 {...view === 'resource' ? {} : {
                   onClick: () => this.setState({ view: 'resource' }),
                 }}
               >Resource View</div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>End date:</label>
+              <label style={{ fontWeight: 'bold' }}>Start Date:</label>
               <div className="ui input">
-                <DateTimePicker
-                  className="ui input" style={{ width: '50%' }}
-                  dateValidator={this.modelDateValidator}
-                  dateTimeFormat="YYYY-MM-DD" value={endTime}
-                  onChange={this.handleEndTimeChange}
+                <DatePicker
+                  selected={startTime}
+                  dateFormat={this.dateFormat}
+                  maxDate={maxStartTime}
+                  onChange={this.handleStartTimeChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
-              <NumberOfDays
-                style={{ width: 120 }}
-                value={numberOfDays} onChange={this.handleDayChange}
-              />
+              <label style={{ fontWeight: 'bold' }}>End Date:</label>
+              <div className="ui input">
+                <DatePicker
+                  selected={endTime}
+                  dateFormat={this.dateFormat}
+                  maxDate={maxEndTime}
+                  onChange={this.handleEndTimeChange}
+                />
+              </div>
             </div>
             <div className="field">
               <div
@@ -232,23 +250,32 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div className={`ui vertical segment ${loading ? 'loading form' : ''}`}>
+          <div
+            className="ui vertical segment"
+            {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
             <TopListAnomaly
+              timeInterval={timeInterval}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
-              {...view === 'anomaly' ? { } : { style: { display: 'none' } }}
-            />
-            <TopListResource
-              stats={eventStats}
-              onRowOpen={this.handleListRowOpenResource}
-              {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
           </div>
-          {heatmap === '1' &&
-            <div className={`ui vertical segment ${heatmapLoading ? 'loading form' : ''}`}>
-              <HourlyHeatmap duration={numberOfDays} endTime={endTime} dataset={heatmapData} />
-            </div>
-          }
+          <div
+            className="ui vertical segment"
+            {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
+            <TopListResource
+              timeInterval={timeInterval}
+              stats={eventStats}
+              onRowOpen={this.handleListRowOpenResource}
+            />
+          </div>
+          <div
+            className="ui vertical segment"
+            {...view === 'hourly' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
+            <HourlyHeatmap numberOfDays={7} endTime={endTime} dataset={heatmapData} />
+          </div>
         </div>
       </Console.Content>
     );
