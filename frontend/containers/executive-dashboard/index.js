@@ -197,11 +197,8 @@ class ExecutiveDashboard extends React.Component {
     if (heatmap === '1') view = 'hourly';
 
     return (
-      <Console.Content
-        className={`executive-dashboard ${loading && heatmapLoading ? 'ui form loading' : ''}`}
-        style={{ paddingLeft: 0 }}
-      >
-        <div className="ui main tiny container">
+      <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
+        <div className={`ui main tiny container ${loading && heatmapLoading ? 'loading' : ''}`}>
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
@@ -225,6 +222,7 @@ class ExecutiveDashboard extends React.Component {
               <div className="ui input">
                 <DatePicker
                   selected={startTime}
+                  todayButton="Today"
                   dateFormat={this.dateFormat}
                   maxDate={maxStartTime}
                   onChange={this.handleStartTimeChange}
@@ -236,6 +234,7 @@ class ExecutiveDashboard extends React.Component {
               <div className="ui input">
                 <DatePicker
                   selected={endTime}
+                  todayButton="Today"
                   dateFormat={this.dateFormat}
                   maxDate={maxEndTime}
                   onChange={this.handleEndTimeChange}

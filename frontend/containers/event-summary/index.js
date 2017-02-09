@@ -416,6 +416,7 @@ class EventSummary extends React.Component {
               <div className="ui input">
                 <DatePicker
                   selected={startTime}
+                  todayButton="Today"
                   dateFormat={this.dateFormat}
                   maxDate={maxStartTime}
                   onChange={this.handleStartTimeChange}
@@ -427,6 +428,7 @@ class EventSummary extends React.Component {
               <div className="ui input">
                 <DatePicker
                   selected={endTime}
+                  todayButton="Today"
                   dateFormat={this.dateFormat}
                   maxDate={maxEndTime}
                   onChange={this.handleEndTimeChange}
