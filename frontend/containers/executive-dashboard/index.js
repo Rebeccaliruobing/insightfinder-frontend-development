@@ -184,12 +184,19 @@ class ExecutiveDashboard extends React.Component {
     // Convert startTime, endTime to moment object
     startTime = moment(startTime, this.dateFormat);
     endTime = moment(endTime, this.dateFormat);
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+
+    let startTimePrevious = moment(startTime).subtract(numberOfDays, 'day');
+    let endTimePrevious = moment(endTime).subtract(numberOfDays, 'day');
+    let startTimePredicted = moment(startTime).add(numberOfDays, 'day');
+    let endTimePredicted = moment(endTime).add(numberOfDays, 'day');
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const timeInterval = `${startTime.format('M/D')} - ${endTime.format('M/D')}`;
+    const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format('M/D')}`;
+    const timeIntervalCurrent = `${startTime.format('M/D')} - ${endTime.format('M/D')}`;
+    const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
     // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     // Test switch for hourly heatmap
     const { heatmap } = params;
@@ -253,7 +260,9 @@ class ExecutiveDashboard extends React.Component {
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListAnomaly
-              timeInterval={timeInterval}
+              timeIntervalPrevious={timeIntervalPrevious}
+              timeIntervalCurrent={timeIntervalCurrent}
+              timeIntervalPredicted={timeIntervalPredicted}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
             />
@@ -263,7 +272,9 @@ class ExecutiveDashboard extends React.Component {
             {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListResource
-              timeInterval={timeInterval}
+              timeIntervalPrevious={timeIntervalPrevious}
+              timeIntervalCurrent={timeIntervalCurrent}
+              timeIntervalPredicted={timeIntervalPredicted}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenResource}
             />

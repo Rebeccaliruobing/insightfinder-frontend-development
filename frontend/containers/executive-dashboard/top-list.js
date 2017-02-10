@@ -312,7 +312,7 @@ class TopListAnomaly extends React.Component {
   }
 
   render() {
-    const { stats, style, timeInterval } = this.props;
+    const { stats, style, timeIntervalPrevious, timeIntervalCurrent, timeIntervalPredicted, } = this.props;
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
@@ -332,23 +332,23 @@ class TopListAnomaly extends React.Component {
           </tr>
           <tr>
             <th><span>Previous</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPrevious}</span></th>
             <th><span>Current<i className="dropdown icon" /></span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalCurrent}</span></th>
             <th><span>Predicted</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPredicted}</span></th>
             <th><span>Previous</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPrevious}</span></th>
             <th><span>Current</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalCurrent}</span></th>
             <th><span>Predicted</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPredicted}</span></th>
             <th><span>Previous</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPrevious}</span></th>
             <th><span>Current</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalCurrent}</span></th>
             <th><span>Predicted</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPredicted}</span></th>
           </tr>
         </thead>
         {stats.map((data) => {
@@ -530,7 +530,7 @@ class TopListResource extends React.Component {
   }
 
   render() {
-    const { stats, style, timeInterval } = this.props;
+    const { stats, style, timeIntervalPrevious, timeIntervalCurrent, timeIntervalPredicted,  } = this.props;
     const { expandedProjects, expandedItemIndices } = this.state;
 
     return (
@@ -549,17 +549,17 @@ class TopListResource extends React.Component {
           </tr>
           <tr>
             <th><span>Previous</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPrevious}</span></th>
             <th><span>Current</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalCurrent}</span></th>
             <th><span>Predicted</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPredicted}</span></th>
             <th><span>Previous</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPrevious}</span></th>
             <th><span>Current</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalCurrent}</span></th>
             <th><span>Predicted</span>
-              <span className="interval">{timeInterval}</span></th>
+              <span className="interval">{timeIntervalPredicted}</span></th>
           </tr>
         </thead>
         {stats.map((data) => {

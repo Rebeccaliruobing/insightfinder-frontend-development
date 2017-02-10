@@ -107,7 +107,8 @@ class EventTableGroup extends React.Component {
 
     return (
       <div className="ui grid">
-      <div className="three wide column">
+      <div className="three wide column"
+            style={{maxHeight: '700px', overflow: 'auto'}}>
         <table className="ui selectable celled table">
           <thead>
               <tr>
@@ -269,7 +270,7 @@ class LogAnalysisCharts extends React.Component {
   }
 
   calculateEventTableData() {
-
+    let topKCount = 5;
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
@@ -325,6 +326,14 @@ class LogAnalysisCharts extends React.Component {
         groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
         groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
         groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
+
+        let arr = groupData.topKEpisodes.split(",");
+        arr = arr.slice(0,topKCount);
+        groupData.topKEpisodes = arr.toString();
+        arr = groupData.topKWords.split(",");
+        arr = arr.slice(0,topKCount);
+        groupData.topKWords = arr.toString();
+
         groupData.data = [[timestamp, event.rawData, event.timestamp]];
         allEventTableData.push(groupData);
       } else {
@@ -384,6 +393,14 @@ class LogAnalysisCharts extends React.Component {
         groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
         groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
         groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
+
+        let arr = groupData.topKEpisodes.split(",");
+        arr = arr.slice(0,topKCount);
+        groupData.topKEpisodes = arr.toString();
+        arr = groupData.topKWords.split(",");
+        arr = arr.slice(0,topKCount);
+        groupData.topKWords = arr.toString();
+
         groupData.data = [[timestamp, event.rawData, event.timestamp]];
         eventTableData.push(groupData);
       } else {
@@ -764,10 +781,10 @@ class LogAnalysisCharts extends React.Component {
 
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
-    // <br />(sorted by CPU usage)
     return (
       <div className="ui grid">
-        <div className="three wide column">
+        <div className="three wide column"
+            style={{maxHeight: '700px', overflow: 'auto'}}>
           <table className="ui selectable celled table">
             <thead>
               <tr>
@@ -889,10 +906,7 @@ class LogAnalysisCharts extends React.Component {
     const self = this;
     return(
       <div>
-        <div className="ui header">
-          Cluster frequent episodes:
-        </div>
-        <div>
+        <div style={{maxHeight: '700px', overflow: 'auto'}}>
           <table style={{ width:'90%' }} className="episode-table ui celled table">
             <thead>
             <tr>
@@ -984,7 +998,7 @@ class LogAnalysisCharts extends React.Component {
             <a className={tabStates['freq'] + ' item'}
                onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
             <a className={tabStates['clusterfe'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'clusterfe')}>Cluster Frequent Episode</a>
+               onClick={(e) => this.selectTab(e, 'clusterfe')}>Frequent Pattern Sequences</a>
           </div>
           <div className={tabStates['event'] + ' ui tab '}>
             {tabStates['event'] === 'active' ? (

@@ -63,6 +63,7 @@ export default class ThresholdSettings extends React.Component {
       },
       data: {},
       tempSharedUsernames: '',
+      tempLogFreqWindow: '',
       tempLearningSkippingPeriod: '',
       tempDetectionSkippingPeriod: '',
       metricSettings: [],
@@ -88,9 +89,9 @@ export default class ThresholdSettings extends React.Component {
 
     this.sensitivityMap = {};
     this.sensitivityMap["0.99"] = "Low";
-    this.sensitivityMap["0.97"] = "Medium Low";
-    this.sensitivityMap["0.95"] = "Medium";
-    this.sensitivityMap["0.9"] = "Medium High";
+    this.sensitivityMap["0.95"] = "Medium Low";
+    this.sensitivityMap["0.9"] = "Medium";
+    this.sensitivityMap["0.75"] = "Medium High";
     this.sensitivityMap["0.5"] = "High";
   }
 
@@ -138,7 +139,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames } = project;
+    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames,logFreqWindow } = project;
     let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
     if (!projectStr) {
       projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
@@ -195,6 +196,7 @@ export default class ThresholdSettings extends React.Component {
       predictionWindow,
       minAnomalyRatioFilter,
       sharedUsernames,
+      logFreqWindow,
       pvalueText:this.sensitivityMap[pvalue], 
       derivedpvalueText:this.sensitivityMap[derivedpvalue],
       emailpvalueText:this.sensitivityMap[emailpvalue],
@@ -204,6 +206,7 @@ export default class ThresholdSettings extends React.Component {
       data: data,
       groupingRules,
       tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+      tempLogFreqWindow: (data.logFreqWindow || ''),
       tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
       tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
       loading: projectSetting['fileProjectType'] == 0,
@@ -334,6 +337,14 @@ export default class ThresholdSettings extends React.Component {
     });
   }
 
+  handleLogFreqWindowChange(e) {
+    let v = e.target.value;
+    this.setState({
+      tempLogFreqWindow: v,
+      data: Object.assign({}, this.state.data, { logFreqWindow: v })
+    });
+  }
+
   handleSharingChange(e) {
     let v = e.target.value;
     this.setState({
@@ -431,10 +442,10 @@ export default class ThresholdSettings extends React.Component {
   }
 
   handleSaveProjectSetting() {
-    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
-    let { tempSharedUsernames, data } = this.state;
+    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, logFreqWindow, } = this.state.data;
+    let { tempSharedUsernames, tempLogFreqWindow, data } = this.state;
     this.setState({ settingLoading: true }, ()=> {
-      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
+      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, tempSharedUsernames, tempLogFreqWindow, projectHintMapFilename).then((resp)=> {
         if (!resp.success) {
           window.alert(resp.message);
         }
@@ -477,7 +488,7 @@ export default class ThresholdSettings extends React.Component {
   render() {
     let labelStyle = {};
     let {
-      data, tempSharedUsernames, tempLearningSkippingPeriod, tempDetectionSkippingPeriod, 
+      data, tempSharedUsernames, tempLearningSkippingPeriod, tempDetectionSkippingPeriod, tempLogFreqWindow,
       loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0,
       groupingRules,
     } = this.state;
@@ -559,9 +570,9 @@ export default class ThresholdSettings extends React.Component {
                     key={data.projectName} value={data.cvalue}
                     onChange={this.handleValueChange('cvalue')} />
                 </div>
-                <h3>Frequency Anomaly Detection Sensitivity</h3>
+                <h3>Frequency Anomaly Detection Settings</h3>
                 <p>
-                  This setting controls sensitivity InsightFinder will 
+                  Sensitivity: This setting controls sensitivity InsightFinder will 
                   alert on frequency anomaly in given a time window. 
                   With higher sensitivity, system detects more anomalies. 
                 </p>
@@ -570,6 +581,17 @@ export default class ThresholdSettings extends React.Component {
                     style={{width: 180}}
                     key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText}
                     onChange={this.handleValueTextChange('derivedpvalue', 'derivedpvalueText')} />
+                </div>
+                <p>
+                  Window (minute): This setting controls window in minutes by which frequency are grouped. 
+                </p>
+                <div className="field">
+                  <div className="ui input"
+                      style={{width: 180}}>
+                    <input type="text"
+                      value={tempLogFreqWindow}
+                      onChange={this.handleLogFreqWindowChange.bind(this)}/>
+                  </div>
                 </div>
                 <Button className="blue"
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>

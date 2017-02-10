@@ -6,7 +6,7 @@ import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../
 import {
   ModelType,
   BenchmarkModelType,
-  AnomalyThreshold,
+  AnomalyThresholdSensitivity,
   DurationThreshold,
 } from '../../selections';
 
@@ -24,6 +24,14 @@ export default  class FilterBar extends Component {
 
   constructor(props) {
     super(props);
+
+    this.sensitivityMap = {};
+    this.sensitivityMap["0.99"] = "Low";
+    this.sensitivityMap["0.95"] = "Medium Low";
+    this.sensitivityMap["0.9"] = "Medium";
+    this.sensitivityMap["0.75"] = "Medium High";
+    this.sensitivityMap["0.5"] = "High";
+
     this.state = {
       pvalue: 0.99,
       cvalue: 5,
@@ -31,6 +39,7 @@ export default  class FilterBar extends Component {
       epsilon: 1.0,
       startTime: moment().add(-1, 'w').toDate(),
       endTime: moment().toDate(),
+      pvalueText:this.sensitivityMap[0.99], 
       systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       modelType: "Holistic",
       modelTypeText: "Holistic",
@@ -98,6 +107,7 @@ export default  class FilterBar extends Component {
           endTime,
           pvalue,
           cvalue,
+          pvalueText:this.sensitivityMap[pvalue], 
           activeItem: item,
           description: item.metaData.desc,
           modelType,
@@ -162,6 +172,14 @@ export default  class FilterBar extends Component {
     });
   }
 
+  handleValueTextChange(val, text) {
+    return (v,t) => {
+      this.setState({
+        data: Object.assign({}, this.state.data, _.fromPairs([[val, v],[text, t]]))
+      });
+    };
+  }
+
   handleRemoveRow() {
     let {fromUser, dataChunkName, modelKey, projectName, modelName, modelType} = this.state.activeItem;
     this.setState({loading: true});
@@ -203,7 +221,7 @@ export default  class FilterBar extends Component {
             // </div>
 
   render() {
-    const {systemNames, startTime, endTime, description, cvalue, pvalue, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
+    const {systemNames, startTime, endTime, description, cvalue, pvalue, pvalueText, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
@@ -225,7 +243,9 @@ export default  class FilterBar extends Component {
               :
               <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
                 <label style={labelStyle}>Anomaly Threshold</label>
-                <AnomalyThreshold value={pvalue} onChange={(v, t)=>this.setState({pvalue: t})}/>
+                <AnomalyThresholdSensitivity
+                  value={pvalue} text={pvalueText}
+                  onChange={this.handleValueTextChange('pvalue', 'pvalueText')} />
               </div>
             }
             {modelType == 'DBScan'?
