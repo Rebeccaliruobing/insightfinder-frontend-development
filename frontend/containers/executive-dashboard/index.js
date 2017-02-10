@@ -54,6 +54,7 @@ class ExecutiveDashboard extends React.Component {
         .startOf('day').format(this.dateFormat),
       endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
+      heatmap: 0,
       ...params,
     };
   }
@@ -93,7 +94,7 @@ class ExecutiveDashboard extends React.Component {
       retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
         .then((data) => {
           this.setState({
-            heatmapData: aggregateToMultiHourData(data, realEndTime, 7),
+            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
             heatmapLoading: false,
           });
         }).catch((msg) => {
@@ -178,7 +179,7 @@ class ExecutiveDashboard extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    let { startTime, endTime } = params;
+    let { startTime, endTime, heatmap } = params;
     const { loading, eventStats, heatmapLoading, heatmapData } = this.state;
 
     // Convert startTime, endTime to moment object
@@ -198,14 +199,14 @@ class ExecutiveDashboard extends React.Component {
     const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
     // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
 
-    // Test switch for hourly heatmap
-    const { heatmap } = params;
-    let { view } = this.state;
-    if (heatmap === '1') view = 'hourly';
+    const { view } = this.state;
 
     return (
-      <Console.Content className="executive-dashboard" style={{ paddingLeft: 0 }}>
-        <div className={`ui main tiny container ${loading && heatmapLoading ? 'loading' : ''}`}>
+      <Console.Content
+        className={`executive-dashboard  ${loading || heatmapLoading ? 'ui form loading' : ''}`}
+        style={{ paddingLeft: 0 }}
+      >
+        <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
@@ -255,6 +256,27 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
+          {heatmap === '1' &&
+            <div
+              className="ui vertical segment"
+              {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
+            >
+              <div className="heatmap-block">
+                <h3>Hourly Anomaly Score</h3>
+                <HourlyHeatmap
+                  statSelector={d => d.totalAnomalyScore}
+                  numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
+                />
+              </div>
+              <div className="heatmap-block">
+                <h3>Hourly Anomaly Events</h3>
+                <HourlyHeatmap
+                  statSelector={d => d.numberOfEvents}
+                  numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
+                />
+              </div>
+            </div>
+          }
           <div
             className="ui vertical segment"
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
@@ -278,12 +300,6 @@ class ExecutiveDashboard extends React.Component {
               stats={eventStats}
               onRowOpen={this.handleListRowOpenResource}
             />
-          </div>
-          <div
-            className="ui vertical segment"
-            {...view === 'hourly' || view === 'all' ? {} : { style: { display: 'none' } }}
-          >
-            <HourlyHeatmap numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData} />
           </div>
         </div>
       </Console.Content>
