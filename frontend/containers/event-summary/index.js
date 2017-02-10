@@ -150,7 +150,7 @@ class EventSummary extends React.Component {
     let endTime = moment(location.query.endTime).endOf('day');
 
     const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
     if (endTime >= curTime) {
@@ -168,7 +168,7 @@ class EventSummary extends React.Component {
     let startTime = moment(location.query.startTime).startOf('day');
 
     const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
     }
 

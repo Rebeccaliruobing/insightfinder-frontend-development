@@ -128,7 +128,7 @@ class ExecutiveDashboard extends React.Component {
     let endTime = moment(location.query.endTime).endOf('day');
 
     const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
     if (endTime >= curTime) {
@@ -146,7 +146,7 @@ class ExecutiveDashboard extends React.Component {
     let startTime = moment(location.query.startTime).startOf('day');
 
     const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays < 0) {
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
     }
 
@@ -186,10 +186,10 @@ class ExecutiveDashboard extends React.Component {
     endTime = moment(endTime, this.dateFormat);
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
-    let startTimePrevious = moment(startTime).subtract(numberOfDays, 'day');
-    let endTimePrevious = moment(endTime).subtract(numberOfDays, 'day');
-    let startTimePredicted = moment(startTime).add(numberOfDays, 'day');
-    let endTimePredicted = moment(endTime).add(numberOfDays, 'day');
+    const startTimePrevious = moment(startTime).subtract(numberOfDays, 'day');
+    const endTimePrevious = moment(endTime).subtract(numberOfDays, 'day');
+    const startTimePredicted = moment(startTime).add(numberOfDays, 'day');
+    const endTimePredicted = moment(endTime).add(numberOfDays, 'day');
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
