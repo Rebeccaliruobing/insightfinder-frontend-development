@@ -541,64 +541,62 @@ class LogAnalysisCharts extends React.Component {
 
     if (logEventArr) {
       return (
-        <div className="flex-col-container">
+        <div>
           <div className="ui header">Number of rare events: {logEventArr.length}</div>
-          <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <table className="rare-event-table">
-              <thead>
-                <tr>
-                  <td>Time</td>
-                  <td>Event</td>
-                </tr>
-              </thead>
-              <tbody>
-                {logEventArr.map((event, iEvent) => {
-                  let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                  let anomalyString = event.anomaly;
-                  let topKEpisodes = "";
-                  let topKWords = "";
-                  let pos = 0;
-                  let clusterFeature = "";
-                  if (anomalyString == undefined) {
-                    anomalyString = "";
-                    topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-                    topKEpisodes = topKEpisodes ? topKEpisodes.topK : [];
-                    if (topKEpisodes.length > 0) {
-                      var entries = topKEpisodes.split(',');
-                      _.each(entries, function (entry, ie) {
-                        pos = entry.indexOf('(');
-                        if (pos != -1) {
-                          anomalyString += entry.substring(0, pos) + ' ';
-                        }
-                      });
-                    }
-                    topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-                    topKWords = topKWords ? topKWords.topK : [];
-                    if (topKWords.length > 0) {
-                      var entries = topKWords.split(',');
-                      _.each(entries, function (entry, ie) {
-                        pos = entry.indexOf('(');
-                        if (pos != -1) {
-                          anomalyString += entry.substring(0, pos) + ' ';
-                        }
-                      });
-                    }
+          <table className="rare-event-table">
+            <thead>
+              <tr>
+                <td>Time</td>
+                <td>Event</td>
+              </tr>
+            </thead>
+            <tbody>
+              {logEventArr.map((event, iEvent) => {
+                let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+                let anomalyString = event.anomaly;
+                let topKEpisodes = "";
+                let topKWords = "";
+                let pos = 0;
+                let clusterFeature = "";
+                if (anomalyString == undefined) {
+                  anomalyString = "";
+                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
+                  topKEpisodes = topKEpisodes ? topKEpisodes.topK : [];
+                  if (topKEpisodes.length > 0) {
+                    var entries = topKEpisodes.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if (pos != -1) {
+                        anomalyString += entry.substring(0, pos) + ' ';
+                      }
+                    });
                   }
-                  return (
-                    <tr key={iEvent}>
-                      <td>{timestamp}</td>
-                      <td>{event.rawData}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
+                  topKWords = topKWords ? topKWords.topK : [];
+                  if (topKWords.length > 0) {
+                    var entries = topKWords.split(',');
+                    _.each(entries, function (entry, ie) {
+                      pos = entry.indexOf('(');
+                      if (pos != -1) {
+                        anomalyString += entry.substring(0, pos) + ' ';
+                      }
+                    });
+                  }
+                }
+                return (
+                  <tr key={iEvent}>
+                    <td>{timestamp}</td>
+                    <td>{event.rawData}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
-      );
+      )
     }
   }
- 
+  
   getFreqVectorAnnotations(top1FreqData, top1NidData, label) {
     return _.map(top1FreqData, freq => {
       let ts = +moment(freq[0]);
@@ -784,75 +782,73 @@ class LogAnalysisCharts extends React.Component {
     let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
     return (
-      <div className="flex-row-container">
-        <div className="flex-col-container" style={{
-          border: '1px solid rgba(34, 36, 38, 0.15)', marginBottom: 10,
-        }}>
-          <h4 style={{
-            background: '#F9FAFB',
-            width: '100%', height: 40, padding: 10, margin: 0,
-          }}>Pattern List</h4>
-          <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <table className="ui selectable celled table" style={{ border: 0 }}>
-              <tbody>
-                {patterns && patterns.map((pattern, i) => {
-                  let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern', 'neuron')];
-                  let anomalyCount = "";
-                  if (derivedAnomaly && derivedAnomaly.length > 0) {
-                    anomalyCount = " (Anomaly count: " + derivedAnomaly.length + ")";
-                  }
-                  let patternNo = parseInt(pattern.replace("Pattern ", ""));
-                  let group = _.find(eventTableData, group => group.nid == patternNo);
-                  let topKEpisodes = "";
-                  let topKWords = "";
-                  if (group) {
-                    topKEpisodes = group.topKEpisodes.length > 0
-                      ? "Top frequent episodes: " + group.topKEpisodes.replace(/\(\d+\)/g, "") : "";
-                    topKWords = group.topKWords.length > 0
-                      ? "Top keywords: " + group.topKWords.replace(/\(\d+\)/g, "") : "";
-                  }
-                  return (<tr
-                    key={i}
-                    onClick={() => this.handlePatternSelected(pattern)}
-                    className={cx({ active: pattern === this.state.selectedPattern })}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td><b>{pattern}</b>{anomalyCount}<br />{topKWords}<br />{topKEpisodes}</td>
-                  </tr>)
-                })}
-              </tbody>
-            </table>
-          </div>
+      <div className="ui grid">
+        <div className="three wide column"
+          style={{ maxHeight: '700px', overflow: 'auto' }}>
+          <table className="ui selectable celled table">
+            <thead>
+              <tr>
+                <th><span
+                  style={{ fontWeight: 'bold' }}
+                >Pattern List</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {patterns && patterns.map((pattern, i) => {
+                let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern', 'neuron')];
+                let anomalyCount = "";
+                if (derivedAnomaly && derivedAnomaly.length > 0) {
+                  anomalyCount = " (Anomaly count: " + derivedAnomaly.length + ")";
+                }
+                let patternNo = parseInt(pattern.replace("Pattern ", ""));
+                let group = _.find(eventTableData, group => group.nid == patternNo);
+                let topKEpisodes = "";
+                let topKWords = "";
+                if (group) {
+                  topKEpisodes = group.topKEpisodes.length > 0
+                    ? "Top frequent episodes: " + group.topKEpisodes.replace(/\(\d+\)/g, "") : "";
+                  topKWords = group.topKWords.length > 0
+                    ? "Top keywords: " + group.topKWords.replace(/\(\d+\)/g, "") : "";
+                }
+                return (<tr
+                  key={i}
+                  onClick={() => this.handlePatternSelected(pattern)}
+                  className={cx({ active: pattern === this.state.selectedPattern })}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <td><b>{pattern}</b>{anomalyCount}<br />{topKWords}<br />{topKEpisodes}</td>
+                </tr>)
+              })}
+            </tbody>
+          </table>
         </div>
-        <div className="flex-item flex-col-container" style={{ margin: '0 0 10px 10px' }}>
-          <div>
-            {selectedPattern && selectedPatternChartData &&
-              <div style={{ width: '100%', backgroundColor: '#fff', padding: 0 }}>
-                <h4 className="ui header">{title}</h4>
-                <DataChart
-                  chartType='bar'
-                  data={selectedPatternChartData}
-                  barColors={selectedBarColors}
-                  annotations={emptyAnnotations}
-                  onClick={this.handlePatternPointClick}
-                />
-              </div>
-            }
-            {(selectedDetailedText && selectedDetailedText.length) ?
-              <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', left: selectedDetailedTextLeftPosition }}>
-                {selectedDetailedText}
-              </div>
-              :
-              <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', left: selectedDetailedTextLeftPosition }}>
-                &nbsp;
+        <div className="thirteen wide column">
+          {selectedPattern && selectedPatternChartData &&
+            <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
+              <h4 className="ui header">{title}</h4>
+              <DataChart
+                chartType='bar'
+                data={selectedPatternChartData}
+                barColors={selectedBarColors}
+                annotations={emptyAnnotations}
+                onClick={this.handlePatternPointClick}
+              />
             </div>
-            }
-            {eventsInRangeFreqVector && eventsInRangeFreqVector.length > 0 &&
-              <h4 style={{ marginBottom: '1em' }}>Event List</h4>
-            }
-          </div>
-          {eventsInRangeFreqVector && eventsInRangeFreqVector.length > 0 &&
-            <div className="flex-item" style={{ overflowY: 'auto' }}>
+          }
+          {(selectedDetailedText && selectedDetailedText.length) ?
+            <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition }}>
+              {selectedDetailedText}
+            </div>
+            :
+            <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition }}>
+              &nbsp;
+            </div>
+          }
+          {(eventsInRangeFreqVector && eventsInRangeFreqVector.length) ?
+            <div>
+              <br /><br /><br />
+              <h4>Event List</h4>
               <table className="freq-event-table">
                 <thead>
                   <tr>
@@ -870,6 +866,7 @@ class LogAnalysisCharts extends React.Component {
                 </tbody>
               </table>
             </div>
+            : null
           }
         </div>
       </div>
@@ -884,19 +881,13 @@ class LogAnalysisCharts extends React.Component {
 
     if (logEventArr) {
       return (
-        <div className="flex-col-container">
-          <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <div className="ui header">
-              Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
-            </div>
-            <EventTableGroup
-              handleSelectedGroup={this.handleEventTableSelected}
-              selectedGroup={selectedEventTableData}
-              eventTableData={eventTableData}
-            />
+        <div>
+          <div className="ui header">
+            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
           </div>
+          <EventTableGroup handleSelectedGroup={this.handleEventTableSelected} selectedGroup={selectedEventTableData} eventTableData={eventTableData} />
         </div>
-      );
+      )
     }
   }
 
@@ -914,8 +905,8 @@ class LogAnalysisCharts extends React.Component {
     const logNidFE = this.dp.logNidFE;
     const self = this;
     return (
-      <div className="flex-col-container">
-        <div className="flex-item" style={{ overflowY: 'auto' }}>
+      <div>
+        <div style={{ maxHeight: '700px', overflow: 'auto' }}>
           <table style={{ width: '90%' }} className="episode-table ui celled table">
             <thead>
               <tr>
@@ -993,20 +984,20 @@ class LogAnalysisCharts extends React.Component {
 
   render() {
     const { loading, onRefresh } = this.props;
-    const { tabStates } = this.state;
+    const { tabStates, logEventArr, allLogEventArr, rareLogEventArr, neuronValue } = this.state;
+
+    const contentStyle = { paddingLeft: 0 };
+    const contentClass = loading ? 'ui form loading' : '';
+    const summary = this.summary;
+    console.log(summary);
 
     return (
       <Console.Wrapper>
         <Console.Content
           style={{ paddingLeft: 0 }} className={loading ? 'ui form loading' : ''}
         >
-          <div className="ui main tiny container" style={{ height: '100%' }}>
-            <div className="flex-col-container" style={{ height: '100%' }}>
-              <Button
-                className="small labeled icon"
-                style={{ position: 'absolute', right: 0, top: '1em' }}
-                onClick={() => onRefresh()}
-              ><i className="icon refresh" />Refresh</Button>
+          <div className="ui main tiny container" style={{ minHeight: '100%' }}>
+            <div className="ui vertical segment">
               <div className="ui pointing secondary menu">
                 <a className={tabStates['event'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
@@ -1016,11 +1007,31 @@ class LogAnalysisCharts extends React.Component {
                   onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
                 <a className={tabStates['clusterfe'] + ' item'}
                   onClick={(e) => this.selectTab(e, 'clusterfe')}>Frequent Pattern Sequences</a>
+                <Button
+                  className="small labeled icon" style={{ position: 'absolute', right: 0 }}
+                  onClick={() => onRefresh()}
+                ><i className="icon refresh" />Refresh</Button>
               </div>
-              {tabStates['event'] === 'active' && this.renderEventTable()}
-              {tabStates['anomaly'] === 'active' && this.renderAnomalyTable()}
-              {tabStates['freq'] === 'active' && this.renderFreqCharts()}
-              {tabStates['clusterfe'] === 'active' && this.renderClusterFETable()}
+              <div className={tabStates['event'] + ' ui tab '}>
+                {tabStates['event'] === 'active' ? (
+                  this.renderEventTable()
+                ) : null}
+              </div>
+              <div className={tabStates['anomaly'] + ' ui tab '}>
+                {tabStates['anomaly'] === 'active' ? (
+                  this.renderAnomalyTable()
+                ) : null}
+              </div>
+              <div className={tabStates['freq'] + ' ui tab '}>
+                {tabStates['freq'] === 'active' ? (
+                  this.renderFreqCharts()
+                ) : null}
+              </div>
+              <div className={tabStates['clusterfe'] + ' ui tab '}>
+                {tabStates['clusterfe'] === 'active' ? (
+                  this.renderClusterFETable()
+                ) : null}
+              </div>
             </div>
           </div>
         </Console.Content>
