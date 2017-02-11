@@ -68,7 +68,7 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const modelType = query.modelType;
+    const { modelType, heatmap } = query;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
 
@@ -78,7 +78,7 @@ class ExecutiveDashboard extends React.Component {
 
     this.setState({
       loading: true,
-      heatmapLoading: true,
+      heatmapLoading: (heatmap === '1'),
       heatmapData: {},
     }, () => {
       retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays)
@@ -91,15 +91,17 @@ class ExecutiveDashboard extends React.Component {
           console.log(msg);
         });
 
-      retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
-        .then((data) => {
-          this.setState({
-            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
-            heatmapLoading: false,
+      if(heatmap === '1'){
+        retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
+          .then((data) => {
+            this.setState({
+              heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+              heatmapLoading: false,
+            });
+          }).catch((msg) => {
+            console.log(msg);
           });
-        }).catch((msg) => {
-          console.log(msg);
-        });
+      }
     });
   }
 
