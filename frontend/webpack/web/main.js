@@ -1,7 +1,9 @@
+/* eslint-disable no-console */
 import express from 'express';
 import webpack from 'webpack';
-import webpackDev from 'webpack-dev-middleware-webpack-2';
+import webpackDev from 'webpack-dev-middleware';
 import webpackHot from 'webpack-hot-middleware';
+import chalk from 'chalk';
 import proxyMiddleware from 'http-proxy-middleware';
 import path from 'path';
 import webpackSettings from '../../webpack.settings';
@@ -12,6 +14,7 @@ const config = makeConfig();
 const compiler = webpack(config);
 
 app.use(webpackDev(compiler, {
+  headers: { 'Access-Control-Allow-Origin': '*' },
   publicPath: config.output.publicPath,
   watchOptions: {
     aggregateTimeout: 300,
@@ -52,4 +55,11 @@ app.use('*', (req, res, next) => {
   });
 });
 
-app.listen(webpackSettings.hotPort);
+app.listen(webpackSettings.hotPort, (err) => {
+  if (err) {
+    console.error(`${chalk.red('error')} ${err}`);
+  } else {
+    const url = `http://localhost:${webpackSettings.hotPort}`;
+    console.log(`✨  Listening at ${chalk.green(url)}`);
+  }
+});

@@ -1,39 +1,38 @@
 /*
  * Webpack module/rules configuration for js/jsx compilation.
- *
- * Dependant packages:
- * $ npm i -D babel-loader babel-plugin-transform-runtime
- * $ npm i -S babel-runtime
 **/
+
+import webpack from 'webpack';
+import HappyPack from 'happypack';
 
 const babel = (settings) => {
   const { isDev, paths } = settings;
 
   // Use babel-runtime instead of babel-polyfill to avoid polluting global namespace.
   // https://medium.com/@jcse/clearing-up-the-babel-6-ecosystem-c7678a314bf3#.j8i3fgvvf
-  let plugins = [
+  // TODO: How to use runtime & polyfill
+  let rulePlugins = [
     ['transform-runtime', {
       helpers: false,
       polyfill: false,
-      regenerator: false }],
-    'babel-plugin-transform-decorators-legacy',
+      regenerator: false,
+    }],
+    'transform-decorators-legacy',
   ];
 
   if (isDev) {
-    plugins = plugins.concat([
+    rulePlugins = rulePlugins.concat([
       'react-hot-loader/babel',
     ]);
   } else {
-    plugins = plugins.concat([
+    rulePlugins = rulePlugins.concat([
       'transform-react-constant-elements',
     ]);
   }
 
-  return {
-    resource: {
-      test: /\.jsx?$/,
-      exclude: paths.node_modules,
-    },
+  const rules = [{
+    test: /\.jsx?$/,
+    exclude: paths.node_modules,
     loaders: [{
       loader: 'babel-loader',
       options: {
@@ -44,9 +43,38 @@ const babel = (settings) => {
           'react',
           'stage-0',
         ],
-        plugins,
+        plugins: rulePlugins,
       },
     }],
+  }];
+
+  let plugins = [
+    new webpack.NoEmitOnErrorsPlugin(),
+    new HappyPack({
+      id: 'js',
+      threads: 4,
+      loaders: ['babel-loader'],
+    }),
+  ];
+
+  if (isDev) {
+    plugins = plugins.concat([
+      new webpack.HotModuleReplacementPlugin(),
+    ]);
+  } else {
+    plugins = plugins.concat([
+      new webpack.optimize.UglifyJsPlugin({
+        compress: {
+          screw_ie8: true,
+          warnings: false,
+        },
+      }),
+    ]);
+  }
+
+  return {
+    rules,
+    plugins,
   };
 };
 

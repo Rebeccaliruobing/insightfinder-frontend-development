@@ -4,6 +4,7 @@ const args = yargs
   .alias({
     p: 'production',
     t: 'testing',
+    w: 'watch',
   })
   .argv;
 

@@ -12,6 +12,8 @@ const distDir = path.join(currentDir, '../static');
 const nodeModulesDir = path.join(currentDir, 'node_modules');
 const htmlsDir = path.join(sourceDir, 'web/app/htmls');
 
+// Use the reducers to create the state records which will include the type info,
+// and then set the initial value of the records.
 // The initialState is used by html template to generate the pages. For different
 // html template, the initialState might be different.
 const initialState = {};
@@ -35,8 +37,8 @@ const webpackSettings = {
     node_modules: nodeModulesDir,
   },
 
-  // others webpack module rules, mainly for exports & expose
-  moduleRules: [{
+  // others webpack loaders, mainly for exports & expose
+  loaders: [{
     test: require.resolve('dygraphs/dygraph-combined-dev'),
     loader: 'exports-loader?Dygraph',
   }, {
@@ -44,7 +46,7 @@ const webpackSettings = {
     loaders: ['expose-loader?$', 'expose-loader?jQuery'],
   }],
 
-  // others webpack plugins.
+  // plugins
   plugins: [
     new webpack.ProvidePlugin({
       _: 'lodash',
@@ -57,9 +59,6 @@ const webpackSettings = {
       cx: 'classnames',
     }),
   ],
-
-  // resolve alias
-  // resolveAlias: {},
 
   // Define the starting points of app, use object syntax.
   // https://webpack.js.org/concepts/entry-points/

@@ -5,13 +5,17 @@
  * $ npm i -D file-loader url-loader
  * $ npm i -D css-loader postcss-loader style-loader
  * $ npm i -D node-sass sass-loader less less-loader
- * $ npm i -D extract-text-webpack-plugin@2.0.0-beta.4
  **/
 
+import webpack from 'webpack';
+import HappyPack from 'happypack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import autoprefixer from 'autoprefixer';
 
-const assets = (settings) => {
-  const { isDev } = settings;
+const happyThreadPool = HappyPack.ThreadPool({ size: 4 });
+
+const styles = (settings) => {
+  const { isDev, isProd } = settings;
 
   const styleLoaders = (loaders) => {
     if (isDev) {
@@ -35,7 +39,7 @@ const assets = (settings) => {
     loader: 'postcss-loader',
   }];
 
-  return [{
+  const rules = [{
     // normal css
     test: /\.css$/,
     loaders: styleLoaders(cssLoaders),
@@ -52,6 +56,39 @@ const assets = (settings) => {
       loader: `less-loader${isDev ? '?sourceMap' : ''}`,
     })),
   }];
+
+  let plugins = [
+    new HappyPack({
+      id: 'sass',
+      threadPool: happyThreadPool,
+      loaders: ['sass-loader'],
+    }),
+    new HappyPack({
+      id: 'less',
+      threadPool: happyThreadPool,
+      loaders: ['less-loader'],
+    }),
+    // To support webpack 1.x loaders option.
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        context: '/',
+        postcss: [
+          autoprefixer({ browsers: ['last 2 versions', 'ie >= 9'] }),
+        ],
+      },
+    }),
+  ];
+
+  if (isProd) {
+    plugins = plugins.concat([
+      new ExtractTextPlugin('[name]-[hash].css'),
+    ]);
+  }
+
+  return {
+    rules,
+    plugins,
+  };
 };
 
-export default assets;
+export default styles;

@@ -7,7 +7,7 @@ const output = (settings) => {
 
   let ret;
 
-  // In hot mode with HMR, file name cannot contains chunkhash.
+  // When HMR is enabled, file name cannot contains hash.
   if (isDev) {
     ret = {
       path: paths.build,
@@ -20,8 +20,8 @@ const output = (settings) => {
     ret = {
       path: paths.build,
       publicPath: '/',
-      filename: '[name]-[hash:12].js',
-      chunkFilename: '[name].[id]-[hash:12].js',
+      filename: '[name]-[chunkhash].js',
+      chunkFilename: '[name].[id]-[chunkhash].js',
     };
   }
 

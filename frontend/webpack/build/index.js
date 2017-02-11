@@ -5,7 +5,6 @@ import makeConfig from '../makeConfig';
 import webpackSettings from '../../webpack.settings';
 
 const build = (done) => {
-
   const config = makeConfig();
 
   webpack(config, (fatalError, stats) => {
