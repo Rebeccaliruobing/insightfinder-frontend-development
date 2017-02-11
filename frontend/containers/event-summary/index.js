@@ -93,7 +93,12 @@ class EventSummary extends React.Component {
   @autobind()
   handleIncidentSelected(incident, type) {
     const { location } = this.props;
-    const { projectName, numberOfDays } = this.applyDefaultParams(location.query);
+    const query = this.applyDefaultParams(location.query);
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const { projectName } = query;
+
     const { data, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap;
     let groupIdMap = {};
