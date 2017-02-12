@@ -91,7 +91,7 @@ class ExecutiveDashboard extends React.Component {
           console.log(msg);
         });
 
-      if(heatmap === '1'){
+      if (heatmap === '1') {
         retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
           .then((data) => {
             this.setState({

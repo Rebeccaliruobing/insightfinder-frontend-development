@@ -19,7 +19,8 @@ export function aggregateToMultiHourData(
       _.forEach(groups, (hours, group) => {
         if (hours && _.isObject(hours)) {
           _.forEach(hours, (stats, hour) => {
-            const h = moment(hour, 'YYYYMMDDHH');
+            // Server side returns GMT time
+            const h = moment.utc(hour, 'YYYYMMDDHH');
             const idx = h.diff(startTime, 'hours');
             // Ignore data out of time window
             if (idx >= 0) {
