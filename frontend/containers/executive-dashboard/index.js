@@ -8,7 +8,8 @@ import { withRouter } from 'react-router';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { Console } from '../../artui/react';
-import { TopListAnomaly, TopListResource } from './top-list';
+import TopListAnomaly from './top-list-anomaly';
+import TopListResource from './top-list-resource';
 import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
@@ -39,6 +40,8 @@ class ExecutiveDashboard extends React.Component {
       eventStats: [],
       heatmapData: {},
       heatmapLoading: true,
+      heatmapProject: null,
+      heatmapGroup: null,
       view: 'anomaly',
     };
   }
@@ -169,6 +172,44 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
+  handleAnomalyListRowClick(projectName, instanceGroup) {
+    const { heatmapProject, heatmapGroup } = this.state;
+
+    const { location } = this.props;
+    const query = this.applyDefaultParams(location.query);
+    const { modelType, heatmap } = query;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+
+    const curTime = moment();
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+
+    if (heatmap === '1') {
+      if (heatmapProject !== projectName || heatmapGroup !== instanceGroup) {
+        this.setState({
+          heatmapLoading: true,
+          heatmapData: {},
+          heatmapProject: projectName,
+          heatmapGroup: instanceGroup,
+        }, () => {
+          retrieveHeatmapData(
+            modelType, realEndTime, numberOfDays, 'loadHourly',
+            projectName, instanceGroup,
+          ).then((data) => {
+            this.setState({
+              heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+              heatmapLoading: false,
+            });
+          }).catch((msg) => {
+            console.log(msg);
+          });
+        });
+      }
+    }
+  }
+
+  @autobind
   handleListRowOpenResource(projectName, instanceGroup) {
     const query = this.applyDefaultParams({
       projectName,
@@ -205,7 +246,7 @@ class ExecutiveDashboard extends React.Component {
 
     return (
       <Console.Content
-        className={`executive-dashboard  ${loading || heatmapLoading ? 'ui form loading' : ''}`}
+        className={`executive-dashboard  ${loading ? 'ui form loading' : ''}`}
         style={{ paddingLeft: 0 }}
       >
         <div className="ui main tiny container">
@@ -260,7 +301,7 @@ class ExecutiveDashboard extends React.Component {
           </div>
           {heatmap === '1' &&
             <div
-              className="ui vertical segment"
+              className={`ui vertical segment ${heatmapLoading ? 'loading' : ''}`}
               {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
             >
               <div className="heatmap-block">
@@ -289,6 +330,7 @@ class ExecutiveDashboard extends React.Component {
               timeIntervalPredicted={timeIntervalPredicted}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
+              onRowClick={this.handleAnomalyListRowClick}
             />
           </div>
           <div

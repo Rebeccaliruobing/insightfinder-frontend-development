@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider as Redux } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import localforage from 'localforage';
 
@@ -35,17 +36,21 @@ const appElement = document.getElementById('app');
 // https://gist.github.com/gaearon/06bd9e2223556cb0d841#file-naive-js
 ReactDOM.render((
   <AppContainer>
-    <AppRoot store={store} />
+    <Redux store={store}>
+      <AppRoot />
+    </Redux>
   </AppContainer>
 ), appElement);
 
 if (module.hot && typeof module.hot.accept === 'function') {
-  module.hot.accept('./app/Root', () => {
-    const NextAppRoot = require('./app/Root').default;
+  module.hot.accept('../../root', () => {
+    const NextAppRoot = require('../../root').default;
 
     ReactDOM.render((
       <AppContainer>
-        <NextAppRoot store={store} />
+        <Redux store={store}>
+          <NextAppRoot />
+        </Redux>
       </AppContainer>
     ), appElement);
   });

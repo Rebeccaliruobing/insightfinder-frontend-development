@@ -54,7 +54,8 @@ class HourlyHeatmap extends React.Component {
       .append('text')
       .text(d => d)
       .attr('class', 'label-x')
-      .attr('x', (d, i) => ((i) * this.cellWidth) + this.labelYWidth)
+      .attr('x', (d, i) => ((i + 0.5) * this.cellWidth) + this.labelYWidth)
+      .attr('text-anchor', 'middle')
       .attr('y', 10)
       ;
 
