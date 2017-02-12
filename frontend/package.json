@@ -50,6 +50,7 @@
     "react-dom": "^15.4.2",
     "react-faux-dom": "^3.0.0",
     "react-intl": "^2.2.3",
+    "react-redux": "^5.0.2",
     "react-router": "^2.8.0",
     "react-tether": "0.5.2",
     "react-timeout": "^1.0.0",

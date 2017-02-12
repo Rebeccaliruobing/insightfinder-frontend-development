@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { Provider as Redux } from 'react-redux';
 import localforage from 'localforage';
 
 import getBrowserLocale from './src/common/getBrowserLocale';
@@ -32,4 +33,8 @@ const appElement = document.getElementById('app');
 
 // Render app with hot support.
 // https://gist.github.com/gaearon/06bd9e2223556cb0d841#file-naive-js
-ReactDOM.render((<AppRoot store={store} />), appElement);
+ReactDOM.render((
+  <Redux store={store}>
+    <AppRoot />
+  </Redux>
+), appElement);
