@@ -106,87 +106,89 @@ class EventTableGroup extends React.Component {
     }
 
     return (
-      <div className="ui grid">
-      <div className="three wide column"
-            style={{maxHeight: '700px', overflow: 'auto'}}>
-        <table className="ui selectable celled table">
-          <thead>
-              <tr>
-                <th>
-                  <span style={{ fontWeight: 'bold' }}>Pattern List</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {eventTableData && eventTableData.sort(function (a, b) {
-              let aid = a.nEvents;
-              let bid = b.nEvents;
-              if (aid > bid) {
-                return -1;
-              } else if (aid < bid) {
-                return 1;
-              } else {
-                let aaid = a.nid;
-                let bbid = b.nid;
-                if (aaid > bbid) {
-                  return 1;
-                } else if (aaid < bbid) {
-                  return -1;
-                } else {
-                  return 0;
-                }
-              }
-            }).map((grp, iGrp) => {
-              let topKEpisodes = "";
-              let topKWords = "";
-              let patternString = this.getPatternName(grp.nid);
-              let nEventString = "Number of events: "+grp.nEvents;
-              if(grp){
-                topKEpisodes = grp.topKEpisodes.length > 0
-                  ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
-                topKWords = grp.topKWords.length > 0
-                  ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
-              }
-              return (<tr
-                key={iGrp}
-                onClick={() => this.props.handleSelectedGroup(grp.nid)}
-                className={cx({ active: grp.nid === group.nid })}
-                style={{ cursor: 'pointer' }}
-              >
-                <td>
-                  <InlineEditInput
-                    normalStyle={{ fontWeight: 'bold' }}
-                    value={patternString}
-                    onChange={this.handleGroupNameChanged(grp.nid)}
-                  />
-                  {nEventString}<br />
-                  {topKWords}<br />
-                  {topKEpisodes}
-                </td>
-              </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div className="thirteen wide column">
-        <h4 className="ui header">{title}</h4>
-        <table className="event-right-table">
-          <thead>
-          <tr>
-            <td>Time</td>
-            <td>Event</td>
-          </tr>
-          </thead>
-          <tbody>
-          <tr key="0">
-            <td>{data[0][0]}</td>
-            <td dangerouslySetInnerHTML={{__html: this.highlightKWord(data[0][1])}} />
-          </tr>
-          {rows}
-          </tbody>
-        </table>
-      </div>
+      <div className="flex-item flex-row-container">
+        <div
+          className="flex-col-container"
+          style={{ border: '1px solid rgba(34, 36, 38, 0.15)', marginBottom: 10 }}
+        >
+          <h4
+            style={{ background: '#F9FAFB', width: '100%', height: 40, padding: 10, margin: 0 }}
+          >Pattern List</h4>
+          <div className="flex-item" style={{ overflowY: 'auto' }}>
+            <table className="ui selectable celled table" style={{ border: 0 }}>
+              <tbody>
+                {eventTableData && eventTableData.sort(function (a, b) {
+                  let aid = a.nEvents;
+                  let bid = b.nEvents;
+                  if (aid > bid) {
+                    return -1;
+                  } else if (aid < bid) {
+                    return 1;
+                  } else {
+                    let aaid = a.nid;
+                    let bbid = b.nid;
+                    if (aaid > bbid) {
+                      return 1;
+                    } else if (aaid < bbid) {
+                      return -1;
+                    } else {
+                      return 0;
+                    }
+                  }
+                }).map((grp, iGrp) => {
+                  let topKEpisodes = "";
+                  let topKWords = "";
+                  let patternString = this.getPatternName(grp.nid);
+                  let nEventString = "Number of events: " + grp.nEvents;
+                  if (grp) {
+                    topKEpisodes = grp.topKEpisodes.length > 0
+                      ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g, "") : "";
+                    topKWords = grp.topKWords.length > 0
+                      ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g, "") : "";
+                  }
+                  return (<tr
+                    key={iGrp}
+                    onClick={() => this.props.handleSelectedGroup(grp.nid)}
+                    className={cx({ active: grp.nid === group.nid })}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>
+                      <InlineEditInput
+                        normalStyle={{ fontWeight: 'bold' }}
+                        value={patternString}
+                        onChange={this.handleGroupNameChanged(grp.nid)}
+                      />
+                      {nEventString}<br />
+                      {topKWords}<br />
+                      {topKEpisodes}
+                    </td>
+                  </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="flex-item flex-col-container" style={{ padding: 10 }}>
+          <h4 className="ui header">{title}</h4>
+          <div className="flex-item" style={{ overflowY: 'auto', paddingLeft: 10 }}>
+            <table className="event-right-table">
+              <thead>
+                <tr>
+                  <td>Time</td>
+                  <td>Event</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr key="0">
+                  <td>{data[0][0]}</td>
+                  <td dangerouslySetInnerHTML={{ __html: this.highlightKWord(data[0][1]) }} />
+                </tr>
+                {rows}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     );
   }
@@ -848,16 +850,14 @@ class LogAnalysisCharts extends React.Component {
     if (logEventArr) {
       return (
         <div className="flex-col-container">
-          <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <div className="ui header">
-              Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
-            </div>
-            <EventTableGroup
-              handleSelectedGroup={this.handleEventTableSelected}
-              selectedGroup={selectedEventTableData}
-              eventTableData={eventTableData}
-            />
+          <div className="ui header" style={{ marginTop: 0 }}>
+            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
           </div>
+          <EventTableGroup
+            handleSelectedGroup={this.handleEventTableSelected}
+            selectedGroup={selectedEventTableData}
+            eventTableData={eventTableData}
+          />
         </div>
       );
     }
