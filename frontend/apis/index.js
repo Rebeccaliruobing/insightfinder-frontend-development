@@ -476,7 +476,7 @@ const apis = {
         });
     },
 
-    postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
+    postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, rareEventThreshold, operation, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -494,6 +494,7 @@ const apis = {
                     modelStartTime,
                     modelEndTime,
                     isExistentIncident,
+                    rareEventThreshold, 
                     operation
                 }),
                 beforeSend: function (request) {

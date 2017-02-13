@@ -249,10 +249,10 @@ class LogAnalysisCharts extends React.Component {
     // Cache the data, and recalculate it if changed.
     const { data, loading, onRefresh, query, ...rest } = props;
 
-    this.rareEventThreshold = parseInt(query.rareEventThreshold);
-    if (!this.rareEventThreshold) {
-      this.rareEventThreshold = 3;
-    }
+    // this.rareEventThreshold = parseInt(query.rareEventThreshold);
+    // if (!this.rareEventThreshold) {
+    //   this.rareEventThreshold = 3;
+    // }
 
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
@@ -274,7 +274,7 @@ class LogAnalysisCharts extends React.Component {
     let anomalies = this.dp.anomalies["0"];
     let episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
-    let rareEventThreshold = this.rareEventThreshold;
+    // let rareEventThreshold = this.rareEventThreshold;
     allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
       return el.nid != -1
     });
@@ -305,48 +305,12 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
-    let allEventTableData = [];
-    let groupData = {};
-    allLogEventArr.map((event, iEvent) => {
-      let showNumber = neuronList.indexOf(iEvent);
-      let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-
-      // Find a new group.
-      if (showNumber != -1) {
-        groupData = {};
-        let iGroup = neuronIdList.indexOf(event.nid) + 1;
-        groupData.nid = event.nid;
-        groupData.iGroup = iGroup;
-        groupData.rowSpan = neuronValue[showNumber];
-        groupData.nEvents = neuronValue[iGroup - 1];
-
-        // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
-        // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
-        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-        groupData.topKEpisodes = groupData.topKEpisodes ? groupData.topKEpisodes.topK : [];
-        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-        groupData.topKWords = groupData.topKWords ? groupData.topKWords.topK : [];
-
-        let arr = groupData.topKEpisodes.split(",");
-        arr = arr.slice(0, topKCount);
-        groupData.topKEpisodes = arr.toString();
-        arr = groupData.topKWords.split(",");
-        arr = arr.slice(0, topKCount);
-        groupData.topKWords = arr.toString();
-
-        groupData.data = [[timestamp, event.rawData, event.timestamp]];
-        allEventTableData.push(groupData);
-      } else {
-        groupData.data.push([timestamp, event.rawData, event.timestamp]);
-      }
-    });
-
     // make a copy, and filter out anomaly and small cluster, and run again
     let logEventArr = allLogEventArr.filter(function (el, index, arr) {
-      return (neuronValue[neuronIdList.indexOf(el.nid)] > rareEventThreshold)
+      return (!el.rareEventFlag)
     });
     let rareLogEventArr = allLogEventArr.filter(function (el, index, arr) {
-      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
+      return (el.rareEventFlag)
     });
     neuronListNumber = {};
     neuronValue = [];
@@ -373,6 +337,7 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
+    let groupData = {};
     let eventTableData = [];
     logEventArr.map((event, iEvent) => {
       let showNumber = neuronList.indexOf(iEvent);
@@ -408,7 +373,6 @@ class LogAnalysisCharts extends React.Component {
       }
     });
 
-    this.allEventTableData = allEventTableData;
     this.allLogEventArr = allLogEventArr;
     this.logEventArr = logEventArr;
     this.eventTableData = eventTableData;
@@ -510,7 +474,7 @@ class LogAnalysisCharts extends React.Component {
     let logEventArr = this.dp.logEventArr;
     let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
     let clusterTopWordArr = this.dp.clusterTopWordArr;
-    let rareEventThreshold = this.rareEventThreshold;
+    // let rareEventThreshold = this.rareEventThreshold;
     let neuronListNumber = {};
     let neuronValue = [];
     let nidList = _.map(logEventArr, function (o) {
@@ -535,8 +499,7 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
     logEventArr = logEventArr.filter(function (el, index, arr) {
-      // return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold) || (el.nid == -1)
-      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
+      return (el.rareEventFlag)
     });
 
     if (logEventArr) {

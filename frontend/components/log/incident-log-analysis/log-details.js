@@ -36,7 +36,7 @@ const ProjectLogDetails = class extends React.Component {
       modelType,
       startTime, endTime,
       modelStartTime, modelEndTime,
-      isExistentIncident,
+      isExistentIncident, rareEventThreshold,
     } = query;
     this.setState({ loading: true }, () => {
       apis.postLogAnalysis(
@@ -44,7 +44,7 @@ const ProjectLogDetails = class extends React.Component {
         pvalue, cvalue,
         modelType,
         startTime, endTime,
-        modelStartTime, modelEndTime, isExistentIncident, '')
+        modelStartTime, modelEndTime, isExistentIncident, rareEventThreshold, '')
         .then((resp) => {
           const update = {};
           if (resp.success) {
