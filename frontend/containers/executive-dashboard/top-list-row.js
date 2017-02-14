@@ -69,10 +69,10 @@ const ListRow = ({
       <td className="name">
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
-        {!isProject && <i className="icon" />}
+        {!isProject && <i onClick={onNameClick} className="external icon" />}
         {!isProject && <i className="icon" />}
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
-          <span className="name" onClick={onNameClick} style={projectStyle}>{name}</span>
+          <span className="name" style={projectStyle}>{name}</span>
         </OverlayTrigger>
       </td>
 

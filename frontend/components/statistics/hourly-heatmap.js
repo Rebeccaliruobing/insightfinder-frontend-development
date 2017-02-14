@@ -213,11 +213,12 @@ class HourlyHeatmap extends React.Component {
       popupData.items.forEach((item, index) => {
         elems.push((
           <tr key={`${popupData.x}-${popupData.y}-${index}`}>
-            <td className="name" onClick={this.handlePopupRowClick(item)}>{item.project}</td>
-            <td className="name" onClick={this.handlePopupRowClick(item)}>{item.group}</td>
+            <td className="value">{item.project}</td>
+            <td className="value">{item.group}</td>
             <td className="value">{normalizeValue(item.stats.totalAnomalyScore, 2)}</td>
             <td className="value">{normalizeValue(item.stats.avgEventDuration)}</td>
             <td className="value">{normalizeValue(item.stats.numberOfEvents)}</td>
+            <td className="name" ><i onClick={this.handlePopupRowClick(item)} className="external icon" /></td>
           </tr>
         ));
       });
@@ -236,7 +237,7 @@ class HourlyHeatmap extends React.Component {
             onMouseOver={this.handlePopupMouseOver}
             onMouseOut={this.popupOutDebounced}
           >
-            <div className="popup-content" style={{ maxHeight: 160, width: 360 }}>
+            <div className="popup-content" style={{ maxHeight: 160, width: 420 }}>
               <table className="ui striped table">
                 <thead>
                   <tr>
@@ -245,6 +246,7 @@ class HourlyHeatmap extends React.Component {
                     <th style={{ width: 45 }}>Score</th>
                     <th style={{ width: 56 }}>Duration</th>
                     <th style={{ width: 48 }}>Events</th>
+                    <th style={{ width: 48 }}>Details</th>
                   </tr>
                 </thead>
                 <tbody>

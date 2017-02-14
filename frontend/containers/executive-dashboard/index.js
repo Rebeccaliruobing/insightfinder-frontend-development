@@ -305,7 +305,7 @@ class ExecutiveDashboard extends React.Component {
               {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
             >
               <div className="heatmap-block">
-                <h3>Hourly Anomaly Score</h3>
+                <h3>Detected Events</h3>
                 <HourlyHeatmap
                   statSelector={d => d.totalAnomalyScore}
                   numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
@@ -313,10 +313,10 @@ class ExecutiveDashboard extends React.Component {
                 />
               </div>
               <div className="heatmap-block">
-                <h3>Hourly Anomaly Events</h3>
+                <h3>Predicted Events</h3>
                 <HourlyHeatmap
-                  statSelector={d => d.numberOfEvents} rightEdge
-                  numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
+                  statSelector={d => d.totalAnomalyScore} rightEdge
+                  numberOfDays={numberOfDays} endTime={endTimePredicted} dataset={heatmapData}
                 />
               </div>
             </div>
