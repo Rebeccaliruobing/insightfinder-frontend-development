@@ -879,3 +879,55 @@
 .flex-item {
   flex: 1;
 }
+
+.d3-popup {
+  position: absolute;
+  background: white;
+  padding: 4px 10px;
+  z-index: 1060;
+  text-align: left;
+  visibility: hidden;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  &:before {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    border: 8px solid transparent;
+  }
+  &:after {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    border: 7px solid transparent;
+  }
+
+  &.right {
+    margin-left: 9px;
+    &.top:before {
+      top: 6px;
+      left: -16px;
+      border-right-color: rgba(0,0,0,0.15);
+    }
+    &.top:after {
+      top: 7px;
+      left: -14px;
+      border-right-color: white;
+    }
+  }
+
+  &.left {
+    margin-right: 9px;
+    &.top:before{
+      top: 6px;
+      right: -16px;
+      border-left-color: rgba(0,0,0,0.15);
+    }
+    &.top:after{
+      top: 7px;
+      right: -14px;
+      border-left-color: white;
+    }
+  }
+}

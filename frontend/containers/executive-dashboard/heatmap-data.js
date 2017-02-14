@@ -23,7 +23,7 @@ export function aggregateToMultiHourData(
             const h = moment.utc(hour, 'YYYYMMDDHH');
             const idx = h.diff(startTime, 'hours');
             // Ignore data out of time window
-            if (idx >= 0) {
+            if (idx >= 0 && idx < size) {
               vector[idx].items.push({
                 project,
                 group,

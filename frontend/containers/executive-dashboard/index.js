@@ -39,7 +39,7 @@ class ExecutiveDashboard extends React.Component {
       loading: true,
       eventStats: [],
       heatmapData: {},
-      heatmapLoading: true,
+      heatmapLoading: false,
       heatmapProject: null,
       heatmapGroup: null,
       view: 'anomaly',
@@ -309,12 +309,13 @@ class ExecutiveDashboard extends React.Component {
                 <HourlyHeatmap
                   statSelector={d => d.totalAnomalyScore}
                   numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
+                  onNameClick={this.handleListRowOpenAnomaly}
                 />
               </div>
               <div className="heatmap-block">
                 <h3>Hourly Anomaly Events</h3>
                 <HourlyHeatmap
-                  statSelector={d => d.numberOfEvents}
+                  statSelector={d => d.numberOfEvents} rightEdge
                   numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
                 />
               </div>
