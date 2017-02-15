@@ -199,7 +199,12 @@ class HourlyHeatmap extends React.Component {
     return (e) => {
       e.stopPropagation();
       e.preventDefault();
-      this.props.onNameClick(item.project, item.group, item.datetime);
+      this.setState({
+        hoverIndex: null,
+        popupData: null,
+      }, () => {
+        this.props.onNameClick(item.project, item.group, item.datetime);
+      });
     };
   }
 

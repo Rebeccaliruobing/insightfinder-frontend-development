@@ -57,7 +57,6 @@ class ExecutiveDashboard extends React.Component {
         .startOf('day').format(this.dateFormat),
       endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
-      heatmap: 0,
       ...params,
     };
   }
@@ -71,17 +70,18 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const { modelType, heatmap } = query;
+    const { modelType } = query;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     this.setState({
       loading: true,
-      heatmapLoading: (heatmap === '1'),
+      heatmapLoading: true,
       heatmapData: {},
     }, () => {
       retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays)
@@ -94,17 +94,15 @@ class ExecutiveDashboard extends React.Component {
           console.log(msg);
         });
 
-      if (heatmap === '1') {
-        retrieveHeatmapData(modelType, realEndTime, numberOfDays, 'loadHourly')
-          .then((data) => {
-            this.setState({
-              heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
-              heatmapLoading: false,
-            });
-          }).catch((msg) => {
-            console.log(msg);
+      retrieveHeatmapData(modelType, predictedEndTime.valueOf(), numberOfDays * 2, 'loadHourly')
+        .then((data) => {
+          this.setState({
+            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+            heatmapLoading: false,
           });
-      }
+        }).catch((msg) => {
+          console.log(msg);
+        });
     });
   }
 
@@ -181,35 +179,34 @@ class ExecutiveDashboard extends React.Component {
 
     const { location } = this.props;
     const query = this.applyDefaultParams(location.query);
-    const { modelType, heatmap } = query;
+    const { modelType } = query;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
-    if (heatmap === '1') {
-      if (heatmapProject !== projectName || heatmapGroup !== instanceGroup) {
-        this.setState({
-          heatmapLoading: true,
-          heatmapData: {},
-          heatmapProject: projectName,
-          heatmapGroup: instanceGroup,
-        }, () => {
-          retrieveHeatmapData(
-            modelType, realEndTime, numberOfDays, 'loadHourly',
-            projectName, instanceGroup,
-          ).then((data) => {
-            this.setState({
-              heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
-              heatmapLoading: false,
-            });
-          }).catch((msg) => {
-            console.log(msg);
+    if (heatmapProject !== projectName || heatmapGroup !== instanceGroup) {
+      this.setState({
+        heatmapLoading: true,
+        heatmapData: {},
+        heatmapProject: projectName,
+        heatmapGroup: instanceGroup,
+      }, () => {
+        retrieveHeatmapData(
+          modelType, predictedEndTime.valueOf(), numberOfDays * 2, 'loadHourly',
+          projectName, instanceGroup,
+        ).then((data) => {
+          this.setState({
+            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+            heatmapLoading: false,
           });
+        }).catch((msg) => {
+          console.log(msg);
         });
-      }
+      });
     }
   }
 
@@ -226,7 +223,7 @@ class ExecutiveDashboard extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    let { startTime, endTime, heatmap } = params;
+    let { startTime, endTime } = params;
     const { loading, eventStats, heatmapLoading, heatmapData } = this.state;
 
     // Convert startTime, endTime to moment object
@@ -303,28 +300,27 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          {heatmap === '1' &&
-            <div
-              className={`ui vertical segment ${heatmapLoading ? 'loading' : ''}`}
-              {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
-            >
-              <div className="heatmap-block">
-                <h3>Detected Events</h3>
-                <HourlyHeatmap
-                  statSelector={d => d.totalAnomalyScore}
-                  numberOfDays={numberOfDays} endTime={endTime} dataset={heatmapData}
-                  onNameClick={this.handleListRowOpenAnomaly}
-                />
-              </div>
-              <div className="heatmap-block">
-                <h3>Predicted Events</h3>
-                <HourlyHeatmap
-                  statSelector={d => d.totalAnomalyScore} rightEdge
-                  numberOfDays={numberOfDays} endTime={endTimePredicted} dataset={heatmapData}
-                />
-              </div>
+          <div
+            className={`ui vertical segment ${heatmapLoading ? 'loading' : ''}`}
+            {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
+            <div className="heatmap-block">
+              <h3>Detected Events</h3>
+              <HourlyHeatmap
+                statSelector={d => d.totalAnomalyScore}
+                numberOfDays={numberOfDays} dataset={heatmapData.detected}
+                onNameClick={this.handleListRowOpenAnomaly}
+              />
             </div>
-          }
+            <div className="heatmap-block">
+              <h3>Predicted Events</h3>
+              <HourlyHeatmap
+                statSelector={d => d.totalAnomalyScore} rightEdge
+                numberOfDays={numberOfDays} dataset={heatmapData.predicted}
+                onNameClick={this.handleListRowOpenAnomaly}
+              />
+            </div>
+          </div>
           <div
             className="ui vertical segment flex-item"
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}

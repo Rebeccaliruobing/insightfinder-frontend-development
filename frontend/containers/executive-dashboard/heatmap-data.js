@@ -10,7 +10,9 @@ export function aggregateToMultiHourData(
   // Initial an empty vector to hold the hourly object.
   const numberOfHours = 24;
   const size = numberOfDays * numberOfHours;
-  const vector = _.range(size).map(() => ({ items: [] }));
+  const detectedVector = _.range(size).map(() => ({ items: [] }));
+  const predictedVector = _.range(size).map(() => ({ items: [] }));
+
   const startTime = moment(endTime).startOf('day').subtract(numberOfDays - 1, 'day');
 
   // Populate the data into vector.
@@ -20,11 +22,13 @@ export function aggregateToMultiHourData(
         if (hours && _.isObject(hours)) {
           _.forEach(hours, (stats, hour) => {
             // Server side returns GMT time
-            const h = moment.utc(hour, 'YYYYMMDDHH');
+            const h = moment.utc(hour, 'YYYYMMDDHH').local();
             const idx = h.diff(startTime, 'hours');
-            // Ignore data out of time window
-            if (idx >= 0 && idx < size) {
-              vector[idx].items.push({
+            // Ignore data out of time window and split the detected & predicted items
+            if (idx >= 0 && idx < size * 2) {
+              const vector = idx >= size ? predictedVector : detectedVector;
+              const index = idx >= size ? idx - size : idx;
+              vector[index].items.push({
                 project,
                 group,
                 datetime: h,
@@ -38,31 +42,33 @@ export function aggregateToMultiHourData(
   });
 
   // Aggregate the stats hourly
-  _.forEach(vector, (hour, index) => {
-    const items = hour.items;
+  _.forEach([detectedVector, predictedVector], (vector) => {
+    _.forEach(vector, (hour, index) => {
+      const items = hour.items;
 
-    hour.x = index % numberOfHours;
-    hour.y = Math.floor(index / numberOfHours);
+      hour.x = index % numberOfHours;
+      hour.y = Math.floor(index / numberOfHours);
 
-    const hourStats = _.reduce(items, (sum, item) => {
-      const ret = {};
-      // Sum all stats
-      _.forEach(item.stats, (val, stat) => {
-        ret[stat] = (sum[stat] || 0) + (val || 0);
-      });
-      ret.count = sum.count + 1;
-      return ret;
-    }, { count: 0 });
+      const hourStats = _.reduce(items, (sum, item) => {
+        const ret = {};
+        // Sum all stats
+        _.forEach(item.stats, (val, stat) => {
+          ret[stat] = (sum[stat] || 0) + (val || 0);
+        });
+        ret.count = sum.count + 1;
+        return ret;
+      }, { count: 0 });
 
-    hour.stats = hourStats;
+      hour.stats = hourStats;
 
-    if (hourStats.totalAnomalyScore) {
-      hour.totalAnomalyScore = hourStats.totalAnomalyScore / hourStats.count;
-    }
+      if (hourStats.totalAnomalyScore) {
+        hour.totalAnomalyScore = hourStats.totalAnomalyScore / hourStats.count;
+      }
 
-    if (hourStats.numberOfEvents) {
-      hour.numberOfEvents = hourStats.numberOfEvents;
-    }
+      if (hourStats.numberOfEvents) {
+        hour.numberOfEvents = hourStats.numberOfEvents;
+      }
+    });
   });
 
   const timeLabels = [
@@ -76,13 +82,23 @@ export function aggregateToMultiHourData(
     '', '', '12a',
   ];
 
-  const dayLabels = _.range(0, numberOfDays).map(
+  const detectedDayLabels = _.range(0, numberOfDays).map(
     diff => moment(endTime).subtract(numberOfDays - diff - 1, 'days').format('MM/DD'),
+  );
+  const predictedDayLabels = _.range(1, numberOfDays + 1).map(
+    diff => moment(endTime).add(diff, 'days').format('MM/DD'),
   );
 
   return {
-    data: vector,
-    dayLabels,
-    timeLabels,
+    detected: {
+      data: detectedVector,
+      dayLabels: detectedDayLabels,
+      timeLabels,
+    },
+    predicted: {
+      data: predictedVector,
+      dayLabels: predictedDayLabels,
+      timeLabels,
+    },
   };
 }
