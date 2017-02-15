@@ -27,6 +27,7 @@ export function aggregateToMultiHourData(
               vector[idx].items.push({
                 project,
                 group,
+                datetime: h,
                 stats,
               });
             }
@@ -76,7 +77,7 @@ export function aggregateToMultiHourData(
   ];
 
   const dayLabels = _.range(0, numberOfDays).map(
-    diff => moment(endTime).subtract(numberOfDays - diff, 'days').format('MM/DD'),
+    diff => moment(endTime).subtract(numberOfDays - diff - 1, 'days').format('MM/DD'),
   );
 
   return {

@@ -1,6 +1,17 @@
 .content.executive-dashboard {
   background-color: #F5F5F5 !important;
   > .ui.container {
+    display: flex;
+    position: relative;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    height: 100%;
+    margin-top: 0;
+    margin-bottom: 0;
+    .flex-item {
+      overflow-y: auto;
+    }
+
     .heatmap-block {
       display: inline-block;
       width: 50%;
@@ -26,14 +37,14 @@
           }
         }
         .name {
-          white-space: nowrap;
-          overflow: hidden;
-          cursor: pointer;
-          color: #4183C4;
-          text-decoration: underline;
-          text-overflow: ellipsis;
+          text-align: left;
         }
         .value {
+          text-align: center;
+        }
+        .link {
+          cursor: pointer;
+          color: #4183C4;
           text-align: center;
         }
       }
@@ -110,6 +121,11 @@
           }
         }
       }
+      .link {
+        cursor: pointer;
+        color: #4183C4;
+        text-align: center;
+      }
       tbody {
         tr {
           font-size: 14px;
@@ -170,10 +186,6 @@
           td .name {
             cursor: pointer;
             color: #4183C4;
-            text-decoration: underline;
-          }
-          &.project td.name .name {
-            text-decoration: inherit;
           }
         }
       }

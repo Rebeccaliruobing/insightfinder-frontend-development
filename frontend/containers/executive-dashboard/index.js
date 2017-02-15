@@ -160,13 +160,17 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleListRowOpenAnomaly(projectName, instanceGroup) {
+  handleListRowOpenAnomaly(projectName, instanceGroup, datetime) {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
       projectName,
       instanceGroup,
     });
+    if (datetime) {
+      query.startTime = datetime.startOf('day').format(this.dateFormat);
+      query.endTime = datetime.endOf('day').format(this.dateFormat);
+    }
     store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
   }
@@ -322,7 +326,7 @@ class ExecutiveDashboard extends React.Component {
             </div>
           }
           <div
-            className="ui vertical segment"
+            className="ui vertical segment flex-item"
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListAnomaly
@@ -335,7 +339,7 @@ class ExecutiveDashboard extends React.Component {
             />
           </div>
           <div
-            className="ui vertical segment"
+            className="ui vertical segment flex-item"
             {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListResource

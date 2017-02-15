@@ -1,6 +1,8 @@
 import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import { autobind } from 'core-decorators';
 import d3 from 'd3';
 import ReactFauxDOM from 'react-faux-dom';
@@ -77,7 +79,7 @@ class HourlyHeatmap extends React.Component {
       const { rightEdge } = this.props;
 
       // If the heatmap is in the right edge, left align the popup on right edge.
-      const rightAlign = (!rightEdge ? true : (d.x < 10));
+      const rightAlign = (!rightEdge ? true : (d.x < 8));
       const popupX = rightAlign ?
         (((d.x + 1) * this.cellWidth) + this.labelYWidth) :
         (((this.hoursCount - d.x) * this.cellWidth) + 12);
@@ -197,7 +199,7 @@ class HourlyHeatmap extends React.Component {
     return (e) => {
       e.stopPropagation();
       e.preventDefault();
-      this.props.onNameClick(item.project, item.group);
+      this.props.onNameClick(item.project, item.group, item.datetime);
     };
   }
 
@@ -213,12 +215,16 @@ class HourlyHeatmap extends React.Component {
       popupData.items.forEach((item, index) => {
         elems.push((
           <tr key={`${popupData.x}-${popupData.y}-${index}`}>
-            <td className="value">{item.project}</td>
-            <td className="value">{item.group}</td>
+            <td className="link">
+              <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Click for details</Tooltip>}>
+                <i onClick={this.handlePopupRowClick(item)} className="external icon" />
+              </OverlayTrigger>
+            </td>
+            <td className="name">{item.project}</td>
+            <td className="name">{item.group}</td>
             <td className="value">{normalizeValue(item.stats.totalAnomalyScore, 2)}</td>
             <td className="value">{normalizeValue(item.stats.avgEventDuration)}</td>
             <td className="value">{normalizeValue(item.stats.numberOfEvents)}</td>
-            <td className="name" ><i onClick={this.handlePopupRowClick(item)} className="external icon" /></td>
           </tr>
         ));
       });
@@ -241,12 +247,12 @@ class HourlyHeatmap extends React.Component {
               <table className="ui striped table">
                 <thead>
                   <tr>
+                    <th style={{ width: 20 }} />
                     <th style={{ width: 100 }}>Project</th>
                     <th style={{ width: 100 }}>Group</th>
                     <th style={{ width: 45 }}>Score</th>
                     <th style={{ width: 56 }}>Duration</th>
                     <th style={{ width: 48 }}>Events</th>
-                    <th style={{ width: 48 }}>Details</th>
                   </tr>
                 </thead>
                 <tbody>
