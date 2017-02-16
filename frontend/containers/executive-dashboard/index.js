@@ -85,7 +85,7 @@ class ExecutiveDashboard extends React.Component {
       heatmapLoading: true,
       heatmapData: {},
     }, () => {
-      retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays)
+      retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays, timezoneOffset)
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
