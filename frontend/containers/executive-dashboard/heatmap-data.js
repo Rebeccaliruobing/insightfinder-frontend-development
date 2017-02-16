@@ -25,9 +25,17 @@ export function aggregateToMultiHourData(
             const h = moment.utc(hour, 'YYYYMMDDHH').local();
             const idx = h.diff(startTime, 'hours');
             // Ignore data out of time window and split the detected & predicted items
-            if (idx >= 0 && idx < size * 2) {
-              const vector = idx >= size ? predictedVector : detectedVector;
-              const index = idx >= size ? idx - size : idx;
+            const predicted = !!stats.predictedFlag;
+            if (idx >= 0 && idx < (size * 2) - 1) {
+              let vector = detectedVector;
+              let index = idx;
+              if (idx === size - 1 && predicted) {
+                vector = predictedVector;
+                index = 0;
+              } else if (idx >= size) {
+                vector = predictedVector;
+                index = idx - size;
+              }
               vector[index].items.push({
                 project,
                 group,
@@ -85,7 +93,7 @@ export function aggregateToMultiHourData(
   const detectedDayLabels = _.range(0, numberOfDays).map(
     diff => moment(endTime).subtract(numberOfDays - diff - 1, 'days').format('MM/DD'),
   );
-  const predictedDayLabels = _.range(1, numberOfDays + 1).map(
+  const predictedDayLabels = _.range(0, numberOfDays).map(
     diff => moment(endTime).add(diff, 'days').format('MM/DD'),
   );
 

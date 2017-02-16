@@ -56,6 +56,7 @@ class ExecutiveDashboard extends React.Component {
       startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
         .startOf('day').format(this.dateFormat),
       endTime: moment().endOf('day').format(this.dateFormat),
+      timezoneOffset: moment().utcOffset(),
       modelType: 'Holistic',
       ...params,
     };
@@ -70,7 +71,7 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const { modelType } = query;
+    const { modelType, timezoneOffset } = query;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
@@ -94,7 +95,8 @@ class ExecutiveDashboard extends React.Component {
           console.log(msg);
         });
 
-      retrieveHeatmapData(modelType, predictedEndTime.valueOf(), numberOfDays * 2, 'loadHourly')
+      retrieveHeatmapData(
+        modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly')
         .then((data) => {
           this.setState({
             heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
@@ -179,7 +181,7 @@ class ExecutiveDashboard extends React.Component {
 
     const { location } = this.props;
     const query = this.applyDefaultParams(location.query);
-    const { modelType } = query;
+    const { modelType, timezoneOffset } = query;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
@@ -196,7 +198,7 @@ class ExecutiveDashboard extends React.Component {
         heatmapGroup: instanceGroup,
       }, () => {
         retrieveHeatmapData(
-          modelType, predictedEndTime.valueOf(), numberOfDays * 2, 'loadHourly',
+          modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly',
           projectName, instanceGroup,
         ).then((data) => {
           this.setState({
