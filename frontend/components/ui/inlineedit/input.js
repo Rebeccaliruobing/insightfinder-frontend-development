@@ -68,20 +68,24 @@ class InlineEditInput extends React.Component {
   }
 
   renderNormal() {
-    const { value, normalStyle } = this.props;
+    const { value, normalStyle, className } = this.props;
     const { normalHover, newValue } = this.state;
     return (
       <div
-        className="inline-edit"
+        className={`inline-edit ${className}`}
         onMouseOver={this.handleNormalMouseOver}
         onMouseOut={this.handelNormalMouseOut}
       >
-        <span className="text" style={{ ...normalStyle }}>{newValue || value}</span>
         <span
-          className="edit"
+          className="text"
+          style={{ ...normalStyle }}
+          onClick={this.startEditing}
+        >{newValue || value}</span>
+        <i
+          className="write icon"
           style={{ ...normalHover ? {} : { display: 'none' } }}
           onClick={this.startEditing}
-        >Edit</span>
+        />
       </div>
     );
   }

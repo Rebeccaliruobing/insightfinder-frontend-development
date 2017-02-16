@@ -1,3 +1,69 @@
+.log-event-group {
+  font-size: 14px;
+  max-width: 800px;
+  padding: 10px 20px;
+  width: 100%;
+  .title {
+    margin-bottom: 0.5em;
+    color: #4183C4;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .label {
+    font-size: 13px;
+    color: darkgrey;
+  }
+  .keyword {
+    margin: 0 0.125em;
+    cursor: pointer;
+    padding: 0 0.25em 0 0.25em;
+    display: inline-block;
+    line-height: 20px;
+    color: #4183C4;
+    &:after {
+      position: absolute;
+      content: ',';
+    }
+    &:last-child:after {
+      content: '';
+    }
+    &.highlight {
+      background-color: rgb(86, 111, 132);
+      padding-right: 1.25em;
+      color: white;
+      &:after {
+        position: absolute;
+        content: 'x';
+        padding-left: 0.5em;
+      }
+    }
+  }
+}
+
+.log-event-table {
+  width: 100%;
+  font-size: 12px;
+  td, th {
+    border-right: 1px solid black;
+    text-align: left;
+    vertical-align: top;
+    padding: 0.25em 0.5em;
+    &.no {
+      text-align: center;
+    }
+    &:last-child {
+      border-right-width: 0;
+    }
+  }
+  td {
+    border-top: 1px solid black;
+  }
+  .highlight {
+    background-color: yellow;
+  }
+}
+
 .event-table {
   border: 2px solid black;
   width: 90%;
@@ -101,10 +167,6 @@
       }
     }
   }
-}
-
-.highlight {
-  background-color: yellow;
 }
 
 .freq-event-table {
