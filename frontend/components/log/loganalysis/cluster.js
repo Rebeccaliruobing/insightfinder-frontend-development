@@ -1,32 +1,53 @@
-import React from 'react';
-import _ from 'lodash';
-import cx from 'classnames';
+import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
+import R from 'ramda';
 import EventGroup from './event-group';
 import { InlineEditInput } from '../../ui/inlineedit';
 
-class EventTableGroup extends React.Component {
+class EventCluster extends React.Component {
+  static propTypes = {
+    eventDataset: T.array,
+    eventCount: T.number.isRequired,
+    clusterCount: T.number.isRequired,
+  }
+
+  static defaultProps = {
+    eventDataset: [],
+    eventCount: null,
+    clusterCount: null,
+  }
 
   constructor(props) {
     super(props);
     this.state = {
-      selectedWords: '',
-      eventsInRangeFreqVector: [],
-      selectedPattern: '',
-      selectedPatternChartData: {},
-      derivedAnomalyByMetric: {},
+      selectedCluster: null,
       patternNames: {},
     };
+
+    this.dataSorter = R.sortWith([
+      R.descend(R.prop('nEvents')),
+      R.ascend(R.prop('nid')),
+    ]);
+  }
+
+  componentDidMount() {
+    this.autoselectCluster(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.eventDataset !== this.props.eventDataset) {
+      this.autoselectCluster(nextProps);
+    }
   }
 
   @autobind
-  handleHighlight(word) {
-    return () => {
-      const current = this.state.selectedWords;
+  autoselectCluster(props) {
+    const { eventDataset } = props;
+    if (Array.isArray(eventDataset) && eventDataset.length > 0) {
       this.setState({
-        selectedWords: word === current ? '' : word,
+        selectedCluster: this.dataSorter(eventDataset)[0],
       });
-    };
+    }
   }
 
   @autobind
@@ -49,81 +70,56 @@ class EventTableGroup extends React.Component {
     return patternNames[nid] || `Pattern ${nid}`;
   }
 
+  @autobind
+  handleSelectCluster() {
+  }
+
+  @autobind
+  renderCluster(cluster) {
+    if (cluster) {
+      const data = cluster.data;
+      const title = this.getPatternName(cluster.nid);
+
+      // Convert the string format into an array.
+      // TODO: Remove the convertor when api result is json object.
+      const keywords = (cluster.topKWords && cluster.topKWords.length > 0) ?
+        cluster.topKWords.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+      const episodes = (cluster.topKEpisodes && cluster.topKEpisodes.length > 0) ?
+        cluster.topKEpisodes.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+
+      return (
+        <EventGroup
+          className="flex-item flex-col-container" title={title}
+          eventDataset={data} keywords={keywords} episodes={episodes}
+        />
+      );
+    }
+    return null;
+  }
+
   render() {
-    const eventTableData = this.props.eventTableData;
-    const group = this.props.selectedGroup;
-    const data = group.data;
-    const title = this.getPatternName(group.nid);
+    const { eventDataset, eventCount, clusterCount } = this.props;
+    const { selectedCluster } = this.state;
 
     return (
-      <div className="flex-item flex-row-container">
-        <div
-          className="flex-col-container"
-          style={{ border: '1px solid rgba(34, 36, 38, 0.15)', marginBottom: 10 }}
-        >
+      <div className="flex-item flex-row-container" style={{ paddingBottom: 10 }}>
+        <div className="flex-col-container">
           <h4
-            style={{ background: '#F9FAFB', width: '100%', height: 40, padding: 10, margin: 0 }}
+            style={{
+              width: '100%',
+              lineHeight: 24,
+              borderBottom: '1px solid red',
+              margin: 'auto',
+            }}
           >Pattern List</h4>
           <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <table className="ui selectable celled table" style={{ border: 0 }}>
-              <tbody>
-                {eventTableData && eventTableData.sort((a, b) => {
-                  const aid = a.nEvents;
-                  const bid = b.nEvents;
-                  if (aid > bid) {
-                    return -1;
-                  } else if (aid < bid) {
-                    return 1;
-                  }
-                  const aaid = a.nid;
-                  const bbid = b.nid;
-                  if (aaid > bbid) {
-                    return 1;
-                  } else if (aaid < bbid) {
-                    return -1;
-                  }
-                  return 0;
-                }).map((grp, iGrp) => {
-                  let topKEpisodes = '';
-                  let topKWords = '';
-                  const patternString = this.getPatternName(grp.nid);
-                  const nEventString = `Number of events: ${grp.nEvents}`;
-                  if (grp) {
-                    topKEpisodes = grp.topKEpisodes.length > 0
-                      ? `Top frequent episodes: ${grp.topKEpisodes.replace(/\(\d+\)/g, '')}` : '';
-                    topKWords = grp.topKWords.length > 0
-                      ? `Top keywords: ${grp.topKWords.replace(/\(\d+\)/g, '')}` : '';
-                  }
-                  return (<tr
-                    key={iGrp}
-                    onClick={() => this.props.handleSelectedGroup(grp.nid)}
-                    className={cx({ active: grp.nid === group.nid })}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <td>
-                      <InlineEditInput
-                        normalStyle={{ fontWeight: 'bold' }}
-                        value={patternString}
-                        onChange={this.handleGroupNameChanged(grp.nid)}
-                      />
-                      {nEventString}<br />
-                      {topKWords}<br />
-                      {topKEpisodes}
-                    </td>
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div style={{ height: 1000 }} />
           </div>
         </div>
-        <EventGroup
-          className="flex-item flex-col-container"
-          title={title} eventDataset={data} keywords={['Samba', 'SQL']}
-        />
+        {this.renderCluster(selectedCluster)}
       </div>
     );
   }
 }
 
-export default EventTableGroup;
+export default EventCluster;

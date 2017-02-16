@@ -1,7 +1,6 @@
 import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import { InlineEditInput } from '../../ui/inlineedit';
-
 import EventTable from './event-table';
 
 class EventGroup extends React.Component {
@@ -9,12 +8,14 @@ class EventGroup extends React.Component {
     title: T.string.isRequired,
     eventDataset: T.array,
     keywords: T.array,
+    episodes: T.array,
     className: T.string,
   }
 
   static defaultProps = {
     eventDataset: [],
     keywords: [],
+    episodes: [],
     className: '',
   }
 
@@ -51,7 +52,7 @@ class EventGroup extends React.Component {
   }
 
   render() {
-    const { eventDataset, title, className, keywords, ...props } = this.props;
+    const { eventDataset, title, className, keywords, episodes, ...props } = this.props;
     const { highlightWord } = this.state;
     const count = eventDataset.length;
     const timeRange = count > 0 ?
@@ -73,20 +74,41 @@ class EventGroup extends React.Component {
             style={{ float: 'right', marginRight: '1em' }}
           >Number of Events: </span>
         </div>
-        <div style={{ marginBottom: 10 }}>
-          <span className="label">Top keywords: </span>
-          <div style={{ display: 'inline-block' }} >
-            {
-              keywords.map(kw => (
-                <span
-                  key={kw}
-                  className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
-                  onClick={this.handleKeywordClick(kw)}
-                >{kw}</span>
-              ))
-            }
+        {Array.isArray(episodes) && episodes.length > 0 &&
+          <div>
+            <span className="label" style={{ paddingRight: '1em' }}>
+              Top frequent episodes:
+            </span>
+            <div style={{ display: 'inline-block' }} >
+              {
+                episodes.map(kw => (
+                  <span
+                    key={kw}
+                    className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
+                    onClick={this.handleKeywordClick(kw)}
+                  >{kw}</span>
+                ))
+              }
+            </div>
           </div>
-        </div>
+        }
+        {Array.isArray(keywords) && keywords.length > 0 &&
+          <div>
+            <span className="label">Top keywords: </span>
+            <div style={{ display: 'inline-block' }} >
+              {
+                keywords.map(kw => (
+                  <span
+                    key={kw}
+                    className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
+                    onClick={this.handleKeywordClick(kw)}
+                  >{kw}</span>
+                ))
+              }
+            </div>
+          </div>
+        }
+        <div className="spacer" />
         <EventTable
           className="flex-item"
           highlightWord={highlightWord} eventDataset={eventDataset}

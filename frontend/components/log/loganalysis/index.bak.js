@@ -666,16 +666,23 @@ margin: 0,
     const logEventArr = this.logEventArr;
     const neuronValue = this.neuronValue;
     const eventTableData = this.eventTableData;
+    const { selectedEventTableData } = this.state;
+    console.log([logEventArr, neuronValue, eventTableData]);
 
     if (logEventArr) {
       return (
-        <EventCluster
-          eventDataset={eventTableData}
-          eventCount={logEventArr.length} clusterCount={neuronValue.length}
-        />
+        <div className="flex-col-container">
+          <div className="ui header" style={{ marginTop: 0 }}>
+            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
+          </div>
+          <EventCluster
+            handleSelectedGroup={this.handleEventTableSelected}
+            selectedGroup={selectedEventTableData}
+            eventTableData={eventTableData}
+          />
+        </div>
       );
     }
-    return null;
   }
 
   chopString(str, n) {
