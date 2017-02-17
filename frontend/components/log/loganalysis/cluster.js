@@ -2,7 +2,6 @@ import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import R from 'ramda';
 import EventGroup from './event-group';
-import { InlineEditInput } from '../../ui/inlineedit';
 
 class EventCluster extends React.Component {
   static propTypes = {
@@ -21,7 +20,7 @@ class EventCluster extends React.Component {
     super(props);
     this.state = {
       selectedCluster: null,
-      patternNames: {},
+      clusterNames: {},
     };
 
     this.dataSorter = R.sortWith([
@@ -52,23 +51,23 @@ class EventCluster extends React.Component {
   }
 
   @autobind
-  handleGroupNameChanged(nid) {
+  handleClusterNameChanged(cluster) {
     const self = this;
     return (newValue) => {
-      const patternNames = {
-        ...this.state.patternNames,
+      const clusterNames = {
+        ...this.state.clusterNames,
       };
-      patternNames[nid] = newValue;
+      clusterNames[cluster.nid] = newValue;
       self.setState({
-        patternNames,
+        clusterNames,
       });
     };
   }
 
   @autobind
-  getPatternName(nid) {
-    const { patternNames } = this.state;
-    return patternNames[nid] || `Pattern ${nid}`;
+  getClusterName(nid) {
+    const { clusterNames } = this.state;
+    return clusterNames[nid] || `Pattern ${nid}`;
   }
 
   @autobind
@@ -84,7 +83,7 @@ class EventCluster extends React.Component {
   renderCluster(cluster) {
     if (cluster) {
       const data = cluster.data;
-      const title = this.getPatternName(cluster.nid);
+      const title = this.getClusterName(cluster.nid);
 
       // Convert the string format into an array.
       // TODO: Remove the convertor when api result is json object.
@@ -95,8 +94,10 @@ class EventCluster extends React.Component {
 
       return (
         <EventGroup
-          className="flex-item flex-col-container" title={title}
+          key={cluster.nid}
+          className="flex-item flex-col-container" name={title}
           eventDataset={data} keywords={keywords} episodes={episodes}
+          onNameChanged={this.handleClusterNameChanged(cluster)}
         />
       );
     }
@@ -108,7 +109,7 @@ class EventCluster extends React.Component {
     const { selectedCluster } = this.state;
 
     return (
-      <div className="flex-item flex-row-container" style={{ paddingBottom: 10 }}>
+      <div className="flex-item flex-row-container" style={{ paddingBottom: 6 }}>
         <div className="flex-col-container log-event-group-listbar" style={{ paddingTop: 10 }}>
           <div className="header">
             <span className="name">{`${clusterCount} Clusters`}</span>
@@ -127,7 +128,7 @@ class EventCluster extends React.Component {
                     className={`listbar-item ${active ? 'active' : ''}`} key={cluster.nid}
                     onClick={this.handleSelectCluster(cluster)}
                   >
-                    <div className="name">{this.getPatternName(cluster.nid)}</div>
+                    <div className="name">{this.getClusterName(cluster.nid)}</div>
                     <div className="bar" style={{ width }} />
                     <span className="title">{`${nevents}`}</span>
                   </div>

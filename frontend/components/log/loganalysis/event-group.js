@@ -1,15 +1,17 @@
 import React, { PropTypes as T } from 'react';
+import _ from 'lodash';
 import { autobind } from 'core-decorators';
 import { InlineEditInput } from '../../ui/inlineedit';
 import EventTable from './event-table';
 
 class EventGroup extends React.Component {
   static propTypes = {
-    title: T.string.isRequired,
+    name: T.string.isRequired,
     eventDataset: T.array,
     keywords: T.array,
     episodes: T.array,
     className: T.string,
+    onNameChanged: T.func,
   }
 
   static defaultProps = {
@@ -17,6 +19,7 @@ class EventGroup extends React.Component {
     keywords: [],
     episodes: [],
     className: '',
+    onNameChanged: () => { },
   }
 
   componentWillReceiveProps(nextProps) {
@@ -48,11 +51,13 @@ class EventGroup extends React.Component {
   }
 
   @autobind
-  handleTitleChanged() {
+  handleNameChanged(name) {
+    this.props.onNameChanged(name);
   }
 
   render() {
-    const { eventDataset, title, className, keywords, episodes, ...props } = this.props;
+    const { eventDataset, name, className, keywords, episodes, ...others } = this.props;
+    const props = _.omit(others, 'onNameChanged');
     const { highlightWord } = this.state;
     const count = eventDataset.length;
     const timeRange = count > 0 ?
@@ -62,8 +67,8 @@ class EventGroup extends React.Component {
       <div className={`log-event-group ${className}`} {...props}>
         <InlineEditInput
           className="title"
-          value={title}
-          onChange={this.handleTitleChanged}
+          value={name}
+          onChange={this.handleNameChanged}
         />
         <div style={{ fontSize: 13 }}>
           <span className="label" style={{ paddingRight: '1em' }}>Time Range: </span>
