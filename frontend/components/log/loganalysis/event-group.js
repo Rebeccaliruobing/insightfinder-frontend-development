@@ -15,11 +15,13 @@ class EventGroup extends React.Component {
     className: T.string,
     onNameChanged: T.func,
     nameEditable: T.bool,
+    showFE: T.bool,
   }
 
   static defaultProps = {
     eventDataset: [],
     nameEditable: false,
+    showFE: true,
     keywords: [],
     episodes: [],
     className: '',
@@ -77,7 +79,7 @@ class EventGroup extends React.Component {
 
   render() {
     const { name, className,
-      nameEditable, keywords, episodes, ...others } = this.props;
+      nameEditable, keywords, episodes, showFE, ...others } = this.props;
     const normalizedEvents = this.normalizedEvents;
     const props = _.omit(others, 'onNameChanged', 'eventDataset');
     const { highlightWord } = this.state;
@@ -106,7 +108,7 @@ class EventGroup extends React.Component {
             style={{ float: 'right', marginRight: '1em' }}
           >Number of Events: </span>
         </div>
-        {Array.isArray(episodes) && episodes.length > 0 &&
+        {showFE && Array.isArray(episodes) && episodes.length > 0 &&
           <div>
             <span className="label" style={{ paddingRight: '1em' }}>
               Top frequent episodes:
@@ -124,7 +126,7 @@ class EventGroup extends React.Component {
             </div>
           </div>
         }
-        {Array.isArray(keywords) && keywords.length > 0 &&
+        {showFE && Array.isArray(keywords) && keywords.length > 0 &&
           <div>
             <span className="label">Top keywords: </span>
             <div style={{ display: 'inline-block' }} >

@@ -24,7 +24,7 @@ class EventCluster extends React.Component {
     };
 
     this.dataSorter = R.sortWith([
-      R.descend(R.prop('nEvents')),
+      R.ascend(R.prop('nEvents')),
       R.ascend(R.prop('nid')),
     ]);
     this.barFullWidth = 200;
@@ -107,6 +107,7 @@ class EventCluster extends React.Component {
           className="flex-item flex-col-container" name={title}
           eventDataset={events} keywords={keywords} episodes={episodes}
           onNameChanged={this.handleClusterNameChanged(cluster)}
+          showFE={true}
         />
       );
     }

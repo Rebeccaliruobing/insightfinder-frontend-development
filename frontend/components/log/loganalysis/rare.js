@@ -103,7 +103,8 @@ class EventRare extends React.Component {
         <EventGroup
           key={name}
           className="flex-item flex-col-container" name={name}
-          eventDataset={events} keywords={keywords} episodes={episodes}
+          eventDataset={events} keywords={keywords} episodes={episodes}          
+          showFE={false}
         />
       );
     }
