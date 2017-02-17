@@ -2,11 +2,10 @@
 /* eslint-disable react/no-array-index-key */
 import React, { PropTypes as T } from 'react';
 import _ from 'lodash';
-import R from 'ramda';
 
 const highlightContent = (rawData, word) => {
   if (_.isString(word) && _.isString(rawData)) {
-    const regex = new RegExp(`\\b(${word})\\b`, 'mgi');
+    const regex = new RegExp(`\\b(${word.trim()})\\b`, 'mgi');
     return rawData.replace(regex, '<span class="highlight">$1</span>');
   }
 
@@ -16,7 +15,7 @@ const highlightContent = (rawData, word) => {
 const EventTable = ({ highlightWord, eventDataset, ...props }) => {
   const ds = eventDataset || [];
   return (
-    <div {...props} style={{ border: '2px solid black', overflowY: 'auto' }}>
+    <div {...props} style={{ borderTop: '2px solid black', overflowY: 'auto' }}>
       <table className="log-event-table">
         <thead>
           <tr>
@@ -27,13 +26,13 @@ const EventTable = ({ highlightWord, eventDataset, ...props }) => {
         </thead>
         <tbody>
           {
-            R.reverse(ds).map((event, idx) => (
+            ds.map((event, idx) => (
               <tr key={idx}>
                 <td className="no">{idx + 1}</td>
-                <td>{event[0]}</td>
+                <td>{event.timestamp}</td>
                 <td
                   dangerouslySetInnerHTML={{
-                    __html: highlightContent(event[1], highlightWord),
+                    __html: highlightContent(event.rawData, highlightWord),
                   }}
                 />
               </tr>

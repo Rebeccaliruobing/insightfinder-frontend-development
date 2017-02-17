@@ -1,5 +1,7 @@
 import React, { PropTypes as T } from 'react';
 import _ from 'lodash';
+import R from 'ramda';
+import moment from 'moment';
 import { autobind } from 'core-decorators';
 import { InlineEditInput } from '../../ui/inlineedit';
 import EventTable from './event-table';
@@ -12,31 +14,49 @@ class EventGroup extends React.Component {
     episodes: T.array,
     className: T.string,
     onNameChanged: T.func,
+    nameEditable: T.bool,
   }
 
   static defaultProps = {
     eventDataset: [],
+    nameEditable: false,
     keywords: [],
     episodes: [],
     className: '',
     onNameChanged: () => { },
   }
 
+  constructor(props) {
+    super(props);
+
+    this.timeFormat = 'YYYY-MM-DD HH:mm';
+    this.state = {
+      highlightWord: null,
+    };
+
+    this.normalizeDataset(props);
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.eywords !== this.props.keywords ||
       nextProps.eventDataset !== this.props.eventDataset) {
+      this.normalizeDataset(nextProps);
       this.setState({
         highlightWord: null,
       });
     }
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      highlightWord: null,
-    };
+  normalizeDataset(props) {
+    const { eventDataset } = props;
+    const sorter = R.sortWith([R.descend(R.props('timestamp'))]);
+    const normalizer = R.map(
+      e => (_.isString(e.timestamp) ? e : {
+        ...e,
+        timestamp: moment(e.timestamp).format(this.timeFormat),
+      }),
+    );
+    this.normalizedEvents = normalizer(sorter(eventDataset));
   }
 
   @autobind
@@ -56,20 +76,27 @@ class EventGroup extends React.Component {
   }
 
   render() {
-    const { eventDataset, name, className, keywords, episodes, ...others } = this.props;
-    const props = _.omit(others, 'onNameChanged');
+    const { name, className,
+      nameEditable, keywords, episodes, ...others } = this.props;
+    const normalizedEvents = this.normalizedEvents;
+    const props = _.omit(others, 'onNameChanged', 'eventDataset');
     const { highlightWord } = this.state;
-    const count = eventDataset.length;
+    const count = normalizedEvents.length;
     const timeRange = count > 0 ?
-      `${eventDataset[0][0]} ~ ${eventDataset[count - 1][0]}` : '';
+      `${normalizedEvents[0].timestamp} ~ ${normalizedEvents[count - 1].timestamp}` : '';
 
     return (
       <div className={`log-event-group ${className}`} {...props}>
-        <InlineEditInput
-          className="title"
-          value={name}
-          onChange={this.handleNameChanged}
-        />
+        {nameEditable &&
+          <InlineEditInput
+            className="title"
+            value={name}
+            onChange={this.handleNameChanged}
+          />
+        }
+        {!nameEditable &&
+          <div className="title" style={{ cursor: 'inherit' }}>{name}</div>
+        }
         <div style={{ fontSize: 13 }}>
           <span className="label" style={{ paddingRight: '1em' }}>Time Range: </span>
           <span>{timeRange}</span>
@@ -86,7 +113,7 @@ class EventGroup extends React.Component {
             </span>
             <div style={{ display: 'inline-block' }} >
               {
-                episodes.map(kw => (
+                R.uniq(R.map(R.trim, episodes)).map(kw => (
                   <span
                     key={kw}
                     className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
@@ -102,7 +129,7 @@ class EventGroup extends React.Component {
             <span className="label">Top keywords: </span>
             <div style={{ display: 'inline-block' }} >
               {
-                keywords.map(kw => (
+                R.uniq(R.map(R.trim, keywords)).map(kw => (
                   <span
                     key={kw}
                     className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
@@ -116,7 +143,7 @@ class EventGroup extends React.Component {
         <div className="spacer" />
         <EventTable
           className="flex-item"
-          highlightWord={highlightWord} eventDataset={eventDataset}
+          highlightWord={highlightWord} eventDataset={normalizedEvents}
         />
       </div>
     );

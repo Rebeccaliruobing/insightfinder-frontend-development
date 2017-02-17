@@ -47,6 +47,10 @@ class EventCluster extends React.Component {
       this.setState({
         selectedCluster: this.dataSorter(eventDataset)[0],
       });
+    } else {
+      this.setState({
+        selectedCluster: null,
+      });
     }
   }
 
@@ -92,11 +96,16 @@ class EventCluster extends React.Component {
       const episodes = (cluster.topKEpisodes && cluster.topKEpisodes.length > 0) ?
         cluster.topKEpisodes.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
 
+      // Convert the events data into object support by event-group.
+      const events = R.map(d => ({
+        timestamp: d[0],
+        rawData: d[1],
+      }), cluster.data);
       return (
         <EventGroup
           key={cluster.nid}
           className="flex-item flex-col-container" name={title}
-          eventDataset={data} keywords={keywords} episodes={episodes}
+          eventDataset={events} keywords={keywords} episodes={episodes}
           onNameChanged={this.handleClusterNameChanged(cluster)}
         />
       );
@@ -120,6 +129,7 @@ class EventCluster extends React.Component {
             {
               this.dataSorter(eventDataset).map((cluster) => {
                 const nevents = cluster.nEvents;
+                const wide = (nevents / eventCount) * 100 > 80;
                 const width = Math.max(Math.floor((nevents / eventCount) * this.barFullWidth), 1);
                 const active = selectedCluster ? cluster.nid === selectedCluster.nid : false;
 
@@ -130,7 +140,7 @@ class EventCluster extends React.Component {
                   >
                     <div className="name">{this.getClusterName(cluster.nid)}</div>
                     <div className="bar" style={{ width }} />
-                    <span className="title">{`${nevents}`}</span>
+                    <span className={`${wide ? 'wide' : ''} title`}>{`${nevents}`}</span>
                   </div>
                 );
               })

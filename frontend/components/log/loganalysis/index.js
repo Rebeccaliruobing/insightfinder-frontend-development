@@ -2,12 +2,14 @@ import React from 'react';
 import moment from 'moment';
 import _ from 'lodash';
 import cx from 'classnames';
+import R from 'ramda';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
 import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
 import EventCluster from './cluster';
+import EventRare from './rare';
 import './logevent.less';
 import '../../settings/threshold/threshold.less';
 
@@ -286,97 +288,42 @@ class LogAnalysisCharts extends React.Component {
   }
 
   renderAnomalyTable() {
-    if (!this.dp) return;
-    const anomalies = this.dp.anomalies['0'];
-    let logEventArr = this.dp.logEventArr;
-    const clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
-    const clusterTopWordArr = this.dp.clusterTopWordArr;
-    // let rareEventThreshold = this.rareEventThreshold;
-    const neuronListNumber = {};
-    const neuronValue = [];
-    const nidList = _.map(logEventArr, (o) => {
-      return o.nid;
-    });
-    let neuronList = nidList.filter((el, index, arr) => {
-      return index === arr.indexOf(el);
-    });
-    _.forEach(neuronList, (value, key) => {
-      neuronListNumber[value] = (_.partition(logEventArr, (o) => {
-        return o.nid == value;
-      })[0]).length;
-    });
-    const neuronIdList = neuronList;
-    neuronList = [];
-    neuronIdList.map((value, index) => {
-      let num = 0;
-      for (let j = 0; j < index; j++) {
-        num += neuronListNumber[neuronIdList[j]];
-      }
-      neuronList.push(num);
-      neuronValue.push(neuronListNumber[neuronIdList[index]]);
-    });
-    logEventArr = logEventArr.filter((el, index, arr) => {
-      return (el.rareEventFlag);
-    });
+    if (!this.dp) return null;
+
+    const logEventArr = this.dp.logEventArr;
+    const eventTopEpisodes = this.dp.clusterTopEpisodeArr || [];
+    const eventTopkeywords = this.dp.clusterTopWordArr || [];
+    const startTime = moment(this.dp.data.modelStartTime_millis);
+    const endTime = moment(this.dp.data.modelEndTime_millis);
+
+    const filter = R.filter(e => !!e.rareEventFlag);
+    const sorter = R.sortWith([R.descend(R.prop('timestamp'))]);
+    const ds = sorter(filter(logEventArr));
+    const eventDataset = R.map((e) => {
+      // Get the keyword and eposodes for the event.
+      const finder = R.find(R.propEq('nid', e.nid));
+      const keywordStr = (finder(eventTopkeywords) || {}).topK || '';
+      const episodesStr = (finder(eventTopEpisodes) || {}).topK || '';
+      const keywords = keywordStr.length > 0 ?
+        keywordStr.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+      const episodes = episodesStr.length > 0 ?
+        episodesStr.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+
+      return {
+        keywords,
+        episodes,
+        nid: e.nid,
+        timestamp: moment(e.timestamp).format('YYYY-MM-DD HH:mm'),
+        rawData: e.rawData,
+      };
+    })(ds);
 
     if (logEventArr) {
       return (
-        <div className="flex-col-container">
-          <div className="ui header">Number of rare events: {logEventArr.length}</div>
-          <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <table className="rare-event-table">
-              <thead>
-                <tr>
-                  <td>Time</td>
-                  <td>Event</td>
-                </tr>
-              </thead>
-              <tbody>
-                {logEventArr.map((event, iEvent) => {
-                  const timestamp = moment(event.timestamp).format('YYYY-MM-DD HH:mm');
-                  let anomalyString = event.anomaly;
-                  let topKEpisodes = '';
-                  let topKWords = '';
-                  let pos = 0;
-                  const clusterFeature = '';
-                  if (anomalyString == undefined) {
-                    anomalyString = '';
-                    topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-                    topKEpisodes = topKEpisodes ? topKEpisodes.topK : [];
-                    if (topKEpisodes.length > 0) {
-                      var entries = topKEpisodes.split(',');
-                      _.each(entries, (entry, ie) => {
-                        pos = entry.indexOf('(');
-                        if (pos != -1) {
-                          anomalyString += `${entry.substring(0, pos)  } `;
-                        }
-                      });
-                    }
-                    topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-                    topKWords = topKWords ? topKWords.topK : [];
-                    if (topKWords.length > 0) {
-                      var entries = topKWords.split(',');
-                      _.each(entries, (entry, ie) => {
-                        pos = entry.indexOf('(');
-                        if (pos != -1) {
-                          anomalyString += `${entry.substring(0, pos)  } `;
-                        }
-                      });
-                    }
-                  }
-                  return (
-                    <tr key={iEvent}>
-                      <td>{timestamp}</td>
-                      <td>{event.rawData}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <EventRare eventDataset={eventDataset} startTime={startTime} endTime={endTime} />
       );
     }
+    return null;
   }
 
   getFreqVectorAnnotations(top1FreqData, top1NidData, label) {
