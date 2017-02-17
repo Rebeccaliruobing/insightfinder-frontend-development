@@ -8,6 +8,7 @@ import d3 from 'd3';
 import ReactFauxDOM from 'react-faux-dom';
 import D3Popup from '../ui/d3-popup';
 import { calculateRGBByAnomalyScore } from '../utils';
+import WindowResizeListener from '../../src/common/lib/window-resize-listener';
 
 const normalizeValue = (val, fractionDigits = 0) => {
   if (_.isFinite(val)) {
@@ -46,8 +47,7 @@ class HourlyHeatmap extends React.Component {
     super(props);
 
     this.$container = null;
-    this.cellWidth = 24;
-    this.cellHeight = 24;
+    this.defaultCellSize = 24;
     this.hoursCount = 24;
     this.labelXHeight = 14;
     this.labelYWidth = 40;
@@ -59,6 +59,7 @@ class HourlyHeatmap extends React.Component {
     this.state = {
       faux: null,
       hoverIndex: null,
+      cellSize: this.defaultCellSize,
     };
   }
 
@@ -77,19 +78,20 @@ class HourlyHeatmap extends React.Component {
       this.cellOutDebounced.cancel();
       this.popupOutDebounced.cancel();
       const { rightEdge } = this.props;
+      const { cellSize } = this.state;
 
       // If the heatmap is in the right edge, left align the popup on right edge.
       const rightAlign = (!rightEdge ? true : (d.x < 8));
       const popupX = rightAlign ?
-        (((d.x + 1) * this.cellWidth) + this.labelYWidth) :
-        (((this.hoursCount - d.x) * this.cellWidth) + 12);
+        (((d.x + 1) * cellSize) + this.labelYWidth) :
+        (((this.hoursCount - d.x) * cellSize) + 12);
 
       this.setState({
         hoverIndex: idx,
         popupData: d,
         popupRightAlign: rightAlign,
         popupX,
-        popupY: ((d.y) * this.cellHeight) + (this.labelXHeight - 3),
+        popupY: ((d.y) * cellSize) + (this.labelXHeight - 3),
       }, () => {
         this.displayData(this.props);
       });
@@ -132,6 +134,7 @@ class HourlyHeatmap extends React.Component {
   setHeatmap(dataset, props) {
     const width = this.$container.width();
     const height = this.$container.height();
+    const { cellSize } = this.state;
 
     const { statSelector } = props;
     const { hoverIndex } = this.state;
@@ -150,7 +153,7 @@ class HourlyHeatmap extends React.Component {
       .append('text')
       .text(d => d)
       .attr('class', 'label-x')
-      .attr('x', (d, i) => ((i + 0.5) * this.cellWidth) + this.labelYWidth)
+      .attr('x', (d, i) => ((i + 0.5) * cellSize) + this.labelYWidth)
       .attr('text-anchor', 'middle')
       .attr('y', 10)
       ;
@@ -164,7 +167,7 @@ class HourlyHeatmap extends React.Component {
       .text(d => d)
       .attr('x', 0)
       .attr('class', 'label-y')
-      .attr('y', (d, i) => ((i + 0.75) * this.cellHeight) + this.labelXHeight)
+      .attr('y', (d, i) => ((i + 0.75) * cellSize) + this.labelXHeight)
       ;
 
     // data
@@ -174,10 +177,10 @@ class HourlyHeatmap extends React.Component {
       .enter()
       .append('rect')
       .attr('class', (d, idx) => (hoverIndex === idx ? 'active cell' : 'cell'))
-      .attr('x', d => (d.x * this.cellWidth) + this.labelYWidth + 0.5)
-      .attr('y', d => (d.y * this.cellHeight) + this.labelXHeight + 0.5)
-      .attr('width', this.cellWidth - 1)
-      .attr('height', this.cellHeight - 1)
+      .attr('x', d => (d.x * cellSize) + this.labelYWidth + 0.5)
+      .attr('y', d => (d.y * cellSize) + this.labelXHeight + 0.5)
+      .attr('width', cellSize - 1)
+      .attr('height', cellSize - 1)
       .attr('fill', d => calculateRGBByAnomalyScore(statSelector(d)))
       .on('mouseover', this.handleCellMouseOver)
       .on('mouseout', this.cellOutDebounced)
@@ -208,11 +211,32 @@ class HourlyHeatmap extends React.Component {
     };
   }
 
+  @autobind
+  handleWindowResize({ windowWidth }) {
+    const { cellSize } = this.state;
+
+    // Change the cell size in different windows.
+    let size = 24;
+    if (windowWidth >= 1100 && windowWidth < 1280) {
+      size = 20;
+    } else if (windowWidth < 1100 && windowWidth >= 1000) {
+      size = 18;
+    } else if (windowWidth < 1000) {
+      size = 16;
+    }
+
+    if (size !== cellSize) {
+      this.setState({ cellSize: size }, () => {
+        this.displayData(this.props);
+      });
+    }
+  }
+
   render() {
-    const { faux, popupData, popupX, popupY, popupRightAlign } = this.state;
+    const { faux, popupData, cellSize, popupX, popupY, popupRightAlign } = this.state;
     const { style, numberOfDays } = this.props;
-    const width = (this.hoursCount * this.cellHeight) + this.labelYWidth + this.chartMargin;
-    const height = ((numberOfDays || 0) * this.cellHeight) + this.labelXHeight;
+    const width = (this.hoursCount * cellSize) + this.labelYWidth + this.chartMargin;
+    const height = ((numberOfDays || 0) * cellSize) + this.labelXHeight;
 
     const showPopup = !!popupData;
     const elems = [];
@@ -237,6 +261,7 @@ class HourlyHeatmap extends React.Component {
 
     return (
       <div className="hourly-heatmap d3-container" style={style}>
+        <WindowResizeListener onResize={this.handleWindowResize} />
         <div
           style={{ width, height, margin: 'auto', position: 'relative' }}
           ref={(c) => { this.$container = $(c); }}
