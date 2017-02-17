@@ -28,6 +28,7 @@ class EventCluster extends React.Component {
       R.descend(R.prop('nEvents')),
       R.ascend(R.prop('nid')),
     ]);
+    this.barFullWidth = 200;
   }
 
   componentDidMount() {
@@ -71,7 +72,12 @@ class EventCluster extends React.Component {
   }
 
   @autobind
-  handleSelectCluster() {
+  handleSelectCluster(cluster) {
+    return () => {
+      this.setState({
+        selectedCluster: cluster,
+      });
+    };
   }
 
   @autobind
@@ -103,17 +109,31 @@ class EventCluster extends React.Component {
 
     return (
       <div className="flex-item flex-row-container" style={{ paddingBottom: 10 }}>
-        <div className="flex-col-container">
-          <h4
-            style={{
-              width: '100%',
-              lineHeight: 24,
-              borderBottom: '1px solid red',
-              margin: 'auto',
-            }}
-          >Pattern List</h4>
+        <div className="flex-col-container log-event-group-listbar" style={{ paddingTop: 10 }}>
+          <div className="header">
+            <span className="name">{`${clusterCount} Clusters`}</span>
+            <span className="stats">Total events</span>
+            <span className="bar"><span className="title">{eventCount}</span></span>
+          </div>
           <div className="flex-item" style={{ overflowY: 'auto' }}>
-            <div style={{ height: 1000 }} />
+            {
+              this.dataSorter(eventDataset).map((cluster) => {
+                const nevents = cluster.nEvents;
+                const width = Math.max(Math.floor((nevents / eventCount) * this.barFullWidth), 1);
+                const active = selectedCluster ? cluster.nid === selectedCluster.nid : false;
+
+                return (
+                  <div
+                    className={`listbar-item ${active ? 'active' : ''}`} key={cluster.nid}
+                    onClick={this.handleSelectCluster(cluster)}
+                  >
+                    <div className="name">{this.getPatternName(cluster.nid)}</div>
+                    <div className="bar" style={{ width }} />
+                    <span className="title">{`${nevents}`}</span>
+                  </div>
+                );
+              })
+            }
           </div>
         </div>
         {this.renderCluster(selectedCluster)}

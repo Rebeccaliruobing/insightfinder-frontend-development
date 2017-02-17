@@ -1,7 +1,7 @@
 .log-event-group {
   font-size: 14px;
   max-width: 800px;
-  padding: 0px 20px;
+  padding: 0px 0px 0px 20px;
   width: 100%;
   .title {
     margin-bottom: 0.5em;
@@ -61,6 +61,102 @@
   }
   .highlight {
     background-color: yellow;
+  }
+}
+
+.log-event-group-listbar {
+  width: 320px;
+  .name {
+    display: inline-block;
+    padding: 0 0.5em;
+    width: 120px;
+    text-align: right;
+    border-right: 1px solid rgba(34, 36, 38, 0.45);
+  }
+  .bar {
+    background: rgb(86, 111, 132);
+    height: 16px; 
+    color: white;
+    line-height: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    cursor: pointer;
+    vertical-align: middle;
+    &:hover {
+      background: #2185D0;
+    }
+  }
+  .listbar-item {
+    font-size: 12px;
+    line-height: 28px;
+    position: relative;
+    cursor: pointer;
+    .title {
+      line-height: 16px;
+      vertical-align: middle;
+    }
+    &:hover {
+      &:before {
+        visibility: visible;
+      }
+      .bar {
+        background-color: #F2711C;
+      }
+    }
+    &.active {
+      &:before {
+        visibility: visible;
+        width: 4px;
+      }
+      .bar {
+        background-color: #F2711C;
+      }
+    }
+    &:before {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background-color: #F2711C;
+      top: 0;
+      visibility: hidden;
+    }
+  }
+  .header {
+    border-bottom: 1px solid rgba(34, 36, 38, 0.45);
+    font-size: 14px;
+    line-height: 32px;
+    display: flex;
+    position: relative;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    .name {
+      padding: 0 0.5em;
+      width: 120px;
+      text-align: right;
+      border-right: 1px solid rgba(34, 36, 38, 0.45);
+    }
+    .stats {
+      font-size: 13px;
+      padding: 0 0.5em;
+      flex: 1;
+      line-height: 1;
+      vertical-align: top;
+      text-align: right;
+    }
+    .bar {
+      width: 200px;
+      position: absolute;
+      text-align: right;
+      padding-right: 0.5em;
+      top: 14px;
+      left: 120px;
+      cursor: default;
+      &:hover {
+        background: rgb(86, 111, 132);
+      }
+    }
   }
 }
 
