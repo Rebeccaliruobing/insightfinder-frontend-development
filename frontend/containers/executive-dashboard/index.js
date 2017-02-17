@@ -322,6 +322,10 @@ class ExecutiveDashboard extends React.Component {
                 onNameClick={this.handleListRowOpenAnomaly}
               />
             </div>
+            <div style={{ color: 'grey', marginLeft: '2em' }}>
+              <i className="icon circle info" />
+              <span>Only start time of the event is shown, hover the cell to see event duration and details.</span>
+            </div>
           </div>
           <div
             className="ui vertical segment flex-item"
