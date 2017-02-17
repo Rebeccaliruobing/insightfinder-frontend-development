@@ -37,7 +37,7 @@ class SysCallModal extends React.Component {
         let freqFuncList = freqRanking.functionlist;
         timeFuncList = (_.keysIn(timeFuncList)).length != 0 ? timeFuncList : [];
         freqFuncList = (_.keysIn(freqFuncList)).length != 0 ? freqFuncList : [];
-        console.log(dataArray, timeRanking, freqRanking);
+        console.log([dataArray, timeRanking, freqRanking]);
         return (
             <Modal {...rest} size="big" closable={true}>
                 {

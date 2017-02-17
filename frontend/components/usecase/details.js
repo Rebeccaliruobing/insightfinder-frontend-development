@@ -50,8 +50,8 @@ const ProjectDetails = class extends React.Component {
               if (resp2.success) {
                 this.setState({
                   debugData: resp2.data.syscallResults,
-                  timeRanking: resp2.data.freqFunctionList,
-                  freqRanking: resp2.data.timeFunctionList,
+                  freqRanking: resp2.data.freqFunctionList,
+                  timeRanking: resp2.data.timeFunctionList,
                   showSysCall: true
                 });
               } else {

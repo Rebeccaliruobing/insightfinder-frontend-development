@@ -77,8 +77,8 @@ class IncidentsList extends React.Component {
           if (resp.success) {
             self.setState({
               debugData: resp.data.syscallResults,
-              timeRanking: resp.data.freqFunctionList,
-              freqRanking: resp.data.timeFunctionList,
+              freqRanking: resp.data.freqFunctionList,
+              timeRanking: resp.data.timeFunctionList,
               showSysCall: true,
             });
           } else {
