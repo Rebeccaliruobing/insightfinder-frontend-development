@@ -220,7 +220,7 @@ export default class ThresholdSettings extends React.Component {
 
   getLogAnalysisList(projectName, project) {
     let self = this;
-    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
+    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', '', true, '', "readonly").then((resp)=> {
       if(!resp.data){
         alert(resp);
         return;
