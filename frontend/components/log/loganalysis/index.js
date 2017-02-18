@@ -295,6 +295,7 @@ class LogAnalysisCharts extends React.Component {
     const eventTopkeywords = this.dp.clusterTopWordArr || [];
     const startTime = moment(this.dp.data.modelStartTime_millis);
     const endTime = moment(this.dp.data.modelEndTime_millis);
+    const frequency = this.dp.data.logFreqWindow;
 
     const filter = R.filter(e => !!e.rareEventFlag);
     const sorter = R.sortWith([R.descend(R.prop('timestamp'))]);
@@ -320,7 +321,10 @@ class LogAnalysisCharts extends React.Component {
 
     if (logEventArr) {
       return (
-        <EventRare eventDataset={eventDataset} startTime={startTime} endTime={endTime} />
+        <EventRare
+          eventDataset={eventDataset}
+          startTime={startTime} endTime={endTime} frequency={frequency}
+        />
       );
     }
     return null;
@@ -509,6 +513,7 @@ class LogAnalysisCharts extends React.Component {
 
     const title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
+    console.log(selectedPatternChartData);
     return (
       <div className="flex-row-container">
         <div
