@@ -158,7 +158,7 @@ class EventSummary extends React.Component {
     if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
-    if (endTime >= curTime) {
+    if (endTime >= curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) {
       endTime = curTime.endOf('day');
     }
 
@@ -208,7 +208,7 @@ class EventSummary extends React.Component {
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const { projectName, instanceGroup } = query;
@@ -368,7 +368,7 @@ class EventSummary extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
