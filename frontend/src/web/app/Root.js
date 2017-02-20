@@ -1,8 +1,9 @@
 /* @flow */
 import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider as Redux } from 'react-redux';
 import App from '../../../root';
+import AppV2 from './App';
 
 type Props = {
   store: Object;
@@ -16,9 +17,12 @@ class Root extends React.Component {
     const { store } = this.props;
     return (
       <Redux store={store}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <Router>
+          <Switch>
+            <Route path="/v2" component={AppV2} />
+            <Route path="/" component={App} />
+          </Switch>
+        </Router>
       </Redux>
     );
   }

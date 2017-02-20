@@ -40,8 +40,8 @@ ReactDOM.render((
 ), appElement);
 
 if (module.hot && typeof module.hot.accept === 'function') {
-  module.hot.accept('../../root', () => {
-    const NextAppRoot = require('../../root').default;
+  module.hot.accept('./app/Root', () => {
+    const NextAppRoot = require('./app/Root').default;
 
     ReactDOM.render((
       <AppContainer>
