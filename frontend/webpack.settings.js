@@ -64,7 +64,8 @@ const webpackSettings = {
   // Define the starting points of app, use object syntax.
   // https://webpack.js.org/concepts/entry-points/
   entries: {
-    'assets/js/app': './web',
+    'assets/js/app': './web/index',
+    'assets/js/common': './web/common',
   },
 
   // Default html page for HMR in development.

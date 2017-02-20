@@ -117,3 +117,4 @@ GitHub.sublime-settings
 !webpack/parts
 !src/common/lib
 .happypack/
+coverage/

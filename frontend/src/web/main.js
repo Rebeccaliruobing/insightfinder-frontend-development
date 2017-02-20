@@ -1,12 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider as Redux } from 'react-redux';
 import { AppContainer } from 'react-hot-loader';
 import localforage from 'localforage';
 
 import getBrowserLocale from '../common/getBrowserLocale';
 import configureStore from '../common/configureStore';
-import AppRoot from '../../root';
+import AppRoot from './app/Root';
 
 const createInitialState = () => {
   // Merge server states with default web states as the initial states.
@@ -36,9 +35,7 @@ const appElement = document.getElementById('app');
 // https://gist.github.com/gaearon/06bd9e2223556cb0d841#file-naive-js
 ReactDOM.render((
   <AppContainer>
-    <Redux store={store}>
-      <AppRoot />
-    </Redux>
+    <AppRoot store={store} />
   </AppContainer>
 ), appElement);
 
@@ -48,9 +45,7 @@ if (module.hot && typeof module.hot.accept === 'function') {
 
     ReactDOM.render((
       <AppContainer>
-        <Redux store={store}>
-          <NextAppRoot />
-        </Redux>
+        <NextAppRoot store={store} />
       </AppContainer>
     ), appElement);
   });

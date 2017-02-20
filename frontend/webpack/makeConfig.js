@@ -41,7 +41,7 @@ const makeConfig = () => {
       },
     }),
     new webpack.optimize.CommonsChunkPlugin({
-      names: ['assets/common', 'assets/manifest'],
+      names: ['assets/js/common', 'assets/js/manifest'],
     }),
   ];
 
