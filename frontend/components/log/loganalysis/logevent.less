@@ -298,3 +298,20 @@
     }
   }
 }
+
+.pattern-sequence.ui.table {
+  .ui.horizontal.bulleted.list>.item {
+    cursor: pointer;
+    &:before {
+      content: '→';
+      color: #2185D0;
+    }
+  }
+}
+.pattern-sequence-tooltip {
+  .pui-tooltip-inner {
+    text-align: left;
+    font-size: 13px;
+    max-width: 400px;
+  }
+}
