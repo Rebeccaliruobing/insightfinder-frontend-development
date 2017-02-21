@@ -10,6 +10,7 @@ import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
 import EventCluster from './cluster';
 import EventRare from './rare';
+import PatternSequence from './pattern-sequence';
 import './logevent.less';
 import '../../settings/threshold/threshold.less';
 
@@ -651,85 +652,19 @@ margin: 0,
     return null;
   }
 
-  chopString(str, n) {
-    if (str.length <= n + 2) {
-      return str;
-    } 
-      return `${str.slice(0, n)}..`;
-    
-  }
-
-  renderClusterFETable() {
-    if (!this.dp) return;
-    const eventTableData = this.eventTableData;
+  renderPatternSequence() {
+    if (!this.dp) return null;
     const logNidFE = this.dp.logNidFE;
-    const self = this;
+    const eventDataset = this.eventTableData;
+
+    const sorter = R.sortWith([
+      R.descend(R.prop('count')),
+      R.ascend(R.prop('pattern')),
+    ]);
+    const patterns = R.take(200, sorter(logNidFE));
+
     return (
-      <div className="flex-col-container">
-        <div className="flex-item" style={{ overflowY: 'auto' }}>
-          <table style={{ width: '90%' }} className="episode-table ui celled table">
-            <thead>
-              <tr>
-                <th>Frequent Pattern Sequences</th>
-                <th>Count</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logNidFE.sort((a, b) => {
-                const aid = a.count;
-                const bid = b.count;
-                if (aid > bid) {
-                  return -1;
-                } else if (aid < bid) {
-                  return 1;
-                } 
-                  let aaid = a.pattern;
-                  let bbid = b.pattern;
-                  if (aaid > bbid) {
-                    return 1;
-                  } else if (aaid < bbid) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                
-              }).slice(0, 200).map((value, index) => {
-                const pattern = value.pattern;
-                const nids = pattern.split(',');
-                return (
-                  <tr key={index}>
-                    <td>
-                      {nids.map((nid, nididx) => {
-                        const grp = _.find(eventTableData, a => a.nid == nid);
-                        let topKEpisodes = '';
-                        let topKWords = '';
-                        let firstEvent = '';
-                        if (grp) {
-                          topKWords = grp.topKWords.length > 0
-                            ? 'Top keywords: ' + grp.topKWords.replace(/\(\d+\)/g, '') : '';
-                          topKEpisodes = grp.topKEpisodes.length > 0
-                            ? 'Top frequent episodes: ' + grp.topKEpisodes.replace(/\(\d+\)/g, '') : '';
-                          firstEvent = grp.data[0][1];
-                        }
-                        // let popupText = topKWords + ((topKWords.length>0)?",":"") + topKEpisodes;
-                        let popupText = self.chopString(firstEvent, 148);
-                        if (popupText.length > 0) {
-                          popupText = ' (example log entry: ' + popupText + ')';
-                        }
-                        const nidText = nid + popupText;
-                        return (
-                          <div><b>Pattern {nid}</b>{popupText}</div>
-                        );
-                      })}
-                    </td>
-                    <td>{value.count}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <PatternSequence dataset={patterns} eventDataset={eventDataset} />
     );
   }
 
@@ -776,7 +711,7 @@ margin: 0,
               {tabStates.event === 'active' && this.renderEventTable()}
               {tabStates.anomaly === 'active' && this.renderAnomalyTable()}
               {tabStates.freq === 'active' && this.renderFreqCharts()}
-              {tabStates.clusterfe === 'active' && this.renderClusterFETable()}
+              {tabStates.clusterfe === 'active' && this.renderPatternSequence()}
             </div>
           </div>
         </Console.Content>
