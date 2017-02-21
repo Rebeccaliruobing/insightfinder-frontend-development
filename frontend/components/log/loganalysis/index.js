@@ -533,7 +533,28 @@ margin: 0,
           <div className="flex-item" style={{ overflowY: 'auto' }}>
             <table className="ui selectable celled table" style={{ border: 0 }}>
               <tbody>
-                {patterns && patterns.map((pattern, i) => {
+                {patterns && patterns.sort((a, b) => {
+
+                  const aDerivedAnomaly = derivedAnomalyByMetric[a.replace('Pattern', 'neuron')];
+                  const bDerivedAnomaly = derivedAnomalyByMetric[b.replace('Pattern', 'neuron')];
+                  const aDerivedAnomalyCount = aDerivedAnomaly ? aDerivedAnomaly.length : 0;
+                  const bDerivedAnomalyCount = bDerivedAnomaly ? bDerivedAnomaly.length : 0;
+                  if (aDerivedAnomalyCount < bDerivedAnomalyCount) {
+                    return 1;
+                  } else if (aDerivedAnomalyCount > bDerivedAnomalyCount) {
+                    return -1;
+                  } else {
+                    const aNid = parseInt(a.replace('Pattern ', ''));
+                    const bNid = parseInt(b.replace('Pattern ', ''));
+                    if (aNid > bNid) {
+                      return 1;
+                    } else if (aNid < bNid) {
+                      return -1;
+                    } else{
+                      return 0;
+                    }
+                  }
+                }).map((pattern, i) => {
                   const derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern', 'neuron')];
                   let anomalyCount = '';
                   if (derivedAnomaly && derivedAnomaly.length > 0) {
