@@ -14,6 +14,7 @@ export function aggregateToMultiHourData(
   const predictedVector = _.range(size).map(() => ({ items: [] }));
 
   const startTime = moment(endTime).startOf('day').subtract(numberOfDays - 1, 'day');
+  const predictedStartTime = moment(endTime).startOf('day');
 
   // Populate the data into vector.
   _.forEach(dataset, (groups, project) => {
@@ -23,20 +24,14 @@ export function aggregateToMultiHourData(
           _.forEach(hours, (stats, hour) => {
             // Server side returns GMT time
             const h = moment.utc(hour, 'YYYYMMDDHH').local();
-            const idx = h.diff(startTime, 'hours');
-            // Ignore data out of time window and split the detected & predicted items
+
+            // Split the detected & predicted items and ignore data out of time window
             const predicted = !!stats.predictedFlag;
-            if (idx >= 0 && idx < (size * 2) - 1) {
-              let vector = detectedVector;
-              let index = idx;
-              if (idx === size - 1 && predicted) {
-                vector = predictedVector;
-                index = 0;
-              } else if (idx >= size) {
-                vector = predictedVector;
-                index = (idx - size) + numberOfHours;
-              }
-              vector[index].items.push({
+            const vector = predicted ? predictedVector : detectedVector;
+            const idx = h.diff(predicted ? predictedStartTime : startTime, 'hours');
+
+            if (idx >= 0 && idx < size) {
+              vector[idx].items.push({
                 project,
                 group,
                 datetime: h,
