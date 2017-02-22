@@ -40,7 +40,7 @@ class EventGroup extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.eywords !== this.props.keywords ||
+    if (nextProps.keywords !== this.props.keywords ||
       nextProps.eventDataset !== this.props.eventDataset) {
       this.normalizeDataset(nextProps);
       this.setState({
@@ -51,14 +51,14 @@ class EventGroup extends React.Component {
 
   normalizeDataset(props) {
     const { eventDataset } = props;
-    const sorter = R.sortWith([R.descend(R.props('timestamp'))]);
+    const sorter = R.sort((a, b) => b.timestamp - a.timestamp);
     const normalizer = R.map(
-      e => (_.isString(e.timestamp) ? e : {
+      e => (_.isString(e.datetime) ? e : {
         ...e,
-        timestamp: moment(e.timestamp).format(this.timeFormat),
+        datetime: moment(e.datetime).format(this.timeFormat),
       }),
     );
-    this.normalizedEvents = normalizer(sorter(eventDataset));
+    this.normalizedEvents = sorter(normalizer(eventDataset));
   }
 
   @autobind
@@ -85,7 +85,7 @@ class EventGroup extends React.Component {
     const { highlightWord } = this.state;
     const count = normalizedEvents.length;
     const timeRange = count > 0 ?
-      `${normalizedEvents[0].timestamp} ~ ${normalizedEvents[count - 1].timestamp}` : '';
+      `${normalizedEvents[0].datetime} ~ ${normalizedEvents[count - 1].datetime}` : '';
 
     return (
       <div className={`log-event-group ${className}`} {...props}>

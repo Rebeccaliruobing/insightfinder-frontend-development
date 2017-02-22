@@ -98,9 +98,10 @@ class EventCluster extends React.Component {
 
       // Convert the events data into object support by event-group.
       const events = R.map(d => ({
-        timestamp: d[0],
+        datetime: d[0],
         rawData: d[1],
-      }), cluster.data);
+        timestamp: d[2],
+      }), data);
       return (
         <EventGroup
           key={cluster.nid}

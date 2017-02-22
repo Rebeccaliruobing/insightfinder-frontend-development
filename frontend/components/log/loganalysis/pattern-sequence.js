@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes as T } from 'react';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Tooltip } from 'pui-react-tooltip';
@@ -6,6 +6,11 @@ import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import EventGroup from './event-group';
 
 class PatternSequence extends React.Component {
+  static propTypes = {
+    dataset: T.array.isRequired,
+    eventDataset: T.array.isRequired,
+  }
+
   constructor(props) {
     super(props);
 
@@ -25,6 +30,36 @@ class PatternSequence extends React.Component {
       }
     };
   }
+  componentDidMount() {
+    this.autoselectGroup(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.dataset !== this.props.dataset) {
+      this.autoselectGroup(nextProps);
+    }
+  }
+
+  @autobind
+  autoselectGroup(props) {
+    const { dataset, eventDataset } = props;
+    if (Array.isArray(dataset) && dataset.length > 0) {
+      const nids = dataset[0].pattern.split(',');
+      if (nids.length > 0) {
+        const nid = nids[0];
+        const grp = R.find(a => a.nid.toString() === nid)(eventDataset);
+        if (grp) {
+          this.setState({
+            selectedGroup: grp,
+          });
+        }
+      }
+    } else {
+      this.setState({
+        selectedGroup: null,
+      });
+    }
+  }
 
   renderSelectedGroup() {
     const { selectedGroup } = this.state;
@@ -36,8 +71,9 @@ class PatternSequence extends React.Component {
     const episodes = (selectedGroup.topKEpisodes && selectedGroup.topKEpisodes.length > 0) ?
       selectedGroup.topKEpisodes.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
     const events = R.map(d => ({
-      timestamp: d[0],
+      datetime: d[0],
       rawData: d[1],
+      timestamp: d[2],
     }), selectedGroup.data);
 
     return (
@@ -72,7 +108,8 @@ class PatternSequence extends React.Component {
                       <div className="ui horizontal bulleted list">
                         {nids.map((nid, nididx) => {
                           const grp = R.find(a => a.nid.toString() === nid)(eventDataset);
-                          const eventText = grp ? grp.data[0][1] : '';
+                          const data = R.sort((a, b) => b[2] - a[2])(grp.data);
+                          const eventText = data ? data[0][1] : '';
                           return (
                             <OverlayTrigger
                               key={nididx}

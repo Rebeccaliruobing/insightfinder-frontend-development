@@ -514,7 +514,6 @@ class LogAnalysisCharts extends React.Component {
 
     const title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
-    console.log(selectedPatternChartData);
     return (
       <div className="flex-row-container">
         <div
