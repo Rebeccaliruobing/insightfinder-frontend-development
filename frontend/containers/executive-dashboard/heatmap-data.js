@@ -34,7 +34,7 @@ export function aggregateToMultiHourData(
                 index = 0;
               } else if (idx >= size) {
                 vector = predictedVector;
-                index = idx - size;
+                index = idx - size + 24;
               }
               vector[index].items.push({
                 project,
