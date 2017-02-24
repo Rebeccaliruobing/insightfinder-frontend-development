@@ -24,11 +24,11 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
 
 const getArrowStyles = (left, right, reverseColor = false, reverseDirection = false) => {
   const up = {
-    transform: 'rotate(-25deg)',
+    transform: 'rotate(-90deg)',
     color: 'red',
   };
   const down = {
-    transform: 'rotate(25deg)',
+    transform: 'rotate(90deg)',
     color: 'green',
   };
   const flat = {

@@ -160,7 +160,17 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleListRowOpenAnomaly(projectName, instanceGroup, datetime) {
+  handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
+    this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime);
+  }
+
+  @autobind
+  handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
+    this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime, true);
+  }
+
+  @autobind
+  handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
@@ -171,6 +181,10 @@ class ExecutiveDashboard extends React.Component {
       query.startTime = datetime.startOf('day').format(this.dateFormat);
       query.endTime = datetime.endOf('day').format(this.dateFormat);
     }
+    if (predicted) {
+      query.predicted = true;
+    }
+
     store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
   }
@@ -311,7 +325,7 @@ class ExecutiveDashboard extends React.Component {
               <HourlyHeatmap
                 statSelector={d => d.totalAnomalyScore}
                 numberOfDays={numberOfDays} dataset={heatmapData.detected}
-                onNameClick={this.handleListRowOpenAnomaly}
+                onNameClick={this.handleListRowOpenDetectedAnomaly}
               />
             </div>
             <div className="heatmap-block">
@@ -319,7 +333,7 @@ class ExecutiveDashboard extends React.Component {
               <HourlyHeatmap
                 statSelector={d => d.totalAnomalyScore} rightEdge
                 numberOfDays={numberOfDays} dataset={heatmapData.predicted}
-                onNameClick={this.handleListRowOpenAnomaly}
+                onNameClick={this.handleListRowOpenPredictedAnomaly}
               />
             </div>
             <div style={{ color: 'grey', marginLeft: '2em' }}>

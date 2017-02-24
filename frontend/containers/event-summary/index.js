@@ -8,8 +8,6 @@ import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
 import { Console, Dropdown } from '../../artui/react';
-
-import DateTimePicker from '../../components/ui/datetimepicker/index';
 import apis from '../../apis';
 import { ProjectStatistics } from '../../components/statistics';
 import { IncidentsList } from '../../components/incidents';
@@ -349,6 +347,8 @@ class EventSummary extends React.Component {
       endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
       instanceGroup: 'All',
+      predicted: false,
+      eventId: undefined,
       ...params,
     };
   }
@@ -356,7 +356,8 @@ class EventSummary extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    const { projectName, instanceGroup, modelType } = params;
+    const { projectName, instanceGroup, modelType, eventId: activeIncidentId } = params;
+    const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
@@ -463,8 +464,10 @@ class EventSummary extends React.Component {
                   <IncidentsList
                     projectName={projectName} projectType={projectType}
                     endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
-                    onIncidentSelected={this.handleIncidentSelected}
                     incidents={data.incidents}
+                    activeTab={predicted ? 'predicted' : 'detected'}
+                    activeIncidentId={activeIncidentId}
+                    onIncidentSelected={this.handleIncidentSelected}
                     causalDataArray={data.causalDataArray}
                     causalTypes={data.causalTypes}
                     latestTimestamp={latestTimestamp}

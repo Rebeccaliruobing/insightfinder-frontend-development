@@ -2,10 +2,9 @@ import React from 'react';
 import cx from 'classnames';
 import moment from 'moment';
 import _ from 'lodash';
-import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
-import TenderModal from '../cloud/liveanalysis/tenderModal';
+import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
@@ -51,8 +50,8 @@ class IncidentsList extends React.Component {
         angleIconStyleDuration: '',
       },
       tabStates: {
-        predicted: '',
-        detected: 'active',
+        detected: props.activeTab === 'detected' ? 'active' : '',
+        predicted: props.activeTab === 'predicted' ? 'active' : '',
       },
     };
   }
@@ -94,6 +93,7 @@ class IncidentsList extends React.Component {
 
   @autobind
   handleIncidentSelected(incident, tab) {
+    console.log(incident);
     this.props.onIncidentSelected(incident, tab);
     let incidentState = { activeIncident: incident };
     this.setState(incidentState);
@@ -149,7 +149,7 @@ class IncidentsList extends React.Component {
     this.setState({
       tabStates, angleIconStyleSelect, angleIconStyle,
     });
-    let firstIncident = undefined;
+    let firstIncident;
     if (incidents && incidents.length > 0) {
       firstIncident = _.orderBy(incidents, '[id]', 'desc')[0];
     }
