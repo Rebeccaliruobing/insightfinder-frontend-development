@@ -456,7 +456,7 @@ class EventSummary extends React.Component {
           </div>}
           <div
             className="ui vertical segment"
-            style={{ background: 'white', padding: 4 }}
+            style={{ background: 'white', padding: 8 }}
           >
             <div className="ui incidents grid">
               <div className="row" style={{ height: 700, paddingTop: 0 }}>

@@ -42,12 +42,21 @@
 
 .incident-table.ui.table {
   th {
-    cursor: pointer !important;
-    font-weight: bold !important;
-    //background-color: #ADD8E6 !important;
-    background-color: #566f84 !important;
-    //color: #666666 !important;
-    color: white !important;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #566f84;
+    color: white;
+    line-height: 38px;
+    padding: 0 0.5em;
+    position: relative;
+    user-select: none;
+    .icon {
+      position: absolute;
+      line-height: 39px !important;
+    }
+  }
+  td {
+    padding: 0.5em;
   }
   .code {
     white-space: pre-wrap;
@@ -62,29 +71,7 @@
   }
 
   tr {
-      td{
-        &:nth-child(1){
-          width: 10%;
-        }
-        &:nth-child(2){
-          width: 15%;
-        }
-        &:nth-child(3){
-          width: 15%;
-        }
-        &:nth-child(4){
-          width: 15%;
-        }
-        &:nth-child(5){
-          width: 35%;
-        }
-        &:nth-child(6){
-          width: 10%;
-        }
-      }
-  }
-  tr {
-      th{
+      .th1{
         &:nth-child(1){
           width: 10%;
         }
