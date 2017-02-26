@@ -30,6 +30,7 @@ class IncidentsList extends React.Component {
     projectName: T.string,
     projectType: T.string,
     activeTab: T.oneOf(['detected', 'predicted']),
+    onIncidentSelected: T.func.isRequired,
   }
 
   static defaultProps = {
@@ -47,6 +48,9 @@ class IncidentsList extends React.Component {
   }
 
   componentDidMount() {
+    // Raise the selected incident to parent component.
+    const { activeTab, activeIncident } = this.state;
+    this.props.onIncidentSelected(activeIncident, activeTab);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -56,9 +60,16 @@ class IncidentsList extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { activeTab, activeIncident } = this.state;
+    if (prevState.activeIncident !== activeIncident) {
+      this.props.onIncidentSelected(activeIncident, activeTab);
+    }
+  }
+
   @autobind
   resetLocalDataAndState(prevProps, props) {
-    const { incidents, activeTab, activeEventId } = props;
+    const { incidents, activeTab, activeIncidentId } = props;
     let tab = activeTab;
     let state = null;
 
@@ -71,12 +82,21 @@ class IncidentsList extends React.Component {
       this.minAnomalyRatio = R.reduce(R.min, 0, ratios);
 
       // If we have active event id, try to find it and set the active tab.
-      const finder = R.find(R.propEq('id', activeEventId));
+      const finder = R.find(d => d.id.toString() === activeIncidentId);
       let incident = finder(this.detectedIncidents);
       if (incident) {
         tab = 'detected';
+      } else {
         incident = finder(this.predictedIncidents);
         if (incident) tab = 'predicted';
+      }
+
+      // If not find the active event, select the first one
+      if (!incident) {
+        const ins = this.sortingIncidents(this.getIncidents(tab));
+        if (ins.length > 0) {
+          incident = ins[0];
+        }
       }
 
       state = {
@@ -138,7 +158,7 @@ class IncidentsList extends React.Component {
   }
 
   @autobind
-  sortingIncidents(incidents, sortColumn, sortDirection) {
+  sortingIncidents(incidents, sortColumn = 'id', sortDirection = 'desc') {
     const direction = sortDirection === 'desc' ? R.descend : R.ascend;
     const sorter = (sortColumn === 'eventType') ?
       R.sortWith([direction(R.path(['rootCauseJson', 'rootCauseTypes']))]) :
@@ -289,7 +309,6 @@ class IncidentsList extends React.Component {
     const sysCallEnabled = (projectType.toLowerCase() === 'custom');
     const needMerge = sortColumn === 'id';
     let incidents = this.getIncidents(type);
-    console.log([needMerge, incidents]);
 
     // The incidents is order by id by default, so we can add the merge flags
     // before sorting.
@@ -317,7 +336,7 @@ class IncidentsList extends React.Component {
     incidents = this.sortingIncidents(incidents, sortColumn, sortDirection);
 
     return (
-      <tbody style={{ width: '100%', height: tableBodyHeight, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: tableBodyHeight || 0, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';

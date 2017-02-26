@@ -51,6 +51,7 @@ class EventSummary extends React.Component {
         eventStats: {},
       },
       loading: true,
+      dataLoaded: false,
       selectedIncident: undefined,
       instanceGroups: [],
       projectName: undefined,
@@ -87,8 +88,18 @@ class EventSummary extends React.Component {
 
   @autobind()
   handleIncidentSelected(incident, type) {
-    const { location } = this.props;
-    const query = this.applyDefaultParams(location.query);
+    const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query,
+      eventId: incident ? incident.id : location.query.eventId,
+      predicted: type === 'predicted',
+    });
+
+    router.replace({
+      pathname: location.pathname,
+      query,
+    });
+
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
@@ -216,6 +227,7 @@ class EventSummary extends React.Component {
 
     this.setState({
       loading: true,
+      dataLoaded: false,
     }, () => {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
@@ -226,28 +238,15 @@ class EventSummary extends React.Component {
 
           this.setState({
             loading: false,
+            dataLoaded: true,
             // incidentsTreeMap: data.incidentsTreeMap,
             data,
             maxAnomalyRatio,
             minAnomalyRatio,
             startTimestamp: data.startTimestamp,
             endTimestamp: data.endTimestamp,
-          }, () => {
-            const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
-            const incidentDurationThreshold = 15;
-            const detectedIncidents =
-              data.incidents.filter(
-                incident => incident.startTimestamp <= latestTimestamp &&
-                  incident.duration >= parseInt(incidentDurationThreshold, 10));
-
-            if (detectedIncidents.length > 0) {
-              this.handleIncidentSelected(detectedIncidents[detectedIncidents.length - 1], 'detected');
-            } else {
-              this.handleIncidentSelected(undefined, 'detected');
-            }
           });
-        })
-        .catch((msg) => {
+        }).catch((msg) => {
           this.setState({ loading: false });
           console.log(msg);
         });
@@ -263,6 +262,7 @@ class EventSummary extends React.Component {
 
     this.setState({
       loading: true,
+      dataLoaded: false,
       predictionWindow,
       currentTreemapData: undefined,
     }, () => {
@@ -357,7 +357,7 @@ class EventSummary extends React.Component {
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType, groupIdMap } = this.state;
+      instanceGroups, lineChartType, groupIdMap, dataLoaded } = this.state;
 
     // Convert startTime, endTime to moment object
     startTime = moment(startTime, this.dateFormat);
@@ -452,18 +452,20 @@ class EventSummary extends React.Component {
             style={{ background: 'white', padding: 10, marginBottom: 10 }}
           >
             <div style={{ width: '45%', paddingRight: 10 }}>
-              <IncidentsList
-                projectName={projectName} projectType={projectType}
-                endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
-                incidents={data.incidents}
-                activeTab={predicted ? 'predicted' : 'detected'}
-                activeIncidentId={activeIncidentId}
-                onIncidentSelected={this.handleIncidentSelected}
-                causalDataArray={data.causalDataArray}
-                causalTypes={data.causalTypes}
-                latestTimestamp={latestTimestamp}
-                predictionWindow={predictionWindow}
-              />
+              {dataLoaded &&
+                <IncidentsList
+                  projectName={projectName} projectType={projectType}
+                  endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
+                  incidents={data.incidents}
+                  activeTab={predicted ? 'predicted' : 'detected'}
+                  activeIncidentId={activeIncidentId}
+                  onIncidentSelected={this.handleIncidentSelected}
+                  causalDataArray={data.causalDataArray}
+                  causalTypes={data.causalTypes}
+                  latestTimestamp={latestTimestamp}
+                  predictionWindow={predictionWindow}
+                />
+              }
             </div>
             <div className="flex-item flex-col-container" style={{ width: '55%' }}>
               <div style={{ padding: '5px 0px 6px' }}>
