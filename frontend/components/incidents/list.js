@@ -5,10 +5,10 @@ import _ from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
-import TenderModal from '../cloud/liveanalysis/tenderModal';
 import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
+import CausalGraphModal from './causalGraphModal';
 import apis from '../../apis';
 import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
@@ -27,8 +27,6 @@ class IncidentsList extends React.Component {
   static propTypes = {
     projectName: T.string,
     projectType: T.string,
-    causalDataArray: T.array,
-    causalTypes: T.array,
     activeTab: T.oneOf(['detected', 'predicted']),
   }
 
@@ -85,7 +83,7 @@ class IncidentsList extends React.Component {
         activeIncident: incident,
         sortColumn: defaultSortColumn,
         sortDirection: defaultSortDirection,
-        showTenderModal: false,
+        showCausalGraphModal: false,
         showTakeActionModal: false,
         showSysCall: false,
       };
@@ -419,7 +417,7 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { projectName, causalDataArray, causalTypes, predictionWindow } = this.props;
+    const { projectName, predictionWindow } = this.props;
     const { activeTab } = this.state;
 
     const detectedIncidents = this.detectedIncidents;
@@ -431,12 +429,7 @@ class IncidentsList extends React.Component {
           <Button
             className="orange"
             style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
-            onClick={(e) => {
-              e.stopPropagation();
-              this.setState({
-                showTenderModal: true,
-              });
-            }}
+            onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
           >Causal Graph</Button>
           <div className="ui pointing secondary menu">
             <a
@@ -471,10 +464,11 @@ class IncidentsList extends React.Component {
           }
           {(detectedIncidents.length > 0) && this.renderLegend() }
         </div>
-        {this.state.showTenderModal &&
-          <TenderModal
-            dataArray={causalDataArray} types={causalTypes}
-            onClose={() => this.setState({ showTenderModal: false })}
+        {this.state.showCausalGraphModal &&
+          <CausalGraphModal
+            projectName={projectName}
+            onClose={() => this.setState({ showCausalGraphModal: false })}
+            onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
         }
         {this.state.showTakeActionModal &&

@@ -147,3 +147,57 @@
       }
   }
 }
+
+.ui.modal .causal-graph.content {
+  .d3-container {
+    overflow: auto;
+    text-align: left;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+  }
+  svg {
+    font-size: 13px;
+    .node {
+      cursor: pointer;
+      &:hover {
+        rect {
+          fill: #4183C4;
+        }
+        g.label {
+          fill: #4183C4;
+        }
+      }
+    }
+    .node rect {
+      stroke: white;
+      fill: #dfdfdf;
+    }
+    .edgeLabel g {
+      font-size: 12px;
+      font-style: italic;
+    }
+
+    .edgePath {
+      path {
+        stroke:#21BA45;
+        fill: #21BA45;
+        stroke-width: 1px;
+      }
+      &.strong {
+        path {
+          stroke: #F2711C;
+          fill: #F2711C;
+          stroke-width: 1.5px;
+        }
+      }
+      &.very-strong {
+        path {
+          fill: #DB2828;
+          stroke: #DB2828;
+          stroke-width: 2px;
+        }
+      }
+    }
+  }
+}

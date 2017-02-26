@@ -8,7 +8,7 @@ import d3 from 'd3';
 import ReactFauxDOM from 'react-faux-dom';
 import D3Popup from '../ui/d3-popup';
 import { calculateRGBByAnomalyScore } from '../utils';
-import WindowResizeListener from '../../src/common/lib/window-resize-listener';
+import WindowResizeListener from '../ui/window-resize-listener';
 
 const normalizeValue = (val, fractionDigits = 0) => {
   if (_.isFinite(val)) {
