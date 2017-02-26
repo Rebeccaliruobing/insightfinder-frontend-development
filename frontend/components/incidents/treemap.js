@@ -350,7 +350,7 @@ class IncidentsTreeMap extends Component {
 
     const faux = ReactFauxDOM.createElement('svg');
     const svg = d3.select(faux)
-      .attr({ width, height: height + navHeight - 5 })
+      .attr({ width, height: height + navHeight })
       .append('g')
       .attr('transform', `translate(0, ${navHeight})`);
 
@@ -442,7 +442,7 @@ class IncidentsTreeMap extends Component {
   render() {
     const { faux, showMetricModal, metricModalProps } = this.state;
     return (
-      <div className="incidents treemap">
+      <div className="incidents treemap flex-item" style={{ overflow: 'hidden' }}>
         <WindowResizeListener onResize={this.handleWindowResize} />
         <div
           ref={(c) => { this.$container = $(c); }}

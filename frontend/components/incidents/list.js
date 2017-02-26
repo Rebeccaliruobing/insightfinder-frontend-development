@@ -72,7 +72,6 @@ class IncidentsList extends React.Component {
 
       // If we have active event id, try to find it and set the active tab.
       const finder = R.find(R.propEq('id', activeEventId));
-      console.log(activeEventId);
       let incident = finder(this.detectedIncidents);
       if (incident) {
         tab = 'detected';
@@ -132,7 +131,7 @@ class IncidentsList extends React.Component {
     this.setState(incidentState);
   }
 
-  @autobind
+@autobind
   getIncidents(type) {
     return (type === 'detected' ?
       this.detectedIncidents : this.predictedIncidents) || [];
@@ -289,8 +288,8 @@ class IncidentsList extends React.Component {
     const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
     const sysCallEnabled = (projectType.toLowerCase() === 'custom');
     const needMerge = sortColumn === 'id';
-
     let incidents = this.getIncidents(type);
+    console.log([needMerge, incidents]);
 
     // The incidents is order by id by default, so we can add the merge flags
     // before sorting.
@@ -340,7 +339,7 @@ class IncidentsList extends React.Component {
               className={`${incident === self.state.activeIncident ? 'active' : ''}`}
               title={`${anomalyRatioString}Event details: \n ${incident.rootCauseJson.rootCauseDetails}`}
             >
-              <td style={columeStyles.id}>
+              <td style={{ paddingTop: '1em', ...columeStyles.id }}>
                 {needMerge && incident.uiLastMergedId &&
                   !mergedShown ? `${incident.id}-${incident.uiLastMergedId}` : incident.id}
                 {needMerge && incident.uiLastMergedId && <i
@@ -348,25 +347,25 @@ class IncidentsList extends React.Component {
                   style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
                 />}
               </td>
-              <td style={{ textAlign: 'center', ...columeStyles.anomalyRatio }}>
+              <td style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.anomalyRatio }}>
                 {this.renderEventSeverity(incident)}
               </td>
               <td
                 className="code"
-                style={{ textAlign: 'center', ...columeStyles.startTimestamp }}
+                style={{ textAlign: 'center', paddingTop: '1em', ...columeStyles.startTimestamp }}
               >
                 {moment(incident.startTimestamp).format('MM-DD HH:mm')}
               </td>
-              <td style={{ textAlign: 'right', ...columeStyles.duration }}>
+              <td style={{ textAlign: 'right', paddingTop: '1em', ...columeStyles.duration }}>
                 {!mergedShown && `${incident.uiMergedDuration} min`}
                 {mergedShown && (incident.anomalyRatio === 0 ? 'N/A' : `${incident.duration} min`)}
               </td>
-              <td className="code" style={columeStyles.eventType}>
+              <td className="code" style={{ paddingTop: '1em', ...columeStyles.eventType }}>
                 {incident.rootCauseJson.rootCauseTypes}
                 {sysCallEnabled && incident.syscallFlag &&
                   <i className="zoom icon" onClick={this.handleLoadSysCall(incident)} />}
               </td>
-              <td style={columeStyles.control}>
+              <td className="control" style={columeStyles.control}>
                 {incident.anomalyRatio === 0 ? 'N/A' : <Button
                   className="blue" onClick={(e) => {
                     e.stopPropagation();
