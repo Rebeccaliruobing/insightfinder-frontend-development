@@ -12,6 +12,7 @@ import CausalGraphModal from './causalGraphModal';
 import apis from '../../apis';
 import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
+import WindowResizeListener from '../ui/window-resize-listener';
 
 const defaultSortColumn = 'id';
 const defaultSortDirection = 'desc';
@@ -22,6 +23,7 @@ const columeStyles = {
   duration: { width: '15%', minWidth: 80, paddingRight: '1em', textAlign: 'right' },
   control: { width: 64, textAlign: 'center' },
 };
+const tableBodyOffsetHeight = 260;
 
 class IncidentsList extends React.Component {
   static propTypes = {
@@ -37,7 +39,11 @@ class IncidentsList extends React.Component {
   constructor(props) {
     super(props);
     const state = this.resetLocalDataAndState({}, props);
-    this.state = { ...state };
+
+    this.state = {
+      tableBodyHeight: window.clientHeight - tableBodyOffsetHeight,
+      ...state,
+    };
   }
 
   componentDidMount() {
@@ -278,7 +284,7 @@ class IncidentsList extends React.Component {
     // TODO: predicted needs to add syscall button?
     const self = this;
     const { projectType } = this.props;
-    const { sortColumn, sortDirection, shownMergedIncidentIdsByType } = this.state;
+    const { sortColumn, sortDirection, shownMergedIncidentIdsByType, tableBodyHeight } = this.state;
 
     const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
     const sysCallEnabled = (projectType.toLowerCase() === 'custom');
@@ -312,7 +318,7 @@ class IncidentsList extends React.Component {
     incidents = this.sortingIncidents(incidents, sortColumn, sortDirection);
 
     return (
-      <tbody style={{ width: '100%', height: 420, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: tableBodyHeight, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
@@ -388,15 +394,15 @@ class IncidentsList extends React.Component {
           <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
           <span className="title">CPU Surge</span>
         </div>
-        <div className="block">
+        <div className="block" style={{ width: 140 }}>
           <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
           <span className="title">Network Congestion</span>
         </div>
-        <div className="block">
+        <div className="block" style={{ width: 120 }}>
           <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
           <span className="title">Disk Contention</span>
         </div>
-        <div className="block">
+        <div className="block" style={{ width: 140 }}>
           <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
           <span className="title">Workload Increase</span>
         </div>
@@ -408,12 +414,20 @@ class IncidentsList extends React.Component {
           <svg width={16} height={20}>{createEventShape(EventTypes.InstanceDown)}</svg>
           <span className="title">Instance Down</span>
         </div>
-        <div className="block">
+        <div className="block" style={{ width: 80 }}>
           <svg width={16} height={20}>{createEventShape(EventTypes.Others)}</svg>
           <span className="title">Others</span>
         </div>
       </div>
     );
+  }
+
+  @autobind
+  handleWindowResize({ windowHeight }) {
+    const tableBodyHeight = windowHeight - tableBodyOffsetHeight;
+    this.setState({
+      tableBodyHeight,
+    });
   }
 
   render() {
@@ -424,14 +438,15 @@ class IncidentsList extends React.Component {
     const predictedIncidents = this.predictedIncidents;
 
     return (
-      <div>
-        <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
+      <div className="flex-col-container" style={{ height: '100%' }}>
+        <WindowResizeListener onResize={this.handleWindowResize} />
+        <div style={{ marginBottom: 4, position: 'relative' }}>
           <Button
             className="orange"
             style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
             onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
           >Causal Graph</Button>
-          <div className="ui pointing secondary menu">
+          <div className="ui pointing secondary menu" style={{ marginTop: 0 }}>
             <a
               className={`${activeTab === 'detected' ? 'active' : ''} item`}
               onClick={this.selectTab('detected')}
@@ -442,7 +457,7 @@ class IncidentsList extends React.Component {
             >Predicted Events ({predictionWindow} Hr)</a>
           </div>
         </div>
-        <div className={`${activeTab === 'predicted' ? 'active' : ''} ui tab`}>
+        <div className={`${activeTab === 'predicted' ? 'active' : ''} ui tab flex-item`}>
           {(predictedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}
@@ -453,7 +468,7 @@ class IncidentsList extends React.Component {
           }
           {(predictedIncidents.length > 0) && this.renderLegend() }
         </div>
-        <div className={`${activeTab === 'detected' ? 'active' : ''} ui tab`}>
+        <div className={`${activeTab === 'detected' ? 'active' : ''} ui tab flex-item`}>
           {(detectedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}

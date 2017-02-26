@@ -21,7 +21,7 @@ class CausalGraphModal extends React.Component {
     super(props);
 
     this.container = null;
-    this.containerOffsetHeight = 80;
+    this.containerOffsetHeight = 120;
     this.nodeSize = 7;
 
     this.state = {

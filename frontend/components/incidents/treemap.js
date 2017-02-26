@@ -4,7 +4,7 @@ import _ from 'lodash';
 import d3 from 'd3';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
-
+import WindowResizeListener from '../ui/window-resize-listener';
 import MetricModal from './metric_modal';
 
 class IncidentsTreeMap extends Component {
@@ -350,7 +350,7 @@ class IncidentsTreeMap extends Component {
 
     const faux = ReactFauxDOM.createElement('svg');
     const svg = d3.select(faux)
-      .attr({ width, height: height + navHeight })
+      .attr({ width, height: height + navHeight - 5 })
       .append('g')
       .attr('transform', `translate(0, ${navHeight})`);
 
@@ -414,15 +414,15 @@ class IncidentsTreeMap extends Component {
     ).call((t) => {
       t.attr('x', d => x(d.x) + 6).attr('y', d => y(d.y) + 6);
     });
-    if (schema == 'anomaly') {
+    if (schema === 'anomaly') {
       g.append('text').attr('dy', '.75em').text(d => this.chopString(d.eventType, 10)).call((t) => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
-    } else if (schema == 'cpu') {
+    } else if (schema === 'cpu') {
       g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : '')).call((t) => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
-    } else if (schema == 'availability') {
+    } else if (schema === 'availability') {
       g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : '')).call((t) => {
         t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
       });
@@ -434,15 +434,19 @@ class IncidentsTreeMap extends Component {
     this.setState({ faux: faux.toReact() });
   }
 
+  @autobind
+  handleWindowResize() {
+    this.displayData(this.props);
+  }
+
   render() {
     const { faux, showMetricModal, metricModalProps } = this.state;
     return (
-      <div className="incidents treemap" style={{ marginTop: 4 }}>
+      <div className="incidents treemap">
+        <WindowResizeListener onResize={this.handleWindowResize} />
         <div
-          ref={(c) => {
-            this.$container = $(c);
-          }}
-          style={{ paddingTop: 10, height: '100%', width: '100%' }}
+          ref={(c) => { this.$container = $(c); }}
+          style={{ height: '100%', width: '100%' }}
         >{faux}</div>
         { showMetricModal &&
         <MetricModal {...metricModalProps} onClose={this.hideMetricModal} />

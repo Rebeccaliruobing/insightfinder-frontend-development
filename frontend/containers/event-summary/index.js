@@ -9,7 +9,6 @@ import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
-import { ProjectStatistics } from '../../components/statistics';
 import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
 import {
@@ -19,7 +18,6 @@ import {
   TreeMapAvailabilityThresholdSelect,
 } from '../../components/selections';
 import { buildTreemap } from '../../apis/retrieve-liveanalysis';
-import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 
 class EventSummary extends React.Component {
   static contextTypes = {
@@ -53,7 +51,6 @@ class EventSummary extends React.Component {
         eventStats: {},
       },
       loading: true,
-      showTenderModal: false,
       selectedIncident: undefined,
       instanceGroups: [],
       projectName: undefined,
@@ -156,7 +153,7 @@ class EventSummary extends React.Component {
     if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
-    if (endTime >= curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) {
+    if (endTime >= curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) {
       endTime = curTime.endOf('day');
     }
 
@@ -206,7 +203,7 @@ class EventSummary extends React.Component {
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const { projectName, instanceGroup } = query;
@@ -235,7 +232,6 @@ class EventSummary extends React.Component {
             minAnomalyRatio,
             startTimestamp: data.startTimestamp,
             endTimestamp: data.endTimestamp,
-            showTenderModal: false,
           }, () => {
             const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
             const incidentDurationThreshold = 15;
@@ -262,7 +258,7 @@ class EventSummary extends React.Component {
   handleProjectChange(projectName) {
     let { dashboardUservalues } = this.context;
     let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
+    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
     let { predictionWindow } = project;
 
     this.setState({
@@ -369,7 +365,7 @@ class EventSummary extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD')==curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
@@ -388,7 +384,10 @@ class EventSummary extends React.Component {
         className={`event-summary ${loading ? 'ui form loading' : ''}`}
         style={{ background: '#f5f5f5', paddingLeft: 0 }}
       >
-        <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
+        <div
+          className="ui main tiny container flex-col-container"
+          style={{ height: '100%', display: loading && 'none' }}
+        >
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px 10px', padding: '9px 16px', background: 'white' }}
@@ -448,73 +447,57 @@ class EventSummary extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          {false && <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
-          >
-            <ProjectStatistics data={data} dur={numberOfDays} />
-          </div>}
           <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 8 }}
+            className="ui vertical segment flex-item flex-row-container"
+            style={{ background: 'white', padding: 10, marginBottom: 10 }}
           >
-            <div className="ui incidents grid">
-              <div className="row" style={{ height: 700, paddingTop: 0 }}>
-                <div className="seven wide column" style={{ height: 600, paddingRight: 0 }}>
-                  <IncidentsList
-                    projectName={projectName} projectType={projectType}
-                    endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
-                    incidents={data.incidents}
-                    activeTab={predicted ? 'predicted' : 'detected'}
-                    activeIncidentId={activeIncidentId}
-                    onIncidentSelected={this.handleIncidentSelected}
-                    causalDataArray={data.causalDataArray}
-                    causalTypes={data.causalTypes}
-                    latestTimestamp={latestTimestamp}
-                    predictionWindow={predictionWindow}
-                  />
-                </div>
-                <div className="nine wide column" style={{ height: 600, paddingTop: 20 }}>
-                  {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
-                  {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
-                  <TreeMapSchemeSelect
-                    style={{ width: 130 }} value={treeMapScheme}
-                    text={treeMapSchemeText}
-                    onChange={this.handleTreeMapScheme}
-                  />
-                  {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
-                    style={{ minWidth: 10 }} value={treeMapCPUThreshold}
-                    text={`<=${treeMapCPUThreshold}%`}
-                    onChange={this.handleTreeMapCPUThreshold}
-                  />}
-                  {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
-                    style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
-                    text={`<=${treeMapAvailabilityThreshold}%`}
-                    onChange={this.handleTreeMapAvailabilityThreshold}
-                  />
-                  }
-                  <IncidentsTreeMap
-                    data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                    endTime={realEndTime} numberOfDays={numberOfDays}
-                    instanceStatsJson={instanceStatsMap}
-                    treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
-                    treeMapCPUThreshold={treeMapCPUThreshold}
-                    treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                    predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
-                  />
-                </div>
+            <div style={{ width: '45%', paddingRight: 10 }}>
+              <IncidentsList
+                projectName={projectName} projectType={projectType}
+                endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
+                incidents={data.incidents}
+                activeTab={predicted ? 'predicted' : 'detected'}
+                activeIncidentId={activeIncidentId}
+                onIncidentSelected={this.handleIncidentSelected}
+                causalDataArray={data.causalDataArray}
+                causalTypes={data.causalTypes}
+                latestTimestamp={latestTimestamp}
+                predictionWindow={predictionWindow}
+              />
+            </div>
+            <div className="flex-item flex-col-container" style={{ width: '55%' }}>
+              <div style={{ padding: '5px 0px' }}>
+                {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
+                {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
+                <TreeMapSchemeSelect
+                  style={{ width: 130 }} value={treeMapScheme}
+                  text={treeMapSchemeText}
+                  onChange={this.handleTreeMapScheme}
+                />
+                {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
+                  style={{ minWidth: 10 }} value={treeMapCPUThreshold}
+                  text={`<=${treeMapCPUThreshold}%`}
+                  onChange={this.handleTreeMapCPUThreshold}
+                />}
+                {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
+                  style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
+                  text={`<=${treeMapAvailabilityThreshold}%`}
+                  onChange={this.handleTreeMapAvailabilityThreshold}
+                />
+                }
               </div>
+              <IncidentsTreeMap
+                data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                endTime={realEndTime} numberOfDays={numberOfDays}
+                instanceStatsJson={instanceStatsMap}
+                treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
+                treeMapCPUThreshold={treeMapCPUThreshold}
+                treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+              />
             </div>
           </div>
         </div>
-        {this.state.showTenderModal &&
-          <TenderModal
-            dataArray={data.causalDataArray} types={data.causalTypes}
-            endTimestamp={latestTimestamp}
-            startTimestamp={latestTimestamp}
-            onClose={() => this.setState({ showTenderModal: false })}
-          />
-        }
       </Console.Content>
     );
   }

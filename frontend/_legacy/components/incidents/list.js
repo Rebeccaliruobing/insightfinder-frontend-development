@@ -370,7 +370,7 @@ class IncidentsList extends React.Component {
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
-          <span className="title">Network Congestion</span>
+          <span className="title" style={{ width: 140 }}>Network Congestion</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
@@ -378,7 +378,7 @@ class IncidentsList extends React.Component {
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
-          <span className="title">Workload Increase</span>
+          <span className="title" style={{ width: 140 }}>Workload Increase</span>
         </div>
         <div className="block">
           <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance,0,'0,255,0')}</svg>
