@@ -851,7 +851,8 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {episodeList && episodeList.slice(0, 200).map((value, index)=> {
+                    {episodeList && episodeList.map((value, index)=> {
+                    // .slice(0, 200)
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>
@@ -877,7 +878,8 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {wordList && wordList.slice(0, 200).map((value, index)=> {
+                    {wordList && wordList.map((value, index)=> {
+                    // .slice(0, 200)
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>

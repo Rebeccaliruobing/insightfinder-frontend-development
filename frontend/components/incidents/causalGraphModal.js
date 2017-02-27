@@ -122,7 +122,7 @@ class CausalGraphModal extends React.Component {
         console.warn(`Removed self link:${src}`);
       } else {
         g.setEdge(src, target, {
-          label: `count=${weight}`,
+          label: `${weight}`,
           class: classByWeight(weight),
           weight,
           labelpos: 'r',
