@@ -146,6 +146,11 @@
           }
           &:hover {
             background: rgba(33, 150, 243, 0.1);
+            td.name {
+              .hoverable.icon {
+                visibility: visible;
+              }
+            }
           }
           &:nth-child(odd) {
             // background: rgba(33, 150, 243, 0.05);
@@ -181,6 +186,14 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            .hoverable.icon {
+              cursor: pointer;
+              margin-left: 1em;
+              color: #F2711C;
+              visibility: hidden;
+              position: absolute;
+              padding-top: 4px;
+            }
           }
           td .name {
             cursor: pointer;

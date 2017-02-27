@@ -54,7 +54,7 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
 
 
 const ListRow = ({
-  name, data, onRowClick, onNameClick,
+  name, data, onRowClick, onNameClick, onActionClick,
   type, isProject = false, expanded = true }) => {
   const { stats, color } = data;
   const projectStyle = isProject ? { fontWeight: 'bold' } : {};
@@ -78,6 +78,11 @@ const ListRow = ({
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span className="name" style={projectStyle}>{name}</span>
         </OverlayTrigger>
+        {isProject && type === 'anomaly' &&
+          <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
+            <i className="hoverable random icon" onClick={onActionClick} />
+          </OverlayTrigger>
+        }
       </td>
 
       {type === 'anomaly' &&
@@ -235,6 +240,7 @@ ListRow.propTypes = {
   isProject: T.bool,
   onRowClick: T.func,
   onNameClick: T.func,
+  onActionClick: T.func,
 };
 
 export default ListRow;

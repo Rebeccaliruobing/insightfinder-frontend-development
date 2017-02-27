@@ -15,6 +15,12 @@ const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)
 class CausalGraphModal extends React.Component {
   static propTypes = {
     projectName: T.string.isRequired,
+    autoloadData: T.bool,
+    eventsRelation: T.any,
+  }
+  
+  static defaultProps = {
+    autoloadData: true,
   }
 
   constructor(props) {
@@ -26,14 +32,21 @@ class CausalGraphModal extends React.Component {
 
     this.state = {
       containerHeight: $(window).height() - this.containerOffsetHeight,
-      threshold: '3',
-      loading: true,
-      allRelations: {},
+      threshold: '3.0',
+      loading: props.autoloadData,
+      allRelations: props.eventsRelation,
     };
   }
 
   componentDidMount() {
-    this.retrieveData(this.props);
+    const { autoloadData } = this.props;
+    const { allRelations, threshold } = this.state;
+    if (autoloadData) {
+      this.retrieveData(this.props);
+    } else {
+      const relations = allRelations[threshold.toString()] || [];
+      this.renderGraph(relations);
+    }
   }
 
   componentWillMount() {
@@ -43,10 +56,7 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
-  renderGraph(threshold) {
-    const { allRelations } = this.state;
-    const relations = allRelations[threshold.toString()] || [];
-
+  renderGraph(relations) {
     // Remove the old svg
     d3.select(this.container).select('svg').remove();
 
@@ -55,7 +65,7 @@ class CausalGraphModal extends React.Component {
 
     // Change graph layout
     g.setGraph({
-      rankdir: 'LR', align: 'DL', ranksep: 30, nodesep: 30, edgesep: 0, marginx: 20, marginy: 20,
+      rankdir: 'LR', align: 'DR', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
     });
 
     // Create node for src and target
@@ -73,11 +83,33 @@ class CausalGraphModal extends React.Component {
       });
     }, names);
 
+    // Get the topest line based on the weight
+    const total = relations.length;
+    const weights = R.sort(
+      (a, b) => b - a,
+      R.uniq(R.map(R.prop('weight'), relations)),
+    );
+    const vstrong = [];
+    const strong = [];
+    let count = 0;
+    for (let i = 0; i < weights.length; i += 1) {
+      count += R.filter(R.propEq('weight', weights[i]), relations).length;
+      if (count / total < 0.2) {
+        vstrong.push(weights[i]);
+      }
+      if (count / total < 0.55) {
+        strong.push(weights[i]);
+      }
+    }
+    if (weights.length > 1 && vstrong.length === 0) {
+      vstrong.push(weights[0]);
+    }
+
     const classByWeight = (weight) => {
-      if (weight >= 2 && weight < 5) {
-        return 'strong';
-      } else if (weight >= 5) {
+      if (R.indexOf(weight, vstrong) >= 0) {
         return 'very-strong';
+      } else if (R.indexOf(weight, strong) >= 0) {
+        return 'strong';
       }
       return '';
     };
@@ -93,8 +125,8 @@ class CausalGraphModal extends React.Component {
           label: `count=${weight}`,
           class: classByWeight(weight),
           weight,
-          labelpos: 'l',
-          labeloffset: 4,
+          labelpos: 'r',
+          labeloffset: 8,
         });
       }
     }, relations);
@@ -108,15 +140,17 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.node')
       .append('svg:title').text(d => d);
 
-    // Change the cell size
+    // Hidden the rect.
     svg.selectAll('.node rect').attr({
-      width: this.nodeSize,
-      height: this.nodeSize,
-      y: -1 * (this.nodeSize / 2),
+      visibility: 'hidden',
+      // width: this.nodeSize,
+      // height: this.nodeSize,
+      // y: -1 * (this.nodeSize / 2),
     });
 
-    const width = g.graph().width;
-    const height = g.graph().height;
+    let { width, height } = g.graph();
+    width = width <= 0 ? 10 : width;
+    height = height <= 0 ? 10 : height;
     svg.attr({ width, height, viewBox: `0 0 ${width} ${height}` });
   }
 
@@ -126,11 +160,13 @@ class CausalGraphModal extends React.Component {
     retrieveEventData(projectName).then((data) => {
       const { threshold } = this.state;
       const allRelations = JSON.parse(data.causalRelation || '{}');
+      console.log(allRelations);
       this.setState({
         loading: false,
         allRelations,
       }, () => {
-        this.renderGraph(threshold);
+        const relations = allRelations[threshold.toString()] || [];
+        this.renderGraph(relations);
       });
     }).catch((msg) => {
       this.setState({ loading: false });
@@ -156,12 +192,14 @@ class CausalGraphModal extends React.Component {
     this.setState({
       threshold: v,
     }, () => {
-      this.renderGraph(v);
+      const { allRelations } = this.state;
+      const relations = allRelations[v.toString()] || [];
+      this.renderGraph(relations);
     });
   }
 
   render() {
-    const rest = R.omit(['projectName'], this.props);
+    const rest = R.omit(['projectName', 'autoloadData', 'eventsRelation'], this.props);
     const { loading, containerHeight, threshold } = this.state;
 
     return (
@@ -178,12 +216,11 @@ class CausalGraphModal extends React.Component {
             <Dropdown mode="select" className="mini" value={threshold} onChange={this.handleThresholdChange}>
               <i className="dropdown icon" />
               <div className="menu">
-                <div className="item">1</div>
-                <div className="item">2</div>
-                <div className="item">3</div>
-                <div className="item">4</div>
-                <div className="item">5</div>
-                <div className="item">6</div>
+                <div className="item" data-value="0.5">0.5</div>
+                <div className="item" data-value="1.0">1</div>
+                <div className="item" data-value="2.0">2</div>
+                <div className="item" data-value="3.0">3</div>
+                <div className="item" data-value="6.0">6</div>
               </div>
             </Dropdown>
           </div>

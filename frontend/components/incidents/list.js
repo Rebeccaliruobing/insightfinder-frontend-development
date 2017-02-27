@@ -449,7 +449,7 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { projectName, predictionWindow } = this.props;
+    const { projectName, predictionWindow, eventsRelation } = this.props;
     const { activeTab } = this.state;
 
     const detectedIncidents = this.detectedIncidents;
@@ -459,11 +459,13 @@ class IncidentsList extends React.Component {
       <div className="flex-col-container" style={{ height: '100%' }}>
         <WindowResizeListener onResize={this.handleWindowResize} />
         <div style={{ marginBottom: 4, position: 'relative' }}>
-          <Button
-            className="orange"
-            style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
-            onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
-          >Causal Graph</Button>
+          {eventsRelation &&
+            <Button
+              className="orange"
+              style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
+              onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
+            >Causal Graph</Button>
+          }
           <div className="ui pointing secondary menu" style={{ marginTop: 0 }}>
             <a
               className={`${activeTab === 'detected' ? 'active' : ''} item`}
@@ -500,6 +502,8 @@ class IncidentsList extends React.Component {
         {this.state.showCausalGraphModal &&
           <CausalGraphModal
             projectName={projectName}
+            autoloadData={false}
+            eventsRelation={eventsRelation}
             onClose={() => this.setState({ showCausalGraphModal: false })}
             onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
