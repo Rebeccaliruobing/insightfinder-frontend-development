@@ -30,11 +30,15 @@ class CausalGraphModal extends React.Component {
     this.containerOffsetHeight = 120;
     this.nodeSize = 7;
 
+    const allRelations = props.eventsRelation || {};
+    const threshold = '3.0';
+
     this.state = {
       containerHeight: $(window).height() - this.containerOffsetHeight,
-      threshold: '3.0',
+      threshold,
       loading: props.autoloadData,
-      allRelations: props.eventsRelation,
+      allRelations,
+      emptyRelation: !(allRelations[threshold] || []).length,
     };
   }
 
@@ -160,14 +164,22 @@ class CausalGraphModal extends React.Component {
     retrieveEventData(projectName).then((data) => {
       const { threshold } = this.state;
       const allRelations = JSON.parse(data.causalRelation || '{}');
-      console.log(allRelations);
-      this.setState({
-        loading: false,
-        allRelations,
-      }, () => {
-        const relations = allRelations[threshold.toString()] || [];
-        this.renderGraph(relations);
-      });
+      const relations = allRelations[threshold.toString()] || [];
+      if (relations.length > 0) {
+        this.setState({
+          loading: false,
+          emptyRelation: false,
+          allRelations,
+        }, () => {
+          this.renderGraph(relations);
+        });
+      } else {
+        this.setState({
+          loading: false,
+          allRelations,
+          emptyRelation: true,
+        });
+      }
     }).catch((msg) => {
       this.setState({ loading: false });
       console.log(msg);
@@ -189,18 +201,26 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   handleThresholdChange(v) {
-    this.setState({
-      threshold: v,
-    }, () => {
-      const { allRelations } = this.state;
-      const relations = allRelations[v.toString()] || [];
-      this.renderGraph(relations);
-    });
+    const { allRelations } = this.state;
+    const relations = allRelations[v.toString()] || [];
+    if (relations.length > 0) {
+      this.setState({
+        threshold: v,
+        emptyRelation: false,
+      }, () => {
+        this.renderGraph(relations);
+      });
+    } else {
+      this.setState({
+        threshold: v,
+        emptyRelation: true,
+      });
+    }
   }
 
   render() {
     const rest = R.omit(['projectName', 'autoloadData', 'eventsRelation'], this.props);
-    const { loading, containerHeight, threshold } = this.state;
+    const { loading, containerHeight, threshold, emptyRelation } = this.state;
 
     return (
       <Modal {...rest} size="big" closable>
@@ -224,6 +244,9 @@ class CausalGraphModal extends React.Component {
               </div>
             </Dropdown>
           </div>
+          {emptyRelation &&
+            <h4 style={{ margin: '0.5em 0' }}>No causal relations found!</h4>
+          }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>
       </Modal>
