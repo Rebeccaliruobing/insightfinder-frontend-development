@@ -87,8 +87,8 @@ build/Release
 node_modules/
 frontend/manifest-dev.json
 !frontend/artui/semantic/dist
-!frontned/src/common/lib
-
+!frontend/src/common/lib
+!frontend/components/**/lib
 # Jetbrains
 .idea
 static/dev
