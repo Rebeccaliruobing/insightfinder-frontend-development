@@ -173,6 +173,24 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.node')
       .append('svg:title').text(d => d);
 
+    svg.selectAll('.edgePath')
+      .append('svg:title').text((d) => {
+        const { v, w } = d;
+        const matches = R.filter(
+          rel => rel.src === v && rel.target === w,
+          relations,
+        );
+
+        if (matches.length > 0) {
+          const metrics = R.map(
+            m => `From metrics:\n${m.fromMetrics || ''}\nTo metrics:\n${m.toMetrics || ''}`,
+            matches,
+          );
+          return metrics.join('\n');
+        }
+        return '';
+      });
+
     // Hidden the rect.
     svg.selectAll('.node rect').attr({
       visibility: 'hidden',

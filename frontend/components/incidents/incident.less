@@ -184,12 +184,23 @@
     }
 
     .edgePath {
+      cursor: pointer;
+      &:hover {
+        path {
+          stroke-width: 2px;
+        }
+      }
       path {
         stroke: rgba(0, 0, 139, 0.4);
         fill: rgba(0, 0, 139, 0.4);;
         stroke-width: 1px;
       }
       &.strong {
+        &:hover {
+          path {
+            stroke-width: 3px;
+          }
+        }
         path {
           stroke: rgba(242, 113,28, 0.8);
           fill: rgba(242, 113,28, 0.8);
@@ -197,6 +208,11 @@
         }
       }
       &.very-strong {
+        &:hover {
+          path {
+            stroke-width: 4px;
+          }
+        }
         path {
           fill: #DB2828;
           stroke: #DB2828;
