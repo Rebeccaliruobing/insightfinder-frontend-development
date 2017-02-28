@@ -5,11 +5,13 @@ import R from 'ramda';
 import { autobind } from 'core-decorators';
 import * as d3 from 'd3';
 import dagre from 'dagre';
+import Slider from 'rc-slider';
 import { Modal, Dropdown } from '../../artui/react';
 import retrieveEventData from '../../apis/retrieve-event-data';
 import dagreD3 from '../ui/dagre-d3';
 import WindowResizeListener from '../ui/window-resize-listener';
 
+const Range = Slider.Range;
 const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)}..`);
 
 class CausalGraphModal extends React.Component {
@@ -32,13 +34,18 @@ class CausalGraphModal extends React.Component {
 
     const allRelations = props.eventsRelation || {};
     const threshold = '3.0';
+    const relations = allRelations[threshold] || [];
+    const { maxCount, minCount } = this.getWeightRange(relations);
 
     this.state = {
       containerHeight: $(window).height() - this.containerOffsetHeight,
       threshold,
       loading: props.autoloadData,
       allRelations,
-      emptyRelation: !(allRelations[threshold] || []).length,
+      relations,
+      maxCount,
+      minCount,
+      filterRange: [minCount, maxCount],
     };
   }
 
@@ -59,8 +66,30 @@ class CausalGraphModal extends React.Component {
     }
   }
 
+  getWeightRange(relations) {
+    // Get the min/max for filter bar.
+    let minCount = 0;
+    let maxCount = 0;
+
+    const weights = R.sort((a, b) => b - a,
+      R.uniq(R.map(R.prop('weight'), relations)),
+    );
+    if (weights.length > 0) {
+      maxCount = weights[0];
+      minCount = weights[weights.length - 1];
+    }
+
+    return { minCount, maxCount };
+  }
+
   @autobind
   renderGraph(relations) {
+    const { filterRange } = this.state;
+    relations = R.filter(
+      r => (r.weight >= filterRange[0] && r.weight <= filterRange[1]),
+      relations,
+    );
+
     // Remove the old svg
     d3.select(this.container).select('svg').remove();
 
@@ -165,11 +194,15 @@ class CausalGraphModal extends React.Component {
       const { threshold } = this.state;
       const allRelations = JSON.parse(data.causalRelation || '{}');
       const relations = allRelations[threshold.toString()] || [];
+      const { minCount, maxCount } = this.getWeightRange(relations);
       if (relations.length > 0) {
         this.setState({
           loading: false,
-          emptyRelation: false,
           allRelations,
+          relations,
+          minCount,
+          maxCount,
+          filterRange: [minCount, maxCount],
         }, () => {
           this.renderGraph(relations);
         });
@@ -177,7 +210,7 @@ class CausalGraphModal extends React.Component {
         this.setState({
           loading: false,
           allRelations,
-          emptyRelation: true,
+          relations,
         });
       }
     }).catch((msg) => {
@@ -202,25 +235,44 @@ class CausalGraphModal extends React.Component {
   @autobind
   handleThresholdChange(v) {
     const { allRelations } = this.state;
+    // Remove the old svg
+    d3.select(this.container).select('svg').remove();
+
     const relations = allRelations[v.toString()] || [];
     if (relations.length > 0) {
       this.setState({
         threshold: v,
-        emptyRelation: false,
+        relations,
       }, () => {
         this.renderGraph(relations);
       });
     } else {
       this.setState({
         threshold: v,
-        emptyRelation: true,
+        relations,
       });
     }
   }
 
+  @autobind
+  handleSliderChange(range) {
+    this.setState({
+      filterRange: range,
+    }, () => {
+      const { relations } = this.state;
+      this.renderGraph(relations);
+    });
+  }
+
   render() {
     const rest = R.omit(['projectName', 'autoloadData', 'eventsRelation'], this.props);
-    const { loading, containerHeight, threshold, emptyRelation } = this.state;
+    const { loading, containerHeight, threshold, relations,
+      minCount, maxCount } = this.state;
+
+    let step = 1;
+    if (relations.length > 0) {
+      step = Math.floor(maxCount / 10) || 1;
+    }
 
     return (
       <Modal {...rest} size="big" closable>
@@ -243,8 +295,35 @@ class CausalGraphModal extends React.Component {
                 <div className="item" data-value="6.0">6</div>
               </div>
             </Dropdown>
+            {relations.length > 0 &&
+              <span style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em' }}>Filter by count:</span>
+            }
+            {relations.length > 0 &&
+              <span style={{
+                fontSize: 12,
+                fontWeight: 'bold',
+                padding: '0 1em 0 0',
+                color: 'rgba(0, 0, 139, 1)',
+              }}>{minCount}</span>
+            }
+            {relations.length > 0 &&
+              <div style={{ display: 'inline-block', width: 300, verticalAlign: 'middle' }}>
+                <Range
+                  min={minCount} max={maxCount} step={step}
+                  defaultValue={[minCount, maxCount]} onAfterChange={this.handleSliderChange}
+                />
+              </div>
+            }
+            {relations.length > 0 &&
+              <span style={{
+                fontSize: 12,
+                fontWeight: 'bold',
+                padding: '0 0 0 1em',
+                color: '#DB2828',
+              }}>{ maxCount }</span>
+            }
           </div>
-          {emptyRelation &&
+          {relations.length === 0 &&
             <h4 style={{ margin: '0.5em 0' }}>No causal relations found!</h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />

@@ -75,7 +75,7 @@
     "pui-react-tooltip": "^7.3.1",
     "pure-render-decorator": "^1.1.1",
     "ramda": "^0.23.0",
-    "rc-slider": "^3.8.0",
+    "rc-slider": "^6.1.2",
     "react": "^15.4.2",
     "react-addons-perf": "^15.4.2",
     "react-addons-pure-render-mixin": "^15.4.2",
