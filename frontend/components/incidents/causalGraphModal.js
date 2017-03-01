@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
-import debounce from 'lodash/debounce';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 import * as d3 from 'd3';
@@ -179,13 +178,13 @@ class CausalGraphModal extends React.Component {
           console.warn(`Self link:${src} => ${target}`);
         } else {
           g.setEdge(src, target, {
-            label: `${weight}`,
+            label: `\uF05A ${weight}`,
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
             arrowhead: type === 'relation' ? 'vee' : 'undirected',
             weight,
-            labelpos: 'r',
+            labelpos: 'l',
             data: rel,
-            labeloffset: 8,
+            labeloffset: 4,
           }, type);
         }
       }, rels);
@@ -202,25 +201,22 @@ class CausalGraphModal extends React.Component {
 
     // Add title for node
     svg.selectAll('.node')
-      .append('svg:title').text(d => d);
+      .append('svg:title').text(d => g.node(d).name);
 
     // Add title for edge
-    svg.selectAll('.edgePath')
+    svg.selectAll('.edgeLabel')
       .append('svg:title').text((d) => {
-        const { v, w } = d;
-        const matches = R.filter(
-          rel => rel.src === v && rel.target === w,
-          relations,
-        );
-
-        if (matches.length > 0) {
-          const metrics = R.map(
-            m => `From metrics:\n${m.fromMetrics || ''}\nTo metrics:\n${m.toMetrics || ''}`,
-            matches,
-          );
-          return metrics.join('\n');
+        const edge = g.edge(d);
+        const { labelObj } = edge.data;
+        if (labelObj) {
+          const texts = [];
+          R.forEachObjIndexed((val, key) => {
+            const name = key.split(',').slice(-2).join(',');
+            texts.push(`(${name}),${val}`);
+          }, labelObj);
+          return texts.join('\n');
         }
-        return '';
+        return 'N/A';
       });
 
     // Hidden the rect.
