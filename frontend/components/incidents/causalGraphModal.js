@@ -180,7 +180,7 @@ class CausalGraphModal extends React.Component {
           g.setEdge(src, target, {
             label: `\uF05A ${weight}`,
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
-            arrowhead: type === 'relation' ? 'vee' : 'undirected',
+            arrowhead: type === 'relation' ? 'vee' : 'double',
             weight,
             labelpos: 'l',
             data: rel,

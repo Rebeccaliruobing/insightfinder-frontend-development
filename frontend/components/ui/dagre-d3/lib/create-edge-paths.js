@@ -37,6 +37,9 @@ function createEdgePaths(selection, g, arrows) {
       edge.arrowheadId = _.uniqueId("arrowhead");
 
       var domEdge = d3.select(this)
+        .attr("marker-start", function() {
+            return "url(" + makeFragmentRef(location.href, edge.arrowheadId + '-start') + ")";
+        })
         .attr("marker-end", function() {
             return "url(" + makeFragmentRef(location.href, edge.arrowheadId) + ")";
         })
