@@ -461,7 +461,7 @@ class EventSummary extends React.Component {
                   activeIncidentId={activeIncidentId}
                   onIncidentSelected={this.handleIncidentSelected}
                   causalDataArray={data.causalDataArray}
-                  eventsRelation={data.eventsRelation}
+                  eventsCausalRelation={data.eventsCausalRelation}
                   causalTypes={data.causalTypes}
                   latestTimestamp={latestTimestamp}
                   predictionWindow={predictionWindow}

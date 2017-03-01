@@ -18,7 +18,7 @@ class CausalGraphModal extends React.Component {
   static propTypes = {
     projectName: T.string.isRequired,
     autoloadData: T.bool,
-    eventsRelation: T.any,
+    eventsCausalRelation: T.any,
   }
   
   static defaultProps = {
@@ -32,7 +32,7 @@ class CausalGraphModal extends React.Component {
     this.containerOffsetHeight = 120;
     this.nodeSize = 7;
 
-    const allRelations = props.eventsRelation || {};
+    const allRelations = props.eventsCausalRelation || {};
     const threshold = '3.0';
     const relations = allRelations[threshold] || [];
     const { maxCount, minCount } = this.getWeightRange(relations);
@@ -283,7 +283,7 @@ class CausalGraphModal extends React.Component {
   }
 
   render() {
-    const rest = R.omit(['projectName', 'autoloadData', 'eventsRelation'], this.props);
+    const rest = R.omit(['projectName', 'autoloadData', 'eventsCausalRelation'], this.props);
     const { loading, containerHeight, threshold, relations,
       minCount, maxCount } = this.state;
 

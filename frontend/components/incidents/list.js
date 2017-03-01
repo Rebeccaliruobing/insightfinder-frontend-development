@@ -449,7 +449,7 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { projectName, predictionWindow, eventsRelation } = this.props;
+    const { projectName, predictionWindow, eventsCausalRelation } = this.props;
     const { activeTab } = this.state;
 
     const detectedIncidents = this.detectedIncidents;
@@ -459,7 +459,7 @@ class IncidentsList extends React.Component {
       <div className="flex-col-container" style={{ height: '100%' }}>
         <WindowResizeListener onResize={this.handleWindowResize} />
         <div style={{ marginBottom: 4, position: 'relative' }}>
-          {eventsRelation &&
+          {eventsCausalRelation &&
             <Button
               className="orange"
               style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
@@ -503,7 +503,7 @@ class IncidentsList extends React.Component {
           <CausalGraphModal
             projectName={projectName}
             autoloadData={false}
-            eventsRelation={eventsRelation}
+            eventsCausalRelation={eventsCausalRelation}
             onClose={() => this.setState({ showCausalGraphModal: false })}
             onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
