@@ -455,6 +455,7 @@ class EventSummary extends React.Component {
               {dataLoaded &&
                 <IncidentsList
                   projectName={projectName} projectType={projectType}
+                  instanceGroup={instanceGroup}
                   endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                   incidents={data.incidents}
                   activeTab={predicted ? 'predicted' : 'detected'}
