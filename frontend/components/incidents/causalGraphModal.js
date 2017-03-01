@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
+import debounce from 'lodash/debounce';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 import * as d3 from 'd3';
@@ -17,12 +18,11 @@ const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)
 class CausalGraphModal extends React.Component {
   static propTypes = {
     projectName: T.string.isRequired,
-    autoloadData: T.bool,
-    eventsRelation: T.any,
+    loadGroup: T.bool,
   }
-  
+
   static defaultProps = {
-    autoloadData: true,
+    loadGroup: false,
   }
 
   constructor(props) {
@@ -32,98 +32,75 @@ class CausalGraphModal extends React.Component {
     this.containerOffsetHeight = 120;
     this.nodeSize = 7;
 
-    const allRelations = props.eventsRelation || {};
-    const threshold = '3.0';
-    const relations = allRelations[threshold] || [];
-    const { maxCount, minCount } = this.getWeightRange(relations);
+    this.weightMapper = R.compose(
+      R.sort((a, b) => b - a),
+      R.uniq,
+      R.map(R.prop('weight')),
+    );
 
+    const minCount = 1;
+    const maxCount = 1;
     this.state = {
+      loading: true,
       containerHeight: $(window).height() - this.containerOffsetHeight,
-      threshold,
-      loading: props.autoloadData,
-      allRelations,
-      relations,
+      threshold: '3.0',
+      relations: {},
+      correlations: [],
       maxCount,
       minCount,
       filterRange: [minCount, maxCount],
+      showCorrelations: true,
     };
   }
 
   componentDidMount() {
-    const { autoloadData } = this.props;
-    const { allRelations, threshold } = this.state;
-    if (autoloadData) {
-      this.retrieveData(this.props);
-    } else {
-      const relations = allRelations[threshold.toString()] || [];
-      this.renderGraph(relations);
-    }
+    this.retrieveData(this.props);
   }
 
   componentWillMount() {
+    this.cleanChart();
+  }
+
+  @autobind
+  cleanChart() {
     if (this.container) {
       d3.select(this.container).select('svg').remove();
     }
   }
 
-  getWeightRange(relations) {
-    // Get the min/max for filter bar.
-    let minCount = 0;
-    let maxCount = 0;
+  @autobind
+  getWeightRange(relations, correlations, showCorrelations) {
+    let minCount = 1;
+    let maxCount = 1;
 
-    const weights = R.sort((a, b) => b - a,
-      R.uniq(R.map(R.prop('weight'), relations)),
-    );
+    let weights = this.weightMapper(relations);
     if (weights.length > 0) {
-      maxCount = weights[0];
-      minCount = weights[weights.length - 1];
+      maxCount = parseInt(weights[0], 10);
+      minCount = parseInt(weights[weights.length - 1], 10);
+    }
+
+    if (showCorrelations) {
+      weights = this.weightMapper(correlations);
+      if (weights.length > 0) {
+        const max = parseInt(weights[0], 10);
+        const min = parseInt(weights[weights.length - 1], 10);
+        maxCount = R.max(maxCount, max);
+        minCount = R.min(minCount, min);
+      }
     }
 
     return { minCount, maxCount };
   }
 
   @autobind
-  renderGraph(relations) {
-    const { filterRange } = this.state;
-    relations = R.filter(
-      r => (r.weight >= filterRange[0] && r.weight <= filterRange[1]),
-      relations,
-    );
-
-    // Remove the old svg
-    d3.select(this.container).select('svg').remove();
-
-    // Add nodes and edges to dagre graph
-    const g = new dagre.graphlib.Graph();
-
-    // Change graph layout
-    g.setGraph({
-      rankdir: 'LR', align: 'DR', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
-    });
-
-    // Create node for src and target
-    const names = R.uniq(R.concat(
-      R.map(o => o.src, relations),
-      R.map(o => o.target, relations),
-    ));
-    R.forEach((name) => {
-      g.setNode(name, {
-        title: name,
-        label: chopString(name, 16),
-        name,
-        width: 120,
-        height: 0,
-      });
-    }, names);
-
-    // Get the topest line based on the weight
+  getTopestWeights(relations) {
+    // Get the topest weight based on percent.
     const total = relations.length;
-    const weights = R.sort(
-      (a, b) => b - a,
-      R.uniq(R.map(R.prop('weight'), relations)),
-    );
+    const weights = this.weightMapper(relations);
+
     const vstrong = [];
     const strong = [];
+
     let count = 0;
     for (let i = 0; i < weights.length; i += 1) {
       count += R.filter(R.propEq('weight', weights[i]), relations).length;
@@ -138,7 +115,51 @@ class CausalGraphModal extends React.Component {
       vstrong.push(weights[0]);
     }
 
-    const classByWeight = (weight) => {
+    return [strong, vstrong];
+  }
+
+  @autobind
+  renderGraph() {
+    this.cleanChart();
+
+    let { relations, correlations } = this.state;
+    const { filterRange, showCorrelations } = this.state;
+
+    const weightFilter = R.filter(
+      r => (r.weight >= filterRange[0] && r.weight <= filterRange[1]),
+    );
+    relations = weightFilter(relations);
+    correlations = showCorrelations ? weightFilter(correlations) : [];
+
+    const g = new dagre.graphlib.Graph({ multigraph: true });
+
+    // Change graph layout
+    g.setGraph({
+      rankdir: 'LR', align: 'DR', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
+    });
+
+    const addNodes = (g, rels, fsrc, ftarget, existNames) => {
+      const names = R.uniq(R.concat(
+        R.map(fsrc, rels), R.map(ftarget, rels),
+      ));
+      R.forEach((name) => {
+        if (!R.find(n => n === name)(existNames)) {
+          g.setNode(name, {
+            title: name, label: chopString(name, 16), name, width: 120, height: 0,
+          });
+        }
+      }, names);
+
+      return names;
+    };
+
+    // Add relation and correlation nodes
+    const names = addNodes(g, relations, o => o.src, o => o.target, []);
+    if (showCorrelations) {
+      addNodes(g, correlations, o => o.elem1, o => o.elem2, names);
+    }
+
+    const getWeightClass = (weight, strong, vstrong) => {
       if (R.indexOf(weight, vstrong) >= 0) {
         return 'very-strong';
       } else if (R.indexOf(weight, strong) >= 0) {
@@ -147,22 +168,32 @@ class CausalGraphModal extends React.Component {
       return '';
     };
 
-    // Create edges for each link and remove self link
-    R.forEach((rel) => {
-      const { src, target, weight } = rel;
-
-      if (src === target) {
-        console.warn(`Removed self link:${src}`);
-      } else {
-        g.setEdge(src, target, {
-          label: `${weight}`,
-          class: classByWeight(weight),
-          weight,
-          labelpos: 'r',
-          labeloffset: 8,
-        });
-      }
-    }, relations);
+    // Create edges for relations
+    const addEdges = (g, rels, fsrc, ftarget, type) => {
+      const [strong, vstrong] = this.getTopestWeights(rels);
+      R.forEach((rel) => {
+        const { weight } = rel;
+        const src = fsrc(rel);
+        const target = ftarget(rel);
+        if (src === target) {
+          console.warn(`Self link:${src} => ${target}`);
+        } else {
+          g.setEdge(src, target, {
+            label: `${weight}`,
+            class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
+            arrowhead: type === 'relation' ? 'vee' : 'undirected',
+            weight,
+            labelpos: 'r',
+            data: rel,
+            labeloffset: 8,
+          }, type);
+        }
+      }, rels);
+    };
+    addEdges(g, relations, o => o.src, o => o.target, 'relation');
+    if (showCorrelations) {
+      addEdges(g, correlations, o => o.elem1, o => o.elem2, 'correlation');
+    }
 
     const svg = d3.select(this.container).append('svg');
     const inner = svg.append('g');
@@ -173,6 +204,7 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.node')
       .append('svg:title').text(d => d);
 
+    // Add title for edge
     svg.selectAll('.edgePath')
       .append('svg:title').text((d) => {
         const { v, w } = d;
@@ -194,9 +226,6 @@ class CausalGraphModal extends React.Component {
     // Hidden the rect.
     svg.selectAll('.node rect').attr({
       visibility: 'hidden',
-      // width: this.nodeSize,
-      // height: this.nodeSize,
-      // y: -1 * (this.nodeSize / 2),
     });
 
     let { width, height } = g.graph();
@@ -207,30 +236,36 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   retrieveData(props) {
-    const { projectName } = props;
-    retrieveEventData(projectName).then((data) => {
-      const { threshold } = this.state;
-      const allRelations = JSON.parse(data.causalRelation || '{}');
+    const { projectName, loadGroup, instanceGroup, endTime, numberOfDays } = props;
+
+    retrieveEventData(projectName, loadGroup, instanceGroup, endTime, numberOfDays).then((data) => {
+      const { threshold, showCorrelations } = this.state;
+
+      const allRelations = loadGroup ?
+        data.eventsCausalRelation || {} :
+        JSON.parse(data.causalRelation || '{}');
       const relations = allRelations[threshold.toString()] || [];
-      const { minCount, maxCount } = this.getWeightRange(relations);
-      if (relations.length > 0) {
-        this.setState({
-          loading: false,
-          allRelations,
-          relations,
-          minCount,
-          maxCount,
-          filterRange: [minCount, maxCount],
-        }, () => {
-          this.renderGraph(relations);
-        });
-      } else {
-        this.setState({
-          loading: false,
-          allRelations,
-          relations,
-        });
-      }
+
+      const correlations = loadGroup ?
+        data.eventsCorrelation || [] :
+        JSON.parse(data.correlation || '[]');
+
+      const { minCount, maxCount } = this.getWeightRange(
+        relations, correlations, showCorrelations);
+
+      this.setState({
+        loading: false,
+        allRelations,
+        relations,
+        correlations,
+        minCount,
+        maxCount,
+        filterRange: [minCount, maxCount],
+      }, () => {
+        if (relations.length > 0 || correlations.length > 0) {
+          this.renderGraph(relations, correlations);
+        }
+      });
     }).catch((msg) => {
       this.setState({ loading: false });
       console.log(msg);
@@ -245,6 +280,7 @@ class CausalGraphModal extends React.Component {
       this.setState({
         containerHeight: windowHeight - this.containerOffsetHeight,
       }, () => {
+        // Trigger window resize event to change the size of modal window.
         $(window).trigger('resize');
       });
     }
@@ -252,24 +288,22 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   handleThresholdChange(v) {
-    const { allRelations } = this.state;
-    // Remove the old svg
-    d3.select(this.container).select('svg').remove();
-
+    const { allRelations, showCorrelations } = this.state;
     const relations = allRelations[v.toString()] || [];
-    if (relations.length > 0) {
-      this.setState({
-        threshold: v,
-        relations,
-      }, () => {
-        this.renderGraph(relations);
-      });
-    } else {
-      this.setState({
-        threshold: v,
-        relations,
-      });
-    }
+    const { correlations } = this.state;
+    const { minCount, maxCount } = this.getWeightRange(
+      relations, correlations, showCorrelations);
+
+    // Only reset for relations as it's related with threshold.
+    this.setState({
+      threshold: v,
+      relations,
+      minCount,
+      maxCount,
+      filterRange: [minCount, maxCount],
+    }, () => {
+      this.renderGraph();
+    });
   }
 
   @autobind
@@ -277,20 +311,34 @@ class CausalGraphModal extends React.Component {
     this.setState({
       filterRange: range,
     }, () => {
-      const { relations } = this.state;
-      this.renderGraph(relations);
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  handleShowCorrelationsChange(e) {
+    const checked = e.target.checked;
+    const { relations, correlations } = this.state;
+    const { minCount, maxCount } = this.getWeightRange(
+      relations, correlations, checked);
+    this.setState({
+      showCorrelations: checked,
+      minCount,
+      maxCount,
+      filterRange: [minCount, maxCount],
+    }, () => {
+      this.renderGraph();
     });
   }
 
   render() {
-    const rest = R.omit(['projectName', 'autoloadData', 'eventsRelation'], this.props);
+    const rest = R.omit([
+      'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
+    ], this.props);
     const { loading, containerHeight, threshold, relations,
-      minCount, maxCount } = this.state;
+      minCount, maxCount, showCorrelations, correlations, filterRange } = this.state;
 
-    let step = 1;
-    if (relations.length > 0) {
-      step = Math.floor(maxCount / 10) || 1;
-    }
+    const step = Math.floor(maxCount / 10) || 1;
 
     return (
       <Modal {...rest} size="big" closable>
@@ -299,9 +347,9 @@ class CausalGraphModal extends React.Component {
           className={`causal-graph content flex-col-container ${loading ? 'ui container loading' : ''}`}
           style={{ height: containerHeight }}
         >
-          <div style={{ paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #ddd' }}>
+          <div style={{ fontSize: 12, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #ddd' }}>
             <span
-              style={{ display: 'inline-block', paddingRight: '1em', fontSize: 12, fontWeight: 'bold' }}
+              style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
             >Time Thresholds for Causal Relationships (hour):</span>
             <Dropdown mode="select" className="mini" value={threshold} onChange={this.handleThresholdChange}>
               <i className="dropdown icon" />
@@ -313,36 +361,35 @@ class CausalGraphModal extends React.Component {
                 <div className="item" data-value="6.0">6</div>
               </div>
             </Dropdown>
-            {relations.length > 0 &&
-              <span style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em' }}>Filter by count:</span>
-            }
-            {relations.length > 0 &&
-              <span style={{
-                fontSize: 12,
-                fontWeight: 'bold',
-                padding: '0 1em 0 0',
-                color: 'rgba(0, 0, 139, 1)',
-              }}>{minCount}</span>
-            }
-            {relations.length > 0 &&
-              <div style={{ display: 'inline-block', width: 300, verticalAlign: 'middle' }}>
-                <Range
-                  min={minCount} max={maxCount} step={step}
-                  defaultValue={[minCount, maxCount]} onAfterChange={this.handleSliderChange}
-                />
+            <div style={{ paddingLeft: '2em', display: 'inline-block' }}>
+              <input
+                type="checkbox" checked={showCorrelations}
+                onChange={this.handleShowCorrelationsChange}
+              />
+              <span style={{ fontWeight: 'bold', paddingLeft: '0.5em' }}>Show Correlation</span>
+            </div>
+            {(relations.length > 0 || correlations.length > 0) &&
+              <div style={{ float: 'right', paddingTop: 4 }}>
+                <span style={{ verticalAlign: 'middle', fontWeight: 'bold', padding: '0 1em' }}>Filter by count:</span>
+                <span
+                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 1)' }}
+                >{minCount}</span>
+                <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                  <Range
+                    min={minCount} max={maxCount} step={step}
+                    value={filterRange}
+                    defaultValue={[minCount, maxCount]} onChange={this.handleSliderChange}
+                  />
+                </div>
+                <span
+                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: '#DB2828' }}
+                >{maxCount}</span>
               </div>
             }
-            {relations.length > 0 &&
-              <span style={{
-                fontSize: 12,
-                fontWeight: 'bold',
-                padding: '0 0 0 1em',
-                color: '#DB2828',
-              }}>{ maxCount }</span>
-            }
           </div>
-          {relations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No causal relations found!</h4>
+          {((relations.length === 0 && showCorrelations && correlations.length === 0) ||
+            (!showCorrelations && relations.length === 0)) &&
+            <h4 style={{ margin: '0.5em 0' }}>No event causal relation or correlation found!</h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>

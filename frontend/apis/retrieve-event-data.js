@@ -3,17 +3,26 @@ import store from 'store';
 import $ from 'jquery';
 import getEndpoint from './get-endpoint';
 
-const retrieveEventData = (projectName) => {
+const retrieveEventData = (projectName, loadGroup, instanceGroup, endTime, numberOfDays) => {
   const userName = store.get('userName');
   const token = store.get('token');
+  const params = {
+    userName,
+    token,
+    projectName,
+    ...(loadGroup ? {
+      instanceGroup,
+      numberOfDays,
+      endTimestamp: endTime,
+      operation: 'loadGroup',
+    } : {}),
+  };
 
   return new Promise((resolve, reject) => {
     $.ajax({
       type: 'POST',
       url: getEndpoint('eventData'),
-      data: $.param({
-        userName, token, projectName,
-      }),
+      data: $.param(params),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
       },
