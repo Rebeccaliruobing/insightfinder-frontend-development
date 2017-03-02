@@ -7,6 +7,17 @@ import ReactFauxDOM from 'react-faux-dom';
 import WindowResizeListener from '../ui/window-resize-listener';
 import MetricModal from './metric_modal';
 
+function GetURLParameter(sParam) {
+  const sPageURL = window.location.search.substring(1);
+  const sURLVariables = sPageURL.split('&');
+  for (let i = 0; i < sURLVariables.length; i += 1) {
+    const sParameterName = sURLVariables[i].split('=');
+    if (sParameterName[0] === sParam) {
+      return sParameterName[1].trim();
+    }
+  }
+}
+
 class IncidentsTreeMap extends Component {
 
   static propTypes = {
@@ -26,6 +37,7 @@ class IncidentsTreeMap extends Component {
 
     this.$container = null;
     this.navHeight = 40;
+    this.shownInitMetric = false;
 
     this.state = {
       faux: null,
@@ -305,6 +317,7 @@ class IncidentsTreeMap extends Component {
    * Set the treemap state based on the data. The data maybe a child node in the tree.
    * @param data
    */
+  @autobind
   setTreemap(data, props) {
     const schema = props.treeMapScheme || this.props.treeMapScheme;
     const meta = props.instanceMetaData || this.props.instanceMetaData;
@@ -431,7 +444,33 @@ class IncidentsTreeMap extends Component {
     // Bind event for metric
     g.selectAll('.metric').on('click', this.showMetricChart);
 
-    this.setState({ faux: faux.toReact() });
+    this.setState({ faux: faux.toReact() }, () => {
+      // Show the metric passing from the url query string.
+      const initMetric = GetURLParameter('metric');
+      const metricFinder = (d, metric) => {
+        if (d.type === 'metric' && d.id === metric) {
+          return d;
+        } else {
+          if (d._children && d._children.length > 0) {
+            for (let i = 0; i < d._children.length; i = i + 1) {
+              const m = metricFinder(d._children[i], metric);
+              if (m) {
+                return m;
+              }
+            }
+          }
+        }
+        return null;
+      };
+
+      if (initMetric && !this.shownInitMetric) {
+        this.shownInitMetric = true;
+        const m = metricFinder(data, initMetric);
+        if (m) {
+          this.showMetricChart(m);
+        }
+      }
+    });
   }
 
   @autobind
