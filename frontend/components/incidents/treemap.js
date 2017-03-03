@@ -37,7 +37,8 @@ class IncidentsTreeMap extends Component {
 
     this.$container = null;
     this.navHeight = 40;
-    this.shownInitMetric = false;
+
+    this.shownInitMetric = true; // Disable init metric navigation.
 
     this.state = {
       faux: null,

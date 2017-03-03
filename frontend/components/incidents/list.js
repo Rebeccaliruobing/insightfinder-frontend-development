@@ -69,7 +69,7 @@ class IncidentsList extends React.Component {
 
   @autobind
   resetLocalDataAndState(prevProps, props) {
-    const { incidents, activeTab, activeIncidentId } = props;
+    const { incidents, activeTab, eventStartTimestamp } = props;
     let tab = activeTab;
     let state = null;
 
@@ -82,7 +82,9 @@ class IncidentsList extends React.Component {
       this.minAnomalyRatio = R.reduce(R.min, 0, ratios);
 
       // If we have active event id, try to find it and set the active tab.
-      const finder = R.find(d => d.id.toString() === activeIncidentId);
+      const finder = R.find(d => d.startTimestamp.toString() === eventStartTimestamp);
+      console.log([this.detectedIncidents, this.predictedIncidents]);
+
       let incident = finder(this.detectedIncidents);
       if (incident) {
         tab = 'detected';

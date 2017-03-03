@@ -91,8 +91,8 @@ class EventSummary extends React.Component {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
-      eventId: incident ? incident.id : location.query.eventId,
       predicted: type === 'predicted',
+      eventStartTimestamp: undefined,
     });
 
     router.replace({
@@ -343,8 +343,6 @@ class EventSummary extends React.Component {
       endTime: moment().endOf('day').format(this.dateFormat),
       modelType: 'Holistic',
       instanceGroup: 'All',
-      predicted: false,
-      eventId: undefined,
       ...params,
     };
   }
@@ -352,7 +350,7 @@ class EventSummary extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    const { projectName, instanceGroup, modelType, eventId: activeIncidentId } = params;
+    const { projectName, instanceGroup, modelType, eventStartTimestamp } = params;
     const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
@@ -459,7 +457,7 @@ class EventSummary extends React.Component {
                   endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                   incidents={data.incidents}
                   activeTab={predicted ? 'predicted' : 'detected'}
-                  activeIncidentId={activeIncidentId}
+                  eventStartTimestamp={eventStartTimestamp}
                   onIncidentSelected={this.handleIncidentSelected}
                   causalDataArray={data.causalDataArray}
                   eventsCausalRelation={data.eventsCausalRelation}
