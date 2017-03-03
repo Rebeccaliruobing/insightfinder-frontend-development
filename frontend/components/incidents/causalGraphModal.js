@@ -166,12 +166,29 @@ class CausalGraphModal extends React.Component {
     const getLabel = (data, detail = false) => {
       const { labelObj } = data;
       if (labelObj) {
-        const texts = [];
-        R.forEachObjIndexed((val, key) => {
-          const name = key.split(',').slice(-2).map(
-            str => (detail ? str : metricNameMap[str] || str)).join(', ');
-          texts.push(`(${name}), ${val}`);
-        }, labelObj);
+        let texts = [];
+        if (detail) {
+          R.forEachObjIndexed((val, key) => {
+            const name = key.split(',').slice(-2).join(', ');
+            texts.push(`(${name}), ${val}`);
+          }, labelObj);
+        } else {
+          const ms = [];
+          R.forEachObjIndexed((val, key) => {
+            let [src, target] = key.split(',').slice(-2);
+            src = metricNameMap[src] || src;
+            target = metricNameMap[target] || target;
+
+            let metric = R.find(m => m.src === src && m.target === target, ms);
+            if (!metric) {
+              metric = { src, target, count: parseInt(val, 10) };
+              ms.push(metric);
+            } else {
+              metric.count += parseInt(val, 10);
+            }
+          }, labelObj);
+          texts = R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms);
+        }
         return texts.join('\n');
       }
       return 'N/A';
@@ -239,7 +256,7 @@ class CausalGraphModal extends React.Component {
         data.eventsCausalRelation || {} :
         JSON.parse(data.causalRelation || '{}');
       const relations = allRelations[threshold.toString()] || [];
-      const metricNameMap = [];
+      const metricNameMap = {};
       const namesArray = data.metricShortNameArray || [];
       R.forEach((o) => { metricNameMap[o.metric] = o.shortMetric; }, namesArray);
 
