@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+/* eslint-disable object-property-newline */
 import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
 import R from 'ramda';
@@ -11,7 +12,6 @@ import retrieveEventData from '../../apis/retrieve-event-data';
 import dagreD3 from '../ui/dagre-d3';
 import WindowResizeListener from '../ui/window-resize-listener';
 
-const Range = Slider.Range;
 const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)}..`);
 
 class CausalGraphModal extends React.Component {
@@ -29,6 +29,7 @@ class CausalGraphModal extends React.Component {
 
     this.container = null;
     this.containerOffsetHeight = 120;
+    this.containerOffsetWidth = 100;
     this.nodeSize = 7;
 
     this.weightMapper = R.compose(
@@ -37,18 +38,22 @@ class CausalGraphModal extends React.Component {
       R.map(R.prop('weight')),
     );
 
-    const minCount = 1;
-    const maxCount = 1;
     this.state = {
       loading: true,
+      activeTab: 'relation',
       containerHeight: $(window).height() - this.containerOffsetHeight,
+      containerWidth: $(window).width() - this.containerOffsetWidth,
+      allRelations: {},
+      relations: [],
+      metricNameMap: {},
       threshold: '3.0',
-      relations: {},
+      minRelationCount: 1,
+      maxRelationCount: 1,
+      relationFilterCount: 1,
       correlations: [],
-      maxCount,
-      minCount,
-      filterRange: [minCount, maxCount],
-      showCorrelations: true,
+      minCorrelationCount: 1,
+      maxCorrelationCount: 1,
+      correlationFilterCount: 1,
     };
   }
 
@@ -68,27 +73,17 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
-  getWeightRange(relations, correlations, showCorrelations) {
+  getWeightRange(relations) {
     let minCount = 1;
     let maxCount = 1;
 
-    let weights = this.weightMapper(relations);
+    const weights = this.weightMapper(relations);
     if (weights.length > 0) {
       maxCount = parseInt(weights[0], 10);
       minCount = parseInt(weights[weights.length - 1], 10);
     }
 
-    if (showCorrelations) {
-      weights = this.weightMapper(correlations);
-      if (weights.length > 0) {
-        const max = parseInt(weights[0], 10);
-        const min = parseInt(weights[weights.length - 1], 10);
-        maxCount = R.max(maxCount, max);
-        minCount = R.min(minCount, min);
-      }
-    }
-
-    return { minCount, maxCount };
+    return [minCount, maxCount];
   }
 
   @autobind
@@ -121,14 +116,19 @@ class CausalGraphModal extends React.Component {
   renderGraph() {
     this.cleanChart();
 
-    let { relations, correlations } = this.state;
-    const { filterRange, showCorrelations } = this.state;
+    const { relations, correlations, metricNameMap } = this.state;
+    const { activeTab, relationFilterCount, correlationFilterCount } = this.state;
 
-    const weightFilter = R.filter(
-      r => (r.weight >= filterRange[0] && r.weight <= filterRange[1]),
-    );
-    relations = weightFilter(relations);
-    correlations = showCorrelations ? weightFilter(correlations) : [];
+    const showRelations = activeTab === 'relation';
+    const filterCount = showRelations ? relationFilterCount : correlationFilterCount;
+
+    const srcProp = showRelations ? o => o.src : o => o.elem1;
+    const targetProp = showRelations ? o => o.target : o => o.elem2;
+
+    // Filter the relations based on the selected range
+    let rels = showRelations ? relations : correlations;
+    const weightFilter = R.filter(r => (r.weight >= filterCount));
+    rels = weightFilter(rels) || [];
 
     const g = new dagre.graphlib.Graph({ multigraph: true });
 
@@ -152,11 +152,7 @@ class CausalGraphModal extends React.Component {
       return names;
     };
 
-    // Add relation and correlation nodes
-    const names = addNodes(g, relations, o => o.src, o => o.target, []);
-    if (showCorrelations) {
-      addNodes(g, correlations, o => o.elem1, o => o.elem2, names);
-    }
+    addNodes(g, rels, srcProp, targetProp, []);
 
     const getWeightClass = (weight, strong, vstrong) => {
       if (R.indexOf(weight, vstrong) >= 0) {
@@ -167,13 +163,14 @@ class CausalGraphModal extends React.Component {
       return '';
     };
 
-    const getLabel = (data, detail = true) => {
+    const getLabel = (data, detail = false) => {
       const { labelObj } = data;
       if (labelObj) {
         const texts = [];
         R.forEachObjIndexed((val, key) => {
-          const name = key.split(',').slice(-2).map(str => (detail ? str : str[0])).join(',');
-          texts.push(`(${name}),${val}`);
+          const name = key.split(',').slice(-2).map(
+            str => (detail ? str : metricNameMap[str] || str)).join(', ');
+          texts.push(`(${name}), ${val}`);
         }, labelObj);
         return texts.join('\n');
       }
@@ -192,7 +189,6 @@ class CausalGraphModal extends React.Component {
         } else {
           g.setEdge(src, target, {
             label: getLabel(rel),
-            // label: `\uF05A ${getLabel(rel)}`,
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
             arrowhead: type === 'relation' ? 'vee' : 'double',
             weight,
@@ -203,10 +199,7 @@ class CausalGraphModal extends React.Component {
         }
       }, rels);
     };
-    addEdges(g, relations, o => o.src, o => o.target, 'relation');
-    if (showCorrelations) {
-      addEdges(g, correlations, o => o.elem1, o => o.elem2, 'correlation');
-    }
+    addEdges(g, rels, srcProp, targetProp, activeTab);
 
     const svg = d3.select(this.container).append('svg');
     const inner = svg.append('g');
@@ -221,7 +214,7 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.edgeLabel')
       .append('svg:title').text((d) => {
         const edge = g.edge(d);
-        return getLabel(edge.data);
+        return getLabel(edge.data, true);
       });
 
     // Hidden the rect.
@@ -240,28 +233,35 @@ class CausalGraphModal extends React.Component {
     const { projectName, loadGroup, instanceGroup, endTime, numberOfDays } = props;
 
     retrieveEventData(projectName, loadGroup, instanceGroup, endTime, numberOfDays).then((data) => {
-      const { threshold, showCorrelations } = this.state;
+      const { threshold } = this.state;
 
       const allRelations = loadGroup ?
         data.eventsCausalRelation || {} :
         JSON.parse(data.causalRelation || '{}');
       const relations = allRelations[threshold.toString()] || [];
+      const metricNameMap = [];
+      const namesArray = data.metricShortNameArray || [];
+      R.forEach((o) => { metricNameMap[o.metric] = o.shortMetric; }, namesArray);
 
       const correlations = loadGroup ?
         data.eventsCorrelation || [] :
         JSON.parse(data.correlation || '[]');
 
-      const { minCount, maxCount } = this.getWeightRange(
-        relations, correlations, showCorrelations);
+      const [minRelationCount, maxRelationCount] = this.getWeightRange(relations);
+      const [minCorrelationCount, maxCorrelationCount] = this.getWeightRange(relations);
 
       this.setState({
         loading: false,
         allRelations,
         relations,
         correlations,
-        minCount,
-        maxCount,
-        filterRange: [minCount, maxCount],
+        metricNameMap,
+        minRelationCount,
+        maxRelationCount,
+        relationFilterCount: minRelationCount,
+        minCorrelationCount,
+        maxCorrelationCount,
+        correlationFilterCount: minCorrelationCount,
       }, () => {
         if (relations.length > 0 || correlations.length > 0) {
           this.renderGraph(relations, correlations);
@@ -274,123 +274,176 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
-  handleWindowResize({ windowHeight }) {
-    const { containerHeight } = this.state;
-    const height = windowHeight - this.containerOffsetHeight;
-    if (Math.abs(containerHeight - height) > this.containerOffsetHeight / 2) {
-      this.setState({
-        containerHeight: windowHeight - this.containerOffsetHeight,
-      }, () => {
-        // Trigger window resize event to change the size of modal window.
-        $(window).trigger('resize');
-      });
-    }
+  handleWindowResize({ windowHeight, windowWidth }) {
+    this.setState({
+      containerHeight: windowHeight - this.containerOffsetHeight,
+      containerWidth: windowWidth - this.containerOffsetWidth,
+    }, () => {
+      // Trigger window resize event to change the size of modal window.
+      $(window).trigger('resize');
+    });
   }
 
   @autobind
   handleThresholdChange(v) {
-    const { allRelations, showCorrelations } = this.state;
+    const { allRelations, relationFilterCount } = this.state;
     const relations = allRelations[v.toString()] || [];
-    const { correlations } = this.state;
-    const { minCount, maxCount } = this.getWeightRange(
-      relations, correlations, showCorrelations);
+    const [minRelationCount, maxRelationCount] = this.getWeightRange(relations);
 
     // Only reset for relations as it's related with threshold.
     this.setState({
       threshold: v,
       relations,
-      minCount,
-      maxCount,
-      filterRange: [minCount, maxCount],
+      minRelationCount,
+      maxRelationCount,
+      relationFilterCount: R.min(relationFilterCount, maxRelationCount),
     }, () => {
       this.renderGraph();
     });
   }
 
   @autobind
-  handleSliderChange(range) {
+  handleRelationSliderChange(count) {
     this.setState({
-      filterRange: range,
+      relationFilterCount: count,
     }, () => {
       this.renderGraph();
     });
   }
 
   @autobind
-  handleShowCorrelationsChange(e) {
-    const checked = e.target.checked;
-    const { relations, correlations } = this.state;
-    const { minCount, maxCount } = this.getWeightRange(
-      relations, correlations, checked);
+  handleCorrelationSliderChange(count) {
     this.setState({
-      showCorrelations: checked,
-      minCount,
-      maxCount,
-      filterRange: [minCount, maxCount],
+      correlationFilterCount: count,
     }, () => {
       this.renderGraph();
     });
+  }
+
+  @autobind
+  selectTab(tab) {
+    return () => {
+      this.setState({
+        activeTab: tab,
+      }, () => {
+        this.renderGraph();
+      });
+    };
   }
 
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
-    const { loading, containerHeight, threshold, relations,
-      minCount, maxCount, showCorrelations, correlations, filterRange } = this.state;
+    const { loading, activeTab, containerHeight, containerWidth,
+      relations, threshold, minRelationCount, maxRelationCount, relationFilterCount,
+      correlations, minCorrelationCount, maxCorrelationCount, correlationFilterCount,
+    } = this.state;
 
-    const step = Math.floor(maxCount / 10) || 1;
+    const relationStep = Math.floor(maxRelationCount / 10) || 1;
+    const correlationStep = Math.floor(maxCorrelationCount / 10) || 1;
 
     return (
-      <Modal {...rest} size="big" closable>
+      <Modal {...rest} style={{ marginLeft: -containerWidth / 2, width: containerWidth }} size="big" closable>
         <WindowResizeListener onResize={this.handleWindowResize} />
         <div
           className={`causal-graph content flex-col-container ${loading ? 'ui container loading' : ''}`}
-          style={{ height: containerHeight }}
+          style={{ height: containerHeight, width: containerWidth, paddingTop: 4 }}
         >
-          <div style={{ fontSize: 12, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #ddd' }}>
-            <span
-              style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
-            >Time Thresholds for Causal Relationships (hour):</span>
-            <Dropdown mode="select" className="mini" value={threshold} onChange={this.handleThresholdChange}>
-              <i className="dropdown icon" />
-              <div className="menu">
-                <div className="item" data-value="0.5">0.5</div>
-                <div className="item" data-value="1.0">1</div>
-                <div className="item" data-value="2.0">2</div>
-                <div className="item" data-value="3.0">3</div>
-                <div className="item" data-value="6.0">6</div>
-              </div>
-            </Dropdown>
-            <div style={{ paddingLeft: '2em', display: 'inline-block' }}>
-              <input
-                type="checkbox" checked={showCorrelations}
-                onChange={this.handleShowCorrelationsChange}
-              />
-              <span style={{ fontWeight: 'bold', paddingLeft: '0.5em' }}>Show Correlation</span>
-            </div>
-            {(relations.length > 0 || correlations.length > 0) &&
-              <div style={{ float: 'right', paddingTop: 4 }}>
-                <span style={{ verticalAlign: 'middle', fontWeight: 'bold', padding: '0 1em' }}>Filter by count:</span>
+          <div className="ui pointing secondary menu" style={{ margin: '0px 0px 8px', position: 'relative' }}>
+            <a
+              className={`${activeTab === 'relation' ? 'active' : ''} item`}
+              onClick={this.selectTab('relation')}
+            >Causal Relations</a>
+            <a
+              className={`${activeTab === 'correlation' ? 'active' : ''} item`}
+              onClick={this.selectTab('correlation')}
+            >Correlations</a>
+            <div
+              style={{
+                position: 'absolute', right: 0, top: 6,
+                display: `${activeTab === 'relation' ? 'inline-block' : 'none'}`,
+              }}
+            >
+              <span
+                style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
+              >Time Thresholds (hour):</span>
+              <Dropdown mode="select" className="mini" value={threshold} onChange={this.handleThresholdChange}>
+                <i className="dropdown icon" />
+                <div className="menu">
+                  <div className="item" data-value="0.5">0.5</div>
+                  <div className="item" data-value="1.0">1</div>
+                  <div className="item" data-value="2.0">2</div>
+                  <div className="item" data-value="3.0">3</div>
+                  <div className="item" data-value="6.0">6</div>
+                </div>
+              </Dropdown>
+              <div
+                style={{
+                  visibility: `${relations.length === 0 ? 'hidden' : 'visible'}`,
+                  minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
+                }}
+              >
+                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Count >= ${relationFilterCount}:`}</span>
                 <span
-                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 1)' }}
-                >{minCount}</span>
+                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
+                >{minRelationCount}</span>
                 <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
-                  <Range
-                    min={minCount} max={maxCount} step={step}
-                    value={filterRange}
-                    defaultValue={[minCount, maxCount]} onChange={this.handleSliderChange}
+                  <Slider
+                    included={false} dots
+                    min={minRelationCount} max={maxRelationCount} step={relationStep}
+                    value={relationFilterCount}
+                    defaultValue={minRelationCount}
+                    onChange={c => this.setState({ relationFilterCount: c })}
+                    onAfterChange={this.handleRelationSliderChange}
                   />
                 </div>
                 <span
-                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: '#DB2828' }}
-                >{maxCount}</span>
+                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
+                >{maxRelationCount}</span>
               </div>
-            }
+            </div>
+            <div
+              style={{
+                position: 'absolute', right: 0, top: 6,
+                display: `${activeTab === 'correlation' ? 'inline-block' : 'none'}`,
+              }}
+            >
+              <div
+                style={{
+                  visibility: `${correlations.length === 0 ? 'hidden' : 'visible'}`,
+                  minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
+                }}
+              >
+                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>
+                  {`Count >= ${correlationFilterCount}: `}
+                </span>
+                <div style={{ position: 'relative', display: 'inline-block', height: 40 }}>
+                  <span style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}>
+                    {minCorrelationCount}
+                  </span>
+                  <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                    <Slider
+                      included={false} dots
+                      min={minCorrelationCount} max={maxCorrelationCount} step={correlationStep}
+                      value={correlationFilterCount}
+                      defaultValue={minCorrelationCount}
+                      onChange={c => this.setState({ correlationFilterCount: c })}
+                      onAfterChange={this.handleCorrelationSliderChange}
+                    />
+                  </div>
+                  <span
+                    style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
+                  >{maxCorrelationCount}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          {((relations.length === 0 && showCorrelations && correlations.length === 0) ||
-            (!showCorrelations && relations.length === 0)) &&
-            <h4 style={{ margin: '0.5em 0' }}>No event causal relation or correlation found!</h4>
+          {activeTab === 'relation' && relations.length === 0 &&
+            <h4 style={{ margin: '0.5em 0' }}>No event causal relation found!</h4>
+          }
+          {activeTab === 'correlation' && correlations.length === 0 &&
+            <h4 style={{ margin: '0.5em 0' }}>No event correlation found!</h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>

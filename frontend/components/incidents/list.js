@@ -83,7 +83,6 @@ class IncidentsList extends React.Component {
 
       // If we have active event id, try to find it and set the active tab.
       const finder = R.find(d => d.startTimestamp.toString() === eventStartTimestamp);
-      console.log([this.detectedIncidents, this.predictedIncidents]);
 
       let incident = finder(this.detectedIncidents);
       if (incident) {
