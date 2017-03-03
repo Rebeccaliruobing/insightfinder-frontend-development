@@ -337,10 +337,30 @@ class EventSummary extends React.Component {
   }
 
   applyDefaultParams(params) {
+    const { eventStartTimestamp } = params;
+    let { startTime, endTime } = params;
+
+    if (eventStartTimestamp && !startTime) {
+      startTime = moment(parseInt(eventStartTimestamp, 10))
+        .subtract(2, 'days')
+        .startOf('day').format(this.dateFormat);
+    } else {
+      startTime = moment().subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day').format(this.dateFormat);
+    }
+
+    if (eventStartTimestamp && !endTime) {
+      endTime = moment(parseInt(eventStartTimestamp, 10))
+        .add(2, 'days')
+        .endOf('day').format(this.dateFormat);
+    } else {
+      endTime = moment().endOf('day').format(this.dateFormat);
+    }
+
     return {
-      startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
-        .startOf('day').format(this.dateFormat),
-      endTime: moment().endOf('day').format(this.dateFormat),
+      startTime,
+      endTime,
+      timezoneOffset: moment().utcOffset(),
       modelType: 'Holistic',
       instanceGroup: 'All',
       ...params,
