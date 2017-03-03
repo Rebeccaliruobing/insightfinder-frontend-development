@@ -167,6 +167,19 @@ class CausalGraphModal extends React.Component {
       return '';
     };
 
+    const getLabel = (data, detail = true) => {
+      const { labelObj } = data;
+      if (labelObj) {
+        const texts = [];
+        R.forEachObjIndexed((val, key) => {
+          const name = key.split(',').slice(-2).map(str => (detail ? str : str[0])).join(',');
+          texts.push(`(${name}),${val}`);
+        }, labelObj);
+        return texts.join('\n');
+      }
+      return 'N/A';
+    };
+
     // Create edges for relations
     const addEdges = (g, rels, fsrc, ftarget, type) => {
       const [strong, vstrong] = this.getTopestWeights(rels);
@@ -178,7 +191,8 @@ class CausalGraphModal extends React.Component {
           console.warn(`Self link:${src} => ${target}`);
         } else {
           g.setEdge(src, target, {
-            label: `\uF05A ${weight}`,
+            label: getLabel(rel),
+            // label: `\uF05A ${getLabel(rel)}`,
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
             arrowhead: type === 'relation' ? 'vee' : 'double',
             weight,
@@ -207,16 +221,7 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.edgeLabel')
       .append('svg:title').text((d) => {
         const edge = g.edge(d);
-        const { labelObj } = edge.data;
-        if (labelObj) {
-          const texts = [];
-          R.forEachObjIndexed((val, key) => {
-            const name = key.split(',').slice(-2).join(',');
-            texts.push(`(${name}),${val}`);
-          }, labelObj);
-          return texts.join('\n');
-        }
-        return 'N/A';
+        return getLabel(edge.data);
       });
 
     // Hidden the rect.
