@@ -35,16 +35,16 @@ export default class FileDetection extends Component {
         this.state = {
             projectName: undefined,
             modelString: undefined,
-            inputDurationThreshold: 5,
+            inputDurationThreshold: 3,
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
             TestingData: 'TestingData',
             submitLoading: false,
             loading: false,
-            anomalyThreshold: 0.99,
-            durationThreshold: 5,
-            pvalueText:this.sensitivityMap[0.99], 
+            anomalyThreshold: 0.9,
+            durationThreshold: 3,
+            pvalueText:this.sensitivityMap[0.9], 
             minPts: 5,
             epsilon: 1.0
         }
@@ -81,8 +81,8 @@ export default class FileDetection extends Component {
             projectName,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
-            anomalyThreshold: 0.99,
-            durationThreshold: 5,
+            anomalyThreshold: 0.9,
+            durationThreshold: 3,
             minPts: 5,
             epsilon: 1.0
         };
