@@ -1,6 +1,4 @@
-/* @flow */
-
-export const messagesToCode = (messages: Array<Object>) => {
+export const messagesToCode = (messages) => {
   messages.sort((a, b) => a.id.localeCompare(b.id));
   const messagesString = JSON
     .stringify(messages, null, 2)
@@ -13,5 +11,5 @@ export default ${messagesString};
 `;
 };
 
-export const diff = (a: Array<Object>, b: Array<Object>) =>
+export const diff = (a, b) =>
   a.filter(item => b.indexOf(item) === -1);

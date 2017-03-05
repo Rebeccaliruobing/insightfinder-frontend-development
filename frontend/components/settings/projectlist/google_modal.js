@@ -1,10 +1,7 @@
 import 'blueimp-file-upload/css/jquery.fileupload.css';
-
-
 require('script-loader!blueimp-file-upload/js/vendor/jquery.ui.widget');
 require('script-loader!blueimp-file-upload');
-
-import $ from 'jquery';
+import { autobind } from 'core-decorators';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import cx from 'classnames';
@@ -86,7 +83,7 @@ class GoogleProjectModal extends React.Component {
               <label>.p12 key file *</label>
               <div className="ui button fileinput-button">
                 Upload .p12 key file
-                <input type="file" name="file" ref={::this.fileUploadRef}/>
+                <input type="file" name="file" ref={this.fileUploadRef}/>
               </div>
               {this.state.filename && <span className="text-blue">{this.state.filename}</span>}
             </div>
@@ -105,6 +102,7 @@ class GoogleProjectModal extends React.Component {
     )
   }
 
+  @autobind
   fileUploadRef(r) {
 
     $(ReactDOM.findDOMNode(r))

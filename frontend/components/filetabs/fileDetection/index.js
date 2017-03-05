@@ -1,4 +1,5 @@
 import React, {Component}    from 'react';
+import { autobind } from 'core-decorators';
 import {
     Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
 }                           from '../../../artui/react/index';
@@ -192,7 +193,7 @@ export default class FileDetection extends Component {
 
                                     <div className="ui button fileinput-button">
                                         Testing Data
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
+                                        <input type="file" name="file" ref={this.fileUploadRef}/>
                                     </div>
                                     {this.state.testDataShow ?
                                         <span className="text-blue">{this.state.filename}</span> : null}
@@ -211,6 +212,7 @@ export default class FileDetection extends Component {
         );
     }
 
+    @autobind
     fileUploadRef(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({

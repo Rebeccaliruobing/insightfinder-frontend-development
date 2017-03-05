@@ -29,24 +29,21 @@ const store = configureStore({
   },
 });
 
-const appElement = document.getElementById('app');
+const render = (Component) => {
+  ReactDOM.render((
+    <AppContainer>
+      <Component store={store} />
+    </AppContainer>
+  ), document.getElementById('app'));
+};
+
+render(AppRoot);
 
 // Render app with hot support.
 // https://gist.github.com/gaearon/06bd9e2223556cb0d841#file-naive-js
-ReactDOM.render((
-  <AppContainer>
-    <AppRoot store={store} />
-  </AppContainer>
-), appElement);
-
 if (module.hot && typeof module.hot.accept === 'function') {
   module.hot.accept('./app/Root', () => {
-    const NextAppRoot = require('./app/Root').default;
-
-    ReactDOM.render((
-      <AppContainer>
-        <NextAppRoot store={store} />
-      </AppContainer>
-    ), appElement);
+    const AppRootNext = require('./app/Root').default;
+    render(AppRootNext);
   });
 }

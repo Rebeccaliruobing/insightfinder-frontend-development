@@ -1,4 +1,4 @@
-'use strict';
+import React from 'react';
 
 function toTimePartString(timepart) {
   var s = timepart.toString();

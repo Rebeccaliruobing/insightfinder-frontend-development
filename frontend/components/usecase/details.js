@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment';
 import ReactTimeout from 'react-timeout'
 import {Console, ButtonGroup, Button, Link, Accordion, Dropdown} from '../../artui/react';
 import {Dygraph} from '../../artui/react/dataviz';

@@ -1,8 +1,8 @@
-'use strict';
-
 // TODO 'current' should be renamed to 'transient'
 
+import React from 'react';
 import Days from './Days';
+import moment from 'moment';
 import TimePicker from './TimePicker';
 
 import './datepicker.less';

@@ -221,13 +221,13 @@ export default  class FilterBar extends Component {
             // </div>
 
   render() {
-    const {systemNames, startTime, endTime, description, cvalue, pvalue, pvalueText, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
+    const {loading, systemNames, startTime, endTime, description, cvalue, pvalue, pvalueText, minPts,epsilon, nameField, nameFieldValue, activeItem, metricSettings, modelType,modelTypeText} = this.state;
     const labelStyle = {};
 
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
     let system = this.props.location.query.system;
     return (
-      <div className={cx('ui form', {loading: !!this.state.loading})}>
+      <div className={`ui form ${loading ? 'loading' : ''}`}>
         <div className="ui grid">
           <div className="four wide column">
 
@@ -264,8 +264,9 @@ export default  class FilterBar extends Component {
 
             <div className="field">
               <label style={labelStyle}>Incident Description</label>
-              <textarea className="ui input" value={description} name="description" style={{height: '12em'}}
-                        readonly></textarea>
+              <textarea
+                className="ui input" value={description} name="description" style={{ height: '12em' }}
+                readOnly />
             </div>
           </div>
         </div>
@@ -297,9 +298,8 @@ export default  class FilterBar extends Component {
                   }
 
                   return shouldShow && (
-                      <tr key={index} onClick={this.handleSelectItem(item)} className={cx({
-                        'active': item == this.state.activeItem
-                      })}>
+                    <tr key={index} onClick={this.handleSelectItem(item)}
+                      className={`${item == this.state.activeItem ? 'active' : ''}`}>
                         <td>Incident name/bug ID: {item.metaData.name},
                           Owner: {item.fromUser},
                           Sharing mode: {pubMode}, 
@@ -314,7 +314,7 @@ export default  class FilterBar extends Component {
         </div>
         <div className="ui grid">
           <div className="sixteen wide column">
-            <Button className={cx('orange', {'loading': this.props.loading})} onClick={this.handleSubmit.bind(this)}>Submit</Button>
+            <Button className={`orange ${this.props.loading ? 'loading' : ''}`} onClick={this.handleSubmit.bind(this)}>Submit</Button>
             <Button className="basic" onClick={this.handleRefresh}>Refresh</Button>
             {activeItem && <Button className="basic" onClick={this.handleRemoveRow.bind(this)}>Remove</Button>}
           </div>
@@ -323,7 +323,7 @@ export default  class FilterBar extends Component {
 
           {metricSettings && (
 
-            <div className={cx('ui form', {'loading': !!this.state.uservaluesLoading})} style={{padding: '1rem'}}>
+            <div className={`ui form ${this.state.uservaluesLoading ? 'loading' : ''}`} style={{padding: '1rem'}}>
               <h3>Metric Settings (Optional)</h3>
               <table className="ui celled table">
                 <thead>

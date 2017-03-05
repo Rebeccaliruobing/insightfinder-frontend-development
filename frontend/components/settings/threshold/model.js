@@ -53,9 +53,12 @@ class ModelLine extends React.Component {
 }
 
 class ModelSettings extends React.Component {
-
   static propTypes = {
     projectName: T.string.isRequired,
+  }
+
+  static defaultProps = {
+    projectName: '',
   }
 
   constructor(props) {

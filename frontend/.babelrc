@@ -1,22 +1,18 @@
 /**
- * This .babelrc is for react-native, webpack, gulp and jest. 
- * For jest testing, the settings in test environment is used.
+ * This .babelrc is for running gulp tasks and webpack.
  * 
- * For compiling web source by webpack, the babel settings are in the webpack
- * configuration which is created by ./webpack/makeConfig.js
+ * For compiling web code by webpack, the babel settings are in the config files
+ * in the ./webpack folder.
+ *
+ * For jest testing, the settings in test environment is used.
 **/
 {
-  "presets": ["react-native"],
-  "env": {
-    "test": {
-      "presets": [
-        ["es2015", { "loose": false, "modules": false }], 
-        "react", 
-        "stage-1"
-      ],
-      "plugins": [
-        "transform-es2015-modules-commonjs"
-      ]
-    }
-  }
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }], 
+    "stage-3"
+  ]
 }

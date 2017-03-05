@@ -1,10 +1,10 @@
 /*
- * Create webpack configuration object based on application settings.
+ * Create webpack configuration based on passed-in application specific settings.
 **/
-
 import webpack from 'webpack';
+import webpackMerge from 'webpack-merge';
+import isPlainObject from 'lodash/isPlainObject';
 import R from 'ramda';
-import webpackSettings from '../webpack.settings';
 import babel from './parts/babel';
 import assets from './parts/assets';
 import entry from './parts/entry';
@@ -12,14 +12,16 @@ import output from './parts/output';
 import html from './parts/html';
 import styles from './parts/styles';
 
-const makeConfig = () => {
-  const settings = R.clone(webpackSettings);
+const makeConfig = (webpackSettings) => {
+  const settings = Object.assign({
+    assetsRoot: 'assets',
+  }, R.clone(webpackSettings));
 
   const env = process.env.NODE_ENV;
   settings.isDev = env === 'development';
   settings.isProd = env === 'production';
 
-  const { isDev } = settings;
+  const { isDev, commonEntry } = settings;
 
   const babelSettings = babel(settings);
   const styleSettings = styles(settings);
@@ -30,7 +32,6 @@ const makeConfig = () => {
     babelSettings.rules,
     styleSettings.rules,
     assets(settings),
-    settings.moduleRules,
   ));
 
   let plugins = [
@@ -40,19 +41,29 @@ const makeConfig = () => {
         NODE_ENV: JSON.stringify(env),
       },
     }),
-    new webpack.optimize.CommonsChunkPlugin({
-      names: ['assets/js/common', 'assets/js/manifest'],
-    }),
   ];
+
+  // Add common chunks and manifest chunk
+  // https://webpack.js.org/guides/caching/
+  if (isPlainObject(commonEntry)) {
+    const names = R.keys(commonEntry);
+    if (names.length > 0) {
+      names.push(names[0].replace(/[^/]+$/, 'manifest'));
+    }
+    plugins.push(
+      new webpack.optimize.CommonsChunkPlugin({
+        names,
+      }),
+    );
+  }
 
   plugins = R.filter(R.identity)(plugins.concat(
     htmlSettings.plugins,
     babelSettings.plugins,
     styleSettings.plugins,
-    settings.plugins,
   ));
 
-  return {
+  return webpackMerge({
     entry: entry(settings),
     output: output(settings),
     module: {
@@ -60,10 +71,10 @@ const makeConfig = () => {
     },
     resolve: {
       extensions: ['.js', 'jsx'],
-      alias: settings.resolveAlias,
     },
     devtool: isDev ? 'source-map' : '',
     context: settings.paths.source,
+    target: 'web',
     plugins,
 
     // Advanced configuration
@@ -71,7 +82,7 @@ const makeConfig = () => {
     performance: {
       hints: false,
     },
-  };
+  }, settings.webpackConfig);
 };
 
 export default makeConfig;

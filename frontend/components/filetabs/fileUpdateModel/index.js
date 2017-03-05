@@ -1,4 +1,5 @@
 import React, {Component}    from 'react';
+import { autobind } from 'core-decorators';
 import {
     Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
 }                           from '../../../artui/react/index';
@@ -141,7 +142,7 @@ export default class FileUpdateModel extends Component {
 
                                     <div className="ui button fileinput-button">
                                         Training Data
-                                        <input type="file" name="file" ref={::this.fileUploadTrainingData}/>
+                                        <input type="file" name="file" ref={this.fileUploadTrainingData}/>
                                     </div>
                                     {this.state.trainingDataShow?<span className="text-blue">{this.state.filename}</span>: null}
                                 </div>
@@ -150,7 +151,7 @@ export default class FileUpdateModel extends Component {
 
                                     <div className="ui button fileinput-button">
                                         Optional Filter Data
-                                        <input type="file" name="file" ref={::this.fileUploadOptionalFilterData}/>
+                                        <input type="file" name="file" ref={this.fileUploadOptionalFilterData}/>
                                     </div>
                                     {this.state.optionalFilterDataShow?<span className="text-blue">{this.state.filename}</span>:null}
                                 </div>
@@ -178,6 +179,7 @@ export default class FileUpdateModel extends Component {
         );
     }
 
+    @autobind
     fileUploadTrainingData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
@@ -201,6 +203,7 @@ export default class FileUpdateModel extends Component {
                 this.setState(resp);
             });
     }
+    @autobind
     fileUploadOptionalFilterData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
