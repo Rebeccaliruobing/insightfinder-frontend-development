@@ -8,7 +8,10 @@
  **/
 
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import HappyPack from 'happypack';
 import autoprefixer from 'autoprefixer';
+
+const happyPool = HappyPack.ThreadPool({ size: 6 })
 
 const styles = (settings) => {
   const { isDev, isProd, assetsRoot } = settings;
@@ -36,7 +39,7 @@ const styles = (settings) => {
     loader: 'postcss-loader',
     options: {
       plugins: () => [
-        require('autoprefixer')({ browsers: ['last 2 versions', '> 1%'] }),
+        autoprefixer({ browsers: ['last 2 versions', '> 1%'] }),
       ],
     },
   }];
@@ -46,30 +49,67 @@ const styles = (settings) => {
     resource: {
       test: /\.css$/,
     },
-    use: styleLoaders(cssLoaders),
+    use: {
+      loader: 'happypack/loader',
+      options: {
+        id: 'css',
+      },
+    },
   }, {
     // Sass
     resource: {
       test: /\.scss$/,
     },
-    use: styleLoaders(cssLoaders.concat({
-      loader: 'sass-loader',
+    use: {
+      loader: 'happypack/loader',
       options: {
-        sourceMap: isDev,
+        id: 'sass',
       },
-    })),
+    },
   }, {
     // Less
     test: /\.less$/,
-    loaders: styleLoaders(cssLoaders.concat({
-      loader: 'less-loader',
+    use: {
+      loader: 'happypack/loader',
       options: {
-        sourceMap: isDev,
+        id: 'less',
       },
-    })),
+    },
   }];
 
-  let plugins = [];
+  let plugins = [
+    new HappyPack({
+      id: 'css',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders),
+    }),
+    new HappyPack({
+      id: 'sass',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders.concat({
+        loader: 'sass-loader',
+        options: {
+          sourceMap: isDev,
+        },
+      })),
+    }),
+    new HappyPack({
+      id: 'less',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders.concat({
+        loader: 'less-loader',
+        options: {
+          sourceMap: isDev,
+        },
+      })),
+    }),
+  ];
 
   if (isProd) {
     plugins = plugins.concat([

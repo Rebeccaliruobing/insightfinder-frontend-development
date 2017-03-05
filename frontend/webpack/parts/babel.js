@@ -3,6 +3,7 @@
 **/
 
 import webpack from 'webpack';
+import HappyPack from 'happypack';
 
 const babel = (settings) => {
   const { isDev, paths } = settings;
@@ -33,29 +34,41 @@ const babel = (settings) => {
       test: /\.jsx?$/,
       exclude: paths.node_modules,
     },
-    use: [{
-      loader: 'babel-loader',
+    use: {
+      loader: 'happypack/loader',
       options: {
-        cacheDirectory: true,
-        compact: false,
-        presets: [
-          ['env', {
-            targets: {
-              browsers: ['last 2 versions', '> 1%'],
-            },
-            modules: false,
-            loose: true,
-          }],
-          'stage-1',
-          'react',
-        ],
-        plugins: rulePlugins,
+        id: 'js',
       },
-    }],
+    },
   }];
 
   let plugins = [
     new webpack.NoEmitOnErrorsPlugin(),
+    new HappyPack({
+      id: 'js',
+      cache: true,
+      threads: 4,
+      verbose: false,
+      loaders: [{
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+          compact: false,
+          presets: [
+            ['env', {
+              targets: {
+                browsers: ['last 2 versions', '> 1%'],
+              },
+              modules: false,
+              loose: true,
+            }],
+            'stage-1',
+            'react',
+          ],
+          plugins: rulePlugins,
+        },
+      }],
+    }),
   ];
 
   if (isDev) {
