@@ -23,10 +23,17 @@ const styles = (settings) => {
       }].concat(loaders);
     }
 
-    return ExtractTextPlugin.extract({
-      fallback: 'style-loader',
-      use: loaders,
-    });
+    return loaders;
+  };
+
+  const extractStyleLoaders = (loaders) => {
+    if (isProd) {
+      return ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: loaders,
+      });
+    }
+    return loaders;
   };
 
   const cssLoaders = [{
@@ -49,32 +56,32 @@ const styles = (settings) => {
     resource: {
       test: /\.css$/,
     },
-    use: {
+    use: extractStyleLoaders({
       loader: 'happypack/loader',
       options: {
         id: 'css',
       },
-    },
+    }),
   }, {
     // Sass
     resource: {
       test: /\.scss$/,
     },
-    use: {
+    use: extractStyleLoaders({
       loader: 'happypack/loader',
       options: {
         id: 'sass',
       },
-    },
+    }),
   }, {
     // Less
     test: /\.less$/,
-    use: {
+    use: extractStyleLoaders({
       loader: 'happypack/loader',
       options: {
         id: 'less',
       },
-    },
+    }),
   }];
 
   let plugins = [
