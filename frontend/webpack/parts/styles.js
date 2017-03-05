@@ -32,13 +32,13 @@ const styles = (settings) => {
       importLoaders: 1,
       sourceMap: isDev,
     },
-  // }, {
-  //   loader: 'postcss-loader',
-  //   options: {
-  //     plugins: () => [
-  //       autoprefixer({ browsers: ['last 2 versions', '> 1%'] }),
-  //     ],
-  //   },
+  }, {
+    loader: 'postcss-loader',
+    options: {
+      plugins: () => [
+        require('autoprefixer')({ browsers: ['last 2 versions', '> 1%'] }),
+      ],
+    },
   }];
 
   const rules = [{
