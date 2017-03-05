@@ -3,7 +3,7 @@ import './app.less';
 import React from 'react';
 import { Router, Route, browserHistory, IndexRoute, IndexRedirect, Redirect } from 'react-router';
 import store from 'store';
-
+import _ from 'lodash';
 import {Console, Link} from './artui/react';
 
 import {authRoutes} from  './components/auth';
@@ -158,15 +158,15 @@ class App extends React.Component {
   }
 
   render() {
-    let {
+    const {
       userInfo,
       userInstructions,
       dashboardUservalues,
     } = this.state;
 
-    let loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
+    const loading = !(_.keys(userInstructions).length > 0 && _.keys(dashboardUservalues).length > 0);
     return (
-      <Console className={cx({'ui form loading': loading})}>
+      <Console className={`${loading ? 'ui form loading' : ''}`}>
         <Console.Topbar logo={require('./images/logo_white.png')}>
           <Link to="/cloud" className="item">Dashboard</Link>
           <Link to="/log" className="item">Log Analysis</Link>

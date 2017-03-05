@@ -7,15 +7,11 @@
  * $ npm i -D node-sass sass-loader less less-loader
  **/
 
-import webpack from 'webpack';
-import HappyPack from 'happypack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import autoprefixer from 'autoprefixer';
 
-const happyThreadPool = HappyPack.ThreadPool({ size: 4 });
-
 const styles = (settings) => {
-  const { isDev, isProd } = settings;
+  const { isDev, isProd, assetsRoot } = settings;
 
   const styleLoaders = (loaders) => {
     if (isDev) {
@@ -25,63 +21,59 @@ const styles = (settings) => {
     }
 
     return ExtractTextPlugin.extract({
-      fallbackLoader: 'style-loader',
-      loader: loaders,
+      fallback: 'style-loader',
+      use: loaders,
     });
   };
 
   const cssLoaders = [{
     loader: 'css-loader',
     options: {
+      importLoaders: 1,
       sourceMap: isDev,
     },
-  }, {
-    loader: 'postcss-loader',
+  // }, {
+  //   loader: 'postcss-loader',
+  //   options: {
+  //     plugins: () => [
+  //       autoprefixer({ browsers: ['last 2 versions', '> 1%'] }),
+  //     ],
+  //   },
   }];
 
   const rules = [{
     // normal css
-    test: /\.css$/,
-    loaders: styleLoaders(cssLoaders),
+    resource: {
+      test: /\.css$/,
+    },
+    use: styleLoaders(cssLoaders),
   }, {
     // Sass
-    test: /\.scss$/,
-    loaders: styleLoaders(cssLoaders.concat({
-      loader: `sass-loader${isDev ? '?sourceMap' : ''}`,
+    resource: {
+      test: /\.scss$/,
+    },
+    use: styleLoaders(cssLoaders.concat({
+      loader: 'sass-loader',
+      options: {
+        sourceMap: isDev,
+      },
     })),
   }, {
     // Less
     test: /\.less$/,
     loaders: styleLoaders(cssLoaders.concat({
-      loader: `less-loader${isDev ? '?sourceMap' : ''}`,
+      loader: 'less-loader',
+      options: {
+        sourceMap: isDev,
+      },
     })),
   }];
 
-  let plugins = [
-    new HappyPack({
-      id: 'sass',
-      threadPool: happyThreadPool,
-      loaders: ['sass-loader'],
-    }),
-    new HappyPack({
-      id: 'less',
-      threadPool: happyThreadPool,
-      loaders: ['less-loader'],
-    }),
-    // To support webpack 1.x loaders option.
-    new webpack.LoaderOptionsPlugin({
-      options: {
-        context: '/',
-        postcss: [
-          autoprefixer({ browsers: ['last 2 versions', 'ie >= 9'] }),
-        ],
-      },
-    }),
-  ];
+  let plugins = [];
 
   if (isProd) {
     plugins = plugins.concat([
-      new ExtractTextPlugin('[name]-[hash].css'),
+      new ExtractTextPlugin(`${assetsRoot}/css/[name]-[hash].css`),
     ]);
   }
 

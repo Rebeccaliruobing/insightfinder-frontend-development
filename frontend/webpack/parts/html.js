@@ -3,22 +3,20 @@
 **/
 
 import path from 'path';
-import map from 'lodash/map';
+import R from 'ramda';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const html = (settings) => {
   const { paths, htmls } = settings;
 
+  // If no settings, generate a default html page.
   const plugins = htmls ?
-    map(htmls, s =>
-      new HtmlWebpackPlugin({
-        environment: process.env.NODE_ENV,
-        template: path.join(paths.htmls, s.template),
-        filename: s.filename,
-        initialState: JSON.stringify(s.initialState || {}),
-      }),
-    ) :
-    // If no settings, generate a default html page.
+    R.map(s => new HtmlWebpackPlugin({
+      environment: process.env.NODE_ENV,
+      template: path.join(paths.htmls, s.template),
+      filename: s.filename,
+      initialState: JSON.stringify(s.initialState || {}),
+    }), htmls) :
     new HtmlWebpackPlugin({});
 
   return {

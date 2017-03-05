@@ -8,33 +8,30 @@
 **/
 
 import isPlainObject from 'lodash/isPlainObject';
-import forEach from 'lodash/forEach';
+import R from 'ramda';
 import chalk from 'chalk';
 
 const entry = (settings) => {
-  const { entries, isDev } = settings;
+  const { entries, isDev, commonEntry } = settings;
 
   if (!isPlainObject(entries)) {
     console.error(`${chalk.red('error')} The ${chalk.blue('entries')} option` +
-    `in ${chalk.blue('webpack.settings.js')} must be a plain object`);
+      `in ${chalk.blue('webpack.settings.js')} must be a plain object`);
     process.exit();
   }
 
-  const ret = {};
+  // The real entry must be the last item.
+  // And if need to add babel- polyfill, it must be the first one.
+  const patch = R.map(entry => (isDev ? [].concat([
+    'react-hot-loader/patch',
+    'webpack-hot-middleware/client',
+    'react-addons-perf',
+  ], entry) : entry));
 
-  forEach(entries, (v, k) => {
-    let items = [];
-
-    if (isDev) {
-      items = items.concat([
-        'react-hot-loader/patch',
-        'webpack-hot-middleware/client',
-        'react-addons-perf',
-      ]);
-    }
-
-    ret[k] = items.concat(v);
-  });
+  let ret = patch(entries);
+  if (isPlainObject(commonEntry)) {
+    ret = Object.assign({}, ret, patch(commonEntry));
+  }
 
   return ret;
 };

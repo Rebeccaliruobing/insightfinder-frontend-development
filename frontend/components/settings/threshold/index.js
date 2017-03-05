@@ -536,7 +536,7 @@ export default class ThresholdSettings extends React.Component {
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
             </div>
-            <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
+            <div className={`ui grid two columns form ${!!this.state.settingLoading ? 'loading' : ''}`}
                  style={{ 'paddingTop': '10px' }}>
               {!isLogProject && <div className={tabStates0['prediction'] + ' ui tab'}>
                 <div className="field">

@@ -31,6 +31,7 @@ module.exports = merge({}, {
         presets: ['es2015', 'stage-0', 'react'],
         // plugins: ['transform-runtime'],
         plugins: ['transform-decorators-legacy' ],
+        babelrc: false,
         compact: true,
         comments: false,
         cacheDirectory: true

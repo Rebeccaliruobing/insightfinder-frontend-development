@@ -3,17 +3,14 @@
 **/
 
 import webpack from 'webpack';
-import HappyPack from 'happypack';
 
 const babel = (settings) => {
   const { isDev, paths } = settings;
 
-  // Use babel-runtime instead of babel-polyfill to avoid polluting global namespace.
-  // https://medium.com/@jcse/clearing-up-the-babel-6-ecosystem-c7678a314bf3#.j8i3fgvvf
-  // TODO: How to use runtime & polyfill
   let rulePlugins = [
     ['transform-runtime', {
-      helpers: false,
+      helpers: true,
+      // TODO: Why set this options to false?
       polyfill: false,
       regenerator: false,
     }],
@@ -21,6 +18,7 @@ const babel = (settings) => {
   ];
 
   if (isDev) {
+    // https://github.com/gaearon/react-hot-loader/tree/master/docs
     rulePlugins = rulePlugins.concat([
       'react-hot-loader/babel',
     ]);
@@ -31,17 +29,25 @@ const babel = (settings) => {
   }
 
   const rules = [{
-    test: /\.jsx?$/,
-    exclude: paths.node_modules,
-    loaders: [{
+    resource: {
+      test: /\.jsx?$/,
+      exclude: paths.node_modules,
+    },
+    use: [{
       loader: 'babel-loader',
       options: {
         cacheDirectory: true,
         compact: false,
         presets: [
-          ['es2015', { loose: false, modules: false }],
+          ['env', {
+            targets: {
+              browsers: ['last 2 versions', '> 1%'],
+            },
+            modules: false,
+            loose: true,
+          }],
+          'stage-1',
           'react',
-          'stage-0',
         ],
         plugins: rulePlugins,
       },
@@ -50,25 +56,21 @@ const babel = (settings) => {
 
   let plugins = [
     new webpack.NoEmitOnErrorsPlugin(),
-    new HappyPack({
-      id: 'js',
-      threads: 4,
-      loaders: ['babel-loader'],
-    }),
   ];
 
   if (isDev) {
     plugins = plugins.concat([
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.NamedModulesPlugin(),
     ]);
   } else {
     plugins = plugins.concat([
-      new webpack.optimize.UglifyJsPlugin({
-        compress: {
-          screw_ie8: true,
-          warnings: false,
-        },
+      new webpack.HashedModuleIdsPlugin(),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true,
+        debug: false,
       }),
+      new webpack.optimize.UglifyJsPlugin({}),
     ]);
   }
 

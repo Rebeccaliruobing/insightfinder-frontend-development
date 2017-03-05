@@ -1,7 +1,6 @@
 /**
- * Bootstrap
+ * Bootstrap environment.
 **/
-
 const onWindowInit = () => {
   // polyfill will increase about 100K for the production build, enable
   // it if really need it.
@@ -13,7 +12,6 @@ const onWindowInit = () => {
   const { addLocaleData } = require('react-intl');
   const en = require('react-intl/locale-data/en');
   const zh = require('react-intl/locale-data/zh');
-
   [en, zh].forEach(locale => addLocaleData(locale));
 
   require('./main');
@@ -21,15 +19,9 @@ const onWindowInit = () => {
 
 // Intl.js and Browserify/webpack
 // github.com/andyearnshaw/Intl.js/#intljs-and-browserifywebpack
-if (!window.Intl && typeof require.ensure === 'function') {
-  require.ensure([
-    'intl',
-    'intl/locale-data/jsonp/en.js',
-    'intl/locale-data/jsonp/zh.js',
-  ], (require) => {
-    require('intl');
-    require('intl/locale-data/jsonp/en.js');
-    require('intl/locale-data/jsonp/zh.js');
+if (!window.Intl) {
+  // Import intl.js if needed
+  import('../common/polyfillIntl.js').then(() => {
     onWindowInit();
   });
 } else {
