@@ -191,7 +191,8 @@ class CausalGraphModal extends React.Component {
               metric.count += parseInt(val, 10);
             }
           }, labelObj);
-          texts.push(R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms));
+          let labelText = R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms);
+          texts = texts.concat(labelText);
         }
         return texts.join('\n');
       }
@@ -279,10 +280,10 @@ class CausalGraphModal extends React.Component {
         metricNameMap,
         minRelationCount,
         maxRelationCount,
-        relationFilterCount: minRelationCount,
+        relationFilterCount: 0.5,
         minCorrelationCount,
         maxCorrelationCount,
-        correlationFilterCount: minCorrelationCount,
+        correlationFilterCount: 0.5,
       }, () => {
         if (relations.length > 0 || correlations.length > 0) {
           this.renderGraph(relations, correlations);
@@ -405,7 +406,7 @@ class CausalGraphModal extends React.Component {
                   minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
                 }}
               >
-                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Count >= ${relationFilterCount}:`}</span>
+                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Causality Probability >= ${(relationFilterCount*100).toFixed(1)+'%'}:`}</span>
                 <span
                   style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
                 >{minRelationCount}</span>
@@ -437,7 +438,7 @@ class CausalGraphModal extends React.Component {
                 }}
               >
                 <span style={{ fontWeight: 'bold', padding: '0 1em' }}>
-                  {`Count >= ${correlationFilterCount}: `}
+                  {`Correlation Probability >= ${(correlationFilterCount*100).toFixed(1)+'%'}: `}
                 </span>
                 <div style={{ position: 'relative', display: 'inline-block', height: 40 }}>
                   <span style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}>
