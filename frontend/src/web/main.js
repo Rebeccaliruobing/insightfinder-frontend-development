@@ -15,7 +15,6 @@ const createInitialState = () => {
     app: {
       appName: 'InsightFinder',
       appVersion: '1.1',
-      isReactNative: false,
       currentLocale: getBrowserLocale(),
       ...state.app,
     },

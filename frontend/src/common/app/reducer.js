@@ -8,8 +8,6 @@ const messages = loadLocaleMessages();
 const initialState = {
   appName: '',
   appVersion: '',
-  isReactNative: false,
-  platform: '',
   currentTheme: 'light',
   locales: Object.keys(messages) || ['en'],
   currentLocale: null,
@@ -49,6 +47,7 @@ const reducer = (
       return { ...state, online: action.payload.online };
 
     default:
+      console.log({ ...initialState, ...state });
       return { ...initialState, ...state };
   }
 };

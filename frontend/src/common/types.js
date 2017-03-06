@@ -3,8 +3,6 @@
 export type AppState = {
   appName: string,
   appVersion: string,
-  isReactNative: boolean,
-  platform: string, // ios or android in react native.
   currentTheme: ?string,
   currentLocale: ?string,
   locales: ?Array<string>,

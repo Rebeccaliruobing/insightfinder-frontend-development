@@ -13,7 +13,6 @@ type Props = {
   messages: Object,
 }
 
-// TODO: Fix the flow type annotation for wrapped component.
 const start = (
   WrappedComponent: Function,
   IntlTextComponent?: any,
