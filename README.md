@@ -22,6 +22,8 @@
 	   $ yarn run build
 	   The output files are still in web/static folder, copy those files to server.
 
+    1. To change the api url, modify web/frontend/src/web/app/htmls/index.ejs file.
+
 ## Rollback to npm
 	$ cd ~/dev/insightfinder/web/frontend/
 	$ rm -rf node_modules

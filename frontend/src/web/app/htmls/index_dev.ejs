@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="<%= require('../../../common/app/images/favicon.png') %>" type="image/x-icon">
+    <title>InsightFinder</title>
+</head>
+<body>
+<div id="app"></div>
+<% if (htmlWebpackPlugin.options.environment === 'development') { %>
+<script>
+    window.API_BASE_URL =
+//                'https://insightfinderui.appspot.com/api/v1/'; // Test
+//                'https://insightfindergae.appspot.com/api/v1'; // Stage
+                // 'https://app.insightfinder.com/api/v1/'; // Prod
+           'https://insightfinderstaging.appspot.com/api/v1/'; // staging
+                // 'http://localhost:8888/api/v1/'; // Local
+    //                'https://insightfindertesting.appspot.com/api/v1/'; // staging
+    window.BASE_URL =
+//                'https://insightfinderui.appspot.com'; // Test
+//                'https://insightfindergae.appspot.com'; // Stage
+                // 'https://app.insightfinder.com'; // Prod
+           'https://insightfinderstaging.appspot.com/'; // staging
+                // 'http://localhost:8888'; // staging
+    //                'https://insightfindertesting.appspot.com'; // staging
+</script>
+<% } %>
+</body>
+</html>

@@ -11,6 +11,7 @@ const sourceDir = path.join(currentDir, 'src');
 const htmlsDir = path.join(sourceDir, 'web/app/htmls');
 const buildDir = path.join(currentDir, 'build');
 const distDir = path.join(currentDir, '../static');
+const isDev = process.env.NODE_ENV === 'development';
 
 // Webpack settings used to build the webpack configuration.
 const webpackSettings = {
@@ -47,7 +48,7 @@ const webpackSettings = {
   // Html files, template file is related with the path.htmls folder,
   // the filename is the output path related with the path.build folder.
   htmls: [{
-    template: 'index.ejs',
+    template: isDev ? 'index_dev.ejs' : 'index.ejs',
     filename: 'index.jsp',
     initialState: {},
   }],
