@@ -136,6 +136,7 @@
     "require-dir": "^0.3.1",
     "run-sequence": "^1.2.2",
     "sass-loader": "^6.0.2",
+    "script-loader": "^0.7.0",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^2.2.1",

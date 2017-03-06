@@ -1,5 +1,32 @@
 # Insightfinder
 
+## Upgrade to yarn
+	1. Get the latest code with git pull
+
+	1. Remove node_modules folder under web
+       $ cd ~/dev/insightfinder/web
+	   $ rm -rf node_modules
+
+    1. Upgrade nodejs and install yarn
+	   See frontend/README.md Tools section
+
+ 	1. Go to frontend folder and install packages with yarn
+	   $ cd frontend
+	   $ yarn install
+
+    1. Start frontend server, replace 'npm run dev' command
+	   $ yarn run web
+	   $ open http://localhost:3060 to open frontend
+
+    1. Build release build, replace 'npm run stage' or 'npm run build' command
+	   $ yarn run build
+	   The output files are still in web/static folder, copy those files to server.
+
+## Rollback to npm
+	$ cd ~/dev/insightfinder/web/frontend/
+	$ rm -rf node_modules
+	Then run 'npm run dev' & 'npm run stage' as before.
+
 ## Setup development environment
 
 ### Tools
