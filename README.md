@@ -25,6 +25,7 @@
 ## Rollback to npm
 	$ cd ~/dev/insightfinder/web/frontend/
 	$ rm -rf node_modules
+	$ cd ~/dev/insightfinder/web/
 	Then run 'npm run dev' & 'npm run stage' as before.
 
 ## Setup development environment
