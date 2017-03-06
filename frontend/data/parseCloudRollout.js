@@ -15,7 +15,7 @@
 //                 }
 //                 groups[data.groupId].push(Object.assign({}, data, {
 //                     startTime: dataArray.startTime,
-//                     endTime: dataArray.endTime
+//                     endTime: dataArray.endTime React from 
 //                 }));
 //             });
 //         });
@@ -27,6 +27,7 @@
 //     this.setState({ loading: false });
 // })
 
+import React from 'react';
 import moment from 'moment';
 
 /**

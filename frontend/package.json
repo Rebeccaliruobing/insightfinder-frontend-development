@@ -9,6 +9,7 @@
     "web": "gulp web",
     "build": "gulp build --production",
     "build:dev": "gulp build",
+    "build:stage": "gulp build --production --stage",
     "clean": "gulp clean",
     "test": "gulp test",
     "test:watch": "gulp test --watch",
