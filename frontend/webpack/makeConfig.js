@@ -3,6 +3,7 @@
 **/
 import webpack from 'webpack';
 import webpackMerge from 'webpack-merge';
+import ProgressBarPlugin from 'progress-bar-webpack-plugin';
 import isPlainObject from 'lodash/isPlainObject';
 import R from 'ramda';
 import babel from './parts/babel';
@@ -14,7 +15,8 @@ import styles from './parts/styles';
 
 const makeConfig = (webpackSettings) => {
   const settings = Object.assign({
-    assetsRoot: 'assets',
+    assetsRoot: 'assets/',
+    publicPath: '/',
   }, R.clone(webpackSettings));
 
   const env = process.env.NODE_ENV;
@@ -35,6 +37,7 @@ const makeConfig = (webpackSettings) => {
   ));
 
   let plugins = [
+    new ProgressBarPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         IS_BROWSER: true,

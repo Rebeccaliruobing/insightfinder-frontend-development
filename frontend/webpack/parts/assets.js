@@ -17,7 +17,7 @@ const assets = (settings) => {
       loader: 'url-loader',
       options: {
         limit: 10000,
-        name: `${assetsRoot}/imgs/[name]-[hash:12].[ext]`,
+        name: `${assetsRoot}imgs/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -28,7 +28,7 @@ const assets = (settings) => {
     use: [{
       loader: 'file-loader',
       options: {
-        name: `${assetsRoot}/imgs/[name]-[hash:12].[ext]`,
+        name: `${assetsRoot}imgs/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -40,7 +40,7 @@ const assets = (settings) => {
       loader: 'url-loader',
       options: {
         limit: 100000,
-        name: `${assetsRoot}/fonts/[name]-[hash:12].[ext]`,
+        name: `${assetsRoot}fonts/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -52,7 +52,7 @@ const assets = (settings) => {
     use: {
       loader: 'file-loader',
       options: {
-        name: `${assetsRoot}/medias/[name]-[hash:12].[ext]`,
+        name: `${assetsRoot}medias/[name]-[hash:12].[ext]`,
       },
     },
   }];

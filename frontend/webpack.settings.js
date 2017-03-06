@@ -25,7 +25,9 @@ const webpackSettings = {
 
   // The folder path use to store the generated assets. The subfolder
   // is the type of the assets, like ./assets/imgs/
-  // assetsRoot: 'assets',
+  assetsRoot: '',
+
+  publicPath: '/static/',
 
   // Define the starting points of app, use object syntax.
   // https://webpack.js.org/concepts/entry-points/#object-syntax
@@ -57,9 +59,6 @@ const webpackSettings = {
       rules: [{
         test: require.resolve('dygraphs/dygraph-combined-dev'),
         loader: 'exports-loader?Dygraph',
-      }, {
-        test: require.resolve('jquery'),
-        loaders: ['expose-loader?$', 'expose-loader?jQuery'],
       }],
     },
     plugins: [

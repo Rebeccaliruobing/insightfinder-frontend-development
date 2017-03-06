@@ -120,7 +120,7 @@ const styles = (settings) => {
 
   if (isProd) {
     plugins = plugins.concat([
-      new ExtractTextPlugin(`${assetsRoot}/css/[name]-[hash].css`),
+      new ExtractTextPlugin(`${assetsRoot}[name]-[hash].css`),
     ]);
   }
 

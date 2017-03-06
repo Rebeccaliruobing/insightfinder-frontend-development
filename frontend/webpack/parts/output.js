@@ -3,7 +3,7 @@
 **/
 
 const output = (settings) => {
-  const { isDev, paths, assetsRoot } = settings;
+  const { isDev, paths, assetsRoot, publicPath } = settings;
 
   let ret;
 
@@ -11,17 +11,17 @@ const output = (settings) => {
   if (isDev) {
     ret = {
       path: paths.build,
-      publicPath: '/',
+      publicPath,
       pathinfo: true,
-      filename: `${assetsRoot}/js/[name].js`,
-      chunkFilename: `${assetsRoot}/js/[name].[id].js`,
+      filename: `${assetsRoot}[name].js`,
+      chunkFilename: `${assetsRoot}[name].[id].js`,
     };
   } else {
     ret = {
       path: paths.build,
-      publicPath: '/',
-      filename: `${assetsRoot}/js/[name]-[chunkhash].js`,
-      chunkFilename: `${assetsRoot}/js/[name].[id]-[chunkhash].js`,
+      publicPath,
+      filename: `${assetsRoot}[name]-[chunkhash].js`,
+      chunkFilename: `${assetsRoot}[name].[id]-[chunkhash].js`,
     };
   }
 

@@ -1,4 +1,5 @@
 import 'blueimp-file-upload/css/jquery.fileupload.css';
+require("expose-loader?jQuery!jquery");
 require('script-loader!blueimp-file-upload/js/vendor/jquery.ui.widget');
 require('script-loader!blueimp-file-upload');
 import { autobind } from 'core-decorators';
