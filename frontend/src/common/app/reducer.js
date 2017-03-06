@@ -47,7 +47,6 @@ const reducer = (
       return { ...state, online: action.payload.online };
 
     default:
-      console.log({ ...initialState, ...state });
       return { ...initialState, ...state };
   }
 };
