@@ -167,6 +167,10 @@ class CausalGraphModal extends React.Component {
       const { labelObj } = data;
       if (labelObj) {
         let texts = [];
+        if(data.probability){
+          texts.push("Probability: "+(data.probability*100).toFixed(1)+"%"
+            );
+        }
         if (detail) {
           R.forEachObjIndexed((val, key) => {
             const name = key.split(',').slice(-2).join(', ');
@@ -187,7 +191,7 @@ class CausalGraphModal extends React.Component {
               metric.count += parseInt(val, 10);
             }
           }, labelObj);
-          texts = R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms);
+          texts.push(R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms));
         }
         return texts.join('\n');
       }
@@ -228,11 +232,11 @@ class CausalGraphModal extends React.Component {
       .append('svg:title').text(d => g.node(d).name);
 
     // Add title for edge
-    svg.selectAll('.edgeLabel')
-      .append('svg:title').text((d) => {
-        const edge = g.edge(d);
-        return getLabel(edge.data, true);
-      });
+    // svg.selectAll('.edgeLabel')
+    //   .append('svg:title').text((d) => {
+    //     const edge = g.edge(d);
+    //     return getLabel(edge.data, true);
+    //   });
 
     // Hidden the rect.
     svg.selectAll('.node rect').attr({
@@ -357,8 +361,8 @@ class CausalGraphModal extends React.Component {
       correlations, minCorrelationCount, maxCorrelationCount, correlationFilterCount,
     } = this.state;
 
-    const relationStep = Math.floor(maxRelationCount / 10) || 1;
-    const correlationStep = Math.floor(maxCorrelationCount / 10) || 1;
+    const relationStep = 0.1;//Math.floor(maxRelationCount / 10) || 1;
+    const correlationStep = 0.1;//Math.floor(maxCorrelationCount / 10) || 1;
 
     return (
       <Modal {...rest} style={{ marginLeft: -containerWidth / 2, width: containerWidth }} size="big" closable>
@@ -457,10 +461,10 @@ class CausalGraphModal extends React.Component {
             </div>
           </div>
           {activeTab === 'relation' && relations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No event causal relation found!</h4>
+            <h4 style={{ margin: '0.5em 0' }}>No event causal relation found.</h4>
           }
           {activeTab === 'correlation' && correlations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No event correlation found!</h4>
+            <h4 style={{ margin: '0.5em 0' }}>No event correlation found.</h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>
