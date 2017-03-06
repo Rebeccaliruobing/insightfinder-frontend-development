@@ -68,7 +68,7 @@ class ResetPassword extends BaseComponent {
           return xhr;
         },
         onSuccess: (resp) => {
-          store.clear();
+          store.clearAll();
           alert(resp.message);
           window.location.href = '/login';
         },

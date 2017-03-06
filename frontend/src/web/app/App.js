@@ -16,6 +16,7 @@ type Props = {
 export const AppCore = ({
   currentLocale, currentTheme,
 }: Props) => {
+  console.log([currentLocale, currentTheme]);
   return (
     <ThemeProvider theme={themes[currentTheme] || themes.light}>
       <Container fullHeight>

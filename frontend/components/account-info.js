@@ -1,6 +1,6 @@
 import React from 'react';
-import {Console, Link} from '../artui/react/index';
 import store from 'store';
+import {Console, Link} from '../artui/react/index';
 
 export default class AccountInfo extends React.Component {
 
@@ -12,12 +12,7 @@ export default class AccountInfo extends React.Component {
   }
 
   handleLogoff() {
-    //store.remove('userInfo');
-    //store.remove('userName');
-    //store.remove('token');
-    //store.remove('dailyReportResponse');
-
-    store.clear();
+    store.clearAll();
     window.location.reload();
   }
 
