@@ -22,8 +22,9 @@ const makeConfig = (webpackSettings) => {
   const env = process.env.NODE_ENV;
   settings.isDev = env === 'development';
   settings.isProd = env === 'production';
+  settings.uglifyjs = process.env.UGLIFYJS === 'true';
 
-  const { isDev, commonEntry } = settings;
+  const { isDev, commonEntry, uglifyjs } = settings;
 
   const babelSettings = babel(settings);
   const styleSettings = styles(settings);
@@ -75,7 +76,7 @@ const makeConfig = (webpackSettings) => {
     resolve: {
       extensions: ['.js', 'jsx'],
     },
-    devtool: isDev ? 'source-map' : '',
+    devtool: uglifyjs ? 'source-map' : 'inline-source-map',
     context: settings.paths.source,
     target: 'web',
     plugins,

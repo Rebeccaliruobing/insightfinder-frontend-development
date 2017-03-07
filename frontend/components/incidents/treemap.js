@@ -2,6 +2,7 @@ import React, { Component, PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import _ from 'lodash';
 import d3 from 'd3';
+import R from 'ramda';
 import $ from 'jquery';
 import ReactFauxDOM from 'react-faux-dom';
 import WindowResizeListener from '../ui/window-resize-listener';
@@ -93,11 +94,15 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showMetricChart(d) {
-    const { endTime, numberOfDays, instanceGroup, groupIdMap } = this.props;
+    const { numberOfDays, instanceGroup, groupIdMap } = this.props;
     const { startTimestamp, endTimestamp } = this.props.data || {};
     let avgLabel;
-    const metricAvg = (this.props.instanceStatsJson && this.props.instanceStatsJson[d.instanceName] && this.props.instanceStatsJson[d.instanceName].statsByMetricJson && this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name] && this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name].avg);
-    if (metricAvg != undefined) {
+    const metricAvg = (this.props.instanceStatsJson &&
+      this.props.instanceStatsJson[d.instanceName] &&
+      this.props.instanceStatsJson[d.instanceName].statsByMetricJson &&
+      this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name] &&
+      this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name].avg);
+    if (metricAvg !== undefined) {
       avgLabel = ` (${numberOfDays}d avg: ${metricAvg.toPrecision(3)})`;
     }
     const params = {
@@ -143,7 +148,11 @@ class IncidentsTreeMap extends Component {
     const sumScore = (d) => {
       let s = 0;
       if (d.children) {
-        s = d3.sum(d.children, c => sumScore(c));
+        d.children.forEach((c) => {
+          const score = sumScore(c);
+          s += score;
+        });
+        // s = d3.sum(R.sum, d.children, c => sumScore(c));
       } else {
         s = d.score;
       }
@@ -181,7 +190,7 @@ class IncidentsTreeMap extends Component {
       } else if (d._children) {
         d.value = val;
       } else {
-        d.value = (Math.log10(d.score) > num ? scale : 1) * d.value;
+        d.value *= (Math.log10(d.score) > num ? scale : 1);
       }
       return d.value;
     };
@@ -340,8 +349,8 @@ class IncidentsTreeMap extends Component {
       if (d._children) {
         this.treemap.nodes({ _children: d._children });
         d._children.forEach((c) => {
-          c.x = d.x + c.x * d.dx;
-          c.y = d.y + c.y * d.dy;
+          c.x = d.x + (c.x * d.dx);
+          c.y = d.y + (c.y * d.dy);
           c.dx *= d.dx;
           c.dy *= d.dy;
           c.parent = d;
@@ -370,25 +379,18 @@ class IncidentsTreeMap extends Component {
 
     // Display navbar to back to parent node on click
     const navbar = svg.append('g').attr('class', 'navbar');
-    // const twidth = 180;
     const twidth = 180;
 
     // Add a link to open instance chart view
-    if (true || (data.type === 'instance' && data.containers === 0) || data.type === 'container') {
-      navbar.append('rect')
-        .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight })
-        .datum(data.parent).on('click', this.handleTileClick);
-      navbar.append('rect')
-        .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight, class: 'navbar-button', })
-        .datum(data).on('click', this.showInstanceChart);
-      navbar.append('text')
-        .attr({ x: width - twidth + 20, y: 12 - navHeight, dy: '1em' })
-        .text('Line Charts');
-    } else {
-      navbar.append('rect')
-        .attr({ y: -navHeight, width, height: navHeight })
-        .datum(data.parent).on('click', this.handleTileClick);
-    }
+    navbar.append('rect')
+      .attr({ y: -navHeight, width: Math.max(width - twidth, 0), height: navHeight })
+      .datum(data.parent).on('click', this.handleTileClick);
+    navbar.append('rect')
+      .attr({ x: width - twidth, y: -navHeight, width: twidth, height: navHeight, class: 'navbar-button', })
+      .datum(data).on('click', this.showInstanceChart);
+    navbar.append('text')
+      .attr({ x: (width - twidth) + 20, y: 12 - navHeight, dy: '1em' })
+      .text('Line Charts');
 
     navbar.append('text')
       .attr({ x: 12, y: 12 - navHeight, dy: '1em' })
@@ -430,15 +432,15 @@ class IncidentsTreeMap extends Component {
     });
     if (schema === 'anomaly') {
       g.append('text').attr('dy', '.75em').text(d => this.chopString(d.eventType, 10)).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
       });
     } else if (schema === 'cpu') {
       g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
       });
     } else if (schema === 'availability') {
       g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + d.dy / 2) });
+        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
       });
     }
 
@@ -453,7 +455,7 @@ class IncidentsTreeMap extends Component {
           return d;
         } else {
           if (d._children && d._children.length > 0) {
-            for (let i = 0; i < d._children.length; i = i + 1) {
+            for (let i = 0; i < d._children.length; i += 1) {
               const m = metricFinder(d._children[i], metric);
               if (m) {
                 return m;

@@ -6,6 +6,7 @@ const args = yargs
     t: 'testing',
     w: 'watch',
   })
+  .default('uglifyjs', true)
   .argv;
 
 export default args;

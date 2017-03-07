@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom';
 import {
     BaseComponent, Console, ButtonGroup, Button, Popup, Modal,
     Dropdown, Accordion, Message

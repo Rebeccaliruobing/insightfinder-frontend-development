@@ -1,7 +1,6 @@
 import React from 'react';
 import {autobind} from 'core-decorators';
 import shallowCompare from 'react-addons-shallow-compare';
-import cx from 'classnames';
 import {Modal} from '../../artui/react';
 import DataParser from '../cloud/dataparser';
 import {DataChart} from '../share/charts';

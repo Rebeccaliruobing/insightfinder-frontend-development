@@ -18,9 +18,11 @@
 	   $ yarn run web
 	   $ open http://localhost:3060 to open frontend
 
-    1. Build release build, replace 'npm run stage' or 'npm run build' command
-	   $ yarn run build
-	   The output files are still in web/static folder, copy those files to server.
+    1. Stage production build, replace 'npm run stage', huge js files with sourceMap embeded, able to debug code. Output files are in web/static, better for staging deployment.
+		$ yarn run bs
+
+		1. Production build, replace 'npm run build', small size with uglifyjs, sourceMap in seperate file, able to read code when open console. Output files are in web/static, better for production deployment.
+		$ yarn run build
 
     1. To change the api url, modify web/frontend/src/web/app/htmls/index.ejs file.
 

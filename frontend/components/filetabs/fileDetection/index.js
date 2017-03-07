@@ -1,4 +1,5 @@
 import React, {Component}    from 'react';
+import ReactDOM from 'react-dom';
 import { autobind } from 'core-decorators';
 import {
     Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
@@ -201,7 +202,7 @@ export default class FileDetection extends Component {
                             </div>
 
                             <div className="ui field">
-                                <Button className={cx('orange', {'loading': this.state.submitLoading})}
+                                <Button className={`orange ${this.state.submitLoading ? 'loading' : ''}`}
                                         onClick={this.handleSubmit.bind(this)}>Submit</Button>
                             </div>
                         </div>

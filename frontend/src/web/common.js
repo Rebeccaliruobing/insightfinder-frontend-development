@@ -11,6 +11,8 @@ import 'ramda';
 import 'localforage';
 import 'bluebird';
 import 'classnames';
+import 'd3';
+import 'react-faux-dom';
 
 import 'react';
 import 'react-dom';

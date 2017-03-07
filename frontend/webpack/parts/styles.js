@@ -40,7 +40,7 @@ const styles = (settings) => {
     loader: 'css-loader',
     options: {
       importLoaders: 1,
-      sourceMap: isDev,
+      sourceMap: true,
     },
   }, {
     loader: 'postcss-loader',
@@ -100,7 +100,7 @@ const styles = (settings) => {
       loaders: styleLoaders(cssLoaders.concat({
         loader: 'sass-loader',
         options: {
-          sourceMap: isDev,
+          sourceMap: true,
         },
       })),
     }),
@@ -112,7 +112,7 @@ const styles = (settings) => {
       loaders: styleLoaders(cssLoaders.concat({
         loader: 'less-loader',
         options: {
-          sourceMap: isDev,
+          sourceMap: true,
         },
       })),
     }),

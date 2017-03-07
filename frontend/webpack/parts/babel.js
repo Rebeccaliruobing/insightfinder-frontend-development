@@ -6,7 +6,7 @@ import webpack from 'webpack';
 import HappyPack from 'happypack';
 
 const babel = (settings) => {
-  const { isDev, paths } = settings;
+  const { isDev, paths, uglifyjs } = settings;
 
   let rulePlugins = [
     ['transform-runtime', {
@@ -79,11 +79,19 @@ const babel = (settings) => {
   } else {
     plugins = plugins.concat([
       new webpack.HashedModuleIdsPlugin(),
+    ]);
+  }
+
+  if (uglifyjs) {
+    plugins = plugins.concat([
       new webpack.LoaderOptionsPlugin({
         minimize: true,
         debug: false,
       }),
-      new webpack.optimize.UglifyJsPlugin({}),
+      new webpack.optimize.UglifyJsPlugin({
+        compress: false,
+        sourceMap: true,
+      }),
     ]);
   }
 
