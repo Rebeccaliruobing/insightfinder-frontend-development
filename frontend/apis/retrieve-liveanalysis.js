@@ -35,8 +35,9 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     const cname = isContainer ? names[0] : '';
 
     const instanceType = instanceTypeMap[inst];
-    const instanceStats = statistics.instanceStatsJson[inst] || {};
-    const statsByMetric = instanceStats.statsByMetricJson || {};
+    const isFilterByStats = !!statistics.instanceStatsJson;
+    const statsByMetric = _.get(
+      statistics, ['instanceStatsJson', inst, 'statsByMetricJson'], {});
     let instanceMetrics = metrics;
     if (instanceType && typeMetricMap[instanceType]) {
       instanceMetrics = typeMetricMap[instanceType] || [];
@@ -53,7 +54,7 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         eventType1 = eventType1.slice(0, pos1);
       }
 
-      if (statsByMetric[mn]) {
+      if (!isFilterByStats || statsByMetric[mn]) {
         children.push({
           id: mn,
           type: 'metric',
