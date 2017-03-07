@@ -47,13 +47,13 @@ class CausalGraphModal extends React.Component {
       relations: [],
       metricNameMap: {},
       threshold: '3.0',
-      minRelationCount: 1,
-      maxRelationCount: 1,
-      relationFilterCount: 1,
+      minRelationWeight: 0.0,
+      maxRelationWeight: 1.0,
+      relationFilterWeight: 0.0,
       correlations: [],
-      minCorrelationCount: 1,
-      maxCorrelationCount: 1,
-      correlationFilterCount: 1,
+      minCorrelationWeight: 0.0,
+      maxCorrelationWeight: 1.0,
+      correlationFilterWeight: 0.0,
     };
   }
 
@@ -74,16 +74,16 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getWeightRange(relations) {
-    let minCount = 1;
-    let maxCount = 1;
+    let minWeight = 0.0;
+    let maxWeight = 1.0;
 
-    const weights = this.weightMapper(relations);
-    if (weights.length > 0) {
-      maxCount = parseInt(weights[0], 10);
-      minCount = parseInt(weights[weights.length - 1], 10);
-    }
+    // const weights = this.weightMapper(relations);
+    // if (weights.length > 0) {
+    //   maxWeight = parseFloat(weights[0]);
+    //   minWeight = parseFloat(weights[weights.length - 1]);
+    // }
 
-    return [minCount, maxCount];
+    return [minWeight, maxWeight];
   }
 
   @autobind
@@ -117,10 +117,10 @@ class CausalGraphModal extends React.Component {
     this.cleanChart();
 
     const { relations, correlations, metricNameMap } = this.state;
-    const { activeTab, relationFilterCount, correlationFilterCount } = this.state;
+    const { activeTab, relationFilterWeight, correlationFilterWeight } = this.state;
 
     const showRelations = activeTab === 'relation';
-    const filterCount = showRelations ? relationFilterCount : correlationFilterCount;
+    const filterCount = showRelations ? relationFilterWeight : correlationFilterWeight;
 
     const srcProp = showRelations ? o => o.src : o => o.elem1;
     const targetProp = showRelations ? o => o.target : o => o.elem2;
@@ -269,8 +269,8 @@ class CausalGraphModal extends React.Component {
         data.eventsCorrelation || [] :
         JSON.parse(data.correlation || '[]');
 
-      const [minRelationCount, maxRelationCount] = this.getWeightRange(relations);
-      const [minCorrelationCount, maxCorrelationCount] = this.getWeightRange(relations);
+      const [minRelationWeight, maxRelationWeight] = this.getWeightRange(relations);
+      const [minCorrelationWeight, maxCorrelationWeight] = this.getWeightRange(relations);
 
       this.setState({
         loading: false,
@@ -278,12 +278,12 @@ class CausalGraphModal extends React.Component {
         relations,
         correlations,
         metricNameMap,
-        minRelationCount,
-        maxRelationCount,
-        relationFilterCount: 0.5,
-        minCorrelationCount,
-        maxCorrelationCount,
-        correlationFilterCount: 0.5,
+        minRelationWeight,
+        maxRelationWeight,
+        relationFilterWeight: 0.5,
+        minCorrelationWeight,
+        maxCorrelationWeight,
+        correlationFilterWeight: 0.5,
       }, () => {
         if (relations.length > 0 || correlations.length > 0) {
           this.renderGraph(relations, correlations);
@@ -308,17 +308,17 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   handleThresholdChange(v) {
-    const { allRelations, relationFilterCount } = this.state;
+    const { allRelations, relationFilterWeight } = this.state;
     const relations = allRelations[v.toString()] || [];
-    const [minRelationCount, maxRelationCount] = this.getWeightRange(relations);
+    const [minRelationWeight, maxRelationWeight] = this.getWeightRange(relations);
 
     // Only reset for relations as it's related with threshold.
     this.setState({
       threshold: v,
       relations,
-      minRelationCount,
-      maxRelationCount,
-      relationFilterCount: R.min(relationFilterCount, maxRelationCount),
+      minRelationWeight,
+      maxRelationWeight,
+      relationFilterWeight: R.min(relationFilterWeight, maxRelationWeight),
     }, () => {
       this.renderGraph();
     });
@@ -327,7 +327,7 @@ class CausalGraphModal extends React.Component {
   @autobind
   handleRelationSliderChange(count) {
     this.setState({
-      relationFilterCount: count,
+      relationFilterWeight: count,
     }, () => {
       this.renderGraph();
     });
@@ -336,7 +336,7 @@ class CausalGraphModal extends React.Component {
   @autobind
   handleCorrelationSliderChange(count) {
     this.setState({
-      correlationFilterCount: count,
+      correlationFilterWeight: count,
     }, () => {
       this.renderGraph();
     });
@@ -358,12 +358,12 @@ class CausalGraphModal extends React.Component {
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
-      relations, threshold, minRelationCount, maxRelationCount, relationFilterCount,
-      correlations, minCorrelationCount, maxCorrelationCount, correlationFilterCount,
+      relations, threshold, minRelationWeight, maxRelationWeight, relationFilterWeight,
+      correlations, minCorrelationWeight, maxCorrelationWeight, correlationFilterWeight,
     } = this.state;
 
-    const relationStep = 0.1;//Math.floor(maxRelationCount / 10) || 1;
-    const correlationStep = 0.1;//Math.floor(maxCorrelationCount / 10) || 1;
+    const relationStep = 0.1;//Math.floor(maxRelationWeight / 10) || 1;
+    const correlationStep = 0.1;//Math.floor(maxCorrelationWeight / 10) || 1;
 
     return (
       <Modal {...rest} style={{ marginLeft: -containerWidth / 2, width: containerWidth }} size="big" closable>
@@ -406,23 +406,23 @@ class CausalGraphModal extends React.Component {
                   minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
                 }}
               >
-                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Causality Probability >= ${(relationFilterCount*100).toFixed(1)+'%'}:`}</span>
+                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Causality Probability >= ${(relationFilterWeight*100).toFixed(1)+'%'}:`}</span>
                 <span
                   style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
-                >{minRelationCount}</span>
+                >{minRelationWeight}</span>
                 <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
                   <Slider
                     included={false} dots
-                    min={minRelationCount} max={maxRelationCount} step={relationStep}
-                    value={relationFilterCount}
-                    defaultValue={minRelationCount}
-                    onChange={c => this.setState({ relationFilterCount: c })}
+                    min={minRelationWeight} max={maxRelationWeight} step={relationStep}
+                    value={relationFilterWeight}
+                    defaultValue={minRelationWeight}
+                    onChange={c => this.setState({ relationFilterWeight: c })}
                     onAfterChange={this.handleRelationSliderChange}
                   />
                 </div>
                 <span
                   style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
-                >{maxRelationCount}</span>
+                >{maxRelationWeight}</span>
               </div>
             </div>
             <div
@@ -438,25 +438,25 @@ class CausalGraphModal extends React.Component {
                 }}
               >
                 <span style={{ fontWeight: 'bold', padding: '0 1em' }}>
-                  {`Correlation Probability >= ${(correlationFilterCount*100).toFixed(1)+'%'}: `}
+                  {`Correlation Probability >= ${(correlationFilterWeight*100).toFixed(1)+'%'}: `}
                 </span>
                 <div style={{ position: 'relative', display: 'inline-block', height: 40 }}>
                   <span style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}>
-                    {minCorrelationCount}
+                    {minCorrelationWeight}
                   </span>
                   <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
                     <Slider
                       included={false} dots
-                      min={minCorrelationCount} max={maxCorrelationCount} step={correlationStep}
-                      value={correlationFilterCount}
-                      defaultValue={minCorrelationCount}
-                      onChange={c => this.setState({ correlationFilterCount: c })}
+                      min={minCorrelationWeight} max={maxCorrelationWeight} step={correlationStep}
+                      value={correlationFilterWeight}
+                      defaultValue={minCorrelationWeight}
+                      onChange={c => this.setState({ correlationFilterWeight: c })}
                       onAfterChange={this.handleCorrelationSliderChange}
                     />
                   </div>
                   <span
                     style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
-                  >{maxCorrelationCount}</span>
+                  >{maxCorrelationWeight}</span>
                 </div>
               </div>
             </div>
