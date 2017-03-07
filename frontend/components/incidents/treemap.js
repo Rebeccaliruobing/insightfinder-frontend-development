@@ -94,7 +94,7 @@ class IncidentsTreeMap extends Component {
 
   @autobind
   showMetricChart(d) {
-    const { numberOfDays, instanceGroup, groupIdMap } = this.props;
+    const { numberOfDays, instanceGroup, groupIdMap, predictedFlag } = this.props;
     const { startTimestamp, endTimestamp } = this.props.data || {};
     let avgLabel;
     const metricAvg = (this.props.instanceStatsJson &&
@@ -119,7 +119,7 @@ class IncidentsTreeMap extends Component {
         eventEndTime: d.eventEndTime,
         avgLabel,
         grouping: instanceGroup,
-        predictedFlag: this.props.predictedFlag,
+        predictedFlag,
       };
       if (startTimestamp && endTimestamp) {
         params.startTimestamp = startTimestamp;
@@ -128,7 +128,7 @@ class IncidentsTreeMap extends Component {
       this.setState({
         showMetricModal: true,
         metricModalProps: params,
-      });      
+      });
     }
   }
 

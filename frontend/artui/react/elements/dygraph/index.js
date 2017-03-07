@@ -93,12 +93,14 @@ class Dygraph extends Component {
   handleUnderlayCallback(canvas, area, g) {
 
     const {highlights, enableTriangleHighlight, latestDataTimestamp,
-       highlightStartTime, highlightEndTime
+       highlightStartTime, highlightEndTime, data,
     } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
-    if (latestDataTimestamp) {
-      const x = g.toDomXCoord(latestDataTimestamp);
+    if (latestDataTimestamp && data.length > 0) {
+      const begin = data[0][0].valueOf();
+      const start = Math.max(latestDataTimestamp, begin);
+      const x = g.toDomXCoord(start);
       const y = area.y;
       const w = area.w;
       const h = area.h;

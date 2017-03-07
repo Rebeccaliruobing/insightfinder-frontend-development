@@ -392,11 +392,12 @@ class EventSummary extends React.Component {
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
-    let selectedIncidentPredicted = selectedIncident ?
-      (selectedIncident.endTimestamp > latestTimestamp) : false;
-    if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
-      selectedIncidentPredicted = true;
-    }
+    const selectedIncidentPredicted = selectedIncident ? selectedIncident.predictedFlag : false;
+    // let selectedIncidentPredicted = selectedIncident ?
+    //   (selectedIncident.endTimestamp > latestTimestamp) : false;
+    // if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
+    //   selectedIncidentPredicted = true;
+    // }
 
     return (
       <Console.Content

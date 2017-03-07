@@ -70,19 +70,21 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose,  startTimestamp, endTimestamp, eventEndTime, eventStartTime, avgLabel, predictedFlag } = this.props;
+    const { onClose, startTimestamp, endTimestamp,
+      eventEndTime, eventStartTime, avgLabel, predictedFlag } = this.props;
     const { data,showErrorMsg,loading } = this.state;
+
     let latestDataTimestamp = undefined;
-    if(predictedFlag){
+    if (predictedFlag) {
       latestDataTimestamp = +moment();
     }
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
-    if(avgLabel!=undefined){
+    if (avgLabel !== undefined) {
       chartLabel = avgLabel;
     }
     return (
-      <Modal closable={true} onClose={onClose}>
+      <Modal closable onClose={onClose}>
         {showErrorMsg ?
           <div className={classes} style={{ height: 300 }}>
             <h3>Metric data unavailable for this period.</h3>
@@ -90,11 +92,10 @@ class MetricModal extends React.Component {
           :
           <div className={classes} style={{ height: 300 }}>
             {data &&
-            <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
+              <div className="ui header">{`Metric ${data.metrics} ${chartLabel}`}</div>
             }
-            {data  &&
-            <DataChart data={data} latestDataTimestamp={latestDataTimestamp}
-            />
+            {data &&
+              <DataChart data={data} latestDataTimestamp={latestDataTimestamp} />
             }
           </div>
         }
