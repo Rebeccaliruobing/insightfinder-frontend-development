@@ -450,7 +450,7 @@ class IncidentsList extends React.Component {
   }
 
   render() {
-    const { projectName, instanceGroup, endTime, numberOfDays, predictionWindow } = this.props;
+    const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
     const { activeTab } = this.state;
 
     const detectedIncidents = this.detectedIncidents;
@@ -501,7 +501,7 @@ class IncidentsList extends React.Component {
         {this.state.showCausalGraphModal &&
           <CausalGraphModal
             projectName={projectName} instanceGroup={instanceGroup}
-            endTime={endTime} numberOfDays={numberOfDays}
+            endTime={eventEndTime} numberOfDays={numberOfDays}
             loadGroup
             onClose={() => this.setState({ showCausalGraphModal: false })}
             onCancel={() => this.setState({ showCausalGraphModal: false })}

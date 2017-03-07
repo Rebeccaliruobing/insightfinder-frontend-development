@@ -102,29 +102,34 @@ class IncidentsTreeMap extends Component {
       this.props.instanceStatsJson[d.instanceName].statsByMetricJson &&
       this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name] &&
       this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name].avg);
-    if (metricAvg !== undefined) {
-      avgLabel = ` (${numberOfDays}d avg: ${metricAvg.toPrecision(3)})`;
-    }
-    const params = {
-      projectName: d.projectName,
-      metricName: d.name,
-      groupId: groupIdMap[d.name],
-      instanceName: d.instanceName,
-      eventStartTime: d.eventStartTime,
-      eventEndTime: d.eventEndTime,
-      avgLabel,
-      grouping: instanceGroup,
-      predictedFlag: this.props.predictedFlag,
-    };
-    if (startTimestamp && endTimestamp) {
-      params.startTimestamp = startTimestamp;
-      params.endTimestamp = endTimestamp;
-    }
 
-    this.setState({
-      showMetricModal: true,
-      metricModalProps: params,
-    });
+    if(this.props.instanceStatsJson &&
+          this.props.instanceStatsJson[d.instanceName] &&
+          this.props.instanceStatsJson[d.instanceName].statsByMetricJson &&
+          this.props.instanceStatsJson[d.instanceName].statsByMetricJson[d.name]){
+      if (metricAvg !== undefined) {
+        avgLabel = ` (${numberOfDays}d avg: ${metricAvg.toPrecision(3)})`;
+      }
+      const params = {
+        projectName: d.projectName,
+        metricName: d.name,
+        groupId: groupIdMap[d.name],
+        instanceName: d.instanceName,
+        eventStartTime: d.eventStartTime,
+        eventEndTime: d.eventEndTime,
+        avgLabel,
+        grouping: instanceGroup,
+        predictedFlag: this.props.predictedFlag,
+      };
+      if (startTimestamp && endTimestamp) {
+        params.startTimestamp = startTimestamp;
+        params.endTimestamp = endTimestamp;
+      }
+      this.setState({
+        showMetricModal: true,
+        metricModalProps: params,
+      });      
+    }
   }
 
   @autobind

@@ -384,6 +384,7 @@ class EventSummary extends React.Component {
     const maxEndTime = curTime;
     const maxStartTime = curTime;
     const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const eventEndTime = moment(endTime).endOf('day').valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
@@ -473,7 +474,7 @@ class EventSummary extends React.Component {
               {dataLoaded &&
                 <IncidentsList
                   projectName={projectName} projectType={projectType}
-                  instanceGroup={instanceGroup}
+                  instanceGroup={instanceGroup} eventEndTime={eventEndTime}
                   endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                   incidents={data.incidents}
                   activeTab={predicted ? 'predicted' : 'detected'}
