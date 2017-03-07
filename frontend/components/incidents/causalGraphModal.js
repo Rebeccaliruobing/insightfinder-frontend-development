@@ -134,7 +134,7 @@ class CausalGraphModal extends React.Component {
 
     // Change graph layout
     g.setGraph({
-      rankdir: 'LR', align: 'DR', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
+      rankdir: 'LR', align: 'DR', ranker: 'tight-tree', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
     });
 
     const addNodes = (g, rels, fsrc, ftarget, existNames) => {
@@ -209,7 +209,7 @@ class CausalGraphModal extends React.Component {
         if (src === target) {
           console.warn(`Self link:${src} => ${target}`);
         } else {
-          g.setEdge(src, target, {
+          const meta = {
             label: getLabel(rel),
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
             arrowhead: type === 'relation' ? 'vee' : 'double',
@@ -217,7 +217,8 @@ class CausalGraphModal extends React.Component {
             labelpos: 'l',
             data: rel,
             labeloffset: 4,
-          }, type);
+          };
+          g.setEdge(src, target, meta, type);
         }
       }, rels);
     };
