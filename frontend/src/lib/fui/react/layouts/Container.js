@@ -14,7 +14,7 @@ const Container = ({
   className, responsive, noGutter, fullHeight, children, ...rest
 }: Props) => {
   const classes = cx(
-    'ui', {
+    'fui', {
       responsive,
       'no-gutter': noGutter,
       'full-height': fullHeight,
@@ -26,7 +26,6 @@ const Container = ({
   );
 };
 
-Container.defaultProps = {
-};
+Container.defaultProps = {};
 
 export default Container;

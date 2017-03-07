@@ -1,0 +1,25 @@
+@import "../variables";
+@import "../mixins/responsive";
+
+.fui.container {
+  position: relative;
+}
+
+.fui.responsive.container {
+  margin: 0 auto;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 $x-gutter;
+  &.no-gutter {
+    padding: 0;
+  }
+
+  @include desktop {
+    margin: 0 auto;
+    padding: 0;
+    max-width: $desktop-width;
+  }
+  @include widescreen {
+    max-width: $widescreen-width;
+  }
+}

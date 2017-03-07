@@ -1,0 +1,12 @@
+@import "../variables";
+
+@mixin font-body() {
+  font-size: $font-size-body;
+  line-height: 20px/$font-size-body;
+}
+
+@mixin font-body-bold() {
+  font-size: $font-size-body;
+  line-height: 20px/$font-size-body;
+  font-weight: $font-weight-medium;
+}

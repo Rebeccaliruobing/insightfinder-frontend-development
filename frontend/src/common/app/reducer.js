@@ -4,6 +4,10 @@ import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
 const messages = loadLocaleMessages();
+const windowWidth = window.innerWidth ||
+  document.documentElement.clientWidth || document.body.clientHeight;
+const windowHeight = window.innerHeight ||
+  document.documentElement.clientHeight || document.body.clientHeight;
 
 const initialState = {
   appName: '',
@@ -12,6 +16,8 @@ const initialState = {
   locales: Object.keys(messages) || ['en'],
   currentLocale: null,
   messages,
+  windowWidth,
+  windowHeight,
   loaded: false,
   started: false,
   online: false,
@@ -33,6 +39,9 @@ const reducer = (
 
     case 'SET_CURRENT_LOCALE':
       return { ...state, currentLocale: action.payload.locale };
+
+    case 'SET_WINDOW_SIZE':
+      return { ...state, ...action.payload };
 
     case 'APP_START':
       return { ...state, loaded: true };

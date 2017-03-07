@@ -132,6 +132,7 @@
     "less-loader": "^2.2.3",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.5.0",
+    "normalize-scss": "^6.0.0",
     "postcss-loader": "^1.3.1",
     "progress-bar-webpack-plugin": "^1.9.3",
     "raw-loader": "^0.5.1",

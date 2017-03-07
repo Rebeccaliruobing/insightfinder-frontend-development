@@ -29,8 +29,9 @@ const start = (
     }
 
     render() {
-      const { currentLocale, messages, ...rest } = this.props;
-      const props = R.omit(['appStart', 'appStop'], rest);
+      const { currentLocale, messages } = this.props;
+      // Omit messages prop which mostly will not used by wrapped component.
+      const props = R.omit(['messages'], this.props);
 
       return (
         <IntlProvider

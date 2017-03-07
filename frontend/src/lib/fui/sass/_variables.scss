@@ -1,0 +1,43 @@
+@charset "utf-8";
+
+////////////////////////////////////////////////
+// Typography
+////////////////////////////////////////////////
+$family-sans-serif:   "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Segoe UI","Microsoft YaHei","微软雅黑",sans-serif !default;
+$family-monospace:    "Source Code Pro",Inconsolata,Monaco,Consolas,"Courier New",monospace,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑" !default;
+
+$family-primary:      $family-sans-serif !default;
+$family-code:         $family-monospace !default;
+
+$font-size-display4:      112px !default;
+$font-size-display3:      56px !default;
+$font-size-display2:      45px !default;
+$font-size-display1:      34px !default;
+$font-size-headline:      24px !default;
+$font-size-title:         21px !default;
+$font-size-subheading:    16px !default;
+$font-size-body:          14px !default;
+$font-size-caption:       13px !default;
+$font-size-button:        15px !default;
+
+$font-weight-light:       300 !default;
+$font-weight-regular:     400 !default;
+$font-weight-medium:      700 !default;
+
+////////////////////////////////////////////////
+// Spacing
+////////////////////////////////////////////////
+$space-x-base: 8px !default;
+$space-y-base: 8px !default;
+
+// Breakpoints
+$tablet:              769px !default;
+$desktop:             980px !default;
+$widescreen:          1232px !default;
+
+$desktop-width:       960px !default;
+$widescreen-width:    1200px !default;
+
+// Spacing
+$x-gutter:            $space-x-base * 2 !default;
+$x-small-gutter:      $space-x-base !default;

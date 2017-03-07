@@ -4,7 +4,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import shallowCompare from 'react-addons-shallow-compare';
 import {autobind} from 'core-decorators';
-import apis from '.ddk./../../apis';
+import apis from '../../../apis';
 import {Console, ButtonGroup, Button} from '../../../artui/react';
 import DataParser from '../dataparser';
 import SettingModal from './settingModal';

@@ -16,6 +16,11 @@ export const setCurrentLocale = (locale: string): Action => ({
   payload: { locale },
 });
 
+export const setWindowSize = (windowWidth: number, windowHeight: number): Action => ({
+  type: 'SET_WINDOW_SIZE',
+  payload: { windowWidth, windowHeight },
+});
+
 export const appOnline = (online: boolean): Action => ({
   type: 'APP_ONLINE',
   payload: { online },

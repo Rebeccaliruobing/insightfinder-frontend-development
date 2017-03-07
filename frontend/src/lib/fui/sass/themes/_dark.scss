@@ -1,0 +1,12 @@
+@import "./colors";
+
+html.dark {
+  $body-bg-color:       $dark-background-color;
+  background-color:     $body-bg-color;
+  body {
+    background-color:   $body-bg-color;
+  }
+
+  $text-primary-color:   $light-text-primary-color;
+  @import "../base/generic_theme";
+}

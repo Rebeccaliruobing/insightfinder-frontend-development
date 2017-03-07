@@ -1,0 +1,48 @@
+@import "../variables";
+@import "../mixins/typography";
+
+html {
+  // Box sizing
+  box-sizing: border-box;
+  font-size: $font-size-body;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  text-rendering: optimizeLegibility;
+}
+
+// Box sizing
+* {
+  box-sizing: inherit;
+  &:before,
+  &:after {
+    box-sizing: inherit
+  }
+}
+
+body {
+  font-family: $family-primary;
+  overflow-x: hidden;
+  @include font-body();
+}
+
+// Fonts
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: $family-primary;
+}
+
+code,
+pre,
+kbd,
+samp
+{
+  -moz-osx-font-smoothing: auto;
+  -webkit-font-smoothing: auto;
+  font-family: $family-code;
+  line-height: 1.25
+}
