@@ -144,7 +144,7 @@ class CausalGraphModal extends React.Component {
       R.forEach((name) => {
         if (!R.find(n => n === name)(existNames)) {
           g.setNode(name, {
-            title: name, label: chopString(name, 30), name, width: 120, height: 0,
+            title: name, label: chopString(name, 30), name, width: 140, height: 0,
           });
         }
       }, names);
