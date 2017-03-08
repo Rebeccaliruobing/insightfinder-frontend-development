@@ -11,7 +11,7 @@
     "build:dev": "gulp build",
     "bd": "gulp build",
     "build:stage": "gulp build --production --no-uglifyjs",
-    "bs": "gulp build --production --no-uglifyjs",
+    "staging": "gulp build --production --no-uglifyjs",
     "clean": "gulp clean",
     "test": "gulp test",
     "test:watch": "gulp test --watch",
