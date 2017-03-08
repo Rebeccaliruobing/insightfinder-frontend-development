@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import React, { PropTypes as T } from 'react';
+import store from 'store';
 import moment from 'moment';
 import _ from 'lodash';
 import R from 'ramda';
@@ -449,6 +450,30 @@ class IncidentsList extends React.Component {
     });
   }
 
+  showInstanceChart() {
+    const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
+    const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    const projectParam = projectParams.find(p => p.projectName == projectName);
+    const modelType = 'Holistic';
+    const cvalueParam = projectParam ? projectParam.cvalue : '1';
+    const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
+    const params = {
+      projectName,
+      instanceGroup,
+      version: 3,
+      pvalue: pvalueParam,
+      cvalue: cvalueParam,
+      modelType,
+      predictedFlag: this.props.predictedFlag,
+    };
+    let startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
+    params.startTimestamp = startTime.valueOf();
+    params.endTimestamp = eventEndTime;
+
+    const url = `/liveMonitoring?${$.param(params)}`;
+    window.open(url, '_blank');
+  }
+
   render() {
     const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
     const { activeTab } = this.state;
@@ -462,9 +487,14 @@ class IncidentsList extends React.Component {
         <div style={{ marginBottom: 4, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
+            style={{ position: 'absolute', left: 320, top: 5 }} title="Causal Graph"
             onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
           >Causal Graph</Button>
+          {['admin','guest'].indexOf(store.get('userName'))!=-1 && <Button
+            className="orange"
+            style={{ position: 'absolute', left: 450, top: 5 }} title="Overall Chart"
+            onClick={(e) => { e.stopPropagation(); this.showInstanceChart(); }}
+          >Overall Chart</Button>}
           <div className="ui pointing secondary menu" style={{ marginTop: 0 }}>
             <a
               className={`${activeTab === 'detected' ? 'active' : ''} item`}

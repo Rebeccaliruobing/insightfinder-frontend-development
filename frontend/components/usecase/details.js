@@ -81,9 +81,12 @@ const ProjectDetails = class extends React.Component {
     <Console>
       <Console.Topbar logo={require('../../images/logo.png')}>
         <div className="topbar-text">
-          <div className="title">
+          {bugId && <div className="title">
             Please view incident name / bug ID: <b>{bugId}</b><br/>
-          </div>
+          </div>}
+          {!bugId && <div className="title">
+            Please view snapshot of email alert.<br/>
+          </div>}
         </div>
       </Console.Topbar>
       <LiveAnalysisCharts projectName={projectName} data={data} debugData={debugData} timeRanking={timeRanking} freqRanking={freqRanking} bugId={bugId} loading={loading}/>
