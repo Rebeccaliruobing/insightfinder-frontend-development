@@ -605,7 +605,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, userName = store.get('userName'), token = store.get('token')) {
+    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -623,6 +623,7 @@ const apis = {
                     modelStartTime,
                     modelEndTime,
                     latestDataTimestamp,
+                    caller,
                     userName,
                     token
                 }),

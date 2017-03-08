@@ -54,6 +54,7 @@ export default class ListAll extends Component {
     let {cvalue, pvalue, minPts, epsilon, modelType} = data;
     let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp} = data.activeItem;
     let bugId = metaData.name;
+    let caller = "";
     if(modelType=='DBScan'){
       cvalue = minPts;
       pvalue = epsilon;
