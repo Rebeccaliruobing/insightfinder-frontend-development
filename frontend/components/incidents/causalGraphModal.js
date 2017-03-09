@@ -381,7 +381,7 @@ class CausalGraphModal extends React.Component {
             <a
               className={`${activeTab === 'correlation' ? 'active' : ''} item`}
               onClick={this.selectTab('correlation')}
-            >Correlations</a>
+            >Component Correlations</a>
             <div
               style={{
                 position: 'absolute', right: 0, top: 6,
@@ -463,10 +463,10 @@ class CausalGraphModal extends React.Component {
             </div>
           </div>
           {activeTab === 'relation' && relations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No event causal relation found.</h4>
+            <h4 style={{ margin: '0.5em 0' }}>No component causal relation found.</h4>
           }
           {activeTab === 'correlation' && correlations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No event correlation found.</h4>
+            <h4 style={{ margin: '0.5em 0' }}>No component correlation found.</h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>

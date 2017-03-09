@@ -30,7 +30,7 @@ For Ubuntu, we need to install [nodejs] and [npm].
     $ sudo apt-get install npm
     
     3. Install yarn through npm
-    $ npm install -g yarn
+    $ sudo npm install -g yarn
     Note: If cannot install yarn through npm check https://yarnpkg.com/en/docs/install#linux-tab
 
 The frontend uses react & [redux], to help check the redux state, a browser's extension needed to be installed:
