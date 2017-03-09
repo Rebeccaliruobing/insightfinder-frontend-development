@@ -15,6 +15,7 @@
     "global-require": "off",
     // Easy for naming local variable
     "no-param-reassign": "off",
+    "object-property-newline": "off",
     // Use js for jsx
     "react/jsx-filename-extension": "off",
     // Allow object react prop types.

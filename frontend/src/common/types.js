@@ -8,8 +8,7 @@ export type AppState = {
   locales: ?Array<string>,
   messages: ?Object,
 
-  windowWidth: ?number,
-  windowHeight: ?number,
+  windowSize: Object,
 
   // App loaded, rehydrate finished.
   loaded: boolean,
@@ -33,7 +32,7 @@ export type Action =
   { type: 'APP_ERROR'; payload: { error: Error } }
   | { type: 'SET_CURRENT_LOCALE'; payload: { locale: string } }
   | { type: 'SET_CURRENT_THEME'; payload: { theme?: string } }
-  | { type: 'SET_WINDOW_SIZE'; payload: { windowWidth: number, windowHeight: number } }
+  | { type: 'SET_WINDOW_SIZE'; payload: { width: number, height: number } }
   | { type: 'APP_ONLINE'; payload: { online: boolean } }
   | { type: 'APP_START' }
   | { type: 'APP_STARTED' }

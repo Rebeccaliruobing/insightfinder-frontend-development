@@ -537,7 +537,7 @@ export default class ThresholdSettings extends React.Component {
                                     onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
             </div>
             <div className={`ui grid two columns form ${!!this.state.settingLoading ? 'loading' : ''}`}
-                 style={{ 'paddingTop': '10px' }}>
+                 style={{ 'paddingTop': '10px', margin: 0 }}>
               {!isLogProject && <div className={tabStates0['prediction'] + ' ui tab'}>
                 <div className="field">
                   <label style={labelStyle}>Prediction Time Window (Hour)</label>
@@ -895,8 +895,7 @@ export default class ThresholdSettings extends React.Component {
                 </div>
               </div>}
               {!isLogProject &&
-                <div className={tabStates0['model'] + ' ui tab'}>
-                  <h3>List of Holistic Models</h3>
+                <div className={tabStates0['model'] + ' ui tab'} style={{ width: '100%', paddingBottom: 10 }}>
                   <ModelSettings projectName={projectName} />
                 </div>
               }

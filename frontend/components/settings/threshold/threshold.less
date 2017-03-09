@@ -61,7 +61,54 @@
 }
 
 .model-settings {
-  width: 600px;
+  .model-tile {
+    margin: 12px 12px 0px 0;
+    >.fui.box {
+      cursor: pointer;
+      height: 212px;
+      padding: 20px 18px;
+      .meta {
+        font-size: 12px;
+        padding: 1em 0 0;
+        .icon {
+          font-size: 18px;
+          visibility: hidden;
+          cursor: pointer;
+          position: absolute;
+          top: 2px;
+          right: 0;
+          color: rgba(0, 0, 0, 0.35);
+        }
+      }
+      &:hover {
+        .icon {
+          visibility: visible;
+        }
+      }
+    }
+    &.picked {
+      >.fui.box {
+        .icon {
+          visibility: visible;
+          color: #F2711C;
+        }
+      }
+    }
+    &.big {
+      margin: 0 0 12px 0;
+      >.fui.box {
+        height: 272px;
+        margin: 0 auto;
+        .meta {
+          font-size: 14px;
+          .icon {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
   .item {
     line-height: 32px;
     color: #4183C4;

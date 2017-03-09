@@ -1,9 +1,7 @@
 /* @flow */
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Provider as Redux } from 'react-redux';
-import App from '../../../root';
-import AppNext from './App';
+import App from './App';
 
 type Props = {
   store: Object;
@@ -19,12 +17,7 @@ class Root extends React.Component {
     // Switch between different version
     return (
       <Redux store={store}>
-        <Router>
-          <Switch>
-            <Route path="/v2" component={AppNext} />
-            <Route path="/" component={App} />
-          </Switch>
-        </Router>
+        <App />
       </Redux>
     );
   }

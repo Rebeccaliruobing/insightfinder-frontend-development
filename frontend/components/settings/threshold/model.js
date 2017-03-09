@@ -1,7 +1,10 @@
 import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
+import R from 'ramda';
 import moment from 'moment';
 import { getProjectModels, pickProjectModel } from '../../../apis/projectSettings';
+import { Box, Tile } from '../../../src/lib/fui/react';
+import ModelTile from './ModelTile';
 
 class ModelLine extends React.Component {
 
@@ -37,7 +40,7 @@ class ModelLine extends React.Component {
     const etime = moment(endTimestamp).format('YYYY-MM-DD HH:mm');
     return (
       <div
-        className={userPickedFlag ? 'selected item' : 'item'}
+        className={userPickedFlag ? 'fui tile' : 'fui tile'}
         onMouseOver={this.handleHover}
         onMouseOut={this.handleHover}
       >
@@ -65,6 +68,7 @@ class ModelSettings extends React.Component {
     super(props);
     this.state = {
       models: [],
+      pickedModelKeys: [],
       loading: false,
     };
   }
@@ -80,10 +84,20 @@ class ModelSettings extends React.Component {
   @autobind
   reloadData(projectName) {
     if (projectName) {
-      getProjectModels(projectName).then((data) => {
-        this.setState({
-          models: data.modelKeys || [],
-          loading: false,
+      this.setState({
+        loading: true,
+      }, () => {
+        getProjectModels(projectName).then((data) => {
+          const models = data.modelKeys || [];
+          const pickedModelKeys = R.map(
+            m => m.modelKey,
+            R.filter(m => m.userPickedFlag)(models));
+
+          this.setState({
+            models,
+            pickedModelKeys,
+            loading: false,
+          });
         });
       });
     }
@@ -102,19 +116,46 @@ class ModelSettings extends React.Component {
     });
   }
 
+  @autobind
+  handlePickProjectModel(projectName, modelKey) {
+    // TODO: Call server side
+    this.setState({
+      pickedModelKeys: [modelKey],
+    });
+  }
+
   render() {
     const { projectName } = this.props;
-    const { models, loading } = this.state;
+    const { models, pickedModelKeys, loading } = this.state;
+
+    const pickedModels = R.filter(m => R.find(R.equals(m.modelKey), pickedModelKeys), models);
     return (
-      <div className={`model-settings ${loading ? 'ui loading form' : ''}`}>
-        {models.map(model => (
-          <ModelLine
-            key={model.modelKey}
-            projectName={projectName} {...model}
-            onUpdate={this.handleUpdate} onLoading={this.handleLoading}
-          />
-        ))}
-      </div>
+      <Tile isAncestor className={`model-settings ${loading ? 'ui form loading' : ''}`}>
+        <Tile isParent isVertical size={3} style={{ padding: 0 }}>
+          <h4>Picked Model</h4>
+          {pickedModels.map(m => (
+            <ModelTile key={m.modelKey} model={m} big projectName={projectName} />
+          ))}
+        </Tile>
+        <Tile isParent isVertical size={9} style={{ padding: 0 }}>
+          <h4>Model list</h4>
+          <div className="ui info message" style={{ marginTop: 0 }}>
+            Each heat map models the behavior of one instance. Red areas represent frequent behaviors
+            (i.e. normal states) and the size of the red areas indicates the ranges of different metric
+            values.
+          </div>
+          <Tile isParent isFluid style={{ padding: 0 }}>
+            {models.map(m => (
+              <ModelTile
+                key={m.modelKey} model={m}
+                picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
+                projectName={projectName}
+                pickProjectModel={this.handlePickProjectModel}
+              />
+            ))}
+          </Tile>
+        </Tile>
+      </Tile>
     );
   }
 }
