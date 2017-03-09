@@ -43,7 +43,10 @@ class ModelTile extends React.Component {
   }
 
   @autobind
-  handleTilePicked() {
+  handleTilePicked(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
     const { model, projectName } = this.props;
     this.props.pickProjectModel(projectName, model.modelKey);
   }
@@ -59,10 +62,7 @@ class ModelTile extends React.Component {
 
     return (
       <Tile className={cx('model-tile', { big, picked })}>
-        <Box
-          isLink={!big}
-          {...pickable ? { onClick: this.handleTilePicked } : {}}
-        >
+        <Box isLink={!big}>
           <Heatmap dataset={dataset} countPerRow={count} style={{ width: size, height: size }} />
           <div className="meta">
             <div>{`${startTime}-${endTime}`}</div>

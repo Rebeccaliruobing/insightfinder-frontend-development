@@ -12,7 +12,6 @@
 <script>
     window.__INITIAL_STATE__ = '<%= htmlWebpackPlugin.options.initialState %>';
 </script>
-<% if (htmlWebpackPlugin.options.environment === 'development') { %>
 <script>
     window.API_BASE_URL = 
     // 'https://insightfinderui.appspot.com/api/v1/'; // Test 
@@ -30,6 +29,5 @@
     // 'http://localhost:8888'; // staging 
     // 'https://insightfindertesting.appspot.com'; // staging
 </script>
-<% } %>
 </body>
 </html>

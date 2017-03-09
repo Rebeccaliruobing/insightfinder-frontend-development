@@ -10,6 +10,8 @@
     "build": "gulp build --production",
     "build:dev": "gulp build",
     "bd": "gulp build",
+    "build:test": "gulp build --production --test",
+    "bt": "gulp build --production --test",
     "build:stage": "gulp build --production --no-uglifyjs",
     "staging": "gulp build --production --no-uglifyjs",
     "clean": "gulp clean",

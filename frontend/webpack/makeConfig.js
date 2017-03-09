@@ -23,6 +23,7 @@ const makeConfig = (webpackSettings) => {
   settings.isDev = env === 'development';
   settings.isProd = env === 'production';
   settings.uglifyjs = process.env.UGLIFYJS === 'true';
+  settings.testing = process.env.BUILD_ENV === 'test';
 
   const { isDev, commonEntry, uglifyjs } = settings;
 

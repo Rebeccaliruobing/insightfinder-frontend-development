@@ -7,6 +7,7 @@ const args = yargs
     w: 'watch',
   })
   .default('uglifyjs', true)
+  .default('test', false)
   .argv;
 
 export default args;

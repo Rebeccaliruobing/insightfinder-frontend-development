@@ -3,57 +3,8 @@ import { autobind } from 'core-decorators';
 import R from 'ramda';
 import moment from 'moment';
 import { getProjectModels, pickProjectModel } from '../../../apis/projectSettings';
-import { Box, Tile } from '../../../src/lib/fui/react';
+import { Tile } from '../../../src/lib/fui/react';
 import ModelTile from './ModelTile';
-
-class ModelLine extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      hovered: false,
-    };
-  }
-
-  @autobind
-  handleHover() {
-    this.setState({ hovered: !this.state.hovered });
-  }
-
-  @autobind
-  handleSelected() {
-    const { projectName, startTimestamp, endTimestamp, modelKey } = this.props;
-    const modelKeyObj = {
-      startTimestamp, endTimestamp, modelKey,
-    };
-    this.props.onLoading(true);
-
-    pickProjectModel(projectName, JSON.stringify(modelKeyObj)).then(() => {
-      this.props.onUpdate();
-    });
-  }
-
-  render() {
-    const { startTimestamp, endTimestamp, modelKey, userPickedFlag } = this.props;
-    const { hovered } = this.state;
-    const stime = moment(startTimestamp).format('YYYY-MM-DD HH:mm');
-    const etime = moment(endTimestamp).format('YYYY-MM-DD HH:mm');
-    return (
-      <div
-        className={userPickedFlag ? 'fui tile' : 'fui tile'}
-        onMouseOver={this.handleHover}
-        onMouseOut={this.handleHover}
-      >
-        {`[${stime},${etime}] ${modelKey}`}
-        <i
-          className="icon checkmark action"
-          style={{ ...(userPickedFlag || !hovered) ? { display: 'none' } : {} }}
-          {...userPickedFlag ? {} : { onClick: this.handleSelected }}
-        />
-      </div>
-    );
-  }
-}
 
 class ModelSettings extends React.Component {
   static propTypes = {
@@ -109,18 +60,25 @@ class ModelSettings extends React.Component {
     this.reloadData(projectName);
   }
 
-  @autobind()
-  handleLoading(loading) {
-    this.setState({
-      loading,
-    });
-  }
-
   @autobind
-  handlePickProjectModel(projectName, modelKey) {
-    // TODO: Call server side
+  handlePickProjectModel(projectName, key) {
+    const { models } = this.state;
+    const pickedModel = R.find(m => m.modelKey === key, models);
+    const { startTimestamp, endTimestamp, modelKey } = pickedModel;
+    const modelKeyObj = {
+      startTimestamp, endTimestamp, modelKey,
+    };
+
     this.setState({
-      pickedModelKeys: [modelKey],
+      loading: true,
+    }, () => {
+      pickProjectModel(projectName, JSON.stringify(modelKeyObj))
+        .then(() => {
+          this.setState({
+            loading: false,
+            pickedModelKeys: [key],
+          });
+        });
     });
   }
 
@@ -129,10 +87,18 @@ class ModelSettings extends React.Component {
     const { models, pickedModelKeys, loading } = this.state;
 
     const pickedModels = R.filter(m => R.find(R.equals(m.modelKey), pickedModelKeys), models);
+    const pickedModel = pickedModels.length > 0 ? pickedModels[0] : null;
+
     return (
       <Tile isAncestor className={`model-settings ${loading ? 'ui form loading' : ''}`}>
         <Tile isParent isVertical size={3} style={{ padding: 0 }}>
           <h4>Picked Model</h4>
+          {pickedModel &&
+            <div style={{ paddingBottom: '1em' }}>
+              {`You picked model ${moment(pickedModel.startTimestamp).format('YYYY/M/D')}
+               to be used for the next 24 hours.`}
+            </div>
+          }
           {pickedModels.map(m => (
             <ModelTile key={m.modelKey} model={m} big projectName={projectName} />
           ))}
