@@ -1,2 +1,3 @@
-export { default as ThemeProvider } from './ThemeProvider.js';
-export { default as Match } from './Match';
+export { default as ThemeProvider } from './ThemeProvider';
+export { default as PrivateRoute } from './PrivateRoute';
+

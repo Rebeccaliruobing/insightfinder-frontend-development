@@ -13,6 +13,7 @@ type Props = {
 /* eslint-disable react/prefer-stateless-function */
 class Root extends React.Component {
   props: Props;
+
   render() {
     const { store } = this.props;
     // Switch between different version

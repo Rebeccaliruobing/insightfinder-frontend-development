@@ -1,14 +1,15 @@
 import React from 'react';
+import { omit } from 'ramda';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import debounce from 'lodash/debounce';
-import { autobind } from 'core-decorators';
-import type { State } from '../../common/types';
+import { autobind, debounce } from 'core-decorators';
 import { Container } from '../../lib/fui/react';
+import type { State } from '../../common/types';
 import start from '../../common/app/start';
 import { ThemeProvider } from '../../common/app/components';
-import * as themes from './themes';
 import { setWindowSize } from '../../common/app/actions';
+import Routing from './Routing';
+import * as themes from './themes';
 import '../../lib/fui/fui.scss';
 
 type Props = {
@@ -17,18 +18,15 @@ type Props = {
   setWindowSize: Function,
 };
 
+// TODO: Listen scrolling event and save position into redux store.
 export class AppCore extends React.Component {
   props: Props;
-  static DEBOUNCE_TIME = 300;
-  static debouncedResize = null;
 
-  constructor(props: Props) {
-    super(props);
-
-    this.resizeRegistered = false;
-  }
+  // Use the static member to keep only one instance register the resize event.
+  static registeredInstance = null;
 
   @autobind
+  @debounce(300)
   handleOnResize() {
     const width = window.innerWidth ||
       document.documentElement.clientWidth || document.body.clientHeight;
@@ -38,21 +36,21 @@ export class AppCore extends React.Component {
   }
 
   componentDidMount() {
-    if (!AppCore.debouncedResize) {
-      AppCore.debouncedResize = debounce(this.handleOnResize, AppCore.DEBOUNCE_TIME);
-      window.addEventListener('resize', AppCore.debouncedResize, false);
-      this.resizeRegistered = true;
+    if (!AppCore.registeredInstance) {
+      AppCore.registeredInstance = this;
+      window.addEventListener('resize', this.handleOnResize, false);
     }
   }
 
   componentWillUnmount() {
-    if (this.resizeRegistered) {
-      window.removeEventListener('resize', AppCore.debouncedResize);
+    if (AppCore.registeredInstance === this) {
+      window.removeEventListener('resize', this.handleOnResize);
     }
   }
 
   render() {
-    const { currentLocale, currentTheme } = this.props;
+    const { currentLocale, currentTheme, ...rest } = this.props;
+    const others = omit(['setWindowSize'], rest);
     return (
       <ThemeProvider theme={themes[currentTheme] || themes.light}>
         <Container fullHeight>
@@ -62,6 +60,7 @@ export class AppCore extends React.Component {
               class: currentTheme ? `${currentTheme} theme` : '',
             }}
           />
+          <Routing {...others} />
         </Container>
       </ThemeProvider>
     );
