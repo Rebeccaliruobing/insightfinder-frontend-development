@@ -2,7 +2,7 @@ import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import R from 'ramda';
 import moment from 'moment';
-import { getProjectModels, pickProjectModel } from '../../../apis/projectSettings';
+import { getProjectModels, pickProjectModel, removeProjectModel } from '../../../apis/projectSettings';
 import { Tile } from '../../../src/lib/fui/react';
 import ModelTile from './ModelTile';
 
@@ -88,6 +88,25 @@ class ModelSettings extends React.Component {
     });
   }
 
+  @autobind
+  handleRemoveProjectModel(projectName, key) {
+    const { models } = this.state;
+    const pickedModel = R.find(m => m.modelKey === key, models);
+    const { startTimestamp, endTimestamp, modelKey } = pickedModel;
+    const modelKeyObj = {
+      startTimestamp, endTimestamp, modelKey,
+    };
+
+    this.setState({
+      loading: true,
+    }, () => {
+      removeProjectModel(projectName, JSON.stringify(modelKeyObj))
+        .then(() => {
+          this.reloadData(projectName);
+        });
+    });
+  }
+
   render() {
     const { projectName } = this.props;
     const { models, pickedModelKeys, loading } = this.state;
@@ -129,6 +148,7 @@ class ModelSettings extends React.Component {
                 picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
                 projectName={projectName}
                 pickProjectModel={this.handlePickProjectModel}
+                removeProjectModel={this.handleRemoveProjectModel}
               />
             ))}
           </Tile>
