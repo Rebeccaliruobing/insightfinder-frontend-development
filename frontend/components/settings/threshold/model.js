@@ -49,6 +49,12 @@ class ModelSettings extends React.Component {
             pickedModelKeys,
             loading: false,
           });
+        }).catch(() => {
+          this.setState({
+            models: [],
+            pickedModelKeys: [],
+            loading: false,
+          });
         });
       });
     }
@@ -99,6 +105,9 @@ class ModelSettings extends React.Component {
                to be used for the next 24 hours.`}
             </div>
           }
+          {pickedModels.length === 0 &&
+            <h4 style={{ marginTop: 0 }}>No picked model</h4>
+          }
           {pickedModels.map(m => (
             <ModelTile key={m.modelKey} model={m} big projectName={projectName} />
           ))}
@@ -111,6 +120,9 @@ class ModelSettings extends React.Component {
             values.
           </div>
           <Tile isParent isFluid style={{ padding: 0 }}>
+            {models.length === 0 &&
+              <h4>No model available</h4>
+            }
             {models.map(m => (
               <ModelTile
                 key={m.modelKey} model={m}

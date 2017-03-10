@@ -24,7 +24,7 @@
 		1. Production build, replace 'npm run build', small size with uglifyjs, sourceMap in seperate file, able to read code when open console. Output files are in web/static, better for production deployment.
 		$ yarn run build
 
-    1. To change the api url, modify web/frontend/src/web/app/htmls/index.ejs file.
+    1. To change the api url for staging or production build, modify web/frontend/src/web/app/htmls/index.ejs file; For yarn run web, modify index_dev.ejs.
 
 ## Rollback to npm
 	$ cd ~/dev/insightfinder/web/frontend/

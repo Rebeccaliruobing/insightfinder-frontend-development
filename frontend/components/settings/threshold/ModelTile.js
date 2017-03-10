@@ -66,6 +66,7 @@ class ModelTile extends React.Component {
           <Heatmap dataset={dataset} countPerRow={count} style={{ width: size, height: size }} />
           <div className="meta">
             <div>{`${startTime}-${endTime}`}</div>
+            {pickable && <i className="remove icon" onClick={this.handleTilePicked} />}
             {pickable && <i className="check circle outline icon" onClick={this.handleTilePicked} />}
           </div>
         </Box>

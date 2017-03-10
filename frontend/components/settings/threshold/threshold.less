@@ -64,7 +64,6 @@
   .model-tile {
     margin: 12px 12px 0px 0;
     >.fui.box {
-      cursor: pointer;
       height: 212px;
       padding: 20px 18px;
       .meta {
@@ -75,22 +74,42 @@
           visibility: hidden;
           cursor: pointer;
           position: absolute;
-          top: 2px;
-          right: 0;
           color: rgba(0, 0, 0, 0.35);
+          &.remove{
+            top: 2px;
+            right: 0;
+          }
+          &.check {
+            right: 8px;
+          }
+        }
+        .ui.button {
+          font-size: 12px;
+          visibility: hidden;
+          cursor: pointer;
+          float: right;
+          padding: 0.5em;
+          height: 2em;
+          margin-top: 2px;
         }
       }
       &:hover {
         .icon {
           visibility: visible;
         }
+        .ui.button {
+          visibility: visible;
+        }
       }
     }
     &.picked {
       >.fui.box {
-        .icon {
+        .check.icon {
           visibility: visible;
           color: #F2711C;
+        }
+        .remove.icon {
+          visibility: hidden;
         }
       }
     }
