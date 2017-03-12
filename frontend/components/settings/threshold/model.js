@@ -119,9 +119,15 @@ class ModelSettings extends React.Component {
         <Tile isParent isVertical size={3} style={{ padding: 0 }}>
           <h4>Picked Model</h4>
           {pickedModel &&
-            <div style={{ paddingBottom: '1em' }}>
-              {`You picked model ${moment(pickedModel.startTimestamp).format('YYYY/M/D')}
-               to be used for the next 24 hours.`}
+            <div style={{ paddingBottom: '1em', paddingRight: '1em' }}>
+              {`You picked model 
+              ${moment(pickedModel.startTimestamp).format('YYYY/M/D')}-
+              ${moment(pickedModel.endTimestamp).format('YYYY/M/D')}
+              to be used ${
+                pickedModel.userPickedExpiry?
+                  'till ' + moment(pickProjectModel.userPickedExpiry).format('YYYY/MM/DD hh:mm')
+                  : 'for the next 24 hours'}.`
+              }
             </div>
           }
           {pickedModels.length === 0 &&
