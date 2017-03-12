@@ -28,8 +28,9 @@ import 'react-timeout';
 
 import 'redux';
 import 'react-redux';
-import 'redux-action-buffer';
 import 'redux-persist';
+import 'rxjs';
+import 'redux-observable';
 
 import '../../artui';
 import '../../artui/dataviz';

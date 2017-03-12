@@ -22,9 +22,7 @@ const initialState = {
     widthDiff: 0,
     heightDiff: 0,
   },
-  loaded: false,
   started: false,
-  online: false,
   error: null,
 };
 
@@ -57,11 +55,6 @@ const reducer = (
         heightDiff: height - currentHeight,
       },
     };
-  } else if (action.type === 'APP_START') {
-    return {
-      ...state,
-      loaded: true,
-    };
   } else if (action.type === 'APP_STARTED') {
     return {
       ...state,
@@ -71,11 +64,6 @@ const reducer = (
     return {
       ...state,
       error: action.payload.error,
-    };
-  } else if (action.type === 'APP_ONLINE') {
-    return {
-      ...state,
-      online: action.payload.online,
     };
   }
   return { ...initialState, ...state };

@@ -5,17 +5,11 @@ export type AppState = {
   appVersion: string,
   currentTheme: ?string,
   currentLocale: ?string,
+  windowSize: Object,
   locales: ?Array<string>,
   messages: ?Object,
-
-  windowSize: Object,
-
-  // App loaded, rehydrate finished.
-  loaded: boolean,
-
   started: boolean,
   error: ?Error,
-  online: boolean,
 };
 
 export type SessionState = {
@@ -33,7 +27,6 @@ export type Action =
   | { type: 'SET_CURRENT_LOCALE'; payload: { locale: string } }
   | { type: 'SET_CURRENT_THEME'; payload: { theme?: string } }
   | { type: 'SET_WINDOW_SIZE'; payload: { width: number, height: number } }
-  | { type: 'APP_ONLINE'; payload: { online: boolean } }
   | { type: 'APP_START' }
   | { type: 'APP_STARTED' }
   | { type: 'APP_STOP' }

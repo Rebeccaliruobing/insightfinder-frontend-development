@@ -9,12 +9,14 @@ import start from '../../common/app/start';
 import { ThemeProvider } from '../../common/app/components';
 import { setWindowSize } from '../../common/app/actions';
 import Routing from './Routing';
+import Loading from './Loading';
 import * as themes from './themes';
 import '../../lib/fui/fui.scss';
 
 type Props = {
   currentLocale: string,
   currentTheme: string,
+  appStarted: bool,
   setWindowSize: Function,
 };
 
@@ -49,7 +51,7 @@ export class AppCore extends React.Component {
   }
 
   render() {
-    const { currentLocale, currentTheme, ...rest } = this.props;
+    const { appStarted, currentLocale, currentTheme, ...rest } = this.props;
     const others = omit(['setWindowSize'], rest);
     return (
       <ThemeProvider theme={themes[currentTheme] || themes.light}>
@@ -71,6 +73,7 @@ export default connect(
   (state: State) => ({
     currentTheme: state.app.currentTheme,
     currentLocale: state.app.currentLocale,
+    appStarted: state.app.started,
   }),
   { setWindowSize },
 )(start(AppCore));

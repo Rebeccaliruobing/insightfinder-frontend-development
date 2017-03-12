@@ -41,8 +41,9 @@ const configureStore = (options: Options) => {
 
   // Enable hot reloading for reducers.
   if (module.hot && typeof module.hot.accept === 'function') {
-    module.hot.accept('../common/configureReducer', () => {
+    module.hot.accept('./configureReducer', () => {
       const configureReducer = require('./configureReducer').default;
+
       store.replaceReducer(configureReducer());
     });
   }
