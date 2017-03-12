@@ -34,10 +34,6 @@
   background-color: rgba(0, 0, 0, 0.25) !important;
 }
 
-.dygraph-legend {
-  //background: transparent !important;
-}
-
 .auth.ui.container {
   @container-mixins();
   .makeContainer(320px);
@@ -950,4 +946,18 @@
 
 .rc-tooltip {
   z-index: 2000 !important;
+}
+
+.ui.popup {
+  max-width: inherit;
+}
+.dygraph.popup-content {
+  font-size: 12px;
+  overflow: auto;
+  max-height: 300px;
+  > .header {
+    font-weight: bold;
+  }
+  > .content {
+  }
 }
