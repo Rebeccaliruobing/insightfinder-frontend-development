@@ -527,7 +527,8 @@ export default class ThresholdSettings extends React.Component {
                                     onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               {!isLogProject && <a className={tabStates0['prediction'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
-              {!isLogProject && <a className={tabStates0['model'] + ' item'}
+              {['admin','guest'].indexOf(store.get('userName'))!=-1 && 
+                                    !isLogProject && <a className={tabStates0['model'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'model')}>Model Picking</a>}
               <a className={tabStates0['sharing'] + ' item'} 
                                     onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
