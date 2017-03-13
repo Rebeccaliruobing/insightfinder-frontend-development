@@ -2,10 +2,9 @@ import store from 'store';
 import _ from 'lodash';
 import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
-import moment from 'moment';
 
-export function buildTreemap(projectName, incidentName, statistics, anomaliesList, incident) {
-
+export function buildTreemap(
+  projectName, incidentName, statistics, anomaliesList, incident, instanceStatsJson) {
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
 
@@ -35,9 +34,8 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     const cname = isContainer ? names[0] : '';
 
     const instanceType = instanceTypeMap[inst];
-    const isFilterByStats = !!statistics.instanceStatsJson;
-    const statsByMetric = _.get(
-      statistics, ['instanceStatsJson', inst, 'statsByMetricJson'], {});
+    const isFilterByStats = !!instanceStatsJson;
+    const statsByMetric = _.get(instanceStatsJson, [inst, 'statsByMetricJson'], {});
     let instanceMetrics = metrics;
     if (instanceType && typeMetricMap[instanceType]) {
       instanceMetrics = typeMetricMap[instanceType] || [];

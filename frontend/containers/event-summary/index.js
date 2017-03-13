@@ -117,13 +117,18 @@ class EventSummary extends React.Component {
       stats.maxAnomalyRatio = maxAnomalyRatio;
       stats.minAnomalyRatio = minAnomalyRatio;
       incidentsTreeMap =
-        buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
+        buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
+          data.statistics.instanceStatsJson,
+        );
     } else {
       groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
       data.statistics.maxAnomalyRatio = maxAnomalyRatio;
       data.statistics.minAnomalyRatio = minAnomalyRatio;
-      incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
+      incidentsTreeMap = buildTreemap(
+        projectName, caption, data.statistics, data.anomalyMapJson, null,
+        data.statistics.instanceStatsJson,
+      );
     }
     this.setState({
       incidentsTreeMap,
