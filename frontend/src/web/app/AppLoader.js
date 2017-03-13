@@ -11,7 +11,7 @@ type Props = {
 const Loading = ({
   appLoaderVisible,
 }: Props) => (
-  <ImageLoader fullScreen imageSrc={logo} size={150} visible={appLoaderVisible} />
+  <ImageLoader fullScreen imageSrc={logo} size={120} visible={appLoaderVisible} />
 );
 
 export default connect(

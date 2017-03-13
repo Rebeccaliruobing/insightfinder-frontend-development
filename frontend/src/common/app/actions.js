@@ -45,7 +45,7 @@ export const appError = (error: Error): Action => ({
 
 const appStartEpic = (action$: any) =>
   action$.ofType(REHYDRATE)
-    .mapTo(appStarted());
+    .mapTo(hideAppLoader());
 
 export const epics = [
   appStartEpic,

@@ -2,27 +2,53 @@
 @import "../mixins/responsive";
 
 .fui.loader {
-  &.full-screen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    z-index: 2000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    > .fui.image {
-      transform: translateY(-15%);
+  @keyframes round-animate {
+    0% {
+      transform: rotate(0)
+    }
+    100% {
+      transform: rotate(360deg)
     }
   }
-  > .fui.image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1090;
+  &.has-image > .fui.image {
     display: flex;
     justify-content: center;
     align-items: center;
     &:before {
-      content: "";
+      content: " ";
+      position: absolute;
       width: 120%;
       height: 120%;
-      border: 2px solid green;
+      display: inline-block;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: 2px solid #bababa;
+    }
+    &:after {
+      content: " ";
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      display: inline-block;
+      box-sizing: border-box;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-top-color: #2196f3;
+      animation: round-animate 1s linear infinite;
+    }
+  }
+  &.full-screen {
+    position: fixed;
+    z-index: 2000;
+    &.has-image > .fui.image {
+      transform: translateY(-20%);
     }
   }
   &.hidden {
