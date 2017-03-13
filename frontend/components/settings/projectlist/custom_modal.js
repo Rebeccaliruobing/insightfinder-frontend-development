@@ -9,7 +9,7 @@ class CustomProjectModal extends React.Component {
   static contextTypes = {
     root: React.PropTypes.object,
   };
-  
+
   constructor(props) {
     super(props);
     this._dropdown = null;
@@ -115,6 +115,30 @@ class CustomProjectModal extends React.Component {
                 <option className="item" value="60">60 minutes</option>
               </select>
             </div>
+            {projectCloudType=="AWS" && <div className="field">
+              <label>IAM Access Key ID*</label>
+              <input type="text" name="access_id" onChange={(e)=>this.setState({access_key: e.target.value})}/>
+            </div>}
+            {projectCloudType=="AWS" && <div className="field">
+              <label>Secret Access Key*</label>
+              <input type="text" name="access_key" onChange={(e)=>this.setState({secrete_key: e.target.value})}/>
+            </div>}
+            {projectCloudType=="AWS" && <div className="field">
+              <label>Region</label>
+              <select className="ui dropdown" onChange={(e)=>this.setState({zone: e.target.value})}>
+                <option className="item"></option>
+                <option className="item" value="us-east-1">us-east-1</option>
+                <option className="item" value="us-west-1">us-west-1</option>
+                <option className="item" value="us-west-2">us-west-2</option>
+                <option className="item" value="eu-west-1">eu-west-1</option>
+                <option className="item" value="eu-central-1">eu-central-1</option>
+                <option className="item" value="ap-northeast-1">ap-northeast-1</option>
+                <option className="item" value="ap-northeast-2">ap-northeast-2</option>
+                <option className="item" value="ap-southeast-1">ap-southeast-1</option>
+                <option className="item" value="ap-southeast-2">ap-southeast-2</option>
+                <option className="item" value="sa-east-1">sa-east-1</option>
+              </select>
+            </div>}
             {enableProcessName ? <div className="field">
               <label>Process Names (comma separated)</label>
               <label>eg. "httpd,apache"</label>
