@@ -1,4 +1,6 @@
 import React, {Component}    from 'react';
+import ReactDOM from 'react-dom';
+import { autobind } from 'core-decorators';
 import {
     Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
 }                           from '../../../artui/react/index';
@@ -133,7 +135,7 @@ export default class FileNewModel extends Component {
 
                                         <div className="ui button fileinput-button">
                                             Training Data
-                                            <input type="file" name="file" ref={::this.fileUploadTrainingData}/>
+                                            <input type="file" name="file" ref={this.fileUploadTrainingData}/>
                                         </div>
                                         {this.state.trainingDataShow ?
                                             <span className="text-blue">{this.state.filename}</span> : null}
@@ -144,7 +146,7 @@ export default class FileNewModel extends Component {
 
                                         <div className="ui button fileinput-button">
                                             Optional Filter Data
-                                            <input type="file" name="file" ref={::this.fileUploadOptionalFilterData}/>
+                                            <input type="file" name="file" ref={this.fileUploadOptionalFilterData}/>
                                         </div>
                                         {this.state.optionalFilterDataShow ?
                                             <span className="text-blue">{this.state.filename}</span> : null}
@@ -160,7 +162,7 @@ export default class FileNewModel extends Component {
                                     </div>
                                 </div>
                                 <div className="ui field">
-                                    <Button className={cx('orange', {'loading': this.state.submitLoading})}
+                                    <Button className={`orange ${this.state.submitLoading ? 'loading': ''}`}
                                             onClick={this.handleSubmit.bind(this)}>Submit</Button>
                                 </div>
                             </div>
@@ -171,6 +173,7 @@ export default class FileNewModel extends Component {
         );
     }
 
+    @autobind
     fileUploadTrainingData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({
@@ -195,6 +198,7 @@ export default class FileNewModel extends Component {
             });
     }
 
+    @autobind
     fileUploadOptionalFilterData(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({

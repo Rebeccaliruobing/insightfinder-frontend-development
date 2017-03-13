@@ -108,7 +108,7 @@ class TakeActionModal extends React.Component {
   }
 
   render() {
-    let { incident, projectName, actionTime, ...rest} = this.props;
+    let { incident, projectName, ...rest} = this.props;
     let { action, oneTime, instanceId, customAction, textLoaded} = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];

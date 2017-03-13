@@ -2,6 +2,7 @@ import React from 'react';
 import {autobind} from 'core-decorators';
 import shallowCompare from 'react-addons-shallow-compare';
 import cx from 'classnames';
+import moment from 'moment';
 import {Modal} from '../../artui/react';
 import DataParser from '../cloud/dataparser';
 import {DataChart} from '../share/charts';
@@ -30,13 +31,13 @@ class MetricModal extends React.Component {
   }
 
   componentDidMount() {
-    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, groupId, grouping } = this.props;
+    let { projectName, startTimestamp, endTimestamp, instanceName, metricName, groupId, grouping, predictedFlag } = this.props;
     this.setState({ 
       loading: true,
     });
     apis.postProjectData(
       projectName, undefined, undefined, startTimestamp, endTimestamp, groupId,
-      instanceName, metricName, undefined, undefined, grouping)
+      instanceName, metricName, undefined, predictedFlag, grouping, )
       .then(resp => {
         if (resp.success) {
           const data = this.calculateData(resp.data, instanceName);
@@ -69,15 +70,21 @@ class MetricModal extends React.Component {
   }
 
   render() {
-    const { onClose, eventEndTime, eventStartTime, avgLabel } = this.props;
+    const { onClose, startTimestamp, endTimestamp,
+      eventEndTime, eventStartTime, avgLabel, predictedFlag } = this.props;
     const { data,showErrorMsg,loading } = this.state;
+
+    let latestDataTimestamp = undefined;
+    if (predictedFlag) {
+      latestDataTimestamp = +moment();
+    }
     const classes = cx('content', loading ? 'ui form loading' : '');
     let chartLabel = '';
-    if(avgLabel!=undefined){
+    if (avgLabel !== undefined) {
       chartLabel = avgLabel;
     }
     return (
-      <Modal closable={true} onClose={onClose}>
+      <Modal closable onClose={onClose}>
         {showErrorMsg ?
           <div className={classes} style={{ height: 300 }}>
             <h3>Metric data unavailable for this period.</h3>
@@ -85,10 +92,10 @@ class MetricModal extends React.Component {
           :
           <div className={classes} style={{ height: 300 }}>
             {data &&
-            <div className="ui header">{`Metric ${data.metrics} ${chartLabel}` }</div>
+              <div className="ui header">{`Metric ${data.metrics} ${chartLabel}`}</div>
             }
-            {data  &&
-            <DataChart data={data}/>
+            {data &&
+              <DataChart data={data} latestDataTimestamp={latestDataTimestamp} />
             }
           </div>
         }

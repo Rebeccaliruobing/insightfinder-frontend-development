@@ -6,13 +6,16 @@ import $ from 'jquery';
 import { autobind } from 'core-decorators';
 import { withRouter } from 'react-router';
 import moment from 'moment';
+import DatePicker from 'react-datepicker';
 import { Console } from '../../artui/react';
-import { TopListAnomaly, TopListResource } from './top-list';
+import TopListAnomaly from './top-list-anomaly';
+import TopListResource from './top-list-resource';
+import HourlyHeatmap from '../../components/statistics/hourly-heatmap';
 import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
-import DateTimePicker from '../../components/ui/datetimepicker';
+import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
 import './executive-dashboard.less';
-import { NumberOfDays, EventSummaryModelType } from '../../components/selections';
 import normalizeStats from './normalize-stats';
+import { aggregateToMultiHourData } from './heatmap-data';
 
 class ExecutiveDashboard extends React.Component {
   static contextTypes = {
@@ -29,9 +32,16 @@ class ExecutiveDashboard extends React.Component {
   constructor(props) {
     super(props);
 
+    this.defaultNumberOfDays = 7;
+    this.dateFormat = 'YYYY-MM-DD';
+
     this.state = {
-      eventStats: [],
       loading: true,
+      eventStats: [],
+      heatmapData: {},
+      heatmapLoading: false,
+      heatmapProject: null,
+      heatmapGroup: null,
       view: 'anomaly',
     };
   }
@@ -40,14 +50,13 @@ class ExecutiveDashboard extends React.Component {
     this.refreshData();
   }
 
-  modelDateValidator(date) {
-    return moment(date) <= moment();
-  }
-
+  @autobind
   applyDefaultParams(params) {
     return {
-      endTime: moment().endOf('day').format('YYYY-MM-DD'),
-      numberOfDays: 7,
+      startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day').format(this.dateFormat),
+      endTime: moment().endOf('day').format(this.dateFormat),
+      timezoneOffset: moment().utcOffset(),
       modelType: 'Holistic',
       ...params,
     };
@@ -62,11 +71,21 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const endTime = moment(query.endTime).valueOf();
+    const { modelType, timezoneOffset } = query;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
+
+    const curTime = moment();
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+
     this.setState({
       loading: true,
+      heatmapLoading: true,
+      heatmapData: {},
     }, () => {
-      retrieveExecDBStatisticsData(query.modelType, endTime, query.numberOfDays)
+      retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays, timezoneOffset)
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
@@ -75,15 +94,29 @@ class ExecutiveDashboard extends React.Component {
         }).catch((msg) => {
           console.log(msg);
         });
+
+      retrieveHeatmapData(
+        modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly')
+        .then((data) => {
+          this.setState({
+            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+            heatmapLoading: false,
+          });
+        }).catch((msg) => {
+          console.log(msg);
+        });
     });
   }
 
   @autobind
-  handleModelTypeChange(value, modelType) {
+  refreshDataByTime(startTime, endTime) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, modelType,
+      ...location.query,
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
     });
+
     router.push({
       pathname: location.pathname,
       query,
@@ -93,49 +126,108 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  handleDayChange(value, numberOfDays) {
-    const { location, router } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query, numberOfDays: numberOfDays.toString(),
-    });
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
+  handleStartTimeChange(newDate) {
+    const { location } = this.props;
+    const curTime = moment();
 
-    this.refreshData(query);
-  }
+    const startTime = newDate.clone().startOf('day');
+    let endTime = moment(location.query.endTime).endOf('day');
 
-  @autobind
-  handleEndTimeChange(value) {
-    const { location, router } = this.props;
-    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
-    const query = this.applyDefaultParams({ ...location.query, endTime });
-    if (location.query.endTime !== endTime) {
-      router.push({
-        pathname: location.pathname,
-        query,
-      });
-
-      this.refreshData(query);
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
+      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
+    if (endTime >= curTime) {
+      endTime = curTime.endOf('day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
   }
 
   @autobind
-  handleListRowOpenAnomaly(projectName, instanceGroup) {
+  handleEndTimeChange(newDate) {
+    const { location } = this.props;
+
+    const endTime = newDate.clone().endOf('day');
+    let startTime = moment(location.query.startTime).startOf('day');
+
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
+      startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
+  }
+
+  @autobind
+  handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
+    this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime);
+  }
+
+  @autobind
+  handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
+    this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime, true);
+  }
+
+  @autobind
+  handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
     const { location } = this.props;
     const query = this.applyDefaultParams({
       ...location.query,
       projectName,
       instanceGroup,
     });
+    if (datetime) {
+      query.startTime = datetime.startOf('day').format(this.dateFormat);
+      query.endTime = datetime.endOf('day').format(this.dateFormat);
+    }
+    if (predicted) {
+      query.predicted = true;
+    }
+
     store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
   }
 
   @autobind
-  handleListRowOpenResource(projectName, instanceGroup) {
+  handleAnomalyListRowClick(projectName, instanceGroup) {
+    const { heatmapProject, heatmapGroup } = this.state;
+
     const { location } = this.props;
+    const query = this.applyDefaultParams(location.query);
+    const { modelType, timezoneOffset } = query;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
+
+    const curTime = moment();
+    const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+
+    if (heatmapProject !== projectName || heatmapGroup !== instanceGroup) {
+      this.setState({
+        heatmapLoading: true,
+        heatmapData: {},
+        heatmapProject: projectName,
+        heatmapGroup: instanceGroup,
+      }, () => {
+        retrieveHeatmapData(
+          modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly',
+          projectName, instanceGroup,
+        ).then((data) => {
+          this.setState({
+            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+            heatmapLoading: false,
+          });
+        }).catch((msg) => {
+          console.log(msg);
+        });
+      });
+    }
+  }
+
+  @autobind
+  handleListRowOpenResource(projectName, instanceGroup) {
     const query = this.applyDefaultParams({
       projectName,
       instanceGroup,
@@ -146,66 +238,76 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { endTime, numberOfDays, modelType } = this.applyDefaultParams(location.query);
-    const { loading, eventStats, view } = this.state;
+    const params = this.applyDefaultParams(location.query);
+    let { startTime, endTime } = params;
+    const { loading, eventStats, heatmapLoading, heatmapData } = this.state;
+
+    // Convert startTime, endTime to moment object
+    startTime = moment(startTime, this.dateFormat);
+    endTime = moment(endTime, this.dateFormat);
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+
+    const startTimePrevious = moment(startTime).subtract(numberOfDays, 'day');
+    const endTimePrevious = moment(endTime).subtract(numberOfDays, 'day');
+    const startTimePredicted = moment(startTime).add(numberOfDays, 'day');
+    const endTimePredicted = moment(endTime).add(numberOfDays, 'day');
+    const curTime = moment();
+    const maxEndTime = curTime;
+    const maxStartTime = curTime;
+    const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format('M/D')}`;
+    const timeIntervalCurrent = `${startTime.format('M/D')} - ${endTime.format('M/D')}`;
+    const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
+    // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+
+    const { view } = this.state;
 
     return (
       <Console.Content
-        className={`executive-dashboard ${loading ? 'ui form loading' : ''}`}
+        className={`executive-dashboard  ${loading ? 'ui form loading' : ''}`}
         style={{ paddingLeft: 0 }}
       >
-        <div className="ui main tiny container" style={{ display: loading && 'none' }}>
+        <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
-            <div className="field" style={{ float: 'left' }}>
+            <div className="field view-switch" style={{ float: 'left' }}>
               <div
-                className={`ui ${view === 'anomaly' ? 'grey' : 'orange'} button`}
-                style={{
-                  borderRadius: 0,
-                  marginRight: 0,
-                  ...{
-                    cursor: `${view === 'anomaly' ? 'default' : 'pointer'}`,
-                    fontWeight: `${view === 'anomaly' ? 'bolder' : 'lighter'}`,
-                  },
-                }}
+                className={`ui ${view === 'anomaly' ? 'grey active' : 'orange'} button`}
                 {...view === 'anomaly' ? {} : {
                   onClick: () => this.setState({ view: 'anomaly' }),
                 }}
               >Anomaly View</div>
               <div
-                className={`ui ${view === 'resource' ? 'grey' : 'orange'} button`}
-                style={{
-                  borderRadius: 0,
-                  marginRight: 0,
-                  ...{
-                    cursor: `${view === 'resource' ? 'default' : 'pointer'}`,
-                    fontWeight: `${view === 'resource' ? 'bolder' : 'lighter'}`,
-                  },
-                }}
+                className={`ui ${view === 'resource' ? 'grey active' : 'orange'} button`}
                 {...view === 'resource' ? {} : {
                   onClick: () => this.setState({ view: 'resource' }),
                 }}
               >Resource View</div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>End date:</label>
+              <label style={{ fontWeight: 'bold' }}>Start Date:</label>
               <div className="ui input">
-                <DateTimePicker
-                  className="ui input" style={{ width: '50%' }}
-                  dateValidator={this.modelDateValidator}
-                  dateTimeFormat="YYYY-MM-DD" value={endTime}
-                  onChange={this.handleEndTimeChange}
+                <DatePicker
+                  selected={startTime}
+                  todayButton="Today"
+                  dateFormat={this.dateFormat}
+                  maxDate={maxStartTime}
+                  onChange={this.handleStartTimeChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
-              <NumberOfDays
-                style={{ width: 120 }}
-                value={numberOfDays} onChange={this.handleDayChange}
-              />
+              <label style={{ fontWeight: 'bold' }}>End Date:</label>
+              <div className="ui input">
+                <DatePicker
+                  selected={endTime}
+                  todayButton="Today"
+                  dateFormat={this.dateFormat}
+                  maxDate={maxEndTime}
+                  onChange={this.handleEndTimeChange}
+                />
+              </div>
             </div>
             <div className="field">
               <div
@@ -214,19 +316,54 @@ class ExecutiveDashboard extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div className="ui vertical segment" style={{ 
-                  ...{
-                    width: `${view === 'anomaly' ? '100%' : '75%'}`
-                  } }}>
+          <div
+            className={`ui vertical segment ${heatmapLoading ? 'loading' : ''}`}
+            {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
+            <div className="heatmap-block">
+              <h3>Detected Events</h3>
+              <HourlyHeatmap
+                statSelector={d => d.totalAnomalyScore}
+                numberOfDays={numberOfDays} dataset={heatmapData.detected}
+                onNameClick={this.handleListRowOpenDetectedAnomaly}
+              />
+            </div>
+            <div className="heatmap-block">
+              <h3>Predicted Events</h3>
+              <HourlyHeatmap
+                statSelector={d => d.totalAnomalyScore} rightEdge
+                numberOfDays={numberOfDays} dataset={heatmapData.predicted}
+                onNameClick={this.handleListRowOpenPredictedAnomaly}
+              />
+            </div>
+            <div style={{ color: 'grey', marginLeft: '2em' }}>
+              <i className="icon circle info" />
+              <span>Only start time of the event is shown, hover the cell to see event duration and details.</span>
+            </div>
+          </div>
+          <div
+            className="ui vertical segment flex-item"
+            {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
             <TopListAnomaly
+              timeIntervalPrevious={timeIntervalPrevious}
+              timeIntervalCurrent={timeIntervalCurrent}
+              timeIntervalPredicted={timeIntervalPredicted}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
-              {...view === 'anomaly' ? { } : { style: { display: 'none' } }}
+              onRowClick={this.handleAnomalyListRowClick}
             />
+          </div>
+          <div
+            className="ui vertical segment flex-item"
+            {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
+          >
             <TopListResource
+              timeIntervalPrevious={timeIntervalPrevious}
+              timeIntervalCurrent={timeIntervalCurrent}
+              timeIntervalPredicted={timeIntervalPredicted}
               stats={eventStats}
               onRowOpen={this.handleListRowOpenResource}
-              {...view === 'resource' ? { } : { style: { display: 'none' } }}
             />
           </div>
         </div>

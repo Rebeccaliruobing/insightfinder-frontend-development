@@ -362,7 +362,7 @@ class LogAnalysis extends React.Component {
     const {
       projectName, incident, startTime, endTime, derivedPvalue, pvalue, pvalueText, derivedPvalueText, cvalue, minPts,epsilon, recorded, projectType, modelType, modelTypeText, durationHours, incidentList, 
       rareEventThreshold, rareEventThresholdText,
-      modelStartTime, modelEndTime
+      modelStartTime, modelEndTime, loading,
     } = this.state;
     const {dashboardUservalues} = this.context;
     const labelStyle = {};
@@ -371,7 +371,7 @@ class LogAnalysis extends React.Component {
     if (!dashboardUservalues.projectString || !dashboardUservalues.incidentAllInfo) return <div></div>;
 
     return (
-      <div className={cx('ui form', {loading: !!this.state.loading})} style={{'display': 'inline-block'}}>
+      <div className={`ui form ${!!loading ? 'loading' : ''}`} style={{'display': 'inline-block'}}>
         <div className="four fields fill" style={{'float': 'left','display': 'inline-block','width': '33%'}}>
           <div className="field" style={{'width': '100%','marginBottom': '16px'}}>
             <WaringButton labelStyle={labelStyle} labelTitle="Project Name" labelSpan="pick a nickname for your cloud project."/>
@@ -448,8 +448,7 @@ class LogAnalysis extends React.Component {
                 let bgColor = (moment(incidentStartTime) == this.state.startTime) ? '#f1f1f1' : '#fff';
                 return (
                   <div className={"item " + (selected ? 'selected' : '')}
-                       key={isd + ',' + ied + ',' + msd + ',' + med + ',' + modelType}
-                       style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
+                    key={index} style={{'backgroundColor': bgColor,'height':'32px','position': 'relative'}}>
                     <div className="content" onClick={this.handleClickIncident(incident)}>
                       <a className="header padding5 incident-item"
                          title={tooltipcontent}

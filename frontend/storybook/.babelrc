@@ -1,0 +1,12 @@
+/**
+ * This .babelrc is for storybook only, which should include all plugins
+ * used by react & react native app.
+**/
+{
+  "presets": [
+    ["es2015", { "loose": false, "modules": false }], 
+    "react-native",
+    "react", 
+    "stage-1"
+  ]
+}

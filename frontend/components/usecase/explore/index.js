@@ -1,4 +1,5 @@
 import React, {Component}   from 'react';
+import moment from 'moment';
 import ReactDOM             from 'react-dom';
 import {Link, IndexLink}    from 'react-router';
 import {
@@ -29,7 +30,18 @@ export default class ListAll extends Component {
       },
       systemNames: ['Cassandra','Hadoop','Apache','Tomcat','MySQL','HDFS','Spark','Lighttpd','Memcached'],
       colors:['#339999','#1976d2','#1ac986','#2196f3','#505077'],
+      tabStates: {
+        system: 'active',
+        custom: '',
+      },
     };
+  }
+
+  selectTab(e, tab) {
+    var tabStates = this.state['tabStates'];
+    tabStates = _.mapValues(tabStates, () => '');
+    tabStates[tab] = 'active';
+    this.setState({ tabStates: tabStates });
   }
 
   componentDidMount() {
@@ -48,7 +60,7 @@ export default class ListAll extends Component {
   }
 
   render() {
-    const {view, showAddPanel, params, colors, systemNames} = this.state;
+    const {view, showAddPanel, params, colors, systemNames, tabStates } = this.state;
     const {userInstructions} = this.context;
     let publishedData = this.context.dashboardUservalues.publishedDataAllInfo;
     let allSystemNames = publishedData.map((item, index)=> {
@@ -86,6 +98,13 @@ export default class ListAll extends Component {
     return (
       <Console.Content>
         <div style={{padding: 20}}>
+                <div className="ui pointing secondary menu">
+                  <a className={tabStates['system'] + ' item'}
+                     onClick={(e) => this.selectTab(e, 'system')}>Open Source Systems</a>
+                  <a className={tabStates['custom'] + ' item'}
+                     onClick={(e) => this.selectTab(e, 'custom')}>Custom Systems</a>
+                </div>
+                <div className={tabStates['custom'] + ' ui tab '}>
           {!userSystemNames && userOtherSystemNames && 
             <div className="ui four column grid">
               <div className="wide column text-center" style={wrapperStyle}>
@@ -102,7 +121,7 @@ export default class ListAll extends Component {
                 let color = colors[index % 5];
                 let link = "/usecase/list-some?system="+system;
                 return(
-                  <div className="wide column text-center" style={wrapperStyle}>
+                  <div key={index} className="wide column text-center" style={wrapperStyle}>
                     <Link to={link} className="item text-white">
                       <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
                         <span>{system}</span>
@@ -127,7 +146,7 @@ export default class ListAll extends Component {
                 let color = colors[index % 5];
                 let link = "/usecase/list-some?system="+system;
                 return(
-                  <div className="wide column text-center" style={wrapperStyle}>
+                  <div key={index} className="wide column text-center" style={wrapperStyle}>
                     <Link to={link} className="item text-white">
                       <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
                         <span>{system}</span>
@@ -139,13 +158,14 @@ export default class ListAll extends Component {
             }
             </div>
           }
-          <hr/>
+          </div>
+          <div className={tabStates['system'] + ' ui tab '}>
           <div className="ui four column grid">
             { systemNames.map((system, index)=> {
                 let color = colors[index % 5];
                 let link = "/usecase/list-some?system="+system;
                 return(
-                  <div className="wide column text-center" style={wrapperStyle}>
+                  <div key={index} className="wide column text-center" style={wrapperStyle}>
                     <Link to={link} className="item text-white">
                       <div style={Object.assign({},blockStyle, {backgroundColor: color})}>
                         <span>{system}</span>
@@ -155,6 +175,7 @@ export default class ListAll extends Component {
                 )
               })
             }
+          </div>
           </div>
         </div>
       </Console.Content>

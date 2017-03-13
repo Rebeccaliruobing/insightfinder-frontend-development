@@ -1,5 +1,37 @@
 # Insightfinder
 
+## Upgrade to yarn
+	1. Get the latest code with git pull
+
+	1. Remove node_modules folder under web
+       $ cd ~/dev/insightfinder/web
+	   $ rm -rf node_modules
+
+    1. Upgrade nodejs and install yarn
+	   See frontend/README.md Tools section
+
+ 	1. Go to frontend folder and install packages with yarn
+	   $ cd frontend
+	   $ yarn install
+
+    1. Start frontend server, replace 'npm run dev' command
+	   $ yarn run web
+	   $ open http://localhost:3060 to open frontend
+
+    1. Stage production build, replace 'npm run stage', huge js files with sourceMap embeded, able to debug code. Output files are in web/static, better for staging deployment.
+		$ yarn run bs
+
+		1. Production build, replace 'npm run build', small size with uglifyjs, sourceMap in seperate file, able to read code when open console. Output files are in web/static, better for production deployment.
+		$ yarn run build
+
+    1. To change the api url for staging or production build, modify web/frontend/src/web/app/htmls/index.ejs file; For yarn run web, modify index_dev.ejs.
+
+## Rollback to npm
+	$ cd ~/dev/insightfinder/web/frontend/
+	$ rm -rf node_modules
+	$ cd ~/dev/insightfinder/web/
+	Then run 'npm run dev' & 'npm run stage' as before.
+
 ## Setup development environment
 
 ### Tools

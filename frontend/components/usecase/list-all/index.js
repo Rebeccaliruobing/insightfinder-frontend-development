@@ -1,4 +1,6 @@
 import React, {Component}   from 'react';
+import ReactDOM from 'react-dom';
+import moment from 'moment';
 import {Link, IndexLink}    from 'react-router';
 import {
   Modal, Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message
@@ -52,6 +54,7 @@ export default class ListAll extends Component {
     let {cvalue, pvalue, minPts, epsilon, modelType} = data;
     let {modelKey, modelName, projectName, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp} = data.activeItem;
     let bugId = metaData.name;
+    let caller = "";
     if(modelType=='DBScan'){
       cvalue = minPts;
       pvalue = epsilon;

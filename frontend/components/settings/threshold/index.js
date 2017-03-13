@@ -6,8 +6,9 @@ import _ from 'lodash';
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
 import store from 'store';
 import WaringButton from '../../cloud/monitoring/waringButton';
+import ModelSettings from './model';
 
-import "./threshold.less";
+import './threshold.less';
 import apis from '../../../apis';
 
 import {
@@ -62,7 +63,9 @@ export default class ThresholdSettings extends React.Component {
       },
       data: {},
       tempSharedUsernames: '',
+      tempLogFreqWindow: '',
       tempLearningSkippingPeriod: '',
+      tempDetectionSkippingPeriod: '',
       metricSettings: [],
       episodeList: [],
       wordList: [],
@@ -86,9 +89,9 @@ export default class ThresholdSettings extends React.Component {
 
     this.sensitivityMap = {};
     this.sensitivityMap["0.99"] = "Low";
-    this.sensitivityMap["0.97"] = "Medium Low";
-    this.sensitivityMap["0.95"] = "Medium";
-    this.sensitivityMap["0.9"] = "Medium High";
+    this.sensitivityMap["0.95"] = "Medium Low";
+    this.sensitivityMap["0.9"] = "Medium";
+    this.sensitivityMap["0.75"] = "Medium High";
     this.sensitivityMap["0.5"] = "High";
   }
 
@@ -136,7 +139,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames } = project;
+    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames,logFreqWindow } = project;
     let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
     if (!projectStr) {
       projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
@@ -193,6 +196,7 @@ export default class ThresholdSettings extends React.Component {
       predictionWindow,
       minAnomalyRatioFilter,
       sharedUsernames,
+      logFreqWindow,
       pvalueText:this.sensitivityMap[pvalue], 
       derivedpvalueText:this.sensitivityMap[derivedpvalue],
       emailpvalueText:this.sensitivityMap[emailpvalue],
@@ -202,7 +206,9 @@ export default class ThresholdSettings extends React.Component {
       data: data,
       groupingRules,
       tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+      tempLogFreqWindow: (data.logFreqWindow || ''),
       tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+      tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
       loading: projectSetting['fileProjectType'] == 0,
     }, ()=> {
       projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
@@ -214,7 +220,7 @@ export default class ThresholdSettings extends React.Component {
 
   getLogAnalysisList(projectName, project) {
     let self = this;
-    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', '', true, "readonly").then((resp)=> {
+    apis.postLogAnalysis(projectName, '', '', '', '', '', '', '', '', true, '', "readonly").then((resp)=> {
       if(!resp.data){
         alert(resp);
         return;
@@ -323,6 +329,22 @@ export default class ThresholdSettings extends React.Component {
     });
   }
 
+  handleDetectionSkippingPeriodChange(e) {
+    let v = e.target.value;
+    this.setState({
+      tempDetectionSkippingPeriod: v,
+      data: Object.assign({}, this.state.data, { detectionSkippingPeriod: v })
+    });
+  }
+
+  handleLogFreqWindowChange(e) {
+    let v = e.target.value;
+    this.setState({
+      tempLogFreqWindow: v,
+      data: Object.assign({}, this.state.data, { logFreqWindow: v })
+    });
+  }
+
   handleSharingChange(e) {
     let v = e.target.value;
     this.setState({
@@ -417,14 +439,13 @@ export default class ThresholdSettings extends React.Component {
           settingLoading: false
         });
       });
-
   }
 
   handleSaveProjectSetting() {
-    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, } = this.state.data;
-    let { tempSharedUsernames, data } = this.state;
+    let { projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, logFreqWindow, } = this.state.data;
+    let { tempSharedUsernames, tempLogFreqWindow, data } = this.state;
     this.setState({ settingLoading: true }, ()=> {
-      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, tempSharedUsernames, projectHintMapFilename).then((resp)=> {
+      apis.postProjectSetting(projectName, cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, tempSharedUsernames, tempLogFreqWindow, projectHintMapFilename).then((resp)=> {
         if (!resp.success) {
           window.alert(resp.message);
         }
@@ -467,7 +488,7 @@ export default class ThresholdSettings extends React.Component {
   render() {
     let labelStyle = {};
     let {
-      data, tempSharedUsernames, tempLearningSkippingPeriod,
+      data, tempSharedUsernames, tempLearningSkippingPeriod, tempDetectionSkippingPeriod, tempLogFreqWindow,
       loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0,
       groupingRules,
     } = this.state;
@@ -476,6 +497,7 @@ export default class ThresholdSettings extends React.Component {
     let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
     let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
     let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
+    const projectName = data.projectName;
 
     let metricUnitMap = {};
     if(metricUnitMapping){
@@ -505,6 +527,9 @@ export default class ThresholdSettings extends React.Component {
                                     onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               {!isLogProject && <a className={tabStates0['prediction'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
+              {['admin','guest'].indexOf(store.get('userName'))!=-1 && 
+                                    !isLogProject && <a className={tabStates0['model'] + ' item'}
+                                    onClick={(e) => this.selectTab0(e, 'model')}>Model Picking</a>}
               <a className={tabStates0['sharing'] + ' item'} 
                                     onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
@@ -512,12 +537,11 @@ export default class ThresholdSettings extends React.Component {
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
                                     onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
             </div>
-            <div className={cx('ui grid two columns form', { 'loading': !!this.state.settingLoading })}
-                 style={{ 'paddingTop': '10px' }}>
+            <div className={`ui grid two columns form ${!!this.state.settingLoading ? 'loading' : ''}`}
+                 style={{ 'paddingTop': '10px', margin: 0 }}>
               {!isLogProject && <div className={tabStates0['prediction'] + ' ui tab'}>
-                <h3>Prediction Settings</h3>
                 <div className="field">
-                  <label style={labelStyle}>Prediction Window (Hour)</label>
+                  <label style={labelStyle}>Prediction Time Window (Hour)</label>
                   <PredictionWindowHour
                     style={{width: 180}}
                     key={data.projectName} value={data.predictionWindow} 
@@ -547,9 +571,9 @@ export default class ThresholdSettings extends React.Component {
                     key={data.projectName} value={data.cvalue}
                     onChange={this.handleValueChange('cvalue')} />
                 </div>
-                <h3>Frequency Anomaly Detection Sensitivity</h3>
+                <h3>Frequency Anomaly Detection Settings</h3>
                 <p>
-                  This setting controls sensitivity InsightFinder will 
+                  Sensitivity: This setting controls sensitivity InsightFinder will 
                   alert on frequency anomaly in given a time window. 
                   With higher sensitivity, system detects more anomalies. 
                 </p>
@@ -558,6 +582,17 @@ export default class ThresholdSettings extends React.Component {
                     style={{width: 180}}
                     key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText}
                     onChange={this.handleValueTextChange('derivedpvalue', 'derivedpvalueText')} />
+                </div>
+                <p>
+                  Window (minute): This setting controls window in minutes by which frequency are grouped. 
+                </p>
+                <div className="field">
+                  <div className="ui input"
+                      style={{width: 180}}>
+                    <input type="text"
+                      value={tempLogFreqWindow}
+                      onChange={this.handleLogFreqWindowChange.bind(this)}/>
+                  </div>
                 </div>
                 <Button className="blue"
                         onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
@@ -595,6 +630,18 @@ export default class ThresholdSettings extends React.Component {
                 <div className="wide column">
                   <Button className="blue"
                           onClick={this.handleSaveProjectSetting.bind(this)}>Update Learning Settings</Button>
+                </div>
+                <br />
+                <div className="field">
+                  <div className="ui input">
+                    <input key={data.projectName} type="text"
+                           value={tempDetectionSkippingPeriod}
+                           onChange={this.handleDetectionSkippingPeriodChange.bind(this)}/>
+                  </div>
+                </div>
+                <div className="wide column">
+                  <Button className="blue"
+                          onClick={this.handleSaveProjectSetting.bind(this)}>Update Detection Settings</Button>
                 </div>
               </div>}
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
@@ -805,7 +852,8 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {episodeList && episodeList.slice(0, 200).map((value, index)=> {
+                    {episodeList && episodeList.map((value, index)=> {
+                    // .slice(0, 200)
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>
@@ -831,7 +879,8 @@ export default class ThresholdSettings extends React.Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {wordList && wordList.slice(0, 200).map((value, index)=> {
+                    {wordList && wordList.map((value, index)=> {
+                    // .slice(0, 200)
                       return (
                         <tr key={`${data.projectName}-${index}-1`}>
                           <td>{value['pattern']}</td>
@@ -846,6 +895,11 @@ export default class ThresholdSettings extends React.Component {
                   </table>
                 </div>
               </div>}
+              {!isLogProject &&
+                <div className={tabStates0['model'] + ' ui tab'} style={{ width: '100%', paddingBottom: 10 }}>
+                  <ModelSettings projectName={projectName} />
+                </div>
+              }
             </div>
           </div>
         </div>

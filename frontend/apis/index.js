@@ -476,7 +476,7 @@ const apis = {
         });
     },
 
-    postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, operation, userName = store.get('userName'), token = store.get('token')) {
+    postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, rareEventThreshold, operation, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -494,6 +494,7 @@ const apis = {
                     modelStartTime,
                     modelEndTime,
                     isExistentIncident,
+                    rareEventThreshold, 
                     operation
                 }),
                 beforeSend: function (request) {
@@ -604,7 +605,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, userName = store.get('userName'), token = store.get('token')) {
+    postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -622,6 +623,7 @@ const apis = {
                     modelStartTime,
                     modelEndTime,
                     latestDataTimestamp,
+                    caller,
                     userName,
                     token
                 }),
@@ -908,7 +910,7 @@ const apis = {
      * @param token
      * @returns {Promise}
      */
-    postProjectSetting(projectName, cvalue, pvalue, derivedPvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, predictionWindow, minAnomalyRatioFilter, sharedUsernames, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
+    postProjectSetting(projectName, cvalue, pvalue, derivedPvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, predictionWindow, minAnomalyRatioFilter, sharedUsernames, logFreqWindow, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
         return new Promise(function (resolve, reject) {
             $.ajax({
                 type: 'POST',
@@ -925,6 +927,7 @@ const apis = {
                     predictionWindow, 
                     minAnomalyRatioFilter,
                     sharedUsernames,
+                    logFreqWindow, 
                     projectHintMapFilename,
                     userName,
                     token

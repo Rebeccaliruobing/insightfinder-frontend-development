@@ -1,4 +1,6 @@
 import React, {Component}    from 'react';
+import ReactDOM from 'react-dom';
+import { autobind } from 'core-decorators';
 import {
     Modal, Console, ButtonGroup, Button, Dropdown, Accordion, Message
 }                           from '../../../artui/react/index';
@@ -8,7 +10,7 @@ import {
     ModelType,
     FileModelType,
     DurationThreshold,
-    AnomalyThreshold
+    AnomalyThresholdSensitivity,
 } from '../../selections';
 import store from 'store';
 import apis from '../../../apis';
@@ -24,18 +26,27 @@ export default class FileDetection extends Component {
 
     constructor(props) {
         super(props);
+
+        this.sensitivityMap = {};
+        this.sensitivityMap["0.99"] = "Low";
+        this.sensitivityMap["0.95"] = "Medium Low";
+        this.sensitivityMap["0.9"] = "Medium";
+        this.sensitivityMap["0.75"] = "Medium High";
+        this.sensitivityMap["0.5"] = "High";
+
         this.state = {
             projectName: undefined,
             modelString: undefined,
-            inputDurationThreshold: 5,
+            inputDurationThreshold: 3,
             projectType: undefined,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
             TestingData: 'TestingData',
             submitLoading: false,
             loading: false,
-            anomalyThreshold: 0.99,
-            durationThreshold: 5,
+            anomalyThreshold: 0.9,
+            durationThreshold: 3,
+            pvalueText:this.sensitivityMap[0.9], 
             minPts: 5,
             epsilon: 1.0
         }
@@ -72,8 +83,8 @@ export default class FileDetection extends Component {
             projectName,
             modelType: 'Holistic',
             modelTypeText: 'Holistic',
-            anomalyThreshold: 0.99,
-            durationThreshold: 5,
+            anomalyThreshold: 0.9,
+            durationThreshold: 3,
             minPts: 5,
             epsilon: 1.0
         };
@@ -100,6 +111,14 @@ export default class FileDetection extends Component {
         this.setState({modelString: value});
     }
 
+    handleValueTextChange(val, text) {
+      return (v,t) => {
+        this.setState({
+          data: Object.assign({}, this.state.data, _.fromPairs([[val, v],[text, t]]))
+        });
+      };
+    }
+
     handleSubmit(e) {
         let {modelString,modelType,anomalyThreshold,inputDurationThreshold,TestingData,minPts,epsilon} = this.state;
         let modelName = modelString;
@@ -116,7 +135,7 @@ export default class FileDetection extends Component {
 
     render() {
         let {userInstructions} = this.context;
-        let { inputDurationThreshold, loading, modelString, projectName, anomalyThreshold, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
+        let { inputDurationThreshold, loading, modelString, projectName, anomalyThreshold, pvalueText, durationThreshold, minPts, epsilon, projectType, modelType, modelTypeText } = this.state;
         const labelStyle = {};
         return (
             <Console.Content className={loading?"ui form loading":""}>
@@ -148,8 +167,9 @@ export default class FileDetection extends Component {
                                     <div className="field">
                                         <WaringButton labelStyle={labelStyle} labelTitle="Anomaly Threshold"
                                                       labelSpan="choose a number in [0,1) to configure the sensitivity of your anomaly detection tool. Lower values detect a larger variety of anomalies."/>
-                                        <AnomalyThreshold value={anomalyThreshold}
-                                                          onChange={(v, t)=>this.setState({ anomalyThreshold: v })}/>
+                                        <AnomalyThresholdSensitivity
+                                          value={anomalyThreshold} text={pvalueText}
+                                          onChange={this.handleValueTextChange('anomalyThreshold', 'pvalueText')} />
                                     </div>
                                 }
                                 {modelType == 'DBScan' ?
@@ -174,7 +194,7 @@ export default class FileDetection extends Component {
 
                                     <div className="ui button fileinput-button">
                                         Testing Data
-                                        <input type="file" name="file" ref={::this.fileUploadRef}/>
+                                        <input type="file" name="file" ref={this.fileUploadRef}/>
                                     </div>
                                     {this.state.testDataShow ?
                                         <span className="text-blue">{this.state.filename}</span> : null}
@@ -182,7 +202,7 @@ export default class FileDetection extends Component {
                             </div>
 
                             <div className="ui field">
-                                <Button className={cx('orange', {'loading': this.state.submitLoading})}
+                                <Button className={`orange ${this.state.submitLoading ? 'loading' : ''}`}
                                         onClick={this.handleSubmit.bind(this)}>Submit</Button>
                             </div>
                         </div>
@@ -193,6 +213,7 @@ export default class FileDetection extends Component {
         );
     }
 
+    @autobind
     fileUploadRef(r) {
         $(ReactDOM.findDOMNode(r))
             .fileupload({

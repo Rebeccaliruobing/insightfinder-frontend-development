@@ -1,142 +1,301 @@
 import React, { PropTypes as T } from 'react';
+import $ from 'jquery';
+import _ from 'lodash';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
+import { autobind } from 'core-decorators';
 import d3 from 'd3';
+import ReactFauxDOM from 'react-faux-dom';
+import D3Popup from '../ui/d3-popup';
+import { calculateRGBByAnomalyScore } from '../utils';
+import WindowResizeListener from '../ui/window-resize-listener';
 
-export default class HourlyHeatmap extends React.Component {
-  static defaultProps = { data: [], duration: '7d' };
+const normalizeValue = (val, fractionDigits = 0) => {
+  if (_.isFinite(val)) {
+    if (val > 0) {
+      if (val < 0.5 && fractionDigits === 2) {
+        fractionDigits = 2;
+      } else if (val < 5 && fractionDigits === 2) {
+        fractionDigits = 1;
+      } else if (fractionDigits === 2) {
+        fractionDigits = 0;
+      }
+      return val.toFixed(fractionDigits).toString();
+    }
+    fractionDigits = 0;
+    return val.toFixed(fractionDigits).toString();
+  }
+  return '-';
+};
 
-  drawHeatmap(timeframe,duration=7) {
-	let margin = { top: 50, right: 0, bottom: 30, left: 50 },
-        width = 540 - margin.left - margin.right,
-        height = 740 - margin.top - margin.bottom,
-        buckets = 7,
-        cellHeight = 80,
-        cellWidth = Math.floor(width / duration),
-        legendElementWidth = Math.floor(width / buckets),
-//  Original palette:        
-//        historicColors = ['#ffffd9', '#edf8b1', '#c7e9b4', '#7fcdbb', '#41b6c4',
-//            '#1d91c0', '#225ea8', '#253494', '#081d58'],
-        historicColors = ['#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8', '#253494', '#081d58'],
-        predictedColors = ['#c7b4e9', '#7fbbcd', '#41c4b6', '#1dc091', '#22a85e', '#259434', '#08581d'],
-        colors = historicColors,  // Setting default color scheme
-        // Replace "days" below with dynamic calculated labels for $duration
-        days = ['1/15', '1/16', '1/17', '1/18', '1/19', '1/20', '1/21'],
-        predictedDays = ['1/22', '1/23', '1/24', '1/25', '1/26', '1/27', '1/28'],
+class HourlyHeatmap extends React.Component {
+  static propTypes = {
+    numberOfDays: T.number,
+    style: T.object,
+    rightEdge: T.bool,
+    onNameClick: T.func,
+  }
 
-        times = ['12a', '3a', '6a', '9a', '12p', '3p', '6p', '9p'],
-        datasets = ['Anomalies'],
-        dataset = [{ 'day': 1, 'period': 1, 'value': 11, 'title':"1:1" }, { 'day': 1, 'period': 2, 'value': 12 }, { 'day': 1, 'period': 3, 'value': 13 }, { 'day': 1, 'period': 4, 'value': 14 }, { 'day': 1, 'period': 5, 'value': 15 }, { 'day': 1, 'period': 6, 'value': 16 }, { 'day': 1, 'period': 7, 'value': 17 }, { 'day': 1, 'period': 8, 'value': 18 }, { 'day': 2, 'period': 1, 'value': 21 }, { 'day': 2, 'period': 2, 'value': 22 }, { 'day': 2, 'period': 3, 'value': 23 }, { 'day': 2, 'period': 4, 'value': 24 }, { 'day': 2, 'period': 5, 'value': 25 }, { 'day': 2, 'period': 6, 'value': 26 }, { 'day': 2, 'period': 7, 'value': 27 }, { 'day': 2, 'period': 8, 'value': 28 }, { 'day': 3, 'period': 1, 'value': 31 }, { 'day': 3, 'period': 2, 'value': 32 }, { 'day': 3, 'period': 3, 'value': 33 }, { 'day': 3, 'period': 4, 'value': 34 }, { 'day': 3, 'period': 5, 'value': 35 }, { 'day': 3, 'period': 6, 'value': 36 }, { 'day': 3, 'period': 7, 'value': 37 }, { 'day': 3, 'period': 8, 'value': 38 }, { 'day': 4, 'period': 1, 'value': 41 }, { 'day': 4, 'period': 2, 'value': 42 }, { 'day': 4, 'period': 3, 'value': 43 }, { 'day': 4, 'period': 4, 'value': 44 }, { 'day': 4, 'period': 5, 'value': 45 }, { 'day': 4, 'period': 6, 'value': 46 }, { 'day': 4, 'period': 7, 'value': 47 }, { 'day': 4, 'period': 8, 'value': 48 }, { 'day': 5, 'period': 1, 'value': 51 }, { 'day': 5, 'period': 2, 'value': 52 }, { 'day': 5, 'period': 3, 'value': 53 }, { 'day': 5, 'period': 4, 'value': 54 }, { 'day': 5, 'period': 5, 'value': 55 }, { 'day': 5, 'period': 6, 'value': 56 }, { 'day': 5, 'period': 7, 'value': 57 }, { 'day': 5, 'period': 8, 'value': 58 }, { 'day': 6, 'period': 1, 'value': 61 }, { 'day': 6, 'period': 2, 'value': 62 }, { 'day': 6, 'period': 3, 'value': 63 }, { 'day': 6, 'period': 4, 'value': 64 }, { 'day': 6, 'period': 5, 'value': 65 }, { 'day': 6, 'period': 6, 'value': 66 }, { 'day': 6, 'period': 7, 'value': 67 }, { 'day': 6, 'period': 8, 'value': 68 }, { 'day': 7, 'period': 1, 'value': 71 }, { 'day': 7, 'period': 2, 'value': 72 }, { 'day': 7, 'period': 3, 'value': 73 }, { 'day': 7, 'period': 4, 'value': 74 }, { 'day': 7, 'period': 5, 'value': 75 }, { 'day': 7, 'period': 6, 'value': 76 }, { 'day': 7, 'period': 7, 'value': 77 }, { 'day': 7, 'period': 8, 'value': 78 }]; 
+  static defaultProps = {
+    numberOfDays: 0,
+    style: {},
+    rightEdge: false,
+    onNameClick: () => { },
+  }
 
-	if (timeframe == "predicted") {
-		colors = predictedColors;		
-		days = predictedDays;
-	}
-	
-      // Remove the children if exist
-    d3.select('#'+timeframe+' > svg').remove();
+  constructor(props) {
+    super(props);
 
-    let svg = d3.select('#'+timeframe).append('svg')
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    this.$container = null;
+    this.defaultCellSize = 24;
+    this.hoursCount = 24;
+    this.labelXHeight = 14;
+    this.labelYWidth = 40;
+    this.chartMargin = 10;
+    this.popupDelay = 300;
+    this.cellOutDebounced = _.debounce(this.handleCellMouseOut, this.popupDelay);
+    this.popupOutDebounced = _.debounce(this.handlePopupMouseOut, this.popupDelay);
 
-    let dayLabels = svg.selectAll('.dayLabel')
-          .data(days)
-          .enter().append('text')
-            .text((d) => { return d; })
-            .attr('x', (d, i) => { return i * cellWidth; })
-            .attr('y', 0)
-            .style('text-anchor', 'start')
-            .attr('transform', 'translate(' + cellWidth / 8 + ', -6)')
-            .attr('class', (d, i) => { return ((i >= 7 && i <= 16) ? 'dayLabel mono axis axis-workweek' : 'dayLabel mono axis'); });
+    this.state = {
+      faux: null,
+      hoverIndex: null,
+      cellSize: this.defaultCellSize,
+    };
+  }
 
-    if (timeframe == "historic") {
-    	let timeLabels = svg.selectAll('.timeLabel')
-          .data(times)
-          .enter().append('text')
-            .text((d) => { return d; })
-            .attr('x', 0)
-            .attr('y', (d, i) => { return i * cellHeight; })
-            .style('text-anchor', 'end')
-            .attr('transform', 'translate(-6,' + cellWidth / 1.5 + ')')
-            .attr('class', (d, i) => { return ((i >= 0 && i <= 4) ? 'timeLabel mono axis axis-workday' : 'timeLabel mono axis'); });
-    }	
+  componentDidMount() {
+    this.displayData(this.props);
+  }
 
-    let heatmapChart = function (error, data) {
-        let colorScale = d3.scale.quantile()
-              .domain([0, buckets - 1, d3.max(data, (d) => { return d.value; })])
-              .range(colors);
+  componentWillReceiveProps(nextProps) {
+    this.displayData(nextProps);
+  }
 
-        let cards = svg.selectAll('.day')
-              .data(data, (d) => { return `${d.period}:${d.day}`; });
+  @autobind
+  handleCellMouseOver(d, idx) {
+    // Only triger the event if there is data in the cell.
+    if (d.items.length > 0) {
+      this.cellOutDebounced.cancel();
+      this.popupOutDebounced.cancel();
+      const { rightEdge } = this.props;
+      const { cellSize } = this.state;
 
-        cards.append('title');
+      // If the heatmap is in the right edge, left align the popup on right edge.
+      const rightAlign = (!rightEdge ? true : (d.x < 8));
+      const popupX = rightAlign ?
+        (((d.x + 1) * cellSize) + this.labelYWidth) :
+        (((this.hoursCount - d.x) * cellSize) + 12);
 
-        cards.enter().append('rect')
-              .attr('x', (d) => { return (d.day - 1) * cellWidth; })
-              .attr('y', (d) => { return (d.period - 1) * cellHeight; })
-              .attr('rx', 4)
-              .attr('ry', 4)
-              .attr('class', 'day bordered')
-              .attr('width', cellWidth)
-              .attr('height', cellHeight)
-              .style('fill', colors[0]);
+      this.setState({
+        hoverIndex: idx,
+        popupData: d,
+        popupRightAlign: rightAlign,
+        popupX,
+        popupY: ((d.y) * cellSize) + (this.labelXHeight - 3),
+      }, () => {
+        this.displayData(this.props);
+      });
+    }
+  }
 
-        cards.transition().duration(500)
-              .style('fill', (d) => { return colorScale(d.value); });
-        cards.select('title').text((d) => { console.log(d.value); return d.value; });
+  @autobind
+  handleCellMouseOut() {
+    const { hoverIndex } = this.state;
+    if (hoverIndex !== null) {
+      this.setState({
+        hoverIndex: null,
+        popupData: null,
+      }, () => {
+        this.displayData(this.props);
+      });
+    }
+  }
 
-        cards.exit().remove();
+  @autobind
+  handlePopupMouseOver() {
+    this.cellOutDebounced.cancel();
+    this.popupOutDebounced.cancel();
+  }
 
-        let legend = svg.selectAll('.legend')
-             .data([0].concat(colorScale.quantiles()), (d) => { return d; });
+  @autobind
+  handlePopupMouseOut() {
+    const { hoverIndex } = this.state;
+    if (hoverIndex !== null) {
+      this.setState({
+        hoverIndex: null,
+        popupData: null,
+      }, () => {
+        this.displayData(this.props);
+      });
+    }
+  }
 
-        legend.enter().append('g')
-              .attr('class', 'legend');
+  @autobind
+  setHeatmap(dataset, props) {
+    const width = this.$container.width();
+    const height = this.$container.height();
+    const { cellSize } = this.state;
 
-        legend.append('rect')
-            .attr('x', (d, i) => { return legendElementWidth * i; })
-            .attr('y', height)
-            .attr('width', legendElementWidth)
-            .attr('height', cellHeight / 2)
-            .style('fill', (d, i) => { return colors[i]; });
+    const { statSelector } = props;
+    const { hoverIndex } = this.state;
+    const { data, timeLabels, dayLabels } = dataset;
 
-        legend.append('text')
-            .attr('class', 'mono')
-            .text((d) => { return '≥ ' + Math.round(d); })
-            .attr('x', (d, i) => { return legendElementWidth * i; })
-            .attr('y', height + cellHeight);
+    const faux = ReactFauxDOM.createElement('svg');
+    const svg = d3.select(faux)
+      .attr({ width, height, viewBox: `0 0 ${width} ${height}` })
+      .append('g');
 
-        legend.exit().remove();
-      };
+    // Time labels
+    svg.append('g')
+      .selectAll('.timeLabel')
+      .data(timeLabels)
+      .enter()
+      .append('text')
+      .text(d => d)
+      .attr('class', 'label-x')
+      .attr('x', (d, i) => ((i + 0.5) * cellSize) + this.labelYWidth)
+      .attr('text-anchor', 'middle')
+      .attr('y', 10)
+      ;
 
-  heatmapChart(false, dataset);
+    // Day labels
+    svg.append('g')
+      .selectAll('.dayLabel')
+      .data(dayLabels)
+      .enter()
+      .append('text')
+      .text(d => d)
+      .attr('x', 0)
+      .attr('class', 'label-y')
+      .attr('y', (d, i) => ((i + 0.75) * cellSize) + this.labelXHeight)
+      ;
 
-//       var datasetpicker = d3.select("#dataset-picker").selectAll(".dataset-button")
-//        .data(datasets);
-//
-//       datasetpicker.enter()
-//        .append("input")
-//        .attr("value", function(d){ return "Dataset " + d })
-//        .attr("type", "button")
-//        .attr("class", "dataset-button")
-//        .on("click", function(d) {
-//          //heatmapChart(d);
-//        });
+    // data
+    svg.append('g')
+      .selectAll('.hour')
+      .data(data)
+      .enter()
+      .append('rect')
+      .attr('class', (d, idx) => (hoverIndex === idx ? 'active cell' : 'cell'))
+      .attr('x', d => (d.x * cellSize) + this.labelYWidth + 0.5)
+      .attr('y', d => (d.y * cellSize) + this.labelXHeight + 0.5)
+      .attr('width', cellSize - 1)
+      .attr('height', cellSize - 1)
+      .attr('fill', d => calculateRGBByAnomalyScore(statSelector(d)))
+      .on('mouseover', this.handleCellMouseOver)
+      .on('mouseout', this.cellOutDebounced)
+      ;
 
+    this.setState({ faux: faux.toReact() });
+  }
+
+  @autobind
+  displayData(props) {
+    const dataset = props.dataset;
+    if (dataset && !_.isEmpty(dataset) && this.$container) {
+      this.setHeatmap(dataset, props);
+    }
+  }
+
+  @autobind
+  handlePopupRowClick(item) {
+    return (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      this.setState({
+        hoverIndex: null,
+        popupData: null,
+      }, () => {
+        this.props.onNameClick(item.project, item.group, item.datetime);
+      });
+    };
+  }
+
+  @autobind
+  handleWindowResize({ windowWidth }) {
+    const { cellSize } = this.state;
+
+    // Change the cell size in different windows.
+    let size = 24;
+    if (windowWidth >= 1100 && windowWidth < 1280) {
+      size = 20;
+    } else if (windowWidth < 1100 && windowWidth >= 1000) {
+      size = 18;
+    } else if (windowWidth < 1000) {
+      size = 16;
+    }
+
+    if (size !== cellSize) {
+      this.setState({ cellSize: size }, () => {
+        this.displayData(this.props);
+      });
+    }
   }
 
   render() {
-    console.log(this.state);
-	  return (
-      <div id="chart">
-      	<span id="historic">
-      		{this.drawHeatmap("historic")}
-      	</span>
-      	<span id="predicted">
-      		{this.drawHeatmap("predicted")}
-      	</span>
+    const { faux, popupData, cellSize, popupX, popupY, popupRightAlign } = this.state;
+    const { style, numberOfDays } = this.props;
+    const width = (this.hoursCount * cellSize) + this.labelYWidth + this.chartMargin;
+    const height = ((numberOfDays || 0) * cellSize) + this.labelXHeight;
+
+    const showPopup = !!popupData;
+    const elems = [];
+    if (popupData && _.isArray(popupData.items)) {
+      popupData.items.forEach((item, index) => {
+        elems.push((
+          <tr key={`${popupData.x}-${popupData.y}-${index}`}>
+            <td className="link">
+              <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Click for details</Tooltip>}>
+                <i onClick={this.handlePopupRowClick(item)} className="external icon" />
+              </OverlayTrigger>
+            </td>
+            <td className="name">{item.project}</td>
+            <td className="name">{item.group}</td>
+            <td className="value">{normalizeValue(item.stats.totalAnomalyScore, 2)}</td>
+            <td className="value">{normalizeValue(item.stats.avgEventDuration)}</td>
+            <td className="value">{normalizeValue(item.stats.numberOfEvents)}</td>
+          </tr>
+        ));
+      });
+    }
+
+    return (
+      <div className="hourly-heatmap d3-container" style={style}>
+        <WindowResizeListener onResize={this.handleWindowResize} />
+        <div
+          style={{ width, height, margin: 'auto', position: 'relative' }}
+          ref={(c) => { this.$container = $(c); }}
+        >
+          <D3Popup
+            show={showPopup}
+            style={popupRightAlign ? { top: popupY, left: popupX } : { top: popupY, right: popupX }}
+            align={popupRightAlign ? 'right top' : 'left top'}
+            onMouseOver={this.handlePopupMouseOver}
+            onMouseOut={this.popupOutDebounced}
+          >
+            <div className="popup-content" style={{ maxHeight: 160, width: 420 }}>
+              <table className="ui striped table">
+                <thead>
+                  <tr>
+                    <th style={{ width: 20 }} />
+                    <th style={{ width: 100 }}>Project</th>
+                    <th style={{ width: 100 }}>Group</th>
+                    <th style={{ width: 45 }}>Score</th>
+                    <th style={{ width: 56 }}>Duration</th>
+                    <th style={{ width: 48 }}>Events</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {elems}
+                </tbody>
+              </table>
+            </div>
+          </D3Popup>
+          {faux}
+        </div>
       </div>
     );
   }
 }
+
+export default HourlyHeatmap;

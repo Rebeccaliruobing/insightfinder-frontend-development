@@ -3,26 +3,26 @@
 **/
 
 import path from 'path';
-import map from 'lodash/map';
+import R from 'ramda';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { toJSON } from '../../src/common/transit';
 
 const html = (settings) => {
-  const { paths, htmls } = settings;
+  const { paths, htmls, testing, isDev } = settings;
 
-  if (htmls) {
-    return map(htmls, s =>
-      new HtmlWebpackPlugin({
-        environment: process.env.NODE_ENV,
-        template: path.join(paths.htmls, s.template),
-        filename: s.filename,
-        initialState: JSON.stringify(toJSON(s.initialState)),
-      })
-    );
-  }
-
+  console.log(testing);
   // If no settings, generate a default html page.
-  return new HtmlWebpackPlugin({});
+  const plugins = htmls ?
+    R.map(s => new HtmlWebpackPlugin({
+      environment: process.env.NODE_ENV,
+      template: path.join(paths.htmls, (testing || isDev) ? s.template_dev : s.template),
+      filename: s.filename,
+      initialState: JSON.stringify(s.initialState || {}),
+    }), htmls) :
+    new HtmlWebpackPlugin({});
+
+  return {
+    plugins,
+  };
 };
 
 export default html;

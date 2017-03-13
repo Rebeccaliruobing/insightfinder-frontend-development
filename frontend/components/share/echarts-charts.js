@@ -1,5 +1,6 @@
 import React from "react";
 import ReactEcharts from 'echarts-for-react';
+import moment from 'moment';
 
 class PieTickChart extends React.Component {
     static propTypes = {

@@ -1,3 +1,5 @@
+.happypack/**
 android/**
 ios/**
+coverage/**
 node_modules/**

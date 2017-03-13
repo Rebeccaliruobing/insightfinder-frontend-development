@@ -6,22 +6,18 @@ import _ from 'lodash';
 import { withRouter } from 'react-router';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
+import DatePicker from 'react-datepicker';
 import { Console, Dropdown } from '../../artui/react';
-
-import DateTimePicker from '../../components/ui/datetimepicker/index';
 import apis from '../../apis';
-import { ProjectStatistics } from '../../components/statistics';
 import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
 import {
   LiveProjectSelection,
-  NumberOfDays, TreeMapSchemeSelect,
+  TreeMapSchemeSelect,
   TreeMapCPUThresholdSelect,
   TreeMapAvailabilityThresholdSelect,
-  EventSummaryModelType,
 } from '../../components/selections';
 import { buildTreemap } from '../../apis/retrieve-liveanalysis';
-import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
 
 class EventSummary extends React.Component {
   static contextTypes = {
@@ -38,6 +34,9 @@ class EventSummary extends React.Component {
   constructor(props) {
     super(props);
 
+    this.defaultNumberOfDays = 7;
+    this.dateFormat = 'YYYY-MM-DD';
+
     this.state = {
       treeMapCPUThreshold: '0',
       treeMapAvailabilityThreshold: '90',
@@ -52,7 +51,7 @@ class EventSummary extends React.Component {
         eventStats: {},
       },
       loading: true,
-      showTenderModal: false,
+      dataLoaded: false,
       selectedIncident: undefined,
       instanceGroups: [],
       projectName: undefined,
@@ -89,8 +88,23 @@ class EventSummary extends React.Component {
 
   @autobind()
   handleIncidentSelected(incident, type) {
-    const { location } = this.props;
-    const { projectName, numberOfDays } = this.applyDefaultParams(location.query);
+    const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query,
+      predicted: type === 'predicted',
+      eventStartTimestamp: undefined,
+    });
+
+    router.replace({
+      pathname: location.pathname,
+      query,
+    });
+
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    const { projectName } = query;
+
     const { data, maxAnomalyRatio, minAnomalyRatio } = this.state;
     let incidentsTreeMap;
     let groupIdMap = {};
@@ -103,17 +117,22 @@ class EventSummary extends React.Component {
       stats.maxAnomalyRatio = maxAnomalyRatio;
       stats.minAnomalyRatio = minAnomalyRatio;
       incidentsTreeMap =
-        buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident);
+        buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
+          data.statistics.instanceStatsJson,
+        );
     } else {
       groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
       data.statistics.maxAnomalyRatio = maxAnomalyRatio;
       data.statistics.minAnomalyRatio = minAnomalyRatio;
-      incidentsTreeMap = buildTreemap(projectName, caption, data.statistics, data.anomalyMapJson);
+      incidentsTreeMap = buildTreemap(
+        projectName, caption, data.statistics, data.anomalyMapJson, null,
+        data.statistics.instanceStatsJson,
+      );
     }
     this.setState({
       incidentsTreeMap,
-      groupIdMap, 
+      groupIdMap,
       selectedIncident: incident,
       treeMapScheme: 'anomaly',
       currentTreemapData: undefined,
@@ -122,11 +141,14 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleModelTypeChange(value, modelType) {
+  refreshDataByTime(startTime, endTime) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, modelType,
+      ...location.query,
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
     });
+
     router.push({
       pathname: location.pathname,
       query,
@@ -136,32 +158,37 @@ class EventSummary extends React.Component {
   }
 
   @autobind
-  handleDayChange(value, numberOfDays) {
-    const { location, router } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query, numberOfDays: numberOfDays.toString(),
-    });
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
+  handleStartTimeChange(newDate) {
+    const { location } = this.props;
+    const curTime = moment();
 
-    this.refreshInstanceGroup(query);
-  }
+    const startTime = newDate.clone().startOf('day');
+    let endTime = moment(location.query.endTime).endOf('day');
 
-  @autobind
-  handleEndTimeChange(value) {
-    const { location, router } = this.props;
-    const endTime = moment(value).endOf('day').format('YYYY-MM-DD');
-    const query = this.applyDefaultParams({ ...location.query, endTime });
-    if (location.query.endTime !== endTime) {
-      router.push({
-        pathname: location.pathname,
-        query,
-      });
-
-      this.refreshInstanceGroup(query);
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
+      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
     }
+    if (endTime >= curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) {
+      endTime = curTime.endOf('day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
+  }
+
+  @autobind
+  handleEndTimeChange(newDate) {
+    const { location } = this.props;
+
+    const endTime = newDate.clone().endOf('day');
+    let startTime = moment(location.query.startTime).startOf('day');
+
+    const diffDays = endTime.diff(startTime, 'days');
+    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
+      startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
+    }
+
+    this.refreshDataByTime(startTime, endTime);
   }
 
   @autobind
@@ -187,13 +214,15 @@ class EventSummary extends React.Component {
   refreshInstanceGroup(params) {
     const { location } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    let realEndTime = moment(query.endTime).endOf('day');
-    const curTime = moment();
-    if (realEndTime > curTime) {
-      realEndTime = curTime;
-    }
+    const modelType = query.modelType;
+    const endTime = moment(query.endTime).endOf('day');
+    const startTime = moment(query.startTime).startOf('day');
 
-    const { projectName, instanceGroup, numberOfDays, modelType } = query;
+    const curTime = moment();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+
+    const { projectName, instanceGroup } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
     const pvalue = pinfo ? pinfo.pvalue : '0.99';
@@ -203,6 +232,7 @@ class EventSummary extends React.Component {
 
     this.setState({
       loading: true,
+      dataLoaded: false,
     }, () => {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
@@ -213,29 +243,15 @@ class EventSummary extends React.Component {
 
           this.setState({
             loading: false,
+            dataLoaded: true,
             // incidentsTreeMap: data.incidentsTreeMap,
             data,
             maxAnomalyRatio,
             minAnomalyRatio,
             startTimestamp: data.startTimestamp,
             endTimestamp: data.endTimestamp,
-            showTenderModal: false,
-          }, () => {
-            const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
-            const incidentDurationThreshold = 15;
-            const detectedIncidents =
-              data.incidents.filter(
-                incident => incident.startTimestamp <= latestTimestamp &&
-                  incident.duration >= parseInt(incidentDurationThreshold, 10));
-
-            if (detectedIncidents.length > 0) {
-              this.handleIncidentSelected(detectedIncidents[detectedIncidents.length - 1], 'detected');
-            } else {
-              this.handleIncidentSelected(undefined, 'detected');
-            }
           });
-        })
-        .catch((msg) => {
+        }).catch((msg) => {
           this.setState({ loading: false });
           console.log(msg);
         });
@@ -246,11 +262,12 @@ class EventSummary extends React.Component {
   handleProjectChange(projectName) {
     let { dashboardUservalues } = this.context;
     let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
+    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
     let { predictionWindow } = project;
 
     this.setState({
       loading: true,
+      dataLoaded: false,
       predictionWindow,
       currentTreemapData: undefined,
     }, () => {
@@ -313,10 +330,6 @@ class EventSummary extends React.Component {
     this.setState({ treeMapScheme: value });
   }
 
-  modelDateValidator(date) {
-    return moment(date) <= moment();
-  }
-
   getTreeMapSchemeText(scheme) {
     if (scheme === 'anomaly') {
       return 'Anomaly';
@@ -329,9 +342,30 @@ class EventSummary extends React.Component {
   }
 
   applyDefaultParams(params) {
+    const { eventStartTimestamp } = params;
+    let { startTime, endTime } = params;
+
+    if (eventStartTimestamp && !startTime) {
+      startTime = moment(parseInt(eventStartTimestamp, 10))
+        .subtract(2, 'days')
+        .startOf('day').format(this.dateFormat);
+    } else {
+      startTime = moment().subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day').format(this.dateFormat);
+    }
+
+    if (eventStartTimestamp && !endTime) {
+      endTime = moment(parseInt(eventStartTimestamp, 10))
+        .add(2, 'days')
+        .endOf('day').format(this.dateFormat);
+    } else {
+      endTime = moment().endOf('day').format(this.dateFormat);
+    }
+
     return {
-      endTime: moment().endOf('day').format('YYYY-MM-DD'),
-      numberOfDays: 7,
+      startTime,
+      endTime,
+      timezoneOffset: moment().utcOffset(),
       modelType: 'Holistic',
       instanceGroup: 'All',
       ...params,
@@ -340,35 +374,45 @@ class EventSummary extends React.Component {
 
   render() {
     const { location } = this.props;
-    const { projectName, instanceGroup, endTime, numberOfDays, modelType } =
-      this.applyDefaultParams(location.query);
+    const params = this.applyDefaultParams(location.query);
+    const { projectName, instanceGroup, modelType, eventStartTimestamp } = params;
+    const predicted = params.predicted === 'true';
+    let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
       treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType, groupIdMap } = this.state;
+      instanceGroups, lineChartType, groupIdMap, dataLoaded } = this.state;
 
-    let realEndTime = moment(endTime).endOf('day');
-    let curTime = moment();
-    if(realEndTime>curTime){
-      realEndTime = curTime;
-    }
+    // Convert startTime, endTime to moment object
+    startTime = moment(startTime, this.dateFormat);
+    endTime = moment(endTime, this.dateFormat);
+    const curTime = moment();
+    const maxEndTime = curTime;
+    const maxStartTime = curTime;
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const eventEndTime = moment(endTime).endOf('day').valueOf();
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     const treeMapSchemeText = this.getTreeMapSchemeText(treeMapScheme);
     const latestTimestamp = _.get(data, 'instanceMetricJson.latestDataTimestamp');
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
-    let selectedIncidentPredicted = selectedIncident ?
-      (selectedIncident.endTimestamp > latestTimestamp) : false;
-    if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
-      selectedIncidentPredicted = true;
-    }
+    const selectedIncidentPredicted = selectedIncident ? selectedIncident.predictedFlag : false;
+    // let selectedIncidentPredicted = selectedIncident ?
+    //   (selectedIncident.endTimestamp > latestTimestamp) : false;
+    // if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
+    //   selectedIncidentPredicted = true;
+    // }
 
     return (
       <Console.Content
         className={`event-summary ${loading ? 'ui form loading' : ''}`}
         style={{ background: '#f5f5f5', paddingLeft: 0 }}
       >
-        <div className="ui main tiny container" style={{ minHeight: '100%', display: loading && 'none' }}>
+        <div
+          className="ui main tiny container flex-col-container"
+          style={{ height: '100%', display: loading && 'none' }}
+        >
           <div
             className="ui right aligned vertical inline segment"
             style={{ zIndex: 1, margin: '0 -16px 10px', padding: '9px 16px', background: 'white' }}
@@ -399,29 +443,27 @@ class EventSummary extends React.Component {
               </Dropdown>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>End date:</label>
               <div className="ui input">
-                <DateTimePicker
-                  className="ui input" style={{ width: '50%' }}
-                  dateValidator={this.modelDateValidator}
-                  dateTimeFormat="YYYY-MM-DD" value={endTime}
-                  onChange={this.handleEndTimeChange}
+                <DatePicker
+                  selected={startTime}
+                  todayButton="Today"
+                  dateFormat={this.dateFormat}
+                  maxDate={maxStartTime}
+                  onChange={this.handleStartTimeChange}
                 />
               </div>
             </div>
             <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Number of Days:</label>
-              <NumberOfDays
-                style={{ width: 80 }}
-                value={numberOfDays} onChange={this.handleDayChange}
-              />
-            </div>
-            <div className="field">
-              <label style={{ fontWeight: 'bold' }}>Model Type:</label>
-              <EventSummaryModelType
-                style={{ width: 100 }}
-                value={modelType} onChange={this.handleModelTypeChange}
-              />
+              <label style={{ fontWeight: 'bold' }}>End Date:</label>
+              <div className="ui input">
+                <DatePicker
+                  selected={endTime}
+                  todayButton="Today"
+                  dateFormat={this.dateFormat}
+                  maxDate={maxEndTime}
+                  onChange={this.handleEndTimeChange}
+                />
+              </div>
             </div>
             <div className="field">
               <div
@@ -430,71 +472,61 @@ class EventSummary extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          {false && <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 0, margin: '8px 0', borderBottom: 0 }}
-          >
-            <ProjectStatistics data={data} dur={numberOfDays} />
-          </div>}
           <div
-            className="ui vertical segment"
-            style={{ background: 'white', padding: 4 }}
+            className="ui vertical segment flex-item flex-row-container"
+            style={{ background: 'white', padding: 10, marginBottom: 10 }}
           >
-            <div className="ui incidents grid">
-              <div className="row" style={{ height: 700, paddingTop: 0 }}>
-                <div className="seven wide column" style={{ height: 600, paddingRight: 0 }}>
-                  <IncidentsList
-                    projectName={projectName} projectType={projectType}
-                    endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
-                    onIncidentSelected={this.handleIncidentSelected}
-                    incidents={data.incidents}
-                    causalDataArray={data.causalDataArray}
-                    causalTypes={data.causalTypes}
-                    latestTimestamp={latestTimestamp}
-                    predictionWindow={predictionWindow}
-                  />
-                </div>
-                <div className="nine wide column" style={{ height: 600, paddingTop: 20 }}>
-                  {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
-                  {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
-                  <TreeMapSchemeSelect
-                    style={{ width: 130 }} value={treeMapScheme}
-                    text={treeMapSchemeText}
-                    onChange={this.handleTreeMapScheme}
-                  />
-                  {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
-                    style={{ minWidth: 10 }} value={treeMapCPUThreshold}
-                    text={`<=${treeMapCPUThreshold}%`}
-                    onChange={this.handleTreeMapCPUThreshold}
-                  />}
-                  {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
-                    style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
-                    text={`<=${treeMapAvailabilityThreshold}%`}
-                    onChange={this.handleTreeMapAvailabilityThreshold}
-                  />
-                  }
-                  <IncidentsTreeMap
-                    data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                    endTime={realEndTime} numberOfDays={numberOfDays}
-                    instanceStatsJson={instanceStatsMap}
-                    treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
-                    treeMapCPUThreshold={treeMapCPUThreshold}
-                    treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                    predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
-                  />
-                </div>
+            <div style={{ width: '45%', paddingRight: 10 }}>
+              {dataLoaded &&
+                <IncidentsList
+                  projectName={projectName} projectType={projectType}
+                  instanceGroup={instanceGroup} eventEndTime={eventEndTime}
+                  endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
+                  incidents={data.incidents}
+                  activeTab={predicted ? 'predicted' : 'detected'}
+                  eventStartTimestamp={eventStartTimestamp}
+                  onIncidentSelected={this.handleIncidentSelected}
+                  causalDataArray={data.causalDataArray}
+                  eventsCausalRelation={data.eventsCausalRelation}
+                  causalTypes={data.causalTypes}
+                  latestTimestamp={latestTimestamp}
+                  predictionWindow={predictionWindow}
+                />
+              }
+            </div>
+            <div className="flex-item flex-col-container" style={{ width: '55%' }}>
+              <div style={{ padding: '5px 0px 6px' }}>
+                {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
+                {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
+                <TreeMapSchemeSelect
+                  style={{ width: 130 }} value={treeMapScheme}
+                  text={treeMapSchemeText}
+                  onChange={this.handleTreeMapScheme}
+                />
+                {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
+                  style={{ minWidth: 10 }} value={treeMapCPUThreshold}
+                  text={`<=${treeMapCPUThreshold}%`}
+                  onChange={this.handleTreeMapCPUThreshold}
+                />}
+                {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
+                  style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
+                  text={`<=${treeMapAvailabilityThreshold}%`}
+                  onChange={this.handleTreeMapAvailabilityThreshold}
+                />
+                }
               </div>
+              <IncidentsTreeMap
+                data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                endTime={realEndTime} numberOfDays={numberOfDays}
+                instanceStatsJson={instanceStatsMap}
+                treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
+                treeMapCPUThreshold={treeMapCPUThreshold}
+                treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+              />
             </div>
           </div>
         </div>
-        {this.state.showTenderModal &&
-          <TenderModal
-            dataArray={data.causalDataArray} types={data.causalTypes}
-            endTimestamp={latestTimestamp}
-            startTimestamp={latestTimestamp}
-            onClose={() => this.setState({ showTenderModal: false })}
-          />
-        }
       </Console.Content>
     );
   }

@@ -1,185 +1,39 @@
 import React from 'react';
 import moment from 'moment';
-import $ from 'jquery';
 import _ from 'lodash';
+import cx from 'classnames';
+import R from 'ramda';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Console, Button } from '../../../artui/react';
 import DataParser from '../../cloud/dataparser';
 import { DataChart } from '../../share/charts';
+import EventCluster from './cluster';
+import EventRare from './rare';
+import PatternSequence from './pattern-sequence';
 import './logevent.less';
-
-class EventTableGroup extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedWords: '',
-      eventsInRangeFreqVector:[],
-      selectedPattern:'', 
-      selectedPatternChartData:{},
-      derivedAnomalyByMetric:{},
-    };
-  }
-
-  shouldComponentUpdate(nextProps, nextState) {
-    return shallowCompare(this, nextProps, nextState);
-  }
-
-  parseTopWords(wordsStr) {
-    let ret = [];
-    let words = wordsStr ? wordsStr.split(',') : [];
-    _.forEach(words, (w_str) => {
-      let match = w_str.match(/'(.*)'.*\((\d*)\)*/);
-      // The second and third match contains the words and count.
-      if (match && match.length >= 3) {
-        ret.push([match[1], match[2]]);
-      }
-    });
-
-    return ret;
-  }
-
-  @autobind
-  handleHighlight(word) {
-    return () => {
-      const current = this.state.selectedWords;
-      this.setState({
-        selectedWords: word === current ? '' : word,
-      });
-    }
-  }
-
-  @autobind
-  highlightKWord(rawData) {
-    const word = this.state.selectedWords;
-    if (!!word) {
-      var regex = new RegExp( '\\b(' + word + ')\\b', 'mgi' );
-      return rawData.replace(regex, '<span class="highlight">$1</span>');
-    }
-
-    return rawData;
-  }
-
-  render() {
-    let eventTableData = this.props.eventTableData;
-    let group = this.props.selectedGroup;
-    let data = group.data;
-    let title = "Pattern "+group.nid;
-    let rows = [];
-    let topKEpisodes = group.topKEpisodes.length > 0
-      ? "Top frequent episodes: " + group.topKEpisodes : "";
-
-    let topKWords = this.parseTopWords(group.topKWords);
-
-    for (let i = 1; i < data.length; ++i) {
-      let timestamp = data[i][0];
-      let rawData = data[i][1];
-      rows.push((<tr key={i}>
-        <td>{timestamp}</td>
-        <td dangerouslySetInnerHTML={{__html: this.highlightKWord(rawData)}} />
-      </tr>));
-    }
-
-    return (
-      <div className="ui grid">
-      <div className="three wide column">
-        <table className="ui selectable celled table">
-          <thead>
-            <tr>
-              <th><span
-                    style={{ fontWeight: 'bold' }}
-                  >Pattern List</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {eventTableData && eventTableData.sort(function (a, b) {
-              let aid = a.nEvents;
-              let bid = b.nEvents;
-              if (aid > bid) {
-                return -1;
-              } else if (aid < bid) {
-                return 1;
-              } else {
-                let aaid = a.nid;
-                let bbid = b.nid;
-                if (aaid > bbid) {
-                  return 1;
-                } else if (aaid < bbid) {
-                  return -1;
-                } else {
-                  return 0;
-                }
-              }
-            }).map((grp, iGrp) => {
-              let topKEpisodes = "";
-              let topKWords = "";
-              let patternString = "Pattern "+grp.nid;
-              let nEventString = "Number of events: "+grp.nEvents;
-              if(grp){
-                topKEpisodes = grp.topKEpisodes.length > 0
-                  ? "Top frequent episodes: " + grp.topKEpisodes.replace(/\(\d+\)/g,"") : "";
-                topKWords = grp.topKWords.length > 0
-                  ? "Top keywords: " + grp.topKWords.replace(/\(\d+\)/g,"") : ""; 
-              }
-              return (<tr
-                  key={iGrp}
-                  onClick={() => this.props.handleSelectedGroup(grp.nid)}
-                  className={cx({ active: grp.nid === group.nid })} 
-                    style={{ cursor: 'pointer' }}
-                  >
-                  <td><b>{patternString}</b><br />{nEventString}<br />{topKWords}<br />{topKEpisodes}</td>
-                </tr>)
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div className="thirteen wide column">
-        <h4 className="ui header">{title}</h4>
-        <table className="event-right-table">
-          <thead>
-          <tr>
-            <td>Time</td>
-            <td>Event</td>
-          </tr>
-          </thead>
-          <tbody>
-          <tr key="0">
-            <td>{data[0][0]}</td>
-            <td dangerouslySetInnerHTML={{__html: this.highlightKWord(data[0][1])}} />
-          </tr>
-          {rows}
-          </tbody>
-        </table>
-      </div>
-      </div>
-    );
-  }
-}
+import '../../settings/threshold/threshold.less';
 
 class LogAnalysisCharts extends React.Component {
 
   static contextTypes = {
-    router: React.PropTypes.object
+    router: React.PropTypes.object,
   };
 
   static propTypes = {
     data: React.PropTypes.object,
     loading: React.PropTypes.bool,
     enablePublish: React.PropTypes.bool,
-    onRefresh: React.PropTypes.func
+    onRefresh: React.PropTypes.func,
   };
 
   static defaultProps = {
     loading: true,
     enablePublish: false,
-    onRefresh: () => {
-    }
+    onRefresh: () => {},
   };
 
   constructor(props) {
-
     super(props);
     this.dp = null;
 
@@ -193,7 +47,12 @@ class LogAnalysisCharts extends React.Component {
         event: 'active',
         anomaly: '',
         freq: '',
-      }
+        clusterfe: '',
+      },
+      logEventArr: [],
+      allLogEventArr: [],
+      rareLogEventArr: [],
+      neuronValue: [],
     };
     this.calculateData(props);
   }
@@ -210,10 +69,10 @@ class LogAnalysisCharts extends React.Component {
     // Cache the data, and recalculate it if changed.
     const { data, loading, onRefresh, query, ...rest } = props;
 
-    this.rareEventThreshold = parseInt(query.rareEventThreshold);
-    if(!this.rareEventThreshold){
-      this.rareEventThreshold = 3;
-    }
+    // this.rareEventThreshold = parseInt(query.rareEventThreshold);
+    // if (!this.rareEventThreshold) {
+    //   this.rareEventThreshold = 3;
+    // }
 
     if (this._data !== data && !!data) {
       this.dp = new DataParser(data, rest);
@@ -231,33 +90,33 @@ class LogAnalysisCharts extends React.Component {
   }
 
   calculateEventTableData() {
-
-    let anomalies = this.dp.anomalies["0"];
-    let episodeMapArr = this.dp.episodeMapArr;
+    const topKCount = 5;
+    const anomalies = this.dp.anomalies['0'];
+    const episodeMapArr = this.dp.episodeMapArr;
     let allLogEventArr = this.dp.logEventArr;
-    let rareEventThreshold = this.rareEventThreshold;
-    allLogEventArr = allLogEventArr.filter(function (el, index, arr) {
-      return el.nid != -1
+    // let rareEventThreshold = this.rareEventThreshold;
+    allLogEventArr = allLogEventArr.filter((el, index, arr) => {
+      return el.nid != -1;
     });
-    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
-    let clusterTopWordArr = this.dp.clusterTopWordArr;
+    const clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
+    const clusterTopWordArr = this.dp.clusterTopWordArr;
     let neuronListNumber = {};
     let neuronValue = [];
-    let nidList = _.map(allLogEventArr, function (o) {
-      return o['nid']
+    let nidList = _.map(allLogEventArr, (o) => {
+      return o.nid;
     });
-    let neuronList = nidList.filter(function (el, index, arr) {
-      return index === arr.indexOf(el)
+    let neuronList = nidList.filter((el, index, arr) => {
+      return index === arr.indexOf(el);
     });
 
-    _.forEach(neuronList, function (value, key) {
-      neuronListNumber[value] = (_.partition(allLogEventArr, function (o) {
-        return o['nid'] == value
+    _.forEach(neuronList, (value, key) => {
+      neuronListNumber[value] = (_.partition(allLogEventArr, (o) => {
+        return o.nid == value;
       })[0]).length;
     });
     let neuronIdList = neuronList;
     neuronList = [];
-    neuronIdList.map(function (value, index) {
+    neuronIdList.map((value, index) => {
       let num = 0;
       for (let j = 0; j < index; j++) {
         num += neuronListNumber[neuronIdList[j]];
@@ -266,55 +125,30 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
-    let allEventTableData = [];
-    let groupData = {};
-    allLogEventArr.map((event, iEvent) => {
-      let showNumber = neuronList.indexOf(iEvent);
-      let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-
-      // Find a new group.
-      if (showNumber != -1) {
-        groupData = {};
-        let iGroup = neuronIdList.indexOf(event.nid) + 1;
-        groupData.nid = event.nid;
-        groupData.iGroup = iGroup;
-        groupData.rowSpan = neuronValue[showNumber];
-        groupData.nEvents = neuronValue[iGroup - 1];
-
-        // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
-        // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
-        groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-        groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
-        groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-        groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
-        groupData.data = [[timestamp, event.rawData, event.timestamp]];
-        allEventTableData.push(groupData);
-      } else {
-        groupData.data.push([timestamp, event.rawData, event.timestamp]);
-      }
-    });
-
     // make a copy, and filter out anomaly and small cluster, and run again
-    let logEventArr = allLogEventArr.filter(function (el, index, arr) {
-      return (neuronValue[neuronIdList.indexOf(el.nid)] > rareEventThreshold)
+    const logEventArr = allLogEventArr.filter((el, index, arr) => {
+      return (!el.rareEventFlag);
+    });
+    const rareLogEventArr = allLogEventArr.filter((el, index, arr) => {
+      return (el.rareEventFlag);
     });
     neuronListNumber = {};
     neuronValue = [];
-    nidList = _.map(logEventArr, function (o) {
-      return o['nid']
+    nidList = _.map(logEventArr, (o) => {
+      return o.nid;
     });
-    neuronList = nidList.filter(function (el, index, arr) {
-      return index === arr.indexOf(el)
+    neuronList = nidList.filter((el, index, arr) => {
+      return index === arr.indexOf(el);
     });
 
-    _.forEach(neuronList, function (value, key) {
-      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
-        return o['nid'] == value
+    _.forEach(neuronList, (value, key) => {
+      neuronListNumber[value] = (_.partition(logEventArr, (o) => {
+        return o.nid == value;
       })[0]).length;
     });
     neuronIdList = neuronList;
     neuronList = [];
-    neuronIdList.map(function (value, index) {
+    neuronIdList.map((value, index) => {
       let num = 0;
       for (let j = 0; j < index; j++) {
         num += neuronListNumber[neuronIdList[j]];
@@ -323,15 +157,16 @@ class LogAnalysisCharts extends React.Component {
       neuronValue.push(neuronListNumber[neuronIdList[index]]);
     });
 
-    let eventTableData = [];
+    let groupData = {};
+    const eventTableData = [];
     logEventArr.map((event, iEvent) => {
-      let showNumber = neuronList.indexOf(iEvent);
-      let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
+      const showNumber = neuronList.indexOf(iEvent);
+      const timestamp = moment(event.timestamp).format('YYYY-MM-DD HH:mm');
 
       // Find a new group.
       if (showNumber != -1) {
         groupData = {};
-        let iGroup = neuronIdList.indexOf(event.nid) + 1;
+        const iGroup = neuronIdList.indexOf(event.nid) + 1;
         groupData.nid = event.nid;
         groupData.iGroup = iGroup;
         groupData.rowSpan = neuronValue[showNumber];
@@ -340,9 +175,17 @@ class LogAnalysisCharts extends React.Component {
         // let anomaly = _.find(realAnomalies, a => a.timestamp == event.timestamp);
         // let nAnomaly = realAnomalies.indexOf(anomaly) + 1;
         groupData.topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-        groupData.topKEpisodes = groupData.topKEpisodes?groupData.topKEpisodes.topK: [];
+        groupData.topKEpisodes = groupData.topKEpisodes ? groupData.topKEpisodes.topK : [];
         groupData.topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-        groupData.topKWords = groupData.topKWords?groupData.topKWords.topK: [];
+        groupData.topKWords = groupData.topKWords ? groupData.topKWords.topK : [];
+
+        let arr = groupData.topKEpisodes.split(',');
+        arr = arr.slice(0, topKCount);
+        groupData.topKEpisodes = arr.toString();
+        arr = groupData.topKWords.split(',');
+        arr = arr.slice(0, topKCount);
+        groupData.topKWords = arr.toString();
+
         groupData.data = [[timestamp, event.rawData, event.timestamp]];
         eventTableData.push(groupData);
       } else {
@@ -350,197 +193,153 @@ class LogAnalysisCharts extends React.Component {
       }
     });
 
-    this.allEventTableData = allEventTableData;
-
+    this.allLogEventArr = allLogEventArr;
     this.logEventArr = logEventArr;
     this.eventTableData = eventTableData;
     this.neuronValue = neuronValue;
+    this.rareLogEventArr = rareLogEventArr;
 
-    if(eventTableData && eventTableData.length>0){
-      this.setState({selectedEventTableData:eventTableData[0]});
+    if (eventTableData && eventTableData.length > 0) {
+      this.setState({
+        selectedEventTableData: eventTableData[0],
+        logEventArr: this.logEventArr,
+        allLogEventArr: this.allLogEventArr,
+        rareLogEventArr: this.rareLogEventArr,
+        neuronValue: this.neuronValue,
+      });
     }
   }
 
   renderWordCountTable() {
     if (!this.dp) return;
-    let wordCountArr = this.dp.wordCountArr;
+    const wordCountArr = this.dp.wordCountArr;
     if (wordCountArr) {
       return (
         <div>
           <table className="vector-table">
             <tbody>
-            <tr>
-              <td>Word</td>
-              <td>Count</td>
-            </tr>
-            {wordCountArr.sort(function (a, b) {
-              // reverse ordering
-              let aid = parseInt(a.count);
-              let bid = parseInt(b.count);
-              if (aid < bid) {
-                return -1;
-              } else if (aid > bid) {
-                return 1;
-              } else {
-                return 0;
-              }
-            }).map((word, i) => {
-              let cleanWord = word.pattern.replace(/"/g, "");
-              return (
-                <tr key={i}>
-                  <td>{cleanWord}</td>
-                  <td>{word.count}</td>
-                </tr>
-              )
-            })}
+              <tr>
+                <td>Word</td>
+                <td>Count</td>
+              </tr>
+              {wordCountArr.sort((a, b) => {
+                // reverse ordering
+                const aid = parseInt(a.count);
+                const bid = parseInt(b.count);
+                if (aid < bid) {
+                  return -1;
+                } else if (aid > bid) {
+                  return 1;
+                } 
+                  return 0;
+                
+              }).map((word, i) => {
+                const cleanWord = word.pattern.replace(/"/g, '');
+                return (
+                  <tr key={i}>
+                    <td>{cleanWord}</td>
+                    <td>{word.count}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      )
+      );
     }
   }
 
   renderEpisodeMapTable() {
     if (!this.dp) return;
-    let episodeMapArr = this.dp.episodeMapArr;
+    const episodeMapArr = this.dp.episodeMapArr;
     if (episodeMapArr) {
       return (
         <div>
           <table className="vector-table">
             <tbody>
-            <tr>
-              <td>Frequent Episode</td>
-              <td>Count</td>
-            </tr>
-            {episodeMapArr.sort(function (a, b) {
-              // reverse ordering
-              let aid = parseInt(a.count);
-              let bid = parseInt(b.count);
-              if (aid < bid) {
-                return 1;
-              } else if (aid > bid) {
-                return -1;
-              } else {
-                return 0;
-              }
-            }).map((episode, i) => {
-              let cleanEpisode = episode.pattern.replace(/"/g, "");
-              return (
-                <tr key={i}>
-                  <td>{cleanEpisode}</td>
-                  <td>{episode.count}</td>
-                </tr>
-              )
-            })}
+              <tr>
+                <td>Frequent Episode</td>
+                <td>Count</td>
+              </tr>
+              {episodeMapArr.sort((a, b) => {
+                // reverse ordering
+                const aid = parseInt(a.count);
+                const bid = parseInt(b.count);
+                if (aid < bid) {
+                  return 1;
+                } else if (aid > bid) {
+                  return -1;
+                } 
+                  return 0;
+                
+              }).map((episode, i) => {
+                const cleanEpisode = episode.pattern.replace(/"/g, '');
+                return (
+                  <tr key={i}>
+                    <td>{cleanEpisode}</td>
+                    <td>{episode.count}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
-      )
+      );
     }
   }
 
   renderAnomalyTable() {
-    if (!this.dp) return;
-    let anomalies = this.dp.anomalies["0"];
-    let logEventArr = this.dp.logEventArr;
-    let clusterTopEpisodeArr = this.dp.clusterTopEpisodeArr;
-    let clusterTopWordArr = this.dp.clusterTopWordArr;
-    let rareEventThreshold = this.rareEventThreshold;
-    let neuronListNumber = {};
-    let neuronValue = [];
-    let nidList = _.map(logEventArr, function (o) {
-      return o['nid']
-    });
-    let neuronList = nidList.filter(function (el, index, arr) {
-      return index === arr.indexOf(el)
-    });
-    _.forEach(neuronList, function (value, key) {
-      neuronListNumber[value] = (_.partition(logEventArr, function (o) {
-        return o['nid'] == value
-      })[0]).length;
-    });
-    let neuronIdList = neuronList;
-    neuronList = [];
-    neuronIdList.map(function (value, index) {
-      let num = 0;
-      for (let j = 0; j < index; j++) {
-        num += neuronListNumber[neuronIdList[j]];
-      }
-      neuronList.push(num);
-      neuronValue.push(neuronListNumber[neuronIdList[index]]);
-    });
-    logEventArr = logEventArr.filter(function (el, index, arr) {
-      // return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold) || (el.nid == -1)
-      return (neuronValue[neuronIdList.indexOf(el.nid)] <= rareEventThreshold)
-    });
+    if (!this.dp) return null;
+
+    const logEventArr = this.dp.logEventArr;
+    const eventTopEpisodes = this.dp.clusterTopEpisodeArr || [];
+    const eventTopkeywords = this.dp.clusterTopWordArr || [];
+    const startTime = moment(this.dp.data.modelStartTime_millis);
+    const endTime = moment(this.dp.data.modelEndTime_millis);
+    const frequency = this.dp.data.logFreqWindow;
+
+    const filter = R.filter(e => !!e.rareEventFlag);
+    const sorter = R.sortWith([R.descend(R.prop('timestamp'))]);
+    const ds = sorter(filter(logEventArr));
+    const eventDataset = R.map((e) => {
+      // Get the keyword and eposodes for the event.
+      const finder = R.find(R.propEq('nid', e.nid));
+      const keywordStr = (finder(eventTopkeywords) || {}).topK || '';
+      const episodesStr = (finder(eventTopEpisodes) || {}).topK || '';
+      const keywords = keywordStr.length > 0 ?
+        keywordStr.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+      const episodes = episodesStr.length > 0 ?
+        episodesStr.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : [];
+
+      return {
+        keywords,
+        episodes,
+        nid: e.nid,
+        timestamp: moment(e.timestamp).format('YYYY-MM-DD HH:mm'),
+        rawData: e.rawData,
+      };
+    })(ds);
 
     if (logEventArr) {
       return (
-        <div>
-          <div className="ui header">Number of anomalies: {logEventArr.length}</div>
-          <table className="rare-event-table">
-            <thead>
-            <tr>
-                <td>Time</td>
-                <td>Event</td>
-             </tr>
-            </thead>
-            <tbody>
-              {logEventArr.map((event, iEvent) => {
-                let timestamp = moment(event.timestamp).format("YYYY-MM-DD HH:mm");
-                let anomalyString = event.anomaly;
-                let topKEpisodes = "";
-                let topKWords = "";
-                let pos = 0;
-                let clusterFeature = "";
-                if(anomalyString == undefined){
-                  anomalyString = "";
-                  topKEpisodes = _.find(clusterTopEpisodeArr, p => p.nid == event.nid);
-                  topKEpisodes = topKEpisodes?topKEpisodes.topK:[];
-                  if(topKEpisodes.length>0){
-                    var entries = topKEpisodes.split(',');
-                    _.each(entries, function (entry, ie) {
-                      pos = entry.indexOf('(');
-                      if(pos!=-1){
-                        anomalyString += entry.substring(0,pos) + ' ';
-                      }
-                    });
-                  }
-                  topKWords = _.find(clusterTopWordArr, p => p.nid == event.nid);
-                  topKWords = topKWords?topKWords.topK: [];
-                  if(topKWords.length>0){
-                    var entries = topKWords.split(',');
-                    _.each(entries, function (entry, ie) {
-                      pos = entry.indexOf('(');
-                      if(pos!=-1){
-                        anomalyString += entry.substring(0,pos) + ' ';
-                      }
-                    });
-                  }
-                }
-                return (
-                  <tr key={iEvent}>
-                    <td>{timestamp}</td>
-                    <td>{event.rawData}</td>
-                  </tr>
-                )
-              })}              
-            </tbody>
-          </table>
-        </div>
-      )
+        <EventRare
+          eventDataset={eventDataset}
+          startTime={startTime} endTime={endTime} frequency={frequency}
+        />
+      );
     }
+    return null;
   }
-  
-  getFreqVectorAnnotations(top1FreqData, top1NidData, label){
-    return _.map(top1FreqData, freq => {
-      let ts = +moment(freq[0]);
-      let nid = top1NidData[ts];
+
+  getFreqVectorAnnotations(top1FreqData, top1NidData, label) {
+    return _.map(top1FreqData, (freq) => {
+      const ts = +moment(freq[0]);
+      const nid = top1NidData[ts];
       return {
         series: label,
         x: ts.valueOf(),
-        shortText: (nid==null)?'':(nid),
-        text: (nid==null)?'':('Neuron Id '+nid),
+        shortText: (nid == null) ? '' : (nid),
+        text: (nid == null) ? '' : (`Neuron Id ${  nid}`),
       };
     });
   }
@@ -549,27 +348,27 @@ class LogAnalysisCharts extends React.Component {
   handlePatternPointClick(startTs, position) {
     const { selectedPatternChartData, selectedPattern, selectedAnnotation, selectedBarColors } = this.state;
     const eventTableData = this.eventTableData;
-    let nid = parseInt(selectedPattern.replace("Pattern ",""));
-    let selectedEventTableData = _.find(eventTableData, event => event.nid == nid)
-    if(selectedEventTableData){
-      let eventList = selectedEventTableData.data;
-      if (selectedPatternChartData && eventList) {      
+    const nid = parseInt(selectedPattern.replace('Pattern ', ''));
+    const selectedEventTableData = _.find(eventTableData, event => event.nid == nid);
+    if (selectedEventTableData) {
+      const eventList = selectedEventTableData.data;
+      if (selectedPatternChartData && eventList) {
         const sdata = selectedPatternChartData.sdata;
         const idx = _.findIndex(sdata, s => moment(s[0]).valueOf() === startTs);
-        let endTs = sdata[sdata.length-1][0];
-        if(idx==sdata.length){
-          alert("end");
+        let endTs = sdata[sdata.length - 1][0];
+        if (idx == sdata.length) {
+          alert('end');
         } else {
-          endTs = sdata[idx+1][0]-1;
+          endTs = sdata[idx + 1][0] - 1;
         }
-        let eventsInRangeFreqVector = eventList.filter(function (el, index, arr) {
-          return (el[2]>=startTs && el[2]<=endTs);
+        const eventsInRangeFreqVector = eventList.filter((el, index, arr) => {
+          return (el[2] >= startTs && el[2] <= endTs);
         });
-        let selectedSelectedAnnotation = _.find(selectedAnnotation, a => a.x == startTs);
-        let selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText || '';
+        const selectedSelectedAnnotation = _.find(selectedAnnotation, a => a.x == startTs);
+        const selectedDetailedText = selectedSelectedAnnotation && selectedSelectedAnnotation.detailedText || '';
         // Make sure the text position is not out of the screen
         const selectedDetailedTextLeftPosition = position.x;
-          // Math.min(position.x, $(window).width() - selectedDetailedText.length * 8);
+        // Math.min(position.x, $(window).width() - selectedDetailedText.length * 8);
         this.setState({
           eventsInRangeFreqVector,
           selectedDetailedText,
@@ -580,18 +379,18 @@ class LogAnalysisCharts extends React.Component {
   }
 
   @autobind()
-  handleEventTableSelected(nid){
+  handleEventTableSelected(nid) {
     const eventTableData = this.eventTableData;
-    let selectedEventTableData = _.find(eventTableData, a => a.nid == nid);
+    const selectedEventTableData = _.find(eventTableData, a => a.nid == nid);
     this.setState({ selectedEventTableData });
   }
 
   @autobind()
   handlePatternSelected(pattern) {
     const { nonZeroFreqChartDatas, patterns, derivedAnomalyByMetric } = this.state;
-    let pos = patterns.indexOf(pattern);
-    let selectedPatternChartData = _.find(nonZeroFreqChartDatas, a => a.pattern == pattern);
-    let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
+    const pos = patterns.indexOf(pattern);
+    const selectedPatternChartData = _.find(nonZeroFreqChartDatas, a => a.pattern == pattern);
+    const derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern', 'neuron')];
 
     // Create the bar colors for time series. time => colstring.
     const sdata = selectedPatternChartData ? selectedPatternChartData.sdata || [] : [];
@@ -601,16 +400,16 @@ class LogAnalysisCharts extends React.Component {
       barColors[ts] = 'teal';
     });
 
-    let selectedAnnotation = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, datapoint => {
-      let ts = +moment(datapoint[0]);
-      let thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
-      if(thisHint){
+    const selectedAnnotation = (selectedPatternChartData && derivedAnomaly) ? _.map(selectedPatternChartData.sdata, (datapoint) => {
+      const ts = +moment(datapoint[0]);
+      const thisHint = _.find(derivedAnomaly, a => a.timestamp == ts);
+      if (thisHint) {
         let pct = parseFloat(thisHint.pct);
-        pct = Math.round(pct*10)/10;
-        let detailedText = "Frequency of this pattern is " + Math.abs(pct) + "% " + ((pct>0)?"higher":"lower") + " than normal.";
-        let pctString = pct && ((pct>0?"+":"")+pct+"%");
-        let signString = pct && ((pct>0)?"+":"-");
-        barColors[ts] = ((pct>0)?"red":"blue");
+        pct = Math.round(pct * 10) / 10;
+        const detailedText = 'Frequency of this pattern is ' + Math.abs(pct) + '% ' + ((pct > 0) ? 'higher' : 'lower') + ' than normal.';
+        const pctString = pct && (`${(pct > 0 ? "+" : "") + pct  }%`);
+        const signString = pct && ((pct > 0) ? '+' : '-');
+        barColors[ts] = ((pct > 0) ? 'red' : 'blue');
         return {
           series: selectedPatternChartData.sname[1],
           x: ts.valueOf(),
@@ -618,7 +417,7 @@ class LogAnalysisCharts extends React.Component {
           text: pctString,
           detailedText,
         };
-      } else {
+      } 
         barColors[ts] = 'teal';
         return {
           series: '',
@@ -627,43 +426,43 @@ class LogAnalysisCharts extends React.Component {
           text: '',
           detailedText: '',
         };
-      }
+      
     }) : [];
 
     this.setState({
       selectedPattern: pattern,
       selectedPatternChartData,
       selectedAnnotation,
-      selectedBarColors: barColors, 
+      selectedBarColors: barColors,
       derivedAnomaly,
-      eventsInRangeFreqVector:[],
-      selectedDetailedText:'',
+      eventsInRangeFreqVector: [],
+      selectedDetailedText: '',
       selectedDetailedTextLeftPosition: 0,
     });
   }
-  
-  calculateFreqVectorData(){
+
+  calculateFreqVectorData() {
     if (!this.dp) return;
     const eventTableData = this.eventTableData;
-    let derivedAnomalyByMetric = this.dp.anomalyByMetricObjArr && this.dp.anomalyByMetricObjArr[0] ? this.dp.anomalyByMetricObjArr[0] : {};
-    let { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
-    let totalFreqChartData = {
+    const derivedAnomalyByMetric = this.dp.anomalyByMetricObjArr && this.dp.anomalyByMetricObjArr[0] ? this.dp.anomalyByMetricObjArr[0] : {};
+    const { totalFreqData, timestamps, nonZeroFreqVectors } = this.dp.freqVectorData;
+    const totalFreqChartData = {
       sdata: totalFreqData,
-      sname: ['Time Window Start','Total Frequency'],
+      sname: ['Time Window Start', 'Total Frequency'],
     };
 
     let patterns = [];
-    let nonZeroFreqChartDatas = [];
+    const nonZeroFreqChartDatas = [];
     for (var pattern in nonZeroFreqVectors) {
-      if(pattern == 'Pattern -1'){
+      if (pattern == 'Pattern -1') {
         continue; // skip anomaly result: neuronId==-1
       }
-      let patternNo = parseInt(pattern.replace("Pattern ",""));
-      let pGroup = _.find(eventTableData, group => group.nid == patternNo);
-      if(pGroup == undefined){
+      const patternNo = parseInt(pattern.replace('Pattern ', ''));
+      const pGroup = _.find(eventTableData, group => group.nid == patternNo);
+      if (pGroup == undefined) {
         continue; // needs to be in eventTableData
       }
-      let nonZeroFreqChartData = {
+      const nonZeroFreqChartData = {
         sdata: nonZeroFreqVectors[pattern],
         sname: ['Time Window Start', pattern],
         pattern,
@@ -671,233 +470,252 @@ class LogAnalysisCharts extends React.Component {
       nonZeroFreqChartDatas.push(nonZeroFreqChartData);
       patterns.push(pattern);
     }
-    patterns = patterns.sort(function (a, b) {
-                let aPatternNo = parseInt(a.replace("Pattern ",""));
-                let bPatternNo = parseInt(b.replace("Pattern ",""));
-                let aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
-                let bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
-                let aid = aGroup.nEvents;
-                let bid = bGroup.nEvents;
-                if (aid > bid) {
-                  return -1;
-                } else if (aid < bid) {
-                  return 1;
-                } else {
-                  let aaid = aGroup.nid;
-                  let bbid = bGroup.nid;
-                  if (aaid > bbid) {
-                    return 1;
-                  } else if (aaid < bbid) {
-                    return -1;
-                  } else {
-                    return 0;
-                  }
-                }
-              });
+    patterns = patterns.sort((a, b) => {
+      const aPatternNo = parseInt(a.replace('Pattern ', ''));
+      const bPatternNo = parseInt(b.replace('Pattern ', ''));
+      const aGroup = _.find(eventTableData, group => group.nid == aPatternNo);
+      const bGroup = _.find(eventTableData, group => group.nid == bPatternNo);
+      const aid = aGroup.nEvents;
+      const bid = bGroup.nEvents;
+      if (aid > bid) {
+        return -1;
+      } else if (aid < bid) {
+        return 1;
+      } 
+        let aaid = aGroup.nid;
+        let bbid = bGroup.nid;
+        if (aaid > bbid) {
+          return 1;
+        } else if (aaid < bbid) {
+          return -1;
+        } else {
+          return 0;
+        }
+      
+    });
     this.setState({
       nonZeroFreqChartDatas,
       patterns,
       derivedAnomalyByMetric,
-    },()=>{
+    }, () => {
       pattern && this.handlePatternSelected(patterns[0]);
     });
   }
 
-  
 
   @autobind
-  renderFreqCharts(){
+  renderFreqCharts() {
     if (!this.dp) return;
     const eventTableData = this.eventTableData;
-    let { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector, 
+    const { nonZeroFreqChartDatas, patterns, selectedPattern, selectedPatternChartData, eventsInRangeFreqVector,
       derivedAnomaly, selectedDetailedText, selectedDetailedTextLeftPosition,
-      selectedAnnotation, selectedBarColors, derivedAnomalyByMetric} = this.state;
-    let emptyAnnotations = [];
+      selectedAnnotation, selectedBarColors, derivedAnomalyByMetric } = this.state;
+    const emptyAnnotations = [];
 
-    let title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
+    const title = selectedPatternChartData && selectedPatternChartData.sname ? selectedPatternChartData.sname[1] : '';
 
-    // <br />(sorted by CPU usage)
     return (
-      <div className="ui grid">
-        <div className="three wide column">
-          <table className="ui selectable celled table">
-            <thead>
-              <tr>
-                <th><span
-                  style={{ fontWeight: 'bold' }}
-                >Pattern List</span>
-            </th>
-              </tr>
-            </thead>
-            <tbody>
-              {patterns && patterns.map((pattern, i) => {
-                let derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern','neuron')];
-                let anomalyCount = "";
-                if(derivedAnomaly && derivedAnomaly.length>0){
-                  anomalyCount = " (Anomaly count: "+derivedAnomaly.length+")";
-                }
-                let patternNo = parseInt(pattern.replace("Pattern ",""));
-                let group = _.find(eventTableData, group => group.nid == patternNo);
-                let topKEpisodes = "";
-                let topKWords = "";
-                if(group){
-                  topKEpisodes = group.topKEpisodes.length > 0
-                    ? "Top frequent episodes: " + group.topKEpisodes.replace(/\(\d+\)/g,"") : "";
-                  topKWords = group.topKWords.length > 0
-                    ? "Top keywords: " + group.topKWords.replace(/\(\d+\)/g,"") : ""; 
-                }
-                return (<tr
+      <div className="flex-row-container">
+        <div
+className="flex-col-container" style={{
+          border: '1px solid rgba(34, 36, 38, 0.15)', marginBottom: 10,
+        }}
+        >
+          <h4
+style={{
+            background: '#F9FAFB',
+            width: '100%',
+height: 40,
+padding: 10,
+margin: 0,
+          }}
+          >Pattern List</h4>
+          <div className="flex-item" style={{ overflowY: 'auto' }}>
+            <table className="ui selectable celled table" style={{ border: 0 }}>
+              <tbody>
+                {patterns && patterns.sort((a, b) => {
+
+                  const aDerivedAnomaly = derivedAnomalyByMetric[a.replace('Pattern', 'neuron')];
+                  const bDerivedAnomaly = derivedAnomalyByMetric[b.replace('Pattern', 'neuron')];
+                  const aDerivedAnomalyCount = aDerivedAnomaly ? aDerivedAnomaly.length : 0;
+                  const bDerivedAnomalyCount = bDerivedAnomaly ? bDerivedAnomaly.length : 0;
+                  if (aDerivedAnomalyCount < bDerivedAnomalyCount) {
+                    return 1;
+                  } else if (aDerivedAnomalyCount > bDerivedAnomalyCount) {
+                    return -1;
+                  } else {
+                    const aNid = parseInt(a.replace('Pattern ', ''));
+                    const bNid = parseInt(b.replace('Pattern ', ''));
+                    if (aNid > bNid) {
+                      return 1;
+                    } else if (aNid < bNid) {
+                      return -1;
+                    } else{
+                      return 0;
+                    }
+                  }
+                }).map((pattern, i) => {
+                  const derivedAnomaly = derivedAnomalyByMetric[pattern.replace('Pattern', 'neuron')];
+                  let anomalyCount = '';
+                  if (derivedAnomaly && derivedAnomaly.length > 0) {
+                    anomalyCount = ' (Anomaly count: ' + derivedAnomaly.length + ')';
+                  }
+                  const patternNo = parseInt(pattern.replace('Pattern ', ''));
+                  const group = _.find(eventTableData, group => group.nid == patternNo);
+                  let topKEpisodes = '';
+                  let topKWords = '';
+                  if (group) {
+                    topKEpisodes = group.topKEpisodes.length > 0
+                      ? 'Top frequent episodes: ' + group.topKEpisodes.replace(/\(\d+\)/g, '') : '';
+                    topKWords = group.topKWords.length > 0
+                      ? 'Top keywords: ' + group.topKWords.replace(/\(\d+\)/g, '') : '';
+                  }
+                  return (<tr
                     key={i}
                     onClick={() => this.handlePatternSelected(pattern)}
-                    className={cx({ active: pattern === this.state.selectedPattern })} 
-                      style={{ cursor: 'pointer' }}
+                    className={cx({ active: pattern === this.state.selectedPattern })}
+                    style={{ cursor: 'pointer' }}
                   >
                     <td><b>{pattern}</b>{anomalyCount}<br />{topKWords}<br />{topKEpisodes}</td>
-                  </tr>)
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="thirteen wide column">
-          { selectedPattern && selectedPatternChartData &&
-            <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-              <h4 className="ui header">{title}</h4>
-              <DataChart
-                chartType='bar'
-                data={selectedPatternChartData}
-                barColors={selectedBarColors}
-                annotations={emptyAnnotations}
-                onClick={this.handlePatternPointClick}
-              />
-            </div>
-          }
-          { (selectedDetailedText && selectedDetailedText.length) ? 
-            <div style={{position: 'fixed', color:'red', fontSize:'1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
-              {selectedDetailedText}
-            </div>
-            : 
-            <div style={{position: 'fixed', color:'red', fontSize:'1.1rem', marginTop: -12, left: selectedDetailedTextLeftPosition}}>
-              &nbsp;
-            </div>
-          }
-          { (eventsInRangeFreqVector && eventsInRangeFreqVector.length) ? 
-            <div>
-            <br /><br /><br />
-            <h4>Event List</h4>
-            <table className="freq-event-table">
-              <thead>
-              <tr>
-                <td>Time</td>
-                <td>Event</td>
-              </tr>
-              </thead>
-              <tbody>
-                {eventsInRangeFreqVector.map((event, iEvent) => (
-                  <tr key={iEvent}>
-                    <td>{event[0]}</td>
-                    <td>{event[1]}</td>
-                  </tr>
-                ))}
+                  </tr>);
+                })}
               </tbody>
             </table>
+          </div>
+        </div>
+        <div className="flex-item flex-col-container" style={{ margin: '0 0 10px 10px' }}>
+          <div>
+            {selectedPattern && selectedPatternChartData &&
+              <div style={{ width: '100%', backgroundColor: '#fff', padding: 0 }}>
+                <h4 className="ui header">{title}</h4>
+                <DataChart
+                  chartType="bar"
+                  data={selectedPatternChartData}
+                  barColors={selectedBarColors}
+                  annotations={emptyAnnotations}
+                  onClick={this.handlePatternPointClick}
+                />
+              </div>
+            }
+            {(selectedDetailedText && selectedDetailedText.length) ?
+              <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', left: selectedDetailedTextLeftPosition }}>
+                {selectedDetailedText}
+              </div>
+              :
+              <div style={{ position: 'fixed', color: 'red', fontSize: '1.1rem', left: selectedDetailedTextLeftPosition }}>
+                &nbsp;
+              </div>
+            }
+            {eventsInRangeFreqVector && eventsInRangeFreqVector.length > 0 &&
+              <h4 style={{ marginBottom: '1em' }}>Event List</h4>
+            }
+          </div>
+          {eventsInRangeFreqVector && eventsInRangeFreqVector.length > 0 &&
+            <div className="flex-item" style={{ overflowY: 'auto' }}>
+              <table className="freq-event-table">
+                <thead>
+                  <tr>
+                    <td>Time</td>
+                    <td>Event</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {eventsInRangeFreqVector.map((event, iEvent) => (
+                    <tr key={iEvent}>
+                      <td>{event[0]}</td>
+                      <td>{event[1]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            : null
           }
         </div>
       </div>
-    )
+    );
   }
 
   renderEventTable() {
     const logEventArr = this.logEventArr;
     const neuronValue = this.neuronValue;
     const eventTableData = this.eventTableData;
-    let{ selectedEventTableData } = this.state;
 
     if (logEventArr) {
       return (
-        <div>
-          <div className="ui header">
-            Number of events: {logEventArr.length}, Number of clusters: {neuronValue.length}
-          </div>
-          <EventTableGroup handleSelectedGroup={this.handleEventTableSelected} selectedGroup={selectedEventTableData} eventTableData={eventTableData} />
-        </div>
-      )
+        <EventCluster
+          eventDataset={eventTableData}
+          eventCount={logEventArr.length} clusterCount={neuronValue.length}
+        />
+      );
     }
+    return null;
+  }
+
+  renderPatternSequence() {
+    if (!this.dp) return null;
+    const logNidFE = this.dp.logNidFE;
+    const eventDataset = this.eventTableData;
+
+    const sorter = R.sortWith([
+      R.descend(R.prop('count')),
+      R.ascend(R.prop('pattern')),
+    ]);
+    const patterns = R.take(200, sorter(logNidFE));
+
+    return (
+      <PatternSequence dataset={patterns} eventDataset={eventDataset} />
+    );
   }
 
   selectTab(e, tab) {
-    var tabStates = this.state['tabStates'];
-    tabStates = _.mapValues(tabStates, function (val) {
+    let tabStates = this.state.tabStates;
+    tabStates = _.mapValues(tabStates, (val) => {
       return '';
     });
     tabStates[tab] = 'active';
-    this.setState({ tabStates: tabStates });
-  }
-
-  renderList() {
-    let self = this;
-    let { tabStates } = this.state;
-    const summary = this.summary;
-
-    return (
-      <div className="ui grid">
-        <div className="sixteen wide column">
-          <div className="ui pointing secondary menu">
-            <a className={tabStates['event'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'event')}>Clustering Result</a>
-            <a className={tabStates['anomaly'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'anomaly')}>Rare Events</a>
-            <a className={tabStates['freq'] + ' item'}
-               onClick={(e) => this.selectTab(e, 'freq')}>Frequency Based Anomaly Detection</a>
-          </div>
-          <div className={tabStates['event'] + ' ui tab '}>
-            {tabStates['event'] === 'active' ? (
-              self.renderEventTable()
-            ) : null}
-          </div>
-          <div className={tabStates['anomaly'] + ' ui tab '}>
-            {tabStates['anomaly'] === 'active' ? (
-              self.renderAnomalyTable()
-            ) : null}
-          </div>
-          <div className={tabStates['freq'] + ' ui tab '}>
-            {tabStates['freq'] === 'active' ? (
-              self.renderFreqCharts()
-            ) : null}
-          </div>
-        </div>
-      </div>
-    )
+    this.setState({ tabStates });
   }
 
   render() {
-
-    let { loading, onRefresh } = this.props;
-
-    let contentStyle = { paddingLeft: 0 };
-    let contentClass = loading ? 'ui form loading' : '';
-
-    // this.calculateData();
+    const { loading, onRefresh } = this.props;
+    const { tabStates } = this.state;
 
     return (
       <Console.Wrapper>
-        <Console.Content style={contentStyle} className={contentClass}>
-          <div className="ui main tiny container" style={{ minHeight: '100%' }}>
-            {!loading &&
-            <div className="ui vertical segment">
-              <Button className="labeled icon" onClick={() => onRefresh()}>
-                <i className="icon refresh"/>Refresh
-              </Button>
-            </div>
-            }
-            <div className="ui vertical segment">
-              {!loading && this.renderList()}
+        <Console.Content
+          style={{ paddingLeft: 0 }} className={loading ? 'ui form loading' : ''}
+        >
+          <div className="ui main tiny container" style={{ height: '100%' }}>
+            <div className="flex-col-container" style={{ height: '100%' }}>
+              <Button
+                className="small labeled icon"
+                style={{ position: 'absolute', right: 0, top: '1em' }}
+                onClick={() => onRefresh()}
+              ><i className="icon refresh" />Refresh</Button>
+              <div className="ui pointing secondary menu">
+                <a
+                  className={`${tabStates['event']} item`}
+                  onClick={e => this.selectTab(e, 'event')}
+                >Clustering Result</a>
+                <a className={`${tabStates['anomaly']  } item`}
+                  onClick={e => this.selectTab(e, 'anomaly')}
+                >Rare Events</a>
+                <a className={`${tabStates['freq']  } item`}
+                  onClick={e => this.selectTab(e, 'freq')}
+                >Frequency Based Anomaly Detection</a>
+                <a className={`${tabStates['clusterfe']  } item`}
+                  onClick={e => this.selectTab(e, 'clusterfe')}
+                >Frequent Pattern Sequences</a>
+              </div>
+              {tabStates.event === 'active' && this.renderEventTable()}
+              {tabStates.anomaly === 'active' && this.renderAnomalyTable()}
+              {tabStates.freq === 'active' && this.renderFreqCharts()}
+              {tabStates.clusterfe === 'active' && this.renderPatternSequence()}
             </div>
           </div>
         </Console.Content>
       </Console.Wrapper>
-    )
+    );
   }
 }
 

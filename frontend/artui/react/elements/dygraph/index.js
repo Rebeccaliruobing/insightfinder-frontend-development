@@ -6,10 +6,11 @@
  * * Remove interaction support which causes zoom failed.
  **/
 
-import React, {Component, PropTypes as T} from 'react';
+import React, { Component, PropTypes as T } from 'react';
 import classNames from 'classnames';
-import {autobind} from 'core-decorators';
-import {DygraphDefaultProps, spreadDygraphProps} from './options';
+import R from 'ramda';
+import { autobind } from 'core-decorators';
+import { DygraphDefaultProps, spreadDygraphProps } from './options';
 
 const DygraphBase = require('dygraphs/dygraph-combined-dev');
 
@@ -21,11 +22,11 @@ class Dygraph extends Component {
 
   static defaultProps = Object.assign({
     labelsDivStyles: {
-      'backgroundColor': 'transparent',
-      'float': 'right',
-      'textAlign': 'right'
+      backgroundColor: 'transparent',
+      float: 'right',
+      textAlign: 'right',
     },
-    isZoomedIgnoreProgrammaticZoom: true
+    isZoomedIgnoreProgrammaticZoom: true,
   }, DygraphDefaultProps);
 
   constructor(props) {
@@ -93,14 +94,17 @@ class Dygraph extends Component {
   handleUnderlayCallback(canvas, area, g) {
 
     const {highlights, enableTriangleHighlight, latestDataTimestamp,
-       highlightStartTime, highlightEndTime
+       highlightStartTime, highlightEndTime, data,
     } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
-    if (latestDataTimestamp) {
-      const x = g.toDomXCoord(latestDataTimestamp);
+    if (latestDataTimestamp && data.length > 0) {
+      const begin = data[0][0].valueOf();
+      const end = data[data.length - 1][0].valueOf();
+      const start = Math.max(latestDataTimestamp, begin);
+      const x = g.toDomXCoord(start);
       const y = area.y;
-      const w = area.w;
+      const w = g.toDomXCoord(end) - x;
       const h = area.h;
       canvas.fillStyle = this.predicatedRangeFillStyle;
       canvas.fillRect(x, y, w, h);
@@ -133,7 +137,12 @@ class Dygraph extends Component {
 
       if (annotations) {
         this._dygraph.ready(() => {
-          this._dygraph.setAnnotations(annotations);
+          if (this.props.onAnnotationClick) {
+            const annos = R.map(a => ({ ...a, text: '' }), annotations);
+            this._dygraph.setAnnotations(annos);
+          } else {
+            this._dygraph.setAnnotations(annotations);
+          }
         });
       }
 
@@ -153,14 +162,19 @@ class Dygraph extends Component {
   }
 
   componentWillUpdate(nextProps) {
-
     if (this._dygraph) {
       const { known: updateAttrs, rest } = spreadDygraphProps(nextProps, false);
       let { annotations, selection, highlights } = rest;
 
       this._dygraph.updateOptions(updateAttrs);
       if (annotations) {
-        this._dygraph.setAnnotations(annotations);
+        // If enable annotation click, remove the text for the anno.
+        if (nextProps.onAnnotationClick) {
+          const annos = R.map(a => ({ ...a, text: '' }), annotations);
+          this._dygraph.setAnnotations(annos);
+        } else {
+          this._dygraph.setAnnotations(annotations);
+        }
       }
 
       if (selection) {

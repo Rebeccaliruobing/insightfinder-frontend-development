@@ -4,6 +4,7 @@
 @import "./styles/statistic";
 @import "./styles/treemap";
 @import "./styles/heatmap";
+@import '~react-datepicker/dist/react-datepicker.css';
 
 #app {
   height: 100%;
@@ -31,10 +32,6 @@
 
 .ui.dimmer {
   background-color: rgba(0, 0, 0, 0.25) !important;
-}
-
-.dygraph-legend {
-  //background: transparent !important;
 }
 
 .auth.ui.container {
@@ -806,5 +803,161 @@
   height: inherit;
   > .dropdown.icon {
     top: 6px;
+  }
+}
+
+.ui.loading.container {
+  position: relative;
+  cursor: default;
+  point-events: none;
+  text-shadow: none !important;
+  color: transparent !important;
+  -webkit-transition: all 0s linear;
+  transition: all 0s linear;
+}
+
+.ui.loading.container:before {
+  position: absolute;
+  content: '';
+  top: 0%;
+  left: 0%;
+  background: rgba(255, 255, 255, 1);
+  width: 100%;
+  height: 100%;
+  border-radius: 0.14285714rem;
+  z-index: 100;
+}
+
+.ui.loading.container:after {
+  position: absolute;
+  content: '';
+  top: 50%;
+  left: 50%;
+  margin: -1.5em 0em 0em -1.5em;
+  width: 3em;
+  height: 3em;
+  -webkit-animation: segment-spin 0.6s linear;
+  animation: segment-spin 0.6s linear;
+  -webkit-animation-iteration-count: infinite;
+  animation-iteration-count: infinite;
+  border-radius: 500rem;
+  border-color: #767676 rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1);
+  border-style: solid;
+  border-width: 0.2em;
+  box-shadow: 0px 0px 0px 1px transparent;
+  visibility: visible;
+  z-index: 101;
+}
+.ui.loading.form:before {
+  background: rgba(255, 255, 255, 1) !important;
+}
+
+.ui.loading.segment:before{
+  z-index: 98;
+  background: rgba(255, 255, 255, 1);
+}
+.ui.loading.segment:after {
+  z-index: 99;
+}
+
+.d3-container {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.flex-col-container {
+  display: flex !important;
+  position: relative;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+}
+
+.flex-row-container {
+  display: flex;
+  position: relative;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+}
+
+.flex-item {
+  flex: 1;
+}
+
+.d3-popup {
+  position: absolute;
+  background: white;
+  padding: 4px 10px;
+  z-index: 1060;
+  text-align: left;
+  visibility: hidden;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  &:before {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    border: 8px solid transparent;
+  }
+  &:after {
+    content: '';
+    position: absolute;
+    display: inline-block;
+    border: 7px solid transparent;
+  }
+
+  &.right {
+    margin-left: 9px;
+    &.top:before {
+      top: 6px;
+      left: -16px;
+      border-right-color: rgba(0,0,0,0.15);
+    }
+    &.top:after {
+      top: 7px;
+      left: -14px;
+      border-right-color: white;
+    }
+  }
+
+  &.left {
+    margin-right: 9px;
+    &.top:before{
+      top: 6px;
+      right: -16px;
+      border-left-color: rgba(0,0,0,0.15);
+    }
+    &.top:after{
+      top: 7px;
+      right: -14px;
+      border-left-color: white;
+    }
+  }
+}
+
+.spacer {
+  margin: 5px 0;
+}
+
+.pui-tooltip-inner {
+  border-radius: 2px !important;
+}
+
+.rc-tooltip {
+  z-index: 2000 !important;
+}
+
+.ui.popup {
+  max-width: inherit;
+}
+.dygraph.popup-content {
+  font-size: 12px;
+  overflow: auto;
+  max-height: 300px;
+  > .header {
+    font-weight: bold;
+  }
+  > .content {
   }
 }

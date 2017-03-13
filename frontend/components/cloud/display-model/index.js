@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
+import moment from 'moment';
 import store from 'store';
+import ReactDOM from 'react-dom';
 import {Link, IndexLink} from 'react-router';
 import RcSlider from '../../ui/rc-slider';
 import HeatMap from '../../ui/graph/HeatMap';

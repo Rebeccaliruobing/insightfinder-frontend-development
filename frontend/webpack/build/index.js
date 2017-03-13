@@ -1,12 +1,13 @@
 import path from 'path';
+import mkdirp from 'mkdirp';
+import fs from 'fs';
 import gutil from 'gulp-util';
 import webpack from 'webpack';
 import makeConfig from '../makeConfig';
 import webpackSettings from '../../webpack.settings';
 
 const build = (done) => {
-
-  const config = makeConfig();
+  const config = makeConfig(webpackSettings);
 
   webpack(config, (fatalError, stats) => {
     const jsonStats = stats.toJson();
@@ -14,9 +15,6 @@ const build = (done) => {
     // We can save jsonStats to be analyzed with
     // github.com/robertknight/webpack-bundle-size-analyzer.
     // $ webpack-bundle-size-analyzer ./bundle-stats.json
-    const mkdirp = require('mkdirp');
-    const fs = require('fs');
-
     mkdirp.sync(webpackSettings.paths.build);
     fs.writeFileSync(
       path.join(webpackSettings.paths.build, 'bundle-stats.json'),

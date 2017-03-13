@@ -2,6 +2,9 @@ import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
 
+const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)}..`);
+const _hintDisplayLimit = 3;
+
 class DataParser {
 
   constructor(data, instanceName) {
@@ -30,6 +33,7 @@ class DataParser {
     this.nidMap = null;
     this.logEventArr = null;
     this.episodeMapArr = null;
+    this.logNidFE = null;
 
     this.mode = this._detectionModeAndParse();
   }
@@ -126,18 +130,30 @@ class DataParser {
     return retMap;
   }
 
-  _calculateRGB(anomalyRatio, size){
-    let val = (anomalyRatio==0) ? 0 : (anomalyRatio / size);
+  _calculateRGB(anomalyRatio,maxScore,minScore,size){
+    if (minScore >= 0) {
+      minScore = 0;
+    }
+    let val = !anomalyRatio ? 0 : anomalyRatio;
     let gcolorMax = 205;
+    const range = maxScore - minScore;
     var rcolor, gcolor, bcolor = 0;
-    if (val <= 1) {
-        if (val < 0) val = 0;
-        rcolor = Math.floor(255 * val);
-        gcolor = gcolorMax;
+    if (val === 0) {
+      rcolor = Math.floor(255 * val);
+      gcolor = gcolorMax;
+    } else if (val <= 1) {
+      // if (val < 0) val = 0;
+      val = 1;
+      rcolor = Math.floor(255 * val);
+      gcolor = gcolorMax;
     } else {
-        if (val > 10) val = 10;
-        rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+      // if (val > 10) val = 10;
+      rcolor = 255;
+      if(range==0){
+        gcolor = 0;
+      }else{
+        gcolor = Math.floor(gcolorMax - (((val - minScore) / range) * gcolorMax));
+      }
     }
     return (rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString());
   }
@@ -150,6 +166,17 @@ class DataParser {
     let instanceMetaData = this.data['instanceMetaDataJson'];
     let self = this;
     if(incidents){
+      let minScore = 0;
+      let maxScore = 0;
+      _.each(incidents, function (incident, index) {
+        let score = incident.anomalyRatio;
+        if(score>maxScore){
+          maxScore = score;
+        }
+        if(score<minScore){
+          minScore = score;
+        }
+      });
       _.each(incidents, function (incident, index) {
         if(incident.rootCauseByInstanceJson){
           let thisAnomaly = [];
@@ -159,7 +186,7 @@ class DataParser {
             let instance = (instanceMetaData[k] && instanceMetaData[k]['tagName'])?(instanceMetaData[k]['tagName']):k;
             let rootcause = incident.rootCauseByInstanceJson[k];
             causalTypes.push(instance);
-            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,incident.numberOfAnomalies)+')' );
+            thisAnomaly.push("incident #"+incident.id+": "+rootcause + "[" + instance + "]" + 'rgb('+self._calculateRGB(incident.anomalyRatio,maxScore,minScore,incident.numberOfAnomalies)+')' );
           }
           causalDataArray.push(thisAnomaly);
         }
@@ -319,58 +346,60 @@ class DataParser {
               var newhintsStr = "";
               var newhintsIncidentStr = "";
               _.each(newhintsArr,function(h,ih){
-                var parts = h.split(":");
-                var hintsSeries = parts[1];
-                if(parts.length == 3){
-                  hintsSeries = parts[2];
-                }
-                var hintStr = "";
-                _.each(hintsSeries.split(";"),function(item,index){
-                  let pos0 = item.indexOf(".");
-                  let pos1 = item.indexOf("[");
-                  let pos2 = item.indexOf("]");
-                  let pos23 = item.indexOf("(");
-                  let pos3 = item.indexOf(")");
-                  let pos4 = item.indexOf(")",pos3+1);
-                  let rootcause = item.substring(pos3+2,pos4);
-                  let valString = item.substring(pos23+1,pos3);
-                  if(valString != 'missing'){
-                    let val = parseFloat(item.substring(pos23+1,pos3));
-                    let roundedVal = Math.round(val*100)/100;
-                    valString = roundedVal.toString();
+                if(ih < _hintDisplayLimit){
+                  var parts = h.split(":");
+                  var hintsSeries = parts[1];
+                  if(parts.length == 3){
+                    hintsSeries = parts[2];
                   }
-                  if(!hasPct){
-                    rootcause = "";
-                  } else {
+                  var hintStr = "";
+                  _.each(hintsSeries.split(";"),function(item,index){
+                    let pos0 = item.indexOf(".");
+                    let pos1 = item.indexOf("[");
+                    let pos2 = item.indexOf("]");
+                    let pos23 = item.indexOf("(");
+                    let pos3 = item.indexOf(")");
+                    let pos4 = item.indexOf(")",pos3+1);
+                    let rootcause = item.substring(pos3+2,pos4);
+                    let valString = item.substring(pos23+1,pos3);
                     if(valString != 'missing'){
-                      let changePct = parseFloat(rootcause);
-                      let roundedChangePtc = Math.round(changePct*10)/10;
-                      let direction = "higher";
-                      if(changePct<0){
-                        direction = "lower";
-                        changePct = -changePct;
-                      }
-                      if(neuronId&&neuronId==-1){
-                        rootcause = roundedChangePtc.toString() + "% higher than threshold, ";  
-                      } else {
-                        rootcause = roundedChangePtc.toString() + "% " + direction + " than normal, ";
-                      }                      
-                    } else {
-                      rootcause = "missing value, "
+                      let val = parseFloat(item.substring(pos23+1,pos3));
+                      let roundedVal = Math.round(val*100)/100;
+                      valString = roundedVal.toString();
                     }
-                  }
-                  hintStr += "Root cause #" + (index+1) + ": "+rootcause
-                    +"instance:"+item.substring(pos1+1,pos2)
-                    +", metric:"+item.substring(pos0+1,pos1)
-                    +", value:"+valString+";\n";
-                });
-                let tsHint = parseInt(parts[0]);
-                let timeStringHint = moment(tsHint).format("YYYY-MM-DD HH:mm");
-
-                newhintsStr += "Starting at " + timeStringHint +",\n"+hintStr;
-                if(ih == 0){
-                  newhintsIncidentStr = newhintsStr;
-                }              
+                    if(!hasPct){
+                      rootcause = "";
+                    } else {
+                      if(valString != 'missing'){
+                        let changePct = parseFloat(rootcause);
+                        let roundedChangePtc = Math.round(changePct*10)/10;
+                        let direction = "higher";
+                        if(changePct<0){
+                          direction = "lower";
+                          changePct = -changePct;
+                        }
+                        if(neuronId&&neuronId==-1){
+                          rootcause = roundedChangePtc.toString() + "% higher than threshold, ";  
+                        } else {
+                          rootcause = roundedChangePtc.toString() + "% " + direction + " than normal, ";
+                        }                      
+                      } else {
+                        rootcause = "missing value, "
+                      }
+                    }
+                    hintStr += "Root cause #" + (index+1) + ": "+rootcause
+                      +"instance:"+item.substring(pos1+1,pos2)
+                      +", metric:"+item.substring(pos0+1,pos1)
+                      +", value:"+valString+";\n";
+                  });
+                  let tsHint = parseInt(parts[0]);
+                  let timeStringHint = moment(tsHint).format("YYYY-MM-DD HH:mm");
+  
+                  newhintsStr += "Starting at " + timeStringHint +",\n"+hintStr;
+                  if(ih == 0){
+                    newhintsIncidentStr = newhintsStr;
+                  }   
+                }           
               });
               // if(newhintsStr.length>750){
               //   newhintsStr = newhintsStr.substring(0,750)+"...";
@@ -395,6 +424,9 @@ class DataParser {
     }
     if(this.data['episodeMapArr']){
       this.episodeMapArr = this.data['episodeMapArr'];
+    }
+    if(this.data['nidFE']){
+      this.logNidFE = this.data['nidFE'];
     }
     if(this.data['wordCountArr']){
       this.wordCountArr = this.data['wordCountArr'];
@@ -639,7 +671,7 @@ class DataParser {
       } catch (err) {
       }
     }
-    let anomalyTexts = [];
+    // let anomalyTexts = [];
     let anomalyByMetricObjArr = [];
     // let causalDataArray = [];
     // let causalTypes = [];
@@ -709,7 +741,7 @@ class DataParser {
           //   return index === arr.indexOf(el);
           // });
         }
-        anomalyTexts.push(atext);
+        // anomalyTexts.push(atext);
         anomalyByMetricObjArr.push(anomalyByMetricObj);
       });
     }

@@ -1,9 +1,11 @@
-import React, {PropTypes as T} from "react";
-import moment from "moment";
-import _ from "lodash";
-import shallowCompare from "react-addons-shallow-compare";
-import {autobind} from "core-decorators";
-import {Dygraph} from "../../artui/react/dataviz";
+import React, { PropTypes as T } from 'react';
+import moment from 'moment';
+import R from 'ramda';
+import $ from 'jquery';
+import _ from 'lodash';
+import shallowCompare from 'react-addons-shallow-compare';
+import { autobind } from 'core-decorators';
+import { Dygraph } from '../../artui/react/dataviz';
 
 export class DataChart extends React.Component {
 
@@ -43,14 +45,29 @@ export class DataChart extends React.Component {
   @autobind
   handleAnnotationClick(anno) {
     if (anno && anno.div) {
-      var $p = $(anno.div);
-      var title = moment(parseInt(anno.x)).format("YYYY-MM-DD HH:mm");
-      $p.popup({
-        on: 'click',
-        title: title,
-        content: anno.text
-      });
-      $p.popup('show');
+      const x = anno.x;
+      let { annotations } = this.props;
+      const dowAnnotations = this.setWeekdaysForBarChar(this.props.data);
+      annotations = annotations || dowAnnotations;
+
+      // Get the annotion from data which has full infos.
+      const annotation = R.find(a => a.x === x, annotations);
+      if (annotation) {
+        let text = annotation.text;
+        const $p = $(anno.div);
+        let title = moment(parseInt(anno.x, 10)).format('YYYY-MM-DD HH:mm');
+        title = `<div class="header">${title}</div>`;
+        text = _.replace(text, /[,;]\n/g, '<br>');
+        text = _.replace(text, /Root cause /g, '');
+        text = _.replace(text, /, metric:/g, '<br>&nbsp;&nbsp;&nbsp;&nbsp;metric:');
+        const content = `<div class="content">${text}</div>`;
+
+        $p.popup({
+          on: 'click',
+          html: `<div class="dygraph popup-content">${title}${content}</div>`,
+        });
+        $p.popup('show');
+      }
     }
   }
 

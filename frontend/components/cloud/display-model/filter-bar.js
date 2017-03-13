@@ -111,7 +111,7 @@ export default  class FilterBar extends Component {
         </div>
 
         <div className="ui field">
-          <Button className={cx('orange', {'loading': this.props.loading})}
+          <Button className={`orange ${this.props.loading ? 'loading' : ''}`}
                   onClick={this.handleSubmit.bind(this)}>Submit</Button>
         </div>
       </div>

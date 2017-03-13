@@ -1,71 +1,129 @@
-import React from 'react';
-import cx from 'classnames';
+/* eslint-disable class-methods-use-this */
+import React, { PropTypes as T } from 'react';
+import store from 'store';
 import moment from 'moment';
 import _ from 'lodash';
+import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
-import TenderModal from '../../components/cloud/liveanalysis/tenderModal';
-import { getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
+import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
 import SysCallModal from './sysCallModal';
+import CausalGraphModal from './causalGraphModal';
 import apis from '../../apis';
 import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
+import WindowResizeListener from '../ui/window-resize-listener';
+
+const defaultSortColumn = 'id';
+const defaultSortDirection = 'desc';
+const columeStyles = {
+  id: { width: '10%', minWidth: 64 },
+  anomalyRatio: { width: '15%', minWidth: 80 },
+  startTimestamp: { width: '15%', minWidth: 80 },
+  duration: { width: '15%', minWidth: 80, paddingRight: '1em', textAlign: 'right' },
+  control: { width: 64, textAlign: 'center' },
+};
+const tableBodyOffsetHeight = 260;
 
 class IncidentsList extends React.Component {
+  static propTypes = {
+    projectName: T.string,
+    projectType: T.string,
+    activeTab: T.oneOf(['detected', 'predicted']),
+    onIncidentSelected: T.func.isRequired,
+  }
+
+  static defaultProps = {
+    activeTab: 'detected',
+  }
+
   constructor(props) {
     super(props);
+    const state = this.resetLocalDataAndState({}, props);
 
     this.state = {
-      incidents: props.incidents,
-      causalDataArray: props.causalDataArray,
-      causalTypes: props.causalTypes,
-      latestTimestamp: props.latestTimestamp,
-      numberOfDays: props.numberOfDays,
-      endTime: props.endTime,
-      modelType: props.modelType,
-      projectName: props.projectName,
-      projectType: props.projectType,
-      predictionWindow: props.predictionWindow,
-      shownMergedIncidentIds: [],
-      showTenderModal: false,
-      showTakeActionModal: false,
-      showSysCall: false,
-      debugData: undefined,
-      timeRanking: undefined,
-      freqRanking: undefined,
-      startTimestamp: undefined,
-      endTimestamp: undefined,
-      activeIncident: undefined,
-      actionTime: moment(),
-      angleIconStyleSelect: 'angleIconStyleId',
-      angleIconStyle: {
-        angleIconStyleId: 'down',
-        angleIconStyleSeverity: '',
-        angleIconStyleEvent: '',
-        angleIconStyleStartTime: '',
-        angleIconStyleDuration: '',
-      },
-      tabStates: {
-        predicted: '',
-        detected: 'active',
-      },
+      tableBodyHeight: window.clientHeight - tableBodyOffsetHeight,
+      ...state,
     };
   }
 
   componentDidMount() {
-    this.setIncidentsList(this.props);
+    // Raise the selected incident to parent component.
+    const { activeTab, activeIncident } = this.state;
+    this.props.onIncidentSelected(activeIncident, activeTab);
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setIncidentsList(nextProps);
+    const state = this.resetLocalDataAndState(this.props, nextProps);
+    if (state) {
+      this.setState(state);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { activeTab, activeIncident } = this.state;
+    if (prevState.activeIncident !== activeIncident) {
+      this.props.onIncidentSelected(activeIncident, activeTab);
+    }
+  }
+
+  @autobind
+  resetLocalDataAndState(prevProps, props) {
+    const { incidents, activeTab, eventStartTimestamp } = props;
+    let tab = activeTab;
+    let state = null;
+
+    if (prevProps.incidents !== incidents) {
+      this.detectedIncidents = R.filter(i => !i.predictedFlag, incidents);
+      this.predictedIncidents = R.filter(i => !!i.predictedFlag, incidents);
+
+      const ratios = R.map(v => v.anomalyRatio, incidents);
+      this.maxAnomalyRatio = R.reduce(R.max, 0, ratios);
+      this.minAnomalyRatio = R.reduce(R.min, 0, ratios);
+
+      // If we have active event id, try to find it and set the active tab.
+      const finder = R.find(d => d.startTimestamp.toString() === eventStartTimestamp);
+
+      let incident = finder(this.detectedIncidents);
+      if (incident) {
+        tab = 'detected';
+      } else {
+        incident = finder(this.predictedIncidents);
+        if (incident) tab = 'predicted';
+      }
+
+      // If not find the active event, select the first one
+      if (!incident) {
+        const ins = this.sortingIncidents(this.getIncidents(tab));
+        if (ins.length > 0) {
+          incident = ins[0];
+        }
+      }
+
+      state = {
+        shownMergedIncidentIdsByType: {
+          predicted: [],
+          detected: [],
+        },
+        activeTab: tab,
+        activeIncident: incident,
+        sortColumn: defaultSortColumn,
+        sortDirection: defaultSortDirection,
+        showCausalGraphModal: false,
+        showTakeActionModal: false,
+        showSysCall: false,
+      };
+    }
+
+    return state;
   }
 
   @autobind
   handleLoadSysCall(activeIncident) {
     // Return funtion as the click event handler
     return () => {
-      const { projectName } = this.state;
+      const { projectName } = this.props;
       const self = this;
       if (activeIncident) {
         const startTimestamp = activeIncident.startTimestamp;
@@ -74,8 +132,8 @@ class IncidentsList extends React.Component {
           if (resp.success) {
             self.setState({
               debugData: resp.data.syscallResults,
-              timeRanking: resp.data.freqFunctionList,
-              freqRanking: resp.data.timeFunctionList,
+              freqRanking: resp.data.freqFunctionList,
+              timeRanking: resp.data.timeFunctionList,
               showSysCall: true,
             });
           } else {
@@ -95,74 +153,67 @@ class IncidentsList extends React.Component {
     this.setState(incidentState);
   }
 
-  handleLinkToAgentWiki() {
-    const url = 'https://github.com/insightfinder/InsightAgent/wiki';
-    window.open(url, '_blank');
+@autobind
+  getIncidents(type) {
+    return (type === 'detected' ?
+      this.detectedIncidents : this.predictedIncidents) || [];
   }
 
-  setIncidentsList(props) {
-    let anomalyRatioLists = props.incidents.map(function (value, index) {
-      return value['anomalyRatio']
-    });
-    let stateIncidents = {
-      numberOfDays: props.numberOfDays,
-      endTime: props.endTime,
-      modelType: props.modelType,
-      projectName: props.projectName,
-      projectType: props.projectType,
-      incidents: props.incidents,
-      maxAnomalyRatio: _.max(anomalyRatioLists),
-      minAnomalyRatio: _.min(anomalyRatioLists),
-      causalDataArray: props.causalDataArray,
-      causalTypes: props.causalTypes,
-      latestTimestamp: props.latestTimestamp,
-      predictionWindow: props.predictionWindow,
-      showTenderModal: false,
-      showTakeActionModal: false,
-      startTimestamp: undefined,
-      endTimestamp: undefined,
-      actionTime: +moment(),
+  @autobind
+  sortingIncidents(incidents, sortColumn = 'id', sortDirection = 'desc') {
+    const direction = sortDirection === 'desc' ? R.descend : R.ascend;
+    const sorter = (sortColumn === 'eventType') ?
+      R.sortWith([direction(R.path(['rootCauseJson', 'rootCauseTypes']))]) :
+      R.sortWith([direction(R.prop(sortColumn))]);
+
+    return sorter(incidents);
+  }
+
+  @autobind
+  selectTab(tab) {
+    return () => {
+      const sortColumn = defaultSortColumn;
+      const sortDirection = defaultSortDirection;
+      const incidents = this.sortingIncidents(
+        this.getIncidents(tab), sortColumn, sortDirection,
+      );
+      const activeIncident = incidents.length > 0 ? incidents[0] : null;
+
+      this.setState({
+        activeTab: tab,
+        sortColumn,
+        sortDirection,
+        activeIncident,
+      }, () => {
+        if (activeIncident) {
+          this.handleIncidentSelected(activeIncident, tab);
+        }
+      });
     };
-    this.setState(stateIncidents);
   }
 
-  selectTab(e, tab, incidents) {
-    const angleIconStyleSelect = 'angleIconStyleId';
-    const angleIconStyle = {
-      angleIconStyleId: 'down',
-      angleIconStyleSeverity: '',
-      angleIconStyleEvent: '',
-      angleIconStyleStartTime: '',
-      angleIconStyleDuration: '',
+  @autobind
+  changeSorting(column) {
+    return () => {
+      const { sortColumn, sortDirection } = this.state;
+      let direction;
+      if (column === sortColumn) {
+        direction = (sortDirection === 'desc') ? 'asc' : 'desc';
+      } else {
+        direction = defaultSortDirection;
+      }
+
+      this.setState({
+        sortColumn: column,
+        sortDirection: direction,
+      });
     };
-    let tabStates = this.state.tabStates;
-    tabStates = _.mapValues(tabStates, () => '');
-    tabStates[tab] = 'active';
-    this.setState({
-      tabStates, angleIconStyleSelect, angleIconStyle,
-    });
-    let firstIncident = undefined;
-    if (incidents && incidents.length > 0) {
-      firstIncident = _.orderBy(incidents, '[id]', 'desc')[0];
-    }
-    this.handleIncidentSelected(firstIncident, tab);
-  }
-
-  changeAngleStyle(angleIconStyleSelect) {
-    let { angleIconStyle } = this.state;
-    const selectStyle = angleIconStyle[angleIconStyleSelect];
-
-    // Show only one up/down
-    angleIconStyle = _.mapValues(angleIconStyle, () => '');
-    angleIconStyle[angleIconStyleSelect] = selectStyle === 'up' ? 'down' : 'up';
-    this.setState({ angleIconStyle, angleIconStyleSelect });
   }
 
   @autobind
   renderEventSeverity(incident) {
-    const { maxAnomalyRatio, minAnomalyRatio } = this.state;
     const color = calculateRGBByAnomaly(
-      incident.anomalyRatio, maxAnomalyRatio, minAnomalyRatio,
+      incident.anomalyRatio, this.maxAnomalyRatio, this.minAnomalyRatio,
       incident.numberOfAnomalies);
 
     let eventTypes = incident.rootCauseJson.rootCauseTypes.split('\n');
@@ -172,120 +223,122 @@ class IncidentsList extends React.Component {
     eventTypes = _.uniq(eventTypes);
 
     return (
-      <svg width={70} height={26}>
+      <svg width={eventTypes.length * 10} height={26}>
         {eventTypes.map((event, index) => createEventShape(event, index, color))}
       </svg>
     );
   }
 
   @autobind
-  getIncidentOrderParams() {
-    const { angleIconStyle, angleIconStyleSelect } = this.state;
-    const order = angleIconStyle[angleIconStyleSelect] === 'up' ? 'asc' : 'desc';
-
-    let iteratees = [i => i.rootCauseJson.rootCauseTypes];
-
-    if (angleIconStyleSelect === 'angleIconStyleId') {
-      iteratees = ['id'];
-    }
-    if (angleIconStyleSelect === 'angleIconStyleSeverity') {
-      iteratees = ['anomalyRatio'];
-    }
-    if (angleIconStyleSelect === 'angleIconStyleStartTime') {
-      iteratees = ['startTimestamp'];
-    }
-    if (angleIconStyleSelect === 'angleIconStyleDuration') {
-      iteratees = ['duration'];
-    }
-
-    return { order, iteratees };
-  }
-
-  @autobind
   renderTableHead() {
-    const { angleIconStyle } = this.state;
+    const { sortColumn, sortDirection } = this.state;
+    const icon = sortDirection === 'desc' ? 'down' : 'up';
+
     return (
       <thead style={{ display: 'block', width: '100%' }}>
         <tr style={{ display: 'inline-table', width: '100%' }}>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleId')}>Id
-            <i className={`angle ${angleIconStyle.angleIconStyleId} icon`} />
+          <th style={columeStyles.id} onClick={this.changeSorting('id')}>
+            <span>Id</span>
+            <i className={`angle ${sortColumn === 'id' ? icon : ''} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleSeverity')}>Severity
-            <i className={`angle ${angleIconStyle.angleIconStyleSeverity} icon`} />
+          <th
+            style={{ textAlign: 'center', ...columeStyles.anomalyRatio }}
+            onClick={this.changeSorting('anomalyRatio')}
+          >
+            <span>Severity</span>
+            <i className={`angle ${sortColumn === 'anomalyRatio' ? icon : ''} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleStartTime')}>Start Time
-            <i className={`angle ${angleIconStyle.angleIconStyleStartTime} icon`} />
+          <th
+            style={columeStyles.startTimestamp}
+            onClick={this.changeSorting('startTimestamp')}
+          >
+            <span>Start Time</span>
+            <i className={`angle ${sortColumn === 'startTimestamp' ? icon : ''} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleDuration')}>Duration
-            <i className={`angle ${angleIconStyle.angleIconStyleDuration} icon`} />
+          <th
+            style={columeStyles.duration}
+            onClick={this.changeSorting('duration')}
+          >
+            <span>Duration</span>
+            <i className={`angle ${sortColumn === 'duration' ? icon : ''} icon`} />
           </th>
-          <th onClick={() => this.changeAngleStyle('angleIconStyleEvent')}>Event Type
-            <i className={`angle ${angleIconStyle.angleIconStyleEvent} icon`} />
+          <th
+            style={columeStyles.eventType}
+            onClick={this.changeSorting('eventType')}
+          >
+            <span>Event Type</span>
+            <i className={`angle ${sortColumn === 'eventType' ? icon : ''} icon`} />
           </th>
-          <th>Control</th>
+          <th style={{ cursor: 'default', ...columeStyles.control }}>Control</th>
         </tr>
       </thead>
     );
   }
 
   @autobind
-  toggleMergedIncidents(incident) {
+  toggleMergedIncidents(incident, type) {
     return (e) => {
       e.stopPropagation();
-      const { shownMergedIncidentIds } = this.state;
+      const { shownMergedIncidentIdsByType } = this.state;
+      const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
       let ids;
       // If any merged id exists in shownMergedIncidentIds, we need to hidden incidents.
-      if (incident._mergedIds && incident._mergedIds.length > 0) {
-        if (_.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0) {
-          ids = _.without(shownMergedIncidentIds, ...incident._mergedIds);
+      if (incident[`uiMergedIds_${type}`] && incident[`uiMergedIds_${type}`].length > 0) {
+        if (_.indexOf(shownMergedIncidentIds, incident[`uiMergedIds_${type}`][0]) >= 0) {
+          ids = _.without(shownMergedIncidentIds, ...incident[`uiMergedIds_${type}`]);
         } else {
-          ids = _.concat(shownMergedIncidentIds, incident._mergedIds);
+          ids = _.concat(shownMergedIncidentIds, incident[`uiMergedIds_${type}`]);
         }
 
+        const idsByType = _.cloneDeep(shownMergedIncidentIdsByType);
+        idsByType[type] = ids;
         this.setState({
-          shownMergedIncidentIds: ids,
+          shownMergedIncidentIdsByType: idsByType,
         });
       }
     };
   }
 
   @autobind
-  renderTableBody(incidents, type) {
+  renderTableBody(type) {
     // The type should be 'detected' or 'predicted'.
     // TODO: predicted needs to add syscall button?
     const self = this;
-    const { projectType, shownMergedIncidentIds, angleIconStyleSelect } = this.state;
+    const { projectType } = this.props;
+    const { sortColumn, sortDirection, shownMergedIncidentIdsByType, tableBodyHeight } = this.state;
+
+    const shownMergedIncidentIds = shownMergedIncidentIdsByType[type];
     const sysCallEnabled = (projectType.toLowerCase() === 'custom');
-    const needMerge = angleIconStyleSelect === 'angleIconStyleId';
-    // Get the order params and sort incidents
-    const { order, iteratees } = this.getIncidentOrderParams();
+    const needMerge = sortColumn === 'id';
+    let incidents = this.getIncidents(type);
+
     // The incidents is order by id by default, so we can add the merge flags
     // before sorting.
     if (needMerge) {
       let mainIncident = null;
       _.forEach(incidents, (incident) => {
-        incident._mergedIds = [];
-        incident._mergedDuration = (incident.anomalyRatio === 0 ? 0 : incident.duration);
+        incident[`uiMergedIds_${type}`] = [];
+        incident.uiMergedDuration = (incident.anomalyRatio === 0 ? 0 : incident.duration);
         if (!mainIncident) {
           mainIncident = incident;
         } else if (_.isEqual(mainIncident.rootCauseByInstanceJson,
           incident.rootCauseByInstanceJson) && incident.repeatedEventFlag) {
           // If root cause (instance, event type) are same, and has repeatedEventFlag,
           // we need to merge it.
-          incident._mergable = true;
-          mainIncident._mergedIds.push(incident.id);
-          mainIncident._lastMergedId = incident.id;
-          mainIncident._mergedDuration += (incident.anomalyRatio === 0 ? 0 : incident.duration);
+          incident.uiMergable = true;
+          mainIncident[`uiMergedIds_${type}`].push(incident.id);
+          mainIncident.uiLastMergedId = incident.id;
+          mainIncident.uiMergedDuration += (incident.anomalyRatio === 0 ? 0 : incident.duration);
         } else {
           mainIncident = incident;
         }
       });
     }
 
-    incidents = _.orderBy(incidents, iteratees, order);
+    incidents = this.sortingIncidents(incidents, sortColumn, sortDirection);
 
     return (
-      <tbody style={{ width: '100%', height: 480, overflow: 'auto', display: 'block' }}>
+      <tbody style={{ width: '100%', height: tableBodyHeight || 0, overflow: 'auto', display: 'block' }}>
         {incidents.map((incident) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
@@ -293,50 +346,58 @@ class IncidentsList extends React.Component {
             anomalyRatioString =
               `Event Anomaly Score: ${Math.round(incident.anomalyRatio * 10) / 10}\n`;
           }
-          const hidden = needMerge && incident._mergable &&
+          const hidden = needMerge && incident.uiMergable &&
             _.indexOf(shownMergedIncidentIds, incident.id) < 0;
-          const mergedShown = needMerge && incident._mergedIds.length > 0 &&
-            _.indexOf(shownMergedIncidentIds, incident._mergedIds[0]) >= 0;
-          const mergedArrow = mergedShown ? (order === 'asc' ? 'down' : 'up') : 'right';
+          const mergedShown = needMerge && incident[`uiMergedIds_${type}`].length > 0 &&
+            _.indexOf(shownMergedIncidentIds, incident[`uiMergedIds_${type}`][0]) >= 0;
+          const mergedArrow = mergedShown ? (sortDirection === 'asc' ? 'down' : 'up') : 'right';
 
           return (
             <tr
-              style={{ display: hidden ? 'none' : 'inline-table', width: '100%' }} key={incident.id}
+              style={{ display: hidden ? 'none' : 'inline-table', width: '100%' }}
+              key={incident.id}
               onClick={() => this.handleIncidentSelected(incident, type)}
-              className={cx({ active: incident === self.state.activeIncident })}
+              className={`${incident === self.state.activeIncident ? 'active' : ''}`}
               title={`${anomalyRatioString}Event details: \n ${incident.rootCauseJson.rootCauseDetails}`}
             >
-              <td>
-                {needMerge && incident._lastMergedId && !mergedShown ? `${incident.id}-${incident._lastMergedId}` : incident.id}
-                {needMerge && incident._lastMergedId && <i
-                  onClick={self.toggleMergedIncidents(incident)}
+              <td style={{ paddingTop: '1em', ...columeStyles.id }}>
+                {needMerge && incident.uiLastMergedId &&
+                  !mergedShown ? `${incident.id}-${incident.uiLastMergedId}` : incident.id}
+                {needMerge && incident.uiLastMergedId && <i
+                  onClick={self.toggleMergedIncidents(incident, type)}
                   style={{ cursor: 'pointer' }} className={`icon angle ${mergedArrow}`}
                 />}
               </td>
-              <td>{this.renderEventSeverity(incident)}</td>
-              <td className="code">{moment(incident.startTimestamp).format('MM-DD HH:mm')}</td>
-              <td>
-                {!mergedShown && `${incident._mergedDuration} min`}
+              <td style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.anomalyRatio }}>
+                {this.renderEventSeverity(incident)}
+              </td>
+              <td
+                className="code"
+                style={{ textAlign: 'center', paddingTop: '1em', ...columeStyles.startTimestamp }}
+              >
+                {moment(incident.startTimestamp).format('MM-DD HH:mm')}
+              </td>
+              <td style={{ textAlign: 'right', paddingTop: '1em', ...columeStyles.duration }}>
+                {!mergedShown && `${incident.uiMergedDuration} min`}
                 {mergedShown && (incident.anomalyRatio === 0 ? 'N/A' : `${incident.duration} min`)}
               </td>
-              <td className="code">{incident.rootCauseJson.rootCauseTypes}
+              <td className="code" style={{ paddingTop: '1em', ...columeStyles.eventType }}>
+                {incident.rootCauseJson.rootCauseTypes}
                 {sysCallEnabled && incident.syscallFlag &&
                   <i className="zoom icon" onClick={this.handleLoadSysCall(incident)} />}
               </td>
-              <td>{
-                incident.anomalyRatio === 0 ?
-                  'N/A' :
-                  <Button
-                    className="blue" onClick={(e) => {
-                      e.stopPropagation();
-                      this.setState({
-                        activeIncident: incident,
-                        showTakeActionModal: true,
-                        actionTime: moment(),
-                      });
-                    }}
-                    style={{ paddingLeft: 2, paddingRight: 2 }}
-                  >Action</Button>}
+              <td className="control" style={columeStyles.control}>
+                {incident.anomalyRatio === 0 ? 'N/A' : <Button
+                  className="blue" onClick={(e) => {
+                    e.stopPropagation();
+                    this.setState({
+                      activeIncident: incident,
+                      showTakeActionModal: true,
+                    });
+                  }}
+                  style={{ paddingLeft: 2, paddingRight: 2 }}
+                >Action</Button>
+                }
               </td>
             </tr>
           );
@@ -345,73 +406,141 @@ class IncidentsList extends React.Component {
     );
   }
 
-  render() {
-    const { incidents, latestTimestamp, predictionWindow, tabStates, projectName } = this.state;
+  @autobind
+  renderLegend() {
+    return (
+      <div className="list-legend">
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.HighCPU)}</svg>
+          <span className="title">CPU Surge</span>
+        </div>
+        <div className="block" style={{ width: 140 }}>
+          <svg width={16} height={20}>{createEventShape(EventTypes.Network)}</svg>
+          <span className="title">Network Congestion</span>
+        </div>
+        <div className="block" style={{ width: 120 }}>
+          <svg width={16} height={20}>{createEventShape(EventTypes.Disk)}</svg>
+          <span className="title">Disk Contention</span>
+        </div>
+        <div className="block" style={{ width: 140 }}>
+          <svg width={16} height={20}>{createEventShape(EventTypes.Workload)}</svg>
+          <span className="title">Workload Increase</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.NewInstance, 0, '0,255,0')}</svg>
+          <span className="title">New Instance</span>
+        </div>
+        <div className="block">
+          <svg width={16} height={20}>{createEventShape(EventTypes.InstanceDown)}</svg>
+          <span className="title">Instance Down</span>
+        </div>
+        <div className="block" style={{ width: 80 }}>
+          <svg width={16} height={20}>{createEventShape(EventTypes.Others)}</svg>
+          <span className="title">Others</span>
+        </div>
+      </div>
+    );
+  }
 
-    const detectedIncidents = incidents.filter(
-      incident => incident.startTimestamp <= latestTimestamp);
-    const predictedIncidents = incidents.filter(
-      incident => incident.endTimestamp > latestTimestamp);
+  @autobind
+  handleWindowResize({ windowHeight }) {
+    const tableBodyHeight = windowHeight - tableBodyOffsetHeight;
+    this.setState({
+      tableBodyHeight,
+    });
+  }
+
+  showInstanceChart() {
+    const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
+    const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
+    const projectParam = projectParams.find(p => p.projectName == projectName);
+    const modelType = 'Holistic';
+    const cvalueParam = projectParam ? projectParam.cvalue : '1';
+    const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
+    const params = {
+      projectName,
+      instanceGroup,
+      version: 3,
+      pvalue: pvalueParam,
+      cvalue: cvalueParam,
+      modelType,
+      predictedFlag: this.props.predictedFlag,
+    };
+    let startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
+    params.startTimestamp = startTime.valueOf();
+    params.endTimestamp = eventEndTime;
+
+    const url = `/liveMonitoring?${$.param(params)}`;
+    window.open(url, '_blank');
+  }
+
+  render() {
+    const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
+    const { activeTab } = this.state;
+
+    const detectedIncidents = this.detectedIncidents;
+    const predictedIncidents = this.predictedIncidents;
 
     return (
-      <div>
-        <div className="row" style={{ marginBottom: 10, position: 'relative' }}>
+      <div className="flex-col-container" style={{ height: '100%' }}>
+        <WindowResizeListener onResize={this.handleWindowResize} />
+        <div style={{ marginBottom: 4, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', left: 350, top: 5 }} title="Causal Graph"
-            onClick={(e) => {
-              e.stopPropagation();
-              this.setState({
-                showTenderModal: true,
-                startTimestamp: undefined,
-                endTimestamp: undefined,
-              });
-            }}
+            style={{ position: 'absolute', left: 320, top: 5 }} title="Causal Graph"
+            onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
           >Causal Graph</Button>
-          <div className="ui pointing secondary menu">
+          {['admin','guest'].indexOf(store.get('userName'))!=-1 && <Button
+            className="orange"
+            style={{ position: 'absolute', left: 450, top: 5 }} title="Overall Chart"
+            onClick={(e) => { e.stopPropagation(); this.showInstanceChart(); }}
+          >Overall Chart</Button>}
+          <div className="ui pointing secondary menu" style={{ marginTop: 0 }}>
             <a
-              className={`${tabStates.detected} item`}
-              onClick={e => this.selectTab(e, 'detected', detectedIncidents)}
+              className={`${activeTab === 'detected' ? 'active' : ''} item`}
+              onClick={this.selectTab('detected')}
             >Detected Events</a>
             <a
-              className={`${tabStates.predicted} item`}
-              onClick={e => this.selectTab(e, 'predicted', predictedIncidents)}
+              className={`${activeTab === 'predicted' ? 'active' : ''} item`}
+              onClick={this.selectTab('predicted')}
             >Predicted Events ({predictionWindow} Hr)</a>
           </div>
         </div>
-        <div className={`${tabStates.predicted} ui tab`}>
+        <div className={`${activeTab === 'predicted' ? 'active' : ''} ui tab flex-item`}>
           {(predictedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}
-              {this.renderTableBody(predictedIncidents, 'predicted')}
+              {this.renderTableBody('predicted')}
             </table>
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal in prediction.</h5>
           }
+          {(predictedIncidents.length > 0) && this.renderLegend()}
         </div>
-        <div className={`${tabStates.detected} ui tab`}>
+        <div className={`${activeTab === 'detected' ? 'active' : ''} ui tab flex-item`}>
           {(detectedIncidents.length > 0) ?
             <table className="incident-table selectable ui table">
               {this.renderTableHead()}
-              {this.renderTableBody(detectedIncidents, 'detected')}
+              {this.renderTableBody('detected')}
             </table>
             :
             <h5><img alt="normal" height="40px" src={thumbupImg} />Congratulations! Everything is normal.</h5>
           }
+          {(detectedIncidents.length > 0) && this.renderLegend()}
         </div>
-        {this.state.showTenderModal &&
-          <TenderModal
-            dataArray={this.state.causalDataArray} types={this.state.causalTypes}
-            endTimestamp={this.state.endTimestamp}
-            startTimestamp={this.state.startTimestamp}
-            onClose={() => this.setState({ showTenderModal: false })}
+        {this.state.showCausalGraphModal &&
+          <CausalGraphModal
+            projectName={projectName} instanceGroup={instanceGroup}
+            endTime={eventEndTime} numberOfDays={numberOfDays}
+            loadGroup
+            onClose={() => this.setState({ showCausalGraphModal: false })}
+            onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
         }
         {this.state.showTakeActionModal &&
           <TakeActionModal
             incident={this.state.activeIncident}
-            projectName={this.state.projectName}
-            actionTime={this.state.actionTime}
+            projectName={projectName}
             onClose={() => this.setState({ showTakeActionModal: false })}
           />
         }

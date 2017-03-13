@@ -158,14 +158,15 @@ export default class CausalGraph extends React.Component {
             cursor: 'pointer'
         });
 
+        /*
         $(this.$showText).text(point.title).attr({
             x: point.x + 15,
             y: point.y + 10
         });
+        */
 
         point.outLines.forEach((line)=>this.highLightLine(line, 'blue'));
         point.inLines.forEach((line)=>this.highLightLine(line, 'green'));
-
     }
 
     unHighLightPoint(point) {
@@ -175,7 +176,7 @@ export default class CausalGraph extends React.Component {
             stroke: '#fff',
             cursor: 'pointer'
         });
-        $(this.$showText).text('').attr({ x: point.x, y: point.y });
+        // $(this.$showText).text('').attr({ x: point.x, y: point.y });
         point.outLines.forEach((line)=>this.unHighLightLine(line));
         point.inLines.forEach((line)=>this.unHighLightLine(line));
     }

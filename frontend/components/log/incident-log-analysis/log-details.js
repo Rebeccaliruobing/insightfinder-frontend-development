@@ -16,6 +16,13 @@ const ProjectLogDetails = class extends React.Component {
       loading: false,
       selectedGroup: '',
     };
+
+    this.sensitivityMap = {};
+    this.sensitivityMap["0.99"] = "Low";
+    this.sensitivityMap["0.95"] = "Medium Low";
+    this.sensitivityMap["0.9"] = "Medium";
+    this.sensitivityMap["0.75"] = "Medium High";
+    this.sensitivityMap["0.5"] = "High";
   }
 
   componentDidMount() {
@@ -29,7 +36,7 @@ const ProjectLogDetails = class extends React.Component {
       modelType,
       startTime, endTime,
       modelStartTime, modelEndTime,
-      isExistentIncident,
+      isExistentIncident, rareEventThreshold,
     } = query;
     this.setState({ loading: true }, () => {
       apis.postLogAnalysis(
@@ -37,7 +44,7 @@ const ProjectLogDetails = class extends React.Component {
         pvalue, cvalue,
         modelType,
         startTime, endTime,
-        modelStartTime, modelEndTime, isExistentIncident, '')
+        modelStartTime, modelEndTime, isExistentIncident, rareEventThreshold, '')
         .then((resp) => {
           const update = {};
           if (resp.success) {
@@ -58,6 +65,7 @@ const ProjectLogDetails = class extends React.Component {
     let { query } = this.props.location;
     let { projectName, modelName, derivedPvalue, rareEventThreshold, pvalue, cvalue, modelType } = query;
     let { data, groupId, loading } = this.state;
+    let derivedPvalueText = this.sensitivityMap[derivedPvalue];
     if (projectName === '') {
       projectName = modelName;
     }
@@ -68,15 +76,8 @@ const ProjectLogDetails = class extends React.Component {
           <div className="topbar-text">
             <div className="title">
               Please view anomaly detection result for <b>{projectName}</b><br />
-              with model type <b>{modelType}</b>, rare event detection sensitivity <b>{rareEventThreshold}</b>,
-              frequency anomaly detection sensitivity <b>{derivedPvalue}</b>.
-          </div>
-            <div className="legend">
-              <div>Anomaly color map:</div>
-              <div className="colormap2">
-                <div style={{ float: 'left' }}>Normal</div>
-                <div style={{ float: 'right' }}>Abnormal</div>
-              </div>
+              with model type <b>{modelType}</b>, rare event detection threshold <b>{rareEventThreshold}</b>,
+              frequency anomaly detection sensitivity <b>{derivedPvalueText}</b>.
             </div>
           </div>
         </Console.Topbar>

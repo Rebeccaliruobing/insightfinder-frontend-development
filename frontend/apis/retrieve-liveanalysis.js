@@ -2,10 +2,9 @@ import store from 'store';
 import _ from 'lodash';
 import getEndpoint from './get-endpoint';
 import DataParser from './data-parser';
-import moment from 'moment';
 
-export function buildTreemap(projectName, incidentName, statistics, anomaliesList, incident) {
-
+export function buildTreemap(
+  projectName, incidentName, statistics, anomaliesList, incident, instanceStatsJson) {
   // Create tree structure with instance => container => metric.
   // If no container, instance => metric.
 
@@ -35,12 +34,15 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
     const cname = isContainer ? names[0] : '';
 
     const instanceType = instanceTypeMap[inst];
+    const isFilterByStats = !!instanceStatsJson;
+    const statsByMetric = _.get(instanceStatsJson, [inst, 'statsByMetricJson'], {});
     let instanceMetrics = metrics;
     if (instanceType && typeMetricMap[instanceType]) {
       instanceMetrics = typeMetricMap[instanceType] || [];
     }
 
-    const children = _.map(instanceMetrics, (m) => {
+    const children = [];
+    _.forEach(instanceMetrics, (m) => {
       const mn = m.trim();
       const val = parseFloat(anomalies[mn]);
       let eventType1 = rootCauseByInstanceJson[mn] || '';
@@ -50,21 +52,23 @@ export function buildTreemap(projectName, incidentName, statistics, anomaliesLis
         eventType1 = eventType1.slice(0, pos1);
       }
 
-      return {
-        id: mn,
-        type: 'metric',
-        active: true,
-        projectName,
-        instanceName: inst,
-        instanceType: instanceTypeMap[inst],
-        name: mn,
-        eventStartTime,
-        eventEndTime,
-        value: 1,
-        text: _.isFinite(val) ? val.toFixed(2) : '',
-        score: _.isFinite(val) ? val : 0.0,
-        eventType: eventType1,
-      };
+      if (!isFilterByStats || statsByMetric[mn]) {
+        children.push({
+          id: mn,
+          type: 'metric',
+          active: true,
+          projectName,
+          instanceName: inst,
+          instanceType: instanceTypeMap[inst],
+          name: mn,
+          eventStartTime,
+          eventEndTime,
+          value: 1,
+          text: _.isFinite(val) ? val.toFixed(2) : '',
+          score: _.isFinite(val) ? val : 0.0,
+          eventType: eventType1,
+        });
+      }
     });
 
     if (isContainer) {
@@ -191,6 +195,7 @@ export function retrieveLiveAnalysis(projectName, modelType, instanceGroup, pval
           ret['causalDataArray'] = causalDataArray;
           ret['causalTypes'] = causalTypes;
           ret['latestDataTimestamp'] = latestTimestamp;
+          ret['eventsCausalRelation'] = data['eventsCausalRelation'] || {};
           // ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
           ret['incidents'] = incidentList;
 

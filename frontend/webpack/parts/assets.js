@@ -2,22 +2,12 @@
  * Webpack module/rules configuration for static assets files.
  *
  * Dependant packages:
- * $ npm i -D file-loader url-loader json-loader
+ * $ yarn add -D file-loader url-loader
 **/
-
 const assets = (settings) => {
-  const { paths } = settings;
+  const { paths, assetsRoot } = settings;
 
   return [{
-    // json
-    resource: {
-      test: /\.json$/,
-      exclude: paths.node_modules,
-    },
-    use: {
-      loader: 'json-loader',
-    },
-  }, {
     // images
     resource: {
       test: /\.(gif|jpg|png|svg)(\?.*)?$/,
@@ -27,7 +17,7 @@ const assets = (settings) => {
       loader: 'url-loader',
       options: {
         limit: 10000,
-        name: 'assets/imgs/[name]-[hash:12].[ext]',
+        name: `${assetsRoot}imgs/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -38,7 +28,7 @@ const assets = (settings) => {
     use: [{
       loader: 'file-loader',
       options: {
-        name: 'assets/imgs/[name]-[hash:12].[ext]',
+        name: `${assetsRoot}imgs/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -50,7 +40,7 @@ const assets = (settings) => {
       loader: 'url-loader',
       options: {
         limit: 100000,
-        name: 'assets/fonts/[name]-[hash:12].[ext]',
+        name: `${assetsRoot}fonts/[name]-[hash:12].[ext]`,
       },
     }],
   }, {
@@ -62,7 +52,7 @@ const assets = (settings) => {
     use: {
       loader: 'file-loader',
       options: {
-        name: 'assets/medias/[name]-[hash:12].[ext]',
+        name: `${assetsRoot}medias/[name]-[hash:12].[ext]`,
       },
     },
   }];

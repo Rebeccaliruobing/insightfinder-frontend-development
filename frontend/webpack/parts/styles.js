@@ -5,13 +5,16 @@
  * $ npm i -D file-loader url-loader
  * $ npm i -D css-loader postcss-loader style-loader
  * $ npm i -D node-sass sass-loader less less-loader
- * $ npm i -D extract-text-webpack-plugin@2.0.0-beta.4
  **/
 
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import HappyPack from 'happypack';
+import autoprefixer from 'autoprefixer';
 
-const assets = (settings) => {
-  const { isDev } = settings;
+const happyPool = HappyPack.ThreadPool({ size: 6 })
+
+const styles = (settings) => {
+  const { isDev, isProd, assetsRoot } = settings;
 
   const styleLoaders = (loaders) => {
     if (isDev) {
@@ -20,38 +23,111 @@ const assets = (settings) => {
       }].concat(loaders);
     }
 
-    return ExtractTextPlugin.extract({
-      fallbackLoader: 'style-loader',
-      loader: loaders,
-    });
+    return loaders;
+  };
+
+  const extractStyleLoaders = (loaders) => {
+    if (isProd) {
+      return ExtractTextPlugin.extract({
+        fallback: 'style-loader',
+        use: loaders,
+      });
+    }
+    return loaders;
   };
 
   const cssLoaders = [{
     loader: 'css-loader',
     options: {
-      sourceMap: isDev,
+      importLoaders: 1,
+      sourceMap: true,
     },
   }, {
     loader: 'postcss-loader',
+    options: {
+      plugins: () => [
+        autoprefixer({ browsers: ['last 2 versions', '> 1%'] }),
+      ],
+    },
   }];
 
-  return [{
+  const rules = [{
     // normal css
-    test: /\.css$/,
-    loaders: styleLoaders(cssLoaders),
+    resource: {
+      test: /\.css$/,
+    },
+    use: extractStyleLoaders({
+      loader: 'happypack/loader',
+      options: {
+        id: 'css',
+      },
+    }),
   }, {
     // Sass
-    test: /\.scss$/,
-    loaders: styleLoaders(cssLoaders.concat({
-      loader: `sass-loader${isDev ? '?sourceMap' : ''}`,
-    })),
+    resource: {
+      test: /\.scss$/,
+    },
+    use: extractStyleLoaders({
+      loader: 'happypack/loader',
+      options: {
+        id: 'sass',
+      },
+    }),
   }, {
     // Less
     test: /\.less$/,
-    loaders: styleLoaders(cssLoaders.concat({
-      loader: `less-loader${isDev ? '?sourceMap' : ''}`,
-    })),
+    use: extractStyleLoaders({
+      loader: 'happypack/loader',
+      options: {
+        id: 'less',
+      },
+    }),
   }];
+
+  let plugins = [
+    new HappyPack({
+      id: 'css',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders),
+    }),
+    new HappyPack({
+      id: 'sass',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders.concat({
+        loader: 'sass-loader',
+        options: {
+          sourceMap: true,
+        },
+      })),
+    }),
+    new HappyPack({
+      id: 'less',
+      cache: true,
+      threadPool: happyPool,
+      verbose: false,
+      loaders: styleLoaders(cssLoaders.concat({
+        loader: 'less-loader',
+        options: {
+          sourceMap: true,
+        },
+      })),
+    }),
+  ];
+
+  if (isProd) {
+    plugins = plugins.concat([
+      new ExtractTextPlugin(`${assetsRoot}[name]-[hash].css`),
+    ]);
+  }
+
+  return {
+    rules,
+    plugins,
+  };
 };
 
-export default assets;
+export default styles;
