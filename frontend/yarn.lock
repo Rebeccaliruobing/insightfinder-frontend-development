@@ -1865,12 +1865,18 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
 
-echarts-for-react@^1.1.4:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/echarts-for-react/-/echarts-for-react-1.1.6.tgz#6d7dad5b3a511bbbe557eac7003d66dca6917bf4"
+echarts-for-react@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/echarts-for-react/-/echarts-for-react-1.1.5.tgz#891dc795e5cb36ba74971b917882923a302b4cb0"
   dependencies:
     echarts "^3.1.1"
     element-resize-event "^2.0.5"
+
+echarts@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/echarts/-/echarts-3.3.1.tgz#35ad7b1e9e941450ad3e0134635a04bf1e61bb42"
+  dependencies:
+    zrender "^3.2.1"
 
 echarts@^3.1.1:
   version "3.4.0"
@@ -6422,6 +6428,6 @@ yargs@~3.10.0:
     decamelize "^1.0.0"
     window-size "0.1.0"
 
-zrender@^3.3.0:
+zrender@^3.2.1, zrender@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/zrender/-/zrender-3.3.0.tgz#efb5280b248aa48e3bba8d8f8e5469033a355d26"
