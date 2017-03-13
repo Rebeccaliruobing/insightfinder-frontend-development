@@ -5,23 +5,26 @@ import cx from 'classnames';
 type Props = {
   src: string,
   alt: string,
-  size: string,
+  size: string | number,
   className: string,
+  style: Object,
 };
 
 const Image = ({
-  src, alt, size, className, ...rest
+  src, alt,
+  size, className, style, ...rest
 }: Props) => {
   const classes = cx(
     'fui', {
-      size,
+      size: typeof size === 'string',
     },
     'image',
     className,
   );
+  const width = typeof size === 'number' ? { width: size } : {};
   return (
     <div className={classes}>
-      <img alt={alt} src={src} {...rest} />
+      <img alt={alt} src={src} {...rest} {...width} />
     </div>
   );
 };

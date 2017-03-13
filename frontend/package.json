@@ -55,7 +55,7 @@
     "bluebird": "^3.4.6",
     "blueimp-file-upload": "^9.12.5",
     "classnames": "^2.2.5",
-    "core-decorators": "^0.12.3",
+    "core-decorators": "^0.15.0",
     "d3": "^3.5.17",
     "dagre": "^0.7.4",
     "dygraphs": "^1.1.1",

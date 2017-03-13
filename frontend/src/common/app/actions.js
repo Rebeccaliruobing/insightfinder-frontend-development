@@ -1,5 +1,5 @@
 /* @flow */
-// import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { REHYDRATE } from 'redux-persist/constants';
 import type { Action } from '../types';
 
@@ -45,8 +45,7 @@ export const appError = (error: Error): Action => ({
 
 const appStartEpic = (action$: any) =>
   action$.ofType(REHYDRATE)
-    .map(appStarted)
-    .map(hideAppLoader);
+    .mapTo(appStarted());
 
 export const epics = [
   appStartEpic,

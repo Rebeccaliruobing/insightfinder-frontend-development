@@ -10,6 +10,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    > .fui.image {
+      transform: translateY(-15%);
+    }
+  }
+  > .fui.image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    &:before {
+      content: "";
+      width: 120%;
+      height: 120%;
+      border: 2px solid green;
+    }
   }
   &.hidden {
     display: none;

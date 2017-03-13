@@ -1444,9 +1444,9 @@ cookie@0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
-core-decorators@^0.12.3:
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/core-decorators/-/core-decorators-0.12.3.tgz#6b3f83378e680d48b0c08da4489899b7532dcb43"
+core-decorators@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/core-decorators/-/core-decorators-0.15.0.tgz#e5a58ff7ed48b9d2ef42262fd9550cddde18a819"
 
 core-js@^1.0.0:
   version "1.2.7"

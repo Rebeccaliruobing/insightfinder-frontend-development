@@ -1,17 +1,16 @@
 /* @flow */
 import React from 'react';
 import cx from 'classnames';
-import Image from './Image';
 
 type Props = {
-  className: ?string,
   fullScreen: bool,
   visible: bool,
-  size: ?string,
+  size: number,
+  className: string,
   imageSrc: string,
 };
 
-const Loader = ({
+const ImageLoader = ({
   imageSrc, fullScreen, visible, size,
   className, ...rest
 }: Props) => {
@@ -19,24 +18,23 @@ const Loader = ({
     'fui', {
       'full-screen': fullScreen,
       hidden: !visible,
-      size,
     },
-    'loader',
+    'has-image loader',
     className,
   );
-  let children = null;
-  if (imageSrc) {
-    children = (<Image src={imageSrc} size={size} />);
-  }
 
   return (
-    <div className={classes} {...rest}>{children}</div>
+    <div className={classes} {...rest}>
+      <div className="fui image" style={{ width: size, height: size }}>
+        <img alt="" src={imageSrc} size={size} />
+      </div>
+    </div>
   );
 };
 
-Loader.defaultProps = {
+ImageLoader.defaultProps = {
   fullScreen: false,
   visible: false,
 };
 
-export default Loader;
+export default ImageLoader;
