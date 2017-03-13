@@ -9,6 +9,7 @@ export type AppState = {
   locales: ?Array<string>,
   messages: ?Object,
   started: boolean,
+  appLoaderVisible: boolean,
   error: ?Error,
 };
 
@@ -30,4 +31,6 @@ export type Action =
   | { type: 'APP_START' }
   | { type: 'APP_STARTED' }
   | { type: 'APP_STOP' }
+  | { type: 'SHOW_APPLOADER' }
+  | { type: 'HIDE_APPLOADER' }
   ;
