@@ -1,0 +1,17 @@
+@import "../variables";
+
+img.fui.image {
+  display: block;
+}
+
+.fui.image {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  max-width: 100%;
+  svg, img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+}

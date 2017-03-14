@@ -9,7 +9,7 @@ import start from '../../common/app/start';
 import { ThemeProvider } from '../../common/app/components';
 import { setWindowSize } from '../../common/app/actions';
 import Routing from './Routing';
-import Loading from './Loading';
+import AppLoader from './AppLoader';
 import * as themes from './themes';
 import '../../lib/fui/fui.scss';
 
@@ -51,8 +51,9 @@ export class AppCore extends React.Component {
   }
 
   render() {
-    const { appStarted, currentLocale, currentTheme, ...rest } = this.props;
+    const { currentLocale, currentTheme, appStarted, ...rest } = this.props;
     const others = omit(['setWindowSize'], rest);
+
     return (
       <ThemeProvider theme={themes[currentTheme] || themes.light}>
         <Container fullHeight>
@@ -62,7 +63,8 @@ export class AppCore extends React.Component {
               class: currentTheme ? `${currentTheme} theme` : '',
             }}
           />
-          <Routing {...others} />
+          <AppLoader />
+          {appStarted && <Routing {...others} />}
         </Container>
       </ThemeProvider>
     );

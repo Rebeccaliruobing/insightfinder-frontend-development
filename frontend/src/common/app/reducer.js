@@ -23,6 +23,7 @@ const initialState = {
     heightDiff: 0,
   },
   started: false,
+  appLoaderVisible: true,
   error: null,
 };
 
@@ -59,6 +60,16 @@ const reducer = (
     return {
       ...state,
       started: true,
+    };
+  } else if (action.type === 'SHOW_APPLOADER') {
+    return {
+      ...state,
+      appLoaderVisible: true,
+    };
+  } else if (action.type === 'HIDE_APPLOADER') {
+    return {
+      ...state,
+      appLoaderVisible: false,
     };
   } else if (action.type === 'APP_ERROR') {
     return {
