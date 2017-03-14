@@ -16,6 +16,8 @@ $grey-800:     #424242 !default;
 $grey-900:     #212121 !default;
 $grey:         $grey-500;
 
+$primary-color: #2196f3 !default;
+$link: #4183C4 !default;
 //
 // Text and background colors
 // 
@@ -42,5 +44,3 @@ $light-background-statusbar-color: $grey-300 !default;
 $light-background-appbar-color:    $grey-100 !default;
 $light-background-color:           $grey-50 !default;
 $light-background-modal-color:     $white !default;
-
-$link: #4183C4 !default;

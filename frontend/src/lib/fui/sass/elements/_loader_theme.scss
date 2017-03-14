@@ -1,4 +1,13 @@
 .fui.loader {
+  &.has-image > .fui.image {
+    &:before {
+      border: 2px solid $loader-border-color;
+      background-color: $loader-bg-color;
+    }
+    &:after {
+      border-top-color: $primary-color;
+    }
+  }
   &.full-screen {
     background-color: $body-bg-color;
   }

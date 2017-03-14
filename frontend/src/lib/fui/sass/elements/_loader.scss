@@ -21,6 +21,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    > img {
+      z-index: 1;
+    }
     &:before {
       content: " ";
       position: absolute;
@@ -29,7 +32,6 @@
       display: inline-block;
       box-sizing: border-box;
       border-radius: 50%;
-      border: 2px solid #bababa;
     }
     &:after {
       content: " ";
@@ -40,7 +42,6 @@
       box-sizing: border-box;
       border-radius: 50%;
       border: 2px solid transparent;
-      border-top-color: #2196f3;
       animation: round-animate 1s linear infinite;
     }
   }
