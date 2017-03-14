@@ -8,7 +8,7 @@ type Props = {
   loggedIn: boolean,
   component: Function,
   render: Function,
-  children: Funciton,
+  children: Function,
 };
 
 export const PrivateRouteCore = ({
@@ -22,7 +22,7 @@ export const PrivateRouteCore = ({
     <ReactRouterRoute
       {...props}
       render={(renderProps) => {
-        if (!loggedIn) {
+        if (loggedIn) {
           if (Component) {
             return (<Component {...renderProps} />);
           } else if (render) {
@@ -34,7 +34,7 @@ export const PrivateRouteCore = ({
         return (
           <Redirect
             to={{
-              pathname: '/v2/login',
+              pathname: '/login',
               state: { from: renderProps.location },
             }}
           />
@@ -45,6 +45,6 @@ export const PrivateRouteCore = ({
 
 export default connect(
   (state: State) => ({
-    loggedIn: state.session.loggedIn,
+    loggedIn: state.auth.loggedIn,
   }),
 )(PrivateRouteCore);

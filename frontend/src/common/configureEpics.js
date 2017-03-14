@@ -1,11 +1,11 @@
 import 'rxjs';
 import { combineEpics } from 'redux-observable';
 import { epics as appEpics } from './app/actions';
-import { epics as sessionEpics } from './session/actions';
+import { epics as authEpics } from './auth/actions';
 
 const epics = [
   ...appEpics,
-  ...sessionEpics,
+  ...authEpics,
 ];
 
 const configureEpics = deps => (action$, { getState }) =>

@@ -1,7 +1,9 @@
 /* @flow */
 import { Observable } from 'rxjs/Observable';
+import store from 'store';
 import { REHYDRATE } from 'redux-persist/constants';
-import type { Action } from '../types';
+import type { Action, Deps } from '../types';
+import { loginSuccess } from '../auth/actions';
 
 export const setCurrentTheme = (theme?: string): Action => ({
   type: 'SET_CURRENT_THEME',
@@ -43,12 +45,34 @@ export const appError = (error: Error): Action => ({
   payload: { error },
 });
 
-const appStartEpic = (action$: any) =>
+const appStartEpic = (action$: any, { getState }: Deps) =>
+  // After rehydrate state from local storage, verify the user's access token.
   action$.ofType(REHYDRATE)
-    .mergeMap(() => Observable.concat(
-      Observable.of(appStarted()),
-      Observable.of(hideAppLoader()),
-    ));
+    .mergeMap(() => {
+      let { userName, token } = getState().auth;
+      // TODO: [Deprecated] Remove store dependence
+      if (!userName && !token) {
+        userName = store.get('userName');
+        token = store.get('token');
+        if (userName && token) {
+          console.warn('Read token from store, will depreciate in next version');
+        }
+      }
+
+      // If token exists, verify the token is still valid.
+      // TODO: [Security] Add token validation.
+      if (userName && token) {
+        return Observable.concat(
+          Observable.of(loginSuccess(userName, token)),
+          Observable.of(appStarted()),
+          Observable.of(hideAppLoader()),
+        );
+      }
+      return Observable.concat(
+        Observable.of(appStarted()),
+        Observable.of(hideAppLoader()),
+      );
+    });
 
 export const epics = [
   appStartEpic,

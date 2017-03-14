@@ -1,4 +1,7 @@
 /* @flow */
+export type Deps = {
+  getState: () => Object,
+};
 
 export type AppState = {
   appName: string,
@@ -13,13 +16,15 @@ export type AppState = {
   error: ?Error,
 };
 
-export type SessionState = {
+export type AuthState = {
   loggedIn: boolean,
+  userName: ?string,
+  token: ?string,
 };
 
 export type State = {
   app: AppState,
-  session: SessionState,
+  auth: AuthState,
 };
 
 // Actions
@@ -33,4 +38,5 @@ export type Action =
   | { type: 'APP_STOP' }
   | { type: 'SHOW_APPLOADER' }
   | { type: 'HIDE_APPLOADER' }
+  | { type: 'LOGIN_SUCCESS'; payload: { userName: string, token: string } }
   ;
