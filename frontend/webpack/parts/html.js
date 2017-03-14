@@ -9,7 +9,6 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 const html = (settings) => {
   const { paths, htmls, testing, isDev } = settings;
 
-  console.log(testing);
   // If no settings, generate a default html page.
   const plugins = htmls ?
     R.map(s => new HtmlWebpackPlugin({
