@@ -51,7 +51,7 @@ export class AppCore extends React.Component {
   }
 
   render() {
-    const { currentLocale, currentTheme, ...rest } = this.props;
+    const { currentLocale, currentTheme, appStarted, ...rest } = this.props;
     const others = omit(['setWindowSize'], rest);
 
     return (
@@ -64,7 +64,7 @@ export class AppCore extends React.Component {
             }}
           />
           <AppLoader />
-          <Routing {...others} />
+          {appStarted && <Routing {...others} />}
         </Container>
       </ThemeProvider>
     );
@@ -75,6 +75,7 @@ export default connect(
   (state: State) => ({
     currentTheme: state.app.currentTheme,
     currentLocale: state.app.currentLocale,
+    appStarted: state.app.started,
   }),
   { setWindowSize },
 )(start(AppCore));
