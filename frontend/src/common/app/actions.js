@@ -45,7 +45,10 @@ export const appError = (error: Error): Action => ({
 
 const appStartEpic = (action$: any) =>
   action$.ofType(REHYDRATE)
-    .mapTo(appStarted());
+    .mergeMap(() => Observable.concat(
+      Observable.of(appStarted()),
+      Observable.of(hideAppLoader()),
+    ));
 
 export const epics = [
   appStartEpic,

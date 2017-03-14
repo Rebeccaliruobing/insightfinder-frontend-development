@@ -16,7 +16,7 @@ import retrieveExecDBStatisticsData from '../../apis/retrieve-execdb-stats';
 import retrieveHeatmapData from '../../apis/retrieve-heatmap-data';
 import './executive-dashboard.less';
 import normalizeStats from './normalize-stats';
-import { hideAppLoader } from '../../src/common/app/actions';
+import { showAppLoader, hideAppLoader } from '../../src/common/app/actions';
 import { aggregateToMultiHourData } from './heatmap-data';
 
 class ExecutiveDashboard extends React.Component {
@@ -27,6 +27,7 @@ class ExecutiveDashboard extends React.Component {
   static propTypes = {
     location: T.object,
     hideAppLoader: T.func,
+    showAppLoader: T.func,
     router: T.shape({
       push: T.func.isRequired,
     }).isRequired,
@@ -72,7 +73,7 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   refreshData(params) {
-    const { location, hideAppLoader } = this.props;
+    const { location, showAppLoader, hideAppLoader } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const { modelType, timezoneOffset } = query;
     const endTime = moment(query.endTime).endOf('day');
@@ -83,6 +84,7 @@ class ExecutiveDashboard extends React.Component {
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
 
+    showAppLoader();
     this.setState({
       loading: true,
       heatmapLoading: true,
@@ -378,5 +380,5 @@ class ExecutiveDashboard extends React.Component {
 
 export default connect(
   () => ({ }),
-  { hideAppLoader },
+  { hideAppLoader, showAppLoader },
 )(withRouter(ExecutiveDashboard));
