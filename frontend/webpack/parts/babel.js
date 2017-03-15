@@ -48,7 +48,7 @@ const babel = (settings) => {
       id: 'js',
       cache: true,
       threads: 4,
-      verbose: false,
+      verbose: true,
       loaders: [{
         loader: 'babel-loader',
         options: {
