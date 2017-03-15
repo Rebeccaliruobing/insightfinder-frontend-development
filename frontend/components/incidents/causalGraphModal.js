@@ -3,6 +3,7 @@
 import React, { PropTypes as T } from 'react';
 import $ from 'jquery';
 import R from 'ramda';
+import _ from 'lodash';
 import { autobind } from 'core-decorators';
 import * as d3 from 'd3';
 import dagre from 'dagre';
@@ -44,6 +45,7 @@ class CausalGraphModal extends React.Component {
       containerHeight: $(window).height() - this.containerOffsetHeight,
       containerWidth: $(window).width() - this.containerOffsetWidth,
       allRelations: {},
+      kpis: [],
       relations: [],
       metricNameMap: {},
       threshold: '2.0',
@@ -76,12 +78,6 @@ class CausalGraphModal extends React.Component {
   getWeightRange(relations) {
     let minWeight = 0.0;
     let maxWeight = 1.0;
-
-    // const weights = this.weightMapper(relations);
-    // if (weights.length > 0) {
-    //   maxWeight = parseFloat(weights[0]);
-    //   minWeight = parseFloat(weights[weights.length - 1]);
-    // }
 
     return [minWeight, maxWeight];
   }
@@ -116,7 +112,7 @@ class CausalGraphModal extends React.Component {
   renderGraph() {
     this.cleanChart();
 
-    const { relations, correlations, metricNameMap } = this.state;
+    const { relations, correlations, metricNameMap, kpis } = this.state;
     const { activeTab, relationFilterWeight, correlationFilterWeight } = this.state;
 
     const showRelations = activeTab === 'relation';
@@ -167,9 +163,8 @@ class CausalGraphModal extends React.Component {
       const { labelObj } = data;
       if (labelObj) {
         let texts = [];
-        if(data.probability){
-          texts.push("Probability: "+(data.probability*100).toFixed(1)+"%"
-            );
+        if (data.probability) {
+          texts.push(`<div>Probability: ${(data.probability * 100).toFixed(1)}%</div>`);
         }
         if (detail) {
           R.forEachObjIndexed((val, key) => {
@@ -182,16 +177,21 @@ class CausalGraphModal extends React.Component {
             let [src, target] = key.split(',').slice(-2);
             src = metricNameMap[src] || src;
             target = metricNameMap[target] || target;
+            const srcIsKpi = !!(R.find(s => s === src, kpis));
+            const targetIsKpi = !!(R.find(s => s === target, kpis));
 
             let metric = R.find(m => m.src === src && m.target === target, ms);
             if (!metric) {
-              metric = { src, target, count: parseInt(val, 10) };
+              metric = { src, target, count: parseInt(val, 10), srcIsKpi, targetIsKpi };
               ms.push(metric);
             } else {
               metric.count += parseInt(val, 10);
             }
           }, labelObj);
-          let labelText = R.map(m => `(${m.src}, ${m.target}), ${m.count}`, ms);
+          const labelText = R.map(
+            m => `<div>(<span class="${m.srcIsKpi ? 'kpi' : ''}">${m.src}</span>, <span class="${m.targetIsKpi ? 'kpi' : ''}">${m.target}</span>)`,
+            ms,
+          );
           texts = texts.concat(labelText);
         }
         return texts.join('\n');
@@ -211,6 +211,7 @@ class CausalGraphModal extends React.Component {
         } else {
           const meta = {
             label: getLabel(rel),
+            labelType: 'html',
             class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
             arrowhead: type === 'relation' ? 'vee' : 'double',
             weight,
@@ -233,13 +234,6 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.node')
       .append('svg:title').text(d => g.node(d).name);
 
-    // Add title for edge
-    // svg.selectAll('.edgeLabel')
-    //   .append('svg:title').text((d) => {
-    //     const edge = g.edge(d);
-    //     return getLabel(edge.data, true);
-    //   });
-
     // Hidden the rect.
     svg.selectAll('.node rect').attr({
       visibility: 'hidden',
@@ -257,10 +251,10 @@ class CausalGraphModal extends React.Component {
 
     retrieveEventData(projectName, loadGroup, instanceGroup, endTime, numberOfDays).then((data) => {
       const { threshold } = this.state;
-
       const allRelations = loadGroup ?
         data.eventsCausalRelation || {} :
         JSON.parse(data.causalRelation || '{}');
+      const kpis = _.get(data, 'metaData.KPI', '').split(',');
       const relations = allRelations[threshold.toString()] || [];
       const metricNameMap = {};
       const namesArray = data.metricShortNameArray || [];
@@ -275,6 +269,7 @@ class CausalGraphModal extends React.Component {
 
       this.setState({
         loading: false,
+        kpis,
         allRelations,
         relations,
         correlations,
@@ -363,8 +358,8 @@ class CausalGraphModal extends React.Component {
       correlations, minCorrelationWeight, maxCorrelationWeight, correlationFilterWeight,
     } = this.state;
 
-    const relationStep = 0.1;//Math.floor(maxRelationWeight / 10) || 1;
-    const correlationStep = 0.1;//Math.floor(maxCorrelationWeight / 10) || 1;
+    const relationStep = 0.1;
+    const correlationStep = 0.1;
 
     return (
       <Modal {...rest} style={{ marginLeft: -containerWidth / 2, width: containerWidth }} size="big" closable>
@@ -414,7 +409,7 @@ class CausalGraphModal extends React.Component {
                 <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
                   <Slider
                     included={false} dots
-                    min={minRelationWeight} max={maxRelationWeight} step={relationStep}
+                    min={0.0} max={1.0} step={0.1}
                     value={relationFilterWeight}
                     defaultValue={minRelationWeight}
                     onChange={c => this.setState({ relationFilterWeight: c })}
@@ -439,7 +434,7 @@ class CausalGraphModal extends React.Component {
                 }}
               >
                 <span style={{ fontWeight: 'bold', padding: '0 1em' }}>
-                  {`Correlation Probability >= ${(correlationFilterWeight*100).toFixed(1)+'%'}: `}
+                  {`Correlation Probability >= ${(correlationFilterWeight * 100).toFixed(1) + '%'}: `}
                 </span>
                 <div style={{ position: 'relative', display: 'inline-block', height: 40 }}>
                   <span style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}>
@@ -448,7 +443,7 @@ class CausalGraphModal extends React.Component {
                   <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
                     <Slider
                       included={false} dots
-                      min={minCorrelationWeight} max={maxCorrelationWeight} step={correlationStep}
+                      min={0.0} max={1.0} step={0.1}
                       value={correlationFilterWeight}
                       defaultValue={minCorrelationWeight}
                       onChange={c => this.setState({ correlationFilterWeight: c })}
