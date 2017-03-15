@@ -59,16 +59,17 @@ const appStartEpic = (action$: any, { getState }: Deps) =>
         }
       }
 
-      // If token exists, verify the token is still valid.
-      // TODO: [Security] Add token validation.
-      if (userName && token) {
+      // If token not exists, change application state to started.
+      if (!userName || !token) {
         return Observable.concat(
-          Observable.of(loginSuccess(userName, token)),
           Observable.of(appStarted()),
           Observable.of(hideAppLoader()),
         );
       }
+
+      // Otherwise, verify the token is still valid.
       return Observable.concat(
+        Observable.of(loginSuccess(userName, token)),
         Observable.of(appStarted()),
         Observable.of(hideAppLoader()),
       );
