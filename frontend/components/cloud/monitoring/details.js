@@ -77,9 +77,9 @@ const ProjectDetails = class extends React.Component {
         ;
       return (
         <Console>
-          <Console.Topbar logo={require('../../../images/logo.png')}>
+          <Console.Topbar logo={require('../../../images/logo_white.png')}>
             <div className="topbar-text">
-              <div className="title" dangerouslySetInnerHTML={{ __html: title }}/>
+              <div className="title" dangerouslySetInnerHTML={{ __html: title }} />
               <div className="legend">
                 <div>Anomaly color map:</div>
                 <div className="colormap2">

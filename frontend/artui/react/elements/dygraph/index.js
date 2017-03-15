@@ -100,11 +100,10 @@ class Dygraph extends Component {
     // Draw predicated range if latestDataTimestamp is specified.
     if (latestDataTimestamp && data.length > 0) {
       const begin = data[0][0].valueOf();
-      const end = data[data.length - 1][0].valueOf();
       const start = Math.max(latestDataTimestamp, begin);
       const x = g.toDomXCoord(start);
       const y = area.y;
-      const w = g.toDomXCoord(end) - x;
+      const w = (area.w + area.x) - x;
       const h = area.h;
       canvas.fillStyle = this.predicatedRangeFillStyle;
       canvas.fillRect(x, y, w, h);
