@@ -3,7 +3,7 @@ import moment from 'moment';
 import ReactTimeout from 'react-timeout';
 import { Console } from '../../artui/react';
 import apis from '../../apis';
-import LiveAnalysisCharts from '../cloud/liveanalysis';
+import LiveAnalysisCharts from '../cloud/liveanalysis/LiveAnalysisCharts';
 
 const ProjectDetails = class extends React.Component {
 
@@ -33,8 +33,8 @@ const ProjectDetails = class extends React.Component {
     let endTimestamp = undefined;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
       let parts = dataChunkName.split('_');
-      startTimestamp = +moment(parts[3]);
-      endTimestamp = +moment(parts[4]);
+      startTimestamp = +moment(parseInt(parts[3], 10));
+      endTimestamp = +moment(parseInt(parts[4], 10));
     }
 
     this.setState({ loading: true }, () => {

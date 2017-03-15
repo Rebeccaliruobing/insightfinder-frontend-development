@@ -46,7 +46,7 @@ export class DataChart extends React.Component {
   handleAnnotationClick(anno) {
     if (anno && anno.div) {
       const x = anno.x;
-      let { annotations } = this.props;
+      let { annotations, onAnnotationClick } = this.props;
       const dowAnnotations = this.setWeekdaysForBarChar(this.props.data);
       annotations = annotations || dowAnnotations;
 
@@ -67,6 +67,10 @@ export class DataChart extends React.Component {
           html: `<div class="dygraph popup-content">${title}${content}</div>`,
         });
         $p.popup('show');
+
+        if (onAnnotationClick) {
+          onAnnotationClick(annotation);
+        }
       }
     }
   }
@@ -192,7 +196,10 @@ export class DataChart extends React.Component {
   }
 }
 
-export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, latestDataTimestamp }) => {
+export const DataSummaryChart = ({
+  summary, onDateWindowChange, dateWindow, latestDataTimestamp,
+  onAnnotationClick = (() => { }),
+}) => {
   return (
     <div key="summary_chart" className="sixteen wide column" style={{ paddingTop: 0 }}>
       <div className="detail-charts" style={{ position: 'relative' }}>
@@ -203,10 +210,11 @@ export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, late
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
           latestDataTimestamp={latestDataTimestamp}
+          onAnnotationClick={onAnnotationClick}
         />
       </div>
     </div>
-  )
+  );
 };
 
 export class DataGroupCharts extends React.Component {
@@ -219,10 +227,12 @@ export class DataGroupCharts extends React.Component {
     onDateWindowChange: T.func,
     chartType: T.string,
     dateWindow: T.any,
+    onAnnotationClick: T.func,
   };
 
   static defaultProps = {
     orderByMetric: true,
+    onAnnotationClick: () => { },
   };
 
   constructor(props) {
@@ -240,7 +250,7 @@ export class DataGroupCharts extends React.Component {
   render() {
 
     const { groups, view, columns, orderByMetric,
-      latestDataTimestamp, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
+      latestDataTimestamp, alertMissingData, onAnnotationClick, chartType, periodMap, metricAvg, } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -338,6 +348,7 @@ export class DataGroupCharts extends React.Component {
                     latestDataTimestamp={latestDataTimestamp}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
                     dateWindow={ syncDateWindow ? this.props.dateWindow : null}
+                    onAnnotationClick={onAnnotationClick}
                   />
                 </div>
                 {!isListView && isSelectedItem &&
