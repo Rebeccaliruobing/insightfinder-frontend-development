@@ -29,7 +29,9 @@ class ModelSettings extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.reloadData(nextProps.projectName);
+    if (nextProps.projectName !== this.props.projectName) {
+      this.reloadData(nextProps.projectName);
+    }
   }
 
   @autobind

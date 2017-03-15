@@ -763,7 +763,7 @@ export default class ThresholdSettings extends React.Component {
                         <td><input value={setting.thresholdNoAlert}
                                    onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/>
                         </td>
-                        <td><input type='checkbox' defaultChecked={setting.isKPI}
+                        <td><input type='checkbox' defaultChecked={setting.isKPI || false}
                                    onChange={this.handleMetricSettingChecked(index, 'isKPI')}/>
                         </td>
                         <td><input type='checkbox' disabled defaultChecked={isCustomMetric}/>
