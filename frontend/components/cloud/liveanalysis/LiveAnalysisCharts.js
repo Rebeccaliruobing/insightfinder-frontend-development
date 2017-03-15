@@ -400,7 +400,7 @@ class LiveAnalysisCharts extends React.Component {
                   />
                 }
                 {!!groups && groups.length > 0 &&
-                  <div className="sixteen wide column">
+                  <div className="sixteen wide column" style={{ paddingTop: 0 }}>
                     <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric Filters:</label>
                     {!hideGroupSelector &&
                       <Dropdown
@@ -423,7 +423,6 @@ class LiveAnalysisCharts extends React.Component {
                     }
                   </div>
                 }
-
                 {!!selectedGroups && selectedGroups.length > 0 &&
                   <DataGroupCharts
                     chartType={chartType}
