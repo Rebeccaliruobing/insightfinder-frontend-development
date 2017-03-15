@@ -1,6 +1,7 @@
 import React, { PropTypes as T } from 'react';
 import store from 'store';
 import _ from 'lodash';
+import R from 'ramda';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import apis from '../../../apis';
@@ -84,6 +85,7 @@ class LiveAnalysisCharts extends React.Component {
       isForecast: false,
       selectedMetrics: '',
       selectedGroups: null,
+      hideGroupSelector: false,
     };
 
     if (props.isForecast && !!props.isForecast) {
@@ -219,11 +221,29 @@ class LiveAnalysisCharts extends React.Component {
 
   @autobind
   handleAnnotationClick(anno) {
-    // TODO: Show metrics in the annoation?
-    // if (anno && anno.text) {
-    //   const metrics = anno.text.match(/metric:(?:.*),/g);
-    //   console.log(metrics);
-    // }
+    if (anno && anno.text && this.groups) {
+      const re = /(?:metric:)(.*)(?:,)/gi;
+      let metrics = [];
+      let match = re.exec(anno.text);
+      while (match) {
+        metrics.push(match[1]);
+        match = re.exec(anno.text);
+      }
+      metrics = R.uniq(metrics);
+      if (metrics.length > 0) {
+        const { names, selectedGroups } = getSelectedGroup(metrics.join(','), this.groups);
+        // Use hideGroupSelector to remove the node, otherwise Dropdown works strange.
+        this.setState({
+          hideGroupSelector: true,
+        }, () => {
+          this.setState({
+            selectedMetrics: names.join(','),
+            selectedGroups,
+            hideGroupSelector: false,
+          });
+        });
+      }
+    }
   }
 
   @autobind
@@ -233,6 +253,7 @@ class LiveAnalysisCharts extends React.Component {
       this.setState({
         selectedMetrics: names.join(','),
         selectedGroups,
+        hideGroupSelector: false,
       });
     }
   }
@@ -241,7 +262,7 @@ class LiveAnalysisCharts extends React.Component {
     let { loading, onRefresh, enablePublish, enableComments,
       debugData, timeRanking, freqRanking, projectName,
       periodMap, data, chartType, alertMissingData, bugId } = this.props;
-    const { view, columns, showSummaryFlag, isForecast, selectedMetrics } = this.state;
+    const { view, columns, showSummaryFlag, isForecast, selectedMetrics, hideGroupSelector } = this.state;
     let { selectedGroups } = this.state;
 
     const userName = store.get('userName');
@@ -373,29 +394,32 @@ class LiveAnalysisCharts extends React.Component {
                     latestDataTimestamp={latestDataTimestamp}
                     onDateWindowChange={this.handleDateWindowSync}
                     dateWindow={this.state.chartDateWindow}
+                    showLineChartWithAnnotation
                     onAnnotationClick={this.handleAnnotationClick}
                   />
                 }
                 {!!groups && groups.length > 0 &&
                   <div className="sixteen wide column">
                     <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric Filters:</label>
-                    <Dropdown
-                      className="forecast" mode="select" multiple
-                      value={selectedMetrics}
-                      onChange={this.handleMetricSelectionChange}
-                      style={{ minWidth: 200 }}
-                    >
-                      <div className="menu">
-                        {
-                          groups.map(g => (
-                            <div
-                              className="item" key={g.metrics}
-                              data-value={g.metrics}
-                            >{g.metrics}</div>
-                          ))
-                        }
-                      </div>
-                    </Dropdown>
+                    {!hideGroupSelector &&
+                      <Dropdown
+                        className="forecast" mode="select" multiple
+                        value={selectedMetrics}
+                        onChange={this.handleMetricSelectionChange}
+                        style={{ minWidth: 200 }}
+                      >
+                        <div className="menu">
+                          {
+                            groups.map(g => (
+                              <div
+                                className="item" key={g.metrics}
+                                data-value={g.metrics}
+                              >{g.metrics}</div>
+                            ))
+                          }
+                        </div>
+                      </Dropdown>
+                    }
                   </div>
                 }
 
