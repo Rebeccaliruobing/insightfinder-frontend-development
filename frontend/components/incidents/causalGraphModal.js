@@ -46,7 +46,7 @@ class CausalGraphModal extends React.Component {
       allRelations: {},
       relations: [],
       metricNameMap: {},
-      threshold: '3.0',
+      threshold: '2.0',
       minRelationWeight: 0.0,
       maxRelationWeight: 1.0,
       relationFilterWeight: 0.0,
@@ -281,10 +281,10 @@ class CausalGraphModal extends React.Component {
         metricNameMap,
         minRelationWeight,
         maxRelationWeight,
-        relationFilterWeight: 0.5,
+        relationFilterWeight: 0.6,
         minCorrelationWeight,
         maxCorrelationWeight,
-        correlationFilterWeight: 0.5,
+        correlationFilterWeight: 0.8,
       }, () => {
         if (relations.length > 0 || correlations.length > 0) {
           this.renderGraph(relations, correlations);
