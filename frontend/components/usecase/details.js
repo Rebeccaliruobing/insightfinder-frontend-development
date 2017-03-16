@@ -32,11 +32,9 @@ const ProjectDetails = class extends React.Component {
     let startTimestamp = undefined;
     let endTimestamp = undefined;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
-      let parts = dataChunkName.split('_');
-      // startTimestamp = +moment(parseInt(parts[3], 10));
-      // endTimestamp = +moment(parseInt(parts[4], 10));
-      startTimestamp = +moment(parts[3]);
-      endTimestamp = +moment(parts[4]);
+      const parts = dataChunkName.split('_');
+      startTimestamp = +moment(parseInt(parts[3], 10) || parts[3]);
+      endTimestamp = +moment(parseInt(parts[4], 10) || parts[4]);
     }
 
     this.setState({ loading: true }, () => {
