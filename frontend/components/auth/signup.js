@@ -56,7 +56,7 @@ class Signup extends BaseComponent {
 
           settings.data = {
             username: this.state.userName,
-            email: this.stateemail,
+            email: this.state.email,
             accept: true,
           };
           return settings;
