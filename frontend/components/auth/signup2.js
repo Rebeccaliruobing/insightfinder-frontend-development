@@ -30,6 +30,7 @@ class SignupStep2 extends BaseComponent {
       var passForm = $("#form_pass1");
       var passFormConfirm = $("#form_pass2");
       var emailForm = $("#form_email");
+      const userNameForm = $('#form_username');
 
       $(".required").on("keyup blur", function() {
           var input = $(this).val();
@@ -50,6 +51,46 @@ class SignupStep2 extends BaseComponent {
             $(this).parent().find("i").removeClass("remove invalid placeholder").addClass("checkmark valid");
           }
       }); //end general requirement
+
+      userNameForm.on("keyup blur", function () {
+        var userName = $(this).val();
+        var isError = false;
+
+        if (userName === "") {
+          $("#form_username_error").text("Field Required");
+          isError = true;
+        } else {
+          const reUser = /^[_@:/]/g;
+          if (userName.toLowerCase() === 'all' ||
+            userName.toLowerCase() === 'none' || userName.indexOf(' ') !== -1) {
+            $("#form_username_error").text(
+              'Please check your username. It might have been used or have white space in it.'
+            );
+            isError = true;
+          }
+
+          if (reUser.exec(userName)) {
+            $("#form_username_error").text(
+              'Username cannot start with special charactors',
+            );
+            isError = true;
+          }
+        }
+
+        if (isError) {
+            $("#form_username_error").addClass("invalid");
+            $(this).addClass("invalid").removeClass("valid");
+            $("#icon_username").removeClass("checkmark valid placeholder");
+            $("#icon_username").addClass("remove icon invalid");
+        }
+        else {
+            $("#form_username_error").removeClass("invalid");
+            $("#form_username_error").text("");
+            $(this).addClass("valid").removeClass("invalid");
+            $("#icon_username").removeClass("remove invalid placeholder");
+            $("#icon_username").addClass("checkmark valid icon");
+        }
+      });
 
       emailForm.on("keyup blur", function() {
         var email = $(this).val();
@@ -170,6 +211,7 @@ class SignupStep2 extends BaseComponent {
             */
             return false;
           }
+
           let pass1 = this.state['pass1'];
           let pass2 = this.state['pass2'];
           if (pass1.length < 8){
@@ -254,7 +296,7 @@ class SignupStep2 extends BaseComponent {
                          onChange={(e) => this.setState({error: '', userName: e.target.value})}
                          id="form_username" />
                   <i id="icon_username" className="placeholder checkmark icon"></i> 
-                  <span className="errorbox"></span>
+                  <span id="form_username_error" className="errorbox"></span>
                 </div>
               </div>
               <div className="inline field" style={{display: 'flex'}}>

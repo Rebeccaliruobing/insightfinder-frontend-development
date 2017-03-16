@@ -37,18 +37,27 @@ class Signup extends BaseComponent {
             });
             return false;
           }
-          let userName = this.state['userName'];
-          if(userName.toLowerCase() == "all" || userName.toLowerCase() == "none" || userName.indexOf(" ")!=-1){
+          const userName = this.state.userName;
+          const reUser = /^[_@:/]/g;
+          if (userName.toLowerCase() === 'all' ||
+            userName.toLowerCase() === 'none' || userName.indexOf(' ') !== -1) {
             this.setState({
-              error: 'Please check your username. It might have been used or have white space in it.'
+              error: 'Please check your username. It might have been used or have white space in it.',
             });
-            return false;            
+            return false;
           }
-          
+
+          if (reUser.exec(userName)) {
+            this.setState({
+              error: 'Username cannot start with special charactors',
+            });
+            return false;
+          }
+
           settings.data = {
-            'username': this.state['userName'],
-            'email': this.state['email'],
-            'accept': true
+            username: this.state.userName,
+            email: this.stateemail,
+            accept: true,
           };
           return settings;
         },
