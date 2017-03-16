@@ -82,10 +82,10 @@ class Projects extends React.Component {
     if(sharedProjectString.length>0){
       sharedProjectString.split(',').map((s)=>s.split(":")).forEach((project)=>{
         let [name, projectType, cloudType, master, dataType] = project;
+        name = name+"@"+master;
         let zone = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[1]):"N/A";
         let agentDataEnabled = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[2]):false;
         let instanceType = projectInfoArray.find((pair)=>pair[0] == name)?(projectInfoArray.find((pair)=>pair[0] == name)[3]):false;
-        name = name+"@"+master;
         let flag = true;
         switch (projectType) {
           case 'AWS':
