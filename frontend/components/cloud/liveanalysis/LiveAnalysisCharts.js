@@ -239,7 +239,6 @@ class LiveAnalysisCharts extends React.Component {
           this.setState({
             selectedMetrics: names.join(','),
             selectedGroups,
-            view: 'list',
             hideGroupSelector: false,
           });
         });
