@@ -217,7 +217,7 @@ class CausalGraphModal extends React.Component {
             weight,
             labelpos: 'l',
             data: rel,
-            labeloffset: 4,
+            labeloffset: 0,
           };
           g.setEdge(src, target, meta, type);
         }
