@@ -28,17 +28,8 @@ class Signup extends BaseComponent {
           this.setState({
             error: ''
           });
-          
-          let email = this.state['email'];
-          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          if (!re.test(email)) {
-            this.setState({
-              error: 'Please check your email address.'
-            });
-            return false;
-          }
           const userName = this.state.userName;
-          const reUser = /^[_@:/]/g;
+          const reUser = /[_@:/]/g;
           if (userName.toLowerCase() === 'all' ||
             userName.toLowerCase() === 'none' || userName.indexOf(' ') !== -1) {
             this.setState({
@@ -49,7 +40,16 @@ class Signup extends BaseComponent {
 
           if (reUser.exec(userName)) {
             this.setState({
-              error: 'Username cannot start with special charactors',
+              error: 'Username cannot has special charactor',
+            });
+            return false;
+          }
+          
+          const email = this.state['email'];
+          const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          if (!re.test(email)) {
+            this.setState({
+              error: 'Please check your email address.'
             });
             return false;
           }

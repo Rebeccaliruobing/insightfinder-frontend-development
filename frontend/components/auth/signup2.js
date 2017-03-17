@@ -60,7 +60,7 @@ class SignupStep2 extends BaseComponent {
           $("#form_username_error").text("Field Required");
           isError = true;
         } else {
-          const reUser = /^[_@:/]/g;
+          const reUser = /[_@:/]/g;
           if (userName.toLowerCase() === 'all' ||
             userName.toLowerCase() === 'none' || userName.indexOf(' ') !== -1) {
             $("#form_username_error").text(
@@ -71,7 +71,7 @@ class SignupStep2 extends BaseComponent {
 
           if (reUser.exec(userName)) {
             $("#form_username_error").text(
-              'Username cannot start with special charactors',
+              'Username cannot has special charactor',
             );
             isError = true;
           }
