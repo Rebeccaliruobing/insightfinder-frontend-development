@@ -6,7 +6,7 @@ const calculateRGBByAnomalyScore = (val, waterline = 10) => {
   let rcolor = 0;
   let gcolor = 0;
 
-  if (!val) return 'rgb(223,223,223)';
+  if (!val) return 'rgb(122,208,105)';
 
   if (val <= 1) {
     if (val < 0) {
