@@ -75,11 +75,12 @@ const appStartEpic = (action$: any, { getState, bindCredentials }: Deps) =>
 
       // Otherwise, verify the token is still valid.
       return Observable
-        .of(loginSuccess(credentials))
-        .concat(
-        Observable.of(appStarted()),
-        Observable.of(hideAppLoader()),
-        );
+        .fromPromise(bindCredentials(retrieveInitData)())
+        .mapTo(appStarted())
+        .catch((err) => {
+          console.log(err);
+          return Observable.of(appError(err));
+        });
     });
 
 export const epics = [

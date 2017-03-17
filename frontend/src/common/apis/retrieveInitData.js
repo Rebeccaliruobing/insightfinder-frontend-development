@@ -11,10 +11,12 @@ const retrieveInitData = (
   credentials: Credentials,
 ) =>
   fetchPost(
-    getEndpoint('dashboard-uservalues1'),
+    getEndpoint('dashboard-uservalues'),
     {
       operation: 'display',
-      ...credentials,
+      userName: 'admin',
+      token: 'fsfds',
+      // ...credentials,
     },
   )
     .then(d => d);
