@@ -1,9 +1,9 @@
 /* @flow */
-import type { Action } from '../types';
+import type { Action, Credentials } from '../types';
 
-export const loginSuccess = (userName: string, token: string): Action => ({
+export const loginSuccess = (credentials: Credentials): Action => ({
   type: 'LOGIN_SUCCESS',
-  payload: { userName, token },
+  payload: { credentials },
 });
 
 export const epics = [

@@ -1,6 +1,12 @@
 /* @flow */
 export type Deps = {
   getState: () => Object,
+  bindCredentials: (Function) => Function,
+};
+
+export type Credentials = {
+  userName?: string,
+  token?: string,
 };
 
 export type AppState = {
@@ -18,8 +24,7 @@ export type AppState = {
 
 export type AuthState = {
   loggedIn: boolean,
-  userName: ?string,
-  token: ?string,
+  credentials: Credentials,
 };
 
 export type State = {
@@ -38,5 +43,5 @@ export type Action =
   | { type: 'APP_STOP' }
   | { type: 'SHOW_APPLOADER' }
   | { type: 'HIDE_APPLOADER' }
-  | { type: 'LOGIN_SUCCESS'; payload: { userName: string, token: string } }
+  | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials } }
   ;

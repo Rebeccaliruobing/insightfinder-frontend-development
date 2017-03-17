@@ -3,8 +3,7 @@ import type { AuthState, Action } from '../types';
 
 const initialState = {
   loggedIn: false,
-  userName: null,
-  token: null,
+  credentials: {},
 };
 
 const reducer = (

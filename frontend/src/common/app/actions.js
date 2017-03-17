@@ -3,7 +3,9 @@ import { Observable } from 'rxjs/Observable';
 import store from 'store';
 import { REHYDRATE } from 'redux-persist/constants';
 import type { Action, Deps } from '../types';
+import { isValidCredentials } from '../auth';
 import { loginSuccess } from '../auth/actions';
+import { retrieveInitData } from '../apis';
 
 export const setCurrentTheme = (theme?: string): Action => ({
   type: 'SET_CURRENT_THEME',
@@ -45,22 +47,26 @@ export const appError = (error: Error): Action => ({
   payload: { error },
 });
 
-const appStartEpic = (action$: any, { getState }: Deps) =>
+const appStartEpic = (action$: any, { getState, bindCredentials }: Deps) =>
   // After rehydrate state from local storage, verify the user's access token.
   action$.ofType(REHYDRATE)
     .mergeMap(() => {
-      let { userName, token } = getState().auth;
+      let { credentials } = getState().auth;
+      let valid = isValidCredentials(credentials);
+
       // TODO: [Deprecated] Remove store dependence
-      if (!userName && !token) {
-        userName = store.get('userName');
-        token = store.get('token');
+      if (!valid) {
+        const userName = store.get('userName');
+        const token = store.get('token');
         if (userName && token) {
           console.warn('Read token from store, will depreciate in next version');
+          credentials = { userName, token };
+          valid = true;
         }
       }
 
       // If token not exists, change application state to started.
-      if (!userName || !token) {
+      if (!valid) {
         return Observable.concat(
           Observable.of(appStarted()),
           Observable.of(hideAppLoader()),
@@ -68,11 +74,12 @@ const appStartEpic = (action$: any, { getState }: Deps) =>
       }
 
       // Otherwise, verify the token is still valid.
-      return Observable.concat(
-        Observable.of(loginSuccess(userName, token)),
+      return Observable
+        .of(loginSuccess(credentials))
+        .concat(
         Observable.of(appStarted()),
         Observable.of(hideAppLoader()),
-      );
+        );
     });
 
 export const epics = [
