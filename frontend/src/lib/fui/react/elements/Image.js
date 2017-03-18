@@ -11,7 +11,7 @@ type Props = {
 };
 
 const Image = ({
-  src, alt,
+  src, alt = '',
   size, className, style, ...rest
 }: Props) => {
   const classes = cx(

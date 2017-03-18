@@ -11,7 +11,6 @@ import SignupStep2 from './signup2';
 export const authRoutes = (
   <Router history={browserHistory}>
     <Route path="/">
-      <IndexRedirect to="/login"/>
       <Route component={Login} path="/login"/>
       <Route component={Signup} path="/signup"/>
       <Route component={SignupStep2} path="/signup2"/>

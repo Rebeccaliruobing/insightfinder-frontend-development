@@ -14,6 +14,9 @@ const reducer = (
     case 'LOGIN_SUCCESS':
       return { ...state, loggedIn: true, ...action.payload };
 
+    case 'REDIRECT_LOGIN':
+      return { ...state, loggedIn: false, credentials: {} };
+
     default:
       return state;
   }

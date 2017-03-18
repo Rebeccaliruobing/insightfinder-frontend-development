@@ -1,11 +1,12 @@
 /* @flow */
+/* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
-import store from 'store';
 import { REHYDRATE } from 'redux-persist/constants';
 import type { Action, Deps } from '../types';
 import { isValidCredentials } from '../auth';
 import { loginSuccess } from '../auth/actions';
 import { retrieveInitData } from '../apis';
+import { PermissionError } from '../errors';
 
 export const setCurrentTheme = (theme?: string): Action => ({
   type: 'SET_CURRENT_THEME',
@@ -17,9 +18,14 @@ export const setCurrentLocale = (locale: string): Action => ({
   payload: { locale },
 });
 
-export const setWindowSize = (width: number, height: number): Action => ({
-  type: 'SET_WINDOW_SIZE',
+export const setViewport = (width: number, height: number): Action => ({
+  type: 'SET_VIEWPORT',
   payload: { width, height },
+});
+
+export const setInitData = (data: Object): Action => ({
+  type: 'SET_INIT_DATA',
+  payload: data,
 });
 
 export const appStart = (): Action => ({
@@ -32,6 +38,11 @@ export const appStarted = (): Action => ({
 
 export const appStop = (): Action => ({
   type: 'APP_STOP',
+});
+
+export const redirectLogin = (reason: Object = {}): Action => ({
+  type: 'REDIRECT_LOGIN',
+  payload: reason,
 });
 
 export const showAppLoader = (): Action => ({
@@ -47,38 +58,32 @@ export const appError = (error: Error): Action => ({
   payload: { error },
 });
 
-const appStartEpic = (action$: any, { getState, bindCredentials }: Deps) =>
+const appStartEpic = (action$: any, { getState }: Deps) =>
   // After rehydrate state from local storage, verify the user's access token.
   action$.ofType(REHYDRATE)
     .mergeMap(() => {
-      let { credentials } = getState().auth;
-      let valid = isValidCredentials(credentials);
+      const { credentials } = getState().auth;
+      const valid = isValidCredentials(credentials);
 
-      // TODO: [Deprecated] Remove store dependence
+      // If token not exists, change application state to started for logining.
       if (!valid) {
-        const userName = store.get('userName');
-        const token = store.get('token');
-        if (userName && token) {
-          console.warn('Read token from store, will depreciate in next version');
-          credentials = { userName, token };
-          valid = true;
-        }
-      }
-
-      // If token not exists, change application state to started.
-      if (!valid) {
-        return Observable.concat(
-          Observable.of(appStarted()),
-          Observable.of(hideAppLoader()),
-        );
+        return Observable.of(redirectLogin());
       }
 
       // Otherwise, verify the token is still valid.
       return Observable
-        .fromPromise(bindCredentials(retrieveInitData)())
-        .mapTo(appStarted())
+        .from(retrieveInitData(credentials))
+        .switchMap(d => Observable.of(
+          loginSuccess(credentials),
+          setInitData(d),
+          appStarted(),
+        ))
+        .takeUntil(action$.ofType('APP_STOP'))
         .catch((err) => {
-          console.log(err);
+          console.error(err);
+          if (err instanceof PermissionError) {
+            return Observable.of(redirectLogin({ invalidToken: true }));
+          }
           return Observable.of(appError(err));
         });
     });

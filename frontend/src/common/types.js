@@ -14,7 +14,7 @@ export type AppState = {
   appVersion: string,
   currentTheme: ?string,
   currentLocale: ?string,
-  windowSize: Object,
+  viewport: Object,
   locales: ?Array<string>,
   messages: ?Object,
   started: boolean,
@@ -37,11 +37,13 @@ export type Action =
   { type: 'APP_ERROR'; payload: { error: Error } }
   | { type: 'SET_CURRENT_LOCALE'; payload: { locale: string } }
   | { type: 'SET_CURRENT_THEME'; payload: { theme?: string } }
-  | { type: 'SET_WINDOW_SIZE'; payload: { width: number, height: number } }
+  | { type: 'SET_VIEWPORT'; payload: { width: number, height: number } }
   | { type: 'APP_START' }
   | { type: 'APP_STARTED' }
   | { type: 'APP_STOP' }
+  | { type: 'SET_INIT_DATA'; payload: Object }
   | { type: 'SHOW_APPLOADER' }
   | { type: 'HIDE_APPLOADER' }
   | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials } }
+  | { type: 'REDIRECT_LOGIN'; payload: Object }
   ;

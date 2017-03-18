@@ -5,6 +5,24 @@
   position: relative;
 }
 
+.fui.screen-center.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  > div {
+    // Use absolution position to move content around.
+    position: absolute;
+    margin-top: $y-gutter;
+    margin-bottom: $y-gutter;
+  }
+}
+
 .fui.responsive.container {
   margin: 0 auto;
   max-width: 100%;

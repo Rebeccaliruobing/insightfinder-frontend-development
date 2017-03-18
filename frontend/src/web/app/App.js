@@ -3,11 +3,12 @@ import { omit } from 'ramda';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { autobind, debounce } from 'core-decorators';
+import Measure from 'react-measure';
 import { Container } from '../../lib/fui/react';
 import type { State } from '../../common/types';
 import start from '../../common/app/start';
 import { ThemeProvider } from '../../common/app/components';
-import { setWindowSize } from '../../common/app/actions';
+import { setViewport } from '../../common/app/actions';
 import Routing from './Routing';
 import AppLoader from './AppLoader';
 import * as themes from './themes';
@@ -17,55 +18,38 @@ type Props = {
   currentLocale: string,
   currentTheme: string,
   appStarted: bool,
-  setWindowSize: Function,
+  setViewport: Function,
 };
 
 // TODO: Listen scrolling event and save position into redux store.
 export class AppCore extends React.Component {
   props: Props;
 
-  // Use the static member to keep only one instance register the resize event.
-  static registeredInstance = null;
-
   @autobind
   @debounce(300)
-  handleOnResize() {
-    const width = window.innerWidth ||
-      document.documentElement.clientWidth || document.body.clientHeight;
-    const height = window.innerHeight ||
-      document.documentElement.clientHeight || document.body.clientHeight;
-    this.props.setWindowSize(width, height);
-  }
-
-  componentDidMount() {
-    if (!AppCore.registeredInstance) {
-      AppCore.registeredInstance = this;
-      window.addEventListener('resize', this.handleOnResize, false);
-    }
-  }
-
-  componentWillUnmount() {
-    if (AppCore.registeredInstance === this) {
-      window.removeEventListener('resize', this.handleOnResize);
-    }
+  handleOnResize(dimensions) {
+    const { width, height } = dimensions;
+    this.props.setViewport(width, height);
   }
 
   render() {
     const { currentLocale, currentTheme, appStarted, ...rest } = this.props;
-    const others = omit(['setWindowSize'], rest);
+    const others = omit(['setViewport'], rest);
 
     return (
       <ThemeProvider theme={themes[currentTheme] || themes.light}>
-        <Container fullHeight>
-          <Helmet
-            htmlAttributes={{
-              lang: currentLocale,
-              class: currentTheme ? `${currentTheme} theme` : '',
-            }}
-          />
-          <AppLoader />
-          {appStarted && <Routing {...others} />}
-        </Container>
+        <Measure onMeasure={this.handleOnResize}>
+          <Container fullHeight>
+            <Helmet
+              htmlAttributes={{
+                lang: currentLocale,
+                class: currentTheme ? `${currentTheme} theme` : '',
+              }}
+            />
+            <AppLoader />
+            {appStarted && <Routing {...others} />}
+          </Container>
+        </Measure>
       </ThemeProvider>
     );
   }
@@ -77,5 +61,5 @@ export default connect(
     currentLocale: state.app.currentLocale,
     appStarted: state.app.started,
   }),
-  { setWindowSize },
+  { setViewport },
 )(start(AppCore));

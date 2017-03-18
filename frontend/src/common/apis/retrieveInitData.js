@@ -6,6 +6,7 @@ import fetchPost from './fetchPost';
 /**
  * Retrieve the initial data includes projects info, metadata.
  * Old API: postJSONDashboardUserValues()
+ * TODO: convert the response data into objects.
  */
 const retrieveInitData = (
   credentials: Credentials,
@@ -14,11 +15,8 @@ const retrieveInitData = (
     getEndpoint('dashboard-uservalues'),
     {
       operation: 'display',
-      userName: 'admin',
-      token: 'fsfds',
-      // ...credentials,
+      ...credentials,
     },
-  )
-    .then(d => d);
+  );
 
 export default retrieveInitData;

@@ -1,11 +1,13 @@
-import './app.less';
-
 import React from 'react';
+import { connect } from 'react-redux';
 import { Router, Route, browserHistory, IndexRoute, IndexRedirect, Redirect } from 'react-router';
 import store from 'store';
 import _ from 'lodash';
-import {Console, Link} from './artui/react';
+import './app.less';
 
+import type { State } from './src/common/types';
+import { hideAppLoader } from './src/common/app/actions';
+import { Console, Link } from './artui/react';
 import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
 import {logRoute} from './components/log';
@@ -292,23 +294,23 @@ const routes = (
 );
 
 class AppRoute extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
+    this.props.hideAppLoader();
   }
 
   isAuthenticated() {
-    // TODO: We need to check whether token is expired?
     return store.get('userName') && store.get('token');
   }
 
   render() {
     if (this.isAuthenticated()) {
       return routes;
-    } else {
-      return authRoutes;
     }
+    return authRoutes;
   }
 }
 
-export default AppRoute;
-
+export default connect(
+  () => ({}),
+  { hideAppLoader },
+)(AppRoute);

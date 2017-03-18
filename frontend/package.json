@@ -86,6 +86,7 @@
     "react-faux-dom": "^3.0.0",
     "react-helmet": "^4.0.0",
     "react-intl": "^2.2.3",
+    "react-measure": "^1.4.6",
     "react-redux": "^5.0.2",
     "react-router": "^2.8.0",
     "react-router-dom": "^4.0.0",

@@ -16,9 +16,9 @@ const initialState = {
   locales: Object.keys(messages) || ['en'],
   currentLocale: null,
   messages,
-  windowSize: {
-    width: windowWidth,
-    height: windowHeight,
+  viewport: {
+    width: 0,
+    height: 0,
     widthDiff: 0,
     heightDiff: 0,
   },
@@ -45,12 +45,12 @@ const reducer = (
       ...state,
       currentLocale: action.payload.locale,
     };
-  } else if (action.type === 'SET_WINDOW_SIZE') {
-    const { width: currentWidth, height: currentHeight } = state.windowSize;
+  } else if (action.type === 'SET_VIEWPORT') {
+    const { width: currentWidth, height: currentHeight } = state.viewport;
     const { width, height } = action.payload;
     return {
       ...state,
-      windowSize: {
+      viewport: {
         width, height,
         widthDiff: width - currentWidth,
         heightDiff: height - currentHeight,
@@ -70,6 +70,11 @@ const reducer = (
     return {
       ...state,
       appLoaderVisible: false,
+    };
+  } else if (action.type === 'REDIRECT_LOGIN') {
+    return {
+      ...state,
+      started: true,
     };
   } else if (action.type === 'APP_ERROR') {
     return {
