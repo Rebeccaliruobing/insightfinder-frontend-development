@@ -63,6 +63,7 @@ export class AppCore extends React.Component {
               class: currentTheme ? `${currentTheme} theme` : '',
             }}
           />
+          <AppLoader />
           {appStarted && <Routing {...others} />}
         </Container>
       </ThemeProvider>
