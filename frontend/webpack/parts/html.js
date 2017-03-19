@@ -14,6 +14,7 @@ const html = (settings) => {
     R.map(s => new HtmlWebpackPlugin({
       environment: process.env.NODE_ENV,
       template: path.join(paths.htmls, (testing || isDev) ? s.template_dev : s.template),
+      inject: false,
       filename: s.filename,
       initialState: JSON.stringify(s.initialState || {}),
     }), htmls) :
