@@ -1,0 +1,12 @@
+.ui.form{
+  .field {
+    > label {
+      color: $text-primary-color;
+    }
+    &.required {
+      > label:after {
+        color: $error-color;
+      }
+    }
+  }
+}

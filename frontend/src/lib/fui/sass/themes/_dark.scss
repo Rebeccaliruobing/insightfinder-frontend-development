@@ -8,9 +8,12 @@ html.dark {
   }
 
   $text-primary-color:   $light-text-primary-color;
+  $divider-color:        $light-divider-color;
 
   @import "../base/generic_theme";
   @import "../elements/box_theme";
+  @import "../elements/form_theme";
+  @import "../elements/input_theme";
 
   $loader-border-color:  $body-bg-color;
   $loader-bg-color:      $white;

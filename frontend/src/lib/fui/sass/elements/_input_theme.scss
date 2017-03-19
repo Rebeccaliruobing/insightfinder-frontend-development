@@ -1,0 +1,10 @@
+.ui.input {
+  &.invalid {
+    > input {
+      border-color: $error-color;
+    }
+  }
+  .error-text {
+    color: $error-color;
+  }
+}

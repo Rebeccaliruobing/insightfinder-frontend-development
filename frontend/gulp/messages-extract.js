@@ -8,7 +8,7 @@ gulp.task('messages-extract', () => {
 
   const messages = [];
   const getReactIntlMessages = code => babel.transform(code, {
-    plugins: ['react-intl'],
+    plugins: ['react-intl', 'transform-decorators-legacy'],
     presets: ['env', 'react', 'stage-1'],
   }).metadata['react-intl'].messages;
 

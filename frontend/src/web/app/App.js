@@ -12,7 +12,7 @@ import { setViewport } from '../../common/app/actions';
 import Routing from './Routing';
 import AppLoader from './AppLoader';
 import * as themes from './themes';
-import '../../lib/fui/fui.scss';
+import './app.scss';
 
 type Props = {
   currentLocale: string,

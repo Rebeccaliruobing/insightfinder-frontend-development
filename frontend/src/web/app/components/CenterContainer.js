@@ -1,6 +1,6 @@
-/* @flow */
 import React from 'react';
-import { Container, Image } from '../../../lib/fui/react';
+import moment from 'moment';
+import { Container, Image, Box } from '../../../lib/fui/react';
 import logo from '../../../../images/logo.png';
 
 type Props = {
@@ -11,10 +11,13 @@ type Props = {
 
 const CenterContainer = ({ style = { width: 320 }, className, children }: Props) => (
   <Container screenCenter className={className} style={style}>
-    <div style={{ margin: 12 }}>
+    <div style={{ marginBottom: 24, textAlign: 'center' }}>
       <Image size={200} src={logo} />
     </div>
-    {children}
+    <Box raised>{children}</Box>
+    <div className="copyright">
+      {`Copyright © ${moment().year()} InsightFinder Inc.`}
+    </div>
   </Container>
 );
 

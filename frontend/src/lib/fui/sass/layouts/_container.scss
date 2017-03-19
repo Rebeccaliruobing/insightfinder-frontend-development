@@ -16,9 +16,8 @@
   align-items: center;
   overflow-y: auto;
   > div {
-    // Use absolution position to move content around.
     position: absolute;
-    margin-top: $y-gutter;
+    top: 100px;
     margin-bottom: $y-gutter;
   }
 }

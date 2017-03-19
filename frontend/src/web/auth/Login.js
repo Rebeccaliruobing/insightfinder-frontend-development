@@ -1,32 +1,35 @@
+/* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import VLink from 'valuelink';
 import cx from 'classnames';
+import { compose } from 'ramda';
+import { injectIntl } from 'react-intl';
 import type { State } from '../../common/types';
-import logo from '../../../images/logo.png';
 import { hideAppLoader } from '../../common/app/actions';
 import { login } from '../../common/auth/actions';
+import appFieldsMessages from '../../common/app/appFieldsMessages';
+import authMessages from '../../common/auth/authMessages';
+import { Input } from '../../lib/fui/react';
 import { CenterContainer } from '../app/components';
 
-// TODO: Not used
 type Props = {
   isLoggingIn: bool,
+  intl: $IntlShape,
   hideAppLoader: Function,
 };
 
+type States = {
+  userName: string,
+  password: string,
+}
+
 class Login extends React.Component {
   props: Props;
-  static defaultProps = {
-    isLoggingIn: false,
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      userName: '',
-      password: '',
-      error: '',
-    };
+  state: States = {
+    userName: '',
+    password: '',
   }
 
   componentDidMount() {
@@ -34,49 +37,53 @@ class Login extends React.Component {
   }
 
   render() {
-    const { userName, password, error } = this.state;
-    const disabled = !userName || !password;
+    const { intl } = this.props;
+    const userNameLink = VLink.state(this, 'userName')
+      .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
+    const passwordLink = VLink.state(this, 'password')
+      .check(x => x, intl.formatMessage(authMessages.errorsPasswordRequired));
+
+    const disabled = userNameLink.error || passwordLink.error;
 
     return (
       <CenterContainer className="auth">
-        <form
-          className={cx('ui', { error: !!error }, 'form')}
-          ref={c => this._$el = $(c)}
-        >
-          {!!error &&
-            <div className="ui error mini message">{error}</div>
-          }
-          <div className="ui segment left aligned">
-            <div className="field required">
-              <label>Username</label>
-              <div className="ui icon input">
-                <i className="user icon" />
-                <input type="text" name="userName" value={userName}
-                  onChange={(e) => this.setState({ userName: e.target.value })} />
+        <form className="ui form">
+          <div className="input field required">
+            <label>{intl.formatMessage(appFieldsMessages.userName)}</label>
+            <Input valueLink={userNameLink} icon="user icon" />
+          </div>
+          <div className="input field required">
+            <label>{intl.formatMessage(appFieldsMessages.password)}</label>
+            <Input type="password" valueLink={passwordLink} icon="lock icon" />
+          </div>
+          <div className="field" style={{ textAlign: 'right' }}>
+            <Link tabIndex={-1} to="/forgotPassword">
+              {intl.formatMessage(authMessages.hintsForgotPassword)}
+            </Link>
+            <span style={{ margin: '0 0.5em' }}>
+              {intl.formatMessage(authMessages.hintsOr)}
+            </span>
+            <Link tabIndex={-1} to="/forgotUsername">
+              {intl.formatMessage(authMessages.hintsUserName)}
+            </Link>
+          </div>
+          <div className="field">
+            <div className={cx('ui fluid orange submit button', { disabled })}>
+              {intl.formatMessage(authMessages.buttonsSignIn)}
+            </div>
+          </div>
+          <div
+            className="field"
+            style={{ borderTop: '1px solid #ccc', paddingTop: 10, textAlign: 'right' }}
+          >
+            <div style={{ float: 'left', marginTop: 7 }}>
+              {intl.formatMessage(authMessages.hintsNewUser)}
+            </div>
+            <Link tabIndex={-1} to="/signup">
+              <div className="ui orange basic button">
+                {intl.formatMessage(authMessages.buttonsSignUp)}
               </div>
-            </div>
-            <div className="field required">
-              <label>Password</label>
-              <div className="ui icon input">
-                <i className="lock icon" />
-                <input
-                  type="password" name="password" className="password"
-                  value={password}
-                  onChange={(e) => this.setState({ password: e.target.value })} />
-              </div>
-            </div>
-            <div className="field" style={{ textAlign: 'right' }}>
-              <Link to="/forgotPassword">Forgot password?</Link> or <Link to="/forgotUsername">username?</Link>
-            </div>
-            <div className="field">
-              <div className={cx('ui fluid orange submit button', { disabled: disabled })}>Sign In</div>
-            </div>
-            <div className="field" style={{ borderTop: '1px solid #ccc', paddingTop: 10, textAlign: 'right' }}>
-              <div style={{ float: 'left', marginTop: 7 }}>New user? </div>
-              <Link to="/signup">
-                <div className='ui orange basic button'>Sign Up</div>
-              </Link>
-            </div>
+            </Link>
           </div>
         </form>
       </CenterContainer>
@@ -84,9 +91,12 @@ class Login extends React.Component {
   }
 }
 
-export default connect(
-  (state: State) => ({
-    isLoggingIn: state.auth.isloggingIn,
-  }),
-  { login, hideAppLoader },
+export default compose(
+  connect(
+    (state: State) => ({
+      isLoggingIn: state.auth.loggedIn,
+    }),
+    { login, hideAppLoader },
+  ),
+  injectIntl,
 )(Login);
