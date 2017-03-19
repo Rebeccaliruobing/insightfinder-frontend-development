@@ -5,6 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="<%= require('../../../common/app/images/favicon.png') %>" type="image/x-icon">
+    <% for (var css in htmlWebpackPlugin.files.chunks.common.css){ %>
+    <link href="<%= htmlWebpackPlugin.files.chunks.common.css[css] %>" rel="stylesheet">
+    <% } %>
+    <% for (var css in htmlWebpackPlugin.files.chunks.app.css) { %>
+    <link href="<%= htmlWebpackPlugin.files.chunks.app.css[css] %>" rel="stylesheet">
+    <% } %>
     <title>InsightFinder</title>
 </head>
 <body style="height: 100%">
@@ -12,5 +18,8 @@
 <script>
     window.__INITIAL_STATE__ = '<%= htmlWebpackPlugin.options.initialState %>';
 </script>
+<script src="<%= htmlWebpackPlugin.files.chunks.manifest.entry %>" charset="utf-8"></script>
+<script src="<%= htmlWebpackPlugin.files.chunks.common.entry %>" charset="utf-8"></script>
+<script src="<%= htmlWebpackPlugin.files.chunks.app.entry %>" charset="utf-8"></script>
 </body>
 </html>
