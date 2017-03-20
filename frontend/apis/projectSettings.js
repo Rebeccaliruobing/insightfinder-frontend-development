@@ -3,7 +3,7 @@ import store from 'store';
 import $ from 'jquery';
 import getEndpoint from './get-endpoint';
 
-export function getProjectModels(projectName) {
+export function getProjectModels(projectName, instanceGroup) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -11,7 +11,7 @@ export function getProjectModels(projectName) {
     $.ajax({
       type: 'GET',
       url: getEndpoint('modelPicking', 1),
-      data: $.param({ userName, token, projectName, operation: 'list' }),
+      data: $.param({ userName, token, projectName, instanceGroup, operation: 'list' }),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
       },

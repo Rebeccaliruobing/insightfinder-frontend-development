@@ -9,10 +9,12 @@ import ModelTile from './ModelTile';
 class ModelSettings extends React.Component {
   static propTypes = {
     projectName: T.string.isRequired,
+    instanceGroup: T.string,
   }
 
   static defaultProps = {
     projectName: '',
+    instanceGroup: '',
   }
 
   constructor(props) {
@@ -25,22 +27,23 @@ class ModelSettings extends React.Component {
   }
 
   componentDidMount() {
-    this.reloadData(this.props.projectName);
+    this.reloadData(this.props.projectName, this.props.instanceGroup);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.projectName !== this.props.projectName) {
-      this.reloadData(nextProps.projectName);
+    if (nextProps.projectName !== this.props.projectName ||
+      nextProps.instanceGroup !== this.props.instanceGroup) {
+      this.reloadData(nextProps.projectName, nextProps.instanceGroup);
     }
   }
 
   @autobind
-  reloadData(projectName) {
+  reloadData(projectName, instanceGroup) {
     if (projectName) {
       this.setState({
         loading: true,
       }, () => {
-        getProjectModels(projectName).then((data) => {
+        getProjectModels(projectName, instanceGroup).then((data) => {
           const models = data.modelKeys || [];
           const pickedModelKeys = R.map(
             m => m.modelKey,
@@ -118,7 +121,10 @@ class ModelSettings extends React.Component {
 
     return (
       <Tile isAncestor className={`model-settings ${loading ? 'ui form loading' : ''}`}>
-        <Tile isParent isVertical size={3} style={{ padding: 0 }}>
+        <Tile
+          isParent isVertical size={3}
+          style={{ padding: 0, marginRight: 10 }}
+        >
           <h4>Picked Model</h4>
           {pickedModel &&
             <div style={{ paddingBottom: '1em', paddingRight: '1em' }}>
