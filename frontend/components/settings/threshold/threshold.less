@@ -68,7 +68,7 @@
       padding: 20px 18px;
       .meta {
         font-size: 12px;
-        padding: 1em 0 0;
+        padding: 8px 0 0;
         .icon {
           font-size: 18px;
           visibility: hidden;
@@ -76,11 +76,12 @@
           position: absolute;
           color: rgba(0, 0, 0, 0.35);
           &.remove{
-            top: 2px;
-            right: 0;
+            top: -10px;
+            right: -14px;
           }
           &.check {
             right: 8px;
+            bottom: 16px;
           }
         }
         .ui.button {
@@ -113,10 +114,17 @@
     &.big {
       margin: 0 0 12px 0;
       >.fui.box {
-        height: 272px;
         margin: 0 auto;
+        padding: 0;
+        border: 0px;
+        box-shadow: none;
+        .fui.heatmap {
+          margin: 0 auto;
+        }
         .meta {
+          width: 160px;
           font-size: 14px;
+          margin: 0 auto;
           .icon {
             display: none;
           }

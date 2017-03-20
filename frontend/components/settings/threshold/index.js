@@ -75,6 +75,8 @@ export default class ThresholdSettings extends React.Component {
       },
       tabStates0,
       groupingRules: [],
+      instanceGroup: '',
+      instanceGroups: [],
     };
 
     this.matchOpMap = {};
@@ -133,16 +135,17 @@ export default class ThresholdSettings extends React.Component {
     this.$filterPanel.slideUp();
   }
 
+  @autobind
   handleProjectChange(projectName) {
     let { dashboardUservalues } = this.context;
     let { projectModelAllInfo, projectSettingsAllInfo, projectString, sharedProjectString, metricUnitMapping } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info)=>info.projectName == projectName);
-    let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == projectName);
+    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
+    let projectSetting = projectSettingsAllInfo.find((info) => info.projectName == projectName);
     let metricSettings = (projectSetting && projectSetting.metricSettings) || [];
-    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames,logFreqWindow } = project;
-    let projectStr = projectString.split(',').map((s)=>s.split(":")).find(v => v[0] == projectName);
+    let { cvalue, pvalue, derivedpvalue, emailcvalue, emailpvalue, filtercvalue, filterpvalue, predictionWindow, minAnomalyRatioFilter, sharedUsernames, logFreqWindow } = project;
+    let projectStr = projectString.split(',').map((s) => s.split(":")).find(v => v[0] == projectName);
     if (!projectStr) {
-      projectStr = sharedProjectString.split(',').map((s)=>s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
+      projectStr = sharedProjectString.split(',').map((s) => s.split(":")).find(v => (v[0] + '@' + v[3]) == projectName);
     }
     // // 前三部分是名称，数据类型dataType和云类型cloudType
     let dataType = projectStr ? projectStr[1] : null;
@@ -167,8 +170,8 @@ export default class ThresholdSettings extends React.Component {
         projectType = `${cloudType}/Agent`;
     }
     // apis.loadInstanceGrouping(projectName).then((resp)=> {
-      // TODO: Change to the real grouping rules from server.
-      // const groupingRules = resp.instanceGrouping;
+    // TODO: Change to the real grouping rules from server.
+    // const groupingRules = resp.instanceGrouping;
     // });
     const groupingRules = [{
       groupName: 'EnvGroup',
@@ -197,24 +200,46 @@ export default class ThresholdSettings extends React.Component {
       minAnomalyRatioFilter,
       sharedUsernames,
       logFreqWindow,
-      pvalueText:this.sensitivityMap[pvalue], 
-      derivedpvalueText:this.sensitivityMap[derivedpvalue],
-      emailpvalueText:this.sensitivityMap[emailpvalue],
+      pvalueText: this.sensitivityMap[pvalue],
+      derivedpvalueText: this.sensitivityMap[derivedpvalue],
+      emailpvalueText: this.sensitivityMap[emailpvalue],
     });
+
+    // Get project groups 
     this.setState({
-      metricSettings: metricSettings,
-      data: data,
+      metricSettings,
+      data,
       groupingRules,
       tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
       tempLogFreqWindow: (data.logFreqWindow || ''),
       tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
       tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
-      loading: projectSetting['fileProjectType'] == 0,
-    }, ()=> {
-      projectSetting['fileProjectType'] == 0 ? self.getLogAnalysisList(projectName, project) : null;
-      let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
-      this.selectTab0(null, _.findKey(this.state['tabStates0'], s => s === 'active'));
-      store.set('liveAnalysisProjectName', projectName);
+      loading: true,
+    }, () => {
+      apis.loadInstanceGrouping(projectName, 'getGrouping')
+        .then((resp) => {
+          if (resp.groupingString) {
+            let groups = resp.groupingString.split(',').sort();
+            const pos = groups.indexOf('All');
+            if (pos !== -1) {
+              const len = groups.length;
+              groups = groups.slice(1, len).concat(groups.slice(0, 1));
+            }
+            const instanceGroup = (groups && groups.length > 0) ? groups[0] : '';
+            const instanceGroups = groups;
+            this.setState({
+              instanceGroup,
+              instanceGroups,
+              loading: projectSetting.fileProjectType === 0,
+            }, () => {
+              if (projectSetting.fileProjectType === 0) {
+                self.getLogAnalysisList(projectName, project);
+              }
+              this.selectTab0(null, _.findKey(this.state.tabStates0, s => s === 'active'));
+              store.set('liveAnalysisProjectName', projectName);
+            });
+          }
+        });
     });
   }
 
@@ -485,12 +510,24 @@ export default class ThresholdSettings extends React.Component {
     });
   }
 
+  @autobind
+  handleInstanceGroupChange(instanceGroup) {
+    this.setState({
+      loading: true,
+      instanceGroup,
+    }, () => {
+      this.setState({
+        loading: false,
+      });
+    });
+  }
+
   render() {
     let labelStyle = {};
     let {
       data, tempSharedUsernames, tempLearningSkippingPeriod, tempDetectionSkippingPeriod, tempLogFreqWindow,
       loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0,
-      groupingRules,
+      groupingRules, instanceGroup, instanceGroups,
     } = this.state;
     let { dashboardUservalues } = this.context;
     let { projectModelAllInfo, projectSettingsAllInfo, projectString,metricUnitMapping } = dashboardUservalues;
@@ -507,13 +544,37 @@ export default class ThresholdSettings extends React.Component {
     }
     let self = this;
     return (
-      <Console.Content className={loading ? "ui form loading" : ""}>
+      <Console.Content className={loading ? "loading" : ""}>
         <div className="ui main tiny container project-settings" ref={c => this._el = c}>
           <div className="ui right aligned vertical inline segment" style={{ zIndex: 200 }}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
-              <ProjectSelection key={data.projectName} value={data.projectName} style={{ minWidth: 200 }} onChange={this.handleProjectChange.bind(this)}/>
+              <ProjectSelection
+                key={projectName} value={projectName}
+                style={{ minWidth: 200 }} onChange={this.handleProjectChange}
+              />
             </div>
+            {tabStates0['model'] === 'active' &&
+              <div className="field">
+                <label style={{ fontWeight: 'bold' }}>Group:</label>
+                <Dropdown
+                  key={projectName}
+                  mode="select"
+                  searchable
+                  value={instanceGroup}
+                  onChange={this.handleInstanceGroupChange}
+                  style={{ minWidth: 150 }}
+                >
+                  <div className="menu">
+                    {
+                      instanceGroups.map(g => (
+                        <div className="item" key={g} data-value={g}>{g}</div>
+                      ))
+                    }
+                  </div>
+                </Dropdown>
+              </div>
+            }
           </div>
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
@@ -897,7 +958,7 @@ export default class ThresholdSettings extends React.Component {
               </div>}
               {!isLogProject &&
                 <div className={tabStates0['model'] + ' ui tab'} style={{ width: '100%', paddingBottom: 10 }}>
-                  <ModelSettings projectName={projectName} />
+                  <ModelSettings projectName={projectName} instanceGroup={instanceGroup} />
                 </div>
               }
             </div>
