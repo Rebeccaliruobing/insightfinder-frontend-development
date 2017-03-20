@@ -17,6 +17,6 @@ const retrieveInitData = (
       operation: 'display',
       ...credentials,
     },
-  );
+  ).then(d => d.data);
 
 export default retrieveInitData;

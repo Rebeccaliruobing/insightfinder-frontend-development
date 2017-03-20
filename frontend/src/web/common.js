@@ -28,6 +28,8 @@ import 'react-router-dom';
 
 import 'react-router';
 import 'react-timeout';
+import 'react-select';
+import 'react-measure';
 
 import 'redux';
 import 'react-redux';

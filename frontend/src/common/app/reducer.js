@@ -1,19 +1,18 @@
 /* @flow */
 import { REHYDRATE } from 'redux-persist/constants';
+import R from 'ramda';
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
-const messages = loadLocaleMessages();
-const windowWidth = window.innerWidth ||
-  document.documentElement.clientWidth || document.body.clientHeight;
-const windowHeight = window.innerHeight ||
-  document.documentElement.clientHeight || document.body.clientHeight;
+const localeMessages = loadLocaleMessages();
+const locales = R.map(l => l.name, localeMessages);
+const messages = R.map(l => l.messages, localeMessages);
 
 const initialState = {
   appName: '',
   appVersion: '',
   currentTheme: 'light',
-  locales: Object.keys(messages) || ['en'],
+  locales,
   currentLocale: null,
   messages,
   viewport: {

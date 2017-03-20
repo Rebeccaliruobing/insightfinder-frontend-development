@@ -1,6 +1,6 @@
 @charset "utf-8";
 
-@import "../../lib/fui/fui.scss";
+@import "../../lib/fui/fui";
 
 .screen-center.container {
   .copyright {
@@ -9,5 +9,20 @@
     text-transform: uppercase;
     text-align: right;
     font-size: 12px;
+  }
+}
+
+.locale-selector {
+  text-align: center;
+  .world.icon {
+    font-size: 16px;
+    color: $grey;
+    margin-top: 8px;
+    margin-right: 8px;
+    vertical-align: top;
+  }
+  .Select {
+    display: inline-block;
+    text-align: left;
   }
 }

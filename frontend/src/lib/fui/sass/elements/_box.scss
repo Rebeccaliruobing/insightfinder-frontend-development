@@ -1,7 +1,7 @@
 @import "../variables";
 
 .fui.box {
-  border-radius: 1px;
+  border-radius: $border-radius;
   display: block;
   position: relative;
   padding: 1rem;

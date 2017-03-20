@@ -1,10 +1,10 @@
-/* @flow */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import VLink from 'valuelink';
 import cx from 'classnames';
 import { compose } from 'ramda';
+import { autobind } from 'core-decorators';
 import { injectIntl } from 'react-intl';
 import type { State } from '../../common/types';
 import { hideAppLoader } from '../../common/app/actions';
@@ -12,12 +12,14 @@ import { login } from '../../common/auth/actions';
 import appFieldsMessages from '../../common/app/appFieldsMessages';
 import authMessages from '../../common/auth/authMessages';
 import { Input } from '../../lib/fui/react';
-import { CenterContainer } from '../app/components';
+import { CenterContainer, LocaleSelector } from '../app/components';
 
 type Props = {
+  isLoggedIn: bool,
   isLoggingIn: bool,
   intl: $IntlShape,
   hideAppLoader: Function,
+  login: Function,
 };
 
 type States = {
@@ -36,25 +38,45 @@ class Login extends React.Component {
     this.props.hideAppLoader();
   }
 
+  @autobind
+  handleSignIn(e) {
+    e.preventDefault();
+    const { userName, password } = this.state;
+    this.props.login(userName, password);
+  }
+
+  @autobind
+  handleEnterSubmit(e) {
+    const { userName, password } = this.state;
+    if (e.key === 'Enter' && userName && password) {
+      e.preventDefault();
+      const { userName, password } = this.state;
+      this.props.login(userName, password);
+    }
+  }
+
   render() {
-    const { intl } = this.props;
+    const { intl, isLoggingIn } = this.props;
     const userNameLink = VLink.state(this, 'userName')
       .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
     const passwordLink = VLink.state(this, 'password')
       .check(x => x, intl.formatMessage(authMessages.errorsPasswordRequired));
-
-    const disabled = userNameLink.error || passwordLink.error;
+    const disabled = userNameLink.error || passwordLink.error || isLoggingIn;
 
     return (
       <CenterContainer className="auth">
         <form className="ui form">
+          <LocaleSelector style={{ marginBottom: 10 }} />
           <div className="input field required">
             <label>{intl.formatMessage(appFieldsMessages.userName)}</label>
             <Input valueLink={userNameLink} icon="user icon" />
           </div>
           <div className="input field required">
             <label>{intl.formatMessage(appFieldsMessages.password)}</label>
-            <Input type="password" valueLink={passwordLink} icon="lock icon" />
+            <Input
+              type="password" valueLink={passwordLink} icon="lock icon"
+              onKeyPress={this.handleEnterSubmit}
+            />
           </div>
           <div className="field" style={{ textAlign: 'right' }}>
             <Link tabIndex={-1} to="/forgotPassword">
@@ -68,7 +90,10 @@ class Login extends React.Component {
             </Link>
           </div>
           <div className="field">
-            <div className={cx('ui fluid orange submit button', { disabled })}>
+            <div
+              className={cx('ui fluid orange submit button', { disabled, loading: isLoggingIn })}
+              onClick={this.handleSignIn}
+            >
               {intl.formatMessage(authMessages.buttonsSignIn)}
             </div>
           </div>
@@ -94,7 +119,8 @@ class Login extends React.Component {
 export default compose(
   connect(
     (state: State) => ({
-      isLoggingIn: state.auth.loggedIn,
+      isLoggedIn: state.auth.loggedIn,
+      isLoggingIn: state.auth.loggingIn,
     }),
     { login, hideAppLoader },
   ),

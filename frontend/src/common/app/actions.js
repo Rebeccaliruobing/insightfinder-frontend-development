@@ -61,7 +61,7 @@ export const appError = (error: Error): Action => ({
 const appStartEpic = (action$: any, { getState }: Deps) =>
   // After rehydrate state from local storage, verify the user's access token.
   action$.ofType(REHYDRATE)
-    .mergeMap(() => {
+    .concatMap(() => {
       const { credentials } = getState().auth;
       const valid = isValidCredentials(credentials);
 
@@ -80,7 +80,6 @@ const appStartEpic = (action$: any, { getState }: Deps) =>
         ))
         .takeUntil(action$.ofType('APP_STOP'))
         .catch((err) => {
-          console.error(err);
           if (err instanceof PermissionError) {
             return Observable.of(redirectLogin({ invalidToken: true }));
           }

@@ -58,7 +58,7 @@ const fetchPost = (
         }
         throw new InvalidDataError(json.message, json.code, json);
       }
-      return json.data;
+      return json;
     });
 
 export default fetchPost;

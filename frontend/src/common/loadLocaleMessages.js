@@ -7,8 +7,14 @@ const descriptorsToMessages = descriptors =>
   }), {})(descriptors || []);
 
 const loadLocaleMessages = () => ({
-  en: descriptorsToMessages(require('../../messages/en').default),
-  zh: descriptorsToMessages(require('../../messages/zh').default),
+  en: {
+    name: 'English',
+    messages: descriptorsToMessages(require('../../messages/en').default),
+  },
+  zh: {
+    name: '简体中文',
+    messages: descriptorsToMessages(require('../../messages/zh').default),
+  },
 });
 
 export default loadLocaleMessages;

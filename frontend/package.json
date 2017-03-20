@@ -90,6 +90,7 @@
     "react-redux": "^5.0.2",
     "react-router": "^2.8.0",
     "react-router-dom": "^4.0.0",
+    "react-select": "1.0.0-rc",
     "react-tether": "0.5.2",
     "react-timeout": "^1.0.0",
     "reactable": "^0.14.1",

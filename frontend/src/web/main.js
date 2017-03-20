@@ -10,12 +10,22 @@ import AppRoot from './app/Root';
 const createInitialState = () => {
   // Merge server states with default web states as the initial states.
   const state = JSON.parse(window.__INITIAL_STATE__ || '{}'); // eslint-disable-line no-underscore-dangle
+  const windowWidth = window.innerWidth ||
+    document.documentElement.clientWidth || document.body.clientHeight;
+  const windowHeight = window.innerHeight ||
+    document.documentElement.clientHeight || document.body.clientHeight;
   return {
     ...state,
     app: {
       appName: 'InsightFinder',
       appVersion: '1.1',
       currentLocale: getBrowserLocale(),
+      viewport: {
+        width: windowWidth,
+        height: windowHeight,
+        widthDiff: 0,
+        heightDiff: 0,
+      },
       ...state.app,
     },
   };

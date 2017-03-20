@@ -4,6 +4,11 @@ export type Deps = {
   bindCredentials: (Function) => Function,
 };
 
+export type Reason = {
+  id?: string,
+  message?: string,
+}
+
 export type Credentials = {
   userName?: string,
   token?: string,
@@ -15,7 +20,7 @@ export type AppState = {
   currentTheme: ?string,
   currentLocale: ?string,
   viewport: Object,
-  locales: ?Array<string>,
+  locales: Object,
   messages: ?Object,
   started: boolean,
   appLoaderVisible: boolean,
@@ -24,7 +29,10 @@ export type AppState = {
 
 export type AuthState = {
   loggedIn: boolean,
+  loggingIn: boolean,
   credentials: Credentials,
+  userInfo: Object,
+  loginReason: Reason,
 };
 
 export type State = {
@@ -44,6 +52,9 @@ export type Action =
   | { type: 'SET_INIT_DATA'; payload: Object }
   | { type: 'SHOW_APPLOADER' }
   | { type: 'HIDE_APPLOADER' }
-  | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials } }
+  | { type: 'LOGIN'; payload: { userName: string, password: string } }
+  | { type: 'LOGGINGIN' }
+  | { type: 'LOGIN_SUCCESS'; payload: Object }
+  | { type: 'LOGIN_FAILURE'; payload: Reason }
   | { type: 'REDIRECT_LOGIN'; payload: Object }
   ;
