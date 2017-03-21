@@ -39,8 +39,9 @@ function createNodes(selection, g, shapes) {
     bbox.width += node.paddingLeft + node.paddingRight;
     bbox.height += node.paddingTop + node.paddingBottom;
     labelGroup.attr("transform", "translate(" +
-      ((node.paddingLeft - node.paddingRight) / 2) + "," +
-      ((node.paddingTop - node.paddingBottom) / 2) + ")");
+      ((node.paddingLeft - node.paddingRight) / 2) + ",14)");
+      // ((node.paddingLeft - node.paddingRight) / 2) + "," +
+      // ((node.paddingTop - node.paddingBottom) / 2) + ")");
 
     var shapeSvg = shape(d3.select(this), bbox, node);
     util.applyStyle(shapeSvg, node.style);
