@@ -404,6 +404,10 @@ class EventSummary extends React.Component {
     //   selectedIncidentPredicted = true;
     // }
 
+    const hasTreeMapData = incidentsTreeMap && incidentsTreeMap.children
+      && incidentsTreeMap.children.length > 0;
+    const hasDataFlag = !!data.hasDataFlag;
+
     return (
       <Console.Content
         className={`event-summary ${loading ? 'ui form loading' : ''}`}
@@ -495,7 +499,7 @@ class EventSummary extends React.Component {
               }
             </div>
             <div className="flex-item flex-col-container" style={{ width: '55%' }}>
-              <div style={{ padding: '5px 0px 6px' }}>
+              <div style={{ padding: '5px 0px 6px', borderBottom: '2px solid rgba(34,36,38,.15)' }}>
                 {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
                 {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
                 <TreeMapSchemeSelect
@@ -515,15 +519,23 @@ class EventSummary extends React.Component {
                 />
                 }
               </div>
-              <IncidentsTreeMap
-                data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                endTime={realEndTime} numberOfDays={numberOfDays}
-                instanceStatsJson={instanceStatsMap}
-                treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
-                treeMapCPUThreshold={treeMapCPUThreshold}
-                treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
-              />
+              {hasTreeMapData &&
+                <IncidentsTreeMap
+                  data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                  endTime={realEndTime} numberOfDays={numberOfDays}
+                  instanceStatsJson={instanceStatsMap}
+                  treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
+                  treeMapCPUThreshold={treeMapCPUThreshold}
+                  treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                  predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+                />
+              }
+              {!hasTreeMapData && hasDataFlag &&
+                <div className="ui warning message">Metric data are being sent to InsightFinder intelligence engine successfully. Model training requires several hours of data. Please check back later</div>
+              }
+              {!hasTreeMapData && !hasDataFlag &&
+                <div className="ui warning message">Metric data collection failed. Please check your data source to make sure data are being sent to InsightFinder intelligence engine correctly</div>
+              }
             </div>
           </div>
         </div>
