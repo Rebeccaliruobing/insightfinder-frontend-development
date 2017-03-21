@@ -34,6 +34,18 @@ const authMessages = defineMessages({
     defaultMessage: 'Password is required',
     id: 'auth.errors.passwordRequired',
   },
+  errorsLoginFailure: {
+    defaultMessage: 'Cannot login please try again',
+    id: 'auth.errors.loginFailure',
+  },
+  errorsWrongCredential: {
+    defaultMessage: 'Username or password is incorrect please try again',
+    id: 'auth.errors.wrongCredential',
+  },
+  errorsTokenInvalid: {
+    defaultMessage: 'Your session has expired please login again',
+    id: 'auth.errors.tokenInvalid',
+  },
 });
 
 export default authMessages;

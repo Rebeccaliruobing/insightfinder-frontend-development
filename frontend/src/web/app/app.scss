@@ -2,13 +2,82 @@
 
 @import "../../lib/fui/fui";
 
-.screen-center.container {
+.center-page.container {
   .copyright {
     margin-top: $y-small-gutter;
     color: $grey;
     text-transform: uppercase;
     text-align: right;
     font-size: 12px;
+  }
+}
+
+.single-page.container {
+  background: transparent;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 0;
+  > .topbar {
+    height: 48px;
+    width: 100%;
+    background: $primary-color;
+    position: fixed;
+    z-index: 1000;
+    .logo {
+      width: 160px; 
+      height: 48px;
+      display: block;
+      float: left;
+      img {
+        height: 36px;
+        margin: 6px 16px;
+      }
+    }
+    .content {
+      margin-left: 160px;
+      height: 48px;
+      > .ui.menu {
+        background: $primary-color;
+        color: white;
+        font-size: 16px;
+        margin: 0px;
+        border: 0px;
+        box-shadow: none;
+        border-radius: 0px;
+        height: 48px;
+        > .right.menu > .item,
+        > .item {
+          &.active {
+            background: $primary-dark-color;
+          }
+          &:before {
+            content: none;
+          }
+          color: white;
+          background: transparent;
+          border-radius: 0;
+          transition: none;
+        }
+        > .right.menu > .user.item{
+          padding: 0 16px;
+          .icon {
+            // background-color: $info-color !important;
+            // font-size: 18px;
+            // text-transform: uppercase;
+            // font-family: inherit;
+            // opacity: 1;
+          }
+        }
+      }
+    }
+  }
+  > .content {
+    padding-top: 48px;
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
   }
 }
 

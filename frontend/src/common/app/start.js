@@ -1,14 +1,13 @@
 /* @flow */
 import React from 'react';
-import R from 'ramda';
 import { connect } from 'react-redux';
 import { IntlProvider } from 'react-intl';
 import type { State } from '../types';
-import { appStart, appStop } from './actions';
+import { appStart } from './actions';
 
 type Props = {
   appStart: Function,
-  appStop: Function,
+  appStarted: bool,
   currentLocale: string,
   messages: Object,
 }
@@ -21,16 +20,20 @@ const start = (
     props: Props;
 
     componentDidMount() {
-      this.props.appStart();
+      if (!this.props.appStarted) {
+        this.props.appStart();
+      }
     }
 
     componentWillUnmount() {
-      this.props.appStop();
+      // When HMR is enabled, code change might cause this component to be
+      // reload, to avoid the state changing, we don't display appStop action.
     }
 
     render() {
-      const { currentLocale, messages } = this.props;
-      const props = R.omit(['messages', 'appStart', 'appStop'], this.props);
+      const { messages, appStart, ...rest } = this.props;
+      // The currentLocale, appStarted props needs to pass to the inner component.
+      const { currentLocale } = this.props;
 
       return (
         <IntlProvider
@@ -39,7 +42,7 @@ const start = (
           messages={messages[currentLocale] || messages.en}
           {...IntlTextComponent ? { textComponent: IntlTextComponent } : {}}
         >
-          <WrappedComponent {...props} />
+          <WrappedComponent {...rest} />
         </IntlProvider>
       );
     }
@@ -49,8 +52,9 @@ const start = (
     (state: State) => ({
       currentLocale: state.app.currentLocale,
       messages: state.app.messages,
+      appStarted: state.app.started,
     }),
-    { appStart, appStop },
+    { appStart },
   )(Start);
 
   return Start;

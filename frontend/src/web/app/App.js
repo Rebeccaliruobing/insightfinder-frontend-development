@@ -1,5 +1,4 @@
 import React from 'react';
-import { omit } from 'ramda';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
 import { autobind, debounce } from 'core-decorators';
@@ -15,9 +14,10 @@ import * as themes from './themes';
 import './app.scss';
 
 type Props = {
+  appStarted: bool,
   currentLocale: string,
   currentTheme: string,
-  appStarted: bool,
+  viewport: Object,
   setViewport: Function,
 };
 
@@ -28,13 +28,19 @@ export class AppCore extends React.Component {
   @autobind
   @debounce(300)
   handleOnResize(dimensions) {
-    const { width, height } = dimensions;
-    this.props.setViewport(width, height);
+    const { appStarted } = this.props;
+    if (appStarted) {
+      const { width, height } = dimensions;
+      const { width: currentWidth, height: currentHeight } = this.props.viewport;
+      if (width !== currentWidth || height !== currentHeight) {
+        this.props.setViewport(width, height);
+      }
+    }
   }
 
   render() {
-    const { currentLocale, currentTheme, appStarted, ...rest } = this.props;
-    const others = omit(['setViewport'], rest);
+    const { currentLocale, currentTheme, appStarted,
+      viewport, setViewport, ...rest } = this.props;
 
     return (
       <ThemeProvider theme={themes[currentTheme] || themes.light}>
@@ -47,7 +53,7 @@ export class AppCore extends React.Component {
               }}
             />
             <AppLoader />
-            {appStarted && <Routing {...others} />}
+            {appStarted && <Routing {...rest} />}
           </Container>
         </Measure>
       </ThemeProvider>
@@ -59,6 +65,7 @@ export default connect(
   (state: State) => ({
     currentTheme: state.app.currentTheme,
     currentLocale: state.app.currentLocale,
+    viewport: state.app.viewport,
     appStarted: state.app.started,
   }),
   { setViewport },

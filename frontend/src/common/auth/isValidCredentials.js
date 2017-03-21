@@ -1,6 +1,6 @@
 /* @flow */
-const isValidCredentials = (credentials: Object = {}) => {
-  const { userName, token } = credentials;
+const isValidCredentials = (credentials: Object) => {
+  const { userName, token } = credentials || {};
   return userName && token;
 };
 

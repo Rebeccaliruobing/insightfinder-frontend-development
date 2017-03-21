@@ -12,18 +12,22 @@ const initialState = {
   appName: '',
   appVersion: '',
   currentTheme: 'light',
-  locales,
   currentLocale: null,
-  messages,
   viewport: {
     width: 0,
     height: 0,
     widthDiff: 0,
     heightDiff: 0,
   },
+  locales,
+  messages,
+  appLoaderVisible: false,
+  rehydrated: false,
+  starting: false,
   started: false,
-  appLoaderVisible: true,
+  fatalError: null,
   error: null,
+  lastError: null,
 };
 
 const reducer = (
@@ -55,10 +59,27 @@ const reducer = (
         heightDiff: height - currentHeight,
       },
     };
+  } else if (action.type === 'APP_START') {
+    return {
+      ...state,
+      appLoaderVisible: true,
+      starting: true,
+    };
+  } else if (action.type === 'APP_REHYDRATED') {
+    return {
+      ...state,
+      rehydrated: true,
+    };
   } else if (action.type === 'APP_STARTED') {
     return {
       ...state,
+      starting: false,
       started: true,
+    };
+  } else if (action.type === 'APP_STOP') {
+    return {
+      ...state,
+      started: false,
     };
   } else if (action.type === 'SHOW_APPLOADER') {
     return {
@@ -70,15 +91,22 @@ const reducer = (
       ...state,
       appLoaderVisible: false,
     };
-  } else if (action.type === 'REDIRECT_LOGIN') {
+  } else if (action.type === 'APP_FATAL_ERROR') {
     return {
       ...state,
-      started: true,
+      fatalError: action.payload.error,
+      lastError: action.payload.error,
     };
   } else if (action.type === 'APP_ERROR') {
     return {
       ...state,
       error: action.payload.error,
+      lastError: action.payload.error,
+    };
+  } else if (action.type === 'LOGIN_FAILURE') {
+    return {
+      ...state,
+      lastError: action.payload.error,
     };
   }
   return { ...initialState, ...state };

@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import VLink from 'valuelink';
 import cx from 'classnames';
+import { get } from 'lodash';
 import { compose } from 'ramda';
 import { autobind } from 'core-decorators';
 import { injectIntl } from 'react-intl';
@@ -12,14 +13,16 @@ import { login } from '../../common/auth/actions';
 import appFieldsMessages from '../../common/app/appFieldsMessages';
 import authMessages from '../../common/auth/authMessages';
 import { Input } from '../../lib/fui/react';
-import { CenterContainer, LocaleSelector } from '../app/components';
+import { CenterPage, LocaleSelector } from '../app/components';
 
 type Props = {
+  appLoaderVisible: bool,
   isLoggedIn: bool,
   isLoggingIn: bool,
   intl: $IntlShape,
   hideAppLoader: Function,
   login: Function,
+  location: Object,
 };
 
 type States = {
@@ -35,7 +38,9 @@ class Login extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hideAppLoader();
+    if (this.props.appLoaderVisible) {
+      this.props.hideAppLoader();
+    }
   }
 
   @autobind
@@ -56,15 +61,20 @@ class Login extends React.Component {
   }
 
   render() {
-    const { intl, isLoggingIn } = this.props;
+    const { intl, isLoggingIn, isLoggedIn, location } = this.props;
     const userNameLink = VLink.state(this, 'userName')
       .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
     const passwordLink = VLink.state(this, 'password')
       .check(x => x, intl.formatMessage(authMessages.errorsPasswordRequired));
     const disabled = userNameLink.error || passwordLink.error || isLoggingIn;
+    const from = get(location, 'state.from', '/');
+
+    if (isLoggedIn) {
+      return (<Redirect to={from} />);
+    }
 
     return (
-      <CenterContainer className="auth">
+      <CenterPage className="auth">
         <form className="ui form">
           <LocaleSelector style={{ marginBottom: 10 }} />
           <div className="input field required">
@@ -111,7 +121,7 @@ class Login extends React.Component {
             </Link>
           </div>
         </form>
-      </CenterContainer>
+      </CenterPage>
     );
   }
 }
@@ -119,6 +129,7 @@ class Login extends React.Component {
 export default compose(
   connect(
     (state: State) => ({
+      appLoaderVisible: state.app.appLoaderVisible,
       isLoggedIn: state.auth.loggedIn,
       isLoggingIn: state.auth.loggingIn,
     }),

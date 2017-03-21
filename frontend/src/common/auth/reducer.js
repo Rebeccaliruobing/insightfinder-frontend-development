@@ -4,41 +4,37 @@ import type { AuthState, Action } from '../types';
 const initialState = {
   loggedIn: false,
   loggingIn: false,
-  credentials: {},
-  userInfo: {},
-  loginReason: {},
+  credentials: null,
+  userInfo: null,
+  loginReason: null,
 };
 
 const reducer = (
   state: AuthState = initialState,
   action: Action) => {
-  if (action.type === 'LOGGINGIN') {
+  if (action.type === 'LOGIN') {
     return { ...state, loggingIn: true };
   } else if (action.type === 'LOGIN_SUCCESS') {
-    const { userName, token, ...rest } = action.payload;
+    const { credentials, userInfo } = action.payload;
+
     return {
       ...state,
       loggedIn: true, loggingIn: false,
-      credentials: {
-        userName,
-        token,
-      },
-      userInfo: {
-        userName,
-        ...rest,
-      },
+      credentials,
+      userInfo: userInfo || state.userInfo,
     };
   } else if (action.type === 'LOGIN_FAILURE') {
     return {
       ...state,
       loggedIn: false, loggingIn: false,
-      loginReason: action.payload,
+      loginReason: action.payload.message,
     };
-  } else if (action.type === 'REDIRECT_LOGIN') {
+  } else if (action.type === 'LOGOFF') {
     return {
       ...state,
-      loggedIn: false, credentials: {},
-      loginReason: action.payload,
+      loggedIn: false,
+      credentials: null,
+      userInfo: null,
     };
   }
 

@@ -12,7 +12,17 @@ import BehaviorChangeDetection from './behavior-change-detection';
 import EventSummary from '../../containers/event-summary';
 import ExecutiveDashboard from '../../containers/executive-dashboard';
 import AppForecast from '../../containers/app-forecast';
-import Navbar from './navbar';
+
+export { InsightReport };
+export { EventSummary };
+export { ExecutiveDashboard };
+export { HistoricalReport };
+export { IncidentAnalysis };
+export { BehaviorChangeDetection };
+export { OutlierDetection };
+export { RolloutCheck };
+export { SummaryReport };
+export { AppForecast };
 
 export const Cloud = props => (
   <Console.Wrapper className="cloud-page">

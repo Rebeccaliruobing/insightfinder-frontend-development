@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { Container, Image, Box } from '../../../lib/fui/react';
+
 import logo from '../../../../images/logo.png';
 
 type Props = {
@@ -9,8 +10,8 @@ type Props = {
   style: Object,
 };
 
-const CenterContainer = ({ style = { width: 320 }, className, children }: Props) => (
-  <Container screenCenter className={className} style={style}>
+const CenterPage = ({ style = { width: 320 }, className, children }: Props) => (
+  <Container screenCenter className={`center-page ${className || ''}`} style={style}>
     <div style={{ marginBottom: 24, textAlign: 'center' }}>
       <Image size={200} src={logo} />
     </div>
@@ -21,4 +22,4 @@ const CenterContainer = ({ style = { width: 320 }, className, children }: Props)
   </Container>
 );
 
-export default CenterContainer;
+export default CenterPage;

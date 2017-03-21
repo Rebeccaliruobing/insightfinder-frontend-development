@@ -14,7 +14,6 @@ class Root extends React.Component {
 
   render() {
     const { store } = this.props;
-    // Switch between different version
     return (
       <Redux store={store}>
         <App />

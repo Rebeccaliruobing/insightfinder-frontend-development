@@ -14,6 +14,12 @@ const login = ({ userName, password }: Params) =>
       userName,
       password,
     },
-  );
+  ).then(d => ({
+    credentials: {
+      userName: d.data.userName,
+      token: d.token,
+    },
+    userInfo: d.data,
+  }));
 
 export default login;

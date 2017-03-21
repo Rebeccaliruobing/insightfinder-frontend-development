@@ -2,13 +2,15 @@
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
 import { REHYDRATE } from 'redux-persist/constants';
+import store from 'store';
 import type { Action, Deps } from '../types';
 import { isValidCredentials } from '../auth';
-import { loginSuccess } from '../auth/actions';
+import { loginSuccess, loginFailure } from '../auth/actions';
 import { retrieveInitData } from '../apis';
 import { PermissionError } from '../errors';
+import authMessages from '../auth/authMessages';
 
-export const setCurrentTheme = (theme?: string): Action => ({
+export const setCurrentTheme = (theme: string): Action => ({
   type: 'SET_CURRENT_THEME',
   payload: { theme },
 });
@@ -23,9 +25,8 @@ export const setViewport = (width: number, height: number): Action => ({
   payload: { width, height },
 });
 
-export const setInitData = (data: Object): Action => ({
-  type: 'SET_INIT_DATA',
-  payload: data,
+export const appRehydrated = (): Action => ({
+  type: 'APP_REHYDRATED',
 });
 
 export const appStart = (): Action => ({
@@ -40,9 +41,9 @@ export const appStop = (): Action => ({
   type: 'APP_STOP',
 });
 
-export const redirectLogin = (reason: Object = {}): Action => ({
-  type: 'REDIRECT_LOGIN',
-  payload: reason,
+export const setInitData = (data: Object): Action => ({
+  type: 'SET_INIT_DATA',
+  payload: data,
 });
 
 export const showAppLoader = (): Action => ({
@@ -53,40 +54,86 @@ export const hideAppLoader = (): Action => ({
   type: 'HIDE_APPLOADER',
 });
 
+export const appFatalError = (error: Error): Action => ({
+  type: 'APP_FATAL_ERROR',
+  payload: { error },
+});
+
 export const appError = (error: Error): Action => ({
   type: 'APP_ERROR',
   payload: { error },
 });
 
-const appStartEpic = (action$: any, { getState }: Deps) =>
-  // After rehydrate state from local storage, verify the user's access token.
+const appStart$ = (action$: any, getState: Function) => {
+  let { credentials, userInfo } = getState().auth;
+  let valid = isValidCredentials(credentials);
+
+  if (!valid) {
+    // Get credentials and userinfo from store
+    const userName = store.get('userName');
+    const token = store.get('token');
+    userInfo = store.get('userInfo');
+    credentials = { userName, token };
+
+    valid = isValidCredentials(credentials);
+  } else {
+    store.set('token', credentials.token);
+    store.set('userName', credentials.userName);
+    store.set('userInfo', userInfo);
+  }
+
+  // If token not exists, return login failure action with error message.
+  if (!valid) {
+    return Observable.of(loginFailure(), appStarted());
+  }
+
+  // Otherwise, verify the token is still valid.
+  return Observable
+    .from(retrieveInitData(credentials))
+    .switchMap(d => Observable.of(
+      loginSuccess(credentials, userInfo),
+      setInitData(d),
+      appStarted(),
+    ))
+    .takeUntil(action$.ofType('APP_STOP'))
+    .catch((err) => {
+      if (err instanceof PermissionError) {
+        return Observable.of(
+          loginFailure(authMessages.errorsTokenInvalid, err),
+          appStarted(),
+        );
+      }
+      return Observable.of(
+        appFatalError(err),
+        appStarted(),
+      );
+    });
+};
+
+const RehydrateEpic = (action$: any, { getState }: Deps) =>
   action$.ofType(REHYDRATE)
     .concatMap(() => {
-      const { credentials } = getState().auth;
-      const valid = isValidCredentials(credentials);
-
-      // If token not exists, change application state to started for logining.
-      if (!valid) {
-        return Observable.of(redirectLogin());
+      const { starting } = getState().app;
+      if (!starting) {
+        return Observable.of(appRehydrated());
       }
+      return Observable.concat(
+        Observable.of(appRehydrated()),
+        appStart$(action$, getState),
+      );
+    });
 
-      // Otherwise, verify the token is still valid.
-      return Observable
-        .from(retrieveInitData(credentials))
-        .switchMap(d => Observable.of(
-          loginSuccess(credentials),
-          setInitData(d),
-          appStarted(),
-        ))
-        .takeUntil(action$.ofType('APP_STOP'))
-        .catch((err) => {
-          if (err instanceof PermissionError) {
-            return Observable.of(redirectLogin({ invalidToken: true }));
-          }
-          return Observable.of(appError(err));
-        });
+const appStartEpic = (action$: any, { getState }: Deps) =>
+  action$.ofType('APP_START')
+    .concatMap(() => {
+      const { rehydrated, started } = getState().app;
+      if (!rehydrated || started) {
+        return Observable.empty();
+      }
+      return appStart$(action$, getState);
     });
 
 export const epics = [
+  RehydrateEpic,
   appStartEpic,
 ];
