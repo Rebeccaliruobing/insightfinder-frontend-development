@@ -1,10 +1,11 @@
 import React from 'react';
 import cx from 'classnames';
 import { autobind } from 'core-decorators';
-import _ from 'lodash';
 import get from 'lodash/get';
 import moment from 'moment';
 import { Box, Tile, Heatmap } from '../../../src/lib/fui/react';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
 type Props = {
   projectName: string,
@@ -73,12 +74,17 @@ class ModelTile extends React.Component {
     const size = count * (big ? 5 : 4);
     const dataset = this.normalizeHeatmapDataset();
     const { startTimestamp, endTimestamp,
-      userPickableFlag: pickable, sampleCount, metricNameList, maxValues, minValues } = model;
+      userPickableFlag: pickable, sampleCount,
+      metricNameList, maxValues, minValues } = model;
+    let { fileUrl } = model;
     const startTime = moment(startTimestamp).format('YYYY/M/D');
     const endTime = moment(endTimestamp).format('YYYY/M/D');
     const metric = (metricNameList || '[]').slice(1, -1).split(',');
     const maxs = JSON.parse(maxValues || '[]');
     const mins = JSON.parse(minValues || '[]');
+
+    fileUrl = 'https://insightfinder.com/wp-content/uploads/2016/01/iStock_000021981766_s-reduced.jpg?3f50eb';
+    fileUrl += `&t=${moment().valueOf()}`;
 
     return (
       <Tile className={cx('model-tile', { big, picked })}>
@@ -89,7 +95,24 @@ class ModelTile extends React.Component {
             <div>{`Metric: ${metric.length}`}</div>
             <div>{`Samples: ${sampleCount}`}</div>
             {pickable && <i className="remove icon" onClick={this.handleModelRemove} />}
-            {pickable && <i className="check circle outline icon" onClick={this.handleModelPicked} />}
+            {pickable &&
+              <OverlayTrigger
+                placement="top" delayShow={300}
+                overlay={<Tooltip>Download</Tooltip>}
+              >
+                <a className="download" href={fileUrl} target="_blank" rel="noopener noreferrer">
+                  <i className="download icon" />
+                </a>
+              </OverlayTrigger>
+            }
+            {pickable &&
+              <OverlayTrigger
+                placement="top" delayShow={300}
+                overlay={<Tooltip>Pick</Tooltip>}
+              >
+                <i className="check icon" onClick={this.handleModelPicked} />
+              </OverlayTrigger>
+            }
           </div>
           {big &&
             <table className="ui compact table">
