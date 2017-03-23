@@ -47,7 +47,7 @@ class ModelSettings extends React.Component {
           const models = data.modelKeys || [];
           const pickedModelKeys = R.map(
             m => m.modelKey,
-            R.filter(m => m.userPickedFlag)(models));
+            R.filter(m => m.pickedFlag)(models));
 
           this.setState({
             models,
@@ -129,11 +129,11 @@ class ModelSettings extends React.Component {
           {pickedModel &&
             <div style={{ paddingBottom: '1em', paddingRight: '1em' }}>
               {`You picked model 
-              ${moment(pickedModel.startTimestamp).format('YYYY/M/D')}-
-              ${moment(pickedModel.endTimestamp).format('YYYY/M/D')}
+              ${moment(pickedModel.startTimestamp).format('MM/DD HH:mm')}-
+              ${moment(pickedModel.endTimestamp).format('MM/DD HH:mm')}
               to be used ${
-                pickedModel.userPickedExpiry?
-                  'till ' + moment(pickProjectModel.userPickedExpiry).format('YYYY/MM/DD hh:mm')
+                pickedModel.pickedExpiry?
+                  'till ' + moment(pickProjectModel.pickedExpiry).format('MM/DD HH:mm')
                   : 'for the next 24 hours'}.`
               }
             </div>

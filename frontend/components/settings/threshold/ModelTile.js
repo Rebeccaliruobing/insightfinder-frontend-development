@@ -62,7 +62,7 @@ class ModelTile extends React.Component {
 
     const { model, projectName } = this.props;
     const { startTimestamp } = model;
-    const startTime = moment(startTimestamp).format('YYYY/M/D');
+    const startTime = moment(startTimestamp).format('MM/DD HH:mm');
     if (window.confirm(`Are you sure to remove model ${startTime}`)) {
       this.props.removeProjectModel(projectName, model.modelKey);
     }
@@ -71,14 +71,14 @@ class ModelTile extends React.Component {
   render() {
     const { model, big, picked } = this.props;
     const count = 32;
-    const size = count * (big ? 5 : 4);
+    const size = count * (big ? 6 : 5);
     const dataset = this.normalizeHeatmapDataset();
     const { startTimestamp, endTimestamp,
-      userPickableFlag: pickable, sampleCount,
+      pickableFlag: pickable, sampleCount,
       metricNameList, maxValues, minValues } = model;
     let { fileUrl } = model;
-    const startTime = moment(startTimestamp).format('YYYY/M/D');
-    const endTime = moment(endTimestamp).format('YYYY/M/D');
+    const startTime = moment(startTimestamp).format('MM/DD HH:mm');
+    const endTime = moment(endTimestamp).format('MM/DD HH:mm');
     const metric = (metricNameList || '[]').slice(1, -1).split(',');
     const maxs = JSON.parse(maxValues || '[]');
     const mins = JSON.parse(minValues || '[]');
@@ -91,7 +91,7 @@ class ModelTile extends React.Component {
         <Box isLink={!big}>
           <Heatmap dataset={dataset} countPerRow={count} style={{ width: size, height: size }} />
           <div className="meta">
-            <div>{`${startTime}-${endTime}`}</div>
+            <div>{`${startTime} - ${endTime}`}</div>
             <div>{`Metric: ${metric.length}`}</div>
             <div>{`Samples: ${sampleCount}`}</div>
             {pickable && <i className="remove icon" onClick={this.handleModelRemove} />}
