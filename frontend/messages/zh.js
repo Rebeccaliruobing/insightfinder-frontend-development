@@ -13,6 +13,30 @@ export default [
     "defaultMessage": "用户名",
   },
   {
+    "id": "app.menus.bugRepository",
+    "defaultMessage": "Bug仓库",
+  },
+  {
+    "id": "app.menus.dashboard",
+    "defaultMessage": "仪表板",
+  },
+  {
+    "id": "app.menus.fileAnalysis",
+    "defaultMessage": "文件分析",
+  },
+  {
+    "id": "app.menus.help",
+    "defaultMessage": "帮助",
+  },
+  {
+    "id": "app.menus.logAnalysis",
+    "defaultMessage": "日志分析",
+  },
+  {
+    "id": "app.menus.settings",
+    "defaultMessage": "设置",
+  },
+  {
     "id": "auth.buttons.signin",
     "defaultMessage": "登  录",
   },

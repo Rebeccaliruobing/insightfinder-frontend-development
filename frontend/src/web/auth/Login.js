@@ -19,7 +19,7 @@ type Props = {
   appLoaderVisible: bool,
   isLoggedIn: bool,
   isLoggingIn: bool,
-  intl: $IntlShape,
+  intl: Object,
   hideAppLoader: Function,
   login: Function,
   loginReason: Message,

@@ -13,6 +13,30 @@ export default [
     "defaultMessage": "username",
   },
   {
+    "id": "app.menus.bugRepository",
+    "defaultMessage": "Bug Repository",
+  },
+  {
+    "id": "app.menus.dashboard",
+    "defaultMessage": "Dashboard",
+  },
+  {
+    "id": "app.menus.fileAnalysis",
+    "defaultMessage": "File Analysis",
+  },
+  {
+    "id": "app.menus.help",
+    "defaultMessage": "Help",
+  },
+  {
+    "id": "app.menus.logAnalysis",
+    "defaultMessage": "Log Analysis",
+  },
+  {
+    "id": "app.menus.settings",
+    "defaultMessage": "Settings",
+  },
+  {
     "id": "auth.buttons.signin",
     "defaultMessage": "Sign In",
   },
