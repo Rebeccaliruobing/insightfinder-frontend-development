@@ -33,6 +33,7 @@ const reducer = (
     return {
       ...state,
       loggedIn: false,
+      loginReason: null,
       credentials: null,
       userInfo: null,
     };
