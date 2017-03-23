@@ -436,17 +436,29 @@ class IncidentsTreeMap extends Component {
       t.attr('x', d => x(d.x) + 6).attr('y', d => y(d.y) + 6);
     });
     if (schema === 'anomaly') {
-      g.append('text').attr('dy', '.75em').text(d => this.chopString(d.eventType, 10)).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => this.chopString(d.eventType, 12))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     } else if (schema === 'cpu') {
-      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : ''))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     } else if (schema === 'availability') {
-      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : ''))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     }
 
     // Bind event for metric

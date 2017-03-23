@@ -447,6 +447,7 @@ class EventSummary extends React.Component {
               </Dropdown>
             </div>
             <div className="field">
+              <label style={{ fontWeight: 'bold' }}>Start Date:</label>
               <div className="ui input">
                 <DatePicker
                   selected={startTime}
@@ -500,8 +501,8 @@ class EventSummary extends React.Component {
             </div>
             <div className="flex-item flex-col-container" style={{ width: '55%' }}>
               <div style={{ padding: '5px 0px 6px', borderBottom: '2px solid rgba(34,36,38,.15)' }}>
-                {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
-                {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
+                {treeMapScheme === 'anomaly' && <b style={{ paddingRight: '1em' }}>Show event by:</b>}
+                {treeMapScheme !== 'anomaly' && <b style={{ paddingRight: '1em' }}>Show instance by:</b>}
                 <TreeMapSchemeSelect
                   style={{ width: 130 }} value={treeMapScheme}
                   text={treeMapSchemeText}
