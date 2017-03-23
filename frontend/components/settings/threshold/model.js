@@ -72,7 +72,7 @@ class ModelSettings extends React.Component {
   }
 
   @autobind
-  handlePickProjectModel(projectName, key) {
+  handlePickProjectModel(projectName, instanceGroup, key) {
     const { models } = this.state;
     const pickedModel = R.find(m => m.modelKey === key, models);
     const { startTimestamp, endTimestamp, modelKey } = pickedModel;
@@ -83,7 +83,7 @@ class ModelSettings extends React.Component {
     this.setState({
       loading: true,
     }, () => {
-      pickProjectModel(projectName, JSON.stringify(modelKeyObj))
+      pickProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
           this.setState({
             loading: false,
@@ -94,7 +94,7 @@ class ModelSettings extends React.Component {
   }
 
   @autobind
-  handleRemoveProjectModel(projectName, key) {
+  handleRemoveProjectModel(projectName, instanceGroup, key) {
     const { models } = this.state;
     const pickedModel = R.find(m => m.modelKey === key, models);
     const { startTimestamp, endTimestamp, modelKey } = pickedModel;
@@ -105,7 +105,7 @@ class ModelSettings extends React.Component {
     this.setState({
       loading: true,
     }, () => {
-      removeProjectModel(projectName, JSON.stringify(modelKeyObj))
+      removeProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
           this.reloadData(projectName);
         });
@@ -113,7 +113,7 @@ class ModelSettings extends React.Component {
   }
 
   render() {
-    const { projectName } = this.props;
+    const { projectName, instanceGroup } = this.props;
     const { models, pickedModelKeys, loading } = this.state;
 
     const pickedModels = R.filter(m => R.find(R.equals(m.modelKey), pickedModelKeys), models);
@@ -161,6 +161,7 @@ class ModelSettings extends React.Component {
                 key={m.modelKey} model={m}
                 picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
                 projectName={projectName}
+                instanceGroup={instanceGroup}
                 pickProjectModel={this.handlePickProjectModel}
                 removeProjectModel={this.handleRemoveProjectModel}
               />

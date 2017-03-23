@@ -34,7 +34,7 @@ export function getProjectModels(projectName, instanceGroup) {
   });
 }
 
-export function pickProjectModel(projectName, modelKeyObj) {
+export function pickProjectModel(projectName, instanceGroup, modelKeyObj) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -42,7 +42,7 @@ export function pickProjectModel(projectName, modelKeyObj) {
     $.ajax({
       type: 'GET',
       url: getEndpoint('modelPicking', 1),
-      data: $.param({ userName, token, projectName, modelKeyObj, operation: 'save' }),
+      data: $.param({ userName, token, projectName, instanceGroup, modelKeyObj, operation: 'save' }),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
       },
@@ -65,7 +65,7 @@ export function pickProjectModel(projectName, modelKeyObj) {
   });
 }
 
-export function removeProjectModel(projectName, modelKeyObj) {
+export function removeProjectModel(projectName, instanceGroup, modelKeyObj) {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -73,7 +73,7 @@ export function removeProjectModel(projectName, modelKeyObj) {
     $.ajax({
       type: 'GET',
       url: getEndpoint('modelPicking', 1),
-      data: $.param({ userName, token, projectName, modelKeyObj, operation: 'delete' }),
+      data: $.param({ userName, token, projectName, instanceGroup, modelKeyObj, operation: 'delete' }),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
       },

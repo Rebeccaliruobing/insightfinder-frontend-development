@@ -9,6 +9,7 @@ import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
 type Props = {
   projectName: string,
+  instanceGroup: string,
   model: Object,
   big: bool,
   picked: bool,
@@ -51,8 +52,8 @@ class ModelTile extends React.Component {
     e.preventDefault();
     e.stopPropagation();
 
-    const { model, projectName } = this.props;
-    this.props.pickProjectModel(projectName, model.modelKey);
+    const { model, projectName, instanceGroup } = this.props;
+    this.props.pickProjectModel(projectName, instanceGroup, model.modelKey);
   }
 
   @autobind
@@ -60,11 +61,11 @@ class ModelTile extends React.Component {
     e.preventDefault();
     e.stopPropagation();
 
-    const { model, projectName } = this.props;
+    const { model, projectName, instanceGroup } = this.props;
     const { startTimestamp } = model;
     const startTime = moment(startTimestamp).format('MM/DD HH:mm');
     if (window.confirm(`Are you sure to remove model ${startTime}`)) {
-      this.props.removeProjectModel(projectName, model.modelKey);
+      this.props.removeProjectModel(projectName, instanceGroup, model.modelKey);
     }
   }
 
