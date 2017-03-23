@@ -113,7 +113,8 @@ class CausalGraphModal extends React.Component {
     this.cleanChart();
 
     const { relations, correlations, metricNameMap, kpis } = this.state;
-    const { activeTab, relationFilterWeight, correlationFilterWeight } = this.state;
+    const { activeTab, relationFilterWeight, correlationFilterWeight,
+      containerHeight, containerWidth } = this.state;
 
     const showRelations = activeTab === 'relation';
     const filterCount = showRelations ? relationFilterWeight : correlationFilterWeight;
@@ -130,7 +131,8 @@ class CausalGraphModal extends React.Component {
 
     // Change graph layout
     g.setGraph({
-      rankdir: 'LR', align: 'DR', ranker: 'tight-tree', ranksep: 50, nodesep: 30, edgesep: 10, marginx: 20, marginy: 20,
+      rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
+      ranksep: 100, nodesep: 50, edgesep: 10, marginx: 20, marginy: 20,
     });
 
     const addNodes = (g, rels, fsrc, ftarget, existNames) => {
@@ -140,7 +142,8 @@ class CausalGraphModal extends React.Component {
       R.forEach((name) => {
         if (!R.find(n => n === name)(existNames)) {
           g.setNode(name, {
-            title: name, label: chopString(name, 30), name, width: 140, height: 0,
+            title: name, label: chopString(name, 30), name, width: -6, height: -6,
+            shape: 'circle',
           });
         }
       }, names);
@@ -234,15 +237,18 @@ class CausalGraphModal extends React.Component {
     svg.selectAll('.node')
       .append('svg:title').text(d => g.node(d).name);
 
-    // Hidden the rect.
-    svg.selectAll('.node rect').attr({
-      visibility: 'hidden',
+    // Change node fill.
+    svg.selectAll('.node circle').attr({
+      fill: '#1976d2',
     });
 
     let { width, height } = g.graph();
     width = width <= 0 ? 10 : width;
     height = height <= 0 ? 10 : height;
-    svg.attr({ width, height, viewBox: `0 0 ${width} ${height}` });
+    svg.attr({
+      width: width + 300, height: height + 50,
+      viewBox: `0 0 ${width} ${height}`,
+    });
   }
 
   @autobind

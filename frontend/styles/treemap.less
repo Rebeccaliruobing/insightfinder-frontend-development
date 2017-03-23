@@ -3,6 +3,11 @@
     text {
       pointer-events: none;
       fill: white;
+      &.metric {
+        fill: yellow;
+        font-weight: bold;
+        font-style: italic;
+      }
     }
 
     rect {
@@ -47,6 +52,5 @@
 }
 
 .incidents.treemap {
-  border-top: 2px solid rgba(34,36,38,.15);
   padding-top: 4px;
 }

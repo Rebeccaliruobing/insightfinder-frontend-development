@@ -47,7 +47,7 @@ class ModelSettings extends React.Component {
           const models = data.modelKeys || [];
           const pickedModelKeys = R.map(
             m => m.modelKey,
-            R.filter(m => m.userPickedFlag)(models));
+            R.filter(m => m.pickedFlag)(models));
 
           this.setState({
             models,
@@ -72,7 +72,7 @@ class ModelSettings extends React.Component {
   }
 
   @autobind
-  handlePickProjectModel(projectName, key) {
+  handlePickProjectModel(projectName, instanceGroup, key) {
     const { models } = this.state;
     const pickedModel = R.find(m => m.modelKey === key, models);
     const { startTimestamp, endTimestamp, modelKey } = pickedModel;
@@ -83,7 +83,7 @@ class ModelSettings extends React.Component {
     this.setState({
       loading: true,
     }, () => {
-      pickProjectModel(projectName, JSON.stringify(modelKeyObj))
+      pickProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
           this.setState({
             loading: false,
@@ -94,7 +94,7 @@ class ModelSettings extends React.Component {
   }
 
   @autobind
-  handleRemoveProjectModel(projectName, key) {
+  handleRemoveProjectModel(projectName, instanceGroup, key) {
     const { models } = this.state;
     const pickedModel = R.find(m => m.modelKey === key, models);
     const { startTimestamp, endTimestamp, modelKey } = pickedModel;
@@ -105,7 +105,7 @@ class ModelSettings extends React.Component {
     this.setState({
       loading: true,
     }, () => {
-      removeProjectModel(projectName, JSON.stringify(modelKeyObj))
+      removeProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
           this.reloadData(projectName);
         });
@@ -113,7 +113,7 @@ class ModelSettings extends React.Component {
   }
 
   render() {
-    const { projectName } = this.props;
+    const { projectName, instanceGroup } = this.props;
     const { models, pickedModelKeys, loading } = this.state;
 
     const pickedModels = R.filter(m => R.find(R.equals(m.modelKey), pickedModelKeys), models);
@@ -129,11 +129,11 @@ class ModelSettings extends React.Component {
           {pickedModel &&
             <div style={{ paddingBottom: '1em', paddingRight: '1em' }}>
               {`You picked model 
-              ${moment(pickedModel.startTimestamp).format('YYYY/M/D')}-
-              ${moment(pickedModel.endTimestamp).format('YYYY/M/D')}
+              ${moment(pickedModel.startTimestamp).format('MM/DD HH:mm')}-
+              ${moment(pickedModel.endTimestamp).format('MM/DD HH:mm')}
               to be used ${
-                pickedModel.userPickedExpiry?
-                  'till ' + moment(pickProjectModel.userPickedExpiry).format('YYYY/MM/DD hh:mm')
+                pickedModel.pickedExpiry?
+                  'till ' + moment(pickProjectModel.pickedExpiry).format('MM/DD HH:mm')
                   : 'for the next 24 hours'}.`
               }
             </div>
@@ -161,6 +161,7 @@ class ModelSettings extends React.Component {
                 key={m.modelKey} model={m}
                 picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
                 projectName={projectName}
+                instanceGroup={instanceGroup}
                 pickProjectModel={this.handlePickProjectModel}
                 removeProjectModel={this.handleRemoveProjectModel}
               />

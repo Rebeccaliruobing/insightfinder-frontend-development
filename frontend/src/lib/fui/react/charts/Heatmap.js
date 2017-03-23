@@ -73,7 +73,7 @@ class Heatmap extends React.Component {
       .range(colorCalibration);
 
     rect
-      .filter(d => d > 0)
+      // .filter(d => d >= 0)
       .attr('fill', d => colorScale(valueAccessor(d)));
 
     this.setState({ chart: chart.toReact() });

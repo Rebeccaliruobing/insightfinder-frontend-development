@@ -14,8 +14,10 @@ const retrieveEventData = (projectName, loadGroup, instanceGroup, endTime, numbe
       instanceGroup,
       numberOfDays,
       endTimestamp: endTime,
-      operation: 'loadGroup',
-    } : {}),
+      operation: 'loadPeriod',
+    } : {
+      operation: 'loadOverall',
+    }),
   };
 
   return new Promise((resolve, reject) => {
