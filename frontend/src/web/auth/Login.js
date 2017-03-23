@@ -7,7 +7,7 @@ import { get } from 'lodash';
 import { compose } from 'ramda';
 import { autobind } from 'core-decorators';
 import { injectIntl } from 'react-intl';
-import type { State } from '../../common/types';
+import type { State, Message } from '../../common/types';
 import { hideAppLoader } from '../../common/app/actions';
 import { login } from '../../common/auth/actions';
 import appFieldsMessages from '../../common/app/appFieldsMessages';
@@ -22,6 +22,7 @@ type Props = {
   intl: $IntlShape,
   hideAppLoader: Function,
   login: Function,
+  loginReason: Message,
   location: Object,
 };
 
@@ -61,13 +62,14 @@ class Login extends React.Component {
   }
 
   render() {
-    const { intl, isLoggingIn, isLoggedIn, location } = this.props;
+    const { intl, isLoggingIn, isLoggedIn, location, loginReason } = this.props;
     const userNameLink = VLink.state(this, 'userName')
       .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
     const passwordLink = VLink.state(this, 'password')
       .check(x => x, intl.formatMessage(authMessages.errorsPasswordRequired));
     const disabled = userNameLink.error || passwordLink.error || isLoggingIn;
     const from = get(location, 'state.from', '/');
+    const hasError = !isLoggedIn && loginReason;
 
     if (isLoggedIn) {
       if (from && from.pathname && from.pathname === '/account-info') {
@@ -78,8 +80,11 @@ class Login extends React.Component {
 
     return (
       <CenterPage className="auth">
-        <form className="ui form">
+        <form className={`ui ${hasError ? 'error' : ''} form`}>
           <LocaleSelector style={{ marginBottom: 10 }} />
+          {hasError &&
+            <div className="ui error message">{intl.formatMessage(loginReason)}</div>
+          }
           <div className="input field required">
             <label>{intl.formatMessage(appFieldsMessages.userName)}</label>
             <Input valueLink={userNameLink} icon="user icon" />
@@ -133,6 +138,7 @@ export default compose(
   connect(
     (state: State) => ({
       appLoaderVisible: state.app.appLoaderVisible,
+      loginReason: state.auth.loginReason,
       isLoggedIn: state.auth.loggedIn,
       isLoggingIn: state.auth.loggingIn,
     }),

@@ -21,12 +21,24 @@ export default [
     "defaultMessage": "注  册",
   },
   {
+    "id": "auth.errors.loginFailure",
+    "defaultMessage": "登录失败，请检查网络后重试",
+  },
+  {
     "id": "auth.errors.passwordRequired",
     "defaultMessage": "密码不能为空",
   },
   {
+    "id": "auth.errors.tokenInvalid",
+    "defaultMessage": "登录信息过期，请重新登录",
+  },
+  {
     "id": "auth.errors.userNameRequired",
     "defaultMessage": "用户名不能为空",
+  },
+  {
+    "id": "auth.errors.wrongCredential",
+    "defaultMessage": "用户名或密码错误，请重试",
   },
   {
     "id": "auth.hint.forgotPassword",
