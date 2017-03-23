@@ -10,6 +10,12 @@ import { DataDisqualifiersSettings, AlertSensitivitySettings,
 import ExtSvc from './extsvc/index';
 import Projects from './projectlist/index';
 
+export {
+  ThresholdSettingsOld, DataDisqualifiersSettings, AlertSensitivitySettings,
+  DataSharingSettings, GroupingSettings, ThresholdSettings, LogAnalysisSettings,
+  ExtSvc, Projects,
+};
+
 import Navbar from './navbar';
 
 export const Settings = ({ children }) => (

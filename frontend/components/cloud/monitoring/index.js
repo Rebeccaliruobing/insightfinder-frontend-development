@@ -2,7 +2,6 @@ import React from 'react';
 import _ from 'lodash';
 import store from 'store';
 import ReactDOM from 'react-dom';
-import {Link, IndexLink} from 'react-router';
 import {
   BaseComponent, Console, ButtonGroup, Button, Popup, Modal, Dropdown, Message
 } from '../../../artui/react';

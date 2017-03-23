@@ -5,6 +5,8 @@ import { Console } from '../../artui/react/index';
 import IncidentLogAnalysis from './incident-log-analysis';
 import Navbar from './navbar';
 
+export { IncidentLogAnalysis };
+
 export const Log = props => (
   <Console.Wrapper className="log-page">
     {props.children}

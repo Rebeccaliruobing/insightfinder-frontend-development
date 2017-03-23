@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import {Link, IndexLink} from 'react-router';
 import cx from 'classnames';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react';

@@ -4,19 +4,18 @@
 
 import React from 'react';
 
-// TODO: v1=> next 
-/*
-import {Link as RLink, IndexLink as RIndexLink} from 'react-router';
+// TODO: next => v1
+// import { Link as RLink, IndexLink as RIndexLink } from 'react-router';
 
-export const Link = (props) => (
-  <RLink activeClassName="active" {...props}>{props.children}</RLink>
-);
+// export const Link = (props) => (
+//   <RLink activeClassName="active" {...props}>{props.children}</RLink>
+// );
 
-export const IndexLink = (props) => (
-  <RIndexLink activeClassName="active" {...props}>{props.children}</RIndexLink>
-);
-*/
+// export const IndexLink = (props) => (
+//   <RIndexLink activeClassName="active" {...props}>{props.children}</RIndexLink>
+// );
 
+// TODO: v1 => next
 import { NavLink } from 'react-router-dom';
 
 export const Link = props => (

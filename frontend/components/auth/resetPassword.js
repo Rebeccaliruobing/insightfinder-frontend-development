@@ -1,8 +1,10 @@
 import $ from 'jquery';
 import React from 'react';
+import { connect } from 'react-redux';
 import cx from 'classnames';
 import store from 'store';
-import {BaseComponent, PropTypes, Input, Link} from '../../artui/react';
+import { BaseComponent } from '../../artui/react';
+import { hideAppLoader } from '../../src/common/app/actions';
 
 const logo = require('../../images/logo.png');
 
@@ -23,6 +25,7 @@ class ResetPassword extends BaseComponent {
   }
   
   componentDidMount() {
+    this.props.hideAppLoader();
     if (this._$el) {
       this._$el.find('.ui.submit.button').api({
         action: 'reset password',
@@ -153,4 +156,7 @@ class ResetPassword extends BaseComponent {
   }
 }
 
-export default ResetPassword;
+export default connect(
+  () => ({}),
+  { hideAppLoader },
+)(ResetPassword);

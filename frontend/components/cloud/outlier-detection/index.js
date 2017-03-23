@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import moment from 'moment';
 import ReactDOM from 'react-dom';
-import {Link, IndexLink} from 'react-router';
-import {autobind} from 'core-decorators';
+import { autobind } from 'core-decorators';
 import RcSlider from '../../ui/rc-slider';
 import HeatMapCard from '../../ui/heat-map-card';
 import {Console, ButtonGroup, Button, Message} from '../../../artui/react/index';

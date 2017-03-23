@@ -5,7 +5,9 @@ import {Route, IndexRedirect, IndexRoute} from 'react-router';
 import Navbar   from './navbar';
 import ListAll  from './list-all/index';
 import Search   from './search/index';
-import Explore  from './explore/index';
+import Explore from './explore/index';
+
+export { ListAll, Search, Explore };
 
 export class UseCase extends React.Component {
   render() {

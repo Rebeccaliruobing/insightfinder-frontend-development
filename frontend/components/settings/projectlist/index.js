@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-import {Link, IndexLink} from 'react-router';
 import {Console} from '../../../artui/react';
 import AmazonProjects from './amazon';
 import ProjectsGoogle from './google';

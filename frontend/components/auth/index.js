@@ -8,6 +8,8 @@ import ForgotUsername from './forgotUsername';
 import Signup from './signup';
 import SignupStep2 from './signup2';
 
+export { ForgotPassword, ResetPassword, ForgotUsername, Signup, SignupStep2 };
+
 export const authRoutes = (
   <Router history={browserHistory}>
     <Route path="/">

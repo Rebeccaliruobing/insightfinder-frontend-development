@@ -299,6 +299,17 @@ const routes = (
   </Router>
 );
 
+export {
+  liveMonitoringApp,
+  FilesMonitoringApp,
+  FilesDetectionMonitoringApp,
+  projectDataOnlyApp,
+  incidentAnalysisApp,
+  incidentLogAnalysisApp,
+  useCaseApp,
+  ExecutiveDashboardApp,
+};
+
 class AppRoute extends React.Component {
   componentDidMount() {
     this.props.hideAppLoader();

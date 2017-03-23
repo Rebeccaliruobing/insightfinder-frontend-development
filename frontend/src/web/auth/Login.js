@@ -70,6 +70,9 @@ class Login extends React.Component {
     const from = get(location, 'state.from', '/');
 
     if (isLoggedIn) {
+      if (from && from.pathname && from.pathname === '/account-info') {
+        return (<Redirect to="/" />);
+      }
       return (<Redirect to={from} />);
     }
 
