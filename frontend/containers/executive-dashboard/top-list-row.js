@@ -78,7 +78,7 @@ const ListRow = ({
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span className="name" style={projectStyle}>{name}</span>
         </OverlayTrigger>
-        {isProject && type === 'anomaly' &&
+        {!isProject && type === 'anomaly' &&
           <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
             <i className="hoverable random icon" onClick={onActionClick} />
           </OverlayTrigger>

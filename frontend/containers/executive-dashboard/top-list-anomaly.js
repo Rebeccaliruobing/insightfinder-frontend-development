@@ -185,7 +185,6 @@ class TopListAnomaly extends React.Component {
               (<tbody key={name}><ListRow
                 key={name} name={title} data={data} isProject expanded={expanded}
                 onRowClick={this.toggleProjectRow(name)} type="anomaly"
-                onActionClick={this.handleProjectActionClick(name)}
               /></tbody>),
             ];
 
@@ -223,6 +222,7 @@ class TopListAnomaly extends React.Component {
                   key={`${group.name}`} name={title} data={group} expanded={expanded} type="anomaly"
                   onNameClick={this.handleNameClick(name, group.name)}
                   onRowClick={this.handleProjectClick(name, group.name)}
+                  onActionClick={this.handleProjectActionClick(name, group.name)}
                 />
               ));
               return true;

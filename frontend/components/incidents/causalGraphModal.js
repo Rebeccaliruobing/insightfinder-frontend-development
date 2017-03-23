@@ -113,7 +113,8 @@ class CausalGraphModal extends React.Component {
     this.cleanChart();
 
     const { relations, correlations, metricNameMap, kpis } = this.state;
-    const { activeTab, relationFilterWeight, correlationFilterWeight } = this.state;
+    const { activeTab, relationFilterWeight, correlationFilterWeight,
+      containerHeight, containerWidth } = this.state;
 
     const showRelations = activeTab === 'relation';
     const filterCount = showRelations ? relationFilterWeight : correlationFilterWeight;
@@ -245,7 +246,7 @@ class CausalGraphModal extends React.Component {
     width = width <= 0 ? 10 : width;
     height = height <= 0 ? 10 : height;
     svg.attr({
-      width: width + 200, height: height + 30,
+      width: width + 300, height: height + 50,
       viewBox: `0 0 ${width} ${height}`,
     });
   }
