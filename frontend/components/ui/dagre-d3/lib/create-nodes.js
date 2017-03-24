@@ -39,7 +39,7 @@ function createNodes(selection, g, shapes) {
     bbox.width += node.paddingLeft + node.paddingRight;
     bbox.height += node.paddingTop + node.paddingBottom;
     labelGroup.attr("transform", "translate(" +
-      ((node.paddingLeft - node.paddingRight) / 2) + ",14)");
+      ((node.paddingLeft - node.paddingRight) / 2) + ", 20)");
       // ((node.paddingLeft - node.paddingRight) / 2) + "," +
       // ((node.paddingTop - node.paddingBottom) / 2) + ")");
 

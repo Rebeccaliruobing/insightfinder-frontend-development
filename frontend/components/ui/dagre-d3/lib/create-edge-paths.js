@@ -23,9 +23,10 @@ function createEdgePaths(selection, g, arrows) {
     var edge = g.edge(e);
     edge.elem = this;
 
-    if (edge.id) {
-      domEdge.attr("id", edge.id);
-    }
+    // Move the id to the path element, which will be used for text label.
+    // if (edge.id) {
+    //   domEdge.attr("id", edge.id);
+    // }
 
     util.applyClass(domEdge, edge["class"],
       (domEdge.classed("update") ? "update " : "") + "edgePath");
@@ -37,11 +38,12 @@ function createEdgePaths(selection, g, arrows) {
       edge.arrowheadId = _.uniqueId("arrowhead");
 
       var domEdge = d3.select(this)
-        .attr("marker-start", function() {
-            return "url(" + makeFragmentRef(location.href, edge.arrowheadId + '-start') + ")";
+        .attr('id', edge.id)
+        .attr("marker-start", function () {
+          return "url(" + makeFragmentRef(location.href, edge.arrowheadId + '-start') + ")";
         })
-        .attr("marker-end", function() {
-            return "url(" + makeFragmentRef(location.href, edge.arrowheadId) + ")";
+        .attr("marker-end", function () {
+          return "url(" + makeFragmentRef(location.href, edge.arrowheadId) + ")";
         })
         .style("fill", "none");
 

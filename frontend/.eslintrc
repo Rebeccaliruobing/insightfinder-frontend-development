@@ -18,6 +18,7 @@
     "object-property-newline": "off",
     // Use js for jsx
     "react/jsx-filename-extension": "off",
+    "react/prefer-stateless-function": "off",
     // Allow object react prop types.
     "react/forbid-prop-types": "off",
     "react/sort-comp": ["warn", {

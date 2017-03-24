@@ -164,24 +164,33 @@
     text-align: left;
   }
   svg {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 400;
     .node {
-      cursor: pointer;
-      &:hover {
-        rect {
-          fill: #4183C4;
-        }
-        g.label {
-          fill: #4183C4;
-        }
-      }
+      // cursor: pointer;
+      // &:hover {
+      //   rect {
+      //     fill: #4183C4;
+      //   }
+      //   g.label {
+      //     fill: #4183C4;
+      //   }
+      // }
     }
     .node rect {
       stroke: white;
       fill: #dfdfdf;
     }
+    .edgeLeftLabels,
+    .edgeRightLabels,
     .edgeLabel {
+      font-size: 11px;
+      font-style: italic;
+      font-weight: bold;
+      .highlight {
+        font-weight: bold;
+        fill: red;
+      }
       div {
         font-size: 12px;
         color: #4183C4;
@@ -190,6 +199,14 @@
           // color: #F2711C;
         }
       }
+    }
+
+    .edgeLeftLabels,
+    .edgeRightLabels {
+      fill: #4183C4;
+    }
+    .edgeLabel {
+      fill: green;
     }
 
     .edgePath {
@@ -202,14 +219,14 @@
         path {
           stroke: rgba(242, 113,28, 0.6);
           fill: rgba(242, 113,28, 0.6);
-          stroke-width: 2px;
+          stroke-width: 1.25px;
         }
       }
       &.very-strong {
         path {
           stroke: rgba(242, 113,28, 0.8);
           fill: rgba(242, 113,28, 0.8);
-          stroke-width: 3px;
+          stroke-width: 1.5px;
         }
       }
       &.correlation {
