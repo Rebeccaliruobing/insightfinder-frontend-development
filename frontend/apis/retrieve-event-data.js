@@ -10,8 +10,8 @@ const retrieveEventData = (projectName, loadGroup, instanceGroup, endTime, numbe
     userName,
     token,
     projectName,
+    instanceGroup,
     ...(loadGroup ? {
-      instanceGroup,
       numberOfDays,
       endTimestamp: endTime,
       operation: 'loadPeriod',
