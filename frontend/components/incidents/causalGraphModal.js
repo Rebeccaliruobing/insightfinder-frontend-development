@@ -110,7 +110,7 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 160, nodesep: 160, edgesep: 30,
+      ranksep: 200, nodesep: 200, edgesep: 40,
       marginx: 20, marginy: 20,
     });
 
@@ -134,15 +134,14 @@ class CausalGraphModal extends React.Component {
     // Add edge for each relations, ignore self to self relations.
     const arrowhead = (relType === 'correlation') ? 'double' : 'vee';
     relations.forEach((rel) => {
-      const { left, right, label, leftLabel, rightLabel } = rel;
-      const labelClass = '';
+      const { left, right, label, leftLabel, rightLabel, highlight } = rel;
       if (left === right) {
         console.warn(`Ignore self link :${left} => ${right}`);
       } else {
         const meta = {
           id: `${left}:${right}`,
           label,
-          class: labelClass,
+          class: highlight ? 'highlight' : '',
           lineInterpolate: 'monotone',
           arrowhead,
           labelpos: 'l',
@@ -190,7 +189,7 @@ class CausalGraphModal extends React.Component {
             label.forEach(([n, highlight], idx) => {
               tp.append('tspan')
                 .attr('class', highlight ? 'highlight' : '')
-                .text(n + (idx === label.length - 1 ? '' : ','));
+                .text(n + (idx === label.length - 1 ? '' : ',   '));
             });
           } else {
             tp.append('tspan')
@@ -471,6 +470,7 @@ class CausalGraphModal extends React.Component {
           left: r.src,
           right: r.target,
           label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          highlight: Number(r.probability) >= 0.6,
           leftLabel: ll,
           rightLabel: rl,
         };
@@ -509,6 +509,7 @@ class CausalGraphModal extends React.Component {
           left: r.elem1,
           right: r.elem2,
           label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          highlight: Number(r.probability) >= 0.8,
           leftLabel,
           rightLabel,
         };
