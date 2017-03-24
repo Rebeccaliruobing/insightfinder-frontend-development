@@ -486,7 +486,6 @@ class CausalGraphModal extends React.Component {
 
     let relations = eventsCorrelations || [];
     relations = relations.filter(r => r.probability >= correlationProbability);
-    console.log(relations);
 
     relations = relations.map(
       (r) => {
