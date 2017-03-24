@@ -110,7 +110,7 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 200, nodesep: 200, edgesep: 50,
+      ranksep: 160, nodesep: 160, edgesep: 30,
       marginx: 20, marginy: 20,
     });
 
@@ -143,11 +143,12 @@ class CausalGraphModal extends React.Component {
           id: `${left}:${right}`,
           label,
           class: labelClass,
+          lineInterpolate: 'monotone',
           arrowhead,
           labelpos: 'l',
           leftLabel,
           rightLabel,
-          labeloffset: 0,
+          labeloffset: 5,
         };
         g.setEdge(left, right, meta, relType);
       }
@@ -158,55 +159,64 @@ class CausalGraphModal extends React.Component {
     const render = dagreD3.render();
     render(inner, g);
 
-    // Change node fill.
-    svg.selectAll('.node circle').attr({
-      fill: '#1976d2',
-    });
-
     // Add title for node
     svg.selectAll('.node')
       .append('svg:title').text(d => g.node(d).name);
 
-    // Add edge left labels
+    // Add edge left and right labels
     const edgeLeftLables = svg.select('.output').append('g')
       .attr('class', 'edgeLeftLabels');
     const edgeRightLables = svg.select('.output').append('g')
       .attr('class', 'edgeRightLabels');
 
     relations.forEach((rel) => {
-      const edge = g.edge(rel.left, rel.right);
-      console.log(edge);
+      const e = R.find(o => o.v === rel.left && o.w === rel.right, g.edges());
+      if (e) {
+        const edge = g.edge(e);
 
-      edgeLeftLables
-        .append('text')
-        .attr({ dx: 0, dy: -5 })
-        .append('textPath')
-        .attr('xlink:href', `#${rel.left}:${rel.right}`)
-        .attr('startOffset', '0%')
-        .attr('text-anchor', 'start')
-        .append('tspan')
-        .text(rel.leftLabel);
+        // If it's not closewise, needs to flip the text.
+        const closewise = (edge.points[edge.points.length - 1].x - edge.points[0].x) >= 0;
 
-      edgeRightLables
-        .append('text')
-        .attr({ dx: 0, dy: -5 })
-        .append('textPath')
-        .attr('xlink:href', `#${rel.left}:${rel.right}`)
-        .attr('startOffset', '100%')
-        .attr('text-anchor', 'end')
-        .append('tspan')
-        .text(rel.rightLabel);
+        const addEdgeLabel = (edgeLabels, label, isLeft) => {
+          const l = edgeLabels
+            .append('text')
+            .attr({ dy: -5 });
+          const tp = l.append('textPath')
+            .attr('xlink:href', `#${rel.left}:${rel.right}`)
+            .attr('startOffset', isLeft ? '4%' : '96%')
+            .attr('text-anchor', isLeft ? 'start' : 'end');
+
+          if (_.isArray(label)) {
+            label.forEach(([n, highlight], idx) => {
+              tp.append('tspan')
+                .attr('class', highlight ? 'highlight' : '')
+                .text(n + (idx === label.length - 1 ? '' : ','));
+            });
+          } else {
+            tp.append('tspan')
+              .text(label);
+          }
+
+          if (!closewise) {
+            const lbox = l.node().getBBox();
+            const cx = lbox.x + (lbox.width / 2);
+            const cy = lbox.y + (lbox.height / 2);
+            l.attr('transform', `rotate(180 ${cx} ${cy})`);
+          }
+        };
+        addEdgeLabel(edgeLeftLables, rel.leftLabel, true);
+        addEdgeLabel(edgeRightLables, rel.rightLabel, false);
+      }
     });
 
-    let { width, height } = g.graph();
-    const paddingX = 100;
-    const paddingY = 20;
-    // Add some spaces.
-    width = width <= 0 ? 10 : width + (paddingX * 2);
-    height = height <= 0 ? 10 : height + (paddingY * 2);
-    svg.attr({ width, height });
-    inner.attr({
-      transform: `translate(${paddingX}, 15)`,
+    const gbox = inner.node().getBBox();
+    const width = gbox.width;
+    const height = gbox.height;
+
+    svg.attr({
+      width,
+      height,
+      viewBox: `${gbox.x} ${gbox.y} ${width} ${height}`,
     });
   }
 
@@ -446,19 +456,25 @@ class CausalGraphModal extends React.Component {
   @autobind
   getFilteredRelations() {
     // Filter the dataset and transform into relations array.
-    const { eventsCausalRelations, relationTimeThreshold, relationProbability } = this.state;
+    const { eventsCausalRelations, relationTimeThreshold,
+      metaDataKPIs, relationProbability } = this.state;
 
     let relations = eventsCausalRelations[relationTimeThreshold] || [];
     relations = relations.filter(r => r.probability >= relationProbability);
 
     relations = relations.map(
-      r => ({
-        left: r.src,
-        right: r.target,
-        label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
-        leftLabel: r.fromMetrics,
-        rightLabel: r.toMetrics,
-      }),
+      (r) => {
+        // Check whether metric the kpi and return a array of metric with kpi flag.
+        const ll = r.fromMetrics.split(',').map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        const rl = r.toMetrics.split(',').map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        return {
+          left: r.src,
+          right: r.target,
+          label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          leftLabel: ll,
+          rightLabel: rl,
+        };
+      },
     );
 
     return relations;
@@ -466,19 +482,38 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getFilteredCorrelations() {
-    const { eventsCorrelations, correlationProbability } = this.state;
+    const { eventsCorrelations, correlationProbability, metaDataKPIs } = this.state;
 
     let relations = eventsCorrelations || [];
     relations = relations.filter(r => r.probability >= correlationProbability);
+    console.log(relations);
 
     relations = relations.map(
-      r => ({
-        left: r.elem1,
-        right: r.elem2,
-        label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
-        leftLabel: '',
-        rightLabel: '',
-      }),
+      (r) => {
+        const { labelObj } = r;
+        let leftLabel = [];
+        let rightLabel = [];
+
+        if (labelObj) {
+          R.forEachObjIndexed((val, key) => {
+            const names = key.split(',');
+            if (names.length >= 3) {
+              leftLabel.push(names[2]);
+              rightLabel.push(names[3]);
+            }
+          }, labelObj);
+          leftLabel = R.uniq(leftLabel).map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+          rightLabel = R.uniq(rightLabel).map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        }
+
+        return {
+          left: r.elem1,
+          right: r.elem2,
+          label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          leftLabel,
+          rightLabel,
+        };
+      },
     );
 
     return relations;
@@ -495,12 +530,13 @@ class CausalGraphModal extends React.Component {
           if (mval && _.has(mval, kpiPredictionProbability)) {
             const snames = servers.split(',');
             const mnames = metrics.split(',');
+            // For the kpi predictions, the right label is always kpi metric.
             relations.push({
               left: snames[0],
               right: snames[1],
               label: '',
-              leftLabel: `${mnames[0]}(${mval[kpiPredictionProbability]})`,
-              rightLabel: mnames[1],
+              leftLabel: `${mnames[0]} (${mval[kpiPredictionProbability]})`,
+              rightLabel: [[mnames[1], true]],
             });
           }
         }, sval);
@@ -540,7 +576,7 @@ class CausalGraphModal extends React.Component {
           className={`causal-graph content flex-col-container ${loading ? 'ui container loading' : ''}`}
           style={{ height: containerHeight, width: containerWidth, paddingTop: 4 }}
         >
-          <div className="ui pointing secondary menu" style={{ margin: '0px 0px 8px', position: 'relative' }}>
+          <div className="ui pointing secondary menu" style={{ margin: '0px 0px 24px', position: 'relative' }}>
             <a
               className={`${activeTab === 'relation' ? 'active' : ''} item`}
               onClick={this.selectTab('relation')}

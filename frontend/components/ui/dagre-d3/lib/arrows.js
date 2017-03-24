@@ -94,7 +94,7 @@ function double(parent, id, edge, type) {
   marker = parent.append("marker")
     .attr("id", id + '-start')
     .attr("viewBox", "0 0 10 10")
-    .attr("refX", 9)
+    .attr("refX", 0) // artui Changed.
     .attr("refY", 5)
     .attr("markerUnits", "strokeWidth")
     .attr("markerWidth", 8)
