@@ -52,6 +52,8 @@ class CausalGraphModal extends React.Component {
       relationProbability: 0.6,
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
+      currentZoom: 10,
+      showMetrics: true,
     };
   }
 
@@ -100,7 +102,7 @@ class CausalGraphModal extends React.Component {
   renderGraph() {
     this.cleanChart();
 
-    const { activeTab: relType } = this.state;
+    const { activeTab: relType, currentZoom, showMetrics } = this.state;
     const relations = this.getFilteredDataset()[relType];
 
     const g = new dagre.graphlib.Graph({
@@ -110,7 +112,9 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 200, nodesep: 200, edgesep: 40,
+      ranksep: 20 + (currentZoom * 20),
+      nodesep: 20 + (currentZoom * 8),
+      edgesep: 10 + (currentZoom * 2),
       marginx: 20, marginy: 20,
     });
 
@@ -131,6 +135,9 @@ class CausalGraphModal extends React.Component {
       });
     });
 
+    // Add a ts in id to avoid id confilict with for multi modal.
+    const ts = Date.now().valueOf();
+
     // Add edge for each relations, ignore self to self relations.
     const arrowhead = (relType === 'correlation') ? 'double' : 'vee';
     relations.forEach((rel) => {
@@ -139,7 +146,7 @@ class CausalGraphModal extends React.Component {
         console.warn(`Ignore self link :${left} => ${right}`);
       } else {
         const meta = {
-          id: `${left}:${right}`,
+          id: `${left}:${right}-${ts}`,
           label,
           class: highlight ? 'highlight' : '',
           lineInterpolate: 'monotone',
@@ -163,54 +170,56 @@ class CausalGraphModal extends React.Component {
       .append('svg:title').text(d => g.node(d).name);
 
     // Add edge left and right labels
-    const edgeLeftLables = svg.select('.output').append('g')
-      .attr('class', 'edgeLeftLabels');
-    const edgeRightLables = svg.select('.output').append('g')
-      .attr('class', 'edgeRightLabels');
+    if (showMetrics) {
+      const edgeLeftLables = svg.select('.output').append('g')
+        .attr('class', 'edgeLeftLabels');
+      const edgeRightLables = svg.select('.output').append('g')
+        .attr('class', 'edgeRightLabels');
 
-    relations.forEach((rel) => {
-      const e = R.find(o => o.v === rel.left && o.w === rel.right, g.edges());
-      if (e) {
-        const edge = g.edge(e);
+      relations.forEach((rel) => {
+        const e = R.find(o => o.v === rel.left && o.w === rel.right, g.edges());
+        if (e) {
+          const edge = g.edge(e);
 
-        // If it's not closewise, needs to flip the text.
-        const closewise = (edge.points[edge.points.length - 1].x - edge.points[0].x) >= 0;
+          // If it's not closewise, needs to flip the text.
+          const closewise = (edge.points[edge.points.length - 1].x - edge.points[0].x) >= 0;
 
-        const addEdgeLabel = (edgeLabels, label, isLeft) => {
-          const l = edgeLabels
-            .append('text')
-            .attr({ dy: -5 });
-          const tp = l.append('textPath')
-            .attr('xlink:href', `#${rel.left}:${rel.right}`)
-            .attr('startOffset', isLeft ? '4%' : '96%')
-            .attr('text-anchor', isLeft ? 'start' : 'end');
+          const addEdgeLabel = (edgeLabels, label, isLeft) => {
+            const l = edgeLabels
+              .append('text')
+              .attr({ dy: -5 });
+            const tp = l.append('textPath')
+              .attr('xlink:href', `#${rel.left}:${rel.right}-${ts}`)
+              .attr('startOffset', isLeft ? '6%' : '94%')
+              .attr('text-anchor', isLeft ? 'start' : 'end');
 
-          if (_.isArray(label)) {
-            label.forEach(([n, highlight], idx) => {
+            if (_.isArray(label)) {
+              label.forEach(([n, highlight], idx) => {
+                tp.append('tspan')
+                  .attr('class', highlight ? 'highlight' : '')
+                  .text(n + (idx === label.length - 1 ? '' : ',   '));
+              });
+            } else {
               tp.append('tspan')
-                .attr('class', highlight ? 'highlight' : '')
-                .text(n + (idx === label.length - 1 ? '' : ',   '));
-            });
-          } else {
-            tp.append('tspan')
-              .text(label);
-          }
+                .text(label);
+            }
 
-          if (!closewise) {
-            const lbox = l.node().getBBox();
-            const cx = lbox.x + (lbox.width / 2);
-            const cy = lbox.y + (lbox.height / 2);
-            l.attr('transform', `rotate(180 ${cx} ${cy})`);
-          }
-        };
-        addEdgeLabel(edgeLeftLables, rel.leftLabel, true);
-        addEdgeLabel(edgeRightLables, rel.rightLabel, false);
-      }
-    });
+            if (!closewise) {
+              const lbox = l.node().getBBox();
+              const cx = lbox.x + (lbox.width / 2);
+              const cy = lbox.y + (lbox.height / 2);
+              l.attr('transform', `rotate(180 ${cx} ${cy})`);
+            }
+          };
+          addEdgeLabel(edgeLeftLables, rel.leftLabel, true);
+          addEdgeLabel(edgeRightLables, rel.rightLabel, false);
+        }
+      });
+    }
 
     const gbox = inner.node().getBBox();
     const width = gbox.width;
-    const height = gbox.height;
+    const height = gbox.height + 40;
 
     svg.attr({
       width,
@@ -453,6 +462,12 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
+  getMetricShortNames(name) {
+    const { metricShortNames } = this.state;
+    return metricShortNames[name] || name;
+  }
+
+  @autobind
   getFilteredRelations() {
     // Filter the dataset and transform into relations array.
     const { eventsCausalRelations, relationTimeThreshold,
@@ -460,12 +475,16 @@ class CausalGraphModal extends React.Component {
 
     let relations = eventsCausalRelations[relationTimeThreshold] || [];
     relations = relations.filter(r => r.probability >= relationProbability);
+    const shortName = R.map(n => this.getMetricShortNames(n));
 
     relations = relations.map(
       (r) => {
         // Check whether metric the kpi and return a array of metric with kpi flag.
-        const ll = r.fromMetrics.split(',').map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
-        const rl = r.toMetrics.split(',').map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        const ll = R.uniq(shortName(r.fromMetrics.split(',')))
+          .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        const rl = R.uniq(shortName(r.toMetrics.split(',')))
+          .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+
         return {
           left: r.src,
           right: r.target,
@@ -501,8 +520,11 @@ class CausalGraphModal extends React.Component {
               rightLabel.push(names[3]);
             }
           }, labelObj);
-          leftLabel = R.uniq(leftLabel).map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
-          rightLabel = R.uniq(rightLabel).map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+          const shortName = R.map(n => this.getMetricShortNames(n));
+          leftLabel = R.uniq(shortName(leftLabel))
+            .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+          rightLabel = R.uniq(shortName(rightLabel))
+            .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
         }
 
         return {
@@ -534,8 +556,8 @@ class CausalGraphModal extends React.Component {
             relations.push({
               left: snames[0],
               right: snames[1],
-              label: '',
-              leftLabel: `${mnames[0]} (${mval[kpiPredictionProbability]})`,
+              label: `Threshold: ${mval[kpiPredictionProbability]}`,
+              leftLabel: `${mnames[0]}`,
               rightLabel: [[mnames[1], true]],
             });
           }
@@ -555,13 +577,44 @@ class CausalGraphModal extends React.Component {
     };
   }
 
+  @autobind
+  zoomIn() {
+    let { currentZoom } = this.state;
+    currentZoom += 1;
+    this.setState({
+      currentZoom,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  zoomOut() {
+    let { currentZoom } = this.state;
+    currentZoom = Math.max(currentZoom - 1, 1);
+    this.setState({
+      currentZoom,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  setShowMetrics(e) {
+    this.setState({
+      showMetrics: e.target.checked,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
-      correlationProbability, kpiPredictionProbability,
+      correlationProbability, kpiPredictionProbability, showMetrics,
     } = this.state;
 
     const filteredDataset = this.getFilteredDataset();
@@ -576,7 +629,7 @@ class CausalGraphModal extends React.Component {
           className={`causal-graph content flex-col-container ${loading ? 'ui container loading' : ''}`}
           style={{ height: containerHeight, width: containerWidth, paddingTop: 4 }}
         >
-          <div className="ui pointing secondary menu" style={{ margin: '0px 0px 24px', position: 'relative' }}>
+          <div className="ui pointing secondary menu" style={{ marginBottom: 4, position: 'relative' }}>
             <a
               className={`${activeTab === 'relation' ? 'active' : ''} item`}
               onClick={this.selectTab('relation')}
@@ -596,17 +649,18 @@ class CausalGraphModal extends React.Component {
               }}
             >
               <span
-                style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
-              >Time Thresholds (hour):</span>
+                style={{ verticalAlign: 'middle', paddingRight: '6px', fontWeight: 'bold' }}
+              >Time Thresholds:</span>
               <Dropdown
                 mode="select" className="mini" value={relationTimeThreshold}
-                onChange={this.handleThresholdChange}
+                text={`${Number(relationTimeThreshold)} hour`}
+                onChange={this.handleThresholdChange} style={{ width: 50 }}
               >
                 <i className="dropdown icon" />
                 <div className="menu">
                   {
                     ['0.5', '1.0', '2.0', '3.0', '6.0'].map(v => (
-                      <div key={v} className="item" data-value={v}>{`${Number(v)}`}</div>
+                      <div key={v} className="item" data-value={v}>{`${Number(v)} hour`}</div>
                     ))
                   }
                 </div>
@@ -622,8 +676,8 @@ class CausalGraphModal extends React.Component {
                     fontSize: 12, fontWeight: 'bold',
                     padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)',
                   }}
-                >0.1</span>
-                <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                >0.0</span>
+                <div style={{ display: 'inline-block', width: 150, verticalAlign: 'middle' }}>
                   <Slider
                     included={false} dots
                     min={0.0} max={1.0} step={0.1}
@@ -656,7 +710,7 @@ class CausalGraphModal extends React.Component {
                   <span
                     style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
                   >0.0</span>
-                  <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                  <div style={{ display: 'inline-block', width: 150, verticalAlign: 'middle' }}>
                     <Slider
                       included={false} dots
                       min={0.0} max={1.0} step={0.1}
@@ -698,6 +752,19 @@ class CausalGraphModal extends React.Component {
                   }
                 </div>
               </Dropdown>
+            </div>
+          </div>
+          <div className="settings">
+            <div className="ui checkbox">
+              <input
+                type="checkbox" tabIndex="0" checked={showMetrics}
+                onChange={this.setShowMetrics}
+              />
+              <label>Show Metrics</label>
+            </div>
+            <div>
+              <i className="minus icon" onClick={this.zoomOut} />
+              <i className="plus icon" onClick={this.zoomIn} />
             </div>
           </div>
           {activeTab === 'relation' && filteredDataset.relation.length === 0 &&
