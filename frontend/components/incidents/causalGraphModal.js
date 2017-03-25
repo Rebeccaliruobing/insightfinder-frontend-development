@@ -556,7 +556,7 @@ class CausalGraphModal extends React.Component {
             relations.push({
               left: snames[0],
               right: snames[1],
-              label: `Threshold: ${mval[kpiPredictionProbability]}`,
+              label: `Value: ${mval[kpiPredictionProbability]}`,
               leftLabel: `${mnames[0]}`,
               rightLabel: [[mnames[1], true]],
             });
