@@ -31,7 +31,6 @@ class CausalGraphModal extends React.Component {
     this.container = null;
     this.containerOffsetHeight = 120;
     this.containerOffsetWidth = 100;
-    this.nodeSize = 7;
 
     this.weightMapper = R.compose(
       R.sort((a, b) => b - a),
@@ -44,18 +43,17 @@ class CausalGraphModal extends React.Component {
       activeTab: 'relation',
       containerHeight: $(window).height() - this.containerOffsetHeight,
       containerWidth: $(window).width() - this.containerOffsetWidth,
-      allRelations: {},
-      kpis: [],
-      relations: [],
-      metricNameMap: {},
-      threshold: '2.0',
-      minRelationWeight: 0.0,
-      maxRelationWeight: 1.0,
-      relationFilterWeight: 0.0,
-      correlations: [],
-      minCorrelationWeight: 0.0,
-      maxCorrelationWeight: 1.0,
-      correlationFilterWeight: 0.0,
+      eventsCausalRelations: {},
+      eventsCorrelations: [],
+      kpiPredictions: {},
+      metaDataKPIs: [],
+      metricShortNames: {},
+      relationTimeThreshold: '2.0',
+      relationProbability: 0.6,
+      correlationProbability: 0.8,
+      kpiPredictionProbability: '0.75',
+      currentZoom: 10,
+      showMetrics: true,
     };
   }
 
@@ -72,14 +70,6 @@ class CausalGraphModal extends React.Component {
     if (this.container) {
       d3.select(this.container).select('svg').remove();
     }
-  }
-
-  @autobind
-  getWeightRange(relations) {
-    let minWeight = 0.0;
-    let maxWeight = 1.0;
-
-    return [minWeight, maxWeight];
   }
 
   @autobind
@@ -112,12 +102,142 @@ class CausalGraphModal extends React.Component {
   renderGraph() {
     this.cleanChart();
 
+    const { activeTab: relType, currentZoom, showMetrics } = this.state;
+    const relations = this.getFilteredDataset()[relType];
+
+    const g = new dagre.graphlib.Graph({
+      directed: !(relType === 'correlation'),
+      multigraph: true,
+    });
+
+    g.setGraph({
+      rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
+      ranksep: 20 + (currentZoom * 20),
+      nodesep: 20 + (currentZoom * 8),
+      edgesep: 10 + (currentZoom * 2),
+      marginx: 20, marginy: 20,
+    });
+
+    // Get unique left & right side of the relations as the node name.
+    const nodeNames = R.uniq(
+      R.concat(
+        R.map(r => r.left, relations),
+        R.map(r => r.right, relations),
+      ),
+    );
+    nodeNames.forEach((name) => {
+      g.setNode(name, {
+        title: name,
+        shape: 'circle',
+        label: chopString(name, 30),
+        name,
+        width: -8, height: -8,
+      });
+    });
+
+    // Add a ts in id to avoid id confilict with for multi modal.
+    const ts = Date.now().valueOf();
+
+    // Add edge for each relations, ignore self to self relations.
+    const arrowhead = (relType === 'correlation') ? 'double' : 'vee';
+    relations.forEach((rel) => {
+      const { left, right, label, leftLabel, rightLabel, highlight } = rel;
+      if (left === right) {
+        console.warn(`Ignore self link :${left} => ${right}`);
+      } else {
+        const meta = {
+          id: `${left}:${right}-${ts}`,
+          label,
+          class: highlight ? 'highlight' : '',
+          lineInterpolate: 'monotone',
+          arrowhead,
+          labelpos: 'l',
+          leftLabel,
+          rightLabel,
+          labeloffset: 5,
+        };
+        g.setEdge(left, right, meta, relType);
+      }
+    });
+
+    const svg = d3.select(this.container).append('svg');
+    const inner = svg.append('g');
+    const render = dagreD3.render();
+    render(inner, g);
+
+    // Add title for node
+    svg.selectAll('.node')
+      .append('svg:title').text(d => g.node(d).name);
+
+    // Add edge left and right labels
+    if (showMetrics) {
+      const edgeLeftLables = svg.select('.output').append('g')
+        .attr('class', 'edgeLeftLabels');
+      const edgeRightLables = svg.select('.output').append('g')
+        .attr('class', 'edgeRightLabels');
+
+      relations.forEach((rel) => {
+        const e = R.find(o => o.v === rel.left && o.w === rel.right, g.edges());
+        if (e) {
+          const edge = g.edge(e);
+
+          // If it's not closewise, needs to flip the text.
+          const closewise = (edge.points[edge.points.length - 1].x - edge.points[0].x) >= 0;
+
+          const addEdgeLabel = (edgeLabels, label, isLeft) => {
+            const l = edgeLabels
+              .append('text')
+              .attr({ dy: -5 });
+            const tp = l.append('textPath')
+              .attr('xlink:href', `#${rel.left}:${rel.right}-${ts}`)
+              .attr('startOffset', isLeft ? '6%' : '94%')
+              .attr('text-anchor', isLeft ? 'start' : 'end');
+
+            if (_.isArray(label)) {
+              label.forEach(([n, highlight], idx) => {
+                tp.append('tspan')
+                  .attr('class', highlight ? 'highlight' : '')
+                  .text(n + (idx === label.length - 1 ? '' : ',   '));
+              });
+            } else {
+              tp.append('tspan')
+                .text(label);
+            }
+
+            if (!closewise) {
+              const lbox = l.node().getBBox();
+              const cx = lbox.x + (lbox.width / 2);
+              const cy = lbox.y + (lbox.height / 2);
+              l.attr('transform', `rotate(180 ${cx} ${cy})`);
+            }
+          };
+          addEdgeLabel(edgeLeftLables, rel.leftLabel, true);
+          addEdgeLabel(edgeRightLables, rel.rightLabel, false);
+        }
+      });
+    }
+
+    const gbox = inner.node().getBBox();
+    const width = gbox.width;
+    const height = gbox.height + 40;
+
+    svg.attr({
+      width,
+      height,
+      viewBox: `${gbox.x} ${gbox.y} ${width} ${height}`,
+    });
+  }
+
+  @autobind
+  renderGraph1() {
+    this.cleanChart();
+
+    const { metaDataKPIs, metricShortNames } = this.state;
     const { relations, correlations, metricNameMap, kpis } = this.state;
-    const { activeTab, relationFilterWeight, correlationFilterWeight,
-      containerHeight, containerWidth } = this.state;
+    const { activeTab, relationProbability, correlationProbability } = this.state;
 
     const showRelations = activeTab === 'relation';
-    const filterCount = showRelations ? relationFilterWeight : correlationFilterWeight;
+    const filterCount = showRelations ? relationProbability : correlationProbability;
 
     const srcProp = showRelations ? o => o.src : o => o.elem1;
     const targetProp = showRelations ? o => o.target : o => o.elem2;
@@ -142,7 +262,7 @@ class CausalGraphModal extends React.Component {
       R.forEach((name) => {
         if (!R.find(n => n === name)(existNames)) {
           g.setNode(name, {
-            title: name, label: chopString(name, 30), name, width: -6, height: -6,
+            title: name, label: chopString(name, 30), name, width: -8, height: -8,
             shape: 'circle',
           });
         }
@@ -245,10 +365,7 @@ class CausalGraphModal extends React.Component {
     let { width, height } = g.graph();
     width = width <= 0 ? 10 : width;
     height = height <= 0 ? 10 : height;
-    svg.attr({
-      width: width + 300, height: height + 50,
-      viewBox: `0 0 ${width} ${height}`,
-    });
+    svg.attr({ width, height });
   }
 
   @autobind
@@ -256,40 +373,28 @@ class CausalGraphModal extends React.Component {
     const { projectName, loadGroup, instanceGroup, endTime, numberOfDays } = props;
 
     retrieveEventData(projectName, loadGroup, instanceGroup, endTime, numberOfDays).then((data) => {
-      const { threshold } = this.state;
-      const allRelations = loadGroup ?
-        data.eventsCausalRelation || {} :
+      const eventsCausalRelations = loadGroup ? (data.eventsCausalRelation || {}) :
         JSON.parse(data.causalRelation || '{}');
-      const kpis = _.get(data, 'metaData.KPI', '').split(',');
-      const relations = allRelations[threshold.toString()] || [];
-      const metricNameMap = {};
-      const namesArray = data.metricShortNameArray || [];
-      R.forEach((o) => { metricNameMap[o.metric] = o.shortMetric; }, namesArray);
-
-      const correlations = loadGroup ?
-        data.eventsCorrelation || [] :
+      const eventsCorrelations = loadGroup ? (data.eventsCorrelation || []) :
         JSON.parse(data.correlation || '[]');
+      const kpiPredictions = JSON.parse(data.kpiPrediction || '{}');
+      const metaDataKPIs = _.get(data, 'metaData.KPI', '').split(',');
 
-      const [minRelationWeight, maxRelationWeight] = this.getWeightRange(relations);
-      const [minCorrelationWeight, maxCorrelationWeight] = this.getWeightRange(relations);
+      // Create metric name => short name map
+      const metricShortNames = R.reduce(
+        (a, o) => { a[o.metric] = o.shortMetric; return a; }, {},
+        data.metricShortNameArray || [],
+      );
 
       this.setState({
         loading: false,
-        kpis,
-        allRelations,
-        relations,
-        correlations,
-        metricNameMap,
-        minRelationWeight,
-        maxRelationWeight,
-        relationFilterWeight: 0.6,
-        minCorrelationWeight,
-        maxCorrelationWeight,
-        correlationFilterWeight: 0.8,
+        eventsCausalRelations,
+        eventsCorrelations,
+        kpiPredictions,
+        metaDataKPIs,
+        metricShortNames,
       }, () => {
-        if (relations.length > 0 || correlations.length > 0) {
-          this.renderGraph(relations, correlations);
-        }
+        this.renderGraph();
       });
     }).catch((msg) => {
       this.setState({ loading: false });
@@ -310,17 +415,8 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   handleThresholdChange(v) {
-    const { allRelations, relationFilterWeight } = this.state;
-    const relations = allRelations[v.toString()] || [];
-    const [minRelationWeight, maxRelationWeight] = this.getWeightRange(relations);
-
-    // Only reset for relations as it's related with threshold.
     this.setState({
-      threshold: v,
-      relations,
-      minRelationWeight,
-      maxRelationWeight,
-      relationFilterWeight: R.min(relationFilterWeight, maxRelationWeight),
+      relationTimeThreshold: v,
     }, () => {
       this.renderGraph();
     });
@@ -329,7 +425,7 @@ class CausalGraphModal extends React.Component {
   @autobind
   handleRelationSliderChange(count) {
     this.setState({
-      relationFilterWeight: count,
+      relationProbability: count,
     }, () => {
       this.renderGraph();
     });
@@ -338,7 +434,17 @@ class CausalGraphModal extends React.Component {
   @autobind
   handleCorrelationSliderChange(count) {
     this.setState({
-      correlationFilterWeight: count,
+      correlationProbability: count,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  handleKPIPredictionChange(v) {
+    this.filteredKPIPredictions = null;
+    this.setState({
+      kpiPredictionProbability: v,
     }, () => {
       this.renderGraph();
     });
@@ -355,26 +461,175 @@ class CausalGraphModal extends React.Component {
     };
   }
 
+  @autobind
+  getMetricShortNames(name) {
+    const { metricShortNames } = this.state;
+    return metricShortNames[name] || name;
+  }
+
+  @autobind
+  getFilteredRelations() {
+    // Filter the dataset and transform into relations array.
+    const { eventsCausalRelations, relationTimeThreshold,
+      metaDataKPIs, relationProbability } = this.state;
+
+    let relations = eventsCausalRelations[relationTimeThreshold] || [];
+    relations = relations.filter(r => r.probability >= relationProbability);
+    const shortName = R.map(n => this.getMetricShortNames(n));
+
+    relations = relations.map(
+      (r) => {
+        // Check whether metric the kpi and return a array of metric with kpi flag.
+        const ll = R.uniq(shortName(r.fromMetrics.split(',')))
+          .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        const rl = R.uniq(shortName(r.toMetrics.split(',')))
+          .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+
+        return {
+          left: r.src,
+          right: r.target,
+          label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          highlight: Number(r.probability) >= 0.6,
+          leftLabel: ll,
+          rightLabel: rl,
+        };
+      },
+    );
+
+    return relations;
+  }
+
+  @autobind
+  getFilteredCorrelations() {
+    const { eventsCorrelations, correlationProbability, metaDataKPIs } = this.state;
+
+    let relations = eventsCorrelations || [];
+    relations = relations.filter(r => r.probability >= correlationProbability);
+
+    relations = relations.map(
+      (r) => {
+        const { labelObj } = r;
+        let leftLabel = [];
+        let rightLabel = [];
+
+        if (labelObj) {
+          R.forEachObjIndexed((val, key) => {
+            const names = key.split(',');
+            if (names.length >= 3) {
+              leftLabel.push(names[2]);
+              rightLabel.push(names[3]);
+            }
+          }, labelObj);
+          const shortName = R.map(n => this.getMetricShortNames(n));
+          leftLabel = R.uniq(shortName(leftLabel))
+            .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+          rightLabel = R.uniq(shortName(rightLabel))
+            .map(m => [m, !!R.find(k => k === m, metaDataKPIs)]);
+        }
+
+        return {
+          left: r.elem1,
+          right: r.elem2,
+          label: `Probability: ${(r.probability * 100).toFixed(1)}%`,
+          highlight: Number(r.probability) >= 0.8,
+          leftLabel,
+          rightLabel,
+        };
+      },
+    );
+
+    return relations;
+  }
+
+  @autobind
+  getFilteredKPIPredictions() {
+    const { kpiPredictions, kpiPredictionProbability } = this.state;
+
+    const relations = [];
+    R.forEachObjIndexed((sval, servers) => {
+      if (_.isObject(sval)) {
+        R.forEachObjIndexed((mval, metrics) => {
+          if (mval && _.has(mval, kpiPredictionProbability)) {
+            const snames = servers.split(',');
+            const mnames = metrics.split(',');
+            // For the kpi predictions, the right label is always kpi metric.
+            relations.push({
+              left: snames[0],
+              right: snames[1],
+              label: `Threshold: ${mval[kpiPredictionProbability]}`,
+              leftLabel: `${mnames[0]}`,
+              rightLabel: [[mnames[1], true]],
+            });
+          }
+        }, sval);
+      }
+    }, kpiPredictions || {});
+
+    return relations;
+  }
+
+  @autobind
+  getFilteredDataset() {
+    return {
+      relation: this.getFilteredRelations(),
+      correlation: this.getFilteredCorrelations(),
+      kpiPrediction: this.getFilteredKPIPredictions(),
+    };
+  }
+
+  @autobind
+  zoomIn() {
+    let { currentZoom } = this.state;
+    currentZoom += 1;
+    this.setState({
+      currentZoom,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  zoomOut() {
+    let { currentZoom } = this.state;
+    currentZoom = Math.max(currentZoom - 1, 1);
+    this.setState({
+      currentZoom,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
+  @autobind
+  setShowMetrics(e) {
+    this.setState({
+      showMetrics: e.target.checked,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
-      relations, threshold, minRelationWeight, maxRelationWeight, relationFilterWeight,
-      correlations, minCorrelationWeight, maxCorrelationWeight, correlationFilterWeight,
+      relationTimeThreshold, relationProbability,
+      correlationProbability, kpiPredictionProbability, showMetrics,
     } = this.state;
 
-    const relationStep = 0.1;
-    const correlationStep = 0.1;
+    const filteredDataset = this.getFilteredDataset();
 
     return (
-      <Modal {...rest} style={{ marginLeft: -containerWidth / 2, width: containerWidth }} size="big" closable>
+      <Modal
+        {...rest} size="big" closable
+        style={{ marginLeft: -containerWidth / 2, width: containerWidth }}
+      >
         <WindowResizeListener onResize={this.handleWindowResize} />
         <div
           className={`causal-graph content flex-col-container ${loading ? 'ui container loading' : ''}`}
           style={{ height: containerHeight, width: containerWidth, paddingTop: 4 }}
         >
-          <div className="ui pointing secondary menu" style={{ margin: '0px 0px 8px', position: 'relative' }}>
+          <div className="ui pointing secondary menu" style={{ marginBottom: 4, position: 'relative' }}>
             <a
               className={`${activeTab === 'relation' ? 'active' : ''} item`}
               onClick={this.selectTab('relation')}
@@ -383,6 +638,10 @@ class CausalGraphModal extends React.Component {
               className={`${activeTab === 'correlation' ? 'active' : ''} item`}
               onClick={this.selectTab('correlation')}
             >Component Correlations</a>
+            <a
+              className={`${activeTab === 'kpiPrediction' ? 'active' : ''} item`}
+              onClick={this.selectTab('kpiPrediction')}
+            >KPI Predictions</a>
             <div
               style={{
                 position: 'absolute', right: 0, top: 6,
@@ -390,41 +649,49 @@ class CausalGraphModal extends React.Component {
               }}
             >
               <span
-                style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
-              >Time Thresholds (hour):</span>
-              <Dropdown mode="select" className="mini" value={threshold} onChange={this.handleThresholdChange}>
+                style={{ verticalAlign: 'middle', paddingRight: '6px', fontWeight: 'bold' }}
+              >Time Thresholds:</span>
+              <Dropdown
+                mode="select" className="mini" value={relationTimeThreshold}
+                text={`${Number(relationTimeThreshold)} hour`}
+                onChange={this.handleThresholdChange} style={{ width: 50 }}
+              >
                 <i className="dropdown icon" />
                 <div className="menu">
-                  <div className="item" data-value="0.5">0.5</div>
-                  <div className="item" data-value="1.0">1</div>
-                  <div className="item" data-value="2.0">2</div>
-                  <div className="item" data-value="3.0">3</div>
-                  <div className="item" data-value="6.0">6</div>
+                  {
+                    ['0.5', '1.0', '2.0', '3.0', '6.0'].map(v => (
+                      <div key={v} className="item" data-value={v}>{`${Number(v)} hour`}</div>
+                    ))
+                  }
                 </div>
               </Dropdown>
               <div
-                style={{
-                  visibility: `${relations.length === 0 ? 'hidden' : 'visible'}`,
-                  minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
-                }}
+                style={{ minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px' }}
               >
-                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{`Causality Probability >= ${(relationFilterWeight*100).toFixed(1)+'%'}:`}</span>
+                <span style={{ fontWeight: 'bold', padding: '0 1em' }}>{
+                  `Causality Probability >= ${(relationProbability * 100).toFixed(1)}%:`}
+                </span>
                 <span
-                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
-                >{minRelationWeight}</span>
-                <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                  style={{
+                    fontSize: 12, fontWeight: 'bold',
+                    padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)',
+                  }}
+                >0.0</span>
+                <div style={{ display: 'inline-block', width: 150, verticalAlign: 'middle' }}>
                   <Slider
                     included={false} dots
                     min={0.0} max={1.0} step={0.1}
-                    value={relationFilterWeight}
-                    defaultValue={minRelationWeight}
-                    onChange={c => this.setState({ relationFilterWeight: c })}
+                    value={relationProbability}
+                    onChange={c => this.setState({ relationProbability: c })}
                     onAfterChange={this.handleRelationSliderChange}
                   />
                 </div>
                 <span
-                  style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
-                >{maxRelationWeight}</span>
+                  style={{
+                    fontSize: 12, fontWeight: 'bold',
+                    padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)',
+                  }}
+                >1.0</span>
               </div>
             </div>
             <div
@@ -434,40 +701,86 @@ class CausalGraphModal extends React.Component {
               }}
             >
               <div
-                style={{
-                  visibility: `${correlations.length === 0 ? 'hidden' : 'visible'}`,
-                  minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px',
-                }}
+                style={{ minWidth: 420, display: 'inline-block', textAlign: 'right', lineHeight: '24px' }}
               >
                 <span style={{ fontWeight: 'bold', padding: '0 1em' }}>
-                  {`Correlation Probability >= ${(correlationFilterWeight * 100).toFixed(1) + '%'}: `}
+                  {`Correlation Probability >= ${(correlationProbability * 100).toFixed(1)}%: `}
                 </span>
                 <div style={{ position: 'relative', display: 'inline-block', height: 40 }}>
-                  <span style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}>
-                    {minCorrelationWeight}
-                  </span>
-                  <div style={{ display: 'inline-block', width: 240, verticalAlign: 'middle' }}>
+                  <span
+                    style={{ fontSize: 12, padding: '0 1em 0 0', color: 'rgba(0, 0, 139, 0.6)' }}
+                  >0.0</span>
+                  <div style={{ display: 'inline-block', width: 150, verticalAlign: 'middle' }}>
                     <Slider
                       included={false} dots
                       min={0.0} max={1.0} step={0.1}
-                      value={correlationFilterWeight}
-                      defaultValue={minCorrelationWeight}
-                      onChange={c => this.setState({ correlationFilterWeight: c })}
+                      value={correlationProbability}
+                      onChange={c => this.setState({ correlationProbability: c })}
                       onAfterChange={this.handleCorrelationSliderChange}
                     />
                   </div>
                   <span
-                    style={{ fontSize: 12, fontWeight: 'bold', padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)' }}
-                  >{maxCorrelationWeight}</span>
+                    style={{
+                      fontSize: 12, fontWeight: 'bold',
+                      padding: '0 0 0 1em', color: 'rgba(242, 113,28, 0.8)',
+                    }}
+                  >1.0</span>
                 </div>
               </div>
             </div>
+            <div
+              style={{
+                position: 'absolute', right: 0, top: 6,
+                display: `${activeTab === 'kpiPrediction' ? 'inline-block' : 'none'}`,
+              }}
+            >
+              <span
+                style={{ verticalAlign: 'middle', paddingRight: '1em', fontWeight: 'bold' }}
+              >KPI Prediction Probability:</span>
+              <Dropdown
+                mode="select" className="mini"
+                value={kpiPredictionProbability}
+                text={`${Number(kpiPredictionProbability) * 100}%`}
+                onChange={this.handleKPIPredictionChange}
+              >
+                <i className="dropdown icon" />
+                <div className="menu">
+                  {
+                    ['0.5', '0.75', '0.8', '0.9', '1.0'].map(
+                      v => <div key={v} className="item" data-value={v}>{`${Number(v) * 100}%`}</div>,
+                    )
+                  }
+                </div>
+              </Dropdown>
+            </div>
           </div>
-          {activeTab === 'relation' && relations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No component causal relation found.</h4>
+          <div className="settings">
+            <div className="ui checkbox">
+              <input
+                type="checkbox" tabIndex="0" checked={showMetrics}
+                onChange={this.setShowMetrics}
+              />
+              <label>Show Metrics</label>
+            </div>
+            <div>
+              <i className="minus icon" onClick={this.zoomOut} />
+              <i className="plus icon" onClick={this.zoomIn} />
+            </div>
+          </div>
+          {activeTab === 'relation' && filteredDataset.relation.length === 0 &&
+            <h4 style={{ margin: '0.5em 0' }}>
+              No causal relations found, try to change the Time Thresholds and Causality Probability.
+            </h4>
           }
-          {activeTab === 'correlation' && correlations.length === 0 &&
-            <h4 style={{ margin: '0.5em 0' }}>No component correlation found.</h4>
+          {activeTab === 'correlation' && filteredDataset.correlation.length === 0 &&
+            <h4 style={{ margin: '0.5em 0' }}>
+              No component correlations found, try to change the Correlation Probability.
+            </h4>
+          }
+          {activeTab === 'kpiPrediction' && filteredDataset.kpiPrediction.length === 0 &&
+            <h4 style={{ margin: '0.5em 0' }}>
+              No KPI prediction found, try to change the KPI Prediction Probability.
+            </h4>
           }
           <div className="d3-container" ref={(c) => { this.container = c; }} />
         </div>

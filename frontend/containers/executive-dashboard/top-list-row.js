@@ -74,15 +74,15 @@ const ListRow = ({
             <i onClick={onNameClick} className="link external icon" />
           </OverlayTrigger>
         }
-        {!isProject && <i className="icon" />}
+        {!isProject && type === 'anomaly' &&
+          <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
+            <i className="random icon" onClick={onActionClick} />
+          </OverlayTrigger>
+        }
+
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span className="name" style={projectStyle}>{name}</span>
         </OverlayTrigger>
-        {!isProject && type === 'anomaly' &&
-          <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
-            <i className="hoverable random icon" onClick={onActionClick} />
-          </OverlayTrigger>
-        }
       </td>
 
       {type === 'anomaly' &&

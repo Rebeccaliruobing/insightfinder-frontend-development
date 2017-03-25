@@ -159,37 +159,60 @@
   .ui.menu .ui.dropdown .menu > .item {
     border: 0px;
   }
+  > .ui.menu {
+    .item {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+  }
+  .settings {
+    right: 20px;
+    top: 50px;
+    text-align: right;
+    color: #666;
+    font-size: 12px;
+    input, label {
+      font-weight: bold;
+      color: #666;
+    }
+    .icon {
+      cursor: pointer;
+    }
+  }
   .d3-container {
     overflow: auto;
     text-align: left;
   }
   svg {
     font-size: 13px;
-    font-weight: 400;
     .node {
-      cursor: pointer;
-      &:hover {
-        rect {
-          fill: #4183C4;
-        }
-        g.label {
-          fill: #4183C4;
-        }
+      font-weight: bold;
+      fill: #566f84
+    }
+    .node circle {
+      fill: #566f84,
+    }
+
+    .edgeLeftLabels,
+    .edgeRightLabels,
+    .edgeLabel {
+      font-style: italic;
+      font-weight: bold;
+      .highlight {
+        font-weight: bold;
+        fill: #912d2b;
       }
     }
-    .node rect {
-      stroke: white;
-      fill: #dfdfdf;
+
+    .edgeLeftLabels,
+    .edgeRightLabels {
+      font-size: 10px;
+      fill: #4183C4;
     }
     .edgeLabel {
-      div {
-        font-size: 12px;
-        color: #4183C4;
-        .kpi {
-          font-weight: bold;
-          // color: #F2711C;
-        }
-      }
+      font-size: 11px;
+      fill: #794b02;
+      text-decoration: underline;
     }
 
     .edgePath {
@@ -198,23 +221,11 @@
         fill: rgba(0, 0, 139, 0.6);;
         stroke-width: 1px;
       }
-      &.strong {
-        path {
-          stroke: rgba(242, 113,28, 0.6);
-          fill: rgba(242, 113,28, 0.6);
-          stroke-width: 2px;
-        }
-      }
-      &.very-strong {
+      &.highlight {
         path {
           stroke: rgba(242, 113,28, 0.8);
           fill: rgba(242, 113,28, 0.8);
-          stroke-width: 3px;
-        }
-      }
-      &.correlation {
-        path {
-          // stroke-dasharray: 5, 5;
+          stroke-width: 1.5px;
         }
       }
     }

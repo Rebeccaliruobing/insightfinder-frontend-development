@@ -36,6 +36,7 @@ class TopListAnomaly extends React.Component {
       expandedItemIndices: {},
       showCausalGraphModal: false,
       causalGraphProject: null,
+      causalGraphProjectGroup: null,
     };
     this.expandPageSize = 10;
   }
@@ -59,7 +60,7 @@ class TopListAnomaly extends React.Component {
   }
 
   @autobind
-  handleProjectActionClick(name) {
+  handleProjectActionClick(name, groupName) {
     return (e) => {
       e.stopPropagation();
       e.preventDefault();
@@ -68,6 +69,7 @@ class TopListAnomaly extends React.Component {
         this.setState({
           showCausalGraphModal: true,
           causalGraphProject: name,
+          causalGraphProjectGroup: groupName,
         });
       }
     };
@@ -135,6 +137,7 @@ class TopListAnomaly extends React.Component {
         {this.state.showCausalGraphModal &&
           <CausalGraphModal
             projectName={this.state.causalGraphProject}
+            instanceGroup={this.state.causalGraphProjectGroup}
             onClose={() => this.setState({ showCausalGraphModal: false })}
             onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
