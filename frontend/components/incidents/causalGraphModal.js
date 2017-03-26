@@ -47,7 +47,9 @@ class CausalGraphModal extends React.Component {
       eventsCorrelations: [],
       kpiPredictions: {},
       metaDataKPIs: [],
+      metaDataKpiUnits: {},
       metricShortNames: {},
+      metricUnits: {},
       relationTimeThreshold: '2.0',
       relationProbability: 0.6,
       correlationProbability: 0.8,
@@ -378,11 +380,21 @@ class CausalGraphModal extends React.Component {
       const eventsCorrelations = loadGroup ? (data.eventsCorrelation || []) :
         JSON.parse(data.correlation || '[]');
       const kpiPredictions = JSON.parse(data.kpiPrediction || '{}');
-      const metaDataKPIs = _.get(data, 'metaData.KPI', '').split(',');
+      const metaDataKpiUnits = _.get(data, 'metaData.kpiObj', {});
+      const metaDataKPIs = R.keys(metaDataKpiUnits);
 
       // Create metric name => short name map
       const metricShortNames = R.reduce(
         (a, o) => { a[o.metric] = o.shortMetric; return a; }, {},
+        data.metricShortNameArray || [],
+      );
+
+      const getUnit = (unit) => {
+        const match = unit.match(/\(.+\)/);
+        return match ? match[0] : '';
+      };
+      const metricUnits = R.reduce(
+        (a, o) => { a[o.metric] = getUnit(o.unit); return a; }, {},
         data.metricShortNameArray || [],
       );
 
@@ -392,7 +404,9 @@ class CausalGraphModal extends React.Component {
         eventsCorrelations,
         kpiPredictions,
         metaDataKPIs,
+        metaDataKpiUnits,
         metricShortNames,
+        metricUnits,
       }, () => {
         this.renderGraph();
       });
@@ -543,7 +557,7 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getFilteredKPIPredictions() {
-    const { kpiPredictions, kpiPredictionProbability } = this.state;
+    const { kpiPredictions, kpiPredictionProbability, metricUnits } = this.state;
 
     const relations = [];
     R.forEachObjIndexed((sval, servers) => {
@@ -552,11 +566,13 @@ class CausalGraphModal extends React.Component {
           if (mval && _.has(mval, kpiPredictionProbability)) {
             const snames = servers.split(',');
             const mnames = metrics.split(',');
+            const metric = mnames[0];
+
             // For the kpi predictions, the right label is always kpi metric.
             relations.push({
               left: snames[0],
               right: snames[1],
-              label: `Value: ${mval[kpiPredictionProbability]}`,
+              label: `> ${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`,
               leftLabel: `${mnames[0]}`,
               rightLabel: [[mnames[1], true]],
             });
@@ -615,6 +631,7 @@ class CausalGraphModal extends React.Component {
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
       correlationProbability, kpiPredictionProbability, showMetrics,
+      metaDataKpiUnits, metricUnits,
     } = this.state;
 
     const filteredDataset = this.getFilteredDataset();
@@ -754,6 +771,17 @@ class CausalGraphModal extends React.Component {
               </Dropdown>
             </div>
           </div>
+          {activeTab === 'kpiPrediction' &&
+            <div className="violation">
+              <span>KPI Violation: </span>
+              {R.keys(metaDataKpiUnits).map(key => (
+                <span key={key}>
+                  <span className="highlight">{key}</span>
+                  <span className="value">{`>= ${metaDataKpiUnits[key] || ''}${metricUnits[key] || ''}`}</span>
+                </span>
+              ))}
+            </div>
+          }
           <div className="settings">
             <div className="ui checkbox">
               <input

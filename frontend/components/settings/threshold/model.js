@@ -67,8 +67,8 @@ class ModelSettings extends React.Component {
 
   @autobind()
   handleUpdate() {
-    const { projectName } = this.props;
-    this.reloadData(projectName);
+    const { projectName, instanceGroup } = this.props;
+    this.reloadData(projectName, instanceGroup);
   }
 
   @autobind
@@ -107,7 +107,7 @@ class ModelSettings extends React.Component {
     }, () => {
       removeProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
-          this.reloadData(projectName);
+          this.reloadData(projectName, instanceGroup);
         });
     });
   }
