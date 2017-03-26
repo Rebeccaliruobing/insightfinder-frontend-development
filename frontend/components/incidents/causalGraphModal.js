@@ -630,7 +630,8 @@ class CausalGraphModal extends React.Component {
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
-      correlationProbability, kpiPredictionProbability, showMetrics, metaDataKpiUnits,
+      correlationProbability, kpiPredictionProbability, showMetrics,
+      metaDataKpiUnits, metricUnits,
     } = this.state;
 
     const filteredDataset = this.getFilteredDataset();
@@ -776,7 +777,7 @@ class CausalGraphModal extends React.Component {
               {R.keys(metaDataKpiUnits).map(key => (
                 <span key={key}>
                   <span className="highlight">{key}</span>
-                  <span className="value">{`>=${metaDataKpiUnits[key] || ''}`}</span>
+                  <span className="value">{`>= ${metaDataKpiUnits[key] || ''}${metricUnits[key] || ''}`}</span>
                 </span>
               ))}
             </div>
