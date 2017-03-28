@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`artui.elements.container should be full height if set prop 1`] = `
+<div
+  className="fui full-height container"
+/>
+`;
+
+exports[`artui.elements.container should be merge className if set 1`] = `
+<div
+  className="fui container main"
+/>
+`;
+
+exports[`artui.elements.container should be no gutter if set prop 1`] = `
+<div
+  className="fui responsive no-gutter container"
+/>
+`;
+
+exports[`artui.elements.container should be normal div for default props 1`] = `
+<div
+  className="fui container"
+/>
+`;
+
+exports[`artui.elements.container should be responsible if set prop 1`] = `
+<div
+  className="fui responsive container"
+/>
+`;
