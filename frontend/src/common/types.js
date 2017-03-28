@@ -61,5 +61,5 @@ export type Action =
   | { type: 'LOGIN'; payload: { userName: string, password: string } }
   | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE'; payload: { message: ?Message, error: ?Error } }
-  | { type: 'LOGIN' }
+  | { type: 'LOGOFF' }
   ;

@@ -103,11 +103,6 @@ const reducer = (
       error: action.payload.error,
       lastError: action.payload.error,
     };
-  } else if (action.type === 'LOGIN_FAILURE') {
-    return {
-      ...state,
-      lastError: action.payload.error,
-    };
   }
   return { ...initialState, ...state };
 };

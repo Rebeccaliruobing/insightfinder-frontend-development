@@ -27,7 +27,7 @@ const start = (
 
     componentWillUnmount() {
       // When HMR is enabled, code change might cause this component to be
-      // reload, to avoid the state changing, we don't display appStop action.
+      // reload, to avoid the state changing, we don't dispatch appStop action.
     }
 
     render() {

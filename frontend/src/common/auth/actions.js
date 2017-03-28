@@ -3,7 +3,8 @@
 import { Observable } from 'rxjs/Observable';
 import store from 'store';
 import type { Action, Credentials, Message } from '../types';
-import { login as loginApi } from '../apis';
+import { login as loginApi, retrieveInitData } from '../apis';
+import { showAppLoader, appFatalError, setInitData } from '../app/actions';
 import { PermissionError } from '../errors';
 import authMessages from './authMessages';
 
@@ -34,13 +35,31 @@ const loginEpic = (action$: any) =>
     .concatMap(action =>
       Observable
         .from(loginApi(action.payload))
-        .map((d) => {
-          // TODO: Remove store dependence
+        .concatMap((d) => {
+          // TODO: [v1.0] Remove store dependence
           store.set('token', d.credentials.token);
           store.set('userName', d.credentials.userName);
           store.set('userInfo', d.userInfo);
 
-          return loginSuccess(d.credentials, d.userInfo);
+          return Observable.of(
+            showAppLoader(),
+            loginSuccess(d.credentials, d.userInfo),
+          );
+          /*
+          return Observable.concat(
+            Observable.of(
+              showAppLoader(),
+              loginSuccess(d.credentials, d.userInfo),
+            ),
+            Observable
+              .from(retrieveInitData(d.credentials))
+              .map(data => setInitData(data))
+              .takeUntil(action$.ofType('APP_STOP'))
+              .catch(err => Observable.of(
+                appFatalError(err),
+              )),
+          );
+          */
         })
         .catch((err) => {
           if (err instanceof PermissionError) {
