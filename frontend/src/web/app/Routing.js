@@ -47,6 +47,8 @@ import {
   FileDisplayModel, FileUpload,
 } from '../../../components/filetabs';
 
+import RoutingNextV1 from './RoutingNextV1';
+
 const liveMonitoringAppV1 = withRouteApp(liveMonitoringApp);
 const FilesMonitoringAppV1 = withRouteApp(FilesMonitoringApp);
 const FilesDetectionMonitoringAppV1 = withRouteApp(FilesDetectionMonitoringApp);
@@ -69,139 +71,6 @@ const RoutingNext = () => (
       <Route path="/resetPassword" component={ResetPassword} />
 
       <PrivateRoute path="/help" component={Help} />
-      <PrivateRoute
-        path="/account-info"
-        render={() => <AppV1><AccountInfo /></AppV1>}
-      />
-
-      <PrivateRoute
-        path="/cloud/insight-report"
-        render={() => (<AppV1><Cloud><InsightReport /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/monitoring"
-        render={() => (<AppV1><Cloud><EventSummary /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/executive-dashboard"
-        render={() => (<AppV1><Cloud><ExecutiveDashboard /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/app-forecast"
-        render={() => (<AppV1><Cloud><AppForecast /></Cloud></AppV1>)}
-      />
-
-      <PrivateRoute
-        path="/cloud/historical-report"
-        render={() => (<AppV1><Cloud><HistoricalReport /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/incident-analysis"
-        render={() => (<AppV1><Cloud><IncidentAnalysis /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/behavior-change-detection"
-        render={() => (<AppV1><Cloud><BehaviorChangeDetection /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/outlier-detection"
-        render={() => (<AppV1><Cloud><OutlierDetection /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/rollout-check"
-        render={() => (<AppV1><Cloud><RolloutCheck /></Cloud></AppV1>)}
-      />
-      <PrivateRoute
-        path="/cloud/summary-report"
-        render={() => (<AppV1><Cloud><SummaryReport /></Cloud></AppV1>)}
-      />
-
-      <PrivateRoute
-        path="/log/incident-log-analysis"
-        render={() => (<AppV1><Log><IncidentLogAnalysis /></Log></AppV1>)}
-      />
-      <Redirect from="/log" to="/log/incident-log-analysis" />
-
-      <PrivateRoute
-        path="/settings/data-disqualifiers"
-        render={() => (<AppV1><Settings><DataDisqualifiersSettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/alert-sensitivity"
-        render={() => (<AppV1><Settings><AlertSensitivitySettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/data-sharing"
-        render={() => (<AppV1><Settings><DataSharingSettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/grouping"
-        render={() => (<AppV1><Settings><GroupingSettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/threshold"
-        render={() => (<AppV1><Settings><ThresholdSettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/log-analysis"
-        render={() => (<AppV1><Settings><LogAnalysisSettings /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/project"
-        render={() => (<AppV1><Settings><ThresholdSettingsOld /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/extsvc"
-        render={() => (<AppV1><Settings><ExtSvc /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/project-list/:tabId"
-        render={() => (<AppV1><Settings><Projects /></Settings></AppV1>)}
-      />
-      <PrivateRoute
-        path="/settings/project-list"
-        render={() => (<AppV1><Settings><Projects /></Settings></AppV1>)}
-      />
-      <Redirect from="/settings" to="/settings/project" />
-      <PrivateRoute
-        path="/usecase/list-all"
-        render={() => (<AppV1><UseCase><ListAll /></UseCase></AppV1>)}
-      />
-      <PrivateRoute
-        path="/usecase/list-some"
-        render={() => (<AppV1><UseCase><ListAll /></UseCase></AppV1>)}
-      />
-      <PrivateRoute
-        path="/usecase/search"
-        render={() => (<AppV1><UseCase><Search /></UseCase></AppV1>)}
-      />
-      <PrivateRoute
-        path="/usecase/explore"
-        render={() => (<AppV1><UseCase><Explore /></UseCase></AppV1>)}
-      />
-      <Redirect from="/usecase" to="/usecase/explore" />
-
-      <PrivateRoute
-        path="/filetabs/fileNewModel"
-        render={() => (<AppV1><FileTabs><FileNewModel /></FileTabs></AppV1>)}
-      />
-      <PrivateRoute
-        path="/filetabs/filedetection"
-        render={() => (<AppV1><FileTabs><FileDetection /></FileTabs></AppV1>)}
-      />
-      <PrivateRoute
-        path="/filetabs/fileupdatemodel"
-        render={() => (<AppV1><FileTabs><FileUpdateModel /></FileTabs></AppV1>)}
-      />
-      <PrivateRoute
-        path="/filetabs/filedisplaymodel"
-        render={() => (<AppV1><FileTabs><FileDisplayModel /></FileTabs></AppV1>)}
-      />
-      <PrivateRoute
-        path="/filetabs/fileupload"
-        render={() => (<AppV1><FileTabs><FileUpload /></FileTabs></AppV1>)}
-      />
-      <Redirect from="/filetabs" to="/filetabs/fileNewModel" />
 
       <PrivateRoute
         path="/liveMonitoring"
@@ -236,7 +105,7 @@ const RoutingNext = () => (
         render={() => React.createElement(ExecutiveDashboardAppV1)}
       />
 
-      <Redirect from="*" to="/cloud/executive-dashboard" />
+      <PrivateRoute component={RoutingNextV1} />
     </Switch>
   </BrowserRouter>
 );
