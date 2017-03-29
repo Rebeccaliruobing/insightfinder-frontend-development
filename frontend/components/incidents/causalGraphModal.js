@@ -54,8 +54,9 @@ class CausalGraphModal extends React.Component {
       relationProbability: 0.6,
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
-      currentZoom: 10,
+      currentZoom: 5,
       showMetrics: true,
+      mergeMetrics: true,
     };
   }
 
@@ -88,9 +89,9 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 20 + (currentZoom * 20),
-      nodesep: 20 + (currentZoom * 8),
-      edgesep: 10 + (currentZoom * 2),
+      ranksep: 20 + (currentZoom * 40),
+      nodesep: 20 + (currentZoom * 16),
+      edgesep: 10 + (currentZoom * 4),
       marginx: 20, marginy: 20,
     });
 
@@ -311,9 +312,12 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getMetricShortNames(name) {
-    // return name;
-    const { metricShortNames } = this.state;
-    return metricShortNames[name] || name;
+    const { mergeMetrics, metricShortNames } = this.state;
+    if (mergeMetrics) {
+      return metricShortNames[name] || name;
+    }
+
+    return name;
   }
 
   @autobind
@@ -400,25 +404,30 @@ class CausalGraphModal extends React.Component {
         const snames = servers.split(',');
         const lname = snames[0];
         const rname = snames[1];
-        const llabels = [];
+        const llabels = {};
         const rlables = [];
         R.forEachObjIndexed((mval, metrics) => {
           if (mval && _.has(mval, kpiPredictionProbability)) {
             const mnames = metrics.split(',');
             const metric = mnames[0];
+            const mergedMetric = this.getMetricShortNames(metric);
             const kpi = this.getMetricShortNames(mnames[1]);
-            const value = `> ${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`;
-            llabels.push(`${this.getMetricShortNames(metric)} ${value}`);
+            const value = `${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`;
+            if (llabels[mergedMetric]) {
+              llabels[mergedMetric].push(value);
+            } else {
+              llabels[mergedMetric] = [value];
+            }
             rlables.push(kpi);
           }
         }, sval);
         // For the kpi predictions, the right label is always kpi metric.
-        if (llabels.length > 0) {
+        if (R.keys(llabels).length > 0) {
           relations.push({
             left: lname,
             right: rname,
             label: '',
-            leftLabel: R.uniq(llabels).map(l => [l, false]),
+            leftLabel: R.keys(llabels).map(k => [`${k} > ${llabels[k].join(';')}`, false]),
             rightLabel: R.uniq(rlables).map(l => [l, true]),
           });
         }
@@ -468,13 +477,22 @@ class CausalGraphModal extends React.Component {
     });
   }
 
+  @autobind
+  setMergeMetrics(e) {
+    this.setState({
+      mergeMetrics: e.target.checked,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
-      correlationProbability, kpiPredictionProbability, showMetrics,
+      correlationProbability, kpiPredictionProbability, showMetrics, mergeMetrics,
       metaDataKpiUnits, metricUnits,
     } = this.state;
 
@@ -633,6 +651,13 @@ class CausalGraphModal extends React.Component {
                 onChange={this.setShowMetrics}
               />
               <label>Show Metrics</label>
+            </div>
+            <div className="ui checkbox">
+              <input
+                type="checkbox" tabIndex="0" checked={mergeMetrics}
+                onChange={this.setMergeMetrics}
+              />
+              <label>Merge Similar Metrics</label>
             </div>
             <div>
               <i className="minus icon" onClick={this.zoomOut} />
