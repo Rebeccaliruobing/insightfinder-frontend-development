@@ -311,9 +311,9 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getMetricShortNames(name) {
-    // return name;
-    const { metricShortNames } = this.state;
-    return metricShortNames[name] || name;
+    return name;
+    // const { metricShortNames } = this.state;
+    // return metricShortNames[name] || name;
   }
 
   @autobind
