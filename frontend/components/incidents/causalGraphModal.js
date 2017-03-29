@@ -405,10 +405,10 @@ class CausalGraphModal extends React.Component {
         R.forEachObjIndexed((mval, metrics) => {
           if (mval && _.has(mval, kpiPredictionProbability)) {
             const mnames = metrics.split(',');
-            const metric = this.getMetricShortNames(mnames[0]);
+            const metric = mnames[0];
             const kpi = this.getMetricShortNames(mnames[1]);
             const value = `> ${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`;
-            llabels.push(`${metric} ${value}`);
+            llabels.push(`${this.getMetricShortNames(metric)} ${value}`);
             rlables.push(kpi);
           }
         }, sval);
