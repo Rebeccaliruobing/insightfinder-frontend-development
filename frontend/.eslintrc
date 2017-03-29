@@ -16,6 +16,7 @@
     // Easy for naming local variable
     "no-param-reassign": "off",
     "object-property-newline": "off",
+    "arrow-body-style": "off",
     // Use js for jsx
     "react/jsx-filename-extension": "off",
     "react/prefer-stateless-function": "off",

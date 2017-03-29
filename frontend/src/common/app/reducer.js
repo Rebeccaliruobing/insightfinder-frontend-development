@@ -1,30 +1,33 @@
 /* @flow */
 import { REHYDRATE } from 'redux-persist/constants';
+import R from 'ramda';
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
-const messages = loadLocaleMessages();
-const windowWidth = window.innerWidth ||
-  document.documentElement.clientWidth || document.body.clientHeight;
-const windowHeight = window.innerHeight ||
-  document.documentElement.clientHeight || document.body.clientHeight;
+const localeMessages = loadLocaleMessages();
+const locales = R.map(l => l.name, localeMessages);
+const messages = R.map(l => l.messages, localeMessages);
 
 const initialState = {
   appName: '',
   appVersion: '',
   currentTheme: 'light',
-  locales: Object.keys(messages) || ['en'],
   currentLocale: null,
-  messages,
-  windowSize: {
-    width: windowWidth,
-    height: windowHeight,
+  viewport: {
+    width: 0,
+    height: 0,
     widthDiff: 0,
     heightDiff: 0,
   },
+  locales,
+  messages,
+  appLoaderVisible: false,
+  rehydrated: false,
+  starting: false,
   started: false,
-  appLoaderVisible: true,
+  fatalError: null,
   error: null,
+  lastError: null,
 };
 
 const reducer = (
@@ -45,21 +48,38 @@ const reducer = (
       ...state,
       currentLocale: action.payload.locale,
     };
-  } else if (action.type === 'SET_WINDOW_SIZE') {
-    const { width: currentWidth, height: currentHeight } = state.windowSize;
+  } else if (action.type === 'SET_VIEWPORT') {
+    const { width: currentWidth, height: currentHeight } = state.viewport;
     const { width, height } = action.payload;
     return {
       ...state,
-      windowSize: {
+      viewport: {
         width, height,
         widthDiff: width - currentWidth,
         heightDiff: height - currentHeight,
       },
     };
+  } else if (action.type === 'APP_START') {
+    return {
+      ...state,
+      appLoaderVisible: true,
+      starting: true,
+    };
+  } else if (action.type === 'APP_REHYDRATED') {
+    return {
+      ...state,
+      rehydrated: true,
+    };
   } else if (action.type === 'APP_STARTED') {
     return {
       ...state,
+      starting: false,
       started: true,
+    };
+  } else if (action.type === 'APP_STOP') {
+    return {
+      ...state,
+      started: false,
     };
   } else if (action.type === 'SHOW_APPLOADER') {
     return {
@@ -71,10 +91,22 @@ const reducer = (
       ...state,
       appLoaderVisible: false,
     };
+  } else if (action.type === 'APP_FATAL_ERROR') {
+    return {
+      ...state,
+      fatalError: action.payload.error,
+      lastError: action.payload.error,
+    };
   } else if (action.type === 'APP_ERROR') {
     return {
       ...state,
       error: action.payload.error,
+      lastError: action.payload.error,
+    };
+  } else if (action.type === 'LOGIN_FAILURE') {
+    return {
+      ...state,
+      lastError: action.payload.error,
     };
   }
   return { ...initialState, ...state };

@@ -21,9 +21,10 @@ $font-size-subheading:    16px !default;
 $font-size-body:          14px !default;
 $font-size-caption:       13px !default;
 $font-size-button:        15px !default;
+$font-size-hint:          12px !default;
 
 $font-weight-light:       300 !default;
-$font-weight-regular:     400 !default;
+$font-weight-regular:     500 !default;
 $font-weight-medium:      700 !default;
 
 ////////////////////////////////////////////////
@@ -43,3 +44,8 @@ $widescreen-width:    1200px !default;
 // Spacing
 $x-gutter:            $space-x-base * 2 !default;
 $x-small-gutter:      $space-x-base !default;
+$y-gutter:            $space-y-base * 2 !default;
+$y-small-gutter:      $space-y-base !default;
+
+// Border
+$border-radius:       2/14 * 1rem !default;

@@ -1,11 +1,13 @@
-import './app.less';
-
 import React from 'react';
-import { Router, Route, browserHistory, IndexRoute, IndexRedirect, Redirect } from 'react-router';
+import { connect } from 'react-redux';
+import { Router, Route, browserHistory, IndexRedirect, Redirect } from 'react-router';
 import store from 'store';
 import _ from 'lodash';
-import {Console, Link} from './artui/react';
+import './app.less';
 
+import type { State } from './src/common/types';
+import { hideAppLoader } from './src/common/app/actions';
+import { Console, Link } from './artui/react';
 import {authRoutes} from  './components/auth';
 import {cloudRoute} from './components/cloud';
 import {logRoute} from './components/log';
@@ -26,7 +28,7 @@ import AccountInfo from './components/account-info';
 import apis from './apis';
 const userInstructionJson = require('./userInstructions.json');
 
-class App extends React.Component {
+class AppCore extends React.Component {
 
   constructor(props) {
     super(props);
@@ -72,6 +74,7 @@ class App extends React.Component {
 
   componentDidMount() {
     this.loadData();
+    this.props.hideAppLoader();
   }
 
   loadData() {
@@ -187,6 +190,11 @@ class App extends React.Component {
   }
 }
 
+export const App = connect(
+  () => ({}),
+  { hideAppLoader },
+)(AppCore);
+
 // Live Monitoring project detail page
 const liveMonitoringApp = function (props) {
   let {location, params} = props;
@@ -270,45 +278,56 @@ const ExecutiveDashboardApp = function (props) {
 const routes = (
   <Router history={browserHistory}>
     <Route component={App} path="/">
-      <IndexRedirect to="/cloud"/>
+      <IndexRedirect to="/cloud" />
       {cloudRoute}
       {logRoute}
       {settingsRoute}
       {useCaseRoute}
       {fileTabsRoute}
-      <Route component={Help} path="help"/>
-      <Route component={AccountInfo} path="account-info"/>
+      <Route component={AccountInfo} path="account-info" />
+      <Route component={Help} path="help" />
     </Route>
-    <Route component={liveMonitoringApp} path="/liveMonitoring"/>
-    <Route component={FilesMonitoringApp} path="/filesMonitoring"/>
+    <Route component={liveMonitoringApp} path="/liveMonitoring" />
+    <Route component={FilesMonitoringApp} path="/filesMonitoring" />
     <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring" />
-    <Route component={projectDataOnlyApp} path="/projectDataOnly"/>
-    <Route component={incidentAnalysisApp} path="/incidentAnalysis"/>
-    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis"/>
-    <Route component={useCaseApp} path="/useCaseDetails"/>
-    <Route component={ExecutiveDashboardApp} path="/executiveDashboard"/>
+    <Route component={projectDataOnlyApp} path="/projectDataOnly" />
+    <Route component={incidentAnalysisApp} path="/incidentAnalysis" />
+    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis" />
+    <Route component={useCaseApp} path="/useCaseDetails" />
+    <Route component={ExecutiveDashboardApp} path="/executiveDashboard" />
     <Redirect from="*" to="/" />
   </Router>
 );
 
+export {
+  liveMonitoringApp,
+  FilesMonitoringApp,
+  FilesDetectionMonitoringApp,
+  projectDataOnlyApp,
+  incidentAnalysisApp,
+  incidentLogAnalysisApp,
+  useCaseApp,
+  ExecutiveDashboardApp,
+};
+
 class AppRoute extends React.Component {
-  constructor(props) {
-    super(props);
+  componentDidMount() {
+    this.props.hideAppLoader();
   }
 
   isAuthenticated() {
-    // TODO: We need to check whether token is expired?
     return store.get('userName') && store.get('token');
   }
 
   render() {
     if (this.isAuthenticated()) {
       return routes;
-    } else {
-      return authRoutes;
     }
+    return authRoutes;
   }
 }
 
-export default AppRoute;
-
+export default connect(
+  () => ({}),
+  { hideAppLoader },
+)(AppRoute);

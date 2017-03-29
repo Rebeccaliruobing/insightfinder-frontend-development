@@ -1,7 +1,9 @@
 import $ from 'jquery';
 import React from 'react';
+import { connect } from 'react-redux';
 import cx from 'classnames';
-import {BaseComponent, PropTypes, Input, Link} from '../../artui/react';
+import { BaseComponent } from '../../artui/react';
+import { hideAppLoader } from '../../src/common/app/actions';
 
 const logo = require('../../images/logo.png');
 
@@ -25,6 +27,7 @@ class SignupStep2 extends BaseComponent {
   }
 
   componentDidMount() {
+    this.props.hideAppLoader();
     var errorPresentInForm = false;
     if (this._$el) {
       var passForm = $("#form_pass1");
@@ -376,4 +379,7 @@ class SignupStep2 extends BaseComponent {
   }
 }
 
-export default SignupStep2;
+export default connect(
+  () => ({}),
+  { hideAppLoader },
+)(SignupStep2);

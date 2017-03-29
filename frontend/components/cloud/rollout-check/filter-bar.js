@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import moment from 'moment';
 import cx from 'classnames';
 import {autobind} from 'core-decorators';
-import {Link, IndexLink} from 'react-router';
 import {Button} from '../../../artui/react';
 import {ProjectSelection, WindowWithWeek} from '../../selections';
 import DateTimePicker from "../../ui/datetimepicker/index";

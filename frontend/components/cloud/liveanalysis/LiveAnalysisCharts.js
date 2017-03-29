@@ -262,7 +262,8 @@ class LiveAnalysisCharts extends React.Component {
     let { loading, onRefresh, enablePublish, enableComments,
       debugData, timeRanking, freqRanking, projectName,
       periodMap, data, chartType, alertMissingData, bugId } = this.props;
-    const { view, columns, showSummaryFlag, isForecast, selectedMetrics, hideGroupSelector } = this.state;
+    const { view, columns, showSummaryFlag,
+      isForecast, selectedMetrics, hideGroupSelector } = this.state;
     let { selectedGroups } = this.state;
 
     const userName = store.get('userName');

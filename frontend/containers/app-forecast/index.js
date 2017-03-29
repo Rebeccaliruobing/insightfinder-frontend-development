@@ -2,10 +2,10 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
-import { withRouter } from 'react-router';
 import cx from 'classnames';
 import store from 'store';
 import _ from 'lodash';
+import withRouter from '../withRouter';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { LiveProjectSelection } from '../../components/selections';

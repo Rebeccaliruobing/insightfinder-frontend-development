@@ -1,8 +1,9 @@
 @import "../variables";
 
 .fui.box {
-  border-radius: 1px;
+  border-radius: $border-radius;
   display: block;
   position: relative;
-  padding: 1.25rem;
+  padding: 1rem;
+  border: 1px solid transparent;
 }

@@ -1,10 +1,8 @@
-import $ from 'jquery';
 import React from 'react';
-import store from 'store';
-import _ from "lodash";
-import {Modal, Dropdown} from '../../artui/react';
-import {PieChart} from '../share/echarts-charts';
-import "./incident.less";
+import _ from 'lodash';
+import { Modal } from '../../artui/react';
+import { PieChart } from '../share/echarts-charts';
+import './incident.less';
 
 class SysCallModal extends React.Component {
 
@@ -13,57 +11,55 @@ class SysCallModal extends React.Component {
     this.state = {
       tabStates: {
         time: 'active',
-        freq: ''
-      }
+        freq: '',
+      },
     };
   }
 
   selectTab(e, tab) {
-    var tabStates = this.state['tabStates'];
-    tabStates = _.mapValues(tabStates, function (val) {
+    let tabStates = this.state.tabStates;
+    tabStates = _.mapValues(tabStates, (val) => {
       return '';
     });
     tabStates[tab] = 'active';
-    this.setState({ tabStates: tabStates });
+    this.setState({ tabStates });
   }
 
   render() {
-    let {dataArray, timeRanking, freqRanking, ...rest} = this.props;
-    let pieChartCanvasStyle = { height: '200px', width: '200px' };
-    let titleStyle = { 'width': '33%', 'margin': '0 auto' };
-    let optionCenterStyle = ['65%', '50%'];
+    const { dataArray, timeRanking, freqRanking, ...rest } = this.props;
+    const pieChartCanvasStyle = { height: '200px', width: '200px' };
+    const titleStyle = { width: '33%', margin: '0 auto' };
+    const optionCenterStyle = ['65%', '50%'];
     const { tabStates } = this.state;
     let timeFuncList = timeRanking.functionlist;
     let freqFuncList = freqRanking.functionlist;
     timeFuncList = (_.keysIn(timeFuncList)).length != 0 ? timeFuncList : [];
     freqFuncList = (_.keysIn(freqFuncList)).length != 0 ? freqFuncList : [];
-    console.log([dataArray, timeRanking, freqRanking]);
     return (
-      <Modal {...rest} size="big" closable={true} style={{ minHeight: '100%' }}>
+      <Modal {...rest} size="big" closable style={{ minHeight: '100%' }}>
         {
           dataArray ?
             <div className="content">
-              <div style={{ 'width': '100%', 'display': 'flex' }}>
-                {_.keysIn(dataArray).map(function (value, index) {
-                  console.log(value);
-                  let name = "";
+              <div style={{ width: '100%', display: 'flex' }}>
+                {_.keysIn(dataArray).map((value, index) => {
+                  let name = '';
                   let dataValue = dataArray[value].toString();
-                  if (value == "impactFactor") {
-                    dataValue = ((dataArray[value] * 100).toFixed(1)).toString() + "%";
-                    name = "Fault Impact Scope";
+                  if (value == 'impactFactor') {
+                    dataValue = `${((dataArray[value] * 100).toFixed(1)).toString()}%`;
+                    name = 'Fault Impact Scope';
+                  } else if (value == 'totalNumThread') {
+                    name = 'Number of All Threads';
+                  } else if (value == 'numAffectedThread') {
+                    name = 'Number of Affected Threads';
                   }
-                  else if (value == "totalNumThread") {
-                    name = "Number of All Threads";
-                  }
-                  else if (value == "numAffectedThread") {
-                    name = "Number of Affected Threads";
-                  }
-                  let radius = [52, 70];
+                  const radius = [52, 70];
                   return (
-                    <PieChart pieChartCanvasStyle={pieChartCanvasStyle} radius={radius} key={index}
+                    <PieChart
+                      pieChartCanvasStyle={pieChartCanvasStyle} radius={radius} key={index}
                       optionCenterStyle={optionCenterStyle} colorChart="#3398DB"
                       titleStyle={titleStyle} data={name}
-                      dataValue={dataValue} />);
+                      dataValue={dataValue}
+                    />);
                 })}
               </div>
               {
@@ -71,18 +67,22 @@ class SysCallModal extends React.Component {
 
                   <div>
                     <div className="ui pointing secondary menu">
-                      <a className={tabStates['time'] + ' item'}
-                        onClick={(e) => this.selectTab(e, 'time')}>By Execution Time</a>
-                      <a className={tabStates['freq'] + ' item'}
-                        onClick={(e) => this.selectTab(e, 'freq')}>By Execution Frequency</a>
+                      <a
+                        className={`${tabStates['time']} item`}
+                        onClick={e => this.selectTab(e, 'time')}
+                      >By Execution Time</a>
+                      <a
+                        className={`${tabStates['freq']} item`}
+                        onClick={e => this.selectTab(e, 'freq')}
+                      >By Execution Frequency</a>
                     </div>
 
-                    <div className={tabStates['time'] + ' ui tab '}>
-                      {tabStates['time'] === 'active' ?
+                    <div className={`${tabStates['time']} ui tab `}>
+                      {tabStates.time === 'active' ?
                         <div>
                           <table className="syscall-table ui compact small celled table">
                             <thead>
-                              <tr style={{ 'textAlign': 'center' }}>
+                              <tr style={{ textAlign: 'center' }}>
                                 <th>Rank</th>
                                 <th>Function Name</th>
                               </tr>
@@ -90,24 +90,26 @@ class SysCallModal extends React.Component {
                             <tbody>
                               {(timeFuncList || []).map((value, index) => {
                                 return (
-                                  <tr key={`time-${index}-1`}
-                                    style={{ 'textAlign': 'center' }}>
-                                    <td>{value['rank']}</td>
-                                    <td>{value['functionName']}</td>
+                                  <tr
+                                    key={`time-${index}-1`}
+                                    style={{ textAlign: 'center' }}
+                                  >
+                                    <td>{value.rank}</td>
+                                    <td>{value.functionName}</td>
                                   </tr>
-                                )
+                                );
                               })}
                             </tbody>
                           </table>
                         </div>
                         : null}
                     </div>
-                    <div className={tabStates['freq'] + ' ui tab '}>
-                      {tabStates['freq'] === 'active' ?
+                    <div className={`${tabStates['freq']} ui tab `}>
+                      {tabStates.freq === 'active' ?
                         <div>
                           <table className="syscall-table ui compact small celled table">
                             <thead>
-                              <tr style={{ 'textAlign': 'center' }}>
+                              <tr style={{ textAlign: 'center' }}>
                                 <th>Rank</th>
                                 <th>Function Name</th>
                               </tr>
@@ -115,12 +117,14 @@ class SysCallModal extends React.Component {
                             <tbody>
                               {(freqFuncList || []).map((value, index) => {
                                 return (
-                                  <tr key={`freq-${index}-1`}
-                                    style={{ 'textAlign': 'center' }}>
-                                    <td>{value['rank']}</td>
-                                    <td>{value['functionName']}</td>
+                                  <tr
+                                    key={`freq-${index}-1`}
+                                    style={{ textAlign: 'center' }}
+                                  >
+                                    <td>{value.rank}</td>
+                                    <td>{value.functionName}</td>
                                   </tr>
-                                )
+                                );
                               })}
                             </tbody>
                           </table>
@@ -132,7 +136,7 @@ class SysCallModal extends React.Component {
             </div> : <span>No Data</span>
         }
       </Modal>
-    )
+    );
   }
 }
 

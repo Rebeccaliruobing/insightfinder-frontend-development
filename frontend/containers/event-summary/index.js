@@ -3,10 +3,10 @@
 import React, { PropTypes as T } from 'react';
 import store from 'store';
 import _ from 'lodash';
-import { withRouter } from 'react-router';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
+import withRouter from '../withRouter';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { IncidentsList } from '../../components/incidents';

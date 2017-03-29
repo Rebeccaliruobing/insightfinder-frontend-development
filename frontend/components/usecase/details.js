@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import ReactTimeout from 'react-timeout';
+import { autobind } from 'core-decorators'
 import { Console } from '../../artui/react';
 import apis from '../../apis';
 import LiveAnalysisCharts from '../cloud/liveanalysis/LiveAnalysisCharts';
@@ -23,9 +23,10 @@ const ProjectDetails = class extends React.Component {
   }
 
   componentDidMount() {
-    (this.props.updateData || this.updateData.bind(this))(this);
+    (this.props.updateData || this.updateData)(this);
   }
 
+  @autobind
   updateData() {
     let { query } = this.props.location;
     let { pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller } = query;
@@ -96,4 +97,4 @@ const ProjectDetails = class extends React.Component {
   }
 };
 
-export default ReactTimeout(ProjectDetails);
+export default ProjectDetails;

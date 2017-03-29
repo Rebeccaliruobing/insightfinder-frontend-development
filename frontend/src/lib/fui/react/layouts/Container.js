@@ -5,14 +5,33 @@ import cx from 'classnames';
 type Props = {
   children: Element<any>,
   className: string,
-  responsive: boolean,
-  noGutter: boolean,
-  fullHeight: boolean,
+  responsive: bool,
+  noGutter: bool,
+  fullHeight: bool,
+  screenCenter: bool,
+  exactCenter: bool,
 };
 
 const Container = ({
-  className, responsive, noGutter, fullHeight, children, ...rest
+      className, screenCenter, responsive,
+  noGutter, fullHeight, children, ...rest
 }: Props) => {
+  if (screenCenter) {
+    const classes = cx(
+      'fui screen-center', {
+        'full-height': fullHeight,
+      },
+      'container',
+      className,
+    );
+
+    return (
+      <div className={classes}>
+        <div {...rest}>{children}</div>
+      </div>
+    );
+  }
+
   const classes = cx(
     'fui', {
       responsive,
@@ -25,7 +44,5 @@ const Container = ({
     <div className={classes} {...rest}>{children}</div>
   );
 };
-
-Container.defaultProps = {};
 
 export default Container;

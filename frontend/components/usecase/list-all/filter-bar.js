@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import moment from 'moment';
-import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Dropdown, Accordion, Message} from '../../../artui/react/index';
 import {
@@ -89,7 +88,7 @@ export default  class FilterBar extends Component {
             fromUser, dataChunkName, modelKey, projectName, modelName, modelType
           }).then((resp)=>{
             if (resp.success) {
-              resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
+              resp.data.metricSettings = JSON.parse(resp.data.metricSettings || '[]');
               this.setState(resp.data);
             }else {
               alert(resp.message);
@@ -118,7 +117,7 @@ export default  class FilterBar extends Component {
             fromUser, dataChunkName, modelKey, projectName, modelName, modelType
           }).then((resp)=>{
             if (resp.success) {
-              resp.data.metricSettings = JSON.parse(resp.data.metricSettings);
+              resp.data.metricSettings = JSON.parse(resp.data.metricSettings || '[]');
               this.setState(resp.data);
             }else {
               alert(resp.message);

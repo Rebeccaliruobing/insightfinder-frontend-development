@@ -2,6 +2,9 @@
  * Common js libraries used in all pages.
  */
 
+import 'bluebird';
+import 'whatwg-fetch';
+
 import 'jquery';
 import 'moment';
 import 'store';
@@ -9,7 +12,7 @@ import 'store';
 import 'lodash';
 import 'ramda';
 import 'localforage';
-import 'bluebird';
+import 'qs';
 import 'classnames';
 import 'd3';
 import 'react-faux-dom';
@@ -25,6 +28,8 @@ import 'react-router-dom';
 
 import 'react-router';
 import 'react-timeout';
+import 'react-select';
+import 'react-measure';
 
 import 'redux';
 import 'react-redux';

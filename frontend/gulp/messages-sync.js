@@ -5,14 +5,14 @@ import loadLocaleMessages from '../src/common/loadLocaleMessages';
 import { diff, messagesToCode } from './support/messages';
 
 gulp.task('messages-sync', ['messages-extract'], () => {
-  const messages = loadLocaleMessages();
+  const locales = loadLocaleMessages();
   const defaultMessages = require('../messages/en').default;
-  const defaultMessagesKeys = Object.keys(messages.en);
+  const defaultMessagesKeys = Object.keys(locales.en.messages);
 
-  Object.keys(messages)
+  Object.keys(locales)
     .filter(locale => locale !== 'en')
     .forEach((locale) => {
-      const localeMessagesKeys = Object.keys(messages[locale]);
+      const localeMessagesKeys = Object.keys(locales[locale].messages);
       const missingMessagesKeys = diff(defaultMessagesKeys, localeMessagesKeys);
       const unusedMessagesKeys = diff(localeMessagesKeys, defaultMessagesKeys);
       const clearedMessages = require(`../messages/${locale}`) // eslint-disable-line import/no-dynamic-require

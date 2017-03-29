@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {Link, IndexLink} from 'react-router';
-import {Console} from '../../../artui/react/index';
+import { Console } from '../../../artui/react/index';
 import OutlierDetection from '../outlier-detection';
 import RolloutCheck from '../rollout-check';
 

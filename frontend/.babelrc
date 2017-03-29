@@ -1,10 +1,11 @@
 /**
- * This .babelrc is for running gulp tasks and webpack.
+ * This .babelrc is for running gulp tasks, webpack and jest.
  * 
  * For compiling web code by webpack, the babel settings are in the config files
  * in the ./webpack folder.
- *
- * For jest testing, the settings in test environment is used.
+
+ * For compiling intl messages with msg or msg:sync, the babel settings are in
+ * message-extrace.js.
 **/
 {
   "presets": [
@@ -13,6 +14,15 @@
         "node": "current"
       }
     }], 
-    "stage-3"
-  ]
+    "stage-1",
+    "react"
+  ],
+  "plugins": [
+    "transform-decorators-legacy"
+  ],
+  "env": {
+    "test": {
+      "plugins": ["transform-es2015-modules-commonjs"]
+    }
+  }
 }

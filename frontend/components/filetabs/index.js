@@ -9,6 +9,8 @@ import FileUpdateModel  from './fileUpdateModel/index';
 import FileDisplayModel  from './fileDisplayModel/index';
 import FileUpload  from './fileUpload/index';
 
+export { FileNewModel, FileDetection, FileUpdateModel, FileDisplayModel, FileUpload };
+
 export class FileTabs extends React.Component {
   render() {
     return (

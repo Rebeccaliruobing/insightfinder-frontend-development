@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-import {Link, IndexLink} from 'react-router';
 
 import {Console, ButtonGroup, Button, Popup, Dropdown, Accordion, Message} from '../../../artui/react/index';
 import apis from '../../../apis';

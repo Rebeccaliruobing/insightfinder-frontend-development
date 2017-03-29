@@ -4,7 +4,7 @@
 
 import React from 'react';
 import classNames from 'classnames';
-import {Link} from 'react-router';
+import {Link} from '../elements/link';
 
 class Console extends React.Component {
   render() {

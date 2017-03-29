@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Link, IndexLink} from 'react-router';
 import HeatMapCard from '../../ui/heat-map-card';
 import moment from 'moment';
 import {autobind} from 'core-decorators';

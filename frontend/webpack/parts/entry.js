@@ -21,7 +21,7 @@ const entry = (settings) => {
   }
 
   // The real entry must be the last item.
-  // And if need to add babel- polyfill, it must be the first one.
+  // And if need to add babel-polyfill, it must be the first one.
   const patch = R.map(entry => (isDev ? [].concat([
     'react-hot-loader/patch',
     'webpack-hot-middleware/client',
