@@ -12,6 +12,15 @@
   }
 }
 
+.center-page.error.container {
+  .fui.box {
+    background: #FFF6F6;
+    color: #9F3A38;
+    box-shadow: 0 0 0 1px #E0B4B4 inset, 0 0 0 0 transparent;
+    border-width: 0px;
+  }
+}
+
 .single-page.container {
   background: transparent;
   height: 100%;

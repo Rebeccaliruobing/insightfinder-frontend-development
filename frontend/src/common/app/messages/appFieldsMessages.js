@@ -1,7 +1,7 @@
 /* @flow */
 import { defineMessages } from 'react-intl';
 
-const fieldsMessages = defineMessages({
+const appFieldsMessages = defineMessages({
   userName: {
     defaultMessage: 'username',
     id: 'app.fields.userName',
@@ -12,4 +12,4 @@ const fieldsMessages = defineMessages({
   },
 });
 
-export default fieldsMessages;
+export default appFieldsMessages;

@@ -2,7 +2,7 @@
 
 import { defineMessages } from 'react-intl';
 
-const menusMessages = defineMessages({
+const appMenusMessages = defineMessages({
   dashboard: {
     defaultMessage: 'Dashboard',
     id: 'app.menus.dashboard',
@@ -29,4 +29,4 @@ const menusMessages = defineMessages({
   },
 });
 
-export default menusMessages;
+export default appMenusMessages;

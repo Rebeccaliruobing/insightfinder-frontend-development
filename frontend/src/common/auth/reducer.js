@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 import type { AuthState, Action } from '../types';
 
 const initialState = {
@@ -24,6 +25,10 @@ const reducer = (
       userInfo: userInfo || state.userInfo,
     };
   } else if (action.type === 'LOGIN_FAILURE') {
+    if (action.payload.error) {
+      console.error(action.payload.error);
+    }
+
     return {
       ...state,
       loggedIn: false, loggingIn: false,

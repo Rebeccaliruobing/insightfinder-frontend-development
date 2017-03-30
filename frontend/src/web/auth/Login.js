@@ -4,14 +4,13 @@ import { Link, Redirect } from 'react-router-dom';
 import VLink from 'valuelink';
 import cx from 'classnames';
 import { get } from 'lodash';
-import { compose } from 'ramda';
 import { autobind } from 'core-decorators';
 import { injectIntl } from 'react-intl';
 import type { State, Message } from '../../common/types';
 import { hideAppLoader } from '../../common/app/actions';
 import { login } from '../../common/auth/actions';
-import appFieldsMessages from '../../common/app/appFieldsMessages';
-import authMessages from '../../common/auth/authMessages';
+import { appFieldsMessages } from '../../common/app/messages';
+import { authMessages } from '../../common/auth/messages';
 import { Input } from '../../lib/fui/react';
 import { CenterPage, LocaleSelector } from '../app/components';
 
@@ -31,7 +30,7 @@ type States = {
   password: string,
 }
 
-class Login extends React.Component {
+class LoginCore extends React.Component {
   props: Props;
   state: States = {
     userName: '',
@@ -63,6 +62,7 @@ class Login extends React.Component {
 
   render() {
     const { intl, isLoggingIn, isLoggedIn, location, loginReason } = this.props;
+
     const userNameLink = VLink.state(this, 'userName')
       .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
     const passwordLink = VLink.state(this, 'password')
@@ -134,15 +134,13 @@ class Login extends React.Component {
   }
 }
 
-export default compose(
-  connect(
-    (state: State) => ({
-      appLoaderVisible: state.app.appLoaderVisible,
-      loginReason: state.auth.loginReason,
-      isLoggedIn: state.auth.loggedIn,
-      isLoggingIn: state.auth.loggingIn,
-    }),
-    { login, hideAppLoader },
-  ),
-  injectIntl,
+const Login = injectIntl(LoginCore);
+export default connect(
+  (state: State) => ({
+    appLoaderVisible: state.app.appLoaderVisible,
+    loginReason: state.auth.loginReason,
+    isLoggedIn: state.auth.loggedIn,
+    isLoggingIn: state.auth.loggingIn,
+  }),
+  { login, hideAppLoader },
 )(Login);

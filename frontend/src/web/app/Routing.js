@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 
 import { PrivateRoute } from '../../common/app/components';
 import { Login } from '../auth';
@@ -8,10 +8,8 @@ import {
   ForgotPassword, ResetPassword,
   ForgotUsername, Signup, SignupStep2,
 } from '../../../components/auth';
-import AccountInfo from '../../../components/account-info';
 
-import AppRootV1, {
-  App as AppV1,
+import {
   liveMonitoringApp,
   FilesMonitoringApp,
   FilesDetectionMonitoringApp,
@@ -23,30 +21,6 @@ import AppRootV1, {
 } from '../../../root';
 
 import withRouteApp from './withRouteApp';
-
-import {
-  Cloud,
-  InsightReport, EventSummary, ExecutiveDashboard, HistoricalReport,
-  IncidentAnalysis, BehaviorChangeDetection, OutlierDetection, RolloutCheck,
-  SummaryReport, AppForecast,
-} from '../../../components/cloud';
-import { Log, IncidentLogAnalysis } from '../../../components/log';
-import {
-  Settings,
-  ThresholdSettingsOld, DataDisqualifiersSettings, AlertSensitivitySettings,
-  DataSharingSettings, GroupingSettings, ThresholdSettings, LogAnalysisSettings,
-  ExtSvc, Projects,
-} from '../../../components/settings';
-
-import {
-  UseCase,
-  ListAll, Search, Explore,
-} from '../../../components/usecase';
-import {
-  FileTabs, FileNewModel, FileDetection, FileUpdateModel,
-  FileDisplayModel, FileUpload,
-} from '../../../components/filetabs';
-
 import RoutingNextV1 from './RoutingNextV1';
 
 const liveMonitoringAppV1 = withRouteApp(liveMonitoringApp);
@@ -58,9 +32,48 @@ const incidentLogAnalysisAppV1 = withRouteApp(incidentLogAnalysisApp);
 const useCaseAppV1 = withRouteApp(useCaseApp);
 const ExecutiveDashboardAppV1 = withRouteApp(ExecutiveDashboardApp);
 
-const RoutingV1 = () => (<AppRootV1 />);
+const PrivateRouting = () => (
+  <Switch>
+    <Route path="/help" component={Help} />
 
-const RoutingNext = () => (
+    <Route
+      path="/liveMonitoring"
+      render={() => React.createElement(liveMonitoringAppV1)}
+    />
+    <Route
+      path="/filesMonitoring"
+      render={() => React.createElement(FilesMonitoringAppV1)}
+    />
+    <Route
+      path="/filesdetectionMonitoring"
+      render={() => React.createElement(FilesDetectionMonitoringAppV1)}
+    />
+    <Route
+      path="/projectDataOnly"
+      render={() => React.createElement(projectDataOnlyAppV1)}
+    />
+    <Route
+      path="/incidentAnalysis"
+      render={() => React.createElement(incidentAnalysisAppV1)}
+    />
+    <Route
+      path="/incidentLogAnalysis"
+      render={() => React.createElement(incidentLogAnalysisAppV1)}
+    />
+    <Route
+      path="/useCaseDetails"
+      render={() => React.createElement(useCaseAppV1)}
+    />
+    <Route
+      path="/executiveDashboard"
+      render={() => React.createElement(ExecutiveDashboardAppV1)}
+    />
+
+    <Route component={RoutingNextV1} />
+  </Switch>
+);
+
+const Routing = () => (
   <BrowserRouter>
     <Switch>
       <Route path="/login" component={Login} />
@@ -69,49 +82,9 @@ const RoutingNext = () => (
       <Route path="/signup" component={Signup} />
       <Route path="/signup2" component={SignupStep2} />
       <Route path="/resetPassword" component={ResetPassword} />
-
-      <PrivateRoute path="/help" component={Help} />
-
-      <PrivateRoute
-        path="/liveMonitoring"
-        render={() => React.createElement(liveMonitoringAppV1)}
-      />
-      <PrivateRoute
-        path="/filesMonitoring"
-        render={() => React.createElement(FilesMonitoringAppV1)}
-      />
-      <PrivateRoute
-        path="/filesdetectionMonitoring"
-        render={() => React.createElement(FilesDetectionMonitoringAppV1)}
-      />
-      <PrivateRoute
-        path="/projectDataOnly"
-        render={() => React.createElement(projectDataOnlyAppV1)}
-      />
-      <PrivateRoute
-        path="/incidentAnalysis"
-        render={() => React.createElement(incidentAnalysisAppV1)}
-      />
-      <PrivateRoute
-        path="/incidentLogAnalysis"
-        render={() => React.createElement(incidentLogAnalysisAppV1)}
-      />
-      <PrivateRoute
-        path="/useCaseDetails"
-        render={() => React.createElement(useCaseAppV1)}
-      />
-      <PrivateRoute
-        path="/executiveDashboard"
-        render={() => React.createElement(ExecutiveDashboardAppV1)}
-      />
-
-      <PrivateRoute component={RoutingNextV1} />
+      <PrivateRoute component={PrivateRouting} />
     </Switch>
   </BrowserRouter>
 );
-
-// TODO: v1 <=> next
-// const Routing = RoutingV1;
-const Routing = RoutingNext;
 
 export default Routing;

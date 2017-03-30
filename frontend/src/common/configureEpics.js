@@ -1,7 +1,7 @@
 import 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { epics as appEpics } from './app/actions';
-import { epics as authEpics } from './auth/actions';
+import appEpics from './app/epics';
+import authEpics from './auth/epics';
 import bindCredentials from '../common/apis/bindCredentials';
 
 const epics = [

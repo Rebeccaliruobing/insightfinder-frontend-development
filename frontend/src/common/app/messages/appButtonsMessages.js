@@ -2,11 +2,11 @@
 
 import { defineMessages } from 'react-intl';
 
-const buttonsMessages = defineMessages({
+const appButtonsMessages = defineMessages({
   refresh: {
     defaultMessage: 'Refresh',
     id: 'app.buttons.refresh',
   },
 });
 
-export default buttonsMessages;
+export default appButtonsMessages;

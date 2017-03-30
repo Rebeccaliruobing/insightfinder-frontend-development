@@ -9,6 +9,11 @@ export type Message = {
   defaultMessage: string,
 };
 
+export type ErrorMessage = {
+  message: ?Message,
+  error: ?Error,
+};
+
 export type Credentials = {
   userName: string,
   token: string,
@@ -25,10 +30,9 @@ export type AppState = {
   rehydrated: bool,
   starting: bool,
   started: bool,
+  inited: bool,
   appLoaderVisible: boolean,
-  fatalError: ?Error,
-  error: ?Error,
-  lastError: ?Error,
+  fatalError: ?ErrorMessage,
 };
 
 export type AuthState = {
@@ -56,8 +60,7 @@ export type Action =
   | { type: 'SET_INIT_DATA'; payload: Object }
   | { type: 'SHOW_APPLOADER' }
   | { type: 'HIDE_APPLOADER' }
-  | { type: 'APP_FATAL_ERROR'; payload: { error: Error } }
-  | { type: 'APP_ERROR'; payload: { error: Error } }
+  | { type: 'APP_FATAL_ERROR'; payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGIN'; payload: { userName: string, password: string } }
   | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE'; payload: { message: ?Message, error: ?Error } }

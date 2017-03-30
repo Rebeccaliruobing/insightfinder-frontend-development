@@ -35,7 +35,7 @@ const authMessages = defineMessages({
     id: 'auth.errors.passwordRequired',
   },
   errorsLoginFailure: {
-    defaultMessage: 'Cannot login please try again',
+    defaultMessage: 'Cannot login, please check the network and try again',
     id: 'auth.errors.loginFailure',
   },
   errorsWrongCredential: {
