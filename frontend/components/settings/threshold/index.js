@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import store from 'store';
 import _ from 'lodash';
 import { Console, Button, Dropdown } from '../../../artui/react/index';
@@ -806,13 +808,20 @@ export default class ThresholdSettings extends React.Component {
                       <th>Alert Threshold</th>
                       <th>No Alert Threshold</th>
                       <th style={{ textAlign: 'center' }}>
-                        <span>
-                          <input
-                            type='checkbox' checked={metricSettingKpiAllChecked}
-                            onChange={this.handleMetricSettingKpiAllChecked}
-                          />
-                          <span>KPI</span>
-                        </span>
+                        <OverlayTrigger
+                          placement="top" delayShow={300}
+                          overlay={
+                            <Tooltip>{metricSettingKpiAllChecked ? 'Deselect All' : 'Select All'}</Tooltip>
+                          }
+                        >
+                          <span>
+                            <input
+                              type='checkbox' checked={metricSettingKpiAllChecked}
+                              onChange={this.handleMetricSettingKpiAllChecked}
+                            />
+                            <span>KPI</span>
+                          </span>
+                        </OverlayTrigger>
                       </th>
                       <th>Custom Metric</th>
                     </tr>

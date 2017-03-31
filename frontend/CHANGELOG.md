@@ -5,6 +5,7 @@
 
 ### Fixed
 - Fix component recreate issue caused by HOC component.
+- Add tooltip for KPI all checkbox in project threshold setting.
 
 ## 2017-03-29
 ### Added
