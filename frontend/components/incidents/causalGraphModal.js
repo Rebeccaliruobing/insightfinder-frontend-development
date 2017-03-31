@@ -54,8 +54,9 @@ class CausalGraphModal extends React.Component {
       relationProbability: 0.6,
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
-      currentZoom: 10,
+      currentZoom: 5,
       showMetrics: true,
+      mergeMetrics: true,
     };
   }
 
@@ -75,32 +76,6 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
-  getTopestWeights(relations) {
-    // Get the topest weight based on percent.
-    const total = relations.length;
-    const weights = this.weightMapper(relations);
-
-    const vstrong = [];
-    const strong = [];
-
-    let count = 0;
-    for (let i = 0; i < weights.length; i += 1) {
-      count += R.filter(R.propEq('weight', weights[i]), relations).length;
-      if (count / total < 0.2) {
-        vstrong.push(weights[i]);
-      }
-      if (count / total < 0.55) {
-        strong.push(weights[i]);
-      }
-    }
-    if (weights.length > 1 && vstrong.length === 0) {
-      vstrong.push(weights[0]);
-    }
-
-    return [strong, vstrong];
-  }
-
-  @autobind
   renderGraph() {
     this.cleanChart();
 
@@ -114,9 +89,9 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 20 + (currentZoom * 20),
-      nodesep: 20 + (currentZoom * 8),
-      edgesep: 10 + (currentZoom * 2),
+      ranksep: 20 + (currentZoom * 40),
+      nodesep: 20 + (currentZoom * 16),
+      edgesep: 10 + (currentZoom * 4),
       marginx: 20, marginy: 20,
     });
 
@@ -231,146 +206,6 @@ class CausalGraphModal extends React.Component {
   }
 
   @autobind
-  renderGraph1() {
-    this.cleanChart();
-
-    const { metaDataKPIs, metricShortNames } = this.state;
-    const { relations, correlations, metricNameMap, kpis } = this.state;
-    const { activeTab, relationProbability, correlationProbability } = this.state;
-
-    const showRelations = activeTab === 'relation';
-    const filterCount = showRelations ? relationProbability : correlationProbability;
-
-    const srcProp = showRelations ? o => o.src : o => o.elem1;
-    const targetProp = showRelations ? o => o.target : o => o.elem2;
-
-    // Filter the relations based on the selected range
-    let rels = showRelations ? relations : correlations;
-    const weightFilter = R.filter(r => (r.weight >= filterCount));
-    rels = weightFilter(rels) || [];
-
-    const g = new dagre.graphlib.Graph({ multigraph: true });
-
-    // Change graph layout
-    g.setGraph({
-      rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 100, nodesep: 50, edgesep: 10, marginx: 20, marginy: 20,
-    });
-
-    const addNodes = (g, rels, fsrc, ftarget, existNames) => {
-      const names = R.uniq(R.concat(
-        R.map(fsrc, rels), R.map(ftarget, rels),
-      ));
-      R.forEach((name) => {
-        if (!R.find(n => n === name)(existNames)) {
-          g.setNode(name, {
-            title: name, label: chopString(name, 30), name, width: -8, height: -8,
-            shape: 'circle',
-          });
-        }
-      }, names);
-
-      return names;
-    };
-
-    addNodes(g, rels, srcProp, targetProp, []);
-
-    const getWeightClass = (weight, strong, vstrong) => {
-      if (R.indexOf(weight, vstrong) >= 0) {
-        return 'very-strong';
-      } else if (R.indexOf(weight, strong) >= 0) {
-        return 'strong';
-      }
-      return '';
-    };
-
-    const getLabel = (data, detail = false) => {
-      const { labelObj } = data;
-      if (labelObj) {
-        let texts = [];
-        if (data.probability) {
-          texts.push(`<div>Probability: ${(data.probability * 100).toFixed(1)}%</div>`);
-        }
-        if (detail) {
-          R.forEachObjIndexed((val, key) => {
-            const name = key.split(',').slice(-2).join(', ');
-            texts.push(`(${name}), ${val}`);
-          }, labelObj);
-        } else {
-          const ms = [];
-          R.forEachObjIndexed((val, key) => {
-            let [src, target] = key.split(',').slice(-2);
-            src = metricNameMap[src] || src;
-            target = metricNameMap[target] || target;
-            const srcIsKpi = !!(R.find(s => s === src, kpis));
-            const targetIsKpi = !!(R.find(s => s === target, kpis));
-
-            let metric = R.find(m => m.src === src && m.target === target, ms);
-            if (!metric) {
-              metric = { src, target, count: parseInt(val, 10), srcIsKpi, targetIsKpi };
-              ms.push(metric);
-            } else {
-              metric.count += parseInt(val, 10);
-            }
-          }, labelObj);
-          const labelText = R.map(
-            m => `<div>(<span class="${m.srcIsKpi ? 'kpi' : ''}">${m.src}</span>, <span class="${m.targetIsKpi ? 'kpi' : ''}">${m.target}</span>)`,
-            ms,
-          );
-          texts = texts.concat(labelText);
-        }
-        return texts.join('\n');
-      }
-      return 'N/A';
-    };
-
-    // Create edges for relations
-    const addEdges = (g, rels, fsrc, ftarget, type) => {
-      const [strong, vstrong] = this.getTopestWeights(rels);
-      R.forEach((rel) => {
-        const { weight } = rel;
-        const src = fsrc(rel);
-        const target = ftarget(rel);
-        if (src === target) {
-          console.warn(`Self link:${src} => ${target}`);
-        } else {
-          const meta = {
-            label: getLabel(rel),
-            labelType: 'html',
-            class: `${type} ${getWeightClass(weight, strong, vstrong)}`,
-            arrowhead: type === 'relation' ? 'vee' : 'double',
-            weight,
-            labelpos: 'l',
-            data: rel,
-            labeloffset: 0,
-          };
-          g.setEdge(src, target, meta, type);
-        }
-      }, rels);
-    };
-    addEdges(g, rels, srcProp, targetProp, activeTab);
-
-    const svg = d3.select(this.container).append('svg');
-    const inner = svg.append('g');
-    const render = dagreD3.render();
-    render(inner, g);
-
-    // Add title for node
-    svg.selectAll('.node')
-      .append('svg:title').text(d => g.node(d).name);
-
-    // Change node fill.
-    svg.selectAll('.node circle').attr({
-      fill: '#1976d2',
-    });
-
-    let { width, height } = g.graph();
-    width = width <= 0 ? 10 : width;
-    height = height <= 0 ? 10 : height;
-    svg.attr({ width, height });
-  }
-
-  @autobind
   retrieveData(props) {
     const { projectName, loadGroup, instanceGroup, endTime, numberOfDays } = props;
 
@@ -477,8 +312,12 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getMetricShortNames(name) {
-    const { metricShortNames } = this.state;
-    return metricShortNames[name] || name;
+    const { mergeMetrics, metricShortNames } = this.state;
+    if (mergeMetrics) {
+      return metricShortNames[name] || name;
+    }
+
+    return name;
   }
 
   @autobind
@@ -562,22 +401,36 @@ class CausalGraphModal extends React.Component {
     const relations = [];
     R.forEachObjIndexed((sval, servers) => {
       if (_.isObject(sval)) {
+        const snames = servers.split(',');
+        const lname = snames[0];
+        const rname = snames[1];
+        const llabels = {};
+        const rlables = [];
         R.forEachObjIndexed((mval, metrics) => {
           if (mval && _.has(mval, kpiPredictionProbability)) {
-            const snames = servers.split(',');
             const mnames = metrics.split(',');
             const metric = mnames[0];
-
-            // For the kpi predictions, the right label is always kpi metric.
-            relations.push({
-              left: snames[0],
-              right: snames[1],
-              label: `> ${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`,
-              leftLabel: `${mnames[0]}`,
-              rightLabel: [[mnames[1], true]],
-            });
+            const mergedMetric = this.getMetricShortNames(metric);
+            const kpi = this.getMetricShortNames(mnames[1]);
+            const value = `${mval[kpiPredictionProbability]} ${metricUnits[metric] || ''}`;
+            if (llabels[mergedMetric]) {
+              llabels[mergedMetric].push(value);
+            } else {
+              llabels[mergedMetric] = [value];
+            }
+            rlables.push(kpi);
           }
         }, sval);
+        // For the kpi predictions, the right label is always kpi metric.
+        if (R.keys(llabels).length > 0) {
+          relations.push({
+            left: lname,
+            right: rname,
+            label: '',
+            leftLabel: R.keys(llabels).map(k => [`${k} > ${llabels[k].join(';')}`, false]),
+            rightLabel: R.uniq(rlables).map(l => [l, true]),
+          });
+        }
       }
     }, kpiPredictions || {});
 
@@ -624,13 +477,22 @@ class CausalGraphModal extends React.Component {
     });
   }
 
+  @autobind
+  setMergeMetrics(e) {
+    this.setState({
+      mergeMetrics: e.target.checked,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
     ], this.props);
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
-      correlationProbability, kpiPredictionProbability, showMetrics,
+      correlationProbability, kpiPredictionProbability, showMetrics, mergeMetrics,
       metaDataKpiUnits, metricUnits,
     } = this.state;
 
@@ -789,6 +651,13 @@ class CausalGraphModal extends React.Component {
                 onChange={this.setShowMetrics}
               />
               <label>Show Metrics</label>
+            </div>
+            <div className="ui checkbox">
+              <input
+                type="checkbox" tabIndex="0" checked={mergeMetrics}
+                onChange={this.setMergeMetrics}
+              />
+              <label>Merge Similar Metrics</label>
             </div>
             <div>
               <i className="minus icon" onClick={this.zoomOut} />

@@ -69,6 +69,7 @@ const appStart$ = (action$: any, getState: Function) => {
   let valid = isValidCredentials(credentials);
 
   if (!valid) {
+    // TODO: [v1.0] Remove store dependence after all api migrated.
     // Get credentials and userinfo from store
     const userName = store.get('userName');
     const token = store.get('token');
@@ -82,12 +83,12 @@ const appStart$ = (action$: any, getState: Function) => {
     store.set('userInfo', userInfo);
   }
 
-  // If token not exists, return login failure action with error message.
+  // If token not exists, return login failure action without reason.
   if (!valid) {
     return Observable.of(loginFailure(), appStarted());
   }
 
-  // Otherwise, verify the token is still valid.
+  // Otherwise, load the initial data and verify the token is still valid.
   return Observable
     .from(retrieveInitData(credentials))
     .switchMap(d => Observable.of(
