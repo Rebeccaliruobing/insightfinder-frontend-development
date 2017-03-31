@@ -15,11 +15,6 @@ const loginEpic = (action$: any) =>
       Observable
         .from(loginApi(action.payload))
         .concatMap((d) => {
-          // TODO: [Deprecated 1.0] Remove store dependence
-          store.set('token', d.credentials.token);
-          store.set('userName', d.credentials.userName);
-          store.set('userInfo', d.userInfo);
-
           return Observable.concat(
             Observable.of(
               showAppLoader(),
