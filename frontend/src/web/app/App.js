@@ -15,6 +15,7 @@ import * as themes from './themes';
 import './app.scss';
 
 type Props = {
+  history: Object,
   appStarted: bool,
   appLoaderVisible: bool,
   messages: Object,
@@ -57,7 +58,7 @@ export class AppCore extends React.Component {
   }
 
   render() {
-    const { currentLocale, currentTheme, appStarted, messages,
+    const { history, currentLocale, currentTheme, appStarted, messages,
       appLoaderVisible, appFatalError } = this.props;
 
     const { message, error } = appFatalError || {};
@@ -78,7 +79,7 @@ export class AppCore extends React.Component {
               />
               <AppFatalError message={message} error={error} />
               <AppLoader visible={appLoaderVisible} />
-              {appStarted && <Routing />}
+              {appStarted && <Routing history={history} />}
             </Container>
           </Measure>
         </ThemeProvider>

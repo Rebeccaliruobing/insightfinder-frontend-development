@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
-
+import { Switch, Route } from 'react-router-dom';
+import { ConnectedRouter as Router } from 'react-router-redux';
 import { PrivateRoute } from '../../common/app/components';
 import { Login } from '../auth';
 import { Help } from '../help';
@@ -73,8 +73,12 @@ const PrivateRouting = () => (
   </Switch>
 );
 
-const Routing = () => (
-  <BrowserRouter>
+type Props = {
+  history: Object,
+};
+
+const Routing = ({ history }: Props) => (
+  <Router history={history}>
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/forgotPassword" component={ForgotPassword} />
@@ -84,7 +88,7 @@ const Routing = () => (
       <Route path="/resetPassword" component={ResetPassword} />
       <PrivateRoute component={PrivateRouting} />
     </Switch>
-  </BrowserRouter>
+  </Router>
 );
 
 export default Routing;

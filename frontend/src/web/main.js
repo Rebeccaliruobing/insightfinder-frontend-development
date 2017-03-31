@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import localforage from 'localforage';
+import createHistory from 'history/createBrowserHistory';
 
 import getBrowserLocale from '../common/getBrowserLocale';
 import configureStore from '../common/configureStore';
 import AppRoot from './app/Root';
+
+const history = createHistory();
 
 const createInitialState = () => {
   // Merge server states with default web states as the initial states.
@@ -35,13 +38,14 @@ const store = configureStore({
   initialState: createInitialState(),
   platformDeps: {
     storageEngine: localforage,
+    history,
   },
 });
 
 const render = (Component) => {
   ReactDOM.render((
     <AppContainer>
-      <Component store={store} />
+      <Component store={store} history={history} />
     </AppContainer>
   ), document.getElementById('app'));
 };
