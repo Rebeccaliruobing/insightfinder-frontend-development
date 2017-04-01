@@ -1,7 +1,7 @@
 ## 2017-04-01
 ### Added
 - Add locale support for topbar menu.
-- 
+- Add model download in project settings.
 
 ### Fixed
 

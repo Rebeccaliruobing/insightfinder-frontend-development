@@ -1,11 +1,14 @@
 import React from 'react';
 import cx from 'classnames';
+import $ from 'jquery';
 import { autobind } from 'core-decorators';
 import get from 'lodash/get';
+import store from 'store';
 import moment from 'moment';
-import { Box, Tile, Heatmap } from '../../../src/lib/fui/react';
 import { Tooltip } from 'pui-react-tooltip';
 import { OverlayTrigger } from 'pui-react-overlay-trigger';
+import { Box, Tile, Heatmap } from '../../../src/lib/fui/react';
+import getEndpoint from '../../../apis/get-endpoint';
 
 type Props = {
   projectName: string,
@@ -70,13 +73,13 @@ class ModelTile extends React.Component {
   }
 
   render() {
-    const { model, big, picked } = this.props;
+    const { model, big, picked, projectName, instanceGroup } = this.props;
     const count = 32;
     const size = count * (big ? 6 : 5);
     const dataset = this.normalizeHeatmapDataset();
     const { startTimestamp, endTimestamp,
       pickableFlag: pickable, sampleCount,
-      metricNameList, maxValues, minValues } = model;
+      metricNameList, maxValues, minValues, modelKey } = model;
     let { fileUrl } = model;
     const startTime = moment(startTimestamp).format('MM/DD HH:mm');
     const endTime = moment(endTimestamp).format('MM/DD HH:mm');
@@ -84,8 +87,19 @@ class ModelTile extends React.Component {
     const maxs = JSON.parse(maxValues || '[]');
     const mins = JSON.parse(minValues || '[]');
 
-    fileUrl = 'https://insightfinder.com/wp-content/uploads/2016/01/iStock_000021981766_s-reduced.jpg?3f50eb';
-    fileUrl += `&t=${moment().valueOf()}`;
+    const modelKeyObj = {
+      startTimestamp, endTimestamp, modelKey,
+    };
+    const userName = store.get('userName');
+    const token = store.get('token');
+    const param = $.param({
+      projectName, instanceGroup,
+      userName, token,
+      modelKeyObj: JSON.stringify(modelKeyObj),
+      operation: 'download',
+    });
+
+    fileUrl = `${getEndpoint('modelPicking')}?${param}`;
 
     return (
       <Tile className={cx('model-tile', { big, picked })}>
