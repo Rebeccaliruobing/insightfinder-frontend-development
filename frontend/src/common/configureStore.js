@@ -16,7 +16,7 @@ const configureStore = (options: Options) => {
   const { initialState, platformDeps } = options;
 
   const rootReducer = configureReducer();
-  const middlewares = configureMiddleware();
+  const middlewares = configureMiddleware(platformDeps);
 
   // Use redux devtools, need to install browser extension
   // https://github.com/zalmoxisus/redux-devtools-extension

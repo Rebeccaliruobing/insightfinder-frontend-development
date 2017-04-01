@@ -1,4 +1,5 @@
 /* @flow */
+/* eslint-disable no-console */
 import { REHYDRATE } from 'redux-persist/constants';
 import R from 'ramda';
 import type { AppState, Action } from '../types';
@@ -25,6 +26,7 @@ const initialState = {
   rehydrated: false,
   starting: false,
   started: false,
+  inited: false,
   fatalError: null,
   error: null,
   lastError: null,
@@ -76,6 +78,11 @@ const reducer = (
       starting: false,
       started: true,
     };
+  } else if (action.type === 'SET_INIT_DATA') {
+    return {
+      ...state,
+      inited: true,
+    };
   } else if (action.type === 'APP_STOP') {
     return {
       ...state,
@@ -92,16 +99,13 @@ const reducer = (
       appLoaderVisible: false,
     };
   } else if (action.type === 'APP_FATAL_ERROR') {
+    if (action.payload.error) {
+      console.error(action.payload.error);
+    }
     return {
       ...state,
-      fatalError: action.payload.error,
-      lastError: action.payload.error,
-    };
-  } else if (action.type === 'APP_ERROR') {
-    return {
-      ...state,
-      error: action.payload.error,
-      lastError: action.payload.error,
+      appLoaderVisible: false,
+      fatalError: action.payload,
     };
   }
   return { ...initialState, ...state };

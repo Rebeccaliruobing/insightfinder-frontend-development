@@ -5,6 +5,10 @@ export default [
     "defaultMessage": "刷新",
   },
   {
+    "id": "app.errors.server",
+    "defaultMessage": "Sorry, we've had a server error, Please try again.",
+  },
+  {
     "id": "app.fields.password",
     "defaultMessage": "密码",
   },

@@ -6,7 +6,7 @@ import { injectIntl } from 'react-intl';
 import type { State } from '../../../common/types';
 import { Container } from '../../../lib/fui/react';
 import Topbar from './Topbar';
-import menusMesssages from '../../../common/app/menusMesssages';
+import { appMenusMessages } from '../../../common/app/messages';
 
 type Props = {
   className: string,
@@ -24,22 +24,22 @@ const SinglePage = ({ className, userInfo, intl, children }: Props) => {
       <Topbar>
         <div className="ui menu">
           <NavLink to="/cloud" className="item">
-            {intl.formatMessage(menusMesssages.dashboard)}
+            {intl.formatMessage(appMenusMessages.dashboard)}
           </NavLink>
           <NavLink to="/log" className="item">
-            {intl.formatMessage(menusMesssages.logAnalysis)}
+            {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
           <NavLink to="/settings" className="item">
-            {intl.formatMessage(menusMesssages.settings)}
+            {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
           <NavLink to="/usecase" className="item">
-            {intl.formatMessage(menusMesssages.bugRepository)}
+            {intl.formatMessage(appMenusMessages.bugRepository)}
           </NavLink>
           {isAdmin && <NavLink to="/filetabs" className="item">
-            {intl.formatMessage(menusMesssages.fileAnalysis)}
+            {intl.formatMessage(appMenusMessages.fileAnalysis)}
           </NavLink>}
           <NavLink to="/help" className="item">
-            {intl.formatMessage(menusMesssages.help)}
+            {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
           <div className="right menu">
             <Link to="/account-info" className="user item">

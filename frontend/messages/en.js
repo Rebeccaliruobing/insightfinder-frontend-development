@@ -5,6 +5,10 @@ export default [
     "defaultMessage": "Refresh",
   },
   {
+    "id": "app.errors.server",
+    "defaultMessage": "Sorry, we've had a server error, Please refresh and try again.",
+  },
+  {
     "id": "app.fields.password",
     "defaultMessage": "password",
   },
@@ -46,7 +50,7 @@ export default [
   },
   {
     "id": "auth.errors.loginFailure",
-    "defaultMessage": "Cannot login please try again",
+    "defaultMessage": "Cannot login, please check the network and try again",
   },
   {
     "id": "auth.errors.passwordRequired",

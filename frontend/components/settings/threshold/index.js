@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
-import {autobind} from 'core-decorators';
-import _ from 'lodash';
-import {Console, ButtonGroup, Button, Dropdown, Accordion, Message, Alert} from '../../../artui/react/index';
+import { autobind } from 'core-decorators';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import store from 'store';
-import WaringButton from '../../cloud/monitoring/waringButton';
+import _ from 'lodash';
+import { Console, Button, Dropdown } from '../../../artui/react/index';
 import ModelSettings from './model';
-
 import './threshold.less';
 import apis from '../../../apis';
 
@@ -77,6 +77,7 @@ export default class ThresholdSettings extends React.Component {
       groupingRules: [],
       instanceGroup: '',
       instanceGroups: [],
+      metricSettingKpiAllChecked: false,
     };
 
     this.matchOpMap = {};
@@ -380,22 +381,38 @@ export default class ThresholdSettings extends React.Component {
 
   handleMetricSetting(index, name) {
     return (e) => {
-      let metricSettings = this.state.metricSettings;
+      const metricSettings = this.state.metricSettings;
       metricSettings[index][name] = e.target.value;
       this.setState({ metricSettings });
-    }
-  }  
+    };
+  }
 
+  @autobind
   handleMetricSettingChecked(index, name) {
     return (e) => {
-        let metricSettings = this.state.metricSettings;
-        if (e.target.checked) {
-            metricSettings[index][name] = "on";
-        } else {
-            metricSettings[index][name] = undefined;
-        }
-        this.setState({ metricSettings });
-    }
+      const metricSettings = this.state.metricSettings;
+      if (e.target.checked) {
+        metricSettings[index][name] = 'on';
+      } else {
+        metricSettings[index][name] = undefined;
+      }
+      this.setState({ metricSettings });
+    };
+  }
+
+  @autobind
+  handleMetricSettingKpiAllChecked(e) {
+    const { metricSettings } = this.state;
+    const checked = e.target.checked;
+
+    metricSettings.forEach((m) => {
+      m.isKPI = checked ? 'on' : undefined;
+    });
+
+    this.setState({
+      metricSettingKpiAllChecked: checked,
+      metricSettings,
+    });
   }
 
   getEpisodeIndexNumber(index, e) {
@@ -527,17 +544,17 @@ export default class ThresholdSettings extends React.Component {
     let {
       data, tempSharedUsernames, tempLearningSkippingPeriod, tempDetectionSkippingPeriod, tempLogFreqWindow,
       loading, metricSettings, episodeList, wordList, indexLoading, tabStates, tabStates0,
-      groupingRules, instanceGroup, instanceGroups,
+      groupingRules, instanceGroup, instanceGroups, metricSettingKpiAllChecked,
     } = this.state;
     let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo, projectSettingsAllInfo, projectString,metricUnitMapping } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info)=>info.projectName == data.projectName);
-    let projectSetting = projectSettingsAllInfo.find((info)=>info.projectName == data.projectName);
+    let { projectModelAllInfo, projectSettingsAllInfo, projectString, metricUnitMapping } = dashboardUservalues;
+    let project = projectModelAllInfo.find((info) => info.projectName == data.projectName);
+    let projectSetting = projectSettingsAllInfo.find((info) => info.projectName == data.projectName);
     let isLogProject = (projectSetting != undefined && projectSetting['fileProjectType'] == 0);
     const projectName = data.projectName;
 
     let metricUnitMap = {};
-    if(metricUnitMapping){
+    if (metricUnitMapping) {
       $.parseJSON(metricUnitMapping).map(function (item, index) {
         metricUnitMap[item.metric] = item.unit;
       });
@@ -579,259 +596,275 @@ export default class ThresholdSettings extends React.Component {
           <div className="ui vertical segment">
             <div className="ui pointing secondary menu">
               {isLogProject && <a className={tabStates0['episodeword'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'episodeword')}>Episode and Word Selection</a>}
+                onClick={(e) => this.selectTab0(e, 'episodeword')}>Episode and Word Selection</a>}
               {isLogProject && <a className={tabStates0['logthreshold'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'logthreshold')}>Sensitivity Settings</a>}
+                onClick={(e) => this.selectTab0(e, 'logthreshold')}>Sensitivity Settings</a>}
               {!isLogProject && <a className={tabStates0['learning'] + ' item'}
-                                   onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
+                onClick={(e) => this.selectTab0(e, 'learning')}>Data Disqualifiers</a>}
               {!isLogProject && <a className={tabStates0['alert'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
+                onClick={(e) => this.selectTab0(e, 'alert')}>Alert Sensitivity</a>}
               {!isLogProject && <a className={tabStates0['prediction'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
-              {['admin','guest'].indexOf(store.get('userName'))!=-1 && 
-                                    !isLogProject && <a className={tabStates0['model'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'model')}>Model Picking</a>}
-              <a className={tabStates0['sharing'] + ' item'} 
-                                    onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
+                onClick={(e) => this.selectTab0(e, 'prediction')}>Prediction</a>}
+              {['admin', 'guest'].indexOf(store.get('userName')) != -1 &&
+                !isLogProject && <a className={tabStates0['model'] + ' item'}
+                  onClick={(e) => this.selectTab0(e, 'model')}>Model Picking</a>}
+              <a className={tabStates0['sharing'] + ' item'}
+                onClick={(e) => this.selectTab0(e, 'sharing')}>Project Sharing</a>
               {!isLogProject && <a className={tabStates0['grouping'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
+                onClick={(e) => this.selectTab0(e, 'grouping')}>Grouping</a>}
               {!isLogProject && <a className={tabStates0['threshold'] + ' item'}
-                                    onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
+                onClick={(e) => this.selectTab0(e, 'threshold')}>Threshold Overrides</a>}
             </div>
             <div className={`ui grid two columns form ${!!this.state.settingLoading ? 'loading' : ''}`}
-                 style={{ 'paddingTop': '10px', margin: 0 }}>
+              style={{ 'paddingTop': '10px', margin: 0 }}>
               {!isLogProject && <div className={tabStates0['prediction'] + ' ui tab'}>
                 <div className="field">
                   <label style={labelStyle}>Prediction Time Window (Hour)</label>
                   <PredictionWindowHour
-                    style={{width: 180}}
-                    key={data.projectName} value={data.predictionWindow} 
+                    style={{ width: 180 }}
+                    key={data.projectName} value={data.predictionWindow}
                     onChange={this.handleValueChange('predictionWindow')} />
                 </div>
                 <Button className="blue"
-                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+                  onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
               </div>}
               {isLogProject && <div className={tabStates0['logthreshold'] + ' ui tab'}>
                 <h3>Clustering Sensitivity</h3>
                 <p>
-                  This setting controls the sensitivity with which  
-                  InsightFinder will cluster logs and detect anomalous 
-                  logs. With higher sensitivity, system detects more anomalies. 
+                  This setting controls the sensitivity with which
+                  InsightFinder will cluster logs and detect anomalous
+                  logs. With higher sensitivity, system detects more anomalies.
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThresholdSensitivity
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.pvalue} text={data.pvalueText}
                     onChange={this.handleValueTextChange('pvalue', 'pvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.cvalue}
                     onChange={this.handleValueChange('cvalue')} />
                 </div>
                 <h3>Frequency Anomaly Detection Settings</h3>
                 <p>
-                  Sensitivity: This setting controls sensitivity InsightFinder will 
-                  alert on frequency anomaly in given a time window. 
-                  With higher sensitivity, system detects more anomalies. 
+                  Sensitivity: This setting controls sensitivity InsightFinder will
+                  alert on frequency anomaly in given a time window.
+                  With higher sensitivity, system detects more anomalies.
                 </p>
                 <div className="field">
                   <AnomalyThresholdSensitivity
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.derivedpvalue} text={data.derivedpvalueText}
                     onChange={this.handleValueTextChange('derivedpvalue', 'derivedpvalueText')} />
                 </div>
                 <p>
-                  Window (minute): This setting controls window in minutes by which frequency are grouped. 
+                  Window (minute): This setting controls window in minutes by which frequency are grouped.
                 </p>
                 <div className="field">
                   <div className="ui input"
-                      style={{width: 180}}>
+                    style={{ width: 180 }}>
                     <input type="text"
                       value={tempLogFreqWindow}
-                      onChange={this.handleLogFreqWindowChange.bind(this)}/>
+                      onChange={this.handleLogFreqWindowChange.bind(this)} />
                   </div>
                 </div>
                 <Button className="blue"
-                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+                  onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
               </div>}
               {!isLogProject && <div className={tabStates0['learning'] + ' ui tab'}>
                 <h3>Time-Based Exclusions</h3>
-								<p>
-									As InsightFinder continuously learns about your 
+                <p>
+                  As InsightFinder continuously learns about your
 									environment, you will identify times that reflect
-									invalid data that should <i>not</i> be used to 
-									identify performance baselines for your systems. 
+									invalid data that should <i>not</i> be used to
+									identify performance baselines for your systems.
 									These periods may include service windows, scheduled
 									or unscheduled downtime, etc.
 								</p>
-								<p>
-									You may specify your timeframe here as either a 
+                <p>
+                  You may specify your timeframe here as either a
 									one-time or recurring period.  Examples include:
 								</p>
-								<ul>
-									<li>Recurring: Every Sunday</li>
-									<li>Recurring: Every Saturday 00:00-01:00 GMT</li>
-									<li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
-								</ul>
-								<p>
-									If you need assistance or have questions, please contact
+                <ul>
+                  <li>Recurring: Every Sunday</li>
+                  <li>Recurring: Every Saturday 00:00-01:00 GMT</li>
+                  <li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
+                </ul>
+                <p>
+                  If you need assistance or have questions, please contact
 									us at support@insightfinder.com.
 								</p>
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
-                           value={tempLearningSkippingPeriod}
-                           onChange={this.handleLearningSkippingPeriodChange.bind(this)}/>
+                      value={tempLearningSkippingPeriod}
+                      onChange={this.handleLearningSkippingPeriodChange.bind(this)} />
                   </div>
                 </div>
                 <div className="wide column">
                   <Button className="blue"
-                          onClick={this.handleSaveProjectSetting.bind(this)}>Update Learning Settings</Button>
+                    onClick={this.handleSaveProjectSetting.bind(this)}>Update Learning Settings</Button>
                 </div>
                 <br />
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
-                           value={tempDetectionSkippingPeriod}
-                           onChange={this.handleDetectionSkippingPeriodChange.bind(this)}/>
+                      value={tempDetectionSkippingPeriod}
+                      onChange={this.handleDetectionSkippingPeriodChange.bind(this)} />
                   </div>
                 </div>
                 <div className="wide column">
                   <Button className="blue"
-                          onClick={this.handleSaveProjectSetting.bind(this)}>Update Detection Settings</Button>
+                    onClick={this.handleSaveProjectSetting.bind(this)}>Update Detection Settings</Button>
                 </div>
               </div>}
               {!isLogProject && <div className={tabStates0['alert'] + ' ui tab'}>
                 <h3>Dashboard Alert</h3>
                 <p>
-                  This setting controls the sensitivity with which  
-                  InsightFinder will detect and create anomaly events and 
-                  display them in the Dashboard. With higher sensitivity, 
-                  system detects more anomalies. 
+                  This setting controls the sensitivity with which
+                  InsightFinder will detect and create anomaly events and
+                  display them in the Dashboard. With higher sensitivity,
+                  system detects more anomalies.
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThresholdSensitivity
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.pvalue} text={data.pvalueText}
                     onChange={this.handleValueTextChange('pvalue', 'pvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.cvalue}
                     onChange={this.handleValueChange('cvalue')} />
                 </div>
                 <h3>Email Alert</h3>
                 <p>
                   This setting controls when InsightFinder will notify you via
-                  email and any configured External Service. With higher sensitivity, 
-                  system detects more anomalies. 
+                  email and any configured External Service. With higher sensitivity,
+                  system detects more anomalies.
                 </p>
                 <div className="field">
                   <label style={labelStyle}>Anomaly Sensitivity</label>
                   <AnomalyThresholdSensitivity
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.emailpvalue} text={data.emailpvalueText}
                     onChange={this.handleValueTextChange('emailpvalue', 'emailpvalueText')} />
                 </div>
                 <div className="field">
                   <label style={labelStyle}>Number of Samples</label>
                   <DurationThreshold
-                    style={{width: 180}}
+                    style={{ width: 180 }}
                     key={data.projectName} value={data.emailcvalue}
                     onChange={this.handleValueChange('emailcvalue')} />
                 </div>
                 <Button className="blue"
-                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
+                  onClick={this.handleSaveProjectSetting.bind(this)}>Update Alert Settings</Button>
               </div>}
               <div className={tabStates0['sharing'] + ' ui tab'}>
                 <h3>Project Sharing</h3>
-								<p>
-									If you are collaborating with other users, you may invite
+                <p>
+                  If you are collaborating with other users, you may invite
 									them to view data associated with your Projects.
 								</p>
-								<p>
-									To share your project, enter their User ID(s) in the 
-									field below and click 'Update Sharing Settings'.  Those 
+                <p>
+                  To share your project, enter their User ID(s) in the
+									field below and click 'Update Sharing Settings'.  Those
 									users will be able to view your project on their next login.
 								</p>
                 <div className="field">
                   <div className="ui input">
                     <input key={data.projectName} type="text"
-                           value={tempSharedUsernames}
-                           onChange={this.handleSharingChange.bind(this)}/>
+                      value={tempSharedUsernames}
+                      onChange={this.handleSharingChange.bind(this)} />
                   </div>
                 </div>
                 <Button className="blue"
-                        onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
+                  onClick={this.handleSaveProjectSetting.bind(this)}>Update Sharing Settings</Button>
               </div>
               {!isLogProject && <div className={tabStates0['threshold'] + ' ui tab'}>
                 <h3>Metric Override Thresholds</h3>
-								<p>
-									<i>Note: This setting is optional and is not required for
+                <p>
+                  <i>Note: This setting is optional and is not required for
 									for basic alerting and notifications.</i>
-								</p>
-								<p>
-									If you have a negotiated SLA and would like InsightFinder
-									to notify you when that specific threshold value is 
+                </p>
+                <p>
+                  If you have a negotiated SLA and would like InsightFinder
+									to notify you when that specific threshold value is
 									violated, you may configure that value here.
 								</p>
                 <table className="ui celled table">
                   <thead>
-                  <tr>
-                    <th>Metric</th>
-                    <th>Unit</th>
-                    <th>Normalization Group</th>
-                    <th>Alert Threshold</th>
-                    <th>No Alert Threshold</th>
-                    <th>KPI</th>
-                    <th>Custom Metric</th>
-                  </tr>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Unit</th>
+                      <th>Normalization Group</th>
+                      <th>Alert Threshold</th>
+                      <th>No Alert Threshold</th>
+                      <th style={{ textAlign: 'center' }}>
+                        <OverlayTrigger
+                          placement="top" delayShow={300}
+                          overlay={
+                            <Tooltip>{metricSettingKpiAllChecked ? 'Deselect All' : 'Select All'}</Tooltip>
+                          }
+                        >
+                          <span>
+                            <input
+                              type='checkbox' checked={metricSettingKpiAllChecked}
+                              onChange={this.handleMetricSettingKpiAllChecked}
+                            />
+                            <span>KPI</span>
+                          </span>
+                        </OverlayTrigger>
+                      </th>
+                      <th>Custom Metric</th>
+                    </tr>
                   </thead>
                   <tbody>
-                  {metricSettings.map((setting, index)=> {
-                    let smetric = setting.smetric;
-                    let pos = smetric.indexOf('/');
-                    if(pos!=-1){
-                      smetric = smetric.substring(0,pos);
-                    }
-                    let unit = metricUnitMap[smetric] || "";
-                    let pos2 = unit.indexOf('(');
-                    let pos3 = unit.indexOf(')');
-                    if(pos2!=-1&&pos3!=-1){
-                      unit = unit.substring(pos2+1,pos3);
-                    }
-                    let isCustomMetric = false;
-                    if((!$.isNumeric(setting.groupId) || ($.isNumeric(setting.groupId) && parseInt(setting.groupId)<1000)) && unit == ""){
-                      // has group id<1000 and not AWS/GAE metrics
-                      isCustomMetric = true;
-                    }
-                    return (
-                      <tr key={`${data.projectName}-${index}`}>
-                        <td>{setting.smetric}</td>
-                        <td>{unit}</td>
-                        <td><input value={setting.groupId}
-                                   onChange={this.handleMetricSetting(index, 'groupId')}/></td>
-                        <td><input value={setting.thresholdAlert}
-                                   onChange={this.handleMetricSetting(index, 'thresholdAlert')}/>
-                        </td>
-                        <td><input value={setting.thresholdNoAlert}
-                                   onChange={this.handleMetricSetting(index, 'thresholdNoAlert')}/>
-                        </td>
-                        <td><input type='checkbox' defaultChecked={setting.isKPI || false}
-                                   onChange={this.handleMetricSettingChecked(index, 'isKPI')}/>
-                        </td>
-                        <td><input type='checkbox' disabled defaultChecked={isCustomMetric}/>
-                        </td>
-                      </tr>
-                    )
-                  })}
+                    {metricSettings.map((setting, index) => {
+                      let smetric = setting.smetric;
+                      let pos = smetric.indexOf('/');
+                      if (pos != -1) {
+                        smetric = smetric.substring(0, pos);
+                      }
+                      let unit = metricUnitMap[smetric] || "";
+                      let pos2 = unit.indexOf('(');
+                      let pos3 = unit.indexOf(')');
+                      if (pos2 != -1 && pos3 != -1) {
+                        unit = unit.substring(pos2 + 1, pos3);
+                      }
+                      let isCustomMetric = false;
+                      if ((!$.isNumeric(setting.groupId) || ($.isNumeric(setting.groupId) && parseInt(setting.groupId) < 1000)) && unit == "") {
+                        // has group id<1000 and not AWS/GAE metrics
+                        isCustomMetric = true;
+                      }
+                      return (
+                        <tr key={`${data.projectName}-${index}`}>
+                          <td>{setting.smetric}</td>
+                          <td>{unit}</td>
+                          <td><input value={setting.groupId}
+                            onChange={this.handleMetricSetting(index, 'groupId')} /></td>
+                          <td><input value={setting.thresholdAlert}
+                            onChange={this.handleMetricSetting(index, 'thresholdAlert')} />
+                          </td>
+                          <td><input value={setting.thresholdNoAlert}
+                            onChange={this.handleMetricSetting(index, 'thresholdNoAlert')} />
+                          </td>
+                          <td><input type='checkbox' checked={!!setting.isKPI}
+                            onChange={this.handleMetricSettingChecked(index, 'isKPI')}
+                          />
+                          </td>
+                          <td><input type='checkbox' disabled defaultChecked={isCustomMetric} />
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
                 <Button className="blue" onClick={this.handleSaveMetricSetting.bind(this)}>Update Threshold
@@ -840,52 +873,52 @@ export default class ThresholdSettings extends React.Component {
               {!isLogProject && <div className={tabStates0['grouping'] + ' ui tab'}>
                 <h3>Instance Grouping Settings</h3>
                 <Button className="orange" onClick={this.handleAddNewGroupingRule}>Add New</Button>
-                <div className='ui vertical segment' style={{ borderBottom: 0}}>
+                <div className='ui vertical segment' style={{ borderBottom: 0 }}>
                   <table className="ui celled table grouping-table" style={{ tableLayout: 'fixed' }}>
                     <thead>
-                    <tr>
-                      <th>Group Name</th>
-                      <th>Grouping Criteria</th>
-                      <th>Key</th>
-                      <th>Value Pattern</th>
-                      <th>Separate model</th>
-                      <th width="40px"/>
-                    </tr>
+                      <tr>
+                        <th>Group Name</th>
+                        <th>Grouping Criteria</th>
+                        <th>Key</th>
+                        <th>Value Pattern</th>
+                        <th>Separate model</th>
+                        <th width="40px" />
+                      </tr>
                     </thead>
                     <tbody>
-                    {groupingRules.map((rule, index) => {
-                      let matchOpText = self.matchOpMap[rule.matchOp];
-                      return (
-                        <tr key={`${data.projectName}-${index}`}>
-                          <td><input
-                            style={{ fontSize: 13 }}
-                            value={rule.groupName}
-                            onChange={this.handleGroupingRuleInputFieldChanged(rule, 'groupName')} /></td>
-                          <td><GroupingCriteriaSelection
-                            value={rule.criteria}
-                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'criteria')}
-                            style={{ width: '100%' }} /></td>
-                          <td><GroupingMatchOpSelection
-                            value={rule.matchOp}
-                            text={matchOpText}
-                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'matchOp')}
-                            style={{ width: '100%' }} /></td>
-                          <td><input
-                            style={{ fontSize: 13 }}
-                            value={rule.matchValue}
-                            onChange={this.handleGroupingRuleInputFieldChanged(rule, 'matchValue')} /></td>
-                          <td><GroupingSeperateModelSelection
-                            value={rule.seperateModel}
-                            onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'seperateModel')}
-                            style={{ width: '100%' }} /></td>
-                          <td width="40px">
-                            <i
-                              className="icon remove" style={{ cursor: 'pointer', fontSize: 14, width: 20 }}
-                              onClick={this.handleRemoveGroupingRule(index)}
-                            /></td>
-                        </tr>
-                      );
-                    })}
+                      {groupingRules.map((rule, index) => {
+                        let matchOpText = self.matchOpMap[rule.matchOp];
+                        return (
+                          <tr key={`${data.projectName}-${index}`}>
+                            <td><input
+                              style={{ fontSize: 13 }}
+                              value={rule.groupName}
+                              onChange={this.handleGroupingRuleInputFieldChanged(rule, 'groupName')} /></td>
+                            <td><GroupingCriteriaSelection
+                              value={rule.criteria}
+                              onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'criteria')}
+                              style={{ width: '100%' }} /></td>
+                            <td><GroupingMatchOpSelection
+                              value={rule.matchOp}
+                              text={matchOpText}
+                              onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'matchOp')}
+                              style={{ width: '100%' }} /></td>
+                            <td><input
+                              style={{ fontSize: 13 }}
+                              value={rule.matchValue}
+                              onChange={this.handleGroupingRuleInputFieldChanged(rule, 'matchValue')} /></td>
+                            <td><GroupingSeperateModelSelection
+                              value={rule.seperateModel}
+                              onChange={this.handleGroupingRuleSelectionFieldChanged(rule, 'seperateModel')}
+                              style={{ width: '100%' }} /></td>
+                            <td width="40px">
+                              <i
+                                className="icon remove" style={{ cursor: 'pointer', fontSize: 14, width: 20 }}
+                                onClick={this.handleRemoveGroupingRule(index)}
+                              /></td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -894,64 +927,64 @@ export default class ThresholdSettings extends React.Component {
               </div>}
               {isLogProject && <div className={tabStates0['episodeword'] + ' ui tab'} style={{ 'paddingTop': '10px' }}>
                 <Button className={indexLoading ? "loading blue" : "blue"}
-                        onClick={this.handleSaveMapArrSetting.bind(this)}> Submit</Button>
+                  onClick={this.handleSaveMapArrSetting.bind(this)}> Submit</Button>
                 <div className="ui pointing secondary menu">
                   <a className={tabStates['episode'] + ' item'}
-                     onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episode List</a>
+                    onClick={(e) => this.selectTab(e, 'episode')}>Frequent Episode List</a>
                   <a className={tabStates['word'] + ' item'}
-                     onClick={(e) => this.selectTab(e, 'word')}>Word List</a>
+                    onClick={(e) => this.selectTab(e, 'word')}>Word List</a>
                 </div>
                 <div className={tabStates['episode'] + ' ui tab '}>
                   <table className="episode-table ui celled table">
                     <thead>
-                    <tr>
-                      <th>Pattern</th>
-                      <th>Count</th>
-                      <th><input type="checkbox" id="checkAllEpisode" defaultChecked="false"
-                                 onChange={(e)=>self.setCheckboxAllEpisode(e)}/>Interesting
+                      <tr>
+                        <th>Pattern</th>
+                        <th>Count</th>
+                        <th><input type="checkbox" id="checkAllEpisode" defaultChecked="false"
+                          onChange={(e) => self.setCheckboxAllEpisode(e)} />Interesting
                       </th>
-                    </tr>
+                      </tr>
                     </thead>
                     <tbody>
-                    {episodeList && episodeList.map((value, index)=> {
-                    // .slice(0, 200)
-                      return (
-                        <tr key={`${data.projectName}-${index}-1`}>
-                          <td>{value['pattern']}</td>
-                          <td>{value['count']}</td>
-                          <td><input type="checkbox" data-id={value['index']} name="indexCheckEpisode"
-                                     defaultChecked={value['selected']}
-                                     onChange={(e)=>self.getEpisodeIndexNumber(value['index'], e)}/></td>
-                        </tr>
-                      )
-                    })}
+                      {episodeList && episodeList.map((value, index) => {
+                        // .slice(0, 200)
+                        return (
+                          <tr key={`${data.projectName}-${index}-1`}>
+                            <td>{value['pattern']}</td>
+                            <td>{value['count']}</td>
+                            <td><input type="checkbox" data-id={value['index']} name="indexCheckEpisode"
+                              defaultChecked={value['selected']}
+                              onChange={(e) => self.getEpisodeIndexNumber(value['index'], e)} /></td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
                 <div className={tabStates['word'] + ' ui tab '}>
                   <table className="word-table ui celled table">
                     <thead>
-                    <tr>
-                      <th>Word</th>
-                      <th>Count</th>
-                      <th><input type="checkbox" id="checkAllWord" defaultChecked="false"
-                                 onChange={(e)=>self.setCheckboxAllWord(e)}/>Interesting
+                      <tr>
+                        <th>Word</th>
+                        <th>Count</th>
+                        <th><input type="checkbox" id="checkAllWord" defaultChecked="false"
+                          onChange={(e) => self.setCheckboxAllWord(e)} />Interesting
                       </th>
-                    </tr>
+                      </tr>
                     </thead>
                     <tbody>
-                    {wordList && wordList.map((value, index)=> {
-                    // .slice(0, 200)
-                      return (
-                        <tr key={`${data.projectName}-${index}-1`}>
-                          <td>{value['pattern']}</td>
-                          <td>{value['count']}</td>
-                          <td><input type="checkbox" data-id={value['index']} name="indexCheckWord"
-                                     defaultChecked={value['selected']}
-                                     onChange={(e)=>self.getEpisodeIndexNumber(value['index'], e)}/></td>
-                        </tr>
-                      )
-                    })}
+                      {wordList && wordList.map((value, index) => {
+                        // .slice(0, 200)
+                        return (
+                          <tr key={`${data.projectName}-${index}-1`}>
+                            <td>{value['pattern']}</td>
+                            <td>{value['count']}</td>
+                            <td><input type="checkbox" data-id={value['index']} name="indexCheckWord"
+                              defaultChecked={value['selected']}
+                              onChange={(e) => self.getEpisodeIndexNumber(value['index'], e)} /></td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>

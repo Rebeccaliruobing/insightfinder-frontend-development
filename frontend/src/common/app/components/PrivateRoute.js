@@ -5,7 +5,9 @@ import { connect } from 'react-redux';
 import type { State } from '../../types';
 
 type Props = {
-  loggedIn: boolean,
+  loggedIn: bool,
+  appInited: bool,
+  loginUrl: string,
   component: Function,
   render: Function,
   children: Function,
@@ -13,6 +15,8 @@ type Props = {
 
 export const PrivateRouteCore = ({
   loggedIn = false,
+  appInited = false,
+  loginUrl = '/login',
   render,
   children,
   component: Component,
@@ -23,6 +27,11 @@ export const PrivateRouteCore = ({
       {...props}
       render={(renderProps) => {
         if (loggedIn) {
+          // If application is not inited, return null to not render private component.
+          if (!appInited) {
+            return null;
+          }
+
           if (Component) {
             return (<Component {...renderProps} />);
           } else if (render) {
@@ -34,7 +43,7 @@ export const PrivateRouteCore = ({
         return (
           <Redirect
             to={{
-              pathname: '/login',
+              pathname: loginUrl,
               state: { from: renderProps.location },
             }}
           />
@@ -45,6 +54,7 @@ export const PrivateRouteCore = ({
 
 export default connect(
   (state: State) => ({
+    appInited: state.app.inited,
     loggedIn: state.auth.loggedIn,
   }),
 )(PrivateRouteCore);

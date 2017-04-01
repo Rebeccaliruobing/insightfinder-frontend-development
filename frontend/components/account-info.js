@@ -24,7 +24,6 @@ class AccountInfo extends React.Component {
   handleLogoff() {
     store.clearAll();
     this.props.logoff();
-    // window.location.href = '/';
   }
 
   render() {

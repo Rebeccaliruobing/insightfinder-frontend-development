@@ -156,9 +156,9 @@ class ModelSettings extends React.Component {
             {models.length === 0 &&
               <h4>No model available</h4>
             }
-            {models.map(m => (
+            {models.map((m, idx) => (
               <ModelTile
-                key={m.modelKey} model={m}
+                key={idx} model={m}
                 picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
                 projectName={projectName}
                 instanceGroup={instanceGroup}
