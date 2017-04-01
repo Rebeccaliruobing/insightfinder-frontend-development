@@ -33,6 +33,7 @@ export type AppState = {
   inited: bool,
   appLoaderVisible: boolean,
   fatalError: ?ErrorMessage,
+  v1store: Object,
 };
 
 export type AuthState = {

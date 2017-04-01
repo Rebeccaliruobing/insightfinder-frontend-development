@@ -27,6 +27,14 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Help',
     id: 'app.menus.help',
   },
+  signout: {
+    defaultMessage: 'Sign out',
+    id: 'app.menus.signout',
+  },
+  accountProfile: {
+    defaultMessage: 'Account Profile',
+    id: 'app.menus.accountProfile',
+  },
 });
 
 export default appMenusMessages;

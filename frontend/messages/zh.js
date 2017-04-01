@@ -17,8 +17,12 @@ export default [
     "defaultMessage": "用户名",
   },
   {
+    "id": "app.menus.accountProfile",
+    "defaultMessage": "账户信息",
+  },
+  {
     "id": "app.menus.bugRepository",
-    "defaultMessage": "Bug仓库",
+    "defaultMessage": "缺陷仓库",
   },
   {
     "id": "app.menus.dashboard",
@@ -39,6 +43,10 @@ export default [
   {
     "id": "app.menus.settings",
     "defaultMessage": "设置",
+  },
+  {
+    "id": "app.menus.signout",
+    "defaultMessage": "登  出",
   },
   {
     "id": "auth.buttons.signin",

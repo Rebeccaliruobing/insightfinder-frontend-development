@@ -21,13 +21,20 @@
   }
 }
 
+.toolbar.container {
+  background: $white;
+  padding: 9px $x-gutter;
+  z-index: 1;
+  border-bottom: 1px solid $dark-divider-color;
+}
+
 .single-page.container {
   background: transparent;
   height: 100%;
   width: 100%;
+  padding: 0;
   overflow: hidden;
   position: relative;
-  padding: 0;
   > .topbar {
     height: 48px;
     width: 100%;
@@ -58,11 +65,17 @@
         height: 48px;
         > .right.menu > .item,
         > .item {
-          &.active {
+          &.active,
+          &:hover {
             background: $primary-dark-color;
           }
           &:before {
             content: none;
+          }
+          > .icon {
+            font-size: 16px;
+            opacity: 1;
+            margin: 0px;
           }
           color: white;
           background: transparent;
@@ -71,12 +84,28 @@
         }
         > .right.menu > .user.item{
           padding: 0 16px;
-          .icon {
-            // background-color: $info-color !important;
-            // font-size: 18px;
-            // text-transform: uppercase;
-            // font-family: inherit;
-            // opacity: 1;
+          > span {
+            margin-left: 0.5em;
+          }
+          > .icon {
+            background-color: $info-color !important;
+            text-transform: uppercase;
+            font-family: inherit;
+          }
+        }
+        > .right.menu > .ui.dropdown.item {
+          > .menu {
+            font-size: 13px;
+            font-weight: 400;
+          }
+          &:hover {
+            > .menu {
+              display: block;
+            }
+          }
+          > .right-align.menu {
+            right: 0;
+            left: inherit;
           }
         }
       }
@@ -86,13 +115,66 @@
     padding-top: 48px;
     height: 100%;
     width: 100%;
-    overflow-y: auto;
+    overflow: auto;
+    > .wrapper {
+      > .navbar {
+        width: 48px;
+        background: #88bbee;
+        height: 100%;
+        padding-top: 48px;
+        border-radius: 0;
+        margin: 0;
+        position: fixed;
+        top: 0;
+        z-index: 12;
+        > .ui.menu {
+          width: 100%;
+          border-color: transparent;
+          position: relative;
+          z-index: 100;
+          &.icon-menu {
+            > a {
+              color: #fff;
+              &.item.active {
+                background-color: #2f88e1;
+              }
+              &:hover {
+                width: 240px;
+                background-color: #2f88e1;
+                > span {
+                  left: 50px;
+                  line-height: 32px;
+                  display: inline-block;
+                }
+              }
+              > i {
+                font-size: 28px;
+              }
+              > span {
+                position: absolute;
+                left: 100%;
+                display: none;
+                line-height: 35px;
+                font-size: 15px;
+              }
+            }
+          }
+        }
+      }
+      > .content {
+        padding-left: 0px;
+        background: $white;
+      }
+      &.has-navbar >.content {
+        padding-left: 48px;
+      }
+    }
   }
 }
 
 .locale-selector {
   text-align: center;
-  .world.icon {
+  > .icon {
     font-size: 16px;
     color: $grey;
     margin-top: 8px;

@@ -14,7 +14,7 @@ export { FileNewModel, FileDetection, FileUpdateModel, FileDisplayModel, FileUpl
 export class FileTabs extends React.Component {
   render() {
     return (
-      <Console.Wrapper className="cloud-page">
+      <Console.Wrapper className="cloud-page has-navbar">
           <Navbar/>
         {this.props.children}
       </Console.Wrapper>

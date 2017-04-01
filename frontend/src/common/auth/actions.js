@@ -1,5 +1,6 @@
 /* @flow */
 import type { Action, Credentials, Message } from '../types';
+import { authMessages } from './messages';
 
 export const login = (
   userName: string, password: string): Action => ({
@@ -17,6 +18,15 @@ export const loginFailure = (
   message: ?Message = null, error: ?Error = null): Action => ({
     type: 'LOGIN_FAILURE',
     payload: { message, error },
+  });
+
+export const sessionInvalid = (
+  error: ?Error = null): Action => ({
+    type: 'LOGIN_FAILURE',
+    payload: {
+      message: authMessages.errorsTokenInvalid,
+      error,
+    },
   });
 
 export const logoff = (): Action => ({

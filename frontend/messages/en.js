@@ -17,6 +17,10 @@ export default [
     "defaultMessage": "username",
   },
   {
+    "id": "app.menus.accountProfile",
+    "defaultMessage": "Account Profile",
+  },
+  {
     "id": "app.menus.bugRepository",
     "defaultMessage": "Bug Repository",
   },
@@ -39,6 +43,10 @@ export default [
   {
     "id": "app.menus.settings",
     "defaultMessage": "Settings",
+  },
+  {
+    "id": "app.menus.signout",
+    "defaultMessage": "Sign out",
   },
   {
     "id": "auth.buttons.signin",

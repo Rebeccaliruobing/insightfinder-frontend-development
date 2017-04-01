@@ -30,6 +30,7 @@ const initialState = {
   fatalError: null,
   error: null,
   lastError: null,
+  v1store: {},
 };
 
 const reducer = (
@@ -82,6 +83,10 @@ const reducer = (
     return {
       ...state,
       inited: true,
+      v1store: {
+        ...state.v1store,
+        dashboardUservalues: action.payload,
+      },
     };
   } else if (action.type === 'APP_STOP') {
     return {
