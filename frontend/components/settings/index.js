@@ -19,7 +19,7 @@ export {
 import Navbar from './navbar';
 
 export const Settings = ({ children }) => (
-  <Console.Wrapper className="settings-page">
+  <Console.Wrapper className="settings-page has-navbar">
     <Navbar />
     {children}
   </Console.Wrapper>

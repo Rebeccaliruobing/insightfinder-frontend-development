@@ -6,7 +6,7 @@ import type { Deps } from '../types';
 import { PermissionError } from '../errors';
 import { isValidCredentials } from '../auth';
 import { retrieveInitData } from '../apis';
-import { loginSuccess, loginFailure } from '../auth/actions';
+import { loginSuccess, loginFailure, sessionInvalid } from '../auth/actions';
 import { appStarted, setInitData, appFatalError, appRehydrated } from './actions';
 import { appMessages } from '../app/messages';
 import { authMessages } from '../auth/messages';
@@ -38,7 +38,7 @@ const appStart$ = (action$: any, getState: Function) => {
     .catch((err) => {
       if (err instanceof PermissionError) {
         return Observable.of(
-          loginFailure(authMessages.errorsTokenInvalid, err),
+          sessionInvalid(err),
           appStarted(),
         );
       }

@@ -16,7 +16,7 @@ const LocaleSelector = ({
 }: Props) =>
   (
     <div className="locale-selector" {...rest}>
-      <i className="world icon" />
+      <i className="translate icon" />
       <Select
         name="locales" style={{ width: 100 }}
         autosize={false} clearable={false}

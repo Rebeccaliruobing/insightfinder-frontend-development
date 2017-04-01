@@ -1,9 +1,12 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import { ConnectedRouter as Router } from 'react-router-redux';
 import { PrivateRoute } from '../../common/app/components';
 import { Login } from '../auth';
 import { Help } from '../help';
+import { SinglePage } from '../app/components';
+import { ExecutiveDashboard } from '../dashboard';
+
 import {
   ForgotPassword, ResetPassword,
   ForgotUsername, Signup, SignupStep2,
@@ -32,9 +35,27 @@ const incidentLogAnalysisAppV1 = withRouteApp(incidentLogAnalysisApp);
 const useCaseAppV1 = withRouteApp(useCaseApp);
 const ExecutiveDashboardAppV1 = withRouteApp(ExecutiveDashboardApp);
 
+type RouteProps = {
+  match: Object,
+};
+
+const DashboardRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={`${match.url}/executive/:view?`} component={ExecutiveDashboard} />
+        <Redirect from="*" to="/" />
+      </Switch>
+    </SinglePage>
+  );
+};
+
 const PrivateRouting = () => (
   <Switch>
     <Route path="/help" component={Help} />
+
+    <Route path="/cloud/dashboard" component={DashboardRouting} />
+    <Route path="/dashboard" component={DashboardRouting} />
 
     <Route
       path="/liveMonitoring"

@@ -99,13 +99,17 @@ export default class ThresholdSettings extends React.Component {
   }
 
   componentDidMount() {
-    let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo, projectString } = dashboardUservalues;
-    let projectNames = projectModelAllInfo.map((info)=>info.projectName);
+    const { dashboardUservalues } = this.context;
+    const { projectModelAllInfo } = dashboardUservalues;
+    const projectNames = projectModelAllInfo.map(info => info.projectName);
 
-    let refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectNames[0];
+    const refreshName = store.get('liveAnalysisProjectName') ? store.get('liveAnalysisProjectName') : projectNames[0];
     if (projectNames.length > 0) {
-      this.handleProjectChange(refreshName);
+      if (_.indexOf(projectNames, refreshName) >= 0) {
+        this.handleProjectChange(refreshName);
+      } else {
+        this.handleProjectChange(projectNames[0]);
+      }
     }
   }
 

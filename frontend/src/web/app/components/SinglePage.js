@@ -1,21 +1,30 @@
 import React from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { compose } from 'ramda';
+import { toPairs, map } from 'ramda';
 import { injectIntl } from 'react-intl';
 import type { State } from '../../../common/types';
 import { Container } from '../../../lib/fui/react';
 import Topbar from './Topbar';
 import { appMenusMessages } from '../../../common/app/messages';
+import { setCurrentLocale } from '../../../common/app/actions';
+import { logoff } from '../../../common/auth/actions';
 
 type Props = {
   className: string,
   intl: Object,
   userInfo: Object,
+  localeOptions: Array,
   children: Element<any>,
+  setCurrentLocale: Function,
+  logoff: Function,
 };
 
-const SinglePage = ({ className, userInfo, intl, children }: Props) => {
+const SinglePageCore = ({
+  className, userInfo, intl,
+  localeOptions, children,
+  setCurrentLocale, logoff,
+}: Props) => {
   const { userName } = userInfo;
   const isAdmin = ['admin', 'guest'].indexOf(userName) >= 0;
 
@@ -42,10 +51,31 @@ const SinglePage = ({ className, userInfo, intl, children }: Props) => {
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
           <div className="right menu">
-            <Link to="/account-info" className="user item">
-              <i className="user icon circular teal inverted" />
-              {userName}
-            </Link>
+            <div className="ui dropdown language item">
+              <i className="translate icon" />
+              <div className="right-align menu">
+                {
+                  localeOptions.map(l => (
+                    <a
+                      key={l.value} className="item"
+                      onClick={() => setCurrentLocale(l.value)}
+                    >{l.label}</a>
+                  ))
+                }
+              </div>
+            </div>
+            <div className="ui dropdown user item">
+              <i className="circular inverted icon">{userName[0]}</i>
+              <span>{userName}</span>
+              <div className="right-align menu">
+                <Link to="/account-info" className="item">
+                  <i className="settings icon" />{intl.formatMessage(appMenusMessages.accountProfile)}
+                </Link>
+                <a className="item" onClick={() => logoff()}>
+                  <i className="sign out icon" />{intl.formatMessage(appMenusMessages.signout)}
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </Topbar>
@@ -54,12 +84,11 @@ const SinglePage = ({ className, userInfo, intl, children }: Props) => {
   );
 };
 
-export default compose(
-  connect(
-    (state: State) => ({
-      userInfo: state.auth.userInfo,
-    }),
-    {},
-  ),
-  injectIntl,
+const SinglePage = injectIntl(SinglePageCore);
+export default connect(
+  (state: State) => ({
+    userInfo: state.auth.userInfo,
+    localeOptions: map(l => ({ value: l[0], label: l[1] }), toPairs(state.app.locales)),
+  }),
+  { setCurrentLocale, logoff },
 )(SinglePage);
