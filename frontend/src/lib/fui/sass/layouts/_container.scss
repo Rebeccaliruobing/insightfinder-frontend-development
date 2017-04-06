@@ -5,6 +5,18 @@
   position: relative;
 }
 
+.fui.with-gutter.container {
+  margin-left: $x-gutter;
+  margin-right: $x-gutter;
+}
+
+.fui.offset-gutter.container {
+  margin-left: -$x-gutter;
+  margin-right: -$x-gutter;
+  padding-left: $x-gutter;
+  padding-right: $x-gutter;
+}
+
 .fui.screen-center.container {
   position: fixed;
   top: 0;

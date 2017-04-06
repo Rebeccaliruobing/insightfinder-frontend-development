@@ -11,6 +11,10 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Log Analysis',
     id: 'app.menus.logAnalysis',
   },
+  staticLogAnalysis: {
+    defaultMessage: 'Static Log Analysis',
+    id: 'app.menus.staticLogAnalysis',
+  },
   settings: {
     defaultMessage: 'Settings',
     id: 'app.menus.settings',

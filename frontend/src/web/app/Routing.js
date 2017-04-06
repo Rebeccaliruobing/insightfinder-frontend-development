@@ -6,6 +6,7 @@ import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { ExecutiveDashboard } from '../dashboard';
+import { LogLiveAnalysis } from '../log';
 
 import {
   ForgotPassword, ResetPassword,
@@ -50,12 +51,23 @@ const DashboardRouting = ({ match }: RouteProps) => {
   );
 };
 
+const LogRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={`${match.url}/:projectName?/:logId?`} component={LogLiveAnalysis} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
 const PrivateRouting = () => (
   <Switch>
     <Route path="/help" component={Help} />
 
     <Route path="/cloud/dashboard" component={DashboardRouting} />
     <Route path="/dashboard" component={DashboardRouting} />
+    <Route path="/log/live-analysis" component={LogRouting} />
 
     <Route
       path="/liveMonitoring"

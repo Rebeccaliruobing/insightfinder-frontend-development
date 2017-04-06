@@ -35,8 +35,8 @@ const SinglePageCore = ({
           <NavLink to="/cloud" className="item">
             {intl.formatMessage(appMenusMessages.dashboard)}
           </NavLink>
-          <NavLink to="/log" className="item">
-            {intl.formatMessage(appMenusMessages.logAnalysis)}
+          <NavLink to="/log/incident-log-analysis" className="item">
+            {intl.formatMessage(appMenusMessages.staticLogAnalysis)}
           </NavLink>
           <NavLink to="/settings" className="item">
             {intl.formatMessage(appMenusMessages.settings)}
@@ -44,6 +44,9 @@ const SinglePageCore = ({
           <NavLink to="/usecase" className="item">
             {intl.formatMessage(appMenusMessages.bugRepository)}
           </NavLink>
+          {isAdmin && <NavLink to="/log/live-analysis" className="item">
+            {intl.formatMessage(appMenusMessages.logAnalysis)}
+          </NavLink>}
           {isAdmin && <NavLink to="/filetabs" className="item">
             {intl.formatMessage(appMenusMessages.fileAnalysis)}
           </NavLink>}
