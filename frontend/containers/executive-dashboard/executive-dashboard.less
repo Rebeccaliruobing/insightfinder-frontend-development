@@ -74,6 +74,62 @@
 
     table.toplist.resource {
       max-width: 1048px;
+      > thead {
+        height: 70px;
+        display: block;
+        width: 100%;
+        > tr {
+          display: inline-table;
+          width: 100%;
+          > th {
+            width: 10%;
+            &.subheader {
+              width: 30%;
+            }
+          }
+        }
+      }
+      > tbody {
+        > tr {
+          display: inline-table;
+          width: 100%;
+          > td {
+            width: 10%;
+            &.name {
+              width: 40%;
+            }
+          }
+        }
+      }
+    }
+    table.anomaly.toplist {
+      > thead {
+        height: 70px;
+        display: block;
+        width: 100%;
+        > tr {
+          display: inline-table;
+          width: 100%;
+          > th {
+            width: 8%;
+            &.subheader {
+              width: 24%;
+            }
+          }
+        }
+      }
+      > tbody {
+        > tr {
+          display: inline-table;
+          width: 100%;
+          > td {
+            width: 8%;
+            &.name {
+              width: 28%;
+            }
+          }
+        }
+      }
     }
     table.toplist {
       width: 100%;

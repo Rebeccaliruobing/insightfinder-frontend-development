@@ -1,3 +1,11 @@
+## 2017-04-06
+### Added
+- Add model upload in file anlysis
+- Add fixed table header in exec-dashboard
+
+### Fixed
+- Exec-dashboard time change bug.
+
 ## 2017-04-01
 ### Added
 - Add locale support for topbar menu.
