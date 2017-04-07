@@ -6,6 +6,15 @@
   cursor: pointer;
 }
 
+.inline-block {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.block {
+  display: block;
+}
+
 .float-left {
   float: left;
 }

@@ -10,7 +10,9 @@
   margin-right: $x-gutter;
 }
 
+// Toolbar container
 .fui.toolbar.container {
+  font-size: 12px;
   background: $white;
   padding-top: $y-small-gutter;
   padding-bottom: $y-small-gutter;
@@ -21,6 +23,12 @@
     display: table;
     clear: both;
   }
+  > * {
+    margin: auto 0.75em auto 0;
+    &:last-child {
+      margin-right: 0em;
+    }
+  }
 }
 
 .fui.with-gutter.container > .fui.toolbar.container {
@@ -30,6 +38,7 @@
   padding-right: $x-gutter;
 }
 
+// Screen center container
 .fui.screen-center.container {
   position: fixed;
   top: 0;
@@ -47,6 +56,7 @@
   }
 }
 
+// Responsive
 .fui.responsive.container {
   margin: 0 auto;
   max-width: 100%;

@@ -43,6 +43,8 @@ class LogLiveAnalysis extends React.Component {
               valueLink={currentProjectLink} options={projects}
             />
           </div>
+          <div className="inline-block">fdfsd</div>
+          <div className="float-right inline-block">fdfsd</div>
         </Container>
       </Container>
     );

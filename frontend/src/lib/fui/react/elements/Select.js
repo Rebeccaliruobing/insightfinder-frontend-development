@@ -12,9 +12,8 @@ type Props = {
 
 const Select = ({ valueLink, className, ...rest }: Props) => {
   if (valueLink) {
-    console.log(valueLink);
     const invalid = !!valueLink.error;
-    const classes = cx({ invalid }, className);
+    const classes = cx('fui select', { invalid }, className);
     return (
       <SelectCore
         value={valueLink.value}
