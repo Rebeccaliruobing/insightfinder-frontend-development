@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import { REHYDRATE } from 'redux-persist/constants';
 import R from 'ramda';
+import { get } from 'lodash'; 
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
@@ -31,6 +32,7 @@ const initialState = {
   error: null,
   lastError: null,
   v1store: {},
+  projects: [],
 };
 
 const reducer = (
@@ -80,9 +82,17 @@ const reducer = (
       started: true,
     };
   } else if (action.type === 'SET_INIT_DATA') {
+    const settings = JSON.parse(get(action.payload, 'projectSettingsAllInfo', '[]'));
+    const projects = R.map(s => ({
+      name: s.projectName,
+      type: s.projectType,
+      hasLogData: s.fileProjectType === 0,
+    }), settings);
+
     return {
       ...state,
       inited: true,
+      projects,
       v1store: {
         ...state.v1store,
         dashboardUservalues: action.payload,

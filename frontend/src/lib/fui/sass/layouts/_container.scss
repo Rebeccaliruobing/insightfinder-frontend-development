@@ -10,7 +10,20 @@
   margin-right: $x-gutter;
 }
 
-.fui.offset-gutter.container {
+.fui.toolbar.container {
+  background: $white;
+  padding-top: $y-small-gutter;
+  padding-bottom: $y-small-gutter;
+  z-index: 1;
+  border-bottom: 1px solid $dark-divider-color;
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.fui.with-gutter.container > .fui.toolbar.container {
   margin-left: -$x-gutter;
   margin-right: -$x-gutter;
   padding-left: $x-gutter;

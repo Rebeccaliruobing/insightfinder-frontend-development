@@ -34,6 +34,7 @@ export type AppState = {
   appLoaderVisible: boolean,
   fatalError: ?ErrorMessage,
   v1store: Object,
+  projects: Array<Object>,
 };
 
 export type AuthState = {
