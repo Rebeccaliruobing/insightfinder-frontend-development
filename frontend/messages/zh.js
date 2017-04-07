@@ -49,6 +49,10 @@ export default [
     "defaultMessage": "登  出",
   },
   {
+    "id": "app.menus.staticLogAnalysis",
+    "defaultMessage": "静态日志分析",
+  },
+  {
     "id": "auth.buttons.signin",
     "defaultMessage": "登  录",
   },

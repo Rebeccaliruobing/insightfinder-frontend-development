@@ -54,7 +54,7 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
 
 
 const ListRow = ({
-  name, data, onRowClick, onNameClick, onActionClick,
+  name, data, onRowClick, onNameClick, onActionClick, style,
   type, isProject = false, expanded = true }) => {
   const { stats, color } = data;
   const projectStyle = isProject ? { fontWeight: 'bold' } : {};
@@ -62,6 +62,7 @@ const ListRow = ({
     <tr
       style={{
         borderLeft: `2px solid rgb(${color})`,
+        ...style,
       }}
       className={isProject ? 'project' : 'group'}
       onClick={onRowClick}
@@ -236,6 +237,7 @@ ListRow.propTypes = {
   name: T.string,
   type: T.string,
   data: T.object,
+  style: T.object,
   expanded: T.bool,
   isProject: T.bool,
   onRowClick: T.func,

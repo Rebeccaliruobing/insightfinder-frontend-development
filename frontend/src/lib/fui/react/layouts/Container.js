@@ -7,14 +7,16 @@ type Props = {
   className: string,
   responsive: bool,
   noGutter: bool,
+  withGutter: bool,
+  offsetGutter: bool,
   fullHeight: bool,
   screenCenter: bool,
   exactCenter: bool,
 };
 
 const Container = ({
-      className, screenCenter, responsive,
-  noGutter, fullHeight, children, ...rest
+      className, screenCenter, withGutter, responsive,
+  noGutter, offsetGutter, fullHeight, children, ...rest
 }: Props) => {
   if (screenCenter) {
     const classes = cx(
@@ -35,6 +37,8 @@ const Container = ({
   const classes = cx(
     'fui', {
       responsive,
+      'with-gutter': withGutter,
+      'offset-gutter': offsetGutter,
       'no-gutter': noGutter,
       'full-height': fullHeight,
     }, 'container',

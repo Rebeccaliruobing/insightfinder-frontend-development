@@ -49,6 +49,10 @@ export default [
     "defaultMessage": "Sign out",
   },
   {
+    "id": "app.menus.staticLogAnalysis",
+    "defaultMessage": "Static Log Analysis",
+  },
+  {
     "id": "auth.buttons.signin",
     "defaultMessage": "Sign In",
   },

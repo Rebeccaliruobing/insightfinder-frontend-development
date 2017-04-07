@@ -25,7 +25,7 @@ import {
 } from '../../../components/usecase';
 import {
   FileTabs, FileNewModel, FileDetection, FileUpdateModel,
-  FileDisplayModel, FileUpload,
+  FileDisplayModel, FileUpload, UploadModel,
 } from '../../../components/filetabs';
 
 const RoutingNextV1 = () => (
@@ -146,6 +146,10 @@ const RoutingNextV1 = () => (
       <Route
         path="/filetabs/fileNewModel"
         render={() => (<FileTabs><FileNewModel /></FileTabs>)}
+      />
+      <Route
+        path="/filetabs/uploadModel"
+        render={() => (<FileTabs><UploadModel /></FileTabs>)}
       />
       <Route
         path="/filetabs/filedetection"

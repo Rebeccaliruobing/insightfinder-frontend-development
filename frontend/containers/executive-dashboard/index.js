@@ -27,6 +27,7 @@ class ExecutiveDashboard extends React.Component {
   static propTypes = {
     location: T.object,
     hideAppLoader: T.func,
+    viewport: T.object,
     router: T.shape({
       push: T.func.isRequired,
     }).isRequired,
@@ -37,6 +38,12 @@ class ExecutiveDashboard extends React.Component {
 
     this.defaultNumberOfDays = 7;
     this.dateFormat = 'YYYY-MM-DD';
+    const query = props.location.query || {};
+    let startTime = query.startTime ? moment(query.startTime) :
+      moment().subtract(this.defaultNumberOfDays - 1, 'days');
+    startTime = startTime.startOf('day');
+    let endTime = query.endTime ? moment(query.endTime) : moment();
+    endTime = endTime.endOf('day');
 
     this.state = {
       loading: true,
@@ -46,23 +53,15 @@ class ExecutiveDashboard extends React.Component {
       heatmapProject: null,
       heatmapGroup: null,
       view: 'anomaly',
+      startTime,
+      endTime,
+      timezoneOffset: moment().utcOffset(),
+      modelType: 'Holistic',
     };
   }
 
   componentDidMount() {
     this.refreshData();
-  }
-
-  @autobind
-  applyDefaultParams(params) {
-    return {
-      startTime: moment().subtract(this.defaultNumberOfDays - 1, 'days')
-        .startOf('day').format(this.dateFormat),
-      endTime: moment().endOf('day').format(this.dateFormat),
-      timezoneOffset: moment().utcOffset(),
-      modelType: 'Holistic',
-      ...params,
-    };
   }
 
   @autobind
@@ -72,13 +71,10 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   refreshData(params) {
-    const { location, hideAppLoader } = this.props;
-    const query = params || this.applyDefaultParams(location.query);
-    const { modelType, timezoneOffset } = query;
-    const endTime = moment(query.endTime).endOf('day');
-    const startTime = moment(query.startTime).startOf('day');
+    const { hideAppLoader } = this.props;
+    const { startTime, endTime, modelType, timezoneOffset } = { ...this.state, ...params };
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
-    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
+    const predictedEndTime = moment(endTime).add(numberOfDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
@@ -92,6 +88,7 @@ class ExecutiveDashboard extends React.Component {
         .then((data) => {
           this.setState({
             eventStats: normalizeStats(data),
+            startTime, endTime, numberOfDays,
             loading: false,
           });
           hideAppLoader();
@@ -103,8 +100,20 @@ class ExecutiveDashboard extends React.Component {
         modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly')
         .then((data) => {
           this.setState({
+            startTime, endTime, numberOfDays,
             heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
             heatmapLoading: false,
+          }, () => {
+            const { location, router } = this.props;
+            router.push({
+              pathname: location.pathname,
+              query: {
+                startTime: startTime.format(this.dateFormat),
+                endTime: endTime.format(this.dateFormat),
+                numberOfDays,
+                timezoneOffset,
+              },
+            });
           });
         }).catch((msg) => {
           console.log(msg);
@@ -113,30 +122,11 @@ class ExecutiveDashboard extends React.Component {
   }
 
   @autobind
-  refreshDataByTime(startTime, endTime) {
-    const { location, router } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query,
-      startTime: startTime.format(this.dateFormat),
-      endTime: endTime.format(this.dateFormat),
-    });
-
-    router.push({
-      pathname: location.pathname,
-      query,
-    });
-
-    this.refreshData(query);
-  }
-
-  @autobind
   handleStartTimeChange(newDate) {
-    const { location } = this.props;
+    let { endTime } = this.state;
     const curTime = moment();
 
     const startTime = newDate.clone().startOf('day');
-    let endTime = moment(location.query.endTime).endOf('day');
-
     const diffDays = endTime.diff(startTime, 'days');
     if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
@@ -144,23 +134,20 @@ class ExecutiveDashboard extends React.Component {
     if (endTime >= curTime) {
       endTime = curTime.endOf('day');
     }
-
-    this.refreshDataByTime(startTime, endTime);
+    this.refreshData({ startTime, endTime });
   }
 
   @autobind
   handleEndTimeChange(newDate) {
-    const { location } = this.props;
-
+    let { startTime } = this.state;
     const endTime = newDate.clone().endOf('day');
-    let startTime = moment(location.query.startTime).startOf('day');
 
     const diffDays = endTime.diff(startTime, 'days');
     if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
       startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
     }
 
-    this.refreshDataByTime(startTime, endTime);
+    this.refreshData({ startTime, endTime });
   }
 
   @autobind
@@ -175,15 +162,19 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
-    const { location } = this.props;
-    const query = this.applyDefaultParams({
-      ...location.query,
+    const { startTime, endTime, numberOfDays, timezoneOffset } = this.state;
+    const query = {
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
+      numberOfDays, timezoneOffset,
       projectName,
       instanceGroup,
-    });
+    };
+
     if (datetime) {
       query.startTime = datetime.startOf('day').format(this.dateFormat);
       query.endTime = datetime.endOf('day').format(this.dateFormat);
+      query.numberOfDays = 1;
     }
     if (predicted) {
       query.predicted = true;
@@ -195,15 +186,11 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleAnomalyListRowClick(projectName, instanceGroup) {
-    const { heatmapProject, heatmapGroup } = this.state;
+    const { heatmapProject, heatmapGroup,
+      modelType, timezoneOffset, startTime, endTime } = this.state;
 
-    const { location } = this.props;
-    const query = this.applyDefaultParams(location.query);
-    const { modelType, timezoneOffset } = query;
-    const endTime = moment(query.endTime).endOf('day');
-    const startTime = moment(query.startTime).startOf('day');
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
-    const predictedEndTime = moment(query.endTime).add(numberOfDays, 'days').endOf('day');
+    const predictedEndTime = endTime.add(numberOfDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
@@ -232,29 +219,36 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleListRowOpenResource(projectName, instanceGroup) {
-    const query = this.applyDefaultParams({
-      projectName,
-      instanceGroup,
-    });
+    const { startTime, endTime, numberOfDays, timezoneOffset } = this.state;
+    const query = {
+      startTime: startTime.format(this.dateFormat),
+      endTime: endTime.format(this.dateFormat),
+      numberOfDays, timezoneOffset,
+      projectName, instanceGroup,
+    };
     store.set('liveAnalysisProjectName', projectName);
     window.open(`/cloud/app-forecast?${$.param(query)}`, '_blank');
   }
 
   render() {
-    const { location } = this.props;
-    const params = this.applyDefaultParams(location.query);
-    let { startTime, endTime } = params;
-    const { loading, eventStats, heatmapLoading, heatmapData } = this.state;
+    const { viewport } = this.props;
+    const { startTime, endTime, loading, eventStats,
+      heatmapLoading, heatmapData, numberOfDays } = this.state;
 
-    // Convert startTime, endTime to moment object
-    startTime = moment(startTime, this.dateFormat);
-    endTime = moment(endTime, this.dateFormat);
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
+    let anomalyContainerHeight = null;
+    let resourceContainerHeight = null;
 
-    const startTimePrevious = moment(startTime).subtract(numberOfDays, 'day');
-    const endTimePrevious = moment(endTime).subtract(numberOfDays, 'day');
-    const startTimePredicted = moment(startTime).add(numberOfDays, 'day');
-    const endTimePredicted = moment(endTime).add(numberOfDays, 'day');
+    const top = 100;
+    resourceContainerHeight = viewport.height - top;
+    if (this.$heapmapBlock) {
+      const height = this.$heapmapBlock.height();
+      anomalyContainerHeight = viewport.height - top - height - 24;
+    }
+
+    const startTimePrevious = startTime.subtract(numberOfDays, 'day');
+    const endTimePrevious = endTime.subtract(numberOfDays, 'day');
+    const startTimePredicted = startTime.add(numberOfDays, 'day');
+    const endTimePredicted = endTime.add(numberOfDays, 'day');
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
@@ -273,6 +267,7 @@ class ExecutiveDashboard extends React.Component {
         <div className="ui main tiny container">
           <div
             className="ui right aligned vertical inline segment"
+            ref={(c) => { this.$toolbar = $(c); }}
             style={{ zIndex: 1, margin: '0 -16px', padding: '9px 16px', background: 'white' }}
           >
             <div className="field view-switch" style={{ float: 'left' }}>
@@ -321,6 +316,7 @@ class ExecutiveDashboard extends React.Component {
             </div>
           </div>
           <div
+            ref={(c) => { this.$heapmapBlock = $(c); }}
             className={`ui vertical segment ${heatmapLoading ? 'loading' : ''}`}
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
@@ -350,6 +346,7 @@ class ExecutiveDashboard extends React.Component {
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListAnomaly
+              containerHeight={anomalyContainerHeight}
               timeIntervalPrevious={timeIntervalPrevious}
               timeIntervalCurrent={timeIntervalCurrent}
               timeIntervalPredicted={timeIntervalPredicted}
@@ -363,6 +360,7 @@ class ExecutiveDashboard extends React.Component {
             {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <TopListResource
+              containerHeight={resourceContainerHeight}
               timeIntervalPrevious={timeIntervalPrevious}
               timeIntervalCurrent={timeIntervalCurrent}
               timeIntervalPredicted={timeIntervalPredicted}
@@ -377,6 +375,8 @@ class ExecutiveDashboard extends React.Component {
 }
 
 export default connect(
-  () => ({ }),
+  state => ({
+    viewport: state.app.viewport,
+  }),
   { hideAppLoader },
 )(withRouter(ExecutiveDashboard));

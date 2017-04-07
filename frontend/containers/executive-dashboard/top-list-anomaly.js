@@ -127,10 +127,21 @@ class TopListAnomaly extends React.Component {
 
   render() {
     const {
-      stats, style,
+      stats, style, containerHeight,
       timeIntervalPrevious, timeIntervalCurrent, timeIntervalPredicted,
     } = this.props;
     const { expandedProjects, expandedItemIndices } = this.state;
+    let tbodyStyle = {
+      width: '100%',
+      overflow: 'auto',
+      display: 'block',
+    };
+    if (containerHeight && containerHeight > 0) {
+      tbodyStyle = {
+        ...tbodyStyle,
+        height: containerHeight - 96,
+      };
+    }
 
     return (
       <div>
@@ -142,21 +153,30 @@ class TopListAnomaly extends React.Component {
             onCancel={() => this.setState({ showCausalGraphModal: false })}
           />
         }
-        <table className="toplist" style={style}>
+        <table className="anomaly toplist" style={style}>
           <thead>
             <tr>
               <th
-                rowSpan={2} style={{
+                style={{
                   paddingLeft: '0.5em',
                   textAlign: 'left',
                   borderLeft: '2px solid #566f84',
+                  width: '28%',
                 }}
               >Project/Group Name</th>
-              <th className="subheader" colSpan={3} width="26%">Anomaly Score (Daily Avg)</th>
-              <th className="subheader" colSpan={3} width="26%">Anomaly Duration (Minute)</th>
-              <th className="subheader" colSpan={3} width="26%">Consolidated Abnormal Events</th>
+              <th className="subheader" colSpan={3}>Anomaly Score (Daily Avg)</th>
+              <th className="subheader" colSpan={3}>Anomaly Duration (Minute)</th>
+              <th className="subheader" colSpan={3}>Consolidated Abnormal Events</th>
             </tr>
             <tr>
+              <th
+                style={{
+                  paddingLeft: '0.5em',
+                  textAlign: 'left',
+                  borderLeft: '2px solid #566f84',
+                  width: '28%',
+                }}
+              >&nbsp;</th>
               <th><span>Previous</span>
                 <span className="interval">{timeIntervalPrevious}</span></th>
               <th><span>Current<i className="dropdown icon" /></span>
@@ -177,94 +197,90 @@ class TopListAnomaly extends React.Component {
                 <span className="interval">{timeIntervalPredicted}</span></th>
             </tr>
           </thead>
-          {stats.map((data) => {
-            const { groups } = data;
-            const name = data.name;
-            const expanded = _.indexOf(expandedProjects, name) >= 0;
-            const expandedIndex = expandedItemIndices[name] || 0;
-            const groupText = groups.length > 1 ? 'groups' : 'group';
-            const title = `${data.name} (${groups.length} ${groupText})`;
-            const elems = [
-              (<tbody key={name}><ListRow
-                key={name} name={title} data={data} isProject expanded={expanded}
-                onRowClick={this.toggleProjectRow(name)} type="anomaly"
-              /></tbody>),
-            ];
-
-            const lastIndex = expandedIndex + this.expandPageSize;
-            const showLoadMore = groups.length > this.expandPageSize;
-            const showNext = groups.length >= lastIndex;
-            const showPrevious = expandedIndex > 0;
-            const showAll = expandedIndex !== -1;
-            const childElems = [];
-            let filteredGroups = groups;
-            if (expandedIndex !== -1) {
-              filteredGroups = groups.slice(expandedIndex, Math.min(groups.length, lastIndex));
-            }
-
-            filteredGroups.every((group) => {
-              const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
-              const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
-              let title = group.name;
-              let suffix = '';
-              if (numberOfInstances !== undefined) {
-                suffix += `${numberOfInstances} instance${numberOfInstances > 1 ? 's' : ''}`;
-              }
-              if (numberOfMetrics !== undefined) {
-                if (suffix.length > 0) {
-                  suffix += ', ';
-                }
-                suffix += `${numberOfMetrics} metric${numberOfMetrics > 1 ? 's' : ''}`;
-              }
-              if (suffix.length > 0) {
-                suffix = ` (${suffix})`;
-              }
-              title += suffix;
-              childElems.push((
+          <tbody style={tbodyStyle}>
+            {stats.map((data) => {
+              const { groups } = data;
+              const name = data.name;
+              const expanded = _.indexOf(expandedProjects, name) >= 0;
+              const expandedIndex = expandedItemIndices[name] || 0;
+              const groupText = groups.length > 1 ? 'groups' : 'group';
+              const title = `${data.name} (${groups.length} ${groupText})`;
+              const elems = [
                 <ListRow
-                  key={`${group.name}`} name={title} data={group} expanded={expanded} type="anomaly"
-                  onNameClick={this.handleNameClick(name, group.name)}
-                  onRowClick={this.handleProjectClick(name, group.name)}
-                  onActionClick={this.handleProjectActionClick(name, group.name)}
-                />
-              ));
-              return true;
-            });
+                  key={name} name={title} data={data} isProject expanded={expanded}
+                  onRowClick={this.toggleProjectRow(name)} type="anomaly"
+                />,
+              ];
 
-            if (showLoadMore) {
-              childElems.push((
-                <tr key={`${name}-more}`} className="more">
-                  <td colSpan={10}>
-                    {showPrevious &&
-                      <span onClick={this.handleExpandMore(name, 'up')}>{`Previous ${this.expandPageSize}`}
-                        <i className="angle double up icon" />
-                      </span>
-                    }
-                    {showNext && showAll &&
-                      <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
-                        <i className="angle double down icon" />
-                      </span>
-                    }
-                    {showAll &&
-                      <span onClick={this.handleExpandMore(name, 'all')}>All</span>
-                    }
-                    {!showAll &&
-                      <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
-                    }
-                  </td>
-                </tr>
-              ));
-            }
+              const lastIndex = expandedIndex + this.expandPageSize;
+              const showLoadMore = groups.length > this.expandPageSize;
+              const showNext = groups.length >= lastIndex;
+              const showPrevious = expandedIndex > 0;
+              const showAll = expandedIndex !== -1;
+              let filteredGroups = groups;
+              if (expandedIndex !== -1) {
+                filteredGroups = groups.slice(expandedIndex, Math.min(groups.length, lastIndex));
+              }
 
-            elems.push((
-              <tbody
-                style={{ display: !expanded ? 'none' : '' }}
-                key={`${name}-children`}
-              >{childElems}</tbody>
-            ));
+              filteredGroups.every((group) => {
+                const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
+                const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
+                let title = group.name;
+                let suffix = '';
+                if (numberOfInstances !== undefined) {
+                  suffix += `${numberOfInstances} instance${numberOfInstances > 1 ? 's' : ''}`;
+                }
+                if (numberOfMetrics !== undefined) {
+                  if (suffix.length > 0) {
+                    suffix += ', ';
+                  }
+                  suffix += `${numberOfMetrics} metric${numberOfMetrics > 1 ? 's' : ''}`;
+                }
+                if (suffix.length > 0) {
+                  suffix = ` (${suffix})`;
+                }
+                title += suffix;
+                elems.push((
+                  <ListRow
+                    key={`${name}-${group.name}`}
+                    name={title} data={group} expanded={expanded} type="anomaly"
+                    style={{ display: !expanded ? 'none' : '' }}
+                    onNameClick={this.handleNameClick(name, group.name)}
+                    onRowClick={this.handleProjectClick(name, group.name)}
+                    onActionClick={this.handleProjectActionClick(name, group.name)}
+                  />
+                ));
+                return true;
+              });
 
-            return elems;
-          })}
+              if (showLoadMore) {
+                elems.push((
+                  <tr key={`${name}-more}`} className="more" style={{ display: !expanded ? 'none' : '' }}>
+                    <td colSpan={10}>
+                      {showPrevious &&
+                        <span onClick={this.handleExpandMore(name, 'up')}>{`Previous ${this.expandPageSize}`}
+                          <i className="angle double up icon" />
+                        </span>
+                      }
+                      {showNext && showAll &&
+                        <span onClick={this.handleExpandMore(name, 'down')}>{`Next ${this.expandPageSize}`}
+                          <i className="angle double down icon" />
+                        </span>
+                      }
+                      {showAll &&
+                        <span onClick={this.handleExpandMore(name, 'all')}>All</span>
+                      }
+                      {!showAll &&
+                        <span onClick={this.handleExpandMore(name, 'less')}>Less</span>
+                      }
+                    </td>
+                  </tr>
+                ));
+              }
+
+              return elems;
+            })}
+          </tbody>
         </table>
       </div>
     );
