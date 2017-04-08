@@ -212,13 +212,6 @@ export default class ThresholdSettings extends React.Component {
 
     // Get project groups 
     this.setState({
-      metricSettings,
-      data,
-      groupingRules,
-      tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
-      tempLogFreqWindow: (data.logFreqWindow || ''),
-      tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
-      tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
       loading: true,
     }, () => {
       apis.loadInstanceGrouping(projectName, 'getGrouping')
@@ -233,6 +226,13 @@ export default class ThresholdSettings extends React.Component {
             const instanceGroup = (groups && groups.length > 0) ? groups[0] : '';
             const instanceGroups = groups;
             this.setState({
+              metricSettings,
+              data,
+              groupingRules,
+              tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+              tempLogFreqWindow: (data.logFreqWindow || ''),
+              tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+              tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
               instanceGroup,
               instanceGroups,
               loading: projectSetting.fileProjectType === 0,
@@ -242,6 +242,16 @@ export default class ThresholdSettings extends React.Component {
               }
               this.selectTab0(null, _.findKey(this.state.tabStates0, s => s === 'active'));
               store.set('liveAnalysisProjectName', projectName);
+            });
+          } else {
+            this.setState({
+              metricSettings,
+              data,
+              groupingRules,
+              tempSharedUsernames: (data.sharedUsernames || '').replace('[', '').replace(']', ''),
+              tempLogFreqWindow: (data.logFreqWindow || ''),
+              tempLearningSkippingPeriod: (data.learningSkippingPeriod || ''),
+              tempDetectionSkippingPeriod: (data.detectionSkippingPeriod || ''),
             });
           }
         });
