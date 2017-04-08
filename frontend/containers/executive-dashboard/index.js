@@ -38,12 +38,21 @@ class ExecutiveDashboard extends React.Component {
 
     this.defaultNumberOfDays = 7;
     this.dateFormat = 'YYYY-MM-DD';
+
     const query = props.location.query || {};
-    let startTime = query.startTime ? moment(query.startTime) :
-      moment().subtract(this.defaultNumberOfDays - 1, 'days');
-    startTime = startTime.startOf('day');
-    let endTime = query.endTime ? moment(query.endTime) : moment();
-    endTime = endTime.endOf('day');
+    const startTime = (query.startTime ? moment(query.startTime, this.dateFormat) :
+      moment().subtract(this.defaultNumberOfDays - 1, 'days')).startOf('day');
+    let endTime = (query.endTime ? moment(query.endTime, this.dateFormat) :
+      moment()).endOf('day');
+    const diffDays = endTime.diff(startTime, 'days');
+
+    if (diffDays > (this.defaultNumberOfDays - 1) || diffDays < 0) {
+      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'days').endOf('day');
+    }
+    const curTime = moment();
+    if (endTime > curTime) {
+      endTime = curTime.endOf('day');
+    }
 
     this.state = {
       loading: true,
@@ -73,47 +82,49 @@ class ExecutiveDashboard extends React.Component {
   refreshData(params) {
     const { hideAppLoader } = this.props;
     const { startTime, endTime, modelType, timezoneOffset } = { ...this.state, ...params };
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
-    const predictedEndTime = moment(endTime).add(numberOfDays, 'days').endOf('day');
+    const diffDays = endTime.diff(startTime, 'days');
+    const numberOfDays = diffDays + 1;
+    const predictedEndTime = endTime.clone().add(diffDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
+
+    // Change the url first
+    const { location, router } = this.props;
+    router.push({
+      pathname: location.pathname,
+      query: {
+        startTime: startTime.format(this.dateFormat),
+        endTime: endTime.format(this.dateFormat),
+        timezoneOffset,
+      },
+    });
 
     this.setState({
       loading: true,
       heatmapLoading: true,
       heatmapData: {},
     }, () => {
-      retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays, timezoneOffset)
-        .then((data) => {
-          this.setState({
-            eventStats: normalizeStats(data),
-            startTime, endTime, numberOfDays,
-            loading: false,
-          });
-          hideAppLoader();
-        }).catch((msg) => {
-          console.log(msg);
-        });
-
       retrieveHeatmapData(
-        modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly')
+        modelType, predictedEndTime.valueOf(), (diffDays * 2) + 1, timezoneOffset, 'loadHourly')
         .then((data) => {
           this.setState({
-            startTime, endTime, numberOfDays,
+            startTime: startTime.clone(), endTime: endTime.clone(),
             heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
-            heatmapLoading: false,
           }, () => {
-            const { location, router } = this.props;
-            router.push({
-              pathname: location.pathname,
-              query: {
-                startTime: startTime.format(this.dateFormat),
-                endTime: endTime.format(this.dateFormat),
-                numberOfDays,
-                timezoneOffset,
-              },
-            });
+            retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays, timezoneOffset)
+              .then((data2) => {
+                this.setState({
+                  heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+                  eventStats: normalizeStats(data2),
+                  loading: false,
+                  heatmapLoading: false,
+                }, () => {
+                  hideAppLoader();
+                });
+              }).catch((msg) => {
+                console.log(msg);
+              });
           });
         }).catch((msg) => {
           console.log(msg);
@@ -123,14 +134,10 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleStartTimeChange(newDate) {
-    let { endTime } = this.state;
     const curTime = moment();
-
     const startTime = newDate.clone().startOf('day');
-    const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
-      endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day');
-    }
+    let endTime = startTime.clone().add(this.defaultNumberOfDays - 1, 'day').endOf('day');
+
     if (endTime >= curTime) {
       endTime = curTime.endOf('day');
     }
@@ -139,14 +146,14 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleEndTimeChange(newDate) {
+    const curTime = moment();
     let { startTime } = this.state;
-    const endTime = newDate.clone().endOf('day');
+    let endTime = newDate.clone().endOf('day');
 
-    const diffDays = endTime.diff(startTime, 'days');
-    if (diffDays >= this.defaultNumberOfDays - 1 || diffDays <= 0) {
-      startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day');
+    if (endTime >= curTime) {
+      endTime = curTime.endOf('day');
     }
-
+    startTime = endTime.clone().subtract(this.defaultNumberOfDays - 1, 'day').startOf('day');
     this.refreshData({ startTime, endTime });
   }
 
@@ -162,7 +169,8 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
-    const { startTime, endTime, numberOfDays, timezoneOffset } = this.state;
+    const { startTime, endTime, timezoneOffset } = this.state;
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
     const query = {
       startTime: startTime.format(this.dateFormat),
       endTime: endTime.format(this.dateFormat),
@@ -172,8 +180,8 @@ class ExecutiveDashboard extends React.Component {
     };
 
     if (datetime) {
-      query.startTime = datetime.startOf('day').format(this.dateFormat);
-      query.endTime = datetime.endOf('day').format(this.dateFormat);
+      query.startTime = datetime.clone().startOf('day').format(this.dateFormat);
+      query.endTime = datetime.clone().endOf('day').format(this.dateFormat);
       query.numberOfDays = 1;
     }
     if (predicted) {
@@ -189,8 +197,9 @@ class ExecutiveDashboard extends React.Component {
     const { heatmapProject, heatmapGroup,
       modelType, timezoneOffset, startTime, endTime } = this.state;
 
-    const numberOfDays = endTime.diff(startTime, 'days') + 1;
-    const predictedEndTime = endTime.add(numberOfDays, 'days').endOf('day');
+    const diffDays = endTime.diff(startTime, 'days');
+    const numberOfDays = diffDays + 1;
+    const predictedEndTime = endTime.clone().add(diffDays, 'days').endOf('day');
 
     const curTime = moment();
     const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
@@ -203,7 +212,8 @@ class ExecutiveDashboard extends React.Component {
         heatmapGroup: instanceGroup,
       }, () => {
         retrieveHeatmapData(
-          modelType, predictedEndTime.valueOf(), numberOfDays * 2, timezoneOffset, 'loadHourly',
+          modelType, predictedEndTime.valueOf(),
+          (diffDays * 2) + 1, timezoneOffset, 'loadHourly',
           projectName, instanceGroup,
         ).then((data) => {
           this.setState({
@@ -219,7 +229,8 @@ class ExecutiveDashboard extends React.Component {
 
   @autobind
   handleListRowOpenResource(projectName, instanceGroup) {
-    const { startTime, endTime, numberOfDays, timezoneOffset } = this.state;
+    const { startTime, endTime, timezoneOffset } = this.state;
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
     const query = {
       startTime: startTime.format(this.dateFormat),
       endTime: endTime.format(this.dateFormat),
@@ -232,31 +243,28 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { viewport } = this.props;
-    const { startTime, endTime, loading, eventStats,
-      heatmapLoading, heatmapData, numberOfDays } = this.state;
+    const { startTime, endTime, loading, eventStats, heatmapLoading, heatmapData } = this.state;
+    const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     let anomalyContainerHeight = null;
-    let resourceContainerHeight = null;
-
     const top = 100;
-    resourceContainerHeight = viewport.height - top;
+    const resourceContainerHeight = viewport.height - top;
+
     if (this.$heapmapBlock) {
       const height = this.$heapmapBlock.height();
       anomalyContainerHeight = viewport.height - top - height - 24;
     }
 
-    const startTimePrevious = startTime.subtract(numberOfDays, 'day');
-    const endTimePrevious = endTime.subtract(numberOfDays, 'day');
-    const startTimePredicted = startTime.add(numberOfDays, 'day');
-    const endTimePredicted = endTime.add(numberOfDays, 'day');
+    const startTimePrevious = startTime.clone().subtract(numberOfDays, 'day');
+    const endTimePrevious = endTime.clone().subtract(numberOfDays, 'day');
+    const startTimePredicted = startTime.clone().add(numberOfDays, 'day');
+    const endTimePredicted = endTime.clone().add(numberOfDays, 'day');
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
     const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format('M/D')}`;
     const timeIntervalCurrent = `${startTime.format('M/D')} - ${endTime.format('M/D')}`;
     const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
-    // const realEndTime = (endTime > curTime ? curTime : endTime).valueOf();
-
     const { view } = this.state;
 
     return (
