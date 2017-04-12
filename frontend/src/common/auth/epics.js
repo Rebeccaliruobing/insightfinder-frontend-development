@@ -1,8 +1,7 @@
 /* @flow */
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
-import store from 'store';
-import { login as loginApi, retrieveInitData } from '../apis';
+import { login as loginApi, loadInitData } from '../apis';
 import { showAppLoader, appFatalError, setInitData } from '../app/actions';
 import { appMessages } from '../app/messages';
 import { loginSuccess, loginFailure } from './actions';
@@ -21,7 +20,7 @@ const loginEpic = (action$: any) =>
               loginSuccess(d.credentials, d.userInfo),
             ),
             Observable
-              .from(retrieveInitData(d.credentials))
+              .from(loadInitData(d.credentials))
               .map(data => setInitData(data))
               .takeUntil(action$.ofType('APP_STOP'))
               .catch(err => Observable.of(

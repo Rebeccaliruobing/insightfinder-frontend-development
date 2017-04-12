@@ -13,6 +13,10 @@ export default [
     "defaultMessage": "password",
   },
   {
+    "id": "app.fields.project",
+    "defaultMessage": "Project",
+  },
+  {
     "id": "app.fields.userName",
     "defaultMessage": "username",
   },

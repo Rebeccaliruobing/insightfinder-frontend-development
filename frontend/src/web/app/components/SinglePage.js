@@ -6,6 +6,7 @@ import { injectIntl } from 'react-intl';
 import type { State } from '../../../common/types';
 import { Container } from '../../../lib/fui/react';
 import Topbar from './Topbar';
+import SinglePageLoader from './SinglePageLoader';
 import { appMenusMessages } from '../../../common/app/messages';
 import { setCurrentLocale } from '../../../common/app/actions';
 import { logoff } from '../../../common/auth/actions';
@@ -14,6 +15,7 @@ type Props = {
   className: string,
   intl: Object,
   userInfo: Object,
+  pageLoaderVisible: bool,
   localeOptions: Array,
   children: Element<any>,
   setCurrentLocale: Function,
@@ -21,7 +23,7 @@ type Props = {
 };
 
 const SinglePageCore = ({
-  className, userInfo, intl,
+  className, userInfo, intl, pageLoaderVisible,
   localeOptions, children,
   setCurrentLocale, logoff,
 }: Props) => {
@@ -82,7 +84,10 @@ const SinglePageCore = ({
           </div>
         </div>
       </Topbar>
-      <div className="content">{children}</div>
+      <div className="content">
+        <SinglePageLoader key="loader" visible={pageLoaderVisible} />
+        {children}
+      </div>
     </Container>
   );
 };
@@ -91,6 +96,7 @@ const SinglePage = injectIntl(SinglePageCore);
 export default connect(
   (state: State) => ({
     userInfo: state.auth.userInfo,
+    pageLoaderVisible: state.app.pageLoaderVisible,
     localeOptions: map(l => ({ value: l[0], label: l[1] }), toPairs(state.app.locales)),
   }),
   { setCurrentLocale, logoff },

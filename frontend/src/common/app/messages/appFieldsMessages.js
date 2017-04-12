@@ -10,6 +10,10 @@ const appFieldsMessages = defineMessages({
     defaultMessage: 'password',
     id: 'app.fields.password',
   },
+  project: {
+    defaultMessage: 'Project',
+    id: 'app.fields.project',
+  },
 });
 
 export default appFieldsMessages;

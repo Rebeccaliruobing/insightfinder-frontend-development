@@ -5,11 +5,10 @@ import { REHYDRATE } from 'redux-persist/constants';
 import type { Deps } from '../types';
 import { PermissionError } from '../errors';
 import { isValidCredentials } from '../auth';
-import { retrieveInitData } from '../apis';
+import { loadInitData } from '../apis';
 import { loginSuccess, loginFailure, sessionInvalid } from '../auth/actions';
 import { appStarted, setInitData, appFatalError, appRehydrated } from './actions';
 import { appMessages } from '../app/messages';
-import { authMessages } from '../auth/messages';
 
 const appStart$ = (action$: any, getState: Function) => {
   const { credentials, userInfo } = getState().auth;
@@ -26,7 +25,7 @@ const appStart$ = (action$: any, getState: Function) => {
 
   // Otherwise, load the initial data and verify the token is still valid.
   return Observable
-    .from(retrieveInitData(credentials))
+    .from(loadInitData(credentials))
     .switchMap((d) => {
       return Observable.of(
         loginSuccess(credentials, userInfo),

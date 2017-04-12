@@ -38,11 +38,19 @@ export const setInitData = (data: Object): Action => ({
 });
 
 export const showAppLoader = (): Action => ({
-  type: 'SHOW_APPLOADER',
+  type: 'SHOW_APP_LOADER',
 });
 
 export const hideAppLoader = (): Action => ({
-  type: 'HIDE_APPLOADER',
+  type: 'HIDE_APP_LOADER',
+});
+
+export const showPageLoader = (): Action => ({
+  type: 'SHOW_PAGE_LOADER',
+});
+
+export const hidePageLoader = (): Action => ({
+  type: 'HIDE_PAGE_LOADER',
 });
 
 export const appFatalError = (message: ?Message, error: ?Error): Action => ({

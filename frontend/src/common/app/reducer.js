@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { REHYDRATE } from 'redux-persist/constants';
 import R from 'ramda';
-import { get } from 'lodash'; 
+import { get } from 'lodash';
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
@@ -24,6 +24,7 @@ const initialState = {
   locales,
   messages,
   appLoaderVisible: false,
+  pageLoaderVisible: false,
   rehydrated: false,
   starting: false,
   started: false,
@@ -103,15 +104,25 @@ const reducer = (
       ...state,
       started: false,
     };
-  } else if (action.type === 'SHOW_APPLOADER') {
+  } else if (action.type === 'SHOW_APP_LOADER') {
     return {
       ...state,
       appLoaderVisible: true,
     };
-  } else if (action.type === 'HIDE_APPLOADER') {
+  } else if (action.type === 'HIDE_APP_LOADER') {
     return {
       ...state,
       appLoaderVisible: false,
+    };
+  } else if (action.type === 'SHOW_PAGE_LOADER') {
+    return {
+      ...state,
+      pageLoaderVisible: true,
+    };
+  } else if (action.type === 'HIDE_PAGE_LOADER') {
+    return {
+      ...state,
+      pageLoaderVisible: false,
     };
   } else if (action.type === 'APP_FATAL_ERROR') {
     if (action.payload.error) {

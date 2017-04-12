@@ -1,5 +1,6 @@
 .fui.loader {
-  &.has-image > .fui.image {
+  background-color: rgba($body-bg-color, 0.8);
+  > .content {
     &:before {
       border: 2px solid $loader-border-color;
       background-color: $loader-bg-color;

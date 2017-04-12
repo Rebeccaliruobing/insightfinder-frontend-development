@@ -1,17 +1,14 @@
 import React from 'react';
-import { ImageLoader } from '../../lib/fui/react';
+import { Loader } from '../../lib/fui/react';
 import logo from '../../common/app/images/logo.png';
 
 type Props = {
   visible: bool,
 };
 
-const Loading = ({
+const AppLoader = ({
   visible,
 }: Props) =>
-  (visible ?
-    (<ImageLoader fullScreen imageSrc={logo} size={120} visible />) :
-    null
-  );
+  (visible ? (<Loader fullScreen imageSrc={logo} size={120} visible />) : null);
 
-export default Loading;
+export default AppLoader;

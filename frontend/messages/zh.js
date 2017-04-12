@@ -13,6 +13,10 @@ export default [
     "defaultMessage": "密码",
   },
   {
+    "id": "app.fields.project",
+    "defaultMessage": "项目",
+  },
+  {
     "id": "app.fields.userName",
     "defaultMessage": "用户名",
   },

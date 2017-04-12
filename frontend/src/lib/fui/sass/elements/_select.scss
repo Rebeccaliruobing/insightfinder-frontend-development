@@ -1,11 +1,17 @@
 @import "../variables";
 
-$select-input-border-radius: $border-radius !default;
-$select-input-height:               32px !default;
+// Styles based on react-select default style
+$select-input-border-radius:        $border-radius !default;
+$select-input-height:               28px !default;
+
 $select-padding-horizontal:         (16/14) * 1em;
 @import "~react-select/scss/default";
 
-.Select {
+.fui.select {
+  font-size: $font-size-hint;
+  &.large {
+    font-size: $font-size-body;
+  }
   .Select-input {
     > input {
       // Override semantic input
@@ -13,6 +19,11 @@ $select-padding-horizontal:         (16/14) * 1em;
       box-shadow: none !important;
       /* For IE 8 compatibility */
       padding: (($select-input-internal-height - 14) / 2 - 2) 0 (($select-input-internal-height - 14) / 2) !important; 
+    }
+  }
+  .Select-arrow-zone {
+    > .fui.angle.icon {
+      font-size: 18px;
     }
   }
 }

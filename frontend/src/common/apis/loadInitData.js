@@ -4,11 +4,11 @@ import getEndpoint from './getEndpoint';
 import fetchPost from './fetchPost';
 
 /**
- * Retrieve the initial data includes projects info, metadata.
+ * Load the initial data includes projects info, metadata.
  * Old API: postJSONDashboardUserValues()
  * TODO: convert the response data into objects.
  */
-const retrieveInitData = (
+const loadInitData = (
   credentials: Credentials,
 ) =>
   fetchPost(
@@ -19,4 +19,4 @@ const retrieveInitData = (
     },
   ).then(d => d.data);
 
-export default retrieveInitData;
+export default loadInitData;

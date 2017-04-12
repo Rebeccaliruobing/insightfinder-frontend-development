@@ -1,60 +1,79 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import R from 'ramda';
-import VLink from 'valuelink';
+import { injectIntl } from 'react-intl';
+import { autobind } from 'core-decorators';
 import { Container, Select } from '../../lib/fui/react';
+import { appFieldsMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
-import { hideAppLoader } from '../../common/app/actions';
+import { hideAppLoader, showPageLoader, hidePageLoader } from '../../common/app/actions';
+import { loadLogStreaming, setLogStreamingSelection } from '../../common/log/actions';
 
 type Props = {
   projects: Array<Object>,
+  currentProject: ?Object,
+  logs: Array<Object>,
+  currentLog: ?Object,
+  intl: Object,
   match: Object,
   hideAppLoader: Function,
+  showPageLoader: Function,
+  hidePageLoader: Function,
+  loadLogStreaming: Function,
+  setLogStreamingSelection: Function,
 };
 
-class LogLiveAnalysis extends React.Component {
+class LogLiveAnalysisCore extends React.Component {
   props: Props;
 
-  constructor(props) {
-    super(props);
-
-    const { match, projects } = props;
-    const { projectName } = match.params;
-    this.state = {
-      currentProject: R.find(p => p.name === projectName)(projects) || {},
-    };
+  componentDidMount() {
+    const { projectName, logName } = this.props.match.params;
+    this.props.loadLogStreaming(projectName, logName);
   }
 
-  componentDidMount() {
-    this.props.hideAppLoader();
+  @autobind
+  handleProjectChange(newValue) {
+    const { setLogStreamingSelection, currentLog } = this.props;
+    const project = newValue ? newValue.value : null;
+    setLogStreamingSelection(project, currentLog);
   }
 
   render() {
-    const { projects } = this.props;
-    const currentProjectLink = VLink.state(this, 'currentProject');
+    const { intl, projects, currentProject, logs, currentLog } = this.props;
+    if (currentLog) {
+    }
+
     return (
       <Container fullHeight withGutter>
         <Container toolbar>
-          <div className="ui breadcrumb">
-            <span className="label">Project :</span>
+          <div className="section">
+            <span className="label">{intl.formatMessage(appFieldsMessages.project)}</span>
             <Select
               name="project" style={{ width: 100 }}
-              autosize={false} clearable={false}
-              valueLink={currentProjectLink} options={projects}
+              options={projects}
+              value={currentProject} onChange={this.handleProjectChange}
             />
           </div>
-          <div className="inline-block">fdfsd</div>
-          <div className="float-right inline-block">fdfsd</div>
         </Container>
       </Container>
     );
   }
 }
 
+const LogLiveAnalysis = injectIntl(LogLiveAnalysisCore);
 export default connect(
-  (state: State) => ({
-    projects: R.map(p => ({ value: p.name, label: p.name }),
-      R.filter(p => p.hasLogData, state.app.projects)),
-  }),
-  { hideAppLoader },
+  (state: State) => {
+    const { streamingProjects: projects,
+      currentStreamingProject: projectName } = state.log;
+    const currentProject = R.find(p => p.name === projectName, projects);
+    return {
+      projects,
+      currentProject,
+    };
+  },
+  {
+    hideAppLoader,
+    showPageLoader, hidePageLoader,
+    loadLogStreaming, setLogStreamingSelection,
+  },
 )(LogLiveAnalysis);
