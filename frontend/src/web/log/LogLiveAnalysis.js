@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import R from 'ramda';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
+import { push } from 'react-router-redux';
 import { Container, Select } from '../../lib/fui/react';
 import { appFieldsMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
@@ -27,8 +28,10 @@ class LogLiveAnalysisCore extends React.Component {
   props: Props;
 
   componentDidMount() {
+    // Get the project and log name from the url
     const { projectName, logName } = this.props.match.params;
     this.props.loadLogStreaming(projectName, logName);
+    this.props.hideAppLoader();
   }
 
   @autobind
@@ -72,7 +75,7 @@ export default connect(
     };
   },
   {
-    hideAppLoader,
+    hideAppLoader, push,
     showPageLoader, hidePageLoader,
     loadLogStreaming, setLogStreamingSelection,
   },
