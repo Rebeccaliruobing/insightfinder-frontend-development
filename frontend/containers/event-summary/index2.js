@@ -259,7 +259,6 @@ class EventSummary extends React.Component {
           Promise.all([detectedPromise, predictedPromise])
             .then(() => {
               const incidents = _.concat(detectedEvents, predictedEvents);
-              console.log(incidents);
               data.incidents = incidents;
               this.setState({
                 loading: false,
