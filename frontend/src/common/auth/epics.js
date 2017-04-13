@@ -29,6 +29,7 @@ const loginEpic = (action$: any) =>
           );
         })
         .catch((err) => {
+          console.error(['API call failed', err]);
           if (err instanceof PermissionError) {
             return Observable.of(
               loginFailure(authMessages.errorsWrongCredential, err),

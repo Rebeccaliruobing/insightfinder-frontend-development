@@ -74,8 +74,8 @@ export class AppCore extends React.Component {
                   class: currentTheme ? `${currentTheme} theme` : '',
                 }}
               />
-              {!appInited && <AppError />}
-              {appInited && <AppAlert />}
+              <AppError />
+              <AppAlert />
               <AppLoader visible={appLoaderVisible} />
               {appStarted && <Routing history={history} />}
             </Container>

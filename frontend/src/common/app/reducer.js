@@ -116,25 +116,11 @@ const reducer = (
       pageLoaderVisible: false,
     };
   } else if (action.type === 'APP_ERROR') {
-    if (action.payload.error) {
-      console.error(action.payload.error);
-    }
-    const { inited } = state;
-    let alerts = state.alerts;
-    if (inited) {
-      alerts = [...alerts, {
-        id: Date.now().toString(),
-        type: 'error',
-        message: action.payload.message,
-      }];
-    }
-
     return {
       ...state,
       appLoaderVisible: false,
       pageLoaderVisible: false,
       lastError: action.payload,
-      alerts,
     };
   } else if (action.type === 'SHOW_APP_ALERT') {
     const { type, message } = action.payload;

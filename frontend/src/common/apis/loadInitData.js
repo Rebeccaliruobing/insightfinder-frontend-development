@@ -14,8 +14,8 @@ const loadInitData = (
   fetchPost(
     getEndpoint('dashboard-uservalues'),
     {
-      operation: 'display',
       ...credentials,
+      operation: 'display',
     },
   ).then(d => d.data);
 

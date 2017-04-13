@@ -13,22 +13,22 @@ import fetchHandler from './fetchHandler';
  * }
  *
  * @param {string} url The url of the api
- * @param {object} data The data to post.
+ * @param {object} query The query string object
  */
-const fetchPost = (
+const fetchGet = (
   url: string,
-  data: Object,
+  query: Object,
 ) =>
   fetchHandler(
-    fetch(url, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    fetch(
+      `${url}?${qs.stringify(query)}`, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+        },
       },
-      body: qs.stringify(data),
-    }),
+    ),
   );
 
-export default fetchPost;
+export default fetchGet;

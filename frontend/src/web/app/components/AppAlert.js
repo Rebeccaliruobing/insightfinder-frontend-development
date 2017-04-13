@@ -26,25 +26,27 @@ class AppAlertCore extends React.Component {
   componentDidMount() {
     const { alertMessages, setTimeout, timeout } = this.props;
     if (alertMessages.length > 0) {
-      setTimeout(this.cleanOutdatedAlerts, timeout);
+      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
     }
   }
 
   componentDidUpdate() {
     const { alertMessages, setTimeout, timeout } = this.props;
     if (alertMessages.length > 0) {
-      setTimeout(this.cleanOutdatedAlerts, timeout);
+      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
     }
   }
 
   @autobind
   cleanOutdatedAlerts() {
-    const { alertMessages, hideAppAlert } = this.props;
-    const now = Date.now().valueOf();
+    const { alertMessages, hideAppAlert, setTimeout, timeout } = this.props;
+    const expired = Date.now().valueOf() - timeout;
     // Get the outdated alerts based on the id.
-    const ids = R.map(a => a.id, R.filter(a => parseInt(a.id, 0) <= now, alertMessages));
+    const ids = R.map(a => a.id, R.filter(a => parseInt(a.id, 0) <= expired, alertMessages));
     if (ids.length > 0) {
       hideAppAlert(ids);
+    } else {
+      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
     }
   }
 

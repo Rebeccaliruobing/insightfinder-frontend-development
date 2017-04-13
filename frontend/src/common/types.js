@@ -1,7 +1,6 @@
 /* @flow */
 export type Deps = {
   getState: () => Object,
-  bindCredentials: (Function) => Function,
 };
 
 export type Message = {

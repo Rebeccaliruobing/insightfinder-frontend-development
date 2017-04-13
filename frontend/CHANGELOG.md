@@ -1,3 +1,10 @@
+## 2017-04-13
+### Added
+- Add fetchGet used to send GET command
+
+### Change
+- Improve app error handle.
+
 ## 2017-04-12
 ### Changed
 - Use new events api to get predicted & detected events.

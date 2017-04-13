@@ -1,17 +1,17 @@
 /*  @flow */
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
-import fetchPost from './fetchPost';
+import fetchGet from './fetchGet';
 
 const loadLogStreaming = (
   credentials: Credentials,
   operation : String,
 ) =>
-  fetchPost(
+  fetchGet(
     getEndpoint('logstreaming'),
     {
-      operation,
       ...credentials,
+      operation,
     },
   ).then(d => d.data);
 

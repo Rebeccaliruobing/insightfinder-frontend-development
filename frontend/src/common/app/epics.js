@@ -35,6 +35,7 @@ const appStart$ = (action$: any, getState: Function) => {
     })
     .takeUntil(action$.ofType('APP_STOP'))
     .catch((err) => {
+      console.error(['API call failed', err]);
       if (err instanceof PermissionError) {
         return Observable.of(
           sessionInvalid(err),

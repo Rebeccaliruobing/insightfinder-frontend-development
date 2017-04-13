@@ -3,10 +3,8 @@
 import { Observable } from 'rxjs/Observable';
 import type { Deps } from '../types';
 import { loadLogStreaming } from '../apis';
-import { showAppLoader, hideAppLoader, appError } from '../app/actions';
-import { PermissionError } from '../errors';
-import { sessionInvalid } from '../auth/actions';
-import { appMessages } from '../app/messages';
+import { showAppLoader, hideAppLoader } from '../app/actions';
+import { apiEpicErrorHandle } from '../errors';
 
 const streamingEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING')
@@ -20,14 +18,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
             console.log(d);
           })
           .catch((err) => {
-            if (err instanceof PermissionError) {
-              return Observable.of(
-                sessionInvalid(err),
-              );
-            }
-            return Observable.of(
-              appError(appMessages.errorsServer, err),
-            );
+            return apiEpicErrorHandle(err);
           }),
         Observable.of(hideAppLoader()),
       );
