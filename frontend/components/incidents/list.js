@@ -70,13 +70,16 @@ class IncidentsList extends React.Component {
 
   @autobind
   resetLocalDataAndState(prevProps, props) {
-    const { incidents, activeTab, eventStartTimestamp } = props;
+    const { incidents, detectedEvents, predictedEvents,
+      activeTab, eventStartTimestamp } = props;
     let tab = activeTab;
     let state = null;
 
-    if (prevProps.incidents !== incidents) {
-      this.detectedIncidents = R.filter(i => !i.predictedFlag, incidents);
-      this.predictedIncidents = R.filter(i => !!i.predictedFlag, incidents);
+    if (prevProps.incidents !== incidents ||
+      prevProps.detectedEvents !== detectedEvents ||
+      prevProps.predictedEvents !== predictedEvents) {
+      this.detectedIncidents = detectedEvents || R.filter(i => !i.predictedFlag, incidents);
+      this.predictedIncidents = predictedEvents || R.filter(i => !!i.predictedFlag, incidents);
 
       const ratios = R.map(v => v.anomalyRatio, incidents);
       this.maxAnomalyRatio = R.reduce(R.max, 0, ratios);
@@ -339,7 +342,7 @@ class IncidentsList extends React.Component {
 
     return (
       <tbody style={{ width: '100%', height: tableBodyHeight || 0, overflow: 'auto', display: 'block' }}>
-        {incidents.map((incident) => {
+        {incidents.map((incident, idx) => {
           // Display the anomaly string in title.
           let anomalyRatioString = '';
           if (incident.anomalyRatio > 0) {
@@ -355,7 +358,7 @@ class IncidentsList extends React.Component {
           return (
             <tr
               style={{ display: hidden ? 'none' : 'inline-table', width: '100%' }}
-              key={incident.id}
+              key={idx}
               onClick={() => this.handleIncidentSelected(incident, type)}
               className={`${incident === self.state.activeIncident ? 'active' : ''}`}
               title={`${anomalyRatioString}Event details: \n ${incident.rootCauseJson.rootCauseDetails}`}

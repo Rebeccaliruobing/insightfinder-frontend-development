@@ -11,6 +11,7 @@ import {
   IncidentAnalysis, BehaviorChangeDetection, OutlierDetection, RolloutCheck,
   SummaryReport, AppForecast,
 } from '../../../components/cloud';
+import EventSummary2 from '../../../containers/event-summary/index2';
 import { Log, IncidentLogAnalysis } from '../../../components/log';
 import {
   Settings,
@@ -43,6 +44,10 @@ const RoutingNextV1 = () => (
       <Route
         path="/cloud/monitoring"
         render={() => (<Cloud><EventSummary /></Cloud>)}
+      />
+      <Route
+        path="/cloud/monitoring2"
+        render={() => (<Cloud><EventSummary2 /></Cloud>)}
       />
       <Route
         path="/cloud/executive-dashboard"

@@ -1,5 +1,6 @@
 ## 2017-04-12
 ### Changed
+- Use new events api to get predicted & detected events.
 - Improve showAppLoader & hideAppLoader, when app is initialized, show page loader.
 - Improve the app error handling, when app is not inited, show error in the whole page, otherwise show the errors in toaster.
 
