@@ -33,7 +33,7 @@ export type AppState = {
   inited: bool,
   appLoaderVisible: boolean,
   pageLoaderVisible: boolean,
-  fatalError: ?ErrorMessage,
+  lastError: ?ErrorMessage,
   v1store: Object,
   projects: Array<Object>,
 };
@@ -70,9 +70,7 @@ export type Action =
   | { type: 'SET_INIT_DATA', payload: Object }
   | { type: 'SHOW_APP_LOADER' }
   | { type: 'HIDE_APP_LOADER' }
-  | { type: 'SHOW_PAGE_LOADER' }
-  | { type: 'HIDE_PAGE_LOADER' }
-  | { type: 'APP_FATAL_ERROR', payload: { message: ?Message, error: ?Error } }
+  | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGIN', payload: { userName: string, password: string } }
   | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }

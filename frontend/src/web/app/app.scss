@@ -12,7 +12,9 @@
   }
 }
 
-.center-page.error.container {
+.error-page.container {
+  z-index: 3000;
+  background-color: $grey-50;
   .fui.box {
     background: #FFF6F6;
     color: #9F3A38;

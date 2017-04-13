@@ -2,7 +2,7 @@
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
 import { login as loginApi, loadInitData } from '../apis';
-import { showAppLoader, appFatalError, setInitData } from '../app/actions';
+import { showAppLoader, appError, setInitData } from '../app/actions';
 import { appMessages } from '../app/messages';
 import { loginSuccess, loginFailure } from './actions';
 import { PermissionError } from '../errors';
@@ -24,7 +24,7 @@ const loginEpic = (action$: any) =>
               .map(data => setInitData(data))
               .takeUntil(action$.ofType('APP_STOP'))
               .catch(err => Observable.of(
-                appFatalError(appMessages.errorsServer, err),
+                appError(appMessages.errorsServer, err),
               )),
           );
         })

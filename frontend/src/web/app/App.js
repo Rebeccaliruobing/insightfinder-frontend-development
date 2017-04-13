@@ -5,21 +5,20 @@ import Helmet from 'react-helmet';
 import { IntlProvider } from 'react-intl';
 import Measure from 'react-measure';
 import { Container } from '../../lib/fui/react';
-import type { State, ErrorMessage } from '../../common/types';
+import type { State } from '../../common/types';
 import { ThemeProvider } from '../../common/app/components';
 import { appStart, appStop, setViewport } from '../../common/app/actions';
+import { AppError, AppLoader, AppToaster } from './components';
 import Routing from './Routing';
-import AppLoader from './AppLoader';
-import AppFatalError from './AppFatalError';
 import * as themes from './themes';
 import './app.scss';
 
 type Props = {
   history: Object,
+  appInited: bool,
   appStarted: bool,
   appLoaderVisible: bool,
   messages: Object,
-  appFatalError: ?ErrorMessage,
   currentLocale: string,
   currentTheme: string,
   viewport: Object,
@@ -59,9 +58,7 @@ export class AppCore extends React.Component {
 
   render() {
     const { history, currentLocale, currentTheme, appStarted, messages,
-      appLoaderVisible, appFatalError } = this.props;
-
-    const { message, error } = appFatalError || {};
+      appLoaderVisible, appInited } = this.props;
 
     return (
       <IntlProvider
@@ -77,7 +74,8 @@ export class AppCore extends React.Component {
                   class: currentTheme ? `${currentTheme} theme` : '',
                 }}
               />
-              <AppFatalError message={message} error={error} />
+              {!appInited && <AppError />}
+              {appInited && <AppToaster />}
               <AppLoader visible={appLoaderVisible} />
               {appStarted && <Routing history={history} />}
             </Container>
@@ -97,7 +95,6 @@ export default connect(
     appStarted: state.app.started,
     appLoaderVisible: state.app.appLoaderVisible,
     appInited: state.app.inited,
-    appFatalError: state.app.fatalError,
   }),
   { setViewport, appStart, appStop },
 )(AppCore);

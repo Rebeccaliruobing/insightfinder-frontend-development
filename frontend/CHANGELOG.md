@@ -1,3 +1,8 @@
+## 2017-04-12
+### Changed
+- Improve showAppLoader & hideAppLoader, when app is initialized, show page loader.
+- Improve the app error handling, when app is not inited, show error in the whole page, otherwise show the errors in toaster.
+
 ## 2017-04-07
 ### Added
 

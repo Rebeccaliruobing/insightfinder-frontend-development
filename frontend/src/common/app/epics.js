@@ -7,7 +7,7 @@ import { PermissionError } from '../errors';
 import { isValidCredentials } from '../auth';
 import { loadInitData } from '../apis';
 import { loginSuccess, loginFailure, sessionInvalid } from '../auth/actions';
-import { appStarted, setInitData, appFatalError, appRehydrated } from './actions';
+import { appStarted, setInitData, appError, appRehydrated } from './actions';
 import { appMessages } from '../app/messages';
 
 const appStart$ = (action$: any, getState: Function) => {
@@ -42,7 +42,7 @@ const appStart$ = (action$: any, getState: Function) => {
         );
       }
       return Observable.of(
-        appFatalError(appMessages.errorsServer, err),
+        appError(appMessages.errorsServer, err),
       );
     });
 };

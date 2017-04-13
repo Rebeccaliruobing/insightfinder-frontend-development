@@ -45,15 +45,7 @@ export const hideAppLoader = (): Action => ({
   type: 'HIDE_APP_LOADER',
 });
 
-export const showPageLoader = (): Action => ({
-  type: 'SHOW_PAGE_LOADER',
-});
-
-export const hidePageLoader = (): Action => ({
-  type: 'HIDE_PAGE_LOADER',
-});
-
-export const appFatalError = (message: ?Message, error: ?Error): Action => ({
-  type: 'APP_FATAL_ERROR',
+export const appError = (message: ?Message, error: ?Error): Action => ({
+  type: 'APP_ERROR',
   payload: { message, error },
 });

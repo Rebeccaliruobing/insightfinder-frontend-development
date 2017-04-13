@@ -16,21 +16,17 @@ const initialState = {
   currentTheme: 'light',
   currentLocale: null,
   viewport: {
-    width: 0,
-    height: 0,
-    widthDiff: 0,
-    heightDiff: 0,
+    width: 0, height: 0,
+    widthDiff: 0, heightDiff: 0,
   },
   locales,
   messages,
-  appLoaderVisible: false,
-  pageLoaderVisible: false,
   rehydrated: false,
   starting: false,
   started: false,
   inited: false,
-  fatalError: null,
-  error: null,
+  appLoaderVisible: false,
+  pageLoaderVisible: false,
   lastError: null,
   v1store: {},
   projects: [],
@@ -105,33 +101,28 @@ const reducer = (
       started: false,
     };
   } else if (action.type === 'SHOW_APP_LOADER') {
+    // Show the app loader if it's not initialized, otherwise show page loader.
+    const { inited, appLoaderVisible } = state;
     return {
       ...state,
-      appLoaderVisible: true,
+      appLoaderVisible: appLoaderVisible || !inited,
+      pageLoaderVisible: inited && !appLoaderVisible,
     };
   } else if (action.type === 'HIDE_APP_LOADER') {
     return {
       ...state,
       appLoaderVisible: false,
-    };
-  } else if (action.type === 'SHOW_PAGE_LOADER') {
-    return {
-      ...state,
-      pageLoaderVisible: true,
-    };
-  } else if (action.type === 'HIDE_PAGE_LOADER') {
-    return {
-      ...state,
       pageLoaderVisible: false,
     };
-  } else if (action.type === 'APP_FATAL_ERROR') {
+  } else if (action.type === 'APP_ERROR') {
     if (action.payload.error) {
       console.error(action.payload.error);
     }
     return {
       ...state,
       appLoaderVisible: false,
-      fatalError: action.payload,
+      pageLoaderVisible: false,
+      lastError: action.payload,
     };
   }
   return { ...initialState, ...state };

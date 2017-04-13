@@ -7,7 +7,6 @@ import { push } from 'react-router-redux';
 import { Container, Select } from '../../lib/fui/react';
 import { appFieldsMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
-import { hideAppLoader, showPageLoader, hidePageLoader } from '../../common/app/actions';
 import { loadLogStreaming, setLogStreamingSelection } from '../../common/log/actions';
 
 type Props = {
@@ -17,9 +16,6 @@ type Props = {
   currentLog: ?Object,
   intl: Object,
   match: Object,
-  hideAppLoader: Function,
-  showPageLoader: Function,
-  hidePageLoader: Function,
   loadLogStreaming: Function,
   setLogStreamingSelection: Function,
 };
@@ -28,10 +24,9 @@ class LogLiveAnalysisCore extends React.Component {
   props: Props;
 
   componentDidMount() {
-    // Get the project and log name from the url
+    // Get the project and log name from the url and use them as the selection.
     const { projectName, logName } = this.props.match.params;
     this.props.loadLogStreaming(projectName, logName);
-    this.props.hideAppLoader();
   }
 
   @autobind
@@ -43,6 +38,7 @@ class LogLiveAnalysisCore extends React.Component {
 
   render() {
     const { intl, projects, currentProject, logs, currentLog } = this.props;
+    console.log(this.props);
     if (currentLog) {
     }
 
@@ -75,8 +71,6 @@ export default connect(
     };
   },
   {
-    hideAppLoader, push,
-    showPageLoader, hidePageLoader,
-    loadLogStreaming, setLogStreamingSelection,
+    push, loadLogStreaming, setLogStreamingSelection,
   },
 )(LogLiveAnalysis);
