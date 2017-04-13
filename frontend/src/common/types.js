@@ -14,6 +14,12 @@ export type ErrorMessage = {
   error: ?Error,
 };
 
+export type AlertMessage = {
+  id: string,
+  type: string,
+  message: ?Message,
+};
+
 export type Credentials = {
   userName: string,
   token: string,
@@ -34,6 +40,7 @@ export type AppState = {
   appLoaderVisible: boolean,
   pageLoaderVisible: boolean,
   lastError: ?ErrorMessage,
+  alerts: Array<AlertMessage>,
   v1store: Object,
   projects: Array<Object>,
 };
@@ -70,6 +77,8 @@ export type Action =
   | { type: 'SET_INIT_DATA', payload: Object }
   | { type: 'SHOW_APP_LOADER' }
   | { type: 'HIDE_APP_LOADER' }
+  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message } }
+  | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
   | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGIN', payload: { userName: string, password: string } }
   | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }

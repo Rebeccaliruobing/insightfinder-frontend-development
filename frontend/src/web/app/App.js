@@ -8,7 +8,7 @@ import { Container } from '../../lib/fui/react';
 import type { State } from '../../common/types';
 import { ThemeProvider } from '../../common/app/components';
 import { appStart, appStop, setViewport } from '../../common/app/actions';
-import { AppError, AppLoader, AppToaster } from './components';
+import { AppError, AppLoader, AppAlert } from './components';
 import Routing from './Routing';
 import * as themes from './themes';
 import './app.scss';
@@ -75,7 +75,7 @@ export class AppCore extends React.Component {
                 }}
               />
               {!appInited && <AppError />}
-              {appInited && <AppToaster />}
+              {appInited && <AppAlert />}
               <AppLoader visible={appLoaderVisible} />
               {appStarted && <Routing history={history} />}
             </Container>

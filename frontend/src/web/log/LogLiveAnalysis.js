@@ -20,7 +20,7 @@ type Props = {
   setLogStreamingSelection: Function,
 };
 
-class LogLiveAnalysisCore extends React.Component {
+class LogLiveAnalysisCore extends React.PureComponent {
   props: Props;
 
   componentDidMount() {

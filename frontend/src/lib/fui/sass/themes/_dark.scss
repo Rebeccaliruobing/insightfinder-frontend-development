@@ -24,4 +24,5 @@ html.dark {
   $loader-border-color:  $body-bg-color;
   $loader-bg-color:      $white;
   @import "../elements/loader_theme";
+  @import "../elements/message_theme";
 }

@@ -1,0 +1,29 @@
+.fui.message {
+  color: rgba(0,0,0,.87);
+  background: #f8f8f9;
+  box-shadow: 0 0 0 1px rgba(34,36,38,.22) inset, 0 0 0 0 transparent;
+  > .fui.close.icon {
+    font-size: 14px;
+    position: absolute;
+    right: 0px;
+    top: 4px;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  &.info {
+    color: $info-color;
+    background: $info-color-bg;
+    box-shadow: 0 0 0 1px $info-color inset, 0 0 0 0 transparent;
+  }
+  &.warning {
+    color: $warning-color;
+    background: $warning-color-bg;
+    box-shadow: 0 0 0 1px $warning-color inset, 0 0 0 0 transparent;
+  }
+  &.error {
+    color: $error-color;
+    background: $error-color-bg;
+    box-shadow: 0 0 0 1px $error-color inset, 0 0 0 0 transparent;
+  }
+}

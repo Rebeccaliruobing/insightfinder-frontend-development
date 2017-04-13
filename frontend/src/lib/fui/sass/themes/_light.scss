@@ -24,4 +24,5 @@ html, html.light {
   $loader-border-color:  $dark-divider-color;
   $loader-bg-color:      $white;
   @import "../elements/loader_theme";
+  @import "../elements/message_theme";
 }

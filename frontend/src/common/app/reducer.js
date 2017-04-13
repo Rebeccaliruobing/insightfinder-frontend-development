@@ -28,6 +28,7 @@ const initialState = {
   appLoaderVisible: false,
   pageLoaderVisible: false,
   lastError: null,
+  alerts: [],
   v1store: {},
   projects: [],
 };
@@ -118,11 +119,42 @@ const reducer = (
     if (action.payload.error) {
       console.error(action.payload.error);
     }
+    const { inited } = state;
+    let alerts = state.alerts;
+    if (inited) {
+      alerts = [...alerts, {
+        id: Date.now().toString(),
+        type: 'error',
+        message: action.payload.message,
+      }];
+    }
+
     return {
       ...state,
       appLoaderVisible: false,
       pageLoaderVisible: false,
       lastError: action.payload,
+      alerts,
+    };
+  } else if (action.type === 'SHOW_APP_ALERT') {
+    const { type, message } = action.payload;
+    let alerts = state.alerts;
+    alerts = [...alerts, {
+      id: Date.now().toString(),
+      type,
+      message,
+    }];
+    return {
+      ...state,
+      alerts,
+    };
+  } else if (action.type === 'HIDE_APP_ALERT') {
+    const { ids } = action.payload;
+    let { alerts } = state;
+    alerts = R.filter(a => !R.find(R.identical(a.id), ids), alerts);
+    return {
+      ...state,
+      alerts,
     };
   }
   return { ...initialState, ...state };
