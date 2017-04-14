@@ -1,3 +1,7 @@
+## 2017-04-14
+### Fix
+- Fix missing All group in exec-db
+
 ## 2017-04-13
 ### Added
 - Add fetchGet used to send GET command

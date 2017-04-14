@@ -42,11 +42,11 @@ const RoutingNextV1 = () => (
         render={() => (<Cloud><InsightReport /></Cloud>)}
       />
       <Route
-        path="/cloud/monitoring"
+        path="/cloud/monitoring1"
         render={() => (<Cloud><EventSummary /></Cloud>)}
       />
       <Route
-        path="/cloud/monitoring2"
+        path="/cloud/monitoring"
         render={() => (<Cloud><EventSummary2 /></Cloud>)}
       />
       <Route

@@ -96,7 +96,6 @@ class ExecutiveDashboard extends React.Component {
       query: {
         startTime: startTime.format(this.dateFormat),
         endTime: endTime.format(this.dateFormat),
-        timezoneOffset,
       },
     });
 
