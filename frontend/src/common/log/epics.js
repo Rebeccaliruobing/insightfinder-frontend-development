@@ -8,12 +8,14 @@ import { apiEpicErrorHandle } from '../errors';
 
 const streamingEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING')
-    .concatMap(() => {
+    .concatMap((action) => {
+      const { project } = action.payload;
+      console.log(action);
       const { credentials } = getState().auth;
       return Observable.concat(
         Observable.of(showAppLoader()),
         Observable
-          .from(loadLogStreaming(credentials, 'list'))
+          .from(loadLogStreaming(credentials, project, 'list'))
           .switchMap((d) => {
             console.log(d);
           })

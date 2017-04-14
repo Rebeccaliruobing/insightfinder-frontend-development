@@ -5,12 +5,13 @@ import fetchGet from './fetchGet';
 
 const loadLogStreaming = (
   credentials: Credentials,
-  operation : String,
+  projectName: String,
+  operation: String,
 ) =>
   fetchGet(
-    getEndpoint('logstreaming'),
-    {
+    getEndpoint('logstreaming'), {
       ...credentials,
+      projectName,
       operation,
     },
   ).then(d => d.data);

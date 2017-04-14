@@ -3,9 +3,9 @@
 import type { LogState, Action } from '../types';
 
 const initialState: LogState = {
-  streamingProjects: [],
   currentStreamingProject: null,
   currentStreamingLog: null,
+  streamingInfos: {},
 };
 
 const reducer = (

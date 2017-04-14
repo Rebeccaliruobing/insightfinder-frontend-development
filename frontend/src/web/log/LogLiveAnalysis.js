@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 import R from 'ramda';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
@@ -7,40 +8,41 @@ import { push } from 'react-router-redux';
 import { Container, Select } from '../../lib/fui/react';
 import { appFieldsMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
-import { loadLogStreaming, setLogStreamingSelection } from '../../common/log/actions';
+import { loadLogStreaming } from '../../common/log/actions';
 
 type Props = {
   projects: Array<Object>,
-  currentProject: ?Object,
-  logs: Array<Object>,
-  currentLog: ?Object,
+  streamingInfos: Object,
+  currentProjectId: ?string,
+  currentLogId: ?string,
   intl: Object,
   match: Object,
   loadLogStreaming: Function,
-  setLogStreamingSelection: Function,
 };
 
 class LogLiveAnalysisCore extends React.PureComponent {
   props: Props;
 
   componentDidMount() {
-    // Get the project and log name from the url and use them as the selection.
-    const { projectName, logName } = this.props.match.params;
-    this.props.loadLogStreaming(projectName, logName);
+    const { logId } = this.props.match.params;
+    const { projects } = this.props;
+    let { projectId } = this.props.match.params;
+    if (!projectId) {
+      projectId = (projects[0] || {}).name || null;
+    }
+    this.props.loadLogStreaming(projectId, logId);
   }
 
   @autobind
   handleProjectChange(newValue) {
-    const { setLogStreamingSelection, currentLog } = this.props;
-    const project = newValue ? newValue.value : null;
-    setLogStreamingSelection(project, currentLog);
+    const projectId = newValue ? newValue.value : null;
+    this.props.loadLogStreaming(projectId, null);
   }
 
   render() {
-    const { intl, projects, currentProject, logs, currentLog } = this.props;
-    console.log(this.props);
-    if (currentLog) {
-    }
+    const { intl, projects, streamingInfos, currentProjectId, currentLogId } = this.props;
+    const projectInfo = get(streamingInfos, currentProjectId, {});
+    const logInfo = get(projectInfo, currentLogId, null);
 
     return (
       <Container fullHeight withGutter>
@@ -49,9 +51,10 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appFieldsMessages.project)}</span>
             <Select
               name="project" style={{ width: 100 }}
-              options={projects}
-              value={currentProject} onChange={this.handleProjectChange}
+              options={R.map(p => ({ label: p.name, value: p.name }), projects)}
+              value={currentProjectId} onChange={this.handleProjectChange}
             />
+            {logInfo && <span>{currentLogId}</span>}
           </div>
         </Container>
       </Container>
@@ -62,15 +65,19 @@ class LogLiveAnalysisCore extends React.PureComponent {
 const LogLiveAnalysis = injectIntl(LogLiveAnalysisCore);
 export default connect(
   (state: State) => {
-    const { streamingProjects: projects,
-      currentStreamingProject: projectName } = state.log;
-    const currentProject = R.find(p => p.name === projectName, projects);
+    const {
+      currentStreamingProject: currentProjectId,
+      currentStreamingLog: currentLogId,
+      streamingInfos,
+    } = state.log;
     return {
-      projects,
-      currentProject,
+      projects: R.filter(p => p.hasLogData, state.app.projects),
+      currentProjectId,
+      currentLogId,
+      streamingInfos,
     };
   },
   {
-    push, loadLogStreaming, setLogStreamingSelection,
+    push, loadLogStreaming,
   },
 )(LogLiveAnalysis);

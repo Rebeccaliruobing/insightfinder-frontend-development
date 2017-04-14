@@ -53,9 +53,9 @@ export type AuthState = {
 };
 
 export type LogState = {
-  streamingProjects: ?Array<Object>,
   currentStreamingProject: ?string,
   currentStreamingLog: ?string,
+  streamingInfos: Object,
 };
 
 export type State = {
@@ -84,5 +84,4 @@ export type Action =
   | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGOFF' }
   | { type: 'LOAD_LOG_STREAMING', payload: { project: ?string, log: ?string } }
-  | { type: 'SET_LOG_STREAMING_SELECTION', payload: { project: ?string, log: ?string } }
   ;

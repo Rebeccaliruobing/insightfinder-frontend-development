@@ -18,8 +18,8 @@ import fetchHandler from './fetchHandler';
 const fetchGet = (
   url: string,
   query: Object,
-) =>
-  fetchHandler(
+) => {
+  return fetchHandler(
     fetch(
       `${url}?${qs.stringify(query)}`, {
         method: 'GET',
@@ -30,5 +30,6 @@ const fetchGet = (
       },
     ),
   );
+};
 
 export default fetchGet;
