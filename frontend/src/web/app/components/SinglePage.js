@@ -56,7 +56,7 @@ const SinglePageCore = ({
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
           <div className="right menu">
-            <div className="ui dropdown language item">
+            <div className="ui dropdown language item" style={{ display: 'none' }}>
               <i className="translate icon" />
               <div className="right-align menu">
                 {

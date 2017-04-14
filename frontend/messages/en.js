@@ -5,6 +5,22 @@ export default [
     "defaultMessage": "Refresh",
   },
   {
+    "id": "app.errors.badRequest",
+    "defaultMessage": "The request parameters are incorrect, please check your input.",
+  },
+  {
+    "id": "app.errors.invalidData",
+    "defaultMessage": "The data is invalid, please try again.",
+  },
+  {
+    "id": "app.errors.network",
+    "defaultMessage": "Connection timeout, please network connection.",
+  },
+  {
+    "id": "app.errors.notFound",
+    "defaultMessage": "The requested resource not exists",
+  },
+  {
     "id": "app.errors.server",
     "defaultMessage": "Sorry, we've had a server error, Please refresh and try again.",
   },

@@ -3,7 +3,8 @@
 - Add fetchGet used to send GET command
 
 ### Change
-- Improve app error handle.
+- Improve error handle message for API call.
+- Hide language selector in navbar.
 
 ## 2017-04-12
 ### Changed
