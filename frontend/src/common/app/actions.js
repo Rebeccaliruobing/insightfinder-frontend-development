@@ -38,14 +38,24 @@ export const setInitData = (data: Object): Action => ({
 });
 
 export const showAppLoader = (): Action => ({
-  type: 'SHOW_APPLOADER',
+  type: 'SHOW_APP_LOADER',
 });
 
 export const hideAppLoader = (): Action => ({
-  type: 'HIDE_APPLOADER',
+  type: 'HIDE_APP_LOADER',
 });
 
-export const appFatalError = (message: ?Message, error: ?Error): Action => ({
-  type: 'APP_FATAL_ERROR',
+export const appError = (message: ?Message, error: ?Error): Action => ({
+  type: 'APP_ERROR',
   payload: { message, error },
+});
+
+export const showAppAlert = (type: string, message: Message): Action => ({
+  type: 'SHOW_APP_ALERT',
+  payload: { type, message },
+});
+
+export const hideAppAlert = (ids: Array<string>): Action => ({
+  type: 'HIDE_APP_ALERT',
+  payload: { ids },
 });

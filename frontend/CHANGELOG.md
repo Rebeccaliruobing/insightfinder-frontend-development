@@ -1,3 +1,27 @@
+## 2017-04-14
+### Fix
+- Fix missing All group in exec-db
+
+## 2017-04-13
+### Added
+- Add fetchGet used to send GET command
+
+### Change
+- Improve error handle message for API call.
+- Hide language selector in navbar.
+
+## 2017-04-12
+### Changed
+- Use new events api to get predicted & detected events.
+- Improve showAppLoader & hideAppLoader, when app is initialized, show page loader.
+- Improve the app error handling, when app is not inited, show error in the whole page, otherwise show the errors in toaster.
+
+## 2017-04-07
+### Added
+
+### Fixed
+- Exec-dashboard startTime/endTime bug.
+
 ## 2017-04-06
 ### Added
 - Add model upload in file anlysis

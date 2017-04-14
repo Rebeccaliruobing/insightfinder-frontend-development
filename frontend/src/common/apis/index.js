@@ -1,3 +1,3 @@
-/* @flow */
-export { default as retrieveInitData } from './retrieveInitData';
 export { default as login } from './login';
+export { default as loadInitData } from './loadInitData';
+export { default as loadLogStreaming } from './loadLogStreaming';

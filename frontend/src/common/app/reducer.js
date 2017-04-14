@@ -2,6 +2,7 @@
 /* eslint-disable no-console */
 import { REHYDRATE } from 'redux-persist/constants';
 import R from 'ramda';
+import { get } from 'lodash';
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
@@ -15,22 +16,21 @@ const initialState = {
   currentTheme: 'light',
   currentLocale: null,
   viewport: {
-    width: 0,
-    height: 0,
-    widthDiff: 0,
-    heightDiff: 0,
+    width: 0, height: 0,
+    widthDiff: 0, heightDiff: 0,
   },
   locales,
   messages,
-  appLoaderVisible: false,
   rehydrated: false,
   starting: false,
   started: false,
   inited: false,
-  fatalError: null,
-  error: null,
+  appLoaderVisible: false,
+  pageLoaderVisible: false,
   lastError: null,
+  alerts: [],
   v1store: {},
+  projects: [],
 };
 
 const reducer = (
@@ -80,9 +80,17 @@ const reducer = (
       started: true,
     };
   } else if (action.type === 'SET_INIT_DATA') {
+    const settings = JSON.parse(get(action.payload, 'projectSettingsAllInfo', '[]'));
+    const projects = R.map(s => ({
+      name: s.projectName,
+      type: s.projectType,
+      hasLogData: s.fileProjectType === 0,
+    }), settings);
+
     return {
       ...state,
       inited: true,
+      projects,
       v1store: {
         ...state.v1store,
         dashboardUservalues: action.payload,
@@ -93,24 +101,46 @@ const reducer = (
       ...state,
       started: false,
     };
-  } else if (action.type === 'SHOW_APPLOADER') {
+  } else if (action.type === 'SHOW_APP_LOADER') {
+    // Show the app loader if it's not initialized, otherwise show page loader.
+    const { inited, appLoaderVisible } = state;
     return {
       ...state,
-      appLoaderVisible: true,
+      appLoaderVisible: appLoaderVisible || !inited,
+      pageLoaderVisible: inited && !appLoaderVisible,
     };
-  } else if (action.type === 'HIDE_APPLOADER') {
+  } else if (action.type === 'HIDE_APP_LOADER') {
     return {
       ...state,
       appLoaderVisible: false,
+      pageLoaderVisible: false,
     };
-  } else if (action.type === 'APP_FATAL_ERROR') {
-    if (action.payload.error) {
-      console.error(action.payload.error);
-    }
+  } else if (action.type === 'APP_ERROR') {
     return {
       ...state,
       appLoaderVisible: false,
-      fatalError: action.payload,
+      pageLoaderVisible: false,
+      lastError: action.payload,
+    };
+  } else if (action.type === 'SHOW_APP_ALERT') {
+    const { type, message } = action.payload;
+    let alerts = state.alerts;
+    alerts = [...alerts, {
+      id: Date.now().toString(),
+      type,
+      message,
+    }];
+    return {
+      ...state,
+      alerts,
+    };
+  } else if (action.type === 'HIDE_APP_ALERT') {
+    const { ids } = action.payload;
+    let { alerts } = state;
+    alerts = R.filter(a => !R.find(R.identical(a.id), ids), alerts);
+    return {
+      ...state,
+      alerts,
     };
   }
   return { ...initialState, ...state };

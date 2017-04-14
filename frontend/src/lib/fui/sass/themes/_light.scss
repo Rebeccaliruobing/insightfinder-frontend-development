@@ -12,9 +12,17 @@ html, html.light {
 
   @import "../base/generic_theme";
   @import "../elements/box_theme";
+  @import "../elements/form_theme";
+
+  $icon-color:           $text-primary-color;
+  $icon-active-color:    $dark-icon-active-color;
+  $icon-inactive-color:  $dark-icon-inactive-color;
+  @import "../elements/icon_theme";
+
   @import "../elements/input_theme";
 
   $loader-border-color:  $dark-divider-color;
   $loader-bg-color:      $white;
   @import "../elements/loader_theme";
+  @import "../elements/message_theme";
 }

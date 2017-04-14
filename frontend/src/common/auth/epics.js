@@ -1,9 +1,8 @@
 /* @flow */
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
-import store from 'store';
-import { login as loginApi, retrieveInitData } from '../apis';
-import { showAppLoader, appFatalError, setInitData } from '../app/actions';
+import { login as loginApi, loadInitData } from '../apis';
+import { showAppLoader, appError, setInitData } from '../app/actions';
 import { appMessages } from '../app/messages';
 import { loginSuccess, loginFailure } from './actions';
 import { PermissionError } from '../errors';
@@ -21,15 +20,16 @@ const loginEpic = (action$: any) =>
               loginSuccess(d.credentials, d.userInfo),
             ),
             Observable
-              .from(retrieveInitData(d.credentials))
+              .from(loadInitData(d.credentials))
               .map(data => setInitData(data))
               .takeUntil(action$.ofType('APP_STOP'))
               .catch(err => Observable.of(
-                appFatalError(appMessages.errorsServer, err),
+                appError(appMessages.errorsServer, err),
               )),
           );
         })
         .catch((err) => {
+          console.error(['API call failed', err]);
           if (err instanceof PermissionError) {
             return Observable.of(
               loginFailure(authMessages.errorsWrongCredential, err),

@@ -1,7 +1,6 @@
 /* @flow */
 export type Deps = {
   getState: () => Object,
-  bindCredentials: (Function) => Function,
 };
 
 export type Message = {
@@ -12,6 +11,12 @@ export type Message = {
 export type ErrorMessage = {
   message: ?Message,
   error: ?Error,
+};
+
+export type AlertMessage = {
+  id: string,
+  type: string,
+  message: ?Message,
 };
 
 export type Credentials = {
@@ -32,8 +37,11 @@ export type AppState = {
   started: bool,
   inited: bool,
   appLoaderVisible: boolean,
-  fatalError: ?ErrorMessage,
+  pageLoaderVisible: boolean,
+  lastError: ?ErrorMessage,
+  alerts: Array<AlertMessage>,
   v1store: Object,
+  projects: Array<Object>,
 };
 
 export type AuthState = {
@@ -44,26 +52,36 @@ export type AuthState = {
   loginReason: ?string,
 };
 
+export type LogState = {
+  currentStreamingProject: ?string,
+  currentStreamingLog: ?string,
+  streamingInfos: Object,
+};
+
 export type State = {
   app: AppState,
   auth: AuthState,
+  log: LogState,
 };
 
 // Actions
 export type Action =
-  { type: 'SET_CURRENT_LOCALE'; payload: { locale: string } }
-  | { type: 'SET_CURRENT_THEME'; payload: { theme: string } }
-  | { type: 'SET_VIEWPORT'; payload: { width: number, height: number } }
+  { type: 'SET_CURRENT_LOCALE', payload: { locale: string } }
+  | { type: 'SET_CURRENT_THEME', payload: { theme: string } }
+  | { type: 'SET_VIEWPORT', payload: { width: number, height: number } }
   | { type: 'APP_REHYDRATED' }
   | { type: 'APP_START' }
   | { type: 'APP_STARTED' }
   | { type: 'APP_STOP' }
-  | { type: 'SET_INIT_DATA'; payload: Object }
-  | { type: 'SHOW_APPLOADER' }
-  | { type: 'HIDE_APPLOADER' }
-  | { type: 'APP_FATAL_ERROR'; payload: { message: ?Message, error: ?Error } }
-  | { type: 'LOGIN'; payload: { userName: string, password: string } }
-  | { type: 'LOGIN_SUCCESS'; payload: { credentials: Credentials, userInfo: ?Object } }
-  | { type: 'LOGIN_FAILURE'; payload: { message: ?Message, error: ?Error } }
+  | { type: 'SET_INIT_DATA', payload: Object }
+  | { type: 'SHOW_APP_LOADER' }
+  | { type: 'HIDE_APP_LOADER' }
+  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message } }
+  | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
+  | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
+  | { type: 'LOGIN', payload: { userName: string, password: string } }
+  | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
+  | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGOFF' }
+  | { type: 'LOAD_LOG_STREAMING', payload: { project: ?string, log: ?string } }
   ;

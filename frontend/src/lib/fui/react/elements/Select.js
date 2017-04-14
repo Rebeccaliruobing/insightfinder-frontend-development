@@ -1,30 +1,34 @@
 import React from 'react';
 import cx from 'classnames';
 import SelectCore from 'react-select';
-
-// TODO: What the value of multiple selection.
-const setValue = o => o.value;
+import Icon from './Icon';
 
 type Props = {
-  valueLink: Object,
   className: string,
+  autosize: bool,
+  clearable: bool,
+  multi: bool,
+  size: string,
 }
 
-const Select = ({ valueLink, className, ...rest }: Props) => {
-  if (valueLink) {
-    const invalid = !!valueLink.error;
-    const classes = cx({ invalid }, className);
-    return (
-      <SelectCore
-        value={valueLink.value}
-        onChange={valueLink.action(setValue)}
-        className={classes}
-        {...rest}
-      />);
-  }
+const Select = ({
+  className,
+  autosize, clearable, multi, size,
+  ...rest
+}: Props) => {
+  const classes = cx('fui', size, 'select', className);
+  const arrowRenderer = ({ onMouseDown, isOpen }: any) => {
+    return isOpen ?
+      (<Icon name="angle up" fitted onMouseDown={onMouseDown} />) :
+      (<Icon name="angle down" fitted onMouseDown={onMouseDown} />);
+  };
 
   return (
-    <SelectCore className={className} {...rest} />
+    <SelectCore
+      multi={multi} autosize={!!autosize} clearable={!!clearable}
+      arrowRenderer={arrowRenderer}
+      className={classes} {...rest}
+    />
   );
 };
 

@@ -5,11 +5,10 @@ import { REHYDRATE } from 'redux-persist/constants';
 import type { Deps } from '../types';
 import { PermissionError } from '../errors';
 import { isValidCredentials } from '../auth';
-import { retrieveInitData } from '../apis';
+import { loadInitData } from '../apis';
 import { loginSuccess, loginFailure, sessionInvalid } from '../auth/actions';
-import { appStarted, setInitData, appFatalError, appRehydrated } from './actions';
+import { appStarted, setInitData, appError, appRehydrated } from './actions';
 import { appMessages } from '../app/messages';
-import { authMessages } from '../auth/messages';
 
 const appStart$ = (action$: any, getState: Function) => {
   const { credentials, userInfo } = getState().auth;
@@ -26,7 +25,7 @@ const appStart$ = (action$: any, getState: Function) => {
 
   // Otherwise, load the initial data and verify the token is still valid.
   return Observable
-    .from(retrieveInitData(credentials))
+    .from(loadInitData(credentials))
     .switchMap((d) => {
       return Observable.of(
         loginSuccess(credentials, userInfo),
@@ -36,6 +35,7 @@ const appStart$ = (action$: any, getState: Function) => {
     })
     .takeUntil(action$.ofType('APP_STOP'))
     .catch((err) => {
+      console.error(['API call failed', err]);
       if (err instanceof PermissionError) {
         return Observable.of(
           sessionInvalid(err),
@@ -43,7 +43,7 @@ const appStart$ = (action$: any, getState: Function) => {
         );
       }
       return Observable.of(
-        appFatalError(appMessages.errorsServer, err),
+        appError(appMessages.errorsServer, err),
       );
     });
 };

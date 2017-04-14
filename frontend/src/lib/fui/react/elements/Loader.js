@@ -8,33 +8,44 @@ type Props = {
   size: number,
   className: string,
   imageSrc: string,
+  children: any,
 };
 
-const ImageLoader = ({
+const Loader = ({
   imageSrc, fullScreen, visible, size,
-  className, ...rest
+  className, children, ...rest
 }: Props) => {
   const classes = cx(
     'fui', {
       'full-screen': fullScreen,
       hidden: !visible,
     },
-    'has-image loader',
+    'loader',
     className,
   );
 
+  if (imageSrc) {
+    return (
+      <div className={classes} {...rest}>
+        <div className="fui image content" style={{ width: size, height: size }}>
+          <img alt="" src={imageSrc} size={size} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={classes} {...rest}>
-      <div className="fui image" style={{ width: size, height: size }}>
-        <img alt="" src={imageSrc} size={size} />
+      <div className="content" style={{ width: size, height: size }}>
+        {children}
       </div>
     </div>
   );
 };
 
-ImageLoader.defaultProps = {
+Loader.defaultProps = {
   fullScreen: false,
   visible: false,
 };
 
-export default ImageLoader;
+export default Loader;

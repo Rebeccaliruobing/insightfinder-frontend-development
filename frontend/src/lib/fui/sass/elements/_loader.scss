@@ -17,10 +17,12 @@
   justify-content: center;
   align-items: center;
   z-index: 1090;
-  &.has-image > .fui.image {
+  > .content {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    transform: translateY(-20%);
     > img {
       z-index: 1;
     }
@@ -48,9 +50,6 @@
   &.full-screen {
     position: fixed;
     z-index: 2000;
-    &.has-image > .fui.image {
-      transform: translateY(-20%);
-    }
   }
   &.hidden {
     display: none;
