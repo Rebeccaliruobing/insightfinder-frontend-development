@@ -1,0 +1,20 @@
+@charset "utf-8";
+
+@import "../../lib/fui/fui";
+
+.log-live {
+  .incident-tile {
+    margin: 0 $x-gutter $y-gutter 0;
+    cursor: pointer;
+    > .fui.box {
+      .content {
+        font-size: 12px;
+        width: 248px;
+        height: 128px;
+        .label {
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+  }
+}

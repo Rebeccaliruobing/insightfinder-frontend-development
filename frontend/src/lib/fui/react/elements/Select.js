@@ -7,16 +7,20 @@ type Props = {
   className: string,
   autosize: bool,
   clearable: bool,
+  inline: bool,
   multi: bool,
   size: string,
 }
 
 const Select = ({
-  className,
+  className, inline,
   autosize, clearable, multi, size,
   ...rest
 }: Props) => {
-  const classes = cx('fui', size, 'select', className);
+  const classes = cx(
+    'fui', size, {
+      inline,
+    }, 'select', className);
   const arrowRenderer = ({ onMouseDown, isOpen }: any) => {
     return isOpen ?
       (<Icon name="angle up" fitted onMouseDown={onMouseDown} />) :
