@@ -55,7 +55,7 @@ const LogRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={`${match.url}/:projectId?/:logId?`} component={LogLiveAnalysis} />
+        <Route path={`${match.url}/:projectId?/:instanceId?`} component={LogLiveAnalysis} />
       </Switch>
     </SinglePage>
   );

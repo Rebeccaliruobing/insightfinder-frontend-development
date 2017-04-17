@@ -1,5 +1,5 @@
 /* @flow */
-import type { Action, Message } from '../types';
+import type { Action, Message, Filters } from '../types';
 
 export const setCurrentTheme = (theme: string): Action => ({
   type: 'SET_CURRENT_THEME',
@@ -43,6 +43,11 @@ export const showAppLoader = (): Action => ({
 
 export const hideAppLoader = (): Action => ({
   type: 'HIDE_APP_LOADER',
+});
+
+export const setAppFilters = (filters: Filters): Action => ({
+  type: 'SET_APP_FILTERS',
+  payload: filters,
 });
 
 export const appError = (message: ?Message, error: ?Error): Action => ({

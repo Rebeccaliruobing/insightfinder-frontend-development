@@ -24,6 +24,11 @@
     align-items: center;
     > i, > span, > a {
       line-height: 28px;
+      &.divider {
+        font-size: 14px;
+        font-weight: $font-weight-medium;
+        color: $dark-text-hint-color;
+      }
       &.label {
         font-weight: $font-weight-medium;
       }

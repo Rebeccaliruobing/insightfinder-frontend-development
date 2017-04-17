@@ -5,15 +5,16 @@ import fetchGet from './fetchGet';
 
 const loadLogStreaming = (
   credentials: Credentials,
-  projectName: String,
   operation: String,
-) =>
-  fetchGet(
-    getEndpoint('logstreaming'), {
-      ...credentials,
-      projectName,
-      operation,
-    },
-  ).then(d => d.data);
+  params: Object,
+) => fetchGet(
+  getEndpoint('logstreaming'), {
+    ...credentials,
+    operation,
+    ...params,
+  },
+  ).then(d => ({
+    instances: d.data,
+  }));
 
 export default loadLogStreaming;

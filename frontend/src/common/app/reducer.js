@@ -31,6 +31,7 @@ const initialState = {
   alerts: [],
   v1store: {},
   projects: [],
+  filters: {},
 };
 
 const reducer = (
@@ -141,6 +142,14 @@ const reducer = (
     return {
       ...state,
       alerts,
+    };
+  } else if (action.type === 'SET_APP_FILTERS') {
+    return {
+      ...state,
+      filters: {
+        ...state.filters,
+        ...action.payload,
+      },
     };
   }
   return { ...initialState, ...state };

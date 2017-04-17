@@ -3,8 +3,6 @@
 import type { LogState, Action } from '../types';
 
 const initialState: LogState = {
-  currentStreamingProject: null,
-  currentStreamingLog: null,
   streamingInfos: {},
 };
 
@@ -12,11 +10,17 @@ const reducer = (
   state: LogState = initialState,
   action: Action,
 ): LogState => {
-  if (action.type === 'SET_LOG_STREAMING_SELECTION') {
+  if (action.type === 'SET_LOG_STREAMING') {
+    const { streamingInfos } = state;
+    const { projectId, info } = action.payload;
     return {
       ...state,
-      currentStreamingProject: action.payload.project,
-      currentStreamingLog: action.payload.log,
+      streamingInfos: {
+        ...streamingInfos,
+        [projectId]: {
+          ...info,
+        },
+      },
     };
   }
   return { ...initialState, ...state };
