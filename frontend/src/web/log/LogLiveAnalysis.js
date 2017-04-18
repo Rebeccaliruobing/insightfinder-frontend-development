@@ -12,11 +12,13 @@ import { State } from '../../common/types';
 import { parseQueryString } from '../../common/utils';
 import { loadLogStreaming } from '../../common/log/actions';
 import { Selectors } from '../app/components';
+import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
 import './log.scss';
 
 type Props = {
   projects: Array<Object>,
   streamingInfos: Object,
+  streamingIncidentInfos: Object,
   intl: Object,
   match: Object,
   location: Object,
@@ -26,27 +28,42 @@ type Props = {
 class LogLiveAnalysisCore extends React.PureComponent {
   props: Props;
 
+  constructor(props) {
+    super(props);
+    this.defaultParams = {
+      rareEventThreshold: '3',
+      derivedPvalue: '0.9',
+    };
+  }
+
   componentDidMount() {
     const { match, location } = this.props;
-    const params = parseQueryString(location.search);
+    let params = parseQueryString(location.search);
     const { projectId, incidentId } = match.params;
+    if (incidentId) {
+      params = { ...this.defaultParams, ...params };
+    }
     this.props.loadLogStreaming(projectId, incidentId, match, params, true);
   }
 
   @autobind
   handleProjectChange(newValue) {
-    const { match, location } = this.props;
-    const params = parseQueryString(location.search);
+    const { match } = this.props;
     const projectId = newValue ? newValue.value : null;
-    this.props.loadLogStreaming(projectId, null, match, params, true);
+    this.props.loadLogStreaming(projectId, null, match, null, true);
   }
 
   @autobind
   handleIncidentChange(newValue) {
     const { match, location } = this.props;
-    const params = parseQueryString(location.search);
+    let params = parseQueryString(location.search);
     const { projectId } = match.params;
     const incidentId = newValue ? newValue.value : null;
+    if (incidentId) {
+      params = { ...this.defaultParams, ...params };
+    } else {
+      params = null;
+    }
     this.props.loadLogStreaming(projectId, incidentId, match, params, false);
   }
 
@@ -54,7 +71,10 @@ class LogLiveAnalysisCore extends React.PureComponent {
   handleRareEventSensitivityChange(newValue) {
     const rareEventThreshold = newValue ? newValue.value : null;
     const { match, location } = this.props;
-    const params = { ...parseQueryString(location.search), rareEventThreshold };
+    const params = {
+      ...this.defaultParams,
+      ...parseQueryString(location.search), rareEventThreshold,
+    };
     const { projectId, incidentId } = match.params;
     this.props.loadLogStreaming(projectId, incidentId, match, params, false);
   }
@@ -63,7 +83,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
   handleFrequencyAnomalySensitivity(newValue) {
     const derivedPvalue = newValue ? newValue.value : null;
     const { match, location } = this.props;
-    const params = { ...parseQueryString(location.search), derivedPvalue };
+    const params = { ...this.defaultParams, ...parseQueryString(location.search), derivedPvalue };
     const { projectId, incidentId } = match.params;
     this.props.loadLogStreaming(projectId, incidentId, match, params, false);
   }
@@ -75,19 +95,19 @@ class LogLiveAnalysisCore extends React.PureComponent {
       e.stopPropagation();
 
       const { match, location } = this.props;
-      const params = parseQueryString(location.search);
+      const params = { ...this.defaultParams, ...parseQueryString(location.search) };
       const { projectId } = match.params;
       this.props.loadLogStreaming(projectId, incidentId, match, params, false);
     };
   }
 
   render() {
-    const { intl, projects, streamingInfos, match, location } = this.props;
+    const { intl, projects, streamingInfos, match, location, streamingIncidentInfos } = this.props;
     const { projectId, incidentId } = match.params;
-    const { derivedPvalue, rareEventThreshold } = parseQueryString(location.search);
+    const { derivedPvalue, rareEventThreshold } = parseQueryString(location.search) || {};
     const project = get(streamingInfos, projectId, {});
     const incidentList = project.incidentList || [];
-    const incident = R.find(i => i.id === incidentId, incidentList);
+    const incident = get(streamingIncidentInfos, incidentId, null);
     console.log([incidentList, incident, derivedPvalue, rareEventThreshold, match]);
 
     return (
@@ -150,7 +170,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
           </Container>
         }
         {incident &&
-          <Container>{incident.name}</Container>
+          <Container><LogAnalysisCharts data={incident} /></Container>
         }
       </Container>
     );
@@ -160,10 +180,11 @@ class LogLiveAnalysisCore extends React.PureComponent {
 const LogLiveAnalysis = injectIntl(LogLiveAnalysisCore);
 export default connect(
   (state: State) => {
-    const { streamingInfos } = state.log;
+    const { streamingInfos, streamingIncidentInfos } = state.log;
     return {
       projects: R.filter(p => p.hasLogData, state.app.projects),
       streamingInfos,
+      streamingIncidentInfos,
     };
   },
   {

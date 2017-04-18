@@ -16,10 +16,14 @@ export const loadLogStreaming = (
   },
 });
 
-export const setLogStreaming = (projectId: string, info: Object): Action => ({
+export const setLogStreaming = (
+  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+): Action => ({
   type: 'SET_LOG_STREAMING',
   payload: {
     projectId,
-    info,
+    projectInfo,
+    incidentId,
+    incidentInfo,
   },
 });

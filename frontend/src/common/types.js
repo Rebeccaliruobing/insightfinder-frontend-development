@@ -61,6 +61,7 @@ export type AuthState = {
 
 export type LogState = {
   streamingInfos: Object,
+  streamingIncidentInfos: Object,
 };
 
 export type State = {
@@ -91,9 +92,12 @@ export type Action =
   | { type: 'LOGOFF' }
   | {
     type: 'LOAD_LOG_STREAMING', payload: {
-      projectId: ?string, incidentId: ?string,
-      match: Object, params: ?Object, forceReload?: bool,
+      projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,
     }
   }
-  | { type: 'SET_LOG_STREAMING', payload: { projectId: string, info: Object } }
+  | {
+    type: 'SET_LOG_STREAMING', payload: {
+      projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
+    }
+  }
   ;
