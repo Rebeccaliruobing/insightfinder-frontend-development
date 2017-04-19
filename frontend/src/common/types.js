@@ -8,6 +8,12 @@ export type Message = {
   defaultMessage: string,
 };
 
+export type Filters = {
+  project?: string,
+  instanceGroup?: string,
+  instance?: string,
+};
+
 export type ErrorMessage = {
   message: ?Message,
   error: ?Error,
@@ -42,6 +48,7 @@ export type AppState = {
   alerts: Array<AlertMessage>,
   v1store: Object,
   projects: Array<Object>,
+  filters: Filters,
 };
 
 export type AuthState = {
@@ -53,9 +60,8 @@ export type AuthState = {
 };
 
 export type LogState = {
-  currentStreamingProject: ?string,
-  currentStreamingLog: ?string,
   streamingInfos: Object,
+  streamingIncidentInfos: Object,
 };
 
 export type State = {
@@ -78,10 +84,20 @@ export type Action =
   | { type: 'HIDE_APP_LOADER' }
   | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message } }
   | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
+  | { type: 'SET_APP_FILTERS', payload: Filters }
   | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGIN', payload: { userName: string, password: string } }
   | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGOFF' }
-  | { type: 'LOAD_LOG_STREAMING', payload: { project: ?string, log: ?string } }
+  | {
+    type: 'LOAD_LOG_STREAMING', payload: {
+      projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,
+    }
+  }
+  | {
+    type: 'SET_LOG_STREAMING', payload: {
+      projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
+    }
+  }
   ;

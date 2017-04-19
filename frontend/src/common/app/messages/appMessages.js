@@ -23,6 +23,10 @@ const appMessages = defineMessages({
     defaultMessage: 'The data is invalid, please try again.',
     id: 'app.errors.invalidData',
   },
+  errorsGeneral: {
+    defaultMessage: 'There is something wrong, please try again.',
+    id: 'app.errors.general',
+  },
 });
 
 export default appMessages;

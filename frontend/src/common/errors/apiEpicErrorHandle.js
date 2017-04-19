@@ -9,6 +9,7 @@ import NotFoundError from './NotFoundError';
 import InvalidDataError from './InvalidDataError';
 import PermissionError from './PermissionError';
 import NetworkError from './NetworkError';
+import HttpError from './HttpError';
 
 const apiEpicErrorHandle = (err :Error) => {
   console.error(['API call failed', err]);
@@ -42,8 +43,14 @@ const apiEpicErrorHandle = (err :Error) => {
     );
   }
 
+  if (err instanceof HttpError) {
+    return Observable.of(
+      showAppAlert('error', appMessages.errorsServer),
+    );
+  }
+
   return Observable.of(
-    showAppAlert('error', appMessages.errorsServer),
+    showAppAlert('error', appMessages.errorsGeneral),
   );
 };
 
