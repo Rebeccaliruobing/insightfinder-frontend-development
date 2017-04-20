@@ -18,6 +18,7 @@ const loadLogStreaming = (
 ).catch(() => {
   return mockData;
 }).then((d) => {
+  console.log(['logstreaming/list', d]);
   let incidentList = d.data;
   const timeFormat = 'YYYY/MM/DD mm:ss';
 
