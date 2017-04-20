@@ -1,0 +1,22 @@
+{
+  "message": "Success",
+  "data": [{
+    "dataChunkKey": "",
+    "modelEndTime": "2017-04-20T00:00:00.000Z",
+    "dataChunkName": "banjizhang_test1_CUSTOM_2017-04-19T00:00:00.000Z_2017-04-20T00:00:00.000Z",
+    "incidentEndTime": "2017-04-20T00:00:00.000Z",
+    "ensembleModelIndex": 0,
+    "projectKey": "58c421f6ca77aa3e930b1fcbad41ece90b768bc9",
+    "holisticModelKeys": ["629bc8b4fbb4abcb33d184830a74f6121ad3914e"],
+    "modelStartTime": "2017-04-19T00:00:00.000Z",
+    "pValue": "0.95",
+    "modelType": "Holistic",
+    "splitModelKeys": [],
+    "recorded": false,
+    "incidentKey": "416af77e95bdc05467db6dd817a17cebd5ff33db",
+    "projectName": "test1",
+    "cValue": "",
+    "incidentStartTime": "2017-04-19T00:00:00.000Z"
+  }],
+  "success": true
+}

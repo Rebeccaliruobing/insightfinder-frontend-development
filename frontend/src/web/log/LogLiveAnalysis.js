@@ -6,7 +6,7 @@ import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
 import { push } from 'react-router-redux';
-import { Container, Select, Tile, Box } from '../../lib/fui/react';
+import { Container, Select, Dropdown, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
 import { parseQueryString } from '../../common/utils';
@@ -108,7 +108,6 @@ class LogLiveAnalysisCore extends React.PureComponent {
     const project = get(streamingInfos, projectId, {});
     const incidentList = project.incidentList || [];
     const incident = get(streamingIncidentInfos, incidentId, null);
-    console.log([incidentList, incident, derivedPvalue, rareEventThreshold, match]);
 
     return (
       <Container fullHeight withGutter className="flex-col log-live">
@@ -117,7 +116,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project" inline style={{ width: 100 }}
+              name="project"
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
@@ -160,8 +159,6 @@ class LogLiveAnalysisCore extends React.PureComponent {
                       <div>{moment(ic.incidentStartTime).format('YYYY/MM/DD mm:ss')}</div>
                       <div className="label">End Time</div>
                       <div>{moment(ic.incidentEndTime).format('YYYY/MM/DD mm:ss')}</div>
-                      <div className="label">Model Type</div>
-                      <div>{ic.modelType}</div>
                     </div>
                   </Box>
                 </Tile>

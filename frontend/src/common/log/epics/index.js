@@ -1,6 +1,8 @@
+import fileEpic from './fileEpic';
 import streamingEpic from './streamingEpic';
 
 const epics = [
+  fileEpic,
   streamingEpic,
 ];
 

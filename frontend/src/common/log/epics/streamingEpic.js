@@ -42,7 +42,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
           Observable.of(showAppLoader()),
           Observable
             .from(loadLogStreaming(
-              credentials, 'list', {
+              credentials, {
                 projectName: projectId,
                 monthlyDate: moment().startOf('month').valueOf(),
               }))
@@ -62,7 +62,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
               // Load the incident data
               return Observable
                 .from(loadLogStreamingIncident(
-                  credentials, 'detection', {
+                  credentials, {
                     projectName: projectId,
                     incident: { ...incident, ...params },
                   },
@@ -101,7 +101,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
         Observable.of(showAppLoader()),
         Observable
           .from(loadLogStreamingIncident(
-            credentials, 'detection', {
+            credentials, {
               projectName: projectId,
               incident: { ...incident, ...params },
             },

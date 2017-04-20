@@ -764,7 +764,7 @@ class DataParser {
 
     let timestamps = [];
     let nonZeroFreqVectors = {};
-    if(freqVectorObj!=undefined){
+    if(freqVectorObj && !_.isEmpty(freqVectorObj)){
       let timestampContent = freqVectorObj['timestamp'];
       let timestampParts = timestampContent.split(',');
       _.each(timestampParts, function (part, idx) {

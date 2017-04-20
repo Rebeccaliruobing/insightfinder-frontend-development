@@ -1,28 +1,27 @@
 /*  @flow */
+import moment from 'moment';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
-import fetchPost from './fetchPost';
+import fetchGet from './fetchGet';
+import mockData from './mock/loadLogStreamingIncident.json';
 
 const loadLogStreamingIncident = (
   credentials: Credentials,
-  operation: String,
   params: Object,
 ) => {
   const { projectName, incident } = params;
-  const { modelType,
-    incidentStartTime: startTime, incidentEndTime: endTime,
-    derivedPvalue, rareEventThreshold,
-    pValue: pvalue, cValue: cvalue, modelStartTime, modelEndTime } = incident;
-  return fetchPost(
-    getEndpoint('logAnalysis'), {
+  const { incidentStartTime } = incident;
+  return fetchGet(
+    getEndpoint('logstreaming'), {
       ...credentials,
-      operation: '',
+      operation: 'detectionResult',
       projectName,
-      modelType, startTime, endTime, derivedPvalue, rareEventThreshold,
-      pvalue, cvalue, modelStartTime, modelEndTime,
-      isExistentIncident: true,
+      dayDate: moment(incidentStartTime).startOf('day').valueOf(),
     },
-  ).then((d) => {
+  ).catch(() => {
+    return mockData;
+  }).then((d) => {
+    console.log(['logstreaming/detectionResult', d]);
     return d.data;
   });
 };

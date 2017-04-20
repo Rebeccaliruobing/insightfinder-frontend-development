@@ -1,6 +1,33 @@
 /* @flow */
 import type { Action } from '../types';
 
+export const loadLogFile = (
+  projectId: ?string, incidentId: ?string,
+  match: Object, params: ?Object,
+  forceReload?: bool,
+): Action => ({
+  type: 'LOAD_LOG_FILE',
+  payload: {
+    projectId,
+    incidentId,
+    match,
+    params,
+    forceReload,
+  },
+});
+
+export const setLogFile = (
+  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+): Action => ({
+  type: 'SET_LOG_FILE',
+  payload: {
+    projectId,
+    projectInfo,
+    incidentId,
+    incidentInfo,
+  },
+});
+
 export const loadLogStreaming = (
   projectId: ?string, incidentId: ?string,
   match: Object, params: ?Object,
