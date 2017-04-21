@@ -20,15 +20,11 @@ const loadLogStreaming = (
 }).then((d) => {
   console.log(['logstreaming/list', d]);
   let incidentList = d.data;
-  const timeFormat = 'YYYY/MM/DD mm:ss';
-
   incidentList = R.map((i) => {
-    const startTime = moment(i.incidentStartTime);
-    const endTime = moment(i.incidentEndTime);
     return {
       ...i,
       id: i.incidentKey,
-      name: `${startTime.format(timeFormat)}-${endTime.format(timeFormat)}`,
+      name: i.incidentKey,
     };
   }, incidentList);
 
