@@ -1,3 +1,11 @@
+## 2017-04-21
+### Added
+- Extend fui select component & style to support inline mode
+
+## 2017-04-20
+### Added
+- Integrate log streaming with streaming API
+
 ## 2017-04-14
 ### Fix
 - Fix missing All group in exec-db
