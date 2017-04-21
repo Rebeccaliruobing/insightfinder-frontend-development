@@ -11,11 +11,13 @@ type Props = {
   multi: bool,
   disabled: bool,
   size: string,
+  valueRenderer: Function,
 }
 
 const Select = ({
   className, inline,
   autosize, clearable, multi, size, disabled,
+  valueRenderer,
   ...rest
 }: Props) => {
   const classes = cx(
@@ -33,6 +35,7 @@ const Select = ({
       multi={multi} autosize={!!autosize} clearable={!!clearable}
       disabled={disabled}
       arrowRenderer={arrowRenderer}
+      valueRenderer={valueRenderer}
       className={classes} {...rest}
     />
   );

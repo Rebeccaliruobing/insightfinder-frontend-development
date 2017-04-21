@@ -3,8 +3,7 @@
 // Styles based on react-select default style
 $select-input-border-radius:        $border-radius !default;
 $select-input-height:               28px !default;
-
-$select-padding-horizontal:         (16/14) * 1em;
+$select-padding-horizontal:         0.75em;
 @import "~react-select/scss/default";
 
 // Override the style of input in ui form
@@ -25,12 +24,20 @@ $select-padding-horizontal:         (16/14) * 1em;
   &.large {
     font-size: $font-size-body;
   }
-  &.inline:not(.is-open),
-  &.inline:not(.is-focused) {
+  &.inline:not(.is-open) {
     .Select-control {
+      width: 100% !important;
       border-color: transparent;
       &:hover {
         box-shadow: none;
+      }
+      .Select-value {
+        z-index: 100;
+        position: relative;
+      }
+      .Select-input {
+        position: absolute;
+        top: 0;
       }
     }
   }
@@ -38,7 +45,7 @@ $select-padding-horizontal:         (16/14) * 1em;
     .Select-input {
       > input {
         /* For IE 8 compatibility */
-        padding: (($select-input-internal-height - 14) / 2 - 2) 0 (($select-input-internal-height - 14) / 2) !important; 
+        padding: (($select-input-internal-height - $font-size-hint) / 2 - 2) 0 (($select-input-internal-height - $font-size-hint) / 2) !important; 
       }
     }
     .Select-arrow-zone {

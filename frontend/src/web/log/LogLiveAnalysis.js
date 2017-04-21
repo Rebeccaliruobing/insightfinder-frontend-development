@@ -6,7 +6,7 @@ import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
 import { push } from 'react-router-redux';
-import { Container, Select, Dropdown, Tile, Box } from '../../lib/fui/react';
+import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
 import { parseQueryString } from '../../common/utils';
