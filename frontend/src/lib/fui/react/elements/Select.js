@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import { Link } from 'react-router-dom';
 import SelectCore from 'react-select';
 import Icon from './Icon';
 
@@ -40,5 +41,20 @@ const Select = ({
     />
   );
 };
+
+type SelectLinkProps = {
+  children: any,
+};
+
+const SelectLink = ({ children, ...props }: SelectLinkProps) => {
+  // Stop propagate mouse down event to prevent open menu.
+  return (
+    <Link {...props} onMouseDown={(e) => { e.stopPropagation(); }}>
+      {children}
+    </Link>
+  );
+};
+
+Select.Link = SelectLink;
 
 export default Select;

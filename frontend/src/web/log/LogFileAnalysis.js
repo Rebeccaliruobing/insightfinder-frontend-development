@@ -5,7 +5,6 @@ import R from 'ramda';
 import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
-import { Link } from 'react-router-dom';
 import { push } from 'react-router-redux';
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
@@ -116,11 +115,10 @@ class LogFileAnalysisCore extends React.PureComponent {
         incidentId: null,
       });
       return (
-        <Link to={url} >{option.label}</Link>
+        <Select.Link to={url} className="label">{option.label}</Select.Link>
       );
     };
 
-    console.log([match, location]);
     return (
       <Container fullHeight withGutter className="flex-col log-live">
         <Container toolbar>
@@ -132,7 +130,7 @@ class LogFileAnalysisCore extends React.PureComponent {
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
-              valueRenderer={projectValueRenderer}
+              {...incident ? { valueRenderer: projectValueRenderer } : {}}
             />
             {incident && <span className="divider">/</span>}
             {incident &&
