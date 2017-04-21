@@ -9,7 +9,7 @@ const loadEvents = (projectName, instanceGroup, startTime, endTime, eventType) =
     userName, token,
     projectName, instanceGroup,
     startTime, endTime,
-    modelType: 'splitByEnv', // 'Holistic',
+    modelType: instanceGroup.toLowerCase() === 'all' ? 'Holistic' : 'splitByEnv',
     eventType,
   };
 
