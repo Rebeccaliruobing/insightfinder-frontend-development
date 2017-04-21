@@ -1,10 +1,13 @@
 import React from 'react';
+import R from 'ramda';
 import cx from 'classnames';
 import { autobind } from 'core-decorators';
 import Icon from './Icon';
 
 type Props = {
   className: string,
+  value: any,
+  options: Array<Object>,
 }
 
 class Dropdown extends React.Component {
@@ -14,6 +17,12 @@ class Dropdown extends React.Component {
     super(props);
     this.state = {
       isOpen: false,
+    };
+
+    this.defaultArrowRenderer = (onMouseDown, isOpen) => {
+      return isOpen ?
+        (<Icon name="angle up" fitted onMouseDown={onMouseDown} />) :
+        (<Icon name="angle down" fitted onMouseDown={onMouseDown} />);
     };
   }
 
@@ -34,29 +43,26 @@ class Dropdown extends React.Component {
   }
 
   @autobind
-  renderArrow() {
-    const onMouseDown = this.handleMouseDownOnArrow;
-    const { isOpen } = this.state;
-
-    const arrowRenderer = ({ onMouseDown, isOpen }: any) => {
-      return isOpen ?
-        (<Icon name="angle up" fitted onMouseDown={onMouseDown} />) :
-        (<Icon name="angle down" fitted onMouseDown={onMouseDown} />);
-    };
-
+  renderOuter() {
     return (
-      <span className="arrow-zone" onMouseDown={onMouseDown}>
-        {arrowRenderer({ onMouseDown, isOpen })}
-      </span>
+      <div className="menu-outer">aaaa</div>
     );
   }
 
   render() {
-    const { className } = this.props;
+    const { className, options, value } = this.props;
+    const { isOpen } = this.state;
+    const arrowRenderer = this.defaultArrowRenderer;
     const classes = cx('fui dropdown', className);
+    const found = R.find(o => o.value === value, options) || {};
+
     return (
       <div className={classes}>
-        {this.renderArrow()}
+        <span className="value-wrapper">{found.label || ''}</span>
+        <span className="arrow-zone" onMouseDown={this.handleMouseDownOnArrow}>
+          {arrowRenderer(this.handleMouseDownOnArrow, isOpen)}
+        </span>
+        {isOpen && this.renderOuter()}
       </div>);
   }
 }

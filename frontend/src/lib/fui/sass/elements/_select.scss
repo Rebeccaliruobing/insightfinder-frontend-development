@@ -25,15 +25,26 @@ $select-padding-horizontal:         (16/14) * 1em;
   &.large {
     font-size: $font-size-body;
   }
-  .Select-input {
-    > input {
-      /* For IE 8 compatibility */
-      padding: (($select-input-internal-height - 14) / 2 - 2) 0 (($select-input-internal-height - 14) / 2) !important; 
+  &.inline:not(.is-open),
+  &.inline:not(.is-focused) {
+    .Select-control {
+      border-color: transparent;
+      &:hover {
+        box-shadow: none;
+      }
     }
   }
-  .Select-arrow-zone {
-    > .fui.angle.icon {
-      font-size: 18px;
+  .Select-control {
+    .Select-input {
+      > input {
+        /* For IE 8 compatibility */
+        padding: (($select-input-internal-height - 14) / 2 - 2) 0 (($select-input-internal-height - 14) / 2) !important; 
+      }
+    }
+    .Select-arrow-zone {
+      > .fui.angle.icon {
+        font-size: 18px;
+      }
     }
   }
 }

@@ -6,7 +6,7 @@ import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
 import { push } from 'react-router-redux';
-import { Container, Select, Tile, Box } from '../../lib/fui/react';
+import { Container, Select, Tile, Box, Dropdown } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
 import { parseQueryString } from '../../common/utils';
@@ -116,7 +116,7 @@ class LogFileAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project"
+              name="project" inline
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
