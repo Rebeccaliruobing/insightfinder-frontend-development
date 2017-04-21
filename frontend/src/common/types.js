@@ -60,6 +60,8 @@ export type AuthState = {
 };
 
 export type LogState = {
+  fileInfos: Object,
+  fileIncidentInfos: Object,
   streamingInfos: Object,
   streamingIncidentInfos: Object,
 };
@@ -90,6 +92,16 @@ export type Action =
   | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGOFF' }
+  | {
+    type: 'LOAD_LOG_FILE', payload: {
+      projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,
+    }
+  }
+  | {
+    type: 'SET_LOG_FILE', payload: {
+      projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
+    }
+  }
   | {
     type: 'LOAD_LOG_STREAMING', payload: {
       projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,

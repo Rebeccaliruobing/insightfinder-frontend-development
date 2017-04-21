@@ -6,7 +6,7 @@ import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { ExecutiveDashboard } from '../dashboard';
-import { LogLiveAnalysis } from '../log';
+import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
 
 import {
   ForgotPassword, ResetPassword,
@@ -51,11 +51,31 @@ const DashboardRouting = ({ match }: RouteProps) => {
   );
 };
 
-const LogRouting = ({ match }: RouteProps) => {
+const LogLiveRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
         <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogLiveAnalysis} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const LogRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogAnalysis} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const LogFileRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogFileAnalysis} />
       </Switch>
     </SinglePage>
   );
@@ -67,7 +87,10 @@ const PrivateRouting = () => (
 
     <Route path="/cloud/dashboard" component={DashboardRouting} />
     <Route path="/dashboard" component={DashboardRouting} />
-    <Route path="/log/live-analysis" component={LogRouting} />
+    <Route path="/log/analysis" component={LogRouting} />
+    <Route path="/log/live-analysis" component={LogLiveRouting} />
+    <Route path="/log/file-analysis" component={LogFileRouting} />
+    <Route path="/log/analysis" component={LogRouting} />
 
     <Route
       path="/liveMonitoring"

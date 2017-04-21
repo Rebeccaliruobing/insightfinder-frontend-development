@@ -9,12 +9,13 @@ type Props = {
   clearable: bool,
   inline: bool,
   multi: bool,
+  disabled: bool,
   size: string,
 }
 
 const Select = ({
   className, inline,
-  autosize, clearable, multi, size,
+  autosize, clearable, multi, size, disabled,
   ...rest
 }: Props) => {
   const classes = cx(
@@ -30,6 +31,7 @@ const Select = ({
   return (
     <SelectCore
       multi={multi} autosize={!!autosize} clearable={!!clearable}
+      disabled={disabled}
       arrowRenderer={arrowRenderer}
       className={classes} {...rest}
     />
