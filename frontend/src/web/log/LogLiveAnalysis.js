@@ -156,9 +156,9 @@ class LogLiveAnalysisCore extends React.PureComponent {
                   <Box isLink>
                     <div className="content">
                       <div className="label">Start Time</div>
-                      <div>{moment(ic.incidentStartTime).format('YYYY/MM/DD mm:ss')}</div>
+                      <div>{ic.incidentStartTime}</div>
                       <div className="label">End Time</div>
-                      <div>{moment(ic.incidentEndTime).format('YYYY/MM/DD mm:ss')}</div>
+                      <div>{ic.incidentEndTime}</div>
                     </div>
                   </Box>
                 </Tile>

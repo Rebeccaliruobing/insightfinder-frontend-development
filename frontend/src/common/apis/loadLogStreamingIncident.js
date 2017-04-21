@@ -16,7 +16,7 @@ const loadLogStreamingIncident = (
       ...credentials,
       operation: 'detectionResult',
       projectName,
-      dayDate: moment(incidentStartTime).startOf('day').valueOf(),
+      dayDate: moment(incidentStartTime).valueOf(),
     },
   ).catch(() => {
     return mockData;
