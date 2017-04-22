@@ -1,6 +1,11 @@
 ## 2017-04-21
-### Added
+### Fixed
 - Extend fui select component & style to support inline mode
+- Display keyword and episodes when mouse over event cluster.
+- In log event, make cluster name editable
+- Fix timestamp issue in log rare events
+- Remove mock data in log streaming
+
 
 ## 2017-04-20
 ### Added

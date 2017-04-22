@@ -1,6 +1,8 @@
 import React, { PropTypes as T } from 'react';
 import { autobind } from 'core-decorators';
 import R from 'ramda';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import EventGroup from './event-group';
 
 class EventCluster extends React.Component {
@@ -104,11 +106,10 @@ class EventCluster extends React.Component {
       }), data);
       return (
         <EventGroup
-          key={cluster.nid}
+          key={cluster.nid} nameEditable showFE
           className="flex-item flex-col-container" name={title}
           eventDataset={events} keywords={keywords} episodes={episodes}
           onNameChanged={this.handleClusterNameChanged(cluster)}
-          showFE={true}
         />
       );
     }
@@ -134,13 +135,27 @@ class EventCluster extends React.Component {
                 const wide = (nevents / eventCount) * 100 > 80;
                 const width = Math.max(Math.floor((nevents / eventCount) * this.barFullWidth), 1);
                 const active = selectedCluster ? cluster.nid === selectedCluster.nid : false;
+                const keywords = ((cluster.topKWords && cluster.topKWords.length > 0) ?
+                  cluster.topKWords.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : []).join(',');
+                const episodes = ((cluster.topKEpisodes && cluster.topKEpisodes.length > 0) ?
+                  cluster.topKEpisodes.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',') : []).join(',');
 
                 return (
                   <div
                     className={`listbar-item ${active ? 'active' : ''}`} key={cluster.nid}
                     onClick={this.handleSelectCluster(cluster)}
                   >
-                    <div className="name">{this.getClusterName(cluster.nid)}</div>
+                    <OverlayTrigger
+                      key={cluster.nid} placement="right" delayShow={300}
+                      overlay={
+                        <Tooltip className="pattern-sequence-tooltip">
+                          {keywords && (<div>Top keywords:<br />{keywords}</div>)}
+                          {episodes && (<div>Top frequent episodes:<br />{episodes}</div>)}
+                        </Tooltip>
+                      }
+                    >
+                      <div className="name">{this.getClusterName(cluster.nid)}</div>
+                    </OverlayTrigger>
                     <div className="bar" style={{ width }} />
                     <span className={`${wide ? 'wide' : ''} title`}>{`${nevents}`}</span>
                   </div>

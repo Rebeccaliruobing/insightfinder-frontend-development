@@ -126,7 +126,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project" inline
+              name="project" inline style={{ width: 120 }}
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
@@ -166,10 +166,22 @@ class LogLiveAnalysisCore extends React.PureComponent {
                 >
                   <Box isLink>
                     <div className="content">
-                      <div className="label">Start Time</div>
-                      <div>{ic.incidentStartTime}</div>
-                      <div className="label">End Time</div>
-                      <div>{ic.incidentEndTime}</div>
+                      <div>
+                        <div className="label" style={{ display: 'inline-block' }}>Start Time:</div>
+                        <div style={{ float: 'right' }}>{moment(ic.incidentStartTime).format('YYYY/MM/DD hh:mm')}</div>
+                      </div>
+                      <div>
+                        <div className="label" style={{ display: 'inline-block' }}>End Time:</div>
+                        <div style={{ float: 'right' }}>{moment(ic.incidentEndTime).format('YYYY/MM/DD hh:mm')}</div>
+                      </div>
+                      <div>
+                        <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
+                        <div style={{ float: 'right' }}></div>
+                      </div>
+                      <div>
+                        <div className="label" style={{ display: 'inline-block' }}>Rare Events:</div>
+                        <div style={{ float: 'right' }}></div>
+                      </div>
                     </div>
                   </Box>
                 </Tile>

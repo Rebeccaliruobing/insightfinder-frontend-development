@@ -11,7 +11,7 @@ const RareEventSensitivity = ({ style, ...rest }) => {
   ];
 
   return (
-    <Select options={options} {...rest} style={{ width: 60, ...style }} />
+    <Select options={options} {...rest} style={{ width: 120, ...style }} />
   );
 };
 
@@ -25,7 +25,7 @@ const AnomalyThresholdSensitivity = ({ style, ...rest }) => {
   ];
 
   return (
-    <Select options={options} {...rest} style={{ width: 60, ...style }} />
+    <Select options={options} {...rest} style={{ width: 120, ...style }} />
   );
 };
 
