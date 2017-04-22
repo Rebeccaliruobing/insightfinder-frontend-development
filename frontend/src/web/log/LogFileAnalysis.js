@@ -9,7 +9,7 @@ import { push } from 'react-router-redux';
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
-import { parseQueryString } from '../../common/utils';
+import { parseQueryString, buildMatchLocation } from '../../common/utils';
 import { loadLogFile } from '../../common/log/actions';
 import { Selectors } from '../app/components';
 import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
@@ -109,6 +109,16 @@ class LogFileAnalysisCore extends React.PureComponent {
     const incidentList = project.incidentList || [];
     const incident = get(fileIncidentInfos, incidentId, null);
 
+    const projectValueRenderer = (option) => {
+      const url = buildMatchLocation(match, {
+        projectId: option.value,
+        incidentId: null,
+      });
+      return (
+        <Select.Link to={url} className="label">{option.label}</Select.Link>
+      );
+    };
+
     return (
       <Container fullHeight withGutter className="flex-col log-live">
         <Container toolbar>
@@ -116,15 +126,16 @@ class LogFileAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project"
+              name="project" inline style={{ width: 120 }}
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
+              {...incident ? { valueRenderer: projectValueRenderer } : {}}
             />
             {incident && <span className="divider">/</span>}
             {incident &&
               <Select
-                name="incident" inline clearable style={{ width: 248 }}
+                name="incident" inline style={{ width: 248 }}
                 options={R.map(i => ({ label: i.name, value: i.id }), incidentList)}
                 value={incidentId || null} onChange={this.handleIncidentChange}
               />

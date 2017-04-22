@@ -6,10 +6,10 @@ import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
 import { push } from 'react-router-redux';
-import { Container, Select, Dropdown, Tile, Box } from '../../lib/fui/react';
+import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { State } from '../../common/types';
-import { parseQueryString } from '../../common/utils';
+import { parseQueryString, buildMatchLocation } from '../../common/utils';
 import { loadLogStreaming } from '../../common/log/actions';
 import { Selectors } from '../app/components';
 import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
@@ -109,6 +109,16 @@ class LogLiveAnalysisCore extends React.PureComponent {
     const incidentList = project.incidentList || [];
     const incident = get(streamingIncidentInfos, incidentId, null);
 
+    const projectValueRenderer = (option) => {
+      const url = buildMatchLocation(match, {
+        projectId: option.value,
+        incidentId: null,
+      });
+      return (
+        <Select.Link to={url} className="label">{option.label}</Select.Link>
+      );
+    };
+
     return (
       <Container fullHeight withGutter className="flex-col log-live">
         <Container toolbar>
@@ -116,10 +126,11 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project"
+              name="project" inline
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
+              {...incident ? { valueRenderer: projectValueRenderer } : {}}
             />
             {incident && <span className="divider">/</span>}
             {incident &&
@@ -156,9 +167,9 @@ class LogLiveAnalysisCore extends React.PureComponent {
                   <Box isLink>
                     <div className="content">
                       <div className="label">Start Time</div>
-                      <div>{moment(ic.incidentStartTime).format('YYYY/MM/DD mm:ss')}</div>
+                      <div>{ic.incidentStartTime}</div>
                       <div className="label">End Time</div>
-                      <div>{moment(ic.incidentEndTime).format('YYYY/MM/DD mm:ss')}</div>
+                      <div>{ic.incidentEndTime}</div>
                     </div>
                   </Box>
                 </Tile>
