@@ -77,6 +77,10 @@ export default [
     "defaultMessage": "静态日志分析",
   },
   {
+    "id": "app.menus.streamLogAnalysis",
+    "defaultMessage": "Stream Log Analysis",
+  },
+  {
     "id": "auth.buttons.signin",
     "defaultMessage": "登  录",
   },

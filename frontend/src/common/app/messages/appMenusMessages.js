@@ -8,8 +8,12 @@ const appMenusMessages = defineMessages({
     id: 'app.menus.dashboard',
   },
   logAnalysis: {
-    defaultMessage: 'Stream Log Analysis',
+    defaultMessage: 'Log Analysis',
     id: 'app.menus.logAnalysis',
+  },
+  streamLogAnalysis: {
+    defaultMessage: 'Stream Log Analysis',
+    id: 'app.menus.streamLogAnalysis',
   },
   staticLogAnalysis: {
     defaultMessage: 'Static Log Analysis',

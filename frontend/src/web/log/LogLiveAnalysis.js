@@ -123,7 +123,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
       <Container fullHeight withGutter className="flex-col log-live">
         <Container toolbar>
           <div className="section">
-            <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
+            <span className="label">{intl.formatMessage(appMenusMessages.streamLogAnalysis)}</span>
             <span className="divider">/</span>
             <Select
               name="project" inline style={{ width: 120 }}

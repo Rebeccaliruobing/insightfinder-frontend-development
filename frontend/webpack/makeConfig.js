@@ -39,7 +39,7 @@ const makeConfig = (webpackSettings) => {
   ));
 
   let plugins = [
-    new ProgressBarPlugin(),
+    // new ProgressBarPlugin({}),
     new webpack.DefinePlugin({
       'process.env': {
         IS_BROWSER: true,
@@ -68,6 +68,7 @@ const makeConfig = (webpackSettings) => {
     styleSettings.plugins,
   ));
 
+  console.log(plugins);
   return webpackMerge({
     entry: entry(settings),
     output: output(settings),

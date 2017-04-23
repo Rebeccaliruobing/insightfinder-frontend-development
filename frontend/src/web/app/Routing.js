@@ -51,21 +51,21 @@ const DashboardRouting = ({ match }: RouteProps) => {
   );
 };
 
-const LogLiveRouting = ({ match }: RouteProps) => {
-  return (
-    <SinglePage>
-      <Switch>
-        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogLiveAnalysis} />
-      </Switch>
-    </SinglePage>
-  );
-};
-
 const LogRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
         <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogAnalysis} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const LogLiveRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogLiveAnalysis} />
       </Switch>
     </SinglePage>
   );

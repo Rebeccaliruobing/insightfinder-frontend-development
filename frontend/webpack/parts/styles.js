@@ -11,7 +11,7 @@ import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import HappyPack from 'happypack';
 import autoprefixer from 'autoprefixer';
 
-const happyPool = HappyPack.ThreadPool({ size: 6 })
+const happyPool = HappyPack.ThreadPool({ size: 6 });
 
 const styles = (settings) => {
   const { isDev, isProd, assetsRoot } = settings;

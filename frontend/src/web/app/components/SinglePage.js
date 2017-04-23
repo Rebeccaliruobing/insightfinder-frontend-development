@@ -47,7 +47,7 @@ const SinglePageCore = ({
             {intl.formatMessage(appMenusMessages.bugRepository)}
           </NavLink>
           {isAdmin && <NavLink to="/log/live-analysis" className="item">
-            {intl.formatMessage(appMenusMessages.logAnalysis)}
+            {intl.formatMessage(appMenusMessages.streamLogAnalysis)}
           </NavLink>}
           {isAdmin && <NavLink to="/filetabs" className="item">
             {intl.formatMessage(appMenusMessages.fileAnalysis)}

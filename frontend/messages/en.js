@@ -62,7 +62,7 @@ export default [
   },
   {
     "id": "app.menus.logAnalysis",
-    "defaultMessage": "Stream Log Analysis",
+    "defaultMessage": "Log Analysis",
   },
   {
     "id": "app.menus.settings",
@@ -75,6 +75,10 @@ export default [
   {
     "id": "app.menus.staticLogAnalysis",
     "defaultMessage": "Static Log Analysis",
+  },
+  {
+    "id": "app.menus.streamLogAnalysis",
+    "defaultMessage": "Stream Log Analysis",
   },
   {
     "id": "auth.buttons.signin",

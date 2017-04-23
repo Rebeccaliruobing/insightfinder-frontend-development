@@ -51,7 +51,7 @@ app.use('*', (req, res, next) => {
 
 app.listen(webpackSettings.hotPort, (err) => {
   if (err) {
-    console.error(`${chalk.red('error')} ${err}`);
+    // console.error(`${chalk.red('error')} ${err}`);
   } else {
     const url = `http://localhost:${webpackSettings.hotPort}`;
     console.log(`✨  Listening at ${chalk.green(url)}`);
