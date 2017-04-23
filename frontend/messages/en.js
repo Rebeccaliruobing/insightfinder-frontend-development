@@ -9,6 +9,10 @@ export default [
     "defaultMessage": "The request parameters are incorrect, please check your input.",
   },
   {
+    "id": "app.errors.general",
+    "defaultMessage": "There is something wrong, please try again.",
+  },
+  {
     "id": "app.errors.invalidData",
     "defaultMessage": "The data is invalid, please try again.",
   },
@@ -58,7 +62,7 @@ export default [
   },
   {
     "id": "app.menus.logAnalysis",
-    "defaultMessage": "Log Analysis",
+    "defaultMessage": "Stream Log Analysis",
   },
   {
     "id": "app.menus.settings",
