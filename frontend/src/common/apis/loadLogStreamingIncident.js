@@ -3,7 +3,6 @@ import moment from 'moment';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
-import mockData from './mock/loadLogStreamingIncident.json';
 
 const loadLogStreamingIncident = (
   credentials: Credentials,
@@ -18,9 +17,7 @@ const loadLogStreamingIncident = (
       projectName,
       dayDate: moment(incidentStartTime).valueOf(),
     },
-  ).catch(() => {
-    return mockData;
-  }).then((d) => {
+  ).then((d) => {
     console.log(['logstreaming/detectionResult', d]);
     return d.data;
   });

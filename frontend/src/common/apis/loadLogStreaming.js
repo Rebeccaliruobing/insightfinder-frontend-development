@@ -1,10 +1,8 @@
 /*  @flow */
 import R from 'ramda';
-import moment from 'moment';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
-import mockData from './mock/loadLogStreaming.json';
 
 const loadLogStreaming = (
   credentials: Credentials,
@@ -15,9 +13,7 @@ const loadLogStreaming = (
     operation: 'list',
     ...params,
   },
-).catch(() => {
-  return mockData;
-}).then((d) => {
+).then((d) => {
   console.log(['logstreaming/list', d]);
   let incidentList = d.data;
   incidentList = R.map((i) => {

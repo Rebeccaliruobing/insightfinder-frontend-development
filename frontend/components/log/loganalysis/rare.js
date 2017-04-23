@@ -67,7 +67,11 @@ class EventRare extends React.Component {
       }
 
       const bucket = buckets[time];
-      bucket.events.push(e);
+      bucket.events.push({
+        datetime: e.timestamp,
+        timestamp: etimeVal,
+        rawData: e.rawData,
+      });
       bucket.keywords = bucket.keywords.concat(e.keywords);
       bucket.episodes = bucket.episodes.concat(e.episodes);
       bucket.nEvents = bucket.events.length;
