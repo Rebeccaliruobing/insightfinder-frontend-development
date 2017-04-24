@@ -14,10 +14,11 @@ import html from './parts/html';
 import styles from './parts/styles';
 
 const makeConfig = (webpackSettings) => {
-  const settings = Object.assign({
+  const settings = {
     assetsRoot: 'assets/',
     publicPath: '/',
-  }, R.clone(webpackSettings));
+    ...webpackSettings,
+  };
 
   const env = process.env.NODE_ENV;
   settings.isDev = env === 'development';
