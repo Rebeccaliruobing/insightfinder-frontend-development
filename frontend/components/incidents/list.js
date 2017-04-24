@@ -78,8 +78,22 @@ class IncidentsList extends React.Component {
     if (prevProps.incidents !== incidents ||
       prevProps.detectedEvents !== detectedEvents ||
       prevProps.predictedEvents !== predictedEvents) {
-      this.detectedIncidents = detectedEvents || R.filter(i => !i.predictedFlag, incidents);
-      this.predictedIncidents = predictedEvents || R.filter(i => !!i.predictedFlag, incidents);
+      let devents = detectedEvents;
+      let pevents = predictedEvents;
+      if (devents) {
+        devents = R.addIndex(R.map)((e, idx) => ({
+          ...e,
+          id: idx + 1,
+        }), this.sortingIncidents(devents, 'startTimestamp', 'asc'));
+      }
+      if (pevents) {
+        pevents = R.addIndex(R.map)((e, idx) => ({
+          ...e,
+          id: idx + 1,
+        }), this.sortingIncidents(pevents, 'startTimestamp', 'asc'));
+      }
+      this.detectedIncidents = devents || R.filter(i => !i.predictedFlag, incidents);
+      this.predictedIncidents = pevents || R.filter(i => !!i.predictedFlag, incidents);
 
       const ratios = R.map(v => v.anomalyRatio, incidents);
       this.maxAnomalyRatio = R.reduce(R.max, 0, ratios);

@@ -126,7 +126,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.streamLogAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project" inline style={{ width: 120 }}
+              name="project" inline style={{ width: 200 }}
               options={R.map(p => ({ label: p.name, value: p.name }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
@@ -176,11 +176,11 @@ class LogLiveAnalysisCore extends React.PureComponent {
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
-                        <div style={{ float: 'right' }}></div>
+                        <div style={{ float: 'right' }}>{(ic.cluster || []).length}</div>
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Rare Events:</div>
-                        <div style={{ float: 'right' }}></div>
+                        <div style={{ float: 'right' }}>{ic.rareEventsSize}</div>
                       </div>
                     </div>
                   </Box>
