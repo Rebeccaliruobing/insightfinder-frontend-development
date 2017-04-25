@@ -82,11 +82,31 @@ const reducer = (
     };
   } else if (action.type === 'SET_INIT_DATA') {
     const settings = JSON.parse(get(action.payload, 'projectSettingsAllInfo', '[]'));
-    const projects = R.map(s => ({
-      name: s.projectName,
-      type: s.projectType,
-      hasLogData: s.fileProjectType === 0,
-    }), settings);
+    const projectString = get(action.payload, 'projectString', '').split(',');
+    const projectInfos = {};
+    R.forEach((p) => {
+      const info = p.split(':');
+      projectInfos[info[0]] = {
+        projectType: info[1],
+        instanceType: info[2],
+        dataType: info[3],
+      };
+    }, projectString);
+
+    const projects = R.map((s) => {
+      const info = projectInfos[s.projectName];
+      const isLogStreaming = info.dataType.toLowerCase() === 'log' &&
+        info.instanceType.toLowerCase() !== 'logfile';
+      const isLogFile = info.dataType.toLowerCase() === 'log' &&
+        info.instanceType.toLowerCase() === 'logfile';
+
+      return {
+        name: s.projectName,
+        type: s.projectType,
+        isLogStreaming,
+        isLogFile,
+      };
+    }, settings);
 
     return {
       ...state,

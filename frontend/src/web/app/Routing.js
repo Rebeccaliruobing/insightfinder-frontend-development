@@ -90,7 +90,6 @@ const PrivateRouting = () => (
     <Route path="/log/analysis" component={LogRouting} />
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
-    <Route path="/log/analysis" component={LogRouting} />
 
     <Route
       path="/liveMonitoring"

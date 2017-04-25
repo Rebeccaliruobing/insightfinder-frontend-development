@@ -202,7 +202,7 @@ export default connect(
   (state: State) => {
     const { streamingInfos, streamingIncidentInfos } = state.log;
     return {
-      projects: R.filter(p => p.hasLogData, state.app.projects),
+      projects: R.filter(p => p.isLogStreaming, state.app.projects),
       streamingInfos,
       streamingIncidentInfos,
     };

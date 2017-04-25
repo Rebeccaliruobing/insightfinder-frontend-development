@@ -1,5 +1,6 @@
 import React, { PropTypes as T } from 'react';
 import moment from 'moment';
+import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Button } from '../../../artui/react';
 import {
@@ -63,7 +64,23 @@ class LogAnalysis extends React.Component {
   componentDidMount() {
     this.handleRefresh();
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) =>  item.fileProjectType == 0);
+    const projectString = (this.context.dashboardUservalues.projectString || '').split(',');
+    const projectInfos = {};
+    R.forEach((p) => {
+      const info = p.split(':');
+      projectInfos[info[0]] = {
+        projectType: info[1],
+        instanceType: info[2],
+        dataType: info[3],
+      };
+    }, projectString);
+
+    projects = projects.filter((item) => {
+      const info = projectInfos[item.projectName];
+      return info.dataType.toLowerCase() === 'log' &&
+        info.instanceType.toLowerCase() === 'logfile';
+    });
+
     if (projects.length > 0) {
       this.handleProjectChange(projects[0].projectName, projects[0].projectName);
     } else {
