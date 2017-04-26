@@ -202,7 +202,7 @@ export default connect(
   (state: State) => {
     const { fileInfos, fileIncidentInfos } = state.log;
     return {
-      projects: R.filter(p => p.hasLogData, state.app.projects),
+      projects: R.filter(p => p.isLogFile, state.app.projects),
       fileInfos,
       fileIncidentInfos,
     };

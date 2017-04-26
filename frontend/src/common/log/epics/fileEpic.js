@@ -19,7 +19,7 @@ const fileEpic = (action$: any, { getState }: Deps) =>
       const { match, params, forceReload } = action.payload;
       const state = getState();
       const { credentials } = state.auth;
-      const projects = R.filter(p => p.hasLogData, state.app.projects);
+      const projects = R.filter(p => p.isLogFile, state.app.projects);
       const { fileInfos } = state.log;
 
       let reloadProject = forceReload;

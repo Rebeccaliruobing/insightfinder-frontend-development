@@ -108,7 +108,7 @@ class PatternSequence extends React.Component {
                       <div className="ui horizontal bulleted list">
                         {nids.map((nid, nididx) => {
                           const grp = R.find(a => a.nid.toString() === nid)(eventDataset);
-                          const data = R.sort((a, b) => b[2] - a[2])(grp.data);
+                          const data = grp ? R.sort((a, b) => b[2] - a[2])(grp.data) : null;
                           const eventText = data ? data[0][1] : '';
                           return (
                             <OverlayTrigger

@@ -1,7 +1,8 @@
 import React from 'react';
-import {Dropdown, Link} from '../artui/react/index';
+import R from 'ramda';
 import classNames from 'classnames';
 import _ from "lodash";
+import { Dropdown, Link } from '../artui/react/index';
 
 class ProjectSelection extends React.Component {
 
@@ -9,12 +10,7 @@ class ProjectSelection extends React.Component {
     dashboardUservalues: React.PropTypes.object
   };
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
-
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
     return (
       <Dropdown mode="select" {...this.props}>
@@ -73,17 +69,31 @@ class LogFileReplayProjectSelection extends React.Component {
   }
 
   render() {
-
     let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.fileProjectType == 0);
+    const projectString = (this.context.dashboardUservalues.projectString || '').split(',');
+    const projectInfos = {};
+    R.forEach((p) => {
+      const info = p.split(':');
+      projectInfos[info[0]] = {
+        projectType: info[1],
+        instanceType: info[2],
+        dataType: info[3],
+      };
+    }, projectString);
+
+    projects = projects.filter((item) => {
+      const info = projectInfos[item.projectName];
+      return info.dataType.toLowerCase() === 'log' &&
+        info.instanceType.toLowerCase() === 'logfile';
+    });
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
+        <i className="dropdown icon" />
+        <div className="menu">
           {
             projects.map((p) => {
               return <div className="item" key={p.projectName}
-                          data-value={p.projectName}>{p.projectName}</div>
+                data-value={p.projectName}>{p.projectName}</div>
             })
           }
         </div>
