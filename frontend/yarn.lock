@@ -5637,9 +5637,9 @@ react-dom@^15.5.4:
     object-assign "^4.1.0"
     prop-types "~15.5.7"
 
-react-faux-dom@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/react-faux-dom/-/react-faux-dom-3.0.1.tgz#1e9f9c9cc0c0d9a4dbd694bd123d1b4bd2783f5a"
+react-faux-dom@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/react-faux-dom/-/react-faux-dom-3.1.0.tgz#d070ce8068bcf10e19b5dec329d2da671aa6734b"
   dependencies:
     query-selector "^1.0.9"
     style-attr "^1.0.1"

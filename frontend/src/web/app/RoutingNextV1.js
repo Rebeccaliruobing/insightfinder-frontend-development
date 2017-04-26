@@ -12,6 +12,7 @@ import {
   SummaryReport, AppForecast,
 } from '../../../components/cloud';
 import EventSummary2 from '../../../containers/event-summary/index2';
+import ExecutiveDashboard2 from '../../../containers/executive-dashboard/index2';
 import { Log, IncidentLogAnalysis } from '../../../components/log';
 import {
   Settings,
@@ -52,6 +53,10 @@ const RoutingNextV1 = () => (
       <Route
         path="/cloud/executive-dashboard"
         render={() => (<Cloud><ExecutiveDashboard /></Cloud>)}
+      />
+      <Route
+        path="/cloud/executive-dashboard2"
+        render={() => (<Cloud><ExecutiveDashboard2 /></Cloud>)}
       />
       <Route
         path="/cloud/app-forecast"
