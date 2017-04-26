@@ -127,7 +127,7 @@ class LogAnalysisCharts extends React.Component {
 
     // make a copy, and filter out anomaly and small cluster, and run again
     const logEventArr = allLogEventArr.filter((el, index, arr) => {
-      return (el.clusteringResultFlag);
+      return (el.rareEventFlag);
     });
     const rareLogEventArr = allLogEventArr.filter((el, index, arr) => {
       return (el.rareEventFlag);
@@ -387,6 +387,9 @@ class LogAnalysisCharts extends React.Component {
 
   @autobind()
   handlePatternSelected(pattern) {
+    if (!pattern) {
+      return;
+    }
     const { nonZeroFreqChartDatas, patterns, derivedAnomalyByMetric } = this.state;
     const pos = patterns.indexOf(pattern);
     const selectedPatternChartData = _.find(nonZeroFreqChartDatas, a => a.pattern == pattern);
@@ -498,7 +501,7 @@ class LogAnalysisCharts extends React.Component {
       patterns,
       derivedAnomalyByMetric,
     }, () => {
-      pattern && this.handlePatternSelected(patterns[0]);
+      patterns[0] && this.handlePatternSelected(patterns[0]);
     });
   }
 
@@ -639,6 +642,7 @@ margin: 0,
     const logEventArr = this.logEventArr;
     const neuronValue = this.neuronValue;
     const eventTableData = this.eventTableData;
+    console.log(eventTableData);
 
     if (logEventArr) {
       return (
