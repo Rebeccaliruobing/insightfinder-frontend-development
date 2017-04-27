@@ -122,6 +122,9 @@ class EventSummary extends React.Component {
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
           data.statistics.instanceStatsJson,
         );
+      console.log(['eventSummaryData', data]);
+      console.log(['selectedEvent', incident]);
+      console.log(['incidentsTreeMap', incidentsTreeMap]);
     } else {
       groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
@@ -221,9 +224,9 @@ class EventSummary extends React.Component {
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime &&
+      endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
-
     const { projectName, instanceGroup } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
@@ -284,10 +287,10 @@ class EventSummary extends React.Component {
 
   @autobind
   handleProjectChange(projectName) {
-    let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
-    let { predictionWindow } = project;
+    const { dashboardUservalues } = this.context;
+    const { projectModelAllInfo } = dashboardUservalues;
+    const project = projectModelAllInfo.find(info => info.projectName === projectName);
+    const { predictionWindow } = project;
 
     this.setState({
       loading: true,
@@ -403,8 +406,8 @@ class EventSummary extends React.Component {
     const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
-      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType, groupIdMap, dataLoaded,
+      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme,
+      instanceGroups, groupIdMap, dataLoaded,
       detectedEvents, predictedEvents,
     } = this.state;
 
@@ -414,7 +417,7 @@ class EventSummary extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const eventEndTime = moment(endTime).endOf('day').valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
@@ -423,12 +426,6 @@ class EventSummary extends React.Component {
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
-    const selectedIncidentPredicted = selectedIncident ? selectedIncident.predictedFlag : false;
-    // let selectedIncidentPredicted = selectedIncident ?
-    //   (selectedIncident.endTimestamp > latestTimestamp) : false;
-    // if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
-    //   selectedIncidentPredicted = true;
-    // }
 
     const hasTreeMapData = incidentsTreeMap && incidentsTreeMap.children
       && incidentsTreeMap.children.length > 0;
@@ -555,7 +552,7 @@ class EventSummary extends React.Component {
                   treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
                   treeMapCPUThreshold={treeMapCPUThreshold}
                   treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                  predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+                  predictedFlag={predicted} instanceGroup={instanceGroup}
                 />
               }
               {!hasTreeMapData && hasDataFlag &&
