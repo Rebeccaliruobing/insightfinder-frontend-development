@@ -118,6 +118,18 @@ class EventSummary extends React.Component {
       stats.endTimestamp = incident.endTimestamp;
       stats.maxAnomalyRatio = maxAnomalyRatio;
       stats.minAnomalyRatio = minAnomalyRatio;
+
+      // Use global instances/metrics if event doesn't include it
+      if (!stats.instances || stats.instances === '[]') {
+        stats.instances = data.instanceMetricJson.instances;
+      }
+      if (!stats.metrics || stats.metrics === '[]') {
+        stats.metrics = data.instanceMetricJson.metrics;
+      }
+      if (!stats.newInstances || stats.newInstances === '[]') {
+        stats.newInstances = data.instanceMetricJson.newInstances;
+      }
+
       incidentsTreeMap =
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
           data.statistics.instanceStatsJson,
