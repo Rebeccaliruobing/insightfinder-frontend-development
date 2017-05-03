@@ -156,7 +156,14 @@ class LogLiveAnalysisCore extends React.PureComponent {
             }
           </div>
         </Container>
-        {!incident &&
+        {!incident && incidentList.length === 0 &&
+          <Container fullHeight>
+            <div className="ui warning message" style={{ marginTop: 10 }}>
+              No streaming log data available yet, Please check back later
+            </div>
+          </Container>
+        }
+        {!incident && incidentList.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
               {incidentList.map(ic => (
