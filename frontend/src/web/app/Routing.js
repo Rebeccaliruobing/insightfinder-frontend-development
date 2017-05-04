@@ -2,11 +2,13 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { ConnectedRouter as Router } from 'react-router-redux';
 import { PrivateRoute } from '../../common/app/components';
+import { urlJoin } from '../../common/utils';
 import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { ExecutiveDashboard } from '../dashboard';
 import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
+import { BugRepository } from '../usecase';
 
 import {
   ForgotPassword, ResetPassword,
@@ -65,7 +67,9 @@ const LogLiveRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogLiveAnalysis} />
+        <Route
+          path={urlJoin(match.url, ':projectId?', ':incidentId?')} component={LogLiveAnalysis}
+        />
       </Switch>
     </SinglePage>
   );
@@ -75,7 +79,19 @@ const LogFileRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogFileAnalysis} />
+        <Route
+          path={urlJoin(match.url, ':projectId?', ':incidentId?')} component={LogFileAnalysis}
+        />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const UseCaseRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={urlJoin(match.url, '/:system?')} component={BugRepository} />
       </Switch>
     </SinglePage>
   );
@@ -90,6 +106,7 @@ const PrivateRouting = () => (
     <Route path="/log/analysis" component={LogRouting} />
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
+    <Route path="/usecase" component={UseCaseRouting} />
 
     <Route
       path="/liveMonitoring"

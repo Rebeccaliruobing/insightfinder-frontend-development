@@ -25,4 +25,6 @@ html.dark {
   $loader-bg-color:      $white;
   @import "../elements/loader_theme";
   @import "../elements/message_theme";
+
+  @import "../grid/table_theme";
 }

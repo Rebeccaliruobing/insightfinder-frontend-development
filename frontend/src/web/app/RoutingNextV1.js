@@ -136,22 +136,22 @@ const RoutingNextV1 = () => (
       />
       <Redirect from="/settings" to="/settings/project" />
       <Route
-        path="/usecase/list-all"
+        path="/usecase1/list-all"
         render={() => (<UseCase><ListAll /></UseCase>)}
       />
       <Route
-        path="/usecase/list-some"
+        path="/usecase1/list-some"
         render={() => (<UseCase><ListAll /></UseCase>)}
       />
       <Route
-        path="/usecase/search"
+        path="/usecase1/search"
         render={() => (<UseCase><Search /></UseCase>)}
       />
       <Route
-        path="/usecase/explore"
+        path="/usecase1/explore"
         render={() => (<UseCase><Explore /></UseCase>)}
       />
-      <Redirect from="/usecase" to="/usecase/explore" />
+      <Redirect from="/usecase1" to="/usecase1/explore" />
 
       <Route
         path="/filetabs/fileNewModel"

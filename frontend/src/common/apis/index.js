@@ -1,3 +1,4 @@
+export { default as loadBugRepository } from './loadBugRepository';
 export { default as login } from './login';
 export { default as loadInitData } from './loadInitData';
 export { default as loadLogFile } from './loadLogFile';

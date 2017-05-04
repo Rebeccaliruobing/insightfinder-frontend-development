@@ -74,11 +74,17 @@ export type LogState = {
   streamingIncidentInfos: Object,
 };
 
+export type UseCaseState = {
+  opensourceSystemNames: Array<string>,
+  bugRepository: Object,
+};
+
 export type State = {
   app: AppState,
   auth: AuthState,
   dashboard: DashboardState,
   log: LogState,
+  usecase: UseCaseState,
 };
 
 // Actions
@@ -126,4 +132,6 @@ export type Action =
       projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
     }
   }
+  | { type: 'LOAD_BUG_REPOSITORY', payload: {} }
+  | { type: 'SET_BUG_REPOSITORY', payload: { bugRepository: Object } }
   ;

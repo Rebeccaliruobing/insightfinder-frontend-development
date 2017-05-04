@@ -1,0 +1,17 @@
+.ReactVirtualized__Table__headerRow {
+  border-color: $divider-color;
+  background-color: #566f84;
+  color: white;
+}
+
+.ReactVirtualized__Table__row {
+  border-color: $divider-color;
+  cursor: pointer;
+  &:hover,
+  &.active {
+    background-color: #d6ebfc;
+    &:before {
+      background: #F2711C;
+    }
+  }
+}
