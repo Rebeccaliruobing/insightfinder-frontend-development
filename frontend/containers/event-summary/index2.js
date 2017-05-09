@@ -3,6 +3,7 @@
 import React, { PropTypes as T } from 'react';
 import store from 'store';
 import _ from 'lodash';
+import R from 'ramda';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
@@ -74,7 +75,9 @@ class EventSummary extends React.Component {
     } else {
       let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
       if (!projectName ||
-        (projectName && !projects.find(item => item.projectName === projectName))) {
+        !R.find(
+          item => item.projectName.toLowerCase() === projectName.toLowerCase(),
+        )(projects)) {
         projectName = projects[0].projectName;
       }
       this.handleProjectChange(projectName);
