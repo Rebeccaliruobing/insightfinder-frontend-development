@@ -15,7 +15,7 @@ import { setLogStreaming } from '../actions';
 const streamingEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING')
     .concatMap((action) => {
-      let { projectId, incidentId } = action.payload;
+      let { projectId, month, incidentId } = action.payload;
       const { match, params, forceReload } = action.payload;
       const state = getState();
       const { credentials } = state.auth;
@@ -37,6 +37,12 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
         reloadProject = !streamingInfo;
       }
 
+      // If month is empty, use current month
+      if (!month) {
+        month = moment().format('YYYY-MM');
+      }
+      const monthlyDate = moment(month, 'YYYY-MM').startOf('month').valueOf();
+
       if (reloadProject && projectId) {
         return Observable.concat(
           Observable.of(showAppLoader()),
@@ -44,13 +50,15 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
             .from(loadLogStreaming(
               credentials, {
                 projectName: projectId,
-                monthlyDate: moment().startOf('month').valueOf(),
+                monthlyDate,
               }))
             .concatMap((projectData) => {
               const incidentList = projectData.incidentList || [];
               const incident = R.find(i => i.id === incidentId, incidentList);
               incidentId = incident ? incidentId : null;
-              const location = buildMatchLocation(match, { projectId, incidentId }, params);
+              const location = buildMatchLocation(match, {
+                projectId, month, incidentId,
+              }, params);
 
               if (!incident) {
                 return Observable.concat(
@@ -89,7 +97,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
         incident = R.find(i => i.id === incidentId, streamingInfo.incidentList || []);
       }
       incidentId = incident ? incidentId : null;
-      const location = buildMatchLocation(match, { projectId, incidentId }, params);
+      const location = buildMatchLocation(match, { projectId, month, incidentId }, params);
 
       if (!incident) {
         return Observable.concat(

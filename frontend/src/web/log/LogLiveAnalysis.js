@@ -1,3 +1,9 @@
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import React from 'react';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -34,37 +40,46 @@ class LogLiveAnalysisCore extends React.PureComponent {
       rareEventThreshold: '3',
       derivedPvalue: '0.9',
     };
+    this.monthCount = 12;
   }
 
   componentDidMount() {
     const { match, location } = this.props;
     let params = parseQueryString(location.search);
-    const { projectId, incidentId } = match.params;
+    const { projectId, month, incidentId } = match.params;
     if (incidentId) {
       params = { ...this.defaultParams, ...params };
     }
-    this.props.loadLogStreaming(projectId, incidentId, match, params, true);
+    this.props.loadLogStreaming(projectId, month, incidentId, match, params, true);
   }
 
   @autobind
   handleProjectChange(newValue) {
     const { match } = this.props;
     const projectId = newValue ? newValue.value : null;
-    this.props.loadLogStreaming(projectId, null, match, null, true);
+    this.props.loadLogStreaming(projectId, null, null, match, null, true);
+  }
+
+  @autobind
+  handleMonthChange(newValue) {
+    const { match } = this.props;
+    const { projectId } = match.params;
+    const month = newValue ? newValue.value : null;
+    this.props.loadLogStreaming(projectId, month, null, match, null, true);
   }
 
   @autobind
   handleIncidentChange(newValue) {
     const { match, location } = this.props;
     let params = parseQueryString(location.search);
-    const { projectId } = match.params;
+    const { projectId, month } = match.params;
     const incidentId = newValue ? newValue.value : null;
     if (incidentId) {
       params = { ...this.defaultParams, ...params };
     } else {
       params = null;
     }
-    this.props.loadLogStreaming(projectId, incidentId, match, params, false);
+    this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
   @autobind
@@ -75,8 +90,8 @@ class LogLiveAnalysisCore extends React.PureComponent {
       ...this.defaultParams,
       ...parseQueryString(location.search), rareEventThreshold,
     };
-    const { projectId, incidentId } = match.params;
-    this.props.loadLogStreaming(projectId, incidentId, match, params, false);
+    const { projectId, month, incidentId } = match.params;
+    this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
   @autobind
@@ -84,8 +99,8 @@ class LogLiveAnalysisCore extends React.PureComponent {
     const derivedPvalue = newValue ? newValue.value : null;
     const { match, location } = this.props;
     const params = { ...this.defaultParams, ...parseQueryString(location.search), derivedPvalue };
-    const { projectId, incidentId } = match.params;
-    this.props.loadLogStreaming(projectId, incidentId, match, params, false);
+    const { projectId, month, incidentId } = match.params;
+    this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
   @autobind
@@ -96,22 +111,33 @@ class LogLiveAnalysisCore extends React.PureComponent {
 
       const { match, location } = this.props;
       const params = { ...this.defaultParams, ...parseQueryString(location.search) };
-      const { projectId } = match.params;
-      this.props.loadLogStreaming(projectId, incidentId, match, params, false);
+      const { projectId, month } = match.params;
+      this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
     };
   }
 
   render() {
     const { intl, projects, streamingInfos, match, location, streamingIncidentInfos } = this.props;
-    const { projectId, incidentId } = match.params;
+    const { projectId, month, incidentId } = match.params;
     const { derivedPvalue, rareEventThreshold } = parseQueryString(location.search) || {};
     const project = get(streamingInfos, projectId, {});
     const incidentList = project.incidentList || [];
     const incident = get(streamingIncidentInfos, incidentId, null);
 
+    // General the monthy option list for one year.
+    const monthOptions = R.map((offset) => {
+      const month = moment();
+      month.add(-offset, 'month').startOf('month');
+      return {
+        label: month.format('MMM YYYY'),
+        value: month.format('YYYY-MM'),
+      };
+    }, R.range(0, this.monthCount));
+
     const projectValueRenderer = (option) => {
       const url = buildMatchLocation(match, {
         projectId: option.value,
+        month: moment().format('YYYY-MM'),
         incidentId: null,
       });
       return (
@@ -132,10 +158,17 @@ class LogLiveAnalysisCore extends React.PureComponent {
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
               {...incident ? { valueRenderer: projectValueRenderer } : {}}
             />
+            <span className="divider">/</span>
+            <Select
+              name="month" inline style={{ width: 140 }}
+              options={monthOptions}
+              value={month} onChange={this.handleMonthChange}
+            />
             {incident && <span className="divider">/</span>}
             {incident &&
               <Select
                 name="incident" inline clearable style={{ width: 248 }}
+                placeholder="Select Month"
                 options={R.map(i => ({ label: i.name, value: i.id }), incidentList)}
                 value={incidentId || null} onChange={this.handleIncidentChange}
               />

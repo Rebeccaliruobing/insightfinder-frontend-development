@@ -68,7 +68,8 @@ const LogLiveRouting = ({ match }: RouteProps) => {
     <SinglePage>
       <Switch>
         <Route
-          path={urlJoin(match.url, ':projectId?', ':incidentId?')} component={LogLiveAnalysis}
+          path={urlJoin(match.url, ':projectId?', ':month?', ':incidentId?')}
+          component={LogLiveAnalysis}
         />
       </Switch>
     </SinglePage>

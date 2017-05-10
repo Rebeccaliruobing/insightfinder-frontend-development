@@ -124,7 +124,8 @@ export type Action =
   }
   | {
     type: 'LOAD_LOG_STREAMING', payload: {
-      projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,
+      projectId: ?string, month: ?string, incidentId: ?string,
+      match: Object, params: ?Object, forceReload?: bool,
     }
   }
   | {

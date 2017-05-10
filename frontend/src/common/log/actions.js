@@ -29,13 +29,14 @@ export const setLogFile = (
 });
 
 export const loadLogStreaming = (
-  projectId: ?string, incidentId: ?string,
+  projectId: ?string, month: ?string, incidentId: ?string,
   match: Object, params: ?Object,
   forceReload?: bool,
 ): Action => ({
   type: 'LOAD_LOG_STREAMING',
   payload: {
     projectId,
+    month,
     incidentId,
     match,
     params,
