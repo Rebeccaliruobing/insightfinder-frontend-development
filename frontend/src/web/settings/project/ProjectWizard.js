@@ -16,13 +16,17 @@ type Props = {
 };
 
 type States = {
-  projectName: string,
+  name: string,
+  description: string,
+  sharedUsers: string,
 }
 
 class ProjectWizardCore extends React.Component {
   props: Props;
   state: States = {
-    projectName: '',
+    name: null,
+    description: null,
+    sharedUsers: null,
   }
 
   componentDidMount() {
@@ -32,7 +36,10 @@ class ProjectWizardCore extends React.Component {
 
   render() {
     const { intl } = this.props;
-    const projectNameLink = VLink.state(this, 'projectName');
+    const nameLink = VLink.state(this, 'name')
+      .check(x => x, 'Project Name is required');
+    const descriptionLink = VLink.state(this, 'description');
+    const sharedUsersLink = VLink.state(this, 'sharedUsers');
 
     return (
       <Container fullHeight withGutter className="flex-col settings">
@@ -76,23 +83,26 @@ class ProjectWizardCore extends React.Component {
           style={{ paddingTop: '1px', paddingBottom: '0.5em' }}
         >
           <Box style={{ minHeight: '100%' }}>
-            <div className="ui form" style={{ width: 608 }}>
-              <div className="inline field required">
-                <div className="label">Project Name:</div>
-                <Input valueLink={projectNameLink} />
-              </div>
-              <div className="inline field">
-                <div className="label">Description:</div>
-                <Input valueLink={projectNameLink} />
-              </div>
-              <div className="inline field">
-                <div className="label">Sharing:</div>
-                <Input valueLink={projectNameLink} />
-                <div className="desc">
+            <div className="ui form" style={{ width: 600 }}>
+              <div className="ui info message">
                 If you are collaborating with other users, you may invite them to view data associated with your Projects.
+              </div>  
+              <div className="inline field required">
+                <label>Project Name:</label>
+                <Input valueLink={nameLink} />
+              </div>
+              <div className="inline field">
+                <label>Description:</label>
+                <Input valueLink={descriptionLink} />
+              </div>
+              <div className="inline field">
+                <label>Sharing:</label>
+                <Input valueLink={sharedUsersLink} />
+                <div className="desc">
+                To share your project, enter their User ID(s) in the above field.
                 </div>
               </div>
-              <div className="inline field">
+              <div className="inline field text-right">
                 <div className="ui orange button">Next</div>
               </div>
             </div>

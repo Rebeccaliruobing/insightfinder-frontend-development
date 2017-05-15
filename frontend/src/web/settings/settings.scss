@@ -10,7 +10,11 @@
   .wizard.container {
     .ui.form {
       .inline.field {
-        > .label {
+        margin: 0 0 1.5em;
+        > .ui.message {
+          font-size: 13px;
+        }
+        > label {
           width: 30%;
           padding-right: 1em;
           margin: 0;
@@ -22,7 +26,11 @@
           margin: 0;
         }
         > .desc {
+          margin-top: 1.5em;
           font-size: 12px;
+        }
+        .ui.button {
+          min-width: 120px;
         }
       }
     }
