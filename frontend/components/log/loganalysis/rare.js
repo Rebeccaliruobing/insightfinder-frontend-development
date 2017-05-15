@@ -53,28 +53,30 @@ class EventRare extends React.Component {
     eventDataset.forEach((e) => {
       const etimeVal = moment(e.timestamp).valueOf();
       const idx = Math.floor((etimeVal - startTimeVal) / frequency);
-      const time = sdata[idx][0].valueOf().toString();
-      sdata[idx][1] += 1;
+      if (idx >= 0) {
+        const time = sdata[idx][0].valueOf().toString();
+        sdata[idx][1] += 1;
 
-      if (!buckets[time]) {
-        buckets[time] = {
-          name: '',
-          events: [],
-          nEvents: 0,
-          keywords: [],
-          episodes: [],
-        };
+        if (!buckets[time]) {
+          buckets[time] = {
+            name: '',
+            events: [],
+            nEvents: 0,
+            keywords: [],
+            episodes: [],
+          };
+        }
+
+        const bucket = buckets[time];
+        bucket.events.push({
+          datetime: e.timestamp,
+          timestamp: etimeVal,
+          rawData: e.rawData,
+        });
+        bucket.keywords = bucket.keywords.concat(e.keywords);
+        bucket.episodes = bucket.episodes.concat(e.episodes);
+        bucket.nEvents = bucket.events.length;
       }
-
-      const bucket = buckets[time];
-      bucket.events.push({
-        datetime: e.timestamp,
-        timestamp: etimeVal,
-        rawData: e.rawData,
-      });
-      bucket.keywords = bucket.keywords.concat(e.keywords);
-      bucket.episodes = bucket.episodes.concat(e.episodes);
-      bucket.nEvents = bucket.events.length;
     });
 
     // merge the keywords and episodes
