@@ -124,4 +124,8 @@ export default [
     "id": "auth.hint.userName",
     "defaultMessage": "username?",
   },
+  {
+    "id": "settings.menus.projects",
+    "defaultMessage": "Project Settings",
+  },
 ];

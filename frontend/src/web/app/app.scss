@@ -106,11 +106,62 @@
       }
     }
   }
+  > .leftbar {
+    height: 100%;
+    position: fixed;
+    left: 0;
+    top: 48px;
+    width: 48px;
+    z-index: 100;
+    background: #88bbee;
+    > .ui.vertical.icon.menu {
+      width: 100%;
+      padding: 10px 0;
+      background: transparent;
+      box-shadow: initial;
+      border-width: 0px;
+      .item {
+        color: white;
+        padding: 6px 0px;
+        margin: 4px 0px;
+        transition: none;
+        border: 0px solid transparent;
+        &:before {
+          display: none;
+        }
+        &.active {
+          background: #2f88e1;
+        }
+        .icon {
+          font-size: 28px;
+          margin: 0px 0px 0px 6px;
+        }
+        > span {
+          position: absolute;
+          top: 0px;
+          left: 52px;
+          font-size: 15px;
+          line-height: 38px;
+          display: none;
+        }
+        &:hover {
+          width: 240px;
+          background: #2f88e1;
+          > span {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
   > .content {
     padding-top: 48px;
     height: 100%;
     width: 100%;
     overflow: auto;
+    &.with-leftbar {
+      padding-left: 48px;
+    }
     > .wrapper {
       > .navbar {
         width: 48px;

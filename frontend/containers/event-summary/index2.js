@@ -263,17 +263,23 @@ class EventSummary extends React.Component {
 
           let detectedEvents = [];
           let predictedEvents = [];
+          let gname = instanceGroup;
+          if (instanceGroup.indexOf(':') >= 0) {
+            gname = instanceGroup.split(':')[1];
+          }
           const detectedPromise = apis.loadEvents(projectName, instanceGroup,
             startTime.valueOf(), realEndTime.valueOf(), 'detected')
             .then((data) => {
-              detectedEvents = data[instanceGroup] || [];
+              console.log(['detected', instanceGroup, data]);
+              detectedEvents = data[gname] || [];
             });
           const predictedPromise = apis.loadEvents(projectName, instanceGroup,
             startTime.valueOf(), realEndTime.valueOf(), 'predicted')
             .then((data) => {
-              predictedEvents = data[instanceGroup] || [];
+              console.log(['predicted'], data);
+              predictedEvents = data[gname] || [];
             });
-          
+
           Promise.all([detectedPromise, predictedPromise])
             .then(() => {
               const incidents = _.concat(detectedEvents, predictedEvents);

@@ -16,6 +16,7 @@ type Props = {
   intl: Object,
   userInfo: Object,
   pageLoaderVisible: bool,
+  leftbar: any, // React component
   localeOptions: Array,
   children: Element<any>,
   setCurrentLocale: Function,
@@ -26,6 +27,7 @@ const SinglePageCore = ({
   className, userInfo, intl, pageLoaderVisible,
   localeOptions, children,
   setCurrentLocale, logoff,
+  leftbar,
 }: Props) => {
   const { userName } = userInfo;
   const isAdmin = ['admin', 'guest'].indexOf(userName) >= 0;
@@ -84,10 +86,21 @@ const SinglePageCore = ({
           </div>
         </div>
       </Topbar>
-      <div className="content">
-        <SinglePageLoader key="loader" visible={pageLoaderVisible} />
-        {children}
-      </div>
+      {!leftbar &&
+        <div className="content">
+          <SinglePageLoader key="loader" visible={pageLoaderVisible} />
+          {children}
+        </div>
+      }
+      {!!leftbar && leftbar}
+      {!!leftbar &&
+        <div className="content with-leftbar">
+          <div>
+            <SinglePageLoader key="loader" visible={pageLoaderVisible} />
+            {children}
+          </div>
+        </div>
+      }
     </Container>
   );
 };

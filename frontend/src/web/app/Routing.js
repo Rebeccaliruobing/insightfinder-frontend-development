@@ -9,6 +9,7 @@ import { SinglePage } from '../app/components';
 import { ExecutiveDashboard } from '../dashboard';
 import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
+import { SettingsLeftbar } from '../settings';
 
 import {
   ForgotPassword, ResetPassword,
@@ -98,6 +99,27 @@ const UseCaseRouting = ({ match }: RouteProps) => {
   );
 };
 
+const SettingsRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage leftbar={<SettingsLeftbar />}>
+      <Switch>
+        <Route path={urlJoin(match.url, '/:project?')} component={BugRepository} />
+      </Switch>
+    </SinglePage>
+  );
+};
+// The routing for projects need to merge into settings after migrate all.
+const SettingsProjectWizardRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage leftbar={<SettingsLeftbar />}>
+      <Switch>
+        <Route path={urlJoin(match.url, '/:test?')} component={BugRepository} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+
 const PrivateRouting = () => (
   <Switch>
     <Route path="/help" component={Help} />
@@ -108,6 +130,8 @@ const PrivateRouting = () => (
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
     <Route path="/usecase" component={UseCaseRouting} />
+    <Route path="/settings/projects" component={SettingsRouting} />
+    <Route path="/settings/project-wizard" component={SettingsProjectWizardRouting} />
 
     <Route
       path="/liveMonitoring"
