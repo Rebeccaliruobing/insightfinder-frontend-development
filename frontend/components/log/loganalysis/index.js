@@ -127,7 +127,7 @@ class LogAnalysisCharts extends React.Component {
 
     // make a copy, and filter out anomaly and small cluster, and run again
     const logEventArr = allLogEventArr.filter((el, index, arr) => {
-      return (el.rareEventFlag);
+      return (el.clusteringResultFlag);
     });
     const rareLogEventArr = allLogEventArr.filter((el, index, arr) => {
       return (el.rareEventFlag);
