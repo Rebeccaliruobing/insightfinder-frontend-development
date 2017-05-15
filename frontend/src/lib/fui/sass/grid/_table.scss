@@ -5,6 +5,12 @@
 .ReactVirtualized__Table {
   outline: none;
   font-size: 12px;
+  &.with-border {
+    > .ReactVirtualized__Table__Grid {
+      border: 1px solid transparent;
+      border-top: 1px;
+    }
+  }
 }
 
 .ReactVirtualized__Table__Grid {

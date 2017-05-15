@@ -1,3 +1,10 @@
+.ReactVirtualized__Table.with-border {
+  > .ReactVirtualized__Table__Grid {
+    border-color: $divider-color;
+    background-color: $white;
+  }
+}
+
 .ReactVirtualized__Table__headerRow {
   border-color: $divider-color;
   background-color: #566f84;

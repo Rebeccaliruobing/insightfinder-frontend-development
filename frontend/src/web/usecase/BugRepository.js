@@ -320,7 +320,7 @@ class BugRepositoryCore extends React.PureComponent {
 
     return (
       <Container fullHeight withGutter className="flex-col bug-repository">
-        <Container toolbar>
+        <Container breadcrumb>
           <div className="section">
             {!selectedSystemName &&
               <span className="label">{intl.formatMessage(appMenusMessages.bugRepository)}</span>

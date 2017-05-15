@@ -161,6 +161,7 @@
     overflow: auto;
     &.with-leftbar {
       padding-left: 48px;
+      overflow: hidden;
     }
     > .wrapper {
       > .navbar {

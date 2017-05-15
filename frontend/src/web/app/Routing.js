@@ -6,10 +6,11 @@ import { urlJoin } from '../../common/utils';
 import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
+import { BaseUrls } from './Constants';
 import { ExecutiveDashboard } from '../dashboard';
 import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
-import { SettingsLeftbar } from '../settings';
+import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
 
 import {
   ForgotPassword, ResetPassword,
@@ -99,21 +100,22 @@ const UseCaseRouting = ({ match }: RouteProps) => {
   );
 };
 
-const SettingsRouting = ({ match }: RouteProps) => {
+const SettingsRouting = () => {
   return (
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
-        <Route path={urlJoin(match.url, '/:project?')} component={BugRepository} />
+        <Route path={BaseUrls.SettingsProjectList} exact component={SettingsProjectList} />
+        <Route path={BaseUrls.ProjectSettings} exact component={ProjectSettings} />
       </Switch>
     </SinglePage>
   );
 };
 // The routing for projects need to merge into settings after migrate all.
-const SettingsProjectWizardRouting = ({ match }: RouteProps) => {
+const SettingsProjectWizardRouting = () => {
   return (
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
-        <Route path={urlJoin(match.url, '/:test?')} component={BugRepository} />
+        <Route path={BaseUrls.ProjectWizard} exact component={ProjectWizard} />
       </Switch>
     </SinglePage>
   );
@@ -130,8 +132,8 @@ const PrivateRouting = () => (
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
     <Route path="/usecase" component={UseCaseRouting} />
-    <Route path="/settings/projects" component={SettingsRouting} />
-    <Route path="/settings/project-wizard" component={SettingsProjectWizardRouting} />
+    <Route path={BaseUrls.SettingsProjectList} component={SettingsRouting} />
+    <Route path={BaseUrls.ProjectWizard} component={SettingsProjectWizardRouting} />
 
     <Route
       path="/liveMonitoring"

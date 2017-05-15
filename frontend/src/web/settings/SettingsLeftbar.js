@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { injectIntl } from 'react-intl';
 import { settingsMenusMessages } from '../../common/settings/messages';
+import './settings.scss';
 
 type Props = {
   intl: Object,

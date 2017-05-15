@@ -1,0 +1,30 @@
+@charset "utf-8";
+@import "../../lib/fui/sass/variables";
+@import "../../lib/fui/sass/themes/colors";
+
+.settings.container {
+  .ui.steps {
+    font-size: 12px;
+  }
+
+  .wizard.container {
+    .ui.form {
+      .inline.field {
+        > .label {
+          width: 30%;
+          padding-right: 1em;
+          margin: 0;
+          display: inline-block;
+          font-weight: $font-weight-regular;
+        }
+        > .ui.input {
+          width: 70%;
+          margin: 0;
+        }
+        > .desc {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
