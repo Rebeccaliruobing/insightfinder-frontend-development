@@ -10,15 +10,24 @@
   margin-right: $x-gutter;
 }
 
-// Toolbar container
-.fui.toolbar.container {
-  font-size: 12px;
-  z-index: 1;
+// Toolbar & breadcrumb container
+.fui.breadcrumb.container {
   background: $white;
   padding-top: $y-small-gutter;
   padding-bottom: $y-small-gutter;
   border-top: 1px solid $white;
   border-bottom: 1px solid $dark-divider-color;
+}
+
+.fui.toolbar.container {
+  padding-top: $y-small-gutter;
+  padding-bottom: $y-small-gutter;
+}
+
+.fui.breadcrumb.container,
+.fui.toolbar.container {
+  font-size: 12px;
+  z-index: 1;
   > .section {
     display: inline-flex;
     align-items: center;

@@ -147,7 +147,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
 
     return (
       <Container fullHeight withGutter className="flex-col log-live">
-        <Container toolbar>
+        <Container breadcrumb>
           <div className="section">
             <span className="label">{intl.formatMessage(appMenusMessages.streamLogAnalysis)}</span>
             <span className="divider">/</span>
