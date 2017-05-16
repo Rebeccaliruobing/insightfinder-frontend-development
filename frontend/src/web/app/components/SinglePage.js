@@ -54,9 +54,6 @@ const SinglePageCore = ({
           {isAdmin && <NavLink to="/filetabs" className="item">
             {intl.formatMessage(appMenusMessages.fileAnalysis)}
           </NavLink>}
-          {isAdmin && <NavLink to="/settings/projects" className="item">
-            Settings2
-          </NavLink>}
           <NavLink to="/help" className="item">
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
