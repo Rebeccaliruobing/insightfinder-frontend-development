@@ -24,9 +24,9 @@ type States = {
 class ProjectWizardCore extends React.Component {
   props: Props;
   state: States = {
-    name: null,
-    description: null,
-    sharedUsers: null,
+    name: '',
+    description: '',
+    sharedUsers: '',
   }
 
   componentDidMount() {

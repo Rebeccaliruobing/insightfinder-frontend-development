@@ -75,7 +75,7 @@ const ListRow = ({
             <i onClick={onNameClick} className="link external icon" />
           </OverlayTrigger>
         }
-        {!isProject && type === 'anomaly' &&
+        {false && !isProject && type === 'anomaly' &&
           <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
             <i className="random icon" onClick={onActionClick} />
           </OverlayTrigger>
