@@ -49,6 +49,7 @@ export type AppState = {
   v1store: Object,
   projects: Array<Object>,
   filters: Filters,
+  enabledDataSourceIds: Array<string>,
 };
 
 export type AuthState = {

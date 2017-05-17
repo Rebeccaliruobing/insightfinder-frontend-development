@@ -5,15 +5,28 @@
 .settings.container {
   .ui.steps {
     font-size: 12px;
+    .step {
+      font-size: inherit;
+      padding: 1em 1.5em;
+      &:before {
+        width: 30px;
+      }
+    }
   }
 
   .wizard.container {
     .ui.form {
+      > * {
+        margin-bottom: 1em;
+        &:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      > .text {
+        font-size: 13px;
+      }
       .inline.field {
         margin: 0 0 1.5em;
-        > .ui.message {
-          font-size: 13px;
-        }
         > label {
           width: 30%;
           padding-right: 1em;

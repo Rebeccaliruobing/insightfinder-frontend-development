@@ -21,6 +21,10 @@
   flex-direction: row;
 }
 
+.flex-grow {
+  flex: 1;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }

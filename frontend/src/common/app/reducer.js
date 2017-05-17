@@ -32,6 +32,10 @@ const initialState = {
   v1store: {},
   projects: [],
   filters: {},
+  enabledDataSourceNames: [
+    'AWSCloudWatch', 'GoogleCloudMonitoring', 'DataDog', 'NewRelic',
+    'AWSEC2', 'cAdvisor',
+  ], // TODO: used to filter enabled data source
 };
 
 const reducer = (

@@ -8,7 +8,8 @@ import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { buildUrl } from '../../../common/utils';
 import { appMenusMessages } from '../../../common/app/messages';
-import { hideAppLoader } from '../../../common/app/actions';
+import { settingsMessages } from '../../../common/settings/messages';
+import { hideAppLoader, showAppAlert } from '../../../common/app/actions';
 import { State } from '../../../common/types';
 
 type Props = {
@@ -16,14 +17,16 @@ type Props = {
   projects: Array<Object>,
   push: Function,
   hideAppLoader: Function,
+  showAppAlert: Function,
 };
 
 class SettingsProjectListCore extends React.Component {
   props: Props;
 
   componentDidMount() {
-    const { projects, push, hideAppLoader } = this.props;
+    const { projects, push, hideAppLoader, showAppAlert } = this.props;
     if (projects.length === 0) {
+      showAppAlert('info', settingsMessages.alertNoProject);
       push(BaseUrls.ProjectWizard);
     } else {
       hideAppLoader();
@@ -97,6 +100,6 @@ export default connect(
     };
   },
   {
-    push, hideAppLoader,
+    push, hideAppLoader, showAppAlert,
   },
 )(SettingsProjectList);

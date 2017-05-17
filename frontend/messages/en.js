@@ -125,6 +125,14 @@ export default [
     "defaultMessage": "username?",
   },
   {
+    "id": "settings.alert.noProject",
+    "defaultMessage": "There is no project, please create new one.",
+  },
+  {
+    "id": "settings.menus.externalService",
+    "defaultMessage": "External Service",
+  },
+  {
     "id": "settings.menus.projects",
     "defaultMessage": "Project Settings",
   },
