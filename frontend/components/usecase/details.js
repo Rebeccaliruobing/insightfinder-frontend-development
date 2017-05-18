@@ -29,7 +29,9 @@ const ProjectDetails = class extends React.Component {
   @autobind
   updateData() {
     let { query } = this.props.location;
-    let { pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller } = query;
+    let { pvalue, cvalue, modelKey, modelName,
+      projectName, groupId, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,
+      latestDataTimestamp, caller } = query;
     let startTimestamp = undefined;
     let endTimestamp = undefined;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
@@ -39,7 +41,9 @@ const ProjectDetails = class extends React.Component {
     }
 
     this.setState({ loading: true }, () => {
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller)
+      apis.postUseCase(pvalue, cvalue, modelKey, modelName,
+        projectName, groupId, modelType, fromUser,
+        dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller)
         .then((resp) => {
           resp.loading = false;
           this.setState(resp, () => {
