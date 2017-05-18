@@ -54,7 +54,10 @@ class LogAnalysisCharts extends React.Component {
       rareLogEventArr: [],
       neuronValue: [],
     };
-    this.calculateData(props);
+  }
+
+  componentDidMount() {
+    this.calculateData(this.props);
   }
 
   componentWillReceiveProps(nextProps) {

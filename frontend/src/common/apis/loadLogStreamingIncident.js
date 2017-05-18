@@ -18,7 +18,6 @@ const loadLogStreamingIncident = (
       dayDate: moment(incidentStartTime).valueOf(),
     },
   ).then((d) => {
-    console.log(['logstreaming/detectionResult', d]);
     return d.data;
   });
 };

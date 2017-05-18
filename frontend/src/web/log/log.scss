@@ -17,4 +17,8 @@
       }
     }
   }
+  > .fui.log-charts.container {
+    flex: 1;
+    overflow: hidden;
+  }
 }

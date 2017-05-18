@@ -175,13 +175,13 @@ class LogLiveAnalysisCore extends React.PureComponent {
             }
           </div>
           <div className="section float-right">
-            {incident && <span className="label">Rare Event Detection Sensitivity</span>}
+            {incident && <span className="label" style={{ fontSize: 12 }}>Rare Event Detection Sensitivity</span>}
             {incident &&
               <Selectors.RareEventSensitivity
                 value={rareEventThreshold || 3} onChange={this.handleRareEventSensitivityChange}
               />
             }
-            {incident && <span className="label">Frequency Anomaly Detection Sensitivity</span>}
+            {incident && <span className="label" style={{ fontSize: 12 }}>Frequency Anomaly Detection Sensitivity</span>}
             {incident &&
               <Selectors.AnomalyThresholdSensitivity
                 value={derivedPvalue || 0.9} onChange={this.handleFrequencyAnomalySensitivity}
@@ -230,7 +230,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
           </Container>
         }
         {incident &&
-          <Container><LogAnalysisCharts data={incident} /></Container>
+          <Container className="log-charts"><LogAnalysisCharts data={incident} /></Container>
         }
       </Container>
     );
