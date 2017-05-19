@@ -153,8 +153,14 @@ class CausalGraphModal extends React.Component {
       const edgeRightLables = svg.select('.output').append('g')
         .attr('class', 'edgeRightLabels');
 
+      const edges = g.edges();
+
       relations.forEach((rel) => {
-        const e = R.find(o => o.v === rel.left && o.w === rel.right, g.edges());
+        const e = R.find((o) => {
+          return (o.v === rel.left && o.w === rel.right) ||
+            (o.v === rel.right && o.w === rel.left);
+        }, edges);
+
         if (e) {
           const edge = g.edge(e);
 
@@ -209,7 +215,9 @@ class CausalGraphModal extends React.Component {
   retrieveData(props) {
     const { projectName, loadGroup, instanceGroup, endTime, numberOfDays } = props;
 
-    retrieveEventData(projectName, loadGroup, instanceGroup, endTime, numberOfDays).then((data) => {
+    retrieveEventData(projectName, loadGroup,
+      instanceGroup, endTime, numberOfDays,
+    ).then((data) => {
       const eventsCausalRelations = loadGroup ? (data.eventsCausalRelation || {}) :
         JSON.parse(data.causalRelation || '{}');
       const eventsCorrelations = loadGroup ? (data.eventsCorrelation || []) :
