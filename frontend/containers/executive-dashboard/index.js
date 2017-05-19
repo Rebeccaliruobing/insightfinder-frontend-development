@@ -56,7 +56,8 @@ class ExecutiveDashboard extends React.Component {
 
     this.state = {
       loading: true,
-      eventStats: [],
+      anomalyEventStats: [],
+      resourceEventStats: [],
       heatmapData: {},
       heatmapLoading: false,
       heatmapProject: null,
@@ -104,28 +105,43 @@ class ExecutiveDashboard extends React.Component {
       heatmapLoading: true,
       heatmapData: {},
     }, () => {
-      retrieveHeatmapData(
-        modelType, predictedEndTime.valueOf(), (diffDays * 2) + 1, timezoneOffset, 'loadHourly')
-        .then((data) => {
+      let heatmapData = {};
+      let anomalyEventStats = [];
+      let resourceEventStats = [];
+
+      const heatmapPromise = retrieveHeatmapData(
+        modelType, predictedEndTime.valueOf(),
+        (diffDays * 2) + 1, timezoneOffset, 'loadHourly',
+      ).then((data) => {
+        heatmapData = aggregateToMultiHourData(data, realEndTime, numberOfDays);
+      });
+
+      const anomalyStatsPromise = retrieveExecDBStatisticsData(
+        modelType, realEndTime, numberOfDays, timezoneOffset, 'loadAnomalyAll',
+      ).then((data) => {
+        anomalyEventStats = normalizeStats(data);
+      });
+
+      const resourceStatsPromise = retrieveExecDBStatisticsData(
+        modelType, realEndTime, numberOfDays, timezoneOffset, 'loadResourceAll',
+      ).then((data) => {
+        resourceEventStats = normalizeStats(data);
+      });
+
+      Promise.all([heatmapPromise, anomalyStatsPromise, resourceStatsPromise])
+        .then(() => {
           this.setState({
             startTime: startTime.clone(), endTime: endTime.clone(),
-            heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
+            heatmapData,
+            anomalyEventStats,
+            resourceEventStats,
+            loading: false,
+            heatmapLoading: false,
           }, () => {
-            retrieveExecDBStatisticsData(modelType, realEndTime, numberOfDays, timezoneOffset)
-              .then((data2) => {
-                this.setState({
-                  heatmapData: aggregateToMultiHourData(data, realEndTime, numberOfDays),
-                  eventStats: normalizeStats(data2),
-                  loading: false,
-                  heatmapLoading: false,
-                }, () => {
-                  hideAppLoader();
-                });
-              }).catch((msg) => {
-                console.log(msg);
-              });
+            hideAppLoader();
           });
-        }).catch((msg) => {
+        })
+        .catch((msg) => {
           console.log(msg);
         });
     });
@@ -242,7 +258,8 @@ class ExecutiveDashboard extends React.Component {
 
   render() {
     const { viewport } = this.props;
-    const { startTime, endTime, loading, eventStats, heatmapLoading, heatmapData } = this.state;
+    const { startTime, endTime, loading, anomalyEventStats, resourceEventStats,
+      heatmapLoading, heatmapData } = this.state;
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
     let anomalyContainerHeight = null;
@@ -357,7 +374,7 @@ class ExecutiveDashboard extends React.Component {
               timeIntervalPrevious={timeIntervalPrevious}
               timeIntervalCurrent={timeIntervalCurrent}
               timeIntervalPredicted={timeIntervalPredicted}
-              stats={eventStats}
+              stats={anomalyEventStats}
               onRowOpen={this.handleListRowOpenAnomaly}
               onRowClick={this.handleAnomalyListRowClick}
             />
@@ -371,7 +388,7 @@ class ExecutiveDashboard extends React.Component {
               timeIntervalPrevious={timeIntervalPrevious}
               timeIntervalCurrent={timeIntervalCurrent}
               timeIntervalPredicted={timeIntervalPredicted}
-              stats={eventStats}
+              stats={resourceEventStats}
               onRowOpen={this.handleListRowOpenResource}
             />
           </div>

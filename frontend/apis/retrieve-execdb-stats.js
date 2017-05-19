@@ -3,7 +3,9 @@ import store from 'store';
 import $ from 'jquery';
 import getEndpoint from './get-endpoint';
 
-const retrieveExecDBStatisticsData = (modelType, endTimestamp, numberOfDays, timezoneOffset) => {
+const retrieveExecDBStatisticsData = (
+  modelType, endTimestamp, numberOfDays, timezoneOffset, operation,
+) => {
   const userName = store.get('userName');
   const token = store.get('token');
 
@@ -12,7 +14,7 @@ const retrieveExecDBStatisticsData = (modelType, endTimestamp, numberOfDays, tim
       type: 'POST',
       url: getEndpoint('execDashboard'),
       data: $.param({
-        userName, token, endTimestamp, modelType, numberOfDays, timezoneOffset,
+        userName, token, endTimestamp, modelType, numberOfDays, timezoneOffset, operation,
       }),
       beforeSend: (request) => {
         request.setRequestHeader('Accept', 'application/json');
