@@ -122,19 +122,21 @@ class ExecutiveDashboard extends React.Component {
         anomalyEventStats = normalizeStats(data);
       });
 
-      const resourceStatsPromise = retrieveExecDBStatisticsData(
+      retrieveExecDBStatisticsData(
         modelType, realEndTime, numberOfDays, timezoneOffset, 'loadResourceAll',
       ).then((data) => {
         resourceEventStats = normalizeStats(data);
+        this.setState({
+          resourceEventStats,
+        });
       });
 
-      Promise.all([heatmapPromise, anomalyStatsPromise, resourceStatsPromise])
+      Promise.all([heatmapPromise, anomalyStatsPromise])
         .then(() => {
           this.setState({
             startTime: startTime.clone(), endTime: endTime.clone(),
             heatmapData,
             anomalyEventStats,
-            resourceEventStats,
             loading: false,
             heatmapLoading: false,
           }, () => {
