@@ -125,7 +125,7 @@ class ExecutiveDashboard extends React.Component {
       retrieveExecDBStatisticsData(
         modelType, realEndTime, numberOfDays, timezoneOffset, 'loadResourceAll',
       ).then((data) => {
-        resourceEventStats = normalizeStats(data);
+        resourceEventStats = normalizeStats(data, 'current.AvgCPUUtilization');
         this.setState({
           resourceEventStats,
         });
