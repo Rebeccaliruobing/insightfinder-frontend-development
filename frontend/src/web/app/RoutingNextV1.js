@@ -7,11 +7,11 @@ import { App as AppV1 } from '../../../root';
 
 import {
   Cloud,
-  InsightReport, EventSummary, ExecutiveDashboard, HistoricalReport,
+  InsightReport, ExecutiveDashboard, HistoricalReport,
   IncidentAnalysis, BehaviorChangeDetection, OutlierDetection, RolloutCheck,
   SummaryReport, AppForecast,
 } from '../../../components/cloud';
-import EventSummary2 from '../../../containers/event-summary/index2';
+import EventSummary from '../../../containers/event-summary';
 import { Log, IncidentLogAnalysis } from '../../../components/log';
 import {
   Settings,
@@ -42,12 +42,8 @@ const RoutingNextV1 = () => (
         render={() => (<Cloud><InsightReport /></Cloud>)}
       />
       <Route
-        path="/cloud/monitoring1"
-        render={() => (<Cloud><EventSummary /></Cloud>)}
-      />
-      <Route
         path="/cloud/monitoring"
-        render={() => (<Cloud><EventSummary2 /></Cloud>)}
+        render={() => (<Cloud><EventSummary /></Cloud>)}
       />
       <Route
         path="/cloud/executive-dashboard"

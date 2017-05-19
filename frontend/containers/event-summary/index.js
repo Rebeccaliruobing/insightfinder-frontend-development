@@ -1,8 +1,8 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import React, { PropTypes as T } from 'react';
-import store from 'store';
 import _ from 'lodash';
+import R from 'ramda';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
@@ -50,6 +50,8 @@ class EventSummary extends React.Component {
         instanceMetaData: {},
         eventStats: {},
       },
+      detectedEvents: [],
+      predictedEvents: [],
       loading: true,
       dataLoaded: false,
       selectedIncident: undefined,
@@ -60,6 +62,8 @@ class EventSummary extends React.Component {
       modelType: 'Holistic',
       instanceGroup: '',
       selectedInstance: undefined,
+      projectNotFound: false,
+      groupNotFound: false,
     };
   }
 
@@ -70,12 +74,36 @@ class EventSummary extends React.Component {
     if (projects.length === 0) {
       router.push('/log/incident-log-analysis');
     } else {
-      let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
-      if (!projectName ||
-        (projectName && !projects.find(item => item.projectName === projectName))) {
+      let { projectName } = location.query;
+
+      // If we don't set project name in url, select the first project; Otherwise
+      // check whether the project name is in the list.
+      if (projectName) {
+        if (!R.find(
+          p => p.projectName.toLowerCase() === projectName.toLowerCase(),
+          projects)) {
+          projectName = null;
+          this.setState({
+            projectNotFound: true,
+            groupNotFound: true,
+            loading: false,
+          });
+        }
+      } else {
         projectName = projects[0].projectName;
+        const query = this.applyDefaultParams({
+          ...location.query,
+          projectName,
+        });
+        router.push({
+          pathname: location.pathname,
+          query,
+        });
       }
-      this.handleProjectChange(projectName);
+
+      if (projectName) {
+        this.handleProjectChange(projectName);
+      }
     }
   }
 
@@ -116,6 +144,18 @@ class EventSummary extends React.Component {
       stats.endTimestamp = incident.endTimestamp;
       stats.maxAnomalyRatio = maxAnomalyRatio;
       stats.minAnomalyRatio = minAnomalyRatio;
+
+      // Use global instances/metrics if event doesn't include it
+      if (!stats.instances || stats.instances === '[]') {
+        stats.instances = data.instanceMetricJson.instances;
+      }
+      if (!stats.metrics || stats.metrics === '[]') {
+        stats.metrics = data.instanceMetricJson.metrics;
+      }
+      if (!stats.newInstances || stats.newInstances === '[]') {
+        stats.newInstances = data.instanceMetricJson.newInstances;
+      }
+
       incidentsTreeMap =
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
           data.statistics.instanceStatsJson,
@@ -219,20 +259,19 @@ class EventSummary extends React.Component {
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime &&
+      endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
-
     const { projectName, instanceGroup } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
     const pvalue = pinfo ? pinfo.pvalue : '0.99';
     const cvalue = pinfo ? pinfo.cvalue : '1';
 
-    store.set('liveAnalysisProjectName', projectName);
-
     this.setState({
       loading: true,
       dataLoaded: false,
+      groupNotFound: false,
     }, () => {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
@@ -241,16 +280,42 @@ class EventSummary extends React.Component {
           const maxAnomalyRatio = _.max(anomalyRatioLists);
           const minAnomalyRatio = _.min(anomalyRatioLists);
 
-          this.setState({
-            loading: false,
-            dataLoaded: true,
-            // incidentsTreeMap: data.incidentsTreeMap,
-            data,
-            maxAnomalyRatio,
-            minAnomalyRatio,
-            startTimestamp: data.startTimestamp,
-            endTimestamp: data.endTimestamp,
-          });
+          let detectedEvents = [];
+          let predictedEvents = [];
+          let gname = instanceGroup;
+          if (instanceGroup.indexOf(':') >= 0) {
+            gname = instanceGroup.split(':')[1];
+          }
+          const detectedPromise = apis.loadEvents(projectName, instanceGroup,
+            startTime.valueOf(), realEndTime.valueOf(), 'detected')
+            .then((data) => {
+              detectedEvents = data[gname] || [];
+            });
+          const predictedPromise = apis.loadEvents(projectName, instanceGroup,
+            startTime.valueOf(), realEndTime.valueOf(), 'predicted')
+            .then((data) => {
+              predictedEvents = data[gname] || [];
+            });
+
+          Promise.all([detectedPromise, predictedPromise])
+            .then(() => {
+              const incidents = _.concat(detectedEvents, predictedEvents);
+              data.incidents = incidents;
+              this.setState({
+                loading: false,
+                dataLoaded: true,
+                // incidentsTreeMap: data.incidentsTreeMap,
+                data,
+                maxAnomalyRatio,
+                minAnomalyRatio,
+                detectedEvents, predictedEvents,
+                startTimestamp: data.startTimestamp,
+                endTimestamp: data.endTimestamp,
+              });
+            }).catch((msg) => {
+              this.setState({ loading: false });
+              console.log(msg);
+            });
         }).catch((msg) => {
           this.setState({ loading: false });
           console.log(msg);
@@ -260,42 +325,50 @@ class EventSummary extends React.Component {
 
   @autobind
   handleProjectChange(projectName) {
-    let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
-    let { predictionWindow } = project;
+    const projects = this.getLiveProjectInfos();
+    const project = R.find(
+      p => p.projectName.toLowerCase() === projectName.toLowerCase(), projects);
+    const { predictionWindow } = project;
 
     this.setState({
       loading: true,
       dataLoaded: false,
+      projectNotFound: false,
       predictionWindow,
       currentTreemapData: undefined,
     }, () => {
       apis.loadInstanceGrouping(projectName, 'getGrouping')
         .then((resp) => {
+          let groups = [];
           if (resp.groupingString) {
-            let groups = resp.groupingString.split(',').sort();
+            groups = resp.groupingString.split(',').sort();
             const pos = groups.indexOf('All');
             if (pos !== -1) {
               const len = groups.length;
               groups = groups.slice(1, len).concat(groups.slice(0, 1));
             }
+          }
 
-            // Get the group to display
-            const { location, router } = this.props;
-            let query = this.applyDefaultParams({
-              ...location.query,
-            });
+          const { location, router } = this.props;
+          let { instanceGroup } = location.query;
+          let groupNotFound = false;
 
-            let instanceGroup = query.instanceGroup;
-            if (groups && groups.length > 0) {
-              if (instanceGroup && groups.indexOf(instanceGroup) < 0) {
-                instanceGroup = groups[0];
-              }
-            } else {
-              instanceGroup = '';
+          if (instanceGroup) {
+            if (groups.indexOf(instanceGroup) < 0) {
+              groupNotFound = true;
+              this.setState({
+                groupNotFound,
+                instanceGroup: '',
+                instanceGroups: groups,
+                loading: false,
+              });
             }
-            query = this.applyDefaultParams({
+          } else if (groups.length > 0) {
+            instanceGroup = groups[0];
+          }
+
+          if (!groupNotFound) {
+            const query = this.applyDefaultParams({
               ...location.query,
               projectName,
               instanceGroup,
@@ -306,7 +379,10 @@ class EventSummary extends React.Component {
             });
 
             this.setState({
+              groupNotFound,
+              instanceGroup,
               instanceGroups: groups,
+              loading: false,
             }, () => {
               this.refreshInstanceGroup(query);
             });
@@ -375,12 +451,17 @@ class EventSummary extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    const { projectName, instanceGroup, modelType, eventStartTimestamp } = params;
+    const { modelType, eventStartTimestamp } = params;
     const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
-      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType, groupIdMap, dataLoaded } = this.state;
+      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme,
+      instanceGroups, groupIdMap, dataLoaded,
+      detectedEvents, predictedEvents,
+      projectNotFound, groupNotFound,
+    } = this.state;
+    const projectName = projectNotFound ? null : params.projectName;
+    const instanceGroup = groupNotFound ? null : params.instanceGroup;
 
     // Convert startTime, endTime to moment object
     startTime = moment(startTime, this.dateFormat);
@@ -388,7 +469,7 @@ class EventSummary extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const eventEndTime = moment(endTime).endOf('day').valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
@@ -397,12 +478,6 @@ class EventSummary extends React.Component {
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
-    const selectedIncidentPredicted = selectedIncident ? selectedIncident.predictedFlag : false;
-    // let selectedIncidentPredicted = selectedIncident ?
-    //   (selectedIncident.endTimestamp > latestTimestamp) : false;
-    // if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
-    //   selectedIncidentPredicted = true;
-    // }
 
     const hasTreeMapData = incidentsTreeMap && incidentsTreeMap.children
       && incidentsTreeMap.children.length > 0;
@@ -477,7 +552,17 @@ class EventSummary extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div
+          {projectNotFound &&
+            <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
+              Project <b>{params.projectName}</b> not found, please choose the project from the list.
+            </div>
+          }
+          {!projectNotFound && groupNotFound &&
+            <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
+              Project group <b>{params.instanceGroup}</b> not found, please choose group from the list.
+            </div>
+          }
+          {!projectNotFound && !groupNotFound && <div
             className="ui vertical segment flex-item flex-row-container"
             style={{ background: 'white', padding: 10, marginBottom: 10 }}
           >
@@ -488,6 +573,7 @@ class EventSummary extends React.Component {
                   instanceGroup={instanceGroup} eventEndTime={eventEndTime}
                   endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                   incidents={data.incidents}
+                  detectedEvents={detectedEvents} predictedEvents={predictedEvents}
                   activeTab={predicted ? 'predicted' : 'detected'}
                   eventStartTimestamp={eventStartTimestamp}
                   onIncidentSelected={this.handleIncidentSelected}
@@ -528,7 +614,7 @@ class EventSummary extends React.Component {
                   treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
                   treeMapCPUThreshold={treeMapCPUThreshold}
                   treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                  predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
+                  predictedFlag={predicted} instanceGroup={instanceGroup}
                 />
               }
               {!hasTreeMapData && hasDataFlag &&
@@ -539,6 +625,7 @@ class EventSummary extends React.Component {
               }
             </div>
           </div>
+          }
         </div>
       </Console.Content>
     );
