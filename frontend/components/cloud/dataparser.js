@@ -722,7 +722,7 @@ class DataParser {
                     //   newhints = newhints + "; ";
                     // }
                   } catch (err) {
-                    newhints = hints[1];
+                    // newhints = hints[1];
                   }
                   let anomalyThisMetric = anomalyByMetricObj[metric];
                   if(anomalyThisMetric==undefined){
