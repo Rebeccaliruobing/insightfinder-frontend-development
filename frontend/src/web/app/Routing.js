@@ -131,7 +131,9 @@ const PrivateRouting = () => (
     <Route path="/log/analysis" component={LogRouting} />
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
+    <Route path="/log/incident-log-analysis" component={LogFileRouting} />
     <Route path="/usecase" component={UseCaseRouting} />
+
     <Route path={BaseUrls.SettingsProjectList} component={SettingsRouting} />
     <Route path={BaseUrls.ProjectWizard} component={SettingsProjectWizardRouting} />
 

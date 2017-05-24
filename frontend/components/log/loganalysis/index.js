@@ -688,15 +688,15 @@ margin: 0,
     const { tabStates } = this.state;
 
     return (
-      <Console.Wrapper>
+      <Console.Wrapper style={{ height: '100%' }}>
         <Console.Content
-          style={{ paddingLeft: 0 }} className={loading ? 'ui form loading' : ''}
+          style={{ paddingLeft: 0, height: '100%' }} className={loading ? 'ui form loading' : ''}
         >
           <div className="ui main tiny container" style={{ height: '100%' }}>
             <div className="flex-col-container" style={{ height: '100%' }}>
               <Button
                 className="small labeled icon"
-                style={{ position: 'absolute', right: 0, top: '1em' }}
+                style={{ position: 'absolute', right: 0, top: '1em', display: 'none' }}
                 onClick={() => onRefresh()}
               ><i className="icon refresh" />Refresh</Button>
               <div className="ui pointing secondary menu">

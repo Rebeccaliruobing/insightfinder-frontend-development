@@ -12,7 +12,7 @@ import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation } from '../../common/utils';
 import { loadLogFile } from '../../common/log/actions';
 import { Selectors } from '../app/components';
-import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
+import LogAnalysisCharts from '../../../components/log/loganalysis';
 import './log.scss';
 
 type Props = {
@@ -190,7 +190,7 @@ class LogFileAnalysisCore extends React.PureComponent {
           </Container>
         }
         {incident &&
-          <Container><LogAnalysisCharts data={incident} /></Container>
+          <Container className="log-charts"><LogAnalysisCharts loading={false} data={incident} /></Container>
         }
       </Container>
     );
