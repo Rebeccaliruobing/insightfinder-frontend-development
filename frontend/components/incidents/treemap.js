@@ -255,7 +255,7 @@ class IncidentsTreeMap extends Component {
           val = 10;
         }
         rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        gcolor = Math.floor(gcolorMax - (val / 10 * gcolorMax));
       }
     } else if (schema == 'cpu') {
       let overAvg = false;
