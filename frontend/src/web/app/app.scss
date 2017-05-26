@@ -2,6 +2,23 @@
 
 @import "../../lib/fui/fui";
 
+.name {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: $font-weight-regular;
+}
+.desc {
+  font-size: 12px;
+  line-height: 16px;
+  color: $grey-700;
+}
+
+.hoverable {
+  &:hover {
+    background-color: #d6ebfc !important;
+  }
+}
+
 .center-page.container {
   .copyright {
     margin-top: $y-small-gutter;

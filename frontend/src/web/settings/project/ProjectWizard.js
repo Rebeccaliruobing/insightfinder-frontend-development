@@ -6,12 +6,12 @@ import { NavLink } from 'react-router-dom';
 import VLink from 'valuelink';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
-import { Container, Box, Input } from '../../../lib/fui/react';
+import { Container, Box, Input, Select } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { appMenusMessages } from '../../../common/app/messages';
 import { projectWizardMessages } from '../../../common/settings/messages';
 import { hideAppLoader } from '../../../common/app/actions';
-import { dataSourcesMetadata } from './dataSource';
+import { DataSourceSelector, dataSourcesMetadata } from './dataSource';
 import { State } from '../../../common/types';
 
 type Props = {
@@ -104,11 +104,11 @@ class ProjectWizardCore extends React.Component {
             <Input valueLink={projectNameLink} />
           </div>
           <div className="inline field">
-            <label>Description:</label>
+            <label>Description: (Optional)</label>
             <Input valueLink={descriptionLink} />
           </div>
           <div className="inline field">
-            <label>Sharing:</label>
+            <label>Sharing: (Optional)</label>
             <Input valueLink={sharedUsersLink} />
             <div className="desc">
               To share your project, enter their User ID(s) in the above field.
@@ -118,7 +118,7 @@ class ProjectWizardCore extends React.Component {
             <div
               className={`ui orange button ${inputsValid ? '' : 'disabled'}`}
               {...inputsValid ? { onClick: this.setNextStep(2) } : {}}
-            >Next</div>
+            >Create Project</div>
           </div>
         </div>
       </Box>
@@ -138,35 +138,7 @@ class ProjectWizardCore extends React.Component {
               __html: intl.formatMessage(projectWizardMessages.step2Introduction),
             }}
           />
-          <div className="flex-row">
-            <div className="overflow-y-auto">
-              <div className="ui vertical secondary pointing menu">
-                <div className="menu">
-                  {
-                    // Create header item for group and item for each data source
-                    R.map(c => c, R.reduce((acc, [group, dss]) => {
-                      // Data structure [group, [[name, group, component]]]
-                      acc.push((<div key={group} className="header item">{group}</div>));
-
-                      R.forEach(([name, g, component]) => {
-                        acc.push((<a
-                          key={`${g}-${name}`}
-                          className="item"
-                          onClick={this.handleDataSourceClick(name, component)}
-                        >{name}</a>));
-                      }, dss);
-                      return acc;
-                    }, [], this.dataSourcesMetadataByGroup))
-                  }
-                </div>
-              </div>
-            </div>
-            <div className="overflow-y-auto flex-grow" style={{ marginLeft: '1em' }}>
-              <div>
-                {!!currentDataSourceComponent && React.createElement(currentDataSourceComponent)}
-              </div>
-            </div>
-          </div>
+          <DataSourceSelector className="flex-grow" />
           <div className="inline field text-right">
             <div
               style={{ float: 'left' }} className="ui button"
@@ -229,7 +201,7 @@ class ProjectWizardCore extends React.Component {
             <div className={`${currentStep === 1 ? 'active' : 'completed'} step`}>
               <div className="content">
                 <div className="title">Create Project</div>
-                <div className="description">Choose name and users</div>
+                <div className="description">Choose name and sharing users</div>
               </div>
             </div>
             <div
@@ -238,13 +210,22 @@ class ProjectWizardCore extends React.Component {
             >
               <div className="content">
                 <div className="title">Data Source</div>
-                <div className="description">Choose and add data source</div>
+                <div className="description">Select project data sources</div>
               </div>
             </div>
-            <div className={`${currentStep === 3 ? 'active' : ''} step`}>
+            <div 
+              className={`${currentStep === 3 ? 'active' :
+                (currentStep > 3 ? 'completed' : '')} step`}
+            >
+              <div className="content">
+                <div className="title">Configure</div>
+                <div className="description">Settings for each data source</div>
+              </div>
+            </div>
+            <div className={`${currentStep === 4 ? 'active' : ''} step`}>
               <div className="content">
                 <div className="title">Finish</div>
-                <div className="description">Advanced Settings</div>
+                <div className="description">Advanced settings</div>
               </div>
             </div>
           </div>

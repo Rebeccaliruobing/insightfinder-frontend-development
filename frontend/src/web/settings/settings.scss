@@ -15,6 +15,9 @@
   }
 
   .wizard.container {
+    .ui.vertical.menu {
+      min-height: 100%;
+    }
     .ui.form {
       > * {
         margin-bottom: 1em;
