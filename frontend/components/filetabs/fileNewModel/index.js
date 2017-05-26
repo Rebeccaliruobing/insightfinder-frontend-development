@@ -35,7 +35,7 @@ export default class FileNewModel extends Component {
 
     componentDidMount() {
         let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-        let modelString = (this.context.dashboardUservalues || {}).modelString || [];
+        let modelString = (this.context.dashboardUservalues || {}).modelString || '';
         projects = projects.filter((item, index) => !(item.isStationary));
         this.setState({'modelString': (modelString.split(',') || [])[0]}, ()=> {
             if (projects.length > 0) {

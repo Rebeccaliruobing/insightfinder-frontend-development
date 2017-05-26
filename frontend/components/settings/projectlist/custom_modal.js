@@ -94,7 +94,7 @@ class CustomProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>Data Type</label>
-              <Dropdown mode="select" multiple={true} onChange={this.handleDataTypeChange} >
+              <Dropdown mode="select" multiple={false} onChange={this.handleDataTypeChange} >
                 <i className="dropdown icon" />
                 <div className="menu">
                   <div className="item" data-value="Metric">Metric</div>
