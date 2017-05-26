@@ -276,6 +276,8 @@ class EventSummary extends React.Component {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
         .then((data) => {
+          console.log(['eventSummary', data]);
+          console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
           const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
           const maxAnomalyRatio = _.max(anomalyRatioLists);
           const minAnomalyRatio = _.min(anomalyRatioLists);
