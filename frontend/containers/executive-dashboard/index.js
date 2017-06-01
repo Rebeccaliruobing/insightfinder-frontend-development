@@ -3,6 +3,7 @@
 import React, { PropTypes as T } from 'react';
 import store from 'store';
 import $ from 'jquery';
+import R from 'ramda';
 import { connect } from 'react-redux';
 import { autobind } from 'core-decorators';
 import moment from 'moment';
@@ -119,24 +120,32 @@ class ExecutiveDashboard extends React.Component {
       const anomalyStatsPromise = retrieveExecDBStatisticsData(
         modelType, realEndTime, numberOfDays, timezoneOffset, 'loadAnomalyAll',
       ).then((data) => {
-        anomalyEventStats = normalizeStats(data);
+        anomalyEventStats = data;
       });
 
-      retrieveExecDBStatisticsData(
+      const resourceStatsPromise = retrieveExecDBStatisticsData(
         modelType, realEndTime, numberOfDays, timezoneOffset, 'loadResourceAll',
       ).then((data) => {
-        resourceEventStats = normalizeStats(data, 'current.AvgCPUUtilization');
-        this.setState({
-          resourceEventStats,
-        });
+        // resourceEventStats = normalizeStats(data, 'current.AvgCPUUtilization');
+        resourceEventStats = data;
       });
 
-      Promise.all([heatmapPromise, anomalyStatsPromise])
+      Promise.all([heatmapPromise, anomalyStatsPromise, resourceStatsPromise])
         .then(() => {
+          // Merge instance/group from resource into anomaly
+          R.forEachObjIndexed((resource, name) => {
+            R.forEachObjIndexed((stats, group) => {
+              const anomaly = anomalyEventStats[name][group];
+              anomaly.current.NumberOfInstances = stats.current.NumberOfInstances;
+              anomaly.current.NumberOfMetrics = stats.current.NumberOfMetrics;
+            }, resource);
+          }, resourceEventStats);
+
           this.setState({
             startTime: startTime.clone(), endTime: endTime.clone(),
             heatmapData,
-            anomalyEventStats,
+            anomalyEventStats: normalizeStats(anomalyEventStats),
+            resourceEventStats: normalizeStats(resourceEventStats, 'current.AvgCPUUtilization'),
             loading: false,
             heatmapLoading: false,
           }, () => {

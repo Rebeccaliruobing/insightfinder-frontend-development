@@ -129,7 +129,7 @@ const ListRow = ({
           {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), false)}
         </div>
       </td>}
-      {type == 'anomaly' && <td className="number predicted">
+      {type === 'anomaly' && <td className="number predicted">
         <div>
           <i
             className="long arrow right icon"

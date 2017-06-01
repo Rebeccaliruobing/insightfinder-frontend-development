@@ -6,12 +6,12 @@ import { NavLink } from 'react-router-dom';
 import VLink from 'valuelink';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
-import { Container, Box, Input, Select } from '../../../lib/fui/react';
+import { Container, Box, Input } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { appMenusMessages } from '../../../common/app/messages';
 import { projectWizardMessages } from '../../../common/settings/messages';
 import { hideAppLoader } from '../../../common/app/actions';
-import { DataSourceSelector, dataSourcesMetadata } from './dataSource';
+import { DataSourceSelector } from './dataSource';
 import { State } from '../../../common/types';
 
 type Props = {
@@ -37,18 +37,6 @@ class ProjectWizardCore extends React.Component {
     sharedUsers: '',
     dataSourceName: '',
     currentStep: 1,
-  }
-
-  constructor(props) {
-    super(props);
-
-    // Use deep tuple to create group => [ datasource, ] array.
-    this.dataSourcesMetadataByGroup = R.map((group) => {
-      const dataSources = R.filter(([name, gname]) => {
-        return gname.toLowerCase() === group.toLowerCase();
-      }, dataSourcesMetadata);
-      return [group, dataSources];
-    }, ['Public Cloud', 'Insight Agent']);
   }
 
   componentDidMount() {
@@ -79,11 +67,6 @@ class ProjectWizardCore extends React.Component {
         currentDataSourceComponent: component,
       });
     };
-  }
-
-  @autobind
-  handleSubmit() {
-    console.log('submit');
   }
 
   renderStep1() {
@@ -180,6 +163,12 @@ class ProjectWizardCore extends React.Component {
   render() {
     const { intl } = this.props;
     const { currentStep } = this.state;
+    const stepState = (step, currentStep) => {
+      if (currentStep === step) {
+        return 'active';
+      }
+      return (currentStep > step) ? 'completed' : '';
+    };
 
     return (
       <Container fullHeight withGutter className="flex-col settings">
@@ -198,31 +187,25 @@ class ProjectWizardCore extends React.Component {
         </Container>
         <Container style={{ marginTop: '0.5em' }}>
           <div className="ui ordered steps">
-            <div className={`${currentStep === 1 ? 'active' : 'completed'} step`}>
+            <div className={`${stepState(1, currentStep)} step`}>
               <div className="content">
                 <div className="title">Create Project</div>
                 <div className="description">Choose name and sharing users</div>
               </div>
             </div>
-            <div
-              className={`${currentStep === 2 ? 'active' :
-                (currentStep > 2 ? 'completed' : '')} step`}
-            >
+            <div className={`${stepState(2, currentStep)} step`}>
               <div className="content">
                 <div className="title">Data Source</div>
                 <div className="description">Select project data sources</div>
               </div>
             </div>
-            <div 
-              className={`${currentStep === 3 ? 'active' :
-                (currentStep > 3 ? 'completed' : '')} step`}
-            >
+            <div className={`${stepState(3, currentStep)} step`}>
               <div className="content">
                 <div className="title">Configure</div>
                 <div className="description">Settings for each data source</div>
               </div>
             </div>
-            <div className={`${currentStep === 4 ? 'active' : ''} step`}>
+            <div className={`${stepState(4, currentStep)} step`}>
               <div className="content">
                 <div className="title">Finish</div>
                 <div className="description">Advanced settings</div>

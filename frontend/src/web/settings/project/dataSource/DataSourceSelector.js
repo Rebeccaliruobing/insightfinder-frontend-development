@@ -6,6 +6,7 @@ import dataSourcesMetadata from './dataSourcesMetadata';
 
 type Props = {
   className: string,
+  selectedDataSources: Array<string>,
   intl: Object,
 }
 
@@ -22,7 +23,7 @@ class DataSourceSelector extends React.PureComponent {
   }
 
   render() {
-    const { className } = this.props;
+    const { className, selectedDataSources } = this.props;
     const { selectedOs, selectedSystem, selectedApplication } = this.state;
     const dataSources = dataSourcesMetadata;
 

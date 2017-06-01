@@ -22,6 +22,7 @@
     "react/prefer-stateless-function": "off",
     // Allow object react prop types.
     "react/forbid-prop-types": "off",
+    "react/no-danger": "off",
     "react/sort-comp": ["warn", {
       "order": [
         "type-annotations",
@@ -45,6 +46,7 @@
     "import/no-extraneous-dependencies": [
       "error", { "devDependencies": true }
     ],
-    "jsx-a11y/no-static-element-interactions": "off"
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/label-has-for": "off"
   }
 }
