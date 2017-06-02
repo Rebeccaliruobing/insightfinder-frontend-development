@@ -11,12 +11,23 @@
       &:before {
         width: 30px;
       }
+      .description {
+        font-size: 12px;
+      }
+      .ui.label {
+        position: absolute;
+        right: 10px;
+        top: 8px;
+      }
     }
   }
 
   .wizard.container {
     .ui.vertical.menu {
       min-height: 100%;
+      .item {
+        cursor: pointer;
+      }
     }
     .ui.form {
       > * {

@@ -1,5 +1,6 @@
 import React from 'react';
 import R from 'ramda';
+import { autobind } from 'core-decorators';
 import { get } from 'lodash';
 import { Select, Box, Tile } from '../../../../lib/fui/react';
 import dataSourcesMetadata from './dataSourcesMetadata';
@@ -8,17 +9,36 @@ type Props = {
   className: string,
   selectedDataSources: Array<string>,
   intl: Object,
-}
+  onSelectionChange: Function,
+};
+
+type States = {
+  selectedOs: string,
+  selectedSystem: string,
+  selectedApplication: string,
+};
 
 class DataSourceSelector extends React.PureComponent {
   props: Props;
+  static defaultProps = {
+    selectedDataSources: [],
+  };
+  state: States = {
+    selectedOs: null,
+    selectedSystem: null,
+    selectedApplication: null,
+  };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedOs: null,
-      selectedSystem: null,
-      selectedApplication: null,
+  @autobind
+  toggleDataSourceSelected(name) {
+    return () => {
+      const { selectedDataSources, onSelectionChange } = this.props;
+      // If the data source already exists, remove it from the selection.
+      const index = R.findIndex(d => d === name, selectedDataSources);
+      const dataSources = index >= 0 ?
+        R.remove(index, 1, selectedDataSources) : [...selectedDataSources, name];
+
+      onSelectionChange(dataSources);
     };
   }
 
@@ -90,6 +110,10 @@ class DataSourceSelector extends React.PureComponent {
                 }
 
                 if (!match) return null;
+
+                // Check whether the data source is selected.
+                const selected = !!R.find(d => d === name, selectedDataSources);
+
                 return (
                   <Tile size={6} key={name}>
                     <Box
@@ -97,7 +121,8 @@ class DataSourceSelector extends React.PureComponent {
                       style={{ margin: '0 0.5em', padding: '0.5em', width: '100%', borderWidth: 0, borderBottomWidth: 1 }}
                     >
                       <div className="ui fitted checkbox" style={{ float: 'left', marginTop: 4 }}>
-                        <input type="checkbox" /><label />
+                        <input type="checkbox" checked={selected} onChange={this.toggleDataSourceSelected(name)} />
+                        <label />
                       </div>
                       <div style={{ paddingLeft: 28 }}>
                         <div className="name">{name}</div>

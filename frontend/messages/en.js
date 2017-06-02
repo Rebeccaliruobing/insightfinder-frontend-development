@@ -136,4 +136,20 @@ export default [
     "id": "settings.menus.projects",
     "defaultMessage": "Project Settings",
   },
+  {
+    "id": "settings.projectWizard.step1Introduction",
+    "defaultMessage": "<b>[TODO]Revise needed:</b> A project is the scope of the data analyse, all data in the same project will be analyzed together. \nIf data has no relations with each others, we might add different data sources into different projects \nto improve the performance. <br>\nIf you are collaborating with other users, you may invite them to view data associated with your Projects.",
+  },
+  {
+    "id": "settings.projectWizard.step2Introduction",
+    "defaultMessage": "<b>[TODO]Revise needed:</b> Project is created, now you need to add some data sources for this project.\nYou can filter the data sources by the OS, platform or application and select the data sources you want to add. \n<br> You can skip this step and add the data sources in the project settings.",
+  },
+  {
+    "id": "settings.projectWizard.step3Introduction",
+    "defaultMessage": "<b>[TODO]Revise needed:</b> Following the precedure to config settings or install agent for all the selected data sources. \nMark it \"Completed\" if you finished the needed precedures.",
+  },
+  {
+    "id": "settings.projectWizard.step4Introduction",
+    "defaultMessage": "<b>[TODO]Revise needed:</b> Congratulation, you have setup the project. If you have added data source for this project, it might\ntake several minutes for the data source agent to work, you can check the status of the data source in the <a href=\"\">Project Settings</a>.",
+  },
 ];
