@@ -47,15 +47,13 @@ class ProjectWizardCore extends React.Component {
   }
 
   @autobind
-  setNextStep(step) {
-    return (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+  handleStep1CreateClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
 
-      this.setState({
-        currentStep: step,
-      });
-    };
+    this.setState({
+      currentStep: 2,
+    });
   }
 
   @autobind
@@ -80,7 +78,6 @@ class ProjectWizardCore extends React.Component {
     const { selectedDataSources, configuredDataSources } = this.state;
     const diff = R.difference(selectedDataSources, configuredDataSources);
     const currentDataSourceName = diff.length > 0 ? diff[0] : (selectedDataSources[0] || null);
-    console.log(currentDataSourceName);
     this.setState({
       currentStep: 3,
       currentDataSourceName,
@@ -88,38 +85,7 @@ class ProjectWizardCore extends React.Component {
   }
 
   @autobind
-  getCurrentDataSource() {
-    // Try to get the first unconfigured data source from the selected data sources.
-    // If all data source are configured, return the metadata of the first data source,
-    // otherwise return an empty list as the metadata.
-    const { selectedDataSources, configuredDataSources } = this.state;
-    let { currentDataSourceName } = this.state;
-    const diff = R.difference(selectedDataSources, configuredDataSources);
-    if (!currentDataSourceName) {
-      console.log(currentDataSourceName);
-      currentDataSourceName = diff.length > 0 ? diff[0] : (selectedDataSources[0] || null);
-    }
-
-    let currentDataSourceComponent = null;
-    let currentDataSourceConfigured = false;
-    if (currentDataSourceName) {
-      const currentDataSource = R.find(d => d[0] === currentDataSourceName, dataSourcesMetadata);
-      if (currentDataSource) {
-        currentDataSourceComponent = currentDataSource[3];
-      }
-      currentDataSourceConfigured = !!R.find(
-        d => d === currentDataSourceName, configuredDataSources);
-    }
-
-    return {
-      currentDataSourceName,
-      currentDataSourceComponent,
-      currentDataSourceConfigured,
-    };
-  }
-
-  @autobind
-  handleStep3AddMoreDataSourceClick(e) {
+  handleStep3AddMoreClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -142,24 +108,29 @@ class ProjectWizardCore extends React.Component {
   }
 
   @autobind
-  handleRemoveDataSourceClick(name) {
+  handleStep3RemoveClick(name) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
 
-      const { selectedDataSources } = this.state;
+      let { selectedDataSources } = this.state;
       const index = R.findIndex(d => d === name, selectedDataSources);
       if (index >= 0) {
+        selectedDataSources = R.remove(index, 1, selectedDataSources);
+        // Get the next data source in the list to display
+        const currentDataSourceName = selectedDataSources[index] ||
+          selectedDataSources[0] || null;
+
         this.setState({
-          selectedDataSources: R.remove(index, 1, selectedDataSources),
-          currentDataSourceName: null,
+          selectedDataSources,
+          currentDataSourceName,
         });
       }
     };
   }
 
   @autobind
-  handleMarkDataSourceCompleted(name) {
+  handleStep3MarkCompletedClick(name) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -169,6 +140,16 @@ class ProjectWizardCore extends React.Component {
         configuredDataSources: [...configuredDataSources, name],
       });
     };
+  }
+
+  @autobind
+  handleStep3ConfiguredClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    this.setState({
+      currentStep: 4,
+    });
   }
 
   @autobind
@@ -213,7 +194,7 @@ class ProjectWizardCore extends React.Component {
           <div className="inline field text-right">
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
-              {...valid ? { onClick: this.setNextStep(2) } : {}}
+              {...valid ? { onClick: this.handleStep1CreateClick } : {}}
             >Create Project</div>
           </div>
         </div>
@@ -223,8 +204,9 @@ class ProjectWizardCore extends React.Component {
 
   renderStep2() {
     const { intl } = this.props;
-    const { selectedDataSources } = this.state;
+    const { selectedDataSources, configuredDataSources } = this.state;
     const valid = selectedDataSources.length > 0;
+    const skipable = configuredDataSources.length === 0;
     return (
       <Box style={{ height: '100%' }}>
         <div className="ui form flex-col" style={{ width: 960, height: '100%' }}>
@@ -237,12 +219,16 @@ class ProjectWizardCore extends React.Component {
           <DataSourceSelector
             className="flex-grow"
             selectedDataSources={selectedDataSources}
+            configuredDataSources={configuredDataSources}
             onSelectionChange={ds => this.setState({
               selectedDataSources: ds,
             })}
           />
           <div className="inline field text-right">
-            <div className="ui grey button" onClick={this.handleStep2SkipClick}>Skip</div>
+            <div
+              className={`ui grey button ${skipable ? '' : 'disabled'}`}
+              onClick={this.handleStep2SkipClick}
+            >Skip</div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
               {...valid ? { onClick: this.handleStep2SelectedClick } : {}}
@@ -259,7 +245,7 @@ class ProjectWizardCore extends React.Component {
     const valid = configuredDataSources.length > 0 &&
       selectedDataSources.length === configuredDataSources.length;
 
-    // Get the current data source component based on the name
+    // Get the data source component of the current name.
     let currentDataSourceConfigured = false;
     let currentDataSourceComponent = null;
 
@@ -291,9 +277,12 @@ class ProjectWizardCore extends React.Component {
                     return (
                       <div
                         key={d}
-                        className={`${selected ? 'active' : ''} ${configured ? 'completed' : ''} item`}
+                        className={`${selected ? 'active ' : ''}item`}
                         onClick={this.handleStep3DataSourceClick(d)}
-                      >{d}</div>
+                      >
+                        <span>{d}</span>
+                        {configured && <i className="checkmark icon" />}
+                      </div>
                     );
                   }, selectedDataSources)
                 }
@@ -304,7 +293,7 @@ class ProjectWizardCore extends React.Component {
                 <div className="inline field text-right">
                   <div
                     className="ui small grey button"
-                    onClick={this.handleRemoveDataSourceClick(currentDataSourceName)}
+                    onClick={this.handleStep3RemoveClick(currentDataSourceName)}
                   >Remove this Data Source</div>
                 </div>
               )}
@@ -316,7 +305,7 @@ class ProjectWizardCore extends React.Component {
                     <div className="inline fiel text-right">
                       <div
                         className="ui small blue button"
-                        onClick={this.handleMarkDataSourceCompleted(currentDataSourceName)}
+                        onClick={this.handleStep3MarkCompletedClick(currentDataSourceName)}
                       >Mark Completed</div>
                     </div>
                   )}
@@ -325,10 +314,10 @@ class ProjectWizardCore extends React.Component {
             </div>
           </div>
           <div className="inline field text-right">
-            <div className="ui grey button" onClick={this.handleStep3AddMoreDataSourceClick}>Add More Data Source</div>
+            <div className="ui grey button" onClick={this.handleStep3AddMoreClick}>Add More Data Source</div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
-              {...valid ? { onClick: this.setNextStep(4) } : {}}
+              {...valid ? { onClick: this.handleStep3ConfiguredClick } : {}}
             >Configured</div>
           </div>
         </div>

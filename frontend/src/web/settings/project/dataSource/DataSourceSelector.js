@@ -8,6 +8,7 @@ import dataSourcesMetadata from './dataSourcesMetadata';
 type Props = {
   className: string,
   selectedDataSources: Array<string>,
+  configuredDataSources: Array<string>,
   intl: Object,
   onSelectionChange: Function,
 };
@@ -22,6 +23,7 @@ class DataSourceSelector extends React.PureComponent {
   props: Props;
   static defaultProps = {
     selectedDataSources: [],
+    configuredDataSources: [],
   };
   state: States = {
     selectedOs: null,
@@ -43,7 +45,7 @@ class DataSourceSelector extends React.PureComponent {
   }
 
   render() {
-    const { className, selectedDataSources } = this.props;
+    const { className, selectedDataSources, configuredDataSources } = this.props;
     const { selectedOs, selectedSystem, selectedApplication } = this.state;
     const dataSources = dataSourcesMetadata;
 
@@ -111,8 +113,10 @@ class DataSourceSelector extends React.PureComponent {
 
                 if (!match) return null;
 
-                // Check whether the data source is selected.
+                // Check whether the data source is selected or configured. If it's configured, disable
+                // the checkbox changing.
                 const selected = !!R.find(d => d === name, selectedDataSources);
+                const configured = !!R.find(d => d === name, configuredDataSources);
 
                 return (
                   <Tile size={6} key={name}>
@@ -120,10 +124,21 @@ class DataSourceSelector extends React.PureComponent {
                       className="hoverable"
                       style={{ margin: '0 0.5em', padding: '0.5em', width: '100%', borderWidth: 0, borderBottomWidth: 1 }}
                     >
-                      <div className="ui fitted checkbox" style={{ float: 'left', marginTop: 4 }}>
-                        <input type="checkbox" checked={selected} onChange={this.toggleDataSourceSelected(name)} />
-                        <label />
-                      </div>
+                      {configured &&
+                        <div className="ui fitted disabled checkbox" style={{ float: 'left', marginTop: 4 }}>
+                          <input
+                            type="checkbox" checked={selected} disabled="disabled"
+                            onChange={this.toggleDataSourceSelected(name)}
+                          />
+                          <label />
+                        </div>
+                      }
+                      {!configured &&
+                        <div className="ui fitted checkbox" style={{ float: 'left', marginTop: 4 }}>
+                          <input type="checkbox" checked={selected} onChange={this.toggleDataSourceSelected(name)} />
+                          <label />
+                        </div>
+                      }
                       <div style={{ paddingLeft: 28 }}>
                         <div className="name">{name}</div>
                         <div className="desc">{desc}</div>

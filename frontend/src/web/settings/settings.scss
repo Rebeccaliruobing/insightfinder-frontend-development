@@ -27,6 +27,11 @@
       min-height: 100%;
       .item {
         cursor: pointer;
+        .checkmark.icon {
+          position: absolute;
+          left: -8px;
+          color: #21BA45;
+        }
       }
     }
     .ui.form {
