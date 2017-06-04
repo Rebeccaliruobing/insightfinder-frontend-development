@@ -1,5 +1,6 @@
 import React from 'react';
 import AWSCloudWatchSetting from './AWSCloudWatchSetting';
+import cAdvisorSetting from './cAdvisorSetting';
 import { projectWizardMessages } from '../../../../common/settings/messages';
 
 const DataSourceSetting = () => (<div>[TODO]:Procedure for setting up the data source.</div>);
@@ -13,7 +14,7 @@ const dataSourcesMetadata = [
   ['New Relic', projectWizardMessages.PublicCloudIntro, '*,,', DataSourceSetting, false],
   ['DataDog Agent', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
   ['AWS EC2', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
-  ['cAdvisor', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
+  ['cAdvisor', projectWizardMessages.cAdvisorIntro, '*,,', cAdvisorSetting, true],
   ['cgroup', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
   ['collectd', projectWizardMessages.InsightAgentIntro, 'Linux,AWS Cloud,', DataSourceSetting, true],
   ['daemonset', projectWizardMessages.InsightAgentIntro, '*,Docker,', DataSourceSetting, true],

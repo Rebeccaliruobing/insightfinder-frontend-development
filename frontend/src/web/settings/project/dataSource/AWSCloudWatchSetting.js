@@ -19,6 +19,9 @@ class AWSCloudWatchSetting extends React.PureComponent {
   props: Props;
   state: States = {
     instanceTypes: [],
+    region: '',
+    iamAccessKey: '',
+    secretAccessKey: '',
   };
 
   @autobind
