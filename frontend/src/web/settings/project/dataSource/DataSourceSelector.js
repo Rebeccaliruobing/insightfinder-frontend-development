@@ -45,7 +45,7 @@ class DataSourceSelector extends React.PureComponent {
   }
 
   render() {
-    const { className, selectedDataSources, configuredDataSources } = this.props;
+    const { className, selectedDataSources, configuredDataSources, intl } = this.props;
     const { selectedOs, selectedSystem, selectedApplication } = this.state;
     const dataSources = dataSourcesMetadata;
 
@@ -92,7 +92,7 @@ class DataSourceSelector extends React.PureComponent {
             />
           </div>
         </div>
-        <Box className="flex-grow overflow-y-auto" style={{ padding: '0.5em' }}>
+        <Box className="flex-grow overflow-y-auto" style={{ padding: '0.5em 0' }}>
           <Tile isParent isFluid style={{ padding: 0 }}>
             {
               R.map(([name, desc, ruleStr]) => {
@@ -113,8 +113,8 @@ class DataSourceSelector extends React.PureComponent {
 
                 if (!match) return null;
 
-                // Check whether the data source is selected or configured. If it's configured, disable
-                // the checkbox changing.
+                // Check whether the data source is selected or configured. If it's configured,
+                // disable the checkbox changing.
                 const selected = !!R.find(d => d === name, selectedDataSources);
                 const configured = !!R.find(d => d === name, configuredDataSources);
 
@@ -141,7 +141,7 @@ class DataSourceSelector extends React.PureComponent {
                       }
                       <div style={{ paddingLeft: 28 }}>
                         <div className="name">{name}</div>
-                        <div className="desc">{desc}</div>
+                        <div className="desc" dangerouslySetInnerHTML={{ __html: intl.formatMessage(desc) }} />
                       </div>
                     </Box>
                   </Tile>

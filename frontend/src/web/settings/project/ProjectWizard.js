@@ -217,9 +217,8 @@ class ProjectWizardCore extends React.Component {
             }}
           />
           <DataSourceSelector
-            className="flex-grow"
-            selectedDataSources={selectedDataSources}
-            configuredDataSources={configuredDataSources}
+            className="flex-grow" intl={intl}
+            selectedDataSources={selectedDataSources} configuredDataSources={configuredDataSources}
             onSelectionChange={ds => this.setState({
               selectedDataSources: ds,
             })}
@@ -246,13 +245,15 @@ class ProjectWizardCore extends React.Component {
       selectedDataSources.length === configuredDataSources.length;
 
     // Get the data source component of the current name.
-    let currentDataSourceConfigured = false;
     let currentDataSourceComponent = null;
+    let currentDataSourceConfigured = false;
+    let currentDataSourceConfigManually = false;
 
     if (currentDataSourceName) {
       const dataSource = R.find(d => d[0] === currentDataSourceName, dataSourcesMetadata);
       if (dataSource) {
         currentDataSourceComponent = dataSource[3];
+        currentDataSourceConfigManually = dataSource[4];
       }
       currentDataSourceConfigured = !!R.find(
         d => d === currentDataSourceName, configuredDataSources);
@@ -290,7 +291,7 @@ class ProjectWizardCore extends React.Component {
             </div>
             <div className="flex-col flex-grow" style={{ marginLeft: '1em' }}>
               {currentDataSourceName && !currentDataSourceConfigured && (
-                <div className="inline field text-right">
+                <div className="text-right" style={{ marginBottom: '0.5em' }}>
                   <div
                     className="ui small grey button"
                     onClick={this.handleStep3RemoveClick(currentDataSourceName)}
@@ -298,10 +299,9 @@ class ProjectWizardCore extends React.Component {
                 </div>
               )}
               {currentDataSourceComponent && (
-                <div className="overflow-y-auto">
-                  {React.createElement(currentDataSourceComponent)}
-                  {currentDataSourceName}
-                  {!currentDataSourceConfigured && (
+                <div className="overflow-y-auto flex-grow">
+                  {React.createElement(currentDataSourceComponent, { intl })}
+                  {!currentDataSourceConfigured && currentDataSourceConfigManually && (
                     <div className="inline fiel text-right">
                       <div
                         className="ui small blue button"

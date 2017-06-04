@@ -25,6 +25,22 @@ const step4Introduction = `
 take several minutes for the data source agent to work, you can check the status of the data source in the <a href="/settings/projects">Project Settings</a>.
 `;
 
+const PublicCloudIntro = `
+<b>[TODO:] Revise ME!</b> Uses public Cloud APIs to monitor and report system metrics for your Google instances.
+`;
+
+const InsightAgentIntro = `
+<b>[TODO:] Revise ME!</b> Uses InsightAgent to monitor and report system metrics for your Google instances.
+`;
+
+const AWSCloudWatchIntro = `
+Uses the AWS API to monitor and report metric for your AWS cloud instances.
+`;
+
+const GoogleCloudMonitoringIntro = `
+Uses Google Cloud APIs to monitor and report system metrics for your Google instances.'
+`;
+
 const projectWizardMessages = defineMessages({
   step1Introduction: {
     defaultMessage: step1Introduction,
@@ -41,6 +57,22 @@ const projectWizardMessages = defineMessages({
   step4Introduction: {
     defaultMessage: step4Introduction,
     id: 'settings.projectWizard.step4Introduction',
+  },
+  PublicCloudIntro: {
+    defaultMessage: PublicCloudIntro,
+    id: 'settings.projectWizard.PublicCloudIntro',
+  },
+  InsightAgentIntro: {
+    defaultMessage: InsightAgentIntro,
+    id: 'settings.projectWizard.InsightAgentIntro',
+  },
+  AWSCloudWatchIntro: {
+    defaultMessage: AWSCloudWatchIntro,
+    id: 'settings.projectWizard.AWSCloudWatchIntro',
+  },
+  GoogleCloudMonitoringIntro: {
+    defaultMessage: GoogleCloudMonitoringIntro,
+    id: 'settings.projectWizard.GoogleCloudMonitoringIntro',
   },
 });
 

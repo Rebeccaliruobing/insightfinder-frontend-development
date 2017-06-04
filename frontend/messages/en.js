@@ -137,6 +137,22 @@ export default [
     "defaultMessage": "Project Settings",
   },
   {
+    "id": "settings.projectWizard.AWSCloudWatchIntro",
+    "defaultMessage": "Uses the AWS API to monitor and report metric for your AWS cloud instances.",
+  },
+  {
+    "id": "settings.projectWizard.GoogleCloudMonitoringIntro",
+    "defaultMessage": "Uses Google Cloud APIs to monitor and report system metrics for your Google instances.'",
+  },
+  {
+    "id": "settings.projectWizard.InsightAgentIntro",
+    "defaultMessage": "<b>[TODO:] Revise ME!</b> Uses InsightAgent to monitor and report system metrics for your Google instances.",
+  },
+  {
+    "id": "settings.projectWizard.PublicCloudIntro",
+    "defaultMessage": "<b>[TODO:] Revise ME!</b> Uses public Cloud APIs to monitor and report system metrics for your Google instances.",
+  },
+  {
     "id": "settings.projectWizard.step1Introduction",
     "defaultMessage": "<b>[TODO]Revise needed:</b> A project is the scope of the data analyse, all data in the same project will be analyzed together. \nIf data has no relations with each others, we might add different data sources into different projects \nto improve the performance. <br>\nIf you are collaborating with other users, you may invite them to view data associated with your Projects.",
   },
@@ -150,6 +166,6 @@ export default [
   },
   {
     "id": "settings.projectWizard.step4Introduction",
-    "defaultMessage": "<b>[TODO]Revise needed:</b> Congratulation, you have setup the project. If you have added data source for this project, it might\ntake several minutes for the data source agent to work, you can check the status of the data source in the <a href=\"\">Project Settings</a>.",
+    "defaultMessage": "<b>[TODO]Revise needed:</b> Congratulation, you have setup the project. If you have added data source for this project, it might\ntake several minutes for the data source agent to work, you can check the status of the data source in the <a href=\"/settings/projects\">Project Settings</a>.",
   },
 ];
