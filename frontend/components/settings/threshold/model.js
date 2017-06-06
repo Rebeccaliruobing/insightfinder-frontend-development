@@ -107,7 +107,7 @@ class ModelSettings extends React.Component {
     }, () => {
       removeProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
-          this.reloadData(projectName, instanceGroup);
+          // this.reloadData(projectName, instanceGroup);
         });
     });
   }
