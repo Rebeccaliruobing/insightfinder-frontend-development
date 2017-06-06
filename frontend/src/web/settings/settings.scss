@@ -34,6 +34,30 @@
         }
       }
     }
+    .precedure {
+      width: 736px;
+      font-size: 14px;
+      p {
+        margin-bottom: 0.5em;
+      }
+      pre {
+        padding: 16px;
+        overflow: scroll;
+        font-size: 85%;
+        line-height: 1.45;
+        background-color: #f6f8fa;
+        border-radius: 3px;
+      }
+      code {
+        display: inline;
+        padding: 0;
+        margin: 0;
+        line-height: inherit;
+        word-wrap: normal;
+        background-color: transparent;
+        border: 0;
+      }
+    }
     .ui.form {
       > * {
         margin-bottom: 1em;

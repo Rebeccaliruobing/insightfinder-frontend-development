@@ -11,15 +11,15 @@ class cAdvisorSetting extends React.PureComponent {
   render() {
     const { intl } = this.props;
     return (
-      <div style={{ fontSize: 14 }}>
+      <div className="precedure">
         <div
-          className="text" style={{ paddingBottom: '1em' }}
+          className="header" style={{ paddingBottom: '1em' }}
           dangerouslySetInnerHTML={{
             __html: intl.formatMessage(projectWizardMessages.cAdvisorIntro),
           }}
         />
         <div
-          className="text"
+          className="content"
           dangerouslySetInnerHTML={{
             __html: intl.formatMessage(projectWizardMessages.cAdvisorAgent),
           }}
