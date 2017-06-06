@@ -356,7 +356,7 @@ class ExecutiveDashboard extends React.Component {
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
             <div className="heatmap-block">
-              <h3>Detected Events</h3>
+              <h4 style={{ marginBottom: '0.5em' }}>Detected Events (Hourly)</h4>
               <HourlyHeatmap
                 statSelector={d => d.totalAnomalyScore}
                 numberOfDays={numberOfDays} dataset={heatmapData.detected}
@@ -364,7 +364,7 @@ class ExecutiveDashboard extends React.Component {
               />
             </div>
             <div className="heatmap-block">
-              <h3>Predicted Events</h3>
+              <h4 style={{ marginBottom: '0.5em' }}>Predicted Events (Hourly)</h4>
               <HourlyHeatmap
                 statSelector={d => d.totalAnomalyScore} rightEdge
                 numberOfDays={numberOfDays} dataset={heatmapData.predicted}
@@ -380,6 +380,7 @@ class ExecutiveDashboard extends React.Component {
             className="ui vertical segment flex-item"
             {...view === 'anomaly' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
+            <h4 style={{ textAlign: 'center', marginBottom: '0.5em' }}>Anomaly Statistcs (Weekly)</h4>
             <TopListAnomaly
               containerHeight={anomalyContainerHeight}
               timeIntervalPrevious={timeIntervalPrevious}
@@ -394,6 +395,7 @@ class ExecutiveDashboard extends React.Component {
             className="ui vertical segment flex-item"
             {...view === 'resource' || view === 'all' ? {} : { style: { display: 'none' } }}
           >
+            <h4 style={{ maxWidth: 1048, textAlign: 'center', marginBottom: '0.5em' }}>Resource Statistcs (Weekly)</h4>
             <TopListResource
               containerHeight={resourceContainerHeight}
               timeIntervalPrevious={timeIntervalPrevious}
