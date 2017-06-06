@@ -504,9 +504,9 @@ class IncidentsList extends React.Component {
         <div style={{ marginBottom: 4, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', left: 320, top: 5 }} title="Causal Graph"
+            style={{ position: 'absolute', left: 320, top: 5 }} title="Causal Analysis"
             onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
-          >Causal Graph</Button>
+          >Causal Analysis</Button>
           {['admin','guest'].indexOf(store.get('userName'))!=-1 && <Button
             className="orange"
             style={{ position: 'absolute', left: 450, top: 5 }} title="Overall Chart"
