@@ -133,17 +133,17 @@ class ModelTile extends React.Component {
             <table className="ui compact table">
               <thead>
                 <tr style={{ display: 'inline-table', width: '100%' }}>
-                  <th style={{ width: 230 }}>Metric</th>
+                  <th>Metric</th>
                   <th style={{ width: 60 }}>Max</th>
-                  <th>Min</th>
+                  <th style={{ width: 60 }}>Min</th>
                 </tr>
               </thead>
               <tbody style={{ width: '100%', height: 200, overflowY: 'auto', display: 'block' }}>
                 {metric.map((val, idx) => (
                   <tr key={val}>
-                    <td>{val}</td>
-                    <td>{maxs[idx].toFixed(2)}</td>
-                    <td>{mins[idx].toFixed(2)}</td>
+                    <td className="name">{val}</td>
+                    <td style={{ width: 60 }}>{maxs[idx].toFixed(2)}</td>
+                    <td style={{ width: 60 }}>{mins[idx].toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -107,7 +107,7 @@ class ModelSettings extends React.Component {
     }, () => {
       removeProjectModel(projectName, instanceGroup, JSON.stringify(modelKeyObj))
         .then(() => {
-          // this.reloadData(projectName, instanceGroup);
+          this.reloadData(projectName, instanceGroup);
         });
     });
   }
@@ -132,9 +132,9 @@ class ModelSettings extends React.Component {
               ${moment(pickedModel.startTimestamp).format('MM/DD HH:mm')}-
               ${moment(pickedModel.endTimestamp).format('MM/DD HH:mm')}
               to be used ${
-                pickedModel.pickedExpiry?
-                  'till ' + moment(pickProjectModel.pickedExpiry).format('MM/DD HH:mm')
-                  : 'for the next 24 hours'}.`
+                pickedModel.pickedExpiry ?
+                'till ' + moment(pickProjectModel.pickedExpiry).format('MM/DD HH:mm') :
+                'for the next 24 hours'}.`
               }
             </div>
           }
