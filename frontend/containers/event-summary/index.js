@@ -276,8 +276,8 @@ class EventSummary extends React.Component {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
         .then((data) => {
-          console.log(['eventSummary', data]);
-          console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
+          // console.log(['eventSummary', data]);
+          // console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
           const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
           const maxAnomalyRatio = _.max(anomalyRatioLists);
           const minAnomalyRatio = _.min(anomalyRatioLists);
@@ -296,7 +296,8 @@ class EventSummary extends React.Component {
           const predictedPromise = apis.loadEvents(projectName, instanceGroup,
             startTime.valueOf(), realEndTime.valueOf(), 'predicted')
             .then((data) => {
-              predictedEvents = data[gname] || [];
+              const tsNow = (new Date()).valueOf();
+              predictedEvents = R.filter(e => e.startTimestamp >= tsNow, data[gname] || []);
             });
 
           Promise.all([detectedPromise, predictedPromise])
