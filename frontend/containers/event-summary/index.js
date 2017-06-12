@@ -297,7 +297,7 @@ class EventSummary extends React.Component {
             startTime.valueOf(), realEndTime.valueOf(), 'predicted')
             .then((data) => {
               const tsNow = (new Date()).valueOf();
-              predictedEvents = R.filter(e => e.startTimestamp >= tsNow, data[gname] || []);
+              predictedEvents = R.filter(e => e.endTimestamp >= tsNow, data[gname] || []);
             });
 
           Promise.all([detectedPromise, predictedPromise])
