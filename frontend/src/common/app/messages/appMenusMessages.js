@@ -7,6 +7,10 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Dashboard',
     id: 'app.menus.dashboard',
   },
+  metricAnalysis: {
+    defaultMessage: 'Metric Analysis',
+    id: 'app.menus.metricAnalysis',
+  },
   logAnalysis: {
     defaultMessage: 'Log Analysis',
     id: 'app.menus.logAnalysis',
@@ -15,6 +19,14 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Stream Log Analysis',
     id: 'app.menus.streamLogAnalysis',
   },
+  historicalMetricAnalysis: {
+    defaultMessage: 'Historical Metric Analysis',
+    id: 'app.menus.historicalMetricAnalysis',
+  },
+  historicalLogAnalysis: {
+    defaultMessage: 'Historical Log Analysis',
+    id: 'app.menus.historicalLogAnalysis',
+  },
   staticLogAnalysis: {
     defaultMessage: 'Static Log Analysis',
     id: 'app.menus.staticLogAnalysis',
@@ -22,6 +34,10 @@ const appMenusMessages = defineMessages({
   settings: {
     defaultMessage: 'Settings',
     id: 'app.menus.settings',
+  },
+  issues: {
+    defaultMessage: 'Issues',
+    id: 'app.menus.issues',
   },
   bugRepository: {
     defaultMessage: 'Bug Repository',

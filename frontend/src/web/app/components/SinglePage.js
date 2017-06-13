@@ -36,20 +36,23 @@ const SinglePageCore = ({
     <Container fullHeight className={`single-page ${className || ''}`}>
       <Topbar>
         <div className="ui menu">
-          <NavLink to="/cloud" className="item">
-            {intl.formatMessage(appMenusMessages.dashboard)}
+          <NavLink to="/cloud/executive-dashboard" className="item">
+            {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
           <NavLink to="/log/live-analysis" className="item">
-            {intl.formatMessage(appMenusMessages.streamLogAnalysis)}
+            {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
           <NavLink to="/settings" className="item">
             {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
           <NavLink to="/usecase" className="item">
-            {intl.formatMessage(appMenusMessages.bugRepository)}
+            {intl.formatMessage(appMenusMessages.issues)}
           </NavLink>
+          {isAdmin && <NavLink to="/cloud/incident-analysis" className="item">
+            {intl.formatMessage(appMenusMessages.historicalMetricAnalysis)}
+          </NavLink>}
           {isAdmin && <NavLink to="/log/incident-log-analysis" className="item">
-            {intl.formatMessage(appMenusMessages.staticLogAnalysis)}
+            {intl.formatMessage(appMenusMessages.historicalLogAnalysis)}
           </NavLink>}
           {isAdmin && <NavLink to="/filetabs" className="item">
             {intl.formatMessage(appMenusMessages.fileAnalysis)}

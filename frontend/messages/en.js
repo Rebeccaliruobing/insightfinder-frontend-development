@@ -61,8 +61,24 @@ export default [
     "defaultMessage": "Help",
   },
   {
+    "id": "app.menus.historicalLogAnalysis",
+    "defaultMessage": "Historical Log Analysis",
+  },
+  {
+    "id": "app.menus.historicalMetricAnalysis",
+    "defaultMessage": "Historical Metric Analysis",
+  },
+  {
+    "id": "app.menus.issues",
+    "defaultMessage": "Issues",
+  },
+  {
     "id": "app.menus.logAnalysis",
     "defaultMessage": "Log Analysis",
+  },
+  {
+    "id": "app.menus.metricAnalysis",
+    "defaultMessage": "Metric Analysis",
   },
   {
     "id": "app.menus.settings",

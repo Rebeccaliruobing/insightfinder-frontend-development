@@ -121,7 +121,6 @@ const SettingsProjectWizardRouting = () => {
   );
 };
 
-
 const PrivateRouting = () => (
   <Switch>
     <Route path="/help" component={Help} />
