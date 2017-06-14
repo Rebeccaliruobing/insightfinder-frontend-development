@@ -234,7 +234,7 @@ class MetricAnalysisCore extends React.PureComponent {
     const query = parseQueryString(location.search) || {};
 
     const { projectId } = match.params;
-    const { startTime, endTime } = query;
+    const { startTime, endTime, instanceGroup } = query;
 
     const mNow = moment();
     const mStartTime = moment(startTime, this.dateFormat);
@@ -263,6 +263,8 @@ class MetricAnalysisCore extends React.PureComponent {
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
+            {!!instanceGroup && <span className="divider">/</span>}
+            {!!instanceGroup && <span>{instanceGroup}</span>}
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
             <span className="label">Start Date:</span>
