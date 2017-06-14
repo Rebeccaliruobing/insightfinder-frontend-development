@@ -68,6 +68,12 @@ export type DashboardState = {
   endTime: ?Object,
 };
 
+export type MetricState = {
+  currentHourlyEvents: ?Object,
+  currentHourlyEventsLoading: bool,
+  currentWeeklyAnomalies: ?Object,
+};
+
 export type LogState = {
   fileInfos: Object,
   fileIncidentInfos: Object,
@@ -84,6 +90,7 @@ export type State = {
   app: AppState,
   auth: AuthState,
   dashboard: DashboardState,
+  metric: MetricState,
   log: LogState,
   usecase: UseCaseState,
 };

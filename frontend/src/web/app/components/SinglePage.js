@@ -36,7 +36,12 @@ const SinglePageCore = ({
     <Container fullHeight className={`single-page ${className || ''}`}>
       <Topbar>
         <div className="ui menu">
+          {false &&
           <NavLink to="/cloud/executive-dashboard" className="item">
+            {intl.formatMessage(appMenusMessages.dashboard)}
+          </NavLink>
+          }
+          <NavLink to="/metric/summary" className="item">
             {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
           <NavLink to="/log/live-analysis" className="item">

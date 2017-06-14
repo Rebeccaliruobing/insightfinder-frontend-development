@@ -164,7 +164,7 @@ const RoutingNextV1 = () => (
         render={() => (<FileTabs><FileUpload /></FileTabs>)}
       />
       <Redirect from="/filetabs" to="/filetabs/fileNewModel" />
-      <Redirect from="*" to="/cloud/executive-dashboard" />
+      <Redirect from="*" to="/metric/summary" />
     </Switch>
   </AppV1>
 );

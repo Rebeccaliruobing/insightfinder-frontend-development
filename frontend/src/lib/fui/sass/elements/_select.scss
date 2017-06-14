@@ -37,6 +37,7 @@ $select-padding-horizontal:         0.75em;
   &.inline:not(.is-open) {
     .Select-control {
       width: 100% !important;
+      min-width: 10em;
       border-color: transparent;
       &:hover {
         box-shadow: none;

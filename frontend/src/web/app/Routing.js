@@ -8,6 +8,7 @@ import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { BaseUrls } from './Constants';
 import { ExecutiveDashboard } from '../dashboard';
+import { MetricAnalysis } from '../metric';
 import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
@@ -55,6 +56,17 @@ const DashboardRouting = ({ match }: RouteProps) => {
   );
 };
 
+const MetricRouting = ({ match }: RouteProps) => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={urlJoin(match.url, 'summary/:projectId?')} component={MetricAnalysis} />
+        <Redirect from="*" to={urlJoin(match.url, 'summary')} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
 const LogRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
@@ -94,7 +106,7 @@ const UseCaseRouting = ({ match }: RouteProps) => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={urlJoin(match.url, '/:system?')} component={BugRepository} />
+        <Route path={urlJoin(match.url, ':system?')} component={BugRepository} />
       </Switch>
     </SinglePage>
   );
@@ -127,6 +139,7 @@ const PrivateRouting = () => (
 
     <Route path="/cloud/dashboard" component={DashboardRouting} />
     <Route path="/dashboard" component={DashboardRouting} />
+    <Route path="/metric" component={MetricRouting} />
     <Route path="/log/analysis" component={LogRouting} />
     <Route path="/log/live-analysis" component={LogLiveRouting} />
     <Route path="/log/file-analysis" component={LogFileRouting} />
