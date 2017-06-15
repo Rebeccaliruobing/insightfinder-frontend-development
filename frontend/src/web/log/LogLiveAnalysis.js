@@ -112,7 +112,12 @@ class LogLiveAnalysisCore extends React.PureComponent {
       const { match, location } = this.props;
       const params = { ...this.defaultParams, ...parseQueryString(location.search) };
       const { projectId, month } = match.params;
-      this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
+      const { pathname, search } = buildMatchLocation(match, {
+        projectId, month, incidentId,
+      }, params);
+      const url = pathname + search;
+      window.open(url, '_blank');
+      // this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
     };
   }
 

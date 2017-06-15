@@ -97,7 +97,10 @@ class LogFileAnalysisCore extends React.PureComponent {
       const { match, location } = this.props;
       const params = { ...this.defaultParams, ...parseQueryString(location.search) };
       const { projectId } = match.params;
-      this.props.loadLogFile(projectId, incidentId, match, params, false);
+      const { pathname, search } = buildMatchLocation(match, { projectId, incidentId }, params);
+      const url = pathname + search;
+      window.open(url, '_blank');
+      // this.props.loadLogFile(projectId, incidentId, match, params, false);
     };
   }
 
@@ -159,9 +162,9 @@ class LogFileAnalysisCore extends React.PureComponent {
         {!incident &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
-            {incidentList.map(ic => (
+            {incidentList.map((ic, idx) => (
               <Tile
-                key={`${projectId}-${ic.id}`} className="incident-tile"
+                key={`${projectId}-${ic.id}-${idx}`} className="incident-tile"
                 onClick={this.handleIncidentClick(ic.id)}
               >
                 <Box isLink>
