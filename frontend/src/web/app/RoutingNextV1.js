@@ -78,6 +78,10 @@ const RoutingNextV1 = () => (
         path="/cloud/summary-report"
         render={() => (<Cloud><SummaryReport /></Cloud>)}
       />
+      <Route
+        path="/log/incident-log-analysis1"
+        render={() => (<Log><IncidentLogAnalysis /></Log>)}
+      />
       <Redirect from="/log" to="/log/incident-log-analysis" />
 
       <Route
