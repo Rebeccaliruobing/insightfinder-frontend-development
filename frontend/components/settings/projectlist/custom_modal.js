@@ -52,7 +52,7 @@ class CustomProjectModal extends React.Component {
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    if (!samplingInterval) {
+    if (projectCloudType !== 'LogFile' && !samplingInterval) {
       alert('Sampling Interval cannot be empty.');
       return false;
     }
