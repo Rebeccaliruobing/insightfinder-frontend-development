@@ -27,6 +27,10 @@ const appMessages = defineMessages({
     defaultMessage: 'There is something wrong, please try again.',
     id: 'app.errors.general',
   },
+  errorsProjectNotFound: {
+    defaultMessage: 'The project <b>{projectName}</b> doesn\' exists. Please choose the project to view.',
+    id: 'app.errors.projectNotFound',
+  },
 });
 
 export default appMessages;

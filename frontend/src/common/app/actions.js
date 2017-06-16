@@ -55,9 +55,9 @@ export const appError = (message: ?Message, error: ?Error): Action => ({
   payload: { message, error },
 });
 
-export const showAppAlert = (type: string, message: Message): Action => ({
+export const showAppAlert = (type: string, message: Message, params: ?Object): Action => ({
   type: 'SHOW_APP_ALERT',
-  payload: { type, message },
+  payload: { type, message, params },
 });
 
 export const hideAppAlert = (ids: Array<string>): Action => ({

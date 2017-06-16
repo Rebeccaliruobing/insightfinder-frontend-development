@@ -55,15 +55,20 @@ class AppAlertCore extends React.Component {
     if (alertMessages.length > 0) {
       return (
         <div className="fui alert container" style={{ paddingTop: 48, paddingBottom: 16 }}>
-          {alertMessages.map(alert => (
-            <div
+          {alertMessages.map((alert) => {
+            // Get locale message and replace placeholders with params.
+            const { params } = alert;
+            const message = intl.formatMessage(alert.message, params);
+
+            return (<div
               className={`fui ${alert.type} message`}
               key={alert.id}
             >
               <Icon name="close" onClick={() => { hideAppAlert([alert.id]); }} />
-              <span>{intl.formatMessage(alert.message)}</span>
+              <span className="title" dangerouslySetInnerHTML={{ __html: message }} />
             </div>
-          ))}
+            );
+          })}
         </div>
       );
     }

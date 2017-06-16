@@ -4,38 +4,37 @@
  * *****************************************************************************
  **/
 
-import { get } from 'lodash';
-import loadProjectsInfo from './loadProjectsInfo';
+import loadInitData from './loadInitData';
 import { PermissionError } from '../errors';
 
-describe('apis.loadProjectsInfo with invalid parameters', () => {
+describe('apis.loadInitData with invalid parameters', () => {
   it('Expect PermissionError if invalid token', async () => {
     try {
-      await loadProjectsInfo(global.userBad);
+      await loadInitData(global.userBad);
     } catch (e) {
       expect(e).toBeInstanceOf(PermissionError);
     }
   });
 });
 
-describe('apis.loadProjectsInfo with valid paremeters', () => {
+describe('apis.loadInitData with valid paremeters', () => {
   let rawData = null;
   let data = null;
 
   beforeAll(async (done) => {
-    const resp = await loadProjectsInfo(global.userGuest);
+    const resp = await loadInitData(global.userGuest);
     rawData = resp.rawData;
     data = resp.data;
 
     done();
   });
 
-  it('Expect raw data contains "projectString"', async () => {
-    expect(get(rawData, 'projectString')).not.toBeNull();
+  it('Expect api response contains "projectString"', async () => {
+    expect(Object.keys(rawData)).toEqual(expect.arrayContaining(['projectString']));
   });
 
-  it('Expect raw data not contains useless "projectSettingsAllInfo"', async () => {
-    expect(get(rawData, 'projectSettingsAllInfo')).toBeFalsy();
+  it('Expect api response contains only 1 key: ["projectString"] ', async () => {
+    expect(Object.keys(rawData).length).toBe(1);
   });
 
   it('Expect data is not null', async () => {
@@ -52,10 +51,12 @@ describe('apis.loadProjectsInfo with valid paremeters', () => {
       const project = projects[0];
       expect(project)
         .toEqual(expect.objectContaining({
+          projectId: expect.any(String),
           projectName: expect.any(String),
           projectType: expect.any(String),
           instanceType: expect.any(String),
           dataType: expect.any(String),
+          isMetric: expect.any(Boolean),
           isLogFile: expect.any(Boolean),
           isLogStreaming: expect.any(Boolean),
         }));

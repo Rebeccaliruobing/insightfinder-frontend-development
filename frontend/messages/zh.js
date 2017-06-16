@@ -25,6 +25,10 @@ export default [
     "defaultMessage": "The requested resource not exists",
   },
   {
+    "id": "app.errors.projectNotFound",
+    "defaultMessage": "The project <b>{projectName}</b> doesn' exists. Please choose the project to view.",
+  },
+  {
     "id": "app.errors.server",
     "defaultMessage": "Sorry, we've had a server error, Please try again.",
   },

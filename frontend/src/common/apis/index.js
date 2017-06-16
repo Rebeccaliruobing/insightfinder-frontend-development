@@ -6,5 +6,4 @@ export { default as loadLogFile } from './loadLogFile';
 export { default as loadLogFileIncident } from './loadLogFileIncident';
 export { default as loadLogStreaming } from './loadLogStreaming';
 export { default as loadLogStreamingIncident } from './loadLogStreamingIncident';
-export { default as loadProjectsInfo } from './loadProjectsInfo';
 export { default as loadWeeklyAnomalies } from './loadWeeklyAnomalies';

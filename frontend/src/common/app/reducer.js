@@ -85,40 +85,14 @@ const reducer = (
       started: true,
     };
   } else if (action.type === 'SET_INIT_DATA') {
-    const settings = JSON.parse(get(action.payload, 'projectSettingsAllInfo', '[]'));
-    const projectString = get(action.payload, 'projectString', '').split(',');
-    const projectInfos = {};
-    R.forEach((p) => {
-      const info = p.split(':');
-      projectInfos[info[0]] = {
-        projectType: info[1],
-        instanceType: info[2],
-        dataType: info[3],
-      };
-    }, projectString);
-
-    const projects = R.map((s) => {
-      const info = projectInfos[s.projectName];
-      const isLogStreaming = info.dataType.toLowerCase() === 'log' &&
-        info.instanceType.toLowerCase() !== 'logfile';
-      const isLogFile = info.dataType.toLowerCase() === 'log' &&
-        info.instanceType.toLowerCase() === 'logfile';
-
-      return {
-        name: s.projectName,
-        type: s.projectType,
-        isLogStreaming,
-        isLogFile,
-      };
-    }, settings);
-
+    const { data, rawData } = action.payload;
     return {
       ...state,
       inited: true,
-      projects,
+      projects: data.projects,
       v1store: {
         ...state.v1store,
-        dashboardUservalues: action.payload,
+        dashboardUservalues: rawData,
       },
     };
   } else if (action.type === 'APP_STOP') {
@@ -148,12 +122,13 @@ const reducer = (
       lastError: action.payload,
     };
   } else if (action.type === 'SHOW_APP_ALERT') {
-    const { type, message } = action.payload;
+    const { type, message, params } = action.payload;
     let alerts = state.alerts;
     alerts = [...alerts, {
       id: Date.now().toString(),
       type,
       message,
+      params: params || {},
     }];
     return {
       ...state,

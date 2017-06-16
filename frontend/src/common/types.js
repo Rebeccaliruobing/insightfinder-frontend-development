@@ -107,7 +107,7 @@ export type Action =
   | { type: 'SET_INIT_DATA', payload: Object }
   | { type: 'SHOW_APP_LOADER' }
   | { type: 'HIDE_APP_LOADER' }
-  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message } }
+  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message, params: ?Object } }
   | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
   | { type: 'SET_APP_FILTERS', payload: Filters }
   | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }

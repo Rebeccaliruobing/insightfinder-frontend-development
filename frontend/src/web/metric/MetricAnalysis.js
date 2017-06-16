@@ -17,7 +17,8 @@ import { autobind } from 'core-decorators';
 import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../../common/utils';
 import { Container, Select } from '../../lib/fui/react';
-import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
+import { appFieldsMessages, appMenusMessages, appMessages } from '../../common/app/messages';
+import { showAppAlert } from '../../common/app/actions';
 import { loadMetricHourlyEvents, loadMetricWeeklyAnomalies } from '../../common/metric/actions';
 import HourlyHeatmap from '../../../components/statistics/hourly-heatmap';
 import TopListAnomaly from '../../../containers/executive-dashboard/top-list-anomaly-metric';
@@ -32,6 +33,7 @@ type Props = {
   location: Object,
   intl: Object,
   push: Function,
+  showAppAlert: Function,
   loadMetricHourlyEvents: Function,
   loadMetricWeeklyAnomalies: Function,
 };
@@ -70,13 +72,23 @@ class MetricAnalysisCore extends React.PureComponent {
     const { projectId: prevProjectId, instanceGroup: prevInstanceGroup,
       startTime: prevStartTime, endTime: prevEndTime } = prevParams || {};
 
-    if (projectId !== prevProjectId || instanceGroup !== prevInstanceGroup ||
-      startTime !== prevStartTime || endTime !== prevEndTime) {
+    // If the projectId not exists, show error message.
+    if (projectId && projectId !== prevProjectId) {
+      const { projects, showAppAlert } = this.props;
+      if (!R.find(p => p.projectId === projectId, projects)) {
+        showAppAlert('error', appMessages.errorsProjectNotFound, { projectName: projectId });
+      }
+    }
+
+    if (projectId && (
+      projectId !== prevProjectId || instanceGroup !== prevInstanceGroup ||
+      startTime !== prevStartTime || endTime !== prevEndTime)) {
       this.props.loadMetricHourlyEvents(projectId, instanceGroup, startTime, endTime);
     }
 
-    if (projectId !== prevProjectId ||
-      startTime !== prevStartTime || endTime !== prevEndTime) {
+    if (projectId && (
+      projectId !== prevProjectId ||
+      startTime !== prevStartTime || endTime !== prevEndTime)) {
       this.props.loadMetricWeeklyAnomalies(projectId, startTime, endTime);
     }
   }
@@ -92,8 +104,9 @@ class MetricAnalysisCore extends React.PureComponent {
     const { instanceGroup } = query;
 
     if (!projectId && projects.length > 0) {
-      projectId = projects[0].name;
+      projectId = projects[0].projectId;
     }
+
     const timeRange = getStartEndTimeRange(
       startTime, endTime, this.defaultNumberOfDays, this.dateFormat);
     startTime = timeRange.startTime;
@@ -259,7 +272,7 @@ class MetricAnalysisCore extends React.PureComponent {
             <span className="divider">/</span>
             <Select
               name="project" inline style={{ width: 200 }}
-              options={R.map(p => ({ label: p.name, value: p.name }), projects)}
+              options={R.map(p => ({ label: p.projectId, value: p.projectName }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
@@ -336,12 +349,14 @@ class MetricAnalysisCore extends React.PureComponent {
 const MetricAnalysis = injectIntl(MetricAnalysisCore);
 export default connect(
   (state: State) => {
-    const { currentHourlyEvents, currentHourlyEventsLoading, currentWeeklyAnomalies } = state.metric;
+    const { currentHourlyEvents, currentHourlyEventsLoading,
+      currentWeeklyAnomalies,
+    } = state.metric;
     return {
-      projects: R.filter(p => !p.isLogStreaming && !p.isLogFile, state.app.projects),
+      projects: R.filter(p => p.isMetric, state.app.projects),
       currentHourlyEvents, currentHourlyEventsLoading,
       currentWeeklyAnomalies,
     };
   },
-  { push, loadMetricHourlyEvents, loadMetricWeeklyAnomalies },
+  { push, showAppAlert, loadMetricHourlyEvents, loadMetricWeeklyAnomalies },
 )(MetricAnalysis);
