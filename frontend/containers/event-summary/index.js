@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
-import React, { PropTypes as T } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import R from 'ramda';
@@ -13,6 +13,7 @@ import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
+import { hideAppLoader } from '../../src/common/app/actions';
 import {
   LiveProjectSelection,
   TreeMapSchemeSelect,
@@ -23,6 +24,7 @@ import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 
 type Props = {
   projects: Array<Object>,
+  hideAppLoader: Function,
   router: Object,
   location: Object,
 };
@@ -248,7 +250,7 @@ class EventSummaryCore extends React.Component {
 
   @autobind
   refreshInstanceGroup(params) {
-    const { location } = this.props;
+    const { location, hideAppLoader } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const modelType = query.modelType;
     const endTime = moment(query.endTime).endOf('day');
@@ -310,13 +312,17 @@ class EventSummaryCore extends React.Component {
                 detectedEvents, predictedEvents,
                 startTimestamp: data.startTimestamp,
                 endTimestamp: data.endTimestamp,
+              }, () => {
+                hideAppLoader();
               });
             }).catch((msg) => {
               this.setState({ loading: false });
+              hideAppLoader();
               console.log(msg);
             });
         }).catch((msg) => {
           this.setState({ loading: false });
+          hideAppLoader();
           console.log(msg);
         });
     });
@@ -639,6 +645,6 @@ export default connect(
       projects: R.filter(p => p.isMetric, state.app.projects),
     };
   },
-  {},
+  { hideAppLoader },
 )(EventSummary);
 

@@ -2,16 +2,19 @@
 /* eslint-disable no-console */
 import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
+import { connect } from 'react-redux';
 import cx from 'classnames';
+import R from 'ramda';
 import store from 'store';
 import _ from 'lodash';
+import { State } from '../../src/common/types';
 import withRouter from '../withRouter';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
+import { hideAppLoader } from '../../src/common/app/actions';
 import { LiveProjectSelection } from '../../components/selections';
 import DataParser from '../../components/cloud/dataparser';
 import { DataGroupCharts } from '../../components/share/charts';
-
 
 const getSelectedGroup = (value, appGroups) => {
   let selectedGroups = appGroups;
@@ -60,11 +63,7 @@ const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
   };
 };
 
-class AppForecast extends Component {
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object,
-  };
-
+class AppForecastCore extends Component {
   constructor(props) {
     super(props);
 
@@ -104,10 +103,7 @@ class AppForecast extends Component {
   }
 
   getLiveProjectInfos() {
-    // exclude GCP and File Replay
-    let pinfos = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    pinfos = pinfos.filter(item => item.fileProjectType !== 0);
-    return pinfos;
+    return this.props.projects;
   }
 
   @autobind()
@@ -158,7 +154,7 @@ class AppForecast extends Component {
 
   @autobind
   refreshInstanceGroup(params) {
-    const { location } = this.props;
+    const { location, hideAppLoader } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const { projectName, instanceGroup } = query;
 
@@ -213,6 +209,8 @@ class AppForecast extends Component {
             selectedMetrics,
             hideGroupSelector: false,
             showErrorMsg: false,
+          }, () => {
+            hideAppLoader();
           });
         })
         .catch(() => {
@@ -220,6 +218,8 @@ class AppForecast extends Component {
           this.setState({
             showErrorMsg: true,
             loading: false,
+          }, () => {
+            hideAppLoader();
           });
         });
     });
@@ -382,66 +382,75 @@ class AppForecast extends Component {
                           key={i}
                           onClick={() => this.handleAppNameSelected(appName)}
                           className={cx(
-                        { active: appName === this.state.selectedAppName })
-                      } style={{ cursor: 'pointer' }}
+                            { active: appName === this.state.selectedAppName })
+                          } style={{ cursor: 'pointer' }}
                         >
                           <td>{appName}</td>
                         </tr>
-                  ))}
+                      ))}
                     </tbody>
                   </table>
                 </div>
                 <div className="thirteen wide column">
-                  { selectedGroups && appGroups &&
-                  <div
-                    className="field"
-                    style={{ paddingTop: 10, paddingBottom: 10 }}
-                  >
-                    <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric
-                      Filters:</label>
-                    { !hideGroupSelector &&
-                    <Dropdown
-                      key={projectName}
-                      className="forecast" mode="select" multiple
-                      value={selectedMetrics}
-                      onChange={this.handleMetricSelectionChange}
-                      style={{ minWidth: 200 }}
+                  {selectedGroups && appGroups &&
+                    <div
+                      className="field"
+                      style={{ paddingTop: 10, paddingBottom: 10 }}
                     >
-                      <div className="menu">
-                        {
-                          appGroups.map(g => (
-                            <div
-                              className="item" key={g.metrics}
-                              data-value={g.metrics}
-                            >{g.metrics}</div>
-                          ))
-                        }
-                      </div>
-                    </Dropdown>
-                    }
-                  </div>
+                      <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric
+                      Filters:</label>
+                      {!hideGroupSelector &&
+                        <Dropdown
+                          key={projectName}
+                          className="forecast" mode="select" multiple
+                          value={selectedMetrics}
+                          onChange={this.handleMetricSelectionChange}
+                          style={{ minWidth: 200 }}
+                        >
+                          <div className="menu">
+                            {
+                              appGroups.map(g => (
+                                <div
+                                  className="item" key={g.metrics}
+                                  data-value={g.metrics}
+                                >{g.metrics}</div>
+                              ))
+                            }
+                          </div>
+                        </Dropdown>
+                      }
+                    </div>
                   }
-                  { !!selectedGroups &&
-                  <div className="ui grid">
-                    <DataGroupCharts
-                      orderByMetric={false}
-                      chartType="bar"
-                      groups={selectedGroups} view="list"
-                      latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}
-                      periodMap={thisPeriodMap}
-                      alertMissingData={false}
-                      onDateWindowChange={this.handleDateWindowSync}
-                      dateWindow={this.state.chartDateWindow}
-                    />
-                  </div>
+                  {!!selectedGroups &&
+                    <div className="ui grid">
+                      <DataGroupCharts
+                        orderByMetric={false}
+                        chartType="bar"
+                        groups={selectedGroups} view="list"
+                        latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}
+                        periodMap={thisPeriodMap}
+                        alertMissingData={false}
+                        onDateWindowChange={this.handleDateWindowSync}
+                        dateWindow={this.state.chartDateWindow}
+                      />
+                    </div>
                   }
                 </div>
               </div>
-          )}
+            )}
         </div>
       </Console.Content >
     );
   }
 }
 
-export default withRouter(AppForecast);
+const AppForecast = withRouter(AppForecastCore);
+
+export default connect(
+  (state: State) => {
+    return {
+      projects: R.filter(p => p.isMetric, state.app.projects),
+    };
+  },
+  { hideAppLoader },
+)(AppForecast);

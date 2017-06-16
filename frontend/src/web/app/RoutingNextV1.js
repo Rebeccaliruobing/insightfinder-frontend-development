@@ -1,24 +1,16 @@
 import React from 'react';
 import { Switch, Redirect, Route } from 'react-router-dom';
-
-import AccountInfo from '../../../components/account-info';
-
 import { App as AppV1 } from '../../../root';
 
 import {
   Cloud,
-  InsightReport, ExecutiveDashboard, HistoricalReport,
+  InsightReport, HistoricalReport,
   IncidentAnalysis, BehaviorChangeDetection, OutlierDetection, RolloutCheck,
   SummaryReport, AppForecast,
 } from '../../../components/cloud';
-import EventSummary from '../../../containers/event-summary';
 import { Log, IncidentLogAnalysis } from '../../../components/log';
 import { Settings, ThresholdSettingsOld, ExtSvc, Projects } from '../../../components/settings';
 
-import {
-  UseCase,
-  ListAll, Search, Explore,
-} from '../../../components/usecase';
 import {
   FileTabs, FileNewModel, FileDetection, FileUpdateModel,
   FileDisplayModel, FileUpload, UploadModel,
@@ -28,21 +20,8 @@ const RoutingNextV1 = () => (
   <AppV1>
     <Switch>
       <Route
-        path="/account-info"
-        render={() => <AccountInfo />}
-      />
-
-      <Route
         path="/cloud/insight-report"
         render={() => (<Cloud><InsightReport /></Cloud>)}
-      />
-      <Route
-        path="/cloud/monitoring"
-        render={() => (<Cloud><EventSummary /></Cloud>)}
-      />
-      <Route
-        path="/cloud/executive-dashboard"
-        render={() => (<Cloud><ExecutiveDashboard /></Cloud>)}
       />
       <Route
         path="/cloud/app-forecast"
@@ -96,23 +75,6 @@ const RoutingNextV1 = () => (
         render={() => (<Settings><Projects /></Settings>)}
       />
       <Redirect from="/settings" to="/settings/project" />
-      <Route
-        path="/usecase1/list-all"
-        render={() => (<UseCase><ListAll /></UseCase>)}
-      />
-      <Route
-        path="/usecase1/list-some"
-        render={() => (<UseCase><ListAll /></UseCase>)}
-      />
-      <Route
-        path="/usecase1/search"
-        render={() => (<UseCase><Search /></UseCase>)}
-      />
-      <Route
-        path="/usecase1/explore"
-        render={() => (<UseCase><Explore /></UseCase>)}
-      />
-      <Redirect from="/usecase1" to="/usecase1/explore" />
 
       <Route
         path="/filetabs/fileNewModel"

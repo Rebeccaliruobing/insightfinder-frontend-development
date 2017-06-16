@@ -27,7 +27,7 @@ class SettingsProjectListCore extends React.Component {
     const { projects, push, hideAppLoader, showAppAlert } = this.props;
     if (projects.length === 0) {
       showAppAlert('info', settingsMessages.alertNoProject);
-      push(BaseUrls.ProjectWizard);
+      push(BaseUrls.SettingsProjectWizard);
     } else {
       hideAppLoader();
     }
@@ -36,7 +36,7 @@ class SettingsProjectListCore extends React.Component {
   @autobind
   handleProjectClick({ rowData: project }) {
     const { push } = this.props;
-    push(buildUrl(BaseUrls.ProjectSettings, {
+    push(buildUrl(BaseUrls.SettingsProject, {
       projectId: project.projectId,
     }));
   }
@@ -55,7 +55,7 @@ class SettingsProjectListCore extends React.Component {
             <span>Projects</span>
           </div>
           <div className="section float-right">
-            <NavLink to={BaseUrls.ProjectWizard}>
+            <NavLink to={BaseUrls.SettingsProjectWizard}>
               <div className="ui orange button">Add New Project...</div>
             </NavLink>
           </div>

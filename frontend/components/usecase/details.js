@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import { autobind } from 'core-decorators'
+import { autobind } from 'core-decorators';
 import { Console } from '../../artui/react';
 import apis from '../../apis';
 import LiveAnalysisCharts from '../cloud/liveanalysis/LiveAnalysisCharts';
@@ -28,12 +28,12 @@ const ProjectDetails = class extends React.Component {
 
   @autobind
   updateData() {
-    let { query } = this.props.location;
-    let { pvalue, cvalue, modelKey, modelName,
+    const { query } = this.props.location;
+    const { pvalue, cvalue, modelKey, modelName,
       projectName, groupId, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,
       latestDataTimestamp, caller } = query;
-    let startTimestamp = undefined;
-    let endTimestamp = undefined;
+    let startTimestamp;
+    let endTimestamp;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
       const parts = dataChunkName.split('_');
       startTimestamp = +moment(Number(parts[3]) || parts[3]);
@@ -49,17 +49,17 @@ const ProjectDetails = class extends React.Component {
           this.setState(resp, () => {
             // fetch syscall results
             if (projectName && startTimestamp && endTimestamp) {
-              let projectName0 = projectName + "@" + fromUser;
+              const projectName0 = `${projectName  }@${  fromUser}`;
               apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then((resp2) => {
                 if (resp2.success) {
                   this.setState({
                     debugData: resp2.data.syscallResults,
                     freqRanking: resp2.data.freqFunctionList,
                     timeRanking: resp2.data.timeFunctionList,
-                    showSysCall: true
+                    showSysCall: true,
                   });
                 } else {
-                  console.log(resp2.message + ", start:" + startTimestamp + ",end:" + endTimestamp);
+                  console.log(`${resp2.message  }, start:${  startTimestamp  },end:${  endTimestamp}`);
                 }
               });
             }

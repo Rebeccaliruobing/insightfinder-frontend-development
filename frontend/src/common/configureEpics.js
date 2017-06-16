@@ -2,7 +2,6 @@ import 'rxjs';
 import { combineEpics } from 'redux-observable';
 import appEpics from './app/epics';
 import authEpics from './auth/epics';
-import dashboardEpics from './dashboard/epics';
 import metricEpics from './metric/epics';
 import logEpics from './log/epics';
 import usecaseEpics from './usecase/epics';
@@ -10,7 +9,6 @@ import usecaseEpics from './usecase/epics';
 const epics = [
   ...appEpics,
   ...authEpics,
-  ...dashboardEpics,
   ...metricEpics,
   ...logEpics,
   ...usecaseEpics,

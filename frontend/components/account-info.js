@@ -1,24 +1,35 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import type { State } from '../src/common/types';
-import { Console } from '../artui/react';
+import { Container } from '../src/lib/fui/react';
 import { logoff, sessionInvalid } from '../src/common/auth/actions';
+import { hideAppLoader } from '../src/common/app/actions';
+import { SinglePage } from '../src/web/app/components';
 
 type Props = {
+  userInfo: Object,
   logoff: Function,
   sessionInvalid: Function,
-  userInfo: Object,
+  hideAppLoader: Function,
 };
 
-const AccountInfo = ({ logoff, sessionInvalid, userInfo = {} }: Props) => {
-  if (!userInfo.userName) {
-    sessionInvalid();
-    return null;
+class AccountInfo extends React.PureComponent {
+  props: Props;
+
+  componentDidMount() {
+    this.props.hideAppLoader();
   }
 
-  return (
-    <Console.Wrapper className="single-page" style={{ paddingTop: 30 }}>
-      <div className="ui container">
+  render() {
+    const { logoff, sessionInvalid, userInfo = {} } = this.props;
+
+    if (!userInfo.userName) {
+      sessionInvalid();
+      return null;
+    }
+
+    return (
+      <Container withGutter style={{ paddingTop: 30 }}>
         <h4>User Account Information:</h4>
         <table className="ui small table" style={{ width: '40%' }}>
           <tbody>
@@ -47,14 +58,14 @@ const AccountInfo = ({ logoff, sessionInvalid, userInfo = {} }: Props) => {
         <button className="ui small gray action button" onClick={() => logoff()}>
           <i className="icon power" />Log Out
           </button>
-      </div>
-    </Console.Wrapper>
-  );
-};
+      </Container>
+    );
+  }
+}
 
 export default connect(
   (state: State) => ({
     userInfo: state.auth.userInfo,
   }),
-  { logoff, sessionInvalid },
+  { logoff, sessionInvalid, hideAppLoader },
 )(AccountInfo);

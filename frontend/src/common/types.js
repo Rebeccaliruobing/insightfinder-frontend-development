@@ -60,14 +60,6 @@ export type AuthState = {
   loginReason: ?string,
 };
 
-export type DashboardState = {
-  detectedEvents: Array<Object>,
-  selectedProject: ?string,
-  selectedGroup: ?string,
-  startTime: ?Object,
-  endTime: ?Object,
-};
-
 export type MetricState = {
   currentHourlyEvents: ?Object,
   currentHourlyEventsLoading: bool,
@@ -89,7 +81,6 @@ export type UseCaseState = {
 export type State = {
   app: AppState,
   auth: AuthState,
-  dashboard: DashboardState,
   metric: MetricState,
   log: LogState,
   usecase: UseCaseState,
@@ -115,11 +106,6 @@ export type Action =
   | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
   | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
   | { type: 'LOGOFF' }
-  | {
-    type: 'LOAD_DASHBOARD_DATA', payload: {
-      projectId: ?string, groupId: ?string,
-    }
-  }
   | {
     type: 'LOAD_LOG_FILE', payload: {
       projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,

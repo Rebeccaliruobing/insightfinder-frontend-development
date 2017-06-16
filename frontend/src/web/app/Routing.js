@@ -2,20 +2,21 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { ConnectedRouter as Router } from 'react-router-redux';
 import { PrivateRoute } from '../../common/app/components';
-import { urlJoin } from '../../common/utils';
 import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { BaseUrls } from './Constants';
-import { ExecutiveDashboard } from '../dashboard';
 import { MetricAnalysis } from '../metric';
-import { LogLiveAnalysis, LogAnalysis, LogFileAnalysis } from '../log';
+import { LogLiveAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
 
+// TODO: Components below need to be upgraded
+import AccountInfo from '../../../components/account-info';
+import EventSummary from '../../../containers/event-summary';
+import ExecutiveDashboard from '../../../containers/executive-dashboard';
 import {
-  ForgotPassword, ResetPassword,
-  ForgotUsername, Signup, SignupStep2,
+  ForgotPassword, ResetPassword, ForgotUsername, Signup, SignupStep2,
 } from '../../../components/auth';
 
 import {
@@ -26,7 +27,6 @@ import {
   incidentAnalysisApp,
   incidentLogAnalysisApp,
   useCaseApp,
-  ExecutiveDashboardApp,
 } from '../../../root';
 
 import withRouteApp from './withRouteApp';
@@ -39,95 +39,35 @@ const projectDataOnlyAppV1 = withRouteApp(projectDataOnlyApp);
 const incidentAnalysisAppV1 = withRouteApp(incidentAnalysisApp);
 const incidentLogAnalysisAppV1 = withRouteApp(incidentLogAnalysisApp);
 const useCaseAppV1 = withRouteApp(useCaseApp);
-const ExecutiveDashboardAppV1 = withRouteApp(ExecutiveDashboardApp);
 
-type RouteProps = {
-  match: Object,
-};
-
-const DashboardRouting = ({ match }: RouteProps) => {
+const MetricRouting = () => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={`${match.url}/executive/:view?`} component={ExecutiveDashboard} />
-        <Redirect from="*" to="/" />
+        <Route path={BaseUrls.MetricSummary} component={MetricAnalysis} />
+        <Redirect from="*" to={BaseUrls.MetricSummaryBase} />
       </Switch>
     </SinglePage>
   );
 };
 
-const MetricRouting = ({ match }: RouteProps) => {
+const UseCaseRouting = () => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={urlJoin(match.url, 'summary/:projectId?')} component={MetricAnalysis} />
-        <Redirect from="*" to={urlJoin(match.url, 'summary')} />
+        <Route path={BaseUrls.Usecase} component={BugRepository} />
       </Switch>
     </SinglePage>
   );
 };
 
-const LogRouting = ({ match }: RouteProps) => {
-  return (
-    <SinglePage>
-      <Switch>
-        <Route path={`${match.url}/:projectId?/:incidentId?`} component={LogAnalysis} />
-      </Switch>
-    </SinglePage>
-  );
-};
-
-const LogLiveRouting = ({ match }: RouteProps) => {
-  return (
-    <SinglePage>
-      <Switch>
-        <Route
-          path={urlJoin(match.url, ':projectId?', ':month?', ':incidentId?')}
-          component={LogLiveAnalysis}
-        />
-      </Switch>
-    </SinglePage>
-  );
-};
-
-const LogFileRouting = ({ match }: RouteProps) => {
-  return (
-    <SinglePage>
-      <Switch>
-        <Route
-          path={urlJoin(match.url, ':projectId?', ':incidentId?')} component={LogFileAnalysis}
-        />
-      </Switch>
-    </SinglePage>
-  );
-};
-
-const UseCaseRouting = ({ match }: RouteProps) => {
-  return (
-    <SinglePage>
-      <Switch>
-        <Route path={urlJoin(match.url, ':system?')} component={BugRepository} />
-      </Switch>
-    </SinglePage>
-  );
-};
-
+// TODO: Merge with routing in RoutingNextV1.
 const SettingsRouting = () => {
   return (
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
         <Route path={BaseUrls.SettingsProjectList} exact component={SettingsProjectList} />
-        <Route path={BaseUrls.ProjectSettings} exact component={ProjectSettings} />
-      </Switch>
-    </SinglePage>
-  );
-};
-// The routing for projects need to merge into settings after migrate all.
-const SettingsProjectWizardRouting = () => {
-  return (
-    <SinglePage leftbar={<SettingsLeftbar />}>
-      <Switch>
-        <Route path={BaseUrls.ProjectWizard} exact component={ProjectWizard} />
+        <Route path={BaseUrls.SettingsProject} exact component={ProjectSettings} />
       </Switch>
     </SinglePage>
   );
@@ -135,24 +75,46 @@ const SettingsProjectWizardRouting = () => {
 
 const PrivateRouting = () => (
   <Switch>
-    <Route path="/help" component={Help} />
+    <Route path={BaseUrls.Help} render={props => (<SinglePage><Help {...props} /></SinglePage>)} />
+    <Route
+      path={BaseUrls.AccountInfo}
+      render={props => (<SinglePage><AccountInfo {...props} /></SinglePage>)}
+    />
 
-    <Route path="/cloud/dashboard" component={DashboardRouting} />
-    <Route path="/dashboard" component={DashboardRouting} />
-    <Route path="/metric" component={MetricRouting} />
-    <Route path="/log/analysis" component={LogRouting} />
-    <Route path="/log/live-analysis" component={LogLiveRouting} />
-    <Route path="/log/file-analysis" component={LogFileRouting} />
-    <Route path="/log/incident-log-analysis" component={LogFileRouting} />
-    <Route path="/usecase" component={UseCaseRouting} />
+    <Route path={BaseUrls.Metric} component={MetricRouting} />
+    <Route path={BaseUrls.UsecaseBase} component={UseCaseRouting} />
+
+    <Route
+      path="/log/live-analysis/:projectId?/:month?/:incidentId?"
+      render={props => (<SinglePage><LogLiveAnalysis {...props} /></SinglePage>)}
+    />
+    <Route
+      path="/log/incident-log-analysis/:projectId?/:incidentId?"
+      render={props => (<SinglePage><LogFileAnalysis {...props} /></SinglePage>)}
+    />
 
     <Route path={BaseUrls.SettingsProjectList} component={SettingsRouting} />
-    <Route path={BaseUrls.ProjectWizard} component={SettingsProjectWizardRouting} />
+    <Route
+      path={BaseUrls.SettingsProjectWizard} exact
+      render={props => (
+        <SinglePage leftbar={<SettingsLeftbar {...props} />}><ProjectWizard /></SinglePage>
+      )}
+    />
+
+    <Route
+      path="/cloud/monitoring" exact
+      render={props => (<SinglePage><EventSummary {...props} /></SinglePage>)}
+    />
+    <Route
+      path="/cloud/executive-dashboard" exact
+      render={props => (<SinglePage><ExecutiveDashboard {...props} /></SinglePage>)}
+    />
 
     <Route
       path="/liveMonitoring"
       render={() => React.createElement(liveMonitoringAppV1)}
     />
+
     <Route
       path="/filesMonitoring"
       render={() => React.createElement(FilesMonitoringAppV1)}
@@ -176,10 +138,6 @@ const PrivateRouting = () => (
     <Route
       path="/useCaseDetails"
       render={() => React.createElement(useCaseAppV1)}
-    />
-    <Route
-      path="/executiveDashboard"
-      render={() => React.createElement(ExecutiveDashboardAppV1)}
     />
 
     <Route component={RoutingNextV1} />

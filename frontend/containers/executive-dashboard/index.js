@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
-import React, { PropTypes as T } from 'react';
+import React from 'react';
 import store from 'store';
 import $ from 'jquery';
 import R from 'ramda';
@@ -20,19 +20,15 @@ import normalizeStats from './normalize-stats';
 import { hideAppLoader } from '../../src/common/app/actions';
 import { aggregateToMultiHourData } from './heatmap-data';
 
-class ExecutiveDashboard extends React.Component {
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object,
-  };
+type Props = {
+  hideAppLoader: Function,
+  viewport: Object,
+  router: Object,
+  location: Object,
+};
 
-  static propTypes = {
-    location: T.object,
-    hideAppLoader: T.func,
-    viewport: T.object,
-    router: T.shape({
-      push: T.func.isRequired,
-    }).isRequired,
-  };
+class ExecutiveDashboard extends React.Component {
+  props: Props;
 
   constructor(props) {
     super(props);

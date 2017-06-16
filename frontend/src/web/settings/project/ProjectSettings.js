@@ -5,7 +5,6 @@ import { push } from 'react-router-redux';
 import { NavLink } from 'react-router-dom';
 import { Container, Box } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
-import { buildUrl } from '../../../common/utils';
 import { appMenusMessages } from '../../../common/app/messages';
 import { hideAppLoader } from '../../../common/app/actions';
 import { State } from '../../../common/types';
@@ -43,7 +42,7 @@ class ProjectSettingsCore extends React.Component {
             <span>{projectId}</span>
           </div>
           <div className="section float-right">
-            <NavLink to={BaseUrls.ProjectWizard}>
+            <NavLink to={BaseUrls.SettingsProjectWizard}>
               <div className="ui orange button">Add New Project...</div>
             </NavLink>
           </div>

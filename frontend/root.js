@@ -14,7 +14,6 @@ import IncidentDetails from './components/cloud/incident-analysis/details';
 import IncidentLogDetails from './components/log/incident-log-analysis/log-details';
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
-import ExecutiveDashboard from './containers/executive-dashboard';
 import apis from './apis';
 import { SinglePage } from './src/web/app/components';
 
@@ -240,8 +239,8 @@ const projectDataOnlyApp = function (props) {
   const { location, params } = props;
   return (
     <Console>
-      <Console.Topbar logo={require('./images/logo.png')}  />
-      <ProjectDataDetails location={location} params={params}  />
+      <Console.Topbar logo={require('./images/logo.png')} />
+      <ProjectDataDetails location={location} params={params} />
     </Console>
   );
 };
@@ -251,19 +250,8 @@ const useCaseApp = function (props) {
   const { location, params } = props;
   return (
     <Console>
-      <Console.Topbar logo={require('./images/logo.png')}  />
-      <UseCaseDetails location={location} params={params}  />
-    </Console>
-  );
-};
-
-// Executive Dashboard Details
-const ExecutiveDashboardApp = function (props) {
-  const { location, params } = props;
-  return (
-    <Console>
-      <Console.Topbar logo={require('./images/logo.png')}  />
-      <ExecutiveDashboard location={location} params={params}  />
+      <Console.Topbar logo={require('./images/logo.png')} />
+      <UseCaseDetails location={location} params={params} />
     </Console>
   );
 };
@@ -276,5 +264,4 @@ export {
   incidentAnalysisApp,
   incidentLogAnalysisApp,
   useCaseApp,
-  ExecutiveDashboardApp,
 };

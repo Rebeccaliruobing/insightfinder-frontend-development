@@ -12,7 +12,6 @@ import WaringButton from './waringButton';
 
 export default  class FilterBar extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object
   };
 
