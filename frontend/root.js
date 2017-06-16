@@ -34,7 +34,6 @@ class AppCore extends React.Component {
     userInfo: React.PropTypes.object,
     userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
-    dashboardDailySummaryReport: React.PropTypes.object,
     root: React.PropTypes.object,
   };
 
@@ -52,7 +51,6 @@ class AppCore extends React.Component {
       token: store.get('token'),
       userInstructions: userInstructionJson,
       dashboardUservalues,
-      dashboardDailySummaryReport: {},
     };
   }
 
@@ -61,13 +59,11 @@ class AppCore extends React.Component {
       userInfo,
       userInstructions,
       dashboardUservalues,
-      dashboardDailySummaryReport,
     } = this.state;
     return {
       userInfo,
       userInstructions,
       dashboardUservalues,
-      dashboardDailySummaryReport,
       root: {
         loadData: this.loadData,
         loadUserValues: this.loadUserValues,
@@ -85,7 +81,6 @@ class AppCore extends React.Component {
   loadData() {
     this.setState({
       dashboardUservalues: {},
-      dashboardDailySummaryReport: {},
     }, () => {
       // Load data only when user login
       if (!(store.get('userName') && store.get('token'))) {

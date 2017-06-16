@@ -13,12 +13,7 @@ import {
 } from '../../../components/cloud';
 import EventSummary from '../../../containers/event-summary';
 import { Log, IncidentLogAnalysis } from '../../../components/log';
-import {
-  Settings,
-  ThresholdSettingsOld, DataDisqualifiersSettings, AlertSensitivitySettings,
-  DataSharingSettings, GroupingSettings, ThresholdSettings, LogAnalysisSettings,
-  ExtSvc, Projects,
-} from '../../../components/settings';
+import { Settings, ThresholdSettingsOld, ExtSvc, Projects } from '../../../components/settings';
 
 import {
   UseCase,
@@ -84,30 +79,6 @@ const RoutingNextV1 = () => (
       />
       <Redirect from="/log" to="/log/incident-log-analysis" />
 
-      <Route
-        path="/settings/data-disqualifiers"
-        render={() => (<Settings><DataDisqualifiersSettings /></Settings>)}
-      />
-      <Route
-        path="/settings/alert-sensitivity"
-        render={() => (<Settings><AlertSensitivitySettings /></Settings>)}
-      />
-      <Route
-        path="/settings/data-sharing"
-        render={() => (<Settings><DataSharingSettings /></Settings>)}
-      />
-      <Route
-        path="/settings/grouping"
-        render={() => (<Settings><GroupingSettings /></Settings>)}
-      />
-      <Route
-        path="/settings/threshold"
-        render={() => (<Settings><ThresholdSettings /></Settings>)}
-      />
-      <Route
-        path="/settings/log-analysis"
-        render={() => (<Settings><LogAnalysisSettings /></Settings>)}
-      />
       <Route
         path="/settings/project"
         render={() => (<Settings><ThresholdSettingsOld /></Settings>)}
