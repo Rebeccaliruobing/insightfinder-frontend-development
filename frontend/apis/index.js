@@ -787,7 +787,7 @@ const apis = {
           projectName,
           projectCloudType,
           dataType,
-          samplingInterval,
+          samplingInterval: samplingInterval || 5,
           zone,
           'access-key': access_key,
           'secrete-key': secrete_key,
