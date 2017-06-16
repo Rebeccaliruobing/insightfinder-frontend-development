@@ -12,7 +12,7 @@ import { get } from 'lodash';
 import R from 'ramda';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
-// import fetchGet from './fetchGet';
+import fetchGet from './fetchGet';
 import fetchPost from './fetchPost';
 
 const loadInitData = (

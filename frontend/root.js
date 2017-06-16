@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Router, Route, browserHistory, IndexRedirect, Redirect } from 'react-router';
 import store from 'store';
 import _ from 'lodash';
 import { autobind } from 'core-decorators';
@@ -8,12 +7,6 @@ import './app.less';
 import type { State } from './src/common/types';
 import { hideAppLoader } from './src/common/app/actions';
 import { Console } from './artui/react';
-import { authRoutes } from './components/auth';
-import { cloudRoute } from './components/cloud';
-import { logRoute } from './components/log';
-import { settingsRoute } from './components/settings';
-import { useCaseRoute } from './components/usecase/index';
-import { fileTabsRoute } from './components/filetabs/index';
 import ProjectDetails from './components/cloud/monitoring/details';
 import FileDetails from './components/cloud/monitoring/files';
 import FileDetectionDetails from './components/cloud/monitoring/filedetection';
@@ -22,8 +15,6 @@ import IncidentLogDetails from './components/log/incident-log-analysis/log-detai
 import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import ExecutiveDashboard from './containers/executive-dashboard';
-import Help from './components/help';
-import AccountInfo from './components/account-info';
 import apis from './apis';
 import { SinglePage } from './src/web/app/components';
 
@@ -96,7 +87,6 @@ class AppCore extends React.Component {
 
   @autobind
   loadIncident() {
-    let self = this;
     return new Promise((resolve, reject) => {
       apis.postDashboardIncident().then((result) => {
         const resp = result.data;
@@ -111,7 +101,7 @@ class AppCore extends React.Component {
   @autobind
   loadBenchmark() {
     const self = this;
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       apis.postDashboardBenchmark().then((result) => {
         const resp = result.data;
         resp.publishedDataAllInfo = JSON.parse(resp.publishedDataAllInfo);
@@ -278,30 +268,6 @@ const ExecutiveDashboardApp = function (props) {
   );
 };
 
-const routes = (
-  <Router history={browserHistory}>
-    <Route component={App} path="/">
-      <IndexRedirect to="/cloud" />
-      {cloudRoute}
-      {logRoute}
-      {settingsRoute}
-      {useCaseRoute}
-      {fileTabsRoute}
-      <Route component={AccountInfo} path="account-info" />
-      <Route component={Help} path="help" />
-    </Route>
-    <Route component={liveMonitoringApp} path="/liveMonitoring" />
-    <Route component={FilesMonitoringApp} path="/filesMonitoring" />
-    <Route component={FilesDetectionMonitoringApp} path="/filesdetectionMonitoring" />
-    <Route component={projectDataOnlyApp} path="/projectDataOnly" />
-    <Route component={incidentAnalysisApp} path="/incidentAnalysis" />
-    <Route component={incidentLogAnalysisApp} path="/incidentLogAnalysis" />
-    <Route component={useCaseApp} path="/useCaseDetails" />
-    <Route component={ExecutiveDashboardApp} path="/executiveDashboard" />
-    <Redirect from="*" to="/" />
-  </Router>
-);
-
 export {
   liveMonitoringApp,
   FilesMonitoringApp,
@@ -312,25 +278,3 @@ export {
   useCaseApp,
   ExecutiveDashboardApp,
 };
-
-class AppRoute extends React.Component {
-  componentDidMount() {
-    this.props.hideAppLoader();
-  }
-
-  isAuthenticated() {
-    return store.get('userName') && store.get('token');
-  }
-
-  render() {
-    if (this.isAuthenticated()) {
-      return routes;
-    }
-    return authRoutes;
-  }
-}
-
-export default connect(
-  () => ({}),
-  { hideAppLoader },
-)(AppRoute);
