@@ -1,11 +1,13 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
 import React, { PropTypes as T } from 'react';
+import { connect } from 'react-redux';
 import _ from 'lodash';
 import R from 'ramda';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
+import { State } from '../../src/common/types';
 import withRouter from '../withRouter';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
@@ -19,17 +21,14 @@ import {
 } from '../../components/selections';
 import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 
-class EventSummary extends React.Component {
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object,
-  };
+type Props = {
+  projects: Array<Object>,
+  router: Object,
+  location: Object,
+};
 
-  static propTypes = {
-    location: T.object,
-    router: T.shape({
-      push: T.func.isRequired,
-    }).isRequired,
-  };
+class EventSummaryCore extends React.Component {
+  props: Props;
 
   constructor(props) {
     super(props);
@@ -108,10 +107,7 @@ class EventSummary extends React.Component {
   }
 
   getLiveProjectInfos() {
-    // exclude GCP and File Replay
-    let pinfos = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    pinfos = pinfos.filter(item => item.fileProjectType !== 0);
-    return pinfos;
+    return this.props.projects;
   }
 
   @autobind()
@@ -635,4 +631,14 @@ class EventSummary extends React.Component {
   }
 }
 
-export default withRouter(EventSummary);
+const EventSummary = withRouter(EventSummaryCore);
+
+export default connect(
+  (state: State) => {
+    return {
+      projects: R.filter(p => p.isMetric, state.app.projects),
+    };
+  },
+  {},
+)(EventSummary);
+
