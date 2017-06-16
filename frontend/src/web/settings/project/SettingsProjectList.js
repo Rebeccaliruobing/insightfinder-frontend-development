@@ -37,7 +37,7 @@ class SettingsProjectListCore extends React.Component {
   handleProjectClick({ rowData: project }) {
     const { push } = this.props;
     push(buildUrl(BaseUrls.ProjectSettings, {
-      projectId: project.name,
+      projectId: project.projectId,
     }));
   }
 
@@ -74,7 +74,7 @@ class SettingsProjectListCore extends React.Component {
                 rowGetter={({ index }) => projects[index]}
                 onRowClick={this.handleProjectClick}
               >
-                <Column width={240} label="Name" dataKey="name" />
+                <Column width={240} label="Name" dataKey="projectName" />
                 <Column width={120} label="Created Time" dataKey="createdTime" />
                 <Column width={120} label="Status" dataKey="status" />
                 <Column width={240} label="Data Sources" dataKey="dataSources" />

@@ -26,8 +26,8 @@ const fileEpic = (action$: any, { getState }: Deps) =>
 
       // Check whether the project id is a valid log project id.
       // If not, choose the first project.
-      if (!projectId || !R.find(p => p.name === projectId, projects)) {
-        projectId = (projects[0] || {}).name || null;
+      if (!projectId || !R.find(p => p.projectId === projectId, projects)) {
+        projectId = (projects[0] || {}).projectId || null;
       }
 
       // Check whether info for this project exists, if not load the data.

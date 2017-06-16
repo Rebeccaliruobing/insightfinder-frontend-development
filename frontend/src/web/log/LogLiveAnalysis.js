@@ -158,7 +158,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="divider">/</span>
             <Select
               name="project" inline style={{ width: 200 }}
-              options={R.map(p => ({ label: p.name, value: p.name }), projects)}
+              options={R.map(p => ({ label: p.projectName, value: p.projectId }), projects)}
               value={projectId} onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
               {...incident ? { valueRenderer: projectValueRenderer } : {}}
