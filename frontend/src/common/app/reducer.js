@@ -29,7 +29,6 @@ const initialState = {
   pageLoaderVisible: false,
   lastError: null,
   alerts: [],
-  v1store: {},
   projects: [],
   filters: {},
   enabledDataSourceNames: [
@@ -85,15 +84,11 @@ const reducer = (
       started: true,
     };
   } else if (action.type === 'SET_INIT_DATA') {
-    const { data, rawData } = action.payload;
+    const { data } = action.payload;
     return {
       ...state,
       inited: true,
       projects: data.projects,
-      v1store: {
-        ...state.v1store,
-        dashboardUservalues: rawData,
-      },
     };
   } else if (action.type === 'APP_STOP') {
     return {

@@ -1,8 +1,11 @@
+/* @flow */
 /* eslint-disable class-methods-use-this */
-import React, { PropTypes as T } from 'react';
+
+import React from 'react';
 import store from 'store';
 import moment from 'moment';
 import _ from 'lodash';
+import $ from 'jquery';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { Button } from '../../artui/react';
@@ -26,17 +29,14 @@ const columeStyles = {
 };
 const tableBodyOffsetHeight = 260;
 
-class IncidentsList extends React.Component {
-  static propTypes = {
-    projectName: T.string,
-    projectType: T.string,
-    activeTab: T.oneOf(['detected', 'predicted']),
-    onIncidentSelected: T.func.isRequired,
-  }
+type Props = {
+    projectName: String,
+    projectType: String,
+    onIncidentSelected: Function,
+}
 
-  static defaultProps = {
-    activeTab: 'detected',
-  }
+class IncidentsList extends React.Component {
+  props: Props;
 
   constructor(props) {
     super(props);
@@ -166,11 +166,11 @@ class IncidentsList extends React.Component {
   @autobind
   handleIncidentSelected(incident, tab) {
     this.props.onIncidentSelected(incident, tab);
-    let incidentState = { activeIncident: incident };
+    const incidentState = { activeIncident: incident };
     this.setState(incidentState);
   }
 
-@autobind
+  @autobind
   getIncidents(type) {
     return (type === 'detected' ?
       this.detectedIncidents : this.predictedIncidents) || [];
@@ -468,22 +468,16 @@ class IncidentsList extends React.Component {
   }
 
   showInstanceChart() {
-    const { projectName, instanceGroup, endTime, eventEndTime, numberOfDays, predictionWindow } = this.props;
-    const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-    const projectParam = projectParams.find(p => p.projectName == projectName);
+    const { projectName, instanceGroup, eventEndTime, numberOfDays } = this.props;
     const modelType = 'Holistic';
-    const cvalueParam = projectParam ? projectParam.cvalue : '1';
-    const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
     const params = {
       projectName,
       instanceGroup,
       version: 3,
-      pvalue: pvalueParam,
-      cvalue: cvalueParam,
       modelType,
       predictedFlag: this.props.predictedFlag,
     };
-    let startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
+    const startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
     params.startTimestamp = startTime.valueOf();
     params.endTimestamp = eventEndTime;
 
@@ -507,7 +501,7 @@ class IncidentsList extends React.Component {
             style={{ position: 'absolute', left: 320, top: 5 }} title="Causal Analysis"
             onClick={(e) => { e.stopPropagation(); this.setState({ showCausalGraphModal: true }); }}
           >Causal Analysis</Button>
-          {['admin','guest'].indexOf(store.get('userName'))!=-1 && <Button
+          {['admin', 'guest'].indexOf(store.get('userName')) != -1 && <Button
             className="orange"
             style={{ position: 'absolute', left: 450, top: 5 }} title="Overall Chart"
             onClick={(e) => { e.stopPropagation(); this.showInstanceChart(); }}

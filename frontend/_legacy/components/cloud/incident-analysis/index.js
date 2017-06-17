@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import { Console } from '../../../artui/react/index';
-import apis from '../../../apis';
 
 import FilterBar from './filter-bar';
 

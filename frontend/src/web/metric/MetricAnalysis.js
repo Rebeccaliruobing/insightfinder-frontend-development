@@ -1,3 +1,4 @@
+/* @flow */
 /**
  * *****************************************************************************
  * Copyright InsightFinder Inc., 2017
@@ -19,6 +20,7 @@ import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../.
 import { Container, Select } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages, appMessages } from '../../common/app/messages';
 import { showAppAlert } from '../../common/app/actions';
+import { BaseUrls } from '../app/Constants';
 import { loadMetricHourlyEvents, loadMetricWeeklyAnomalies } from '../../common/metric/actions';
 import HourlyHeatmap from '../../../components/statistics/hourly-heatmap';
 import TopListAnomaly from '../../../containers/executive-dashboard/top-list-anomaly-metric';
@@ -238,7 +240,7 @@ class MetricAnalysisCore extends React.PureComponent {
       query.predicted = true;
     }
 
-    window.open(`/cloud/monitoring?${$.param(query)}`, '_blank');
+    window.open(`${BaseUrls.MetricEvents}?${$.param(query)}`, '_blank');
   }
 
   render() {

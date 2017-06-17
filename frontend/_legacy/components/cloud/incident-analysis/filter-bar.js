@@ -1,25 +1,16 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 import cx from 'classnames';
-
-import { Console, ButtonGroup, Button, Dropdown, Accordion, Message } from '../../../artui/react';
-import {
-  ProjectSelection,
-  ModelType,
-  DurationHour,
-  AnomalyThreshold,
-  DurationThreshold
-} from '../../selections';
-
+import { Button } from '../../../artui/react';
+import { ProjectSelection, ModelType, AnomalyThreshold } from '../../selections';
 import apis from '../../../apis';
 
-import DateTimePicker from "../../ui/datetimepicker/index";
+import DateTimePicker from '../../ui/datetimepicker/index';
 import WaringButton from '../monitoring/waringButton';
 
 
 export default class FilterBar extends Component {
   static contextTypes = {
-    userInstructions: React.PropTypes.object,
     dashboardUservalues: React.PropTypes.object,
     root: React.PropTypes.object
   };

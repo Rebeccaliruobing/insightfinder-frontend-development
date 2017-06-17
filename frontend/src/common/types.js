@@ -46,7 +46,6 @@ export type AppState = {
   pageLoaderVisible: boolean,
   lastError: ?ErrorMessage,
   alerts: Array<AlertMessage>,
-  v1store: Object,
   projects: Array<Object>,
   filters: Filters,
   enabledDataSourceIds: Array<string>,

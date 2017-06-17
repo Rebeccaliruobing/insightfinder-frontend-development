@@ -1,20 +1,26 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { ConnectedRouter as Router } from 'react-router-redux';
 import { PrivateRoute } from '../../common/app/components';
+import { BaseUrls } from './Constants';
 import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
-import { BaseUrls } from './Constants';
-import { MetricAnalysis } from '../metric';
+import { MetricAnalysis, HistoricalMetricAnalysis } from '../metric';
 import { LogLiveAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
 
-// TODO: Components below need to be upgraded
+// TODO: v1 components needs upgrade
 import AccountInfo from '../../../components/account-info';
 import EventSummary from '../../../containers/event-summary';
-import ExecutiveDashboard from '../../../containers/executive-dashboard';
 import {
   ForgotPassword, ResetPassword, ForgotUsername, Signup, SignupStep2,
 } from '../../../components/auth';
@@ -23,35 +29,50 @@ import {
   liveMonitoringApp,
   FilesMonitoringApp,
   FilesDetectionMonitoringApp,
-  projectDataOnlyApp,
-  incidentAnalysisApp,
-  incidentLogAnalysisApp,
   useCaseApp,
 } from '../../../root';
 
 import withRouteApp from './withRouteApp';
-import RoutingNextV1 from './RoutingNextV1';
+import { RoutingV1Settings, RoutingV1FileTabs } from './RoutingNextV1';
 
 const liveMonitoringAppV1 = withRouteApp(liveMonitoringApp);
 const FilesMonitoringAppV1 = withRouteApp(FilesMonitoringApp);
 const FilesDetectionMonitoringAppV1 = withRouteApp(FilesDetectionMonitoringApp);
-const projectDataOnlyAppV1 = withRouteApp(projectDataOnlyApp);
-const incidentAnalysisAppV1 = withRouteApp(incidentAnalysisApp);
-const incidentLogAnalysisAppV1 = withRouteApp(incidentLogAnalysisApp);
 const useCaseAppV1 = withRouteApp(useCaseApp);
 
-const MetricRouting = () => {
+const MetricRoutings = () => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={BaseUrls.MetricSummary} component={MetricAnalysis} />
-        <Redirect from="*" to={BaseUrls.MetricSummaryBase} />
+        <Route path={BaseUrls.MetricAnalysis} component={MetricAnalysis} />
+        <Route
+          path={BaseUrls.MetricHistoricalMetricAnalysis}
+          component={HistoricalMetricAnalysis}
+        />
+        <Route path={BaseUrls.MetricEvents} component={EventSummary} />
+        <Route
+          path={BaseUrls.MetricLineCharts}
+          render={() => React.createElement(liveMonitoringAppV1)}
+        />
+        <Redirect from="*" to={BaseUrls.MetricAnalysisBase} />
       </Switch>
     </SinglePage>
   );
 };
 
-const UseCaseRouting = () => {
+const LogRoutings = () => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={BaseUrls.LogAnalysis} component={LogLiveAnalysis} />
+        <Route path={BaseUrls.LogHistoricalLogAnalysis} component={LogFileAnalysis} />
+        <Redirect from="*" to={BaseUrls.LogAnalysisBase} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const UseCaseRoutings = () => {
   return (
     <SinglePage>
       <Switch>
@@ -62,7 +83,7 @@ const UseCaseRouting = () => {
 };
 
 // TODO: Merge with routing in RoutingNextV1.
-const SettingsRouting = () => {
+const SettingsRoutings = () => {
   return (
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
@@ -73,27 +94,26 @@ const SettingsRouting = () => {
   );
 };
 
-const PrivateRouting = () => (
+/**
+ * The private routing defines the routings needs authentication. When access these pages
+ * without login, it will be redirected to login page and be redirected back after login.
+ **/
+const PrivateRoutings = () => (
   <Switch>
-    <Route path={BaseUrls.Help} render={props => (<SinglePage><Help {...props} /></SinglePage>)} />
+    <Route
+      path={BaseUrls.Help}
+      render={props => (<SinglePage><Help {...props} /></SinglePage>)}
+    />
     <Route
       path={BaseUrls.AccountInfo}
       render={props => (<SinglePage><AccountInfo {...props} /></SinglePage>)}
     />
 
-    <Route path={BaseUrls.Metric} component={MetricRouting} />
-    <Route path={BaseUrls.UsecaseBase} component={UseCaseRouting} />
+    <Route path={BaseUrls.Metric} component={MetricRoutings} />
+    <Route path={BaseUrls.Log} component={LogRoutings} />
+    <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
 
-    <Route
-      path="/log/live-analysis/:projectId?/:month?/:incidentId?"
-      render={props => (<SinglePage><LogLiveAnalysis {...props} /></SinglePage>)}
-    />
-    <Route
-      path="/log/incident-log-analysis/:projectId?/:incidentId?"
-      render={props => (<SinglePage><LogFileAnalysis {...props} /></SinglePage>)}
-    />
-
-    <Route path={BaseUrls.SettingsProjectList} component={SettingsRouting} />
+    <Route path={BaseUrls.SettingsProjectList} component={SettingsRoutings} />
     <Route
       path={BaseUrls.SettingsProjectWizard} exact
       render={props => (
@@ -102,19 +122,13 @@ const PrivateRouting = () => (
     />
 
     <Route
-      path="/cloud/monitoring" exact
-      render={props => (<SinglePage><EventSummary {...props} /></SinglePage>)}
-    />
-    <Route
-      path="/cloud/executive-dashboard" exact
-      render={props => (<SinglePage><ExecutiveDashboard {...props} /></SinglePage>)}
-    />
-
-    <Route
       path="/liveMonitoring"
       render={() => React.createElement(liveMonitoringAppV1)}
     />
-
+    <Route
+      path="/useCaseDetails"
+      render={() => React.createElement(useCaseAppV1)}
+    />
     <Route
       path="/filesMonitoring"
       render={() => React.createElement(FilesMonitoringAppV1)}
@@ -123,24 +137,10 @@ const PrivateRouting = () => (
       path="/filesdetectionMonitoring"
       render={() => React.createElement(FilesDetectionMonitoringAppV1)}
     />
-    <Route
-      path="/projectDataOnly"
-      render={() => React.createElement(projectDataOnlyAppV1)}
-    />
-    <Route
-      path="/incidentAnalysis"
-      render={() => React.createElement(incidentAnalysisAppV1)}
-    />
-    <Route
-      path="/incidentLogAnalysis"
-      render={() => React.createElement(incidentLogAnalysisAppV1)}
-    />
-    <Route
-      path="/useCaseDetails"
-      render={() => React.createElement(useCaseAppV1)}
-    />
+    <Route path="/settings" component={RoutingV1Settings} />
+    <Route path="/filetabs" component={RoutingV1FileTabs} />
 
-    <Route component={RoutingNextV1} />
+    <Redirect from="*" to={BaseUrls.Metric} />
   </Switch>
 );
 
@@ -157,7 +157,7 @@ const Routing = ({ history }: Props) => (
       <Route path="/signup" component={Signup} />
       <Route path="/signup2" component={SignupStep2} />
       <Route path="/resetPassword" component={ResetPassword} />
-      <PrivateRoute component={PrivateRouting} />
+      <PrivateRoute component={PrivateRoutings} />
     </Switch>
   </Router>
 );

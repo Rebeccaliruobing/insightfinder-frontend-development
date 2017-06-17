@@ -10,9 +10,6 @@ import { Console } from './artui/react';
 import ProjectDetails from './components/cloud/monitoring/details';
 import FileDetails from './components/cloud/monitoring/files';
 import FileDetectionDetails from './components/cloud/monitoring/filedetection';
-import IncidentDetails from './components/cloud/incident-analysis/details';
-import IncidentLogDetails from './components/log/incident-log-analysis/log-details';
-import ProjectDataDetails from './components/cloud/project-data/details';
 import UseCaseDetails from './components/usecase/details';
 import apis from './apis';
 import { SinglePage } from './src/web/app/components';
@@ -30,17 +27,12 @@ class AppCore extends React.Component {
   constructor(props) {
     super(props);
 
-    let dashboardUservalues = {};
-    if (props.dashboardUservalues) {
-      dashboardUservalues = this.convertUservalues(props.dashboardUservalues);
-    }
-
     this.state = {
       userInfo: store.get('userInfo'),
       userName: store.get('userName'),
       token: store.get('token'),
       userInstructions: userInstructionJson,
-      dashboardUservalues,
+      dashboardUservalues: {},
     };
   }
 
@@ -64,7 +56,7 @@ class AppCore extends React.Component {
   }
 
   componentDidMount() {
-    this.props.hideAppLoader();
+    this.loadData();
   }
 
   @autobind
@@ -76,7 +68,9 @@ class AppCore extends React.Component {
       if (!(store.get('userName') && store.get('token'))) {
         return;
       }
-      this.loadUserValues();
+      this.loadUserValues().then(() => {
+        this.props.hideAppLoader();
+      });
     });
   }
 
@@ -181,9 +175,7 @@ class AppCore extends React.Component {
 }
 
 export const App = connect(
-  (state: State) => ({
-    dashboardUservalues: state.app.v1store.dashboardUservalues,
-  }),
+  () => ({}),
   { hideAppLoader },
 )(AppCore);
 
@@ -211,40 +203,6 @@ const FilesDetectionMonitoringApp = function (props) {
   );
 };
 
-// Incident Analysis Details
-const incidentAnalysisApp = function (props) {
-  const { location, params } = props;
-  return (
-    <Console>
-      <Console.Topbar logo={require('./images/logo.png')} />
-      <IncidentDetails location={location} params={params} />
-    </Console>
-  );
-};
-
-// Incident Analysis Details Log
-const incidentLogAnalysisApp = function (props) {
-  const { location, params, children } = props;
-  return (
-    <Console>
-      <IncidentLogDetails location={location} params={params} >
-        {children}
-      </IncidentLogDetails>
-    </Console>
-  );
-};
-
-// project Data Only Details
-const projectDataOnlyApp = function (props) {
-  const { location, params } = props;
-  return (
-    <Console>
-      <Console.Topbar logo={require('./images/logo.png')} />
-      <ProjectDataDetails location={location} params={params} />
-    </Console>
-  );
-};
-
 // Use Case Details
 const useCaseApp = function (props) {
   const { location, params } = props;
@@ -260,8 +218,5 @@ export {
   liveMonitoringApp,
   FilesMonitoringApp,
   FilesDetectionMonitoringApp,
-  projectDataOnlyApp,
-  incidentAnalysisApp,
-  incidentLogAnalysisApp,
   useCaseApp,
 };

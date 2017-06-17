@@ -10,6 +10,7 @@ import SinglePageLoader from './SinglePageLoader';
 import { appMenusMessages } from '../../../common/app/messages';
 import { setCurrentLocale } from '../../../common/app/actions';
 import { logoff } from '../../../common/auth/actions';
+import { BaseUrls } from '../Constants';
 
 type Props = {
   className: string,
@@ -32,37 +33,47 @@ const SinglePageCore = ({
   const { userName } = userInfo;
   const isAdmin = ['admin', 'guest'].indexOf(userName) >= 0;
 
+  // For some menu item, like /metric, it will also match menu item
+  // /metric/historical-metric-analysis so we need isActive check to filter this url.
+  const isActiveIgnoreUrls = url => (match, location) => {
+    if (!match) {
+      return false;
+    }
+    return !location.pathname.startsWith(url);
+  };
+
   return (
     <Container fullHeight className={`single-page ${className || ''}`}>
       <Topbar>
         <div className="ui menu">
-          {false &&
-          <NavLink to="/cloud/executive-dashboard" className="item">
-            {intl.formatMessage(appMenusMessages.dashboard)}
-          </NavLink>
-          }
-          <NavLink to="/metric/summary" className="item">
+          <NavLink
+            to={BaseUrls.Metric} className="item"
+            isActive={isActiveIgnoreUrls(BaseUrls.MetricHistoricalMetricAnalysis)}
+          >
             {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
-          <NavLink to="/log/live-analysis" className="item">
+          <NavLink
+            to={BaseUrls.Log} className="item"
+            isActive={isActiveIgnoreUrls(BaseUrls.LogHistoricalLogAnalysisBase)}
+          >
             {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
-          <NavLink to="/settings" className="item">
+          <NavLink to={BaseUrls.Settings} className="item">
             {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
-          <NavLink to="/usecase" className="item">
+          <NavLink to={BaseUrls.UsecaseBase} className="item">
             {intl.formatMessage(appMenusMessages.issues)}
           </NavLink>
-          {isAdmin && <NavLink to="/cloud/incident-analysis" className="item">
+          {false && <NavLink to={BaseUrls.MetricHistoricalMetricAnalysis} className="item">
             {intl.formatMessage(appMenusMessages.historicalMetricAnalysis)}
           </NavLink>}
-          {isAdmin && <NavLink to="/log/incident-log-analysis" className="item">
+          {isAdmin && <NavLink to={BaseUrls.LogHistoricalLogAnalysisBase} className="item">
             {intl.formatMessage(appMenusMessages.historicalLogAnalysis)}
           </NavLink>}
           {isAdmin && <NavLink to="/filetabs" className="item">
             {intl.formatMessage(appMenusMessages.fileAnalysis)}
           </NavLink>}
-          <NavLink to="/help" className="item">
+          <NavLink to={BaseUrls.Help} className="item">
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
           <div className="right menu">
@@ -83,7 +94,7 @@ const SinglePageCore = ({
               <i className="circular inverted icon">{userName[0]}</i>
               <span>{userName}</span>
               <div className="right-align menu">
-                <Link to="/account-info" className="item">
+                <Link to={BaseUrls.AccountInfo} className="item">
                   <i className="settings icon" />{intl.formatMessage(appMenusMessages.accountProfile)}
                 </Link>
                 <a className="item" onClick={() => logoff()}>

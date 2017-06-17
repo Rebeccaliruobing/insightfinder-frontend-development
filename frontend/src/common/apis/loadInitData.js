@@ -18,16 +18,16 @@ import fetchPost from './fetchPost';
 const loadInitData = (
   credentials: Credentials,
 ) => {
-  return fetchPost(
-    getEndpoint('dashboard-uservalues'),
-    {
-      ...credentials,
-      operation: 'display',
-    },
-  // return fetchGet(
-  //   getEndpoint('loadProjectsInfo'), {
+  // return fetchPost(
+  //   getEndpoint('dashboard-uservalues'),
+  //   {
   //     ...credentials,
+  //     operation: 'display',
   //   },
+  return fetchGet(
+    getEndpoint('loadProjectsInfo'), {
+      ...credentials,
+    },
   ).then((d) => {
     // The string is split by ',' for projects, and split by ':' for each parts.
     // The format is: projectName:projectType:instanceType:dataType.
