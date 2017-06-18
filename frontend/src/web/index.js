@@ -8,6 +8,7 @@ const onWindowInit = () => {
   // require('babel-polyfill');
 
   window.Promise = require('../common/configureBluebird');
+  require('whatwg-fetch');
 
   const { addLocaleData } = require('react-intl');
   const en = require('react-intl/locale-data/en');

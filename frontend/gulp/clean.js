@@ -4,6 +4,7 @@ import webpackSettings from '../webpack.settings';
 
 gulp.task('clean', () => del(
   [
+    `${webpackSettings.paths.root}/.happypack/**`,
     `${webpackSettings.paths.build}/**`,
     `${webpackSettings.paths.dist}/**`,
   ],

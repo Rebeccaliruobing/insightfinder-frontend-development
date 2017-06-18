@@ -1,0 +1,14 @@
+@charset "utf-8";
+
+@import "../../lib/fui/sass/variables";
+@import "../../lib/fui/sass/themes/colors";
+
+.fui.container.auth {
+  .ui.error.form {
+    .ui.error.message {
+      font-size: 12px;
+      margin: 0.5em 0;
+      padding: 0.5em 0.75em; 
+    }
+  }
+}

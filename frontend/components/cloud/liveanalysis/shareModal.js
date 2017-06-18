@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import {Modal, Dropdown} from '../../../artui/react/index';
 import apis from '../../../apis';
+import withRouter from '../../../containers/withRouter';
 
 class ShareModal extends React.Component {
 
@@ -33,7 +34,9 @@ class ShareModal extends React.Component {
   handleSubmit() {
     
     let {name, description, system, showOther, other ,...rest} = this.state;
-    let data = Object.assign({}, this.context.location.query, rest);
+    const { location } = this.props;
+    let data = Object.assign({}, location.query, rest);
+
     let {dp, latestDataTimestamp, dataChunkName} = this.props;
     let startTimestamp = (data['startTime'])?data['startTime']:dp.startTimestamp;
     let endTimestamp = (data['endTime'])?data['endTime']:dp.endTimestamp;
@@ -135,4 +138,4 @@ class ShareModal extends React.Component {
   }
 }
 
-export default ShareModal;
+export default withRouter(ShareModal);

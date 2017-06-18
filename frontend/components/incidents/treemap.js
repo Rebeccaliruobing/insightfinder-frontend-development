@@ -255,7 +255,7 @@ class IncidentsTreeMap extends Component {
           val = 10;
         }
         rcolor = 255;
-        gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
+        gcolor = Math.floor(gcolorMax - (val / 10 * gcolorMax));
       }
     } else if (schema == 'cpu') {
       let overAvg = false;
@@ -293,17 +293,11 @@ class IncidentsTreeMap extends Component {
   showInstanceChart(d) {
     const { endTime, numberOfDays, instanceGroup } = this.props;
     const projectName = d.projectName;
-    const projectParams = (this.context.dashboardUservalues || {}).projectModelAllInfo || [];
-    const projectParam = projectParams.find(p => p.projectName == projectName);
     const modelType = 'Holistic';
-    const cvalueParam = projectParam ? projectParam.cvalue : '1';
-    const pvalueParam = projectParam ? projectParam.pvalue : '0.99';
     const params = {
       projectName,
       instanceGroup,
       version: 3,
-      pvalue: pvalueParam,
-      cvalue: cvalueParam,
       modelType,
       predictedFlag: this.props.predictedFlag,
     };
@@ -436,17 +430,29 @@ class IncidentsTreeMap extends Component {
       t.attr('x', d => x(d.x) + 6).attr('y', d => y(d.y) + 6);
     });
     if (schema === 'anomaly') {
-      g.append('text').attr('dy', '.75em').text(d => this.chopString(d.eventType, 10)).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => this.chopString(d.eventType, 12))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     } else if (schema === 'cpu') {
-      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => ((stats[d.name] && stats[d.name].AvgCPUUtilization) ? `${(Math.round(stats[d.name].AvgCPUUtilization * 10) / 10).toString()}%` : ''))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     } else if (schema === 'availability') {
-      g.append('text').attr('dy', '.75em').text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : '')).call((t) => {
-        t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + (d.dy / 2)) });
-      });
+      g.append('text')
+        .attr('dy', '.75em')
+        .attr('class', 'metric')
+        .text(d => ((stats[d.name] && stats[d.name].AvgInstanceUptime) ? `${(Math.round(stats[d.name].AvgInstanceUptime * 1000) / 10).toString()}%` : ''))
+        .call((t) => {
+          t.attr({ x: d => x(d.x) + 6, y: d => y(d.y + 20) });
+        });
     }
 
     // Bind event for metric

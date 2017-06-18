@@ -20,7 +20,7 @@ class TakeActionModal extends React.Component {
       instanceId: undefined,
       actionMap:{},
       customAction:undefined,
-      textLoaded: false,
+      textLoaded: true,
     };
     this.state.actionMap["ignore"] = "ignore";
     this.state.actionMap["scale-up"] = "coldclone";

@@ -13,6 +13,8 @@ export class DataChart extends React.Component {
     enableTriangleHighlight: T.bool,
     enableAnnotations: T.bool,
     onDateWindowChange: T.func,
+    onAnnotationClick: T.func,
+    showLineChartWithAnnotation: T.bool,
     dateWindow: T.any,
     chartType: T.string,
   };
@@ -20,6 +22,8 @@ export class DataChart extends React.Component {
   static defaultProps = {
     enableTriangleHighlight: true,
     enableAnnotations: false,
+    showLineChartWithAnnotation: false,
+    onAnnotationClick: () => { },
     chartType: 'line',
   };
 
@@ -28,8 +32,8 @@ export class DataChart extends React.Component {
 
     this.dateWindow = [];
     this.state = {
-      metricTags: props.metricTags
-    }
+      metricTags: props.metricTags,
+    };
   }
 
   componentWillReceiveProps(nextProps) {
@@ -46,8 +50,9 @@ export class DataChart extends React.Component {
   handleAnnotationClick(anno) {
     if (anno && anno.div) {
       const x = anno.x;
-      let { annotations } = this.props;
+      const { onAnnotationClick, showLineChartWithAnnotation } = this.props;
       const dowAnnotations = this.setWeekdaysForBarChar(this.props.data);
+      let { annotations } = this.props;
       annotations = annotations || dowAnnotations;
 
       // Get the annotion from data which has full infos.
@@ -56,15 +61,30 @@ export class DataChart extends React.Component {
         let text = annotation.text;
         const $p = $(anno.div);
         let title = moment(parseInt(anno.x, 10)).format('YYYY-MM-DD HH:mm');
-        title = `<div class="header">${title}</div>`;
+        if (showLineChartWithAnnotation) {
+          title = `<div class="header">${title}<i class="line chart icon"></i></div>`;
+        } else {
+          title = `<div class="header">${title}</div>`;
+        }
         text = _.replace(text, /[,;]\n/g, '<br>');
         text = _.replace(text, /Root cause /g, '');
         text = _.replace(text, /, metric:/g, '<br>&nbsp;&nbsp;&nbsp;&nbsp;metric:');
         const content = `<div class="content">${text}</div>`;
+        const $html = $(`<div class="dygraph popup-content">${title}${content}</div>`);
+
+        if (showLineChartWithAnnotation) {
+          const $lineChart = $html.find('.line.chart.icon');
+          const click = () => {
+            $p.popup('destroy');
+            onAnnotationClick(annotation);
+            $lineChart.off('click', click);
+          };
+          $lineChart.on('click', click);
+        }
 
         $p.popup({
           on: 'click',
-          html: `<div class="dygraph popup-content">${title}${content}</div>`,
+          html: $html,
         });
         $p.popup('show');
       }
@@ -186,13 +206,16 @@ export class DataChart extends React.Component {
         plotter={chartType === 'bar' ? this.barChartPlotter : null}
         onAnnotationClick={chartType === 'bar' ? null : this.handleAnnotationClick}
         enableTriangleHighlight={enableTriangleHighlight}
-        onClick={onClick ? this.handleClick: null}
+        onClick={onClick ? this.handleClick : null}
       />
     );
   }
 }
 
-export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, latestDataTimestamp }) => {
+export const DataSummaryChart = ({
+  summary, onDateWindowChange, dateWindow, latestDataTimestamp,
+  onAnnotationClick = (() => { }), showLineChartWithAnnotation,
+}) => {
   return (
     <div key="summary_chart" className="sixteen wide column" style={{ paddingTop: 0 }}>
       <div className="detail-charts" style={{ position: 'relative' }}>
@@ -203,10 +226,12 @@ export const DataSummaryChart = ({ summary, onDateWindowChange, dateWindow, late
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
           latestDataTimestamp={latestDataTimestamp}
+          onAnnotationClick={onAnnotationClick}
+          showLineChartWithAnnotation={showLineChartWithAnnotation}
         />
       </div>
     </div>
-  )
+  );
 };
 
 export class DataGroupCharts extends React.Component {

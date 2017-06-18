@@ -81,7 +81,7 @@ class HourlyHeatmap extends React.Component {
       const { cellSize } = this.state;
 
       // If the heatmap is in the right edge, left align the popup on right edge.
-      const rightAlign = (!rightEdge ? true : (d.x < 8));
+      const rightAlign = (!rightEdge ? true : (d.x < 4));
       const popupX = rightAlign ?
         (((d.x + 1) * cellSize) + this.labelYWidth) :
         (((this.hoursCount - d.x) * cellSize) + 12);
@@ -181,7 +181,13 @@ class HourlyHeatmap extends React.Component {
       .attr('y', d => (d.y * cellSize) + this.labelXHeight + 0.5)
       .attr('width', cellSize - 1)
       .attr('height', cellSize - 1)
-      .attr('fill', d => calculateRGBByAnomalyScore(statSelector(d)))
+      .attr('fill', (d) => {
+        if (d.stats.eventTypes &&
+          d.stats.eventTypes.toLowerCase().indexOf('instance down') >= 0) {
+          return '#aaa';
+        }
+        return calculateRGBByAnomalyScore(statSelector(d));
+      })
       .on('mouseover', this.handleCellMouseOver)
       .on('mouseout', this.cellOutDebounced)
       ;
@@ -242,6 +248,9 @@ class HourlyHeatmap extends React.Component {
     const elems = [];
     if (popupData && _.isArray(popupData.items)) {
       popupData.items.forEach((item, index) => {
+        let { eventTypes } = item.stats;
+        eventTypes = (eventTypes || '[]').slice(1, -1).split(',');
+
         elems.push((
           <tr key={`${popupData.x}-${popupData.y}-${index}`}>
             <td className="link">
@@ -253,7 +262,7 @@ class HourlyHeatmap extends React.Component {
             <td className="name">{item.group}</td>
             <td className="value">{normalizeValue(item.stats.totalAnomalyScore, 2)}</td>
             <td className="value">{normalizeValue(item.stats.avgEventDuration)}</td>
-            <td className="value">{normalizeValue(item.stats.numberOfEvents)}</td>
+            <td className="name">{eventTypes.map((e, idx) => <div key={idx}>{e}</div>)}</td>
           </tr>
         ));
       });
@@ -273,16 +282,16 @@ class HourlyHeatmap extends React.Component {
             onMouseOver={this.handlePopupMouseOver}
             onMouseOut={this.popupOutDebounced}
           >
-            <div className="popup-content" style={{ maxHeight: 160, width: 420 }}>
+            <div className="popup-content" style={{ maxHeight: 160, width: 466 }}>
               <table className="ui striped table">
                 <thead>
                   <tr>
                     <th style={{ width: 20 }} />
                     <th style={{ width: 100 }}>Project</th>
                     <th style={{ width: 100 }}>Group</th>
-                    <th style={{ width: 45 }}>Score</th>
+                    <th style={{ width: 44 }}>Score</th>
                     <th style={{ width: 56 }}>Duration</th>
-                    <th style={{ width: 48 }}>Events</th>
+                    <th style={{ width: 140 }}>Event Types</th>
                   </tr>
                 </thead>
                 <tbody>

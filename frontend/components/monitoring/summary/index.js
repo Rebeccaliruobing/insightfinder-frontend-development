@@ -1,8 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
 import _ from 'lodash';
-import {Link, IndexLink} from 'react-router';
-import {Console} from '../../../artui/react';
+import { Console, Link, IndexLink } from '../../../artui/react';
 import Details from './detail';
 
 class Summary extends React.Component {

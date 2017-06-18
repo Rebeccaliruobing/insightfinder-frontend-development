@@ -1,0 +1,18 @@
+.fui.box {
+  background-color: $white;
+  border-color: $divider-color;
+  &.raised {
+    box-shadow: 0px 1px 2px 0 $divider-color;
+  }
+}
+
+a.fui.box,
+.fui.box.is-link {
+  &:hover,
+  &:focus {
+    box-shadow: 0px 1px 2px 0 $divider-color;
+  }
+  &:active {
+    box-shadow: 0px 1px 2px 0 $divider-color;
+  }
+}

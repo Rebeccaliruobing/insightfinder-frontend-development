@@ -52,7 +52,7 @@
         }
         &:nth-child(5){
           width: 16%;
-        }
+        } 
         &:nth-child(6){
           width: 16%;
         }
@@ -61,14 +61,15 @@
 }
 
 .model-settings {
+  height: 100%;
   .model-tile {
     margin: 12px 12px 0px 0;
     >.fui.box {
-      height: 212px;
+      height: 242px;
       padding: 20px 18px;
       .meta {
         font-size: 12px;
-        padding: 1em 0 0;
+        padding: 8px 0 0;
         .icon {
           font-size: 18px;
           visibility: hidden;
@@ -76,12 +77,22 @@
           position: absolute;
           color: rgba(0, 0, 0, 0.35);
           &.remove{
-            top: 2px;
-            right: 0;
+            top: -10px;
+            right: -14px;
           }
           &.check {
             right: 8px;
+            bottom: 16px;
+            font-size: 20px;
           }
+        }
+        a.download {
+          font-size: 20px;
+          position: absolute;
+          width: 20px;
+          height: 20px;
+          bottom: 12px;
+          right: 42px;
         }
         .ui.button {
           font-size: 12px;
@@ -113,12 +124,26 @@
     &.big {
       margin: 0 0 12px 0;
       >.fui.box {
-        height: 272px;
         margin: 0 auto;
+        padding: 0;
+        border: 0px;
+        box-shadow: none;
+        .fui.heatmap {
+          margin: 0 auto;
+        }
         .meta {
+          width: 200px;
           font-size: 14px;
+          margin: 0 auto;
           .icon {
             display: none;
+          }
+        }
+        .ui.table {
+          td.name {
+            word-break: break-all;
+            font-weight: normal;
+            font-size: inherit;
           }
         }
       }

@@ -3,8 +3,129 @@
 
 .fui.container {
   position: relative;
+  &.boxed {
+    background-color: white;
+    border-radius: $border-radius;
+    margin: $y-small-gutter 0;
+    padding: $y-small-gutter $x-small-gutter;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+  }
+  &.loading {
+    &:before {
+      position: absolute;
+      content: '';
+      top: 0%;
+      left: 0%;
+      background: #ffffff;
+      width: 100%;
+      height: 100%;
+      border-radius: 0.14285714rem;
+      z-index: 100;
+    }
+    &:after {
+      position: absolute;
+      content: '';
+      top: 50%;
+      left: 50%;
+      margin: -1.5em 0em 0em -1.5em;
+      width: 3em;
+      height: 3em;
+      -webkit-animation: segment-spin 0.6s linear;
+      animation: segment-spin 0.6s linear;
+      -webkit-animation-iteration-count: infinite;
+      animation-iteration-count: infinite;
+      border-radius: 500rem;
+      border-color: #767676 rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1);
+      border-style: solid;
+      border-width: 0.2em;
+      box-shadow: 0px 0px 0px 1px transparent;
+      visibility: visible;
+      z-index: 101;      
+    }
+  }
 }
 
+.fui.with-gutter.container {
+  margin-left: $x-gutter;
+  margin-right: $x-gutter;
+}
+
+// Toolbar & breadcrumb container
+.fui.breadcrumb.container {
+  background: $white;
+  padding-top: $y-small-gutter;
+  padding-bottom: $y-small-gutter;
+  border-top: 1px solid $white;
+  border-bottom: 1px solid $dark-divider-color;
+  font-size: 14px;
+}
+
+.fui.toolbar.container {
+  padding-top: $y-small-gutter;
+  padding-bottom: $y-small-gutter;
+  font-size: 12px;
+}
+
+.fui.breadcrumb.container,
+.fui.toolbar.container {
+  z-index: 1;
+  > .section {
+    display: inline-flex;
+    align-items: center;
+    > i, > span, > a {
+      line-height: 28px;
+      &.divider {
+        font-size: 14px;
+        font-weight: $font-weight-medium;
+        color: $dark-text-hint-color;
+      }
+      &.label {
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+  // Margin between parts in toolbar
+  > .section > *,
+  > * {
+    margin: auto 0.75em auto 0;
+    &:last-child {
+      margin-right: 0em;
+    }
+  }
+  // Clearfix
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+.fui.with-gutter.container > .fui.container {
+  margin-left: -$x-gutter;
+  margin-right: -$x-gutter;
+  padding-left: $x-gutter;
+  padding-right: $x-gutter;
+}
+
+// Screen center container
+.fui.screen-center.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  > div {
+    position: absolute;
+    top: 100px;
+    margin-bottom: $y-gutter;
+  }
+}
+
+// Responsive
 .fui.responsive.container {
   margin: 0 auto;
   max-width: 100%;

@@ -9,6 +9,11 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
+    &.inline-edit {
+      .write.icon {
+        display: initial !important;
+      }
+    }
   }
   .label {
     font-size: 13px;
@@ -146,6 +151,7 @@
       width: 120px;
       text-align: right;
       border-right: 1px solid rgba(34, 36, 38, 0.45);
+      word-break: break-all;
     }
     .stats {
       font-size: 13px;

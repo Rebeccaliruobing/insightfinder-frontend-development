@@ -6,6 +6,7 @@ import { pick } from 'ramda';
 // TODO: Support deep level of the state.
 const persistPaths = [
   ['app', ['currentTheme', 'currentLocale']],
+  ['auth', ['credentials', 'userInfo']],
 ];
 
 const configureStorage = (

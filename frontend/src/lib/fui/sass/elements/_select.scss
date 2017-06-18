@@ -1,0 +1,81 @@
+@import "../variables";
+
+// Styles based on react-select default style
+$select-input-border-radius:        $border-radius !default;
+$select-input-height:               28px !default;
+$select-padding-horizontal:         0.75em;
+@import "~react-select/scss/default";
+
+// Override the style of input in ui form
+.ui.form {
+  .fui.select {
+    .Select-input {
+      > input {
+        // Override semantic input
+        border: 0 none !important;
+        box-shadow: none !important;
+      }
+    }
+  }
+}
+
+.fui.select-wrapper {
+  position: relative;
+  > .error-text {
+    font-size : $font-size-hint;
+    position: absolute;
+    margin-top: 2px;
+    top: 100%;
+  }
+}
+
+.fui.select {
+  font-size: $font-size-hint;
+  &.large {
+    font-size: $font-size-body;
+  }
+  &.inline:not(.is-open) {
+    .Select-control {
+      width: 100% !important;
+      min-width: 40px;
+      border-color: transparent;
+      &:hover {
+        box-shadow: none;
+      }
+      .Select-value {
+        z-index: 100;
+        position: relative;
+        padding-left: 0px;
+        padding-right: 0px;
+      }
+      .Select-input {
+        position: absolute;
+        top: 0;
+      }
+      .Select-arrow-zone {
+        padding-right: 0px;
+      }
+    }
+  }
+  .Select-control {
+    .Select-input {
+      padding-right: 0px;
+      > input {
+        /* For IE 8 compatibility */
+        width: 100%;
+        padding: 0px;
+        padding-top: ($select-input-internal-height - $font-size-hint) / 2 - 1;
+        padding-bottom: ($select-input-internal-height - $font-size-hint) / 2 - 1;
+      }
+    }
+    .Select-arrow-zone {
+      width: 24px;
+      text-align: right;
+      padding-left: $select-padding-horizontal / 3;
+      padding-right: $select-padding-horizontal;
+      > .fui.angle.icon {
+        font-size: 18px;
+      }
+    }
+  }
+}

@@ -54,7 +54,10 @@ class LogAnalysisCharts extends React.Component {
       rareLogEventArr: [],
       neuronValue: [],
     };
-    this.calculateData(props);
+  }
+
+  componentDidMount() {
+    this.calculateData(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -127,7 +130,7 @@ class LogAnalysisCharts extends React.Component {
 
     // make a copy, and filter out anomaly and small cluster, and run again
     const logEventArr = allLogEventArr.filter((el, index, arr) => {
-      return (!el.rareEventFlag);
+      return (el.clusteringResultFlag);
     });
     const rareLogEventArr = allLogEventArr.filter((el, index, arr) => {
       return (el.rareEventFlag);
@@ -387,6 +390,9 @@ class LogAnalysisCharts extends React.Component {
 
   @autobind()
   handlePatternSelected(pattern) {
+    if (!pattern) {
+      return;
+    }
     const { nonZeroFreqChartDatas, patterns, derivedAnomalyByMetric } = this.state;
     const pos = patterns.indexOf(pattern);
     const selectedPatternChartData = _.find(nonZeroFreqChartDatas, a => a.pattern == pattern);
@@ -498,7 +504,7 @@ class LogAnalysisCharts extends React.Component {
       patterns,
       derivedAnomalyByMetric,
     }, () => {
-      pattern && this.handlePatternSelected(patterns[0]);
+      patterns[0] && this.handlePatternSelected(patterns[0]);
     });
   }
 
@@ -639,6 +645,7 @@ margin: 0,
     const logEventArr = this.logEventArr;
     const neuronValue = this.neuronValue;
     const eventTableData = this.eventTableData;
+    console.log(eventTableData);
 
     if (logEventArr) {
       return (
@@ -681,15 +688,15 @@ margin: 0,
     const { tabStates } = this.state;
 
     return (
-      <Console.Wrapper>
+      <Console.Wrapper style={{ height: '100%' }}>
         <Console.Content
-          style={{ paddingLeft: 0 }} className={loading ? 'ui form loading' : ''}
+          style={{ paddingLeft: 0, height: '100%' }} className={loading ? 'ui form loading' : ''}
         >
           <div className="ui main tiny container" style={{ height: '100%' }}>
             <div className="flex-col-container" style={{ height: '100%' }}>
               <Button
                 className="small labeled icon"
-                style={{ position: 'absolute', right: 0, top: '1em' }}
+                style={{ position: 'absolute', right: 0, top: '1em', display: 'none' }}
                 onClick={() => onRefresh()}
               ><i className="icon refresh" />Refresh</Button>
               <div className="ui pointing secondary menu">

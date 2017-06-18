@@ -1,79 +1,100 @@
 import React from 'react';
-import { omit } from 'ramda';
+import { autobind, debounce } from 'core-decorators';
 import { connect } from 'react-redux';
 import Helmet from 'react-helmet';
-import { autobind, debounce } from 'core-decorators';
+import { IntlProvider } from 'react-intl';
+import Measure from 'react-measure';
 import { Container } from '../../lib/fui/react';
 import type { State } from '../../common/types';
-import start from '../../common/app/start';
 import { ThemeProvider } from '../../common/app/components';
-import { setWindowSize } from '../../common/app/actions';
+import { appStart, appStop, setViewport } from '../../common/app/actions';
+import { AppError, AppLoader, AppAlert } from './components';
 import Routing from './Routing';
-import Loading from './Loading';
 import * as themes from './themes';
-import '../../lib/fui/fui.scss';
+import './app.scss';
 
 type Props = {
+  history: Object,
+  appInited: bool,
+  appStarted: bool,
+  appLoaderVisible: bool,
+  messages: Object,
   currentLocale: string,
   currentTheme: string,
-  appStarted: bool,
-  setWindowSize: Function,
+  viewport: Object,
+  appStart: Function,
+  appStop: Function,
+  setViewport: Function,
 };
 
 // TODO: Listen scrolling event and save position into redux store.
 export class AppCore extends React.Component {
   props: Props;
 
-  // Use the static member to keep only one instance register the resize event.
-  static registeredInstance = null;
-
   @autobind
   @debounce(300)
-  handleOnResize() {
-    const width = window.innerWidth ||
-      document.documentElement.clientWidth || document.body.clientHeight;
-    const height = window.innerHeight ||
-      document.documentElement.clientHeight || document.body.clientHeight;
-    this.props.setWindowSize(width, height);
+  handleOnResize(dimensions) {
+    const { appStarted } = this.props;
+    if (appStarted) {
+      const { width, height } = dimensions;
+      const { width: currentWidth, height: currentHeight } = this.props.viewport;
+      if (width !== currentWidth || height !== currentHeight) {
+        this.props.setViewport(width, height);
+      }
+    }
   }
 
   componentDidMount() {
-    if (!AppCore.registeredInstance) {
-      AppCore.registeredInstance = this;
-      window.addEventListener('resize', this.handleOnResize, false);
+    if (!this.props.appStarted) {
+      this.props.appStart();
     }
   }
 
   componentWillUnmount() {
-    if (AppCore.registeredInstance === this) {
-      window.removeEventListener('resize', this.handleOnResize);
+    if (this.props.appStarted) {
+      this.props.appStop();
     }
   }
 
   render() {
-    const { appStarted, currentLocale, currentTheme, ...rest } = this.props;
-    const others = omit(['setWindowSize'], rest);
+    const { history, currentLocale, currentTheme, appStarted, messages,
+      appLoaderVisible, appInited } = this.props;
+
     return (
-      <ThemeProvider theme={themes[currentTheme] || themes.light}>
-        <Container fullHeight>
-          <Helmet
-            htmlAttributes={{
-              lang: currentLocale,
-              class: currentTheme ? `${currentTheme} theme` : '',
-            }}
-          />
-          <Routing {...others} />
-        </Container>
-      </ThemeProvider>
+      <IntlProvider
+        key={currentLocale} locale={currentLocale}
+        messages={messages[currentLocale] || messages.en}
+      >
+        <ThemeProvider theme={themes[currentTheme] || themes.light}>
+          <Measure onMeasure={this.handleOnResize}>
+            <Container fullHeight>
+              <Helmet
+                htmlAttributes={{
+                  lang: currentLocale,
+                  class: currentTheme ? `${currentTheme} theme` : '',
+                }}
+              />
+              <AppError />
+              <AppAlert />
+              <AppLoader visible={appLoaderVisible} />
+              {appStarted && <Routing history={history} />}
+            </Container>
+          </Measure>
+        </ThemeProvider>
+      </IntlProvider >
     );
   }
 }
 
 export default connect(
   (state: State) => ({
+    messages: state.app.messages,
     currentTheme: state.app.currentTheme,
     currentLocale: state.app.currentLocale,
+    viewport: state.app.viewport,
     appStarted: state.app.started,
+    appLoaderVisible: state.app.appLoaderVisible,
+    appInited: state.app.inited,
   }),
-  { setWindowSize },
-)(start(AppCore));
+  { setViewport, appStart, appStop },
+)(AppCore);

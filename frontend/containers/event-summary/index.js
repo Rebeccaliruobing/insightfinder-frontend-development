@@ -1,16 +1,19 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-console */
-import React, { PropTypes as T } from 'react';
-import store from 'store';
+import React from 'react';
+import { connect } from 'react-redux';
 import _ from 'lodash';
-import { withRouter } from 'react-router';
+import R from 'ramda';
 import moment from 'moment';
 import { autobind } from 'core-decorators';
 import DatePicker from 'react-datepicker';
+import { State } from '../../src/common/types';
+import withRouter from '../withRouter';
 import { Console, Dropdown } from '../../artui/react';
 import apis from '../../apis';
 import { IncidentsList } from '../../components/incidents';
 import IncidentsTreeMap from '../../components/incidents/treemap';
+import { hideAppLoader } from '../../src/common/app/actions';
 import {
   LiveProjectSelection,
   TreeMapSchemeSelect,
@@ -19,17 +22,15 @@ import {
 } from '../../components/selections';
 import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 
-class EventSummary extends React.Component {
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object,
-  };
+type Props = {
+  projects: Array<Object>,
+  hideAppLoader: Function,
+  router: Object,
+  location: Object,
+};
 
-  static propTypes = {
-    location: T.object,
-    router: T.shape({
-      push: T.func.isRequired,
-    }).isRequired,
-  };
+class EventSummaryCore extends React.Component {
+  props: Props;
 
   constructor(props) {
     super(props);
@@ -50,6 +51,8 @@ class EventSummary extends React.Component {
         instanceMetaData: {},
         eventStats: {},
       },
+      detectedEvents: [],
+      predictedEvents: [],
       loading: true,
       dataLoaded: false,
       selectedIncident: undefined,
@@ -60,6 +63,8 @@ class EventSummary extends React.Component {
       modelType: 'Holistic',
       instanceGroup: '',
       selectedInstance: undefined,
+      projectNotFound: false,
+      groupNotFound: false,
     };
   }
 
@@ -70,20 +75,41 @@ class EventSummary extends React.Component {
     if (projects.length === 0) {
       router.push('/log/incident-log-analysis');
     } else {
-      let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
-      if (!projectName ||
-        (projectName && !projects.find(item => item.projectName === projectName))) {
+      let { projectName } = location.query;
+
+      // If we don't set project name in url, select the first project; Otherwise
+      // check whether the project name is in the list.
+      if (projectName) {
+        if (!R.find(
+          p => p.projectName.toLowerCase() === projectName.toLowerCase(),
+          projects)) {
+          projectName = null;
+          this.setState({
+            projectNotFound: true,
+            groupNotFound: true,
+            loading: false,
+          });
+        }
+      } else {
         projectName = projects[0].projectName;
+        const query = this.applyDefaultParams({
+          ...location.query,
+          projectName,
+        });
+        router.push({
+          pathname: location.pathname,
+          query,
+        });
       }
-      this.handleProjectChange(projectName);
+
+      if (projectName) {
+        this.handleProjectChange(projectName);
+      }
     }
   }
 
   getLiveProjectInfos() {
-    // exclude GCP and File Replay
-    let pinfos = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    pinfos = pinfos.filter(item => item.fileProjectType !== 0);
-    return pinfos;
+    return this.props.projects;
   }
 
   @autobind()
@@ -116,6 +142,18 @@ class EventSummary extends React.Component {
       stats.endTimestamp = incident.endTimestamp;
       stats.maxAnomalyRatio = maxAnomalyRatio;
       stats.minAnomalyRatio = minAnomalyRatio;
+
+      // Use global instances/metrics if event doesn't include it
+      if (!stats.instances || stats.instances === '[]') {
+        stats.instances = data.instanceMetricJson.instances;
+      }
+      if (!stats.metrics || stats.metrics === '[]') {
+        stats.metrics = data.instanceMetricJson.metrics;
+      }
+      if (!stats.newInstances || stats.newInstances === '[]') {
+        stats.newInstances = data.instanceMetricJson.newInstances;
+      }
+
       incidentsTreeMap =
         buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
           data.statistics.instanceStatsJson,
@@ -212,47 +250,79 @@ class EventSummary extends React.Component {
 
   @autobind
   refreshInstanceGroup(params) {
-    const { location } = this.props;
+    const { location, hideAppLoader } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const modelType = query.modelType;
     const endTime = moment(query.endTime).endOf('day');
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime &&
+      endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
-
     const { projectName, instanceGroup } = query;
 
     const pinfo = this.getLiveProjectInfos().find(p => p.projectName === projectName);
     const pvalue = pinfo ? pinfo.pvalue : '0.99';
     const cvalue = pinfo ? pinfo.cvalue : '1';
 
-    store.set('liveAnalysisProjectName', projectName);
-
     this.setState({
       loading: true,
       dataLoaded: false,
+      groupNotFound: false,
     }, () => {
       apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
         pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
         .then((data) => {
+          // console.log(['eventSummary', data]);
+          // console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
           const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
           const maxAnomalyRatio = _.max(anomalyRatioLists);
           const minAnomalyRatio = _.min(anomalyRatioLists);
 
-          this.setState({
-            loading: false,
-            dataLoaded: true,
-            // incidentsTreeMap: data.incidentsTreeMap,
-            data,
-            maxAnomalyRatio,
-            minAnomalyRatio,
-            startTimestamp: data.startTimestamp,
-            endTimestamp: data.endTimestamp,
-          });
+          let detectedEvents = [];
+          let predictedEvents = [];
+          let gname = instanceGroup;
+          if (instanceGroup.indexOf(':') >= 0) {
+            gname = instanceGroup.split(':')[1];
+          }
+          const detectedPromise = apis.loadEvents(projectName, instanceGroup,
+            startTime.valueOf(), realEndTime.valueOf(), 'detected')
+            .then((data) => {
+              detectedEvents = data[gname] || [];
+            });
+          const predictedPromise = apis.loadEvents(projectName, instanceGroup,
+            startTime.valueOf(), realEndTime.valueOf(), 'predicted')
+            .then((data) => {
+              const tsNow = (new Date()).valueOf();
+              predictedEvents = R.filter(e => e.endTimestamp >= tsNow, data[gname] || []);
+            });
+
+          Promise.all([detectedPromise, predictedPromise])
+            .then(() => {
+              const incidents = _.concat(detectedEvents, predictedEvents);
+              data.incidents = incidents;
+              this.setState({
+                loading: false,
+                dataLoaded: true,
+                // incidentsTreeMap: data.incidentsTreeMap,
+                data,
+                maxAnomalyRatio,
+                minAnomalyRatio,
+                detectedEvents, predictedEvents,
+                startTimestamp: data.startTimestamp,
+                endTimestamp: data.endTimestamp,
+              }, () => {
+                hideAppLoader();
+              });
+            }).catch((msg) => {
+              this.setState({ loading: false });
+              hideAppLoader();
+              console.log(msg);
+            });
         }).catch((msg) => {
           this.setState({ loading: false });
+          hideAppLoader();
           console.log(msg);
         });
     });
@@ -260,42 +330,50 @@ class EventSummary extends React.Component {
 
   @autobind
   handleProjectChange(projectName) {
-    let { dashboardUservalues } = this.context;
-    let { projectModelAllInfo } = dashboardUservalues;
-    let project = projectModelAllInfo.find((info) => info.projectName == projectName);
-    let { predictionWindow } = project;
+    const projects = this.getLiveProjectInfos();
+    const project = R.find(
+      p => p.projectName.toLowerCase() === projectName.toLowerCase(), projects);
+    const { predictionWindow } = project;
 
     this.setState({
       loading: true,
       dataLoaded: false,
+      projectNotFound: false,
       predictionWindow,
       currentTreemapData: undefined,
     }, () => {
       apis.loadInstanceGrouping(projectName, 'getGrouping')
         .then((resp) => {
+          let groups = [];
           if (resp.groupingString) {
-            let groups = resp.groupingString.split(',').sort();
+            groups = resp.groupingString.split(',').sort();
             const pos = groups.indexOf('All');
             if (pos !== -1) {
               const len = groups.length;
               groups = groups.slice(1, len).concat(groups.slice(0, 1));
             }
+          }
 
-            // Get the group to display
-            const { location, router } = this.props;
-            let query = this.applyDefaultParams({
-              ...location.query,
-            });
+          const { location, router } = this.props;
+          let { instanceGroup } = location.query;
+          let groupNotFound = false;
 
-            let instanceGroup = query.instanceGroup;
-            if (groups && groups.length > 0) {
-              if (instanceGroup && groups.indexOf(instanceGroup) < 0) {
-                instanceGroup = groups[0];
-              }
-            } else {
-              instanceGroup = '';
+          if (instanceGroup) {
+            if (groups.indexOf(instanceGroup) < 0) {
+              groupNotFound = true;
+              this.setState({
+                groupNotFound,
+                instanceGroup: '',
+                instanceGroups: groups,
+                loading: false,
+              });
             }
-            query = this.applyDefaultParams({
+          } else if (groups.length > 0) {
+            instanceGroup = groups[0];
+          }
+
+          if (!groupNotFound) {
+            const query = this.applyDefaultParams({
               ...location.query,
               projectName,
               instanceGroup,
@@ -306,7 +384,10 @@ class EventSummary extends React.Component {
             });
 
             this.setState({
+              groupNotFound,
+              instanceGroup,
               instanceGroups: groups,
+              loading: false,
             }, () => {
               this.refreshInstanceGroup(query);
             });
@@ -375,12 +456,17 @@ class EventSummary extends React.Component {
   render() {
     const { location } = this.props;
     const params = this.applyDefaultParams(location.query);
-    const { projectName, instanceGroup, modelType, eventStartTimestamp } = params;
+    const { modelType, eventStartTimestamp } = params;
     const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
     const { loading, data, incidentsTreeMap, predictionWindow,
-      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme, selectedIncident,
-      instanceGroups, lineChartType, groupIdMap, dataLoaded } = this.state;
+      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme,
+      instanceGroups, groupIdMap, dataLoaded,
+      detectedEvents, predictedEvents,
+      projectNotFound, groupNotFound,
+    } = this.state;
+    const projectName = projectNotFound ? null : params.projectName;
+    const instanceGroup = groupNotFound ? null : params.instanceGroup;
 
     // Convert startTime, endTime to moment object
     startTime = moment(startTime, this.dateFormat);
@@ -388,7 +474,7 @@ class EventSummary extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') == curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
     const eventEndTime = moment(endTime).endOf('day').valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
@@ -397,12 +483,10 @@ class EventSummary extends React.Component {
     const instanceStatsMap = _.get(data, 'instanceMetricJson.instanceStatsJson', {});
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
-    const selectedIncidentPredicted = selectedIncident ? selectedIncident.predictedFlag : false;
-    // let selectedIncidentPredicted = selectedIncident ?
-    //   (selectedIncident.endTimestamp > latestTimestamp) : false;
-    // if (!selectedIncident && lineChartType && lineChartType === 'predicted') {
-    //   selectedIncidentPredicted = true;
-    // }
+
+    const hasTreeMapData = incidentsTreeMap && incidentsTreeMap.children
+      && incidentsTreeMap.children.length > 0;
+    const hasDataFlag = !!data.hasDataFlag;
 
     return (
       <Console.Content
@@ -443,6 +527,7 @@ class EventSummary extends React.Component {
               </Dropdown>
             </div>
             <div className="field">
+              <label style={{ fontWeight: 'bold' }}>Start Date:</label>
               <div className="ui input">
                 <DatePicker
                   selected={startTime}
@@ -472,7 +557,17 @@ class EventSummary extends React.Component {
               >Refresh</div>
             </div>
           </div>
-          <div
+          {projectNotFound &&
+            <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
+              Project <b>{params.projectName}</b> not found, please choose the project from the list.
+            </div>
+          }
+          {!projectNotFound && groupNotFound &&
+            <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
+              Project group <b>{params.instanceGroup}</b> not found, please choose group from the list.
+            </div>
+          }
+          {!projectNotFound && !groupNotFound && <div
             className="ui vertical segment flex-item flex-row-container"
             style={{ background: 'white', padding: 10, marginBottom: 10 }}
           >
@@ -483,6 +578,7 @@ class EventSummary extends React.Component {
                   instanceGroup={instanceGroup} eventEndTime={eventEndTime}
                   endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
                   incidents={data.incidents}
+                  detectedEvents={detectedEvents} predictedEvents={predictedEvents}
                   activeTab={predicted ? 'predicted' : 'detected'}
                   eventStartTimestamp={eventStartTimestamp}
                   onIncidentSelected={this.handleIncidentSelected}
@@ -495,9 +591,9 @@ class EventSummary extends React.Component {
               }
             </div>
             <div className="flex-item flex-col-container" style={{ width: '55%' }}>
-              <div style={{ padding: '5px 0px 6px' }}>
-                {treeMapScheme === 'anomaly' && <b>Show event by:&nbsp;&nbsp;</b>}
-                {treeMapScheme !== 'anomaly' && <b>Show instance by:&nbsp;&nbsp;</b>}
+              <div style={{ padding: '5px 0px 6px', borderBottom: '2px solid rgba(34,36,38,.15)' }}>
+                {treeMapScheme === 'anomaly' && <b style={{ paddingRight: '1em' }}>Show event by:</b>}
+                {treeMapScheme !== 'anomaly' && <b style={{ paddingRight: '1em' }}>Show instance by:</b>}
                 <TreeMapSchemeSelect
                   style={{ width: 130 }} value={treeMapScheme}
                   text={treeMapSchemeText}
@@ -515,21 +611,40 @@ class EventSummary extends React.Component {
                 />
                 }
               </div>
-              <IncidentsTreeMap
-                data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                endTime={realEndTime} numberOfDays={numberOfDays}
-                instanceStatsJson={instanceStatsMap}
-                treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
-                treeMapCPUThreshold={treeMapCPUThreshold}
-                treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                predictedFlag={selectedIncidentPredicted} instanceGroup={instanceGroup}
-              />
+              {hasTreeMapData &&
+                <IncidentsTreeMap
+                  data={incidentsTreeMap} instanceMetaData={instanceMetaData}
+                  endTime={realEndTime} numberOfDays={numberOfDays}
+                  instanceStatsJson={instanceStatsMap}
+                  treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
+                  treeMapCPUThreshold={treeMapCPUThreshold}
+                  treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                  predictedFlag={predicted} instanceGroup={instanceGroup}
+                />
+              }
+              {!hasTreeMapData && hasDataFlag &&
+                <div className="ui warning message">Metric data are being sent to InsightFinder intelligence engine successfully. Model training requires several hours of data. Please check back later</div>
+              }
+              {!hasTreeMapData && !hasDataFlag &&
+                <div className="ui warning message">Metric data collection failed. Please check your data source to make sure data are being sent to InsightFinder intelligence engine correctly</div>
+              }
             </div>
           </div>
+          }
         </div>
       </Console.Content>
     );
   }
 }
 
-export default withRouter(EventSummary);
+const EventSummary = withRouter(EventSummaryCore);
+
+export default connect(
+  (state: State) => {
+    return {
+      projects: R.filter(p => p.isMetric, state.app.projects),
+    };
+  },
+  { hideAppLoader },
+)(EventSummary);
+

@@ -1,0 +1,18 @@
+@import "../variables";
+
+.fui.message {
+  position: relative;
+  min-height: 1em;
+  margin: 1em 0;
+  padding: 0.5em 1em 0.5em 0.5em;
+  line-height: 1.4285em;
+  transition: opacity .1s ease,color .1s ease,background .1s ease,box-shadow .1s ease;
+  border-radius: $border-radius;
+  > .fui.close.icon {
+    position: absolute;
+    right: 0px;
+    top: 4px;
+    cursor: pointer;
+    color: inherit;
+  }
+}

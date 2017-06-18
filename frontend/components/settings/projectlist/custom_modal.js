@@ -43,7 +43,7 @@ class CustomProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, processName} = this.state;
-    if(projectName==null){
+    if(!projectName){
       alert("Project name cannot be empty.");
       return false;
     }
@@ -52,6 +52,11 @@ class CustomProjectModal extends React.Component {
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
+    if (projectCloudType !== 'LogFile' && !samplingInterval) {
+      alert('Sampling Interval cannot be empty.');
+      return false;
+    }
+
     apis.postAddCustomProject(projectName, projectCloudType, dataTypeString, samplingInterval, zone, access_key, secrete_key, processName).then((resp)=> {
       if(resp.success) {
         window.alert(resp.message);
@@ -94,7 +99,7 @@ class CustomProjectModal extends React.Component {
             </div>
             <div className="field">
               <label>Data Type</label>
-              <Dropdown mode="select" multiple={true} onChange={this.handleDataTypeChange} >
+              <Dropdown mode="select" multiple={false} onChange={this.handleDataTypeChange} >
                 <i className="dropdown icon" />
                 <div className="menu">
                   <div className="item" data-value="Metric">Metric</div>

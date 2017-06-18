@@ -5,7 +5,7 @@ import getEndpoint from './get-endpoint';
 
 const retrieveHeatmapData = (
   modelType, endTimestamp, numberOfDays, timezoneOffset, operation = 'loadHourly',
-  projectName = null, instanceGroup = 'All',
+  projectName = null, instanceGroup = null,
 ) => {
   const userName = store.get('userName');
   const token = store.get('token');

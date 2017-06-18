@@ -5,13 +5,13 @@ import moment from 'moment';
 import store from 'store';
 
 import {Modal, Dropdown} from '../../../artui/react/index';
+import withRouter from '../../../containers/withRouter';
 
 
 class CommentsModal extends React.Component {
 
   static contextTypes = {
     router: React.PropTypes.object,
-    location: React.PropTypes.object,
   };
 
   constructor(props) {
@@ -35,8 +35,8 @@ class CommentsModal extends React.Component {
   
   render() {
     let disabled = false;
-    let {projectName} = this.context.location.query;
-    let {comments} = this.state;
+    let { projectName } = this.props.location.query;
+    let { comments } = this.state;
 
     return (
       <Modal {...this.props} size="tiny" closable={false}>
@@ -79,4 +79,4 @@ class CommentsModal extends React.Component {
   }
 }
 
-export default CommentsModal;
+export default withRouter(CommentsModal);

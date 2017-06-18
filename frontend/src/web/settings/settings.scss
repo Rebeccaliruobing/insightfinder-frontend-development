@@ -1,0 +1,93 @@
+@charset "utf-8";
+@import "../../lib/fui/sass/variables";
+@import "../../lib/fui/sass/themes/colors";
+
+.settings.container {
+  .ui.steps {
+    font-size: 12px;
+    .step {
+      font-size: inherit;
+      padding: 1em 1.5em;
+      &:before {
+        width: 30px;
+      }
+      .description {
+        font-size: 12px;
+      }
+      .ui.label {
+        position: absolute;
+        right: 10px;
+        top: 8px;
+      }
+    }
+  }
+
+  .wizard.container {
+    .ui.vertical.menu {
+      min-height: 100%;
+      .item {
+        cursor: pointer;
+        .checkmark.icon {
+          position: absolute;
+          left: -8px;
+          color: #21BA45;
+        }
+      }
+    }
+    .precedure {
+      width: 736px;
+      font-size: 14px;
+      p {
+        margin-bottom: 0.5em;
+      }
+      pre {
+        padding: 16px;
+        overflow: scroll;
+        font-size: 85%;
+        line-height: 1.45;
+        background-color: #f6f8fa;
+        border-radius: 3px;
+      }
+      code {
+        display: inline;
+        padding: 0;
+        margin: 0;
+        line-height: inherit;
+        word-wrap: normal;
+        background-color: transparent;
+        border: 0;
+      }
+    }
+    .ui.form {
+      > * {
+        margin-bottom: 1em;
+        &:last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      > .text {
+        font-size: 13px;
+      }
+      .inline.field {
+        margin: 0 0 1.5em;
+        > label {
+          width: 30%;
+          padding-right: 1em;
+          margin: 0;
+          display: inline-block;
+          font-weight: $font-weight-regular;
+        }
+        > .ui.input {
+          width: 70%;
+          margin: 0;
+        }
+        > .desc {
+          font-size: 12px;
+        }
+        .ui.button {
+          min-width: 120px;
+        }
+      }
+    }
+  }
+}

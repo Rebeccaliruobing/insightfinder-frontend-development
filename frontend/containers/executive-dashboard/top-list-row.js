@@ -54,7 +54,7 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
 
 
 const ListRow = ({
-  name, data, onRowClick, onNameClick, onActionClick,
+  name, data, onRowClick, onNameClick, onActionClick, style,
   type, isProject = false, expanded = true }) => {
   const { stats, color } = data;
   const projectStyle = isProject ? { fontWeight: 'bold' } : {};
@@ -62,6 +62,7 @@ const ListRow = ({
     <tr
       style={{
         borderLeft: `2px solid rgb(${color})`,
+        ...style,
       }}
       className={isProject ? 'project' : 'group'}
       onClick={onRowClick}
@@ -74,15 +75,15 @@ const ListRow = ({
             <i onClick={onNameClick} className="link external icon" />
           </OverlayTrigger>
         }
-        {!isProject && <i className="icon" />}
+        {false && !isProject && type === 'anomaly' &&
+          <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
+            <i className="random icon" onClick={onActionClick} />
+          </OverlayTrigger>
+        }
+
         <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
           <span className="name" style={projectStyle}>{name}</span>
         </OverlayTrigger>
-        {isProject && type === 'anomaly' &&
-          <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
-            <i className="hoverable random icon" onClick={onActionClick} />
-          </OverlayTrigger>
-        }
       </td>
 
       {type === 'anomaly' &&
@@ -128,7 +129,7 @@ const ListRow = ({
           {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), false)}
         </div>
       </td>}
-      {type == 'anomaly' && <td className="number predicted">
+      {type === 'anomaly' && <td className="number predicted">
         <div>
           <i
             className="long arrow right icon"
@@ -236,6 +237,7 @@ ListRow.propTypes = {
   name: T.string,
   type: T.string,
   data: T.object,
+  style: T.object,
   expanded: T.bool,
   isProject: T.bool,
   onRowClick: T.func,

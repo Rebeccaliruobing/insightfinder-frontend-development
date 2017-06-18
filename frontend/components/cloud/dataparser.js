@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 
 const chopString = (str, n) => (str.length <= (n + 2) ? str : `${str.slice(0, n)}..`);
-const _hintDisplayLimit = 3;
+const _hintDisplayLimit = 3000;
 
 class DataParser {
 
@@ -722,7 +722,7 @@ class DataParser {
                     //   newhints = newhints + "; ";
                     // }
                   } catch (err) {
-                    newhints = hints[1];
+                    // newhints = hints[1];
                   }
                   let anomalyThisMetric = anomalyByMetricObj[metric];
                   if(anomalyThisMetric==undefined){
@@ -764,7 +764,7 @@ class DataParser {
 
     let timestamps = [];
     let nonZeroFreqVectors = {};
-    if(freqVectorObj!=undefined){
+    if(freqVectorObj && !_.isEmpty(freqVectorObj)){
       let timestampContent = freqVectorObj['timestamp'];
       let timestampParts = timestampContent.split(',');
       _.each(timestampParts, function (part, idx) {

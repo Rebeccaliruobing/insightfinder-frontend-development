@@ -1,9 +1,9 @@
 import React from 'react';
 import moment from 'moment';
-import ReactTimeout from 'react-timeout';
+import { autobind } from 'core-decorators';
 import { Console } from '../../artui/react';
 import apis from '../../apis';
-import LiveAnalysisCharts from '../cloud/liveanalysis';
+import LiveAnalysisCharts from '../cloud/liveanalysis/LiveAnalysisCharts';
 
 const ProjectDetails = class extends React.Component {
 
@@ -23,38 +23,43 @@ const ProjectDetails = class extends React.Component {
   }
 
   componentDidMount() {
-    (this.props.updateData || this.updateData.bind(this))(this);
+    (this.props.updateData || this.updateData)(this);
   }
 
+  @autobind
   updateData() {
-    let { query } = this.props.location;
-    let { pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller } = query;
-    let startTimestamp = undefined;
-    let endTimestamp = undefined;
+    const { query } = this.props.location;
+    const { pvalue, cvalue, modelKey, modelName,
+      projectName, groupId, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,
+      latestDataTimestamp, caller } = query;
+    let startTimestamp;
+    let endTimestamp;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
-      let parts = dataChunkName.split('_');
-      startTimestamp = +moment(parts[3]);
-      endTimestamp = +moment(parts[4]);
+      const parts = dataChunkName.split('_');
+      startTimestamp = +moment(Number(parts[3]) || parts[3]);
+      endTimestamp = +moment(Number(parts[4]) || parts[4]);
     }
 
     this.setState({ loading: true }, () => {
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName, projectName, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller)
+      apis.postUseCase(pvalue, cvalue, modelKey, modelName,
+        projectName, groupId, modelType, fromUser,
+        dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller)
         .then((resp) => {
           resp.loading = false;
           this.setState(resp, () => {
             // fetch syscall results
             if (projectName && startTimestamp && endTimestamp) {
-              let projectName0 = projectName + "@" + fromUser;
+              const projectName0 = `${projectName  }@${  fromUser}`;
               apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then((resp2) => {
                 if (resp2.success) {
                   this.setState({
                     debugData: resp2.data.syscallResults,
                     freqRanking: resp2.data.freqFunctionList,
                     timeRanking: resp2.data.timeFunctionList,
-                    showSysCall: true
+                    showSysCall: true,
                   });
                 } else {
-                  console.log(resp2.message + ", start:" + startTimestamp + ",end:" + endTimestamp);
+                  console.log(`${resp2.message  }, start:${  startTimestamp  },end:${  endTimestamp}`);
                 }
               });
             }
@@ -96,4 +101,4 @@ const ProjectDetails = class extends React.Component {
   }
 };
 
-export default ReactTimeout(ProjectDetails);
+export default ProjectDetails;

@@ -83,11 +83,14 @@ class MetricModal extends React.Component {
     if (avgLabel !== undefined) {
       chartLabel = avgLabel;
     }
+    let startString = moment(startTimestamp).format("YYYY-MM-DD HH:mm");
+    let endString = moment(endTimestamp).format("YYYY-MM-DD HH:mm");
+    let periodString = " start: "+startString+", end: "+endString;
     return (
       <Modal closable onClose={onClose}>
         {showErrorMsg ?
           <div className={classes} style={{ height: 300 }}>
-            <h3>Metric data unavailable for this period.</h3>
+            <h3>Metric data unavailable for this period: {periodString}.</h3>
           </div>
           :
           <div className={classes} style={{ height: 300 }}>

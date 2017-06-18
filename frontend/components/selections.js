@@ -1,29 +1,22 @@
 import React from 'react';
-import {Dropdown, Link} from '../artui/react/index';
-import classNames from 'classnames';
-import _ from "lodash";
+import R from 'ramda';
+import { connect } from 'react-redux';
+import _ from 'lodash';
+import { State } from '../src/common/types';
+import { Dropdown } from '../artui/react/index';
 
-class ProjectSelection extends React.Component {
-
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
+class ProjectSelectionCore extends React.Component {
   render() {
-
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
+    const { projects, ...rest } = this.props;
     return (
-      <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
+      <Dropdown mode="select" {...rest}>
+        <i className="dropdown icon" />
+        <div className="menu">
           {
             projects.map((p) => {
-              return <div className="item" key={p.projectName}
-                          data-value={p.projectName}>{p.projectName}</div>
+              return (
+                <div className="item" key={p.projectName} data-value={p.projectName}>{p.projectName}</div>
+              );
             })
           }
         </div>
@@ -31,59 +24,25 @@ class ProjectSelection extends React.Component {
     );
   }
 }
-
-class GroupSelection extends React.Component {
-
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-
-    let s = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    return (
-      <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
-          {
-            groups.map((p) => {
-              return <div className="item" key={p.groupName}
-                          data-value={p.groupName}>{p.groupName}</div>
-            })
-          }
-        </div>
-      </Dropdown>
-    );
-  }
-}
+const ProjectSelection = connect(
+  (state: State) => ({
+    projects: state.app.projects,
+  }), {},
+)(ProjectSelectionCore);
 
 // include only and File Replay
-class LogFileReplayProjectSelection extends React.Component {
-
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
+class LogFileReplayProjectSelectionCore extends React.Component {
   render() {
-
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.fileProjectType == 0);
+    const { projects, ...rest } = this.props;
     return (
-      <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
+      <Dropdown mode="select" {...rest}>
+        <i className="dropdown icon" />
+        <div className="menu">
           {
             projects.map((p) => {
-              return <div className="item" key={p.projectName}
-                          data-value={p.projectName}>{p.projectName}</div>
+              return (
+                <div className="item" key={p.projectName} data-value={p.projectName}>{p.projectName}</div>
+              );
             })
           }
         </div>
@@ -91,30 +50,24 @@ class LogFileReplayProjectSelection extends React.Component {
     );
   }
 }
+const LogFileReplayProjectSelection = connect(
+  (state: State) => ({
+    projects: R.filter(p => p.isLogFile, state.app.projects),
+  }), {},
+)(LogFileReplayProjectSelectionCore);
 
-// exclude GCP and File Replay
-class InstanceProjectSelection extends React.Component {
-
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
+class InstanceProjectSelectionCore extends React.Component {
   render() {
-
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => ((item.fileProjectType!=0)&&(item.projectType!="GAE")&&(item.projectType!="GCE")));
+    const { projects, ...rest } = this.props;
     return (
-      <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
+      <Dropdown mode="select" {...rest}>
+        <i className="dropdown icon" />
+        <div className="menu">
           {
             projects.map((p) => {
-              return <div className="item" key={p.projectName}
-                          data-value={p.projectName}>{p.projectName}</div>
+              return (
+                <div className="item" key={p.projectName} data-value={p.projectName}>{p.projectName}</div>
+              );
             })
           }
         </div>
@@ -122,31 +75,25 @@ class InstanceProjectSelection extends React.Component {
     );
   }
 }
+const InstanceProjectSelection = connect(
+  (state: State) => ({
+    projects: R.filter(p => p.isMetric, state.app.projects),
+  }), {},
+)(InstanceProjectSelectionCore);
 
 // exclude GCP and File Replay
-class LiveProjectSelection extends React.Component {
-
-  static contextTypes = {
-    dashboardUservalues: React.PropTypes.object
-  };
-
-  constructor(props) {
-    super(props);
-  }
-
+class LiveProjectSelectionCore extends React.Component {
   render() {
-
-    let projects = (this.context.dashboardUservalues || {}).projectSettingsAllInfo || [];
-    projects = projects.filter((item,index) => item.fileProjectType!=0);
-    var projectNameList = [];
+    const { projects, ...rest } = this.props;
     return (
-      <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-        <div className="menu"> 
+      <Dropdown mode="select" {...rest}>
+        <i className="dropdown icon" />
+        <div className="menu">
           {
-            projects.map((p,index) => {
-              return <div className="item" key={p.projectName+index}
-                          data-value={p.projectName}>{p.projectName}</div>
+            projects.map((p, index) => {
+              return (
+                <div className="item" key={p.projectName + index} data-value={p.projectName}>{p.projectName}</div>
+              );
             })
           }
         </div>
@@ -154,116 +101,122 @@ class LiveProjectSelection extends React.Component {
     );
   }
 }
+const LiveProjectSelection = connect(
+  (state: State) => ({
+    projects: R.filter(p => p.isMetric, state.app.projects),
+  }), {},
+)(LiveProjectSelectionCore);
+
 
 class ModelNameSelection extends React.Component {
 
   static contextTypes = {
     dashboardUservalues: React.PropTypes.object
   };
-  constructor(props){
+  constructor(props) {
     super(props);
   }
-  splitModelString(model){
-    let result = model.split(',').map(function (value,index) {
-        return value.split('(')[0]
+  splitModelString(model) {
+    let result = model.split(',').map(function (value, index) {
+      return value.split('(')[0]
     });
     return _.uniq(result)
   }
-  render(){
+  render() {
     let modelString = this.splitModelString((this.context.dashboardUservalues || {}).modelString || "");
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-          <div className="menu">
-            {
-              (modelString || []).map(function (value,index) {
-                return (
-                    <div className="item" key={index} data-value={value}>
-                      {value}
-                    </div>
-                )
-              })
-            }
-          </div>
+        <i className="dropdown icon" />
+        <div className="menu">
+          {
+            (modelString || []).map(function (value, index) {
+              return (
+                <div className="item" key={index} data-value={value}>
+                  {value}
+                </div>
+              )
+            })
+          }
+        </div>
       </Dropdown>
     );
   }
 }
 
 class OperationOptionsSelect extends React.Component {
-  render(){
-    let selectOption = ['update','revert','delete'];
-      return (
+  render() {
+    let selectOption = ['update', 'revert', 'delete'];
+    return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-          <div className="menu">
-            {
-              selectOption.map(function (value,index) {
-                return (
-                    <div className="item" key={index} data-value={value}>
-                      {value}
-                    </div>
-                )
-              })
-            }
-          </div>
+        <i className="dropdown icon" />
+        <div className="menu">
+          {
+            selectOption.map(function (value, index) {
+              return (
+                <div className="item" key={index} data-value={value}>
+                  {value}
+                </div>
+              )
+            })
+          }
+        </div>
       </Dropdown>
     );
   }
 }
 
 class TreeMapCPUThresholdSelect extends React.Component {
-  render(){
+  render() {
     let selectOption = [0, 1, 5, 10];
-      return (
+    return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-          <div className="menu">
-            {
-              selectOption.map(function (value,index) {
-                return (
-                    <div className="item" key={index} data-value={value}>
-                      {'<='+value+'%'}
-                    </div>
-                )
-              })
-            }
-          </div>
+        <i className="dropdown icon" />
+        <div className="menu">
+          {
+            selectOption.map(function (value, index) {
+              return (
+                <div className="item" key={index} data-value={value}>
+                  {'<=' + value + '%'}
+                </div>
+              )
+            })
+          }
+        </div>
       </Dropdown>
     );
   }
 }
 
 class TreeMapAvailabilityThresholdSelect extends React.Component {
-  render(){
+  render() {
     let selectOption = [90, 80, 50, 25];
-      return (
+    return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
-          <div className="menu">
-            {
-              selectOption.map(function (value,index) {
-                return (
-                    <div className="item" key={index} data-value={value}>
-                      {'<='+value+'%'}
-                    </div>
-                )
-              })
-            }
-          </div>
+        <i className="dropdown icon" />
+        <div className="menu">
+          {
+            selectOption.map(function (value, index) {
+              return (
+                <div className="item" key={index} data-value={value}>
+                  {'<=' + value + '%'}
+                </div>
+              )
+            })
+          }
+        </div>
       </Dropdown>
     );
   }
 }
 
-class LogModelType extends React.Component{
+class LogModelType extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="holisticLog">Holistic</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
@@ -274,14 +227,14 @@ class LogModelType extends React.Component{
 };
 
 // <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
-class ModelType extends React.Component{
+class ModelType extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
           <div className="item" data-value="Split">Split</div>
@@ -294,14 +247,14 @@ class ModelType extends React.Component{
 };
 
 // <div className="item" data-value="HolisticCP">Holistic + Filtering</div>
-class BenchmarkModelType extends React.Component{
+class BenchmarkModelType extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="Holistic">IF Anomaly Detection</div>
           <div className="item" data-value="DBScan">Clustering (DBScan)</div>
@@ -311,14 +264,14 @@ class BenchmarkModelType extends React.Component{
   }
 };
 
-class FileModelType extends React.Component{
+class FileModelType extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
           <div className="item" data-value="SplitByGroup">SplitByGroup</div>
@@ -332,14 +285,14 @@ class FileModelType extends React.Component{
   }
 };
 
-class ModelTypeSimple extends React.Component{
+class ModelTypeSimple extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
           <div className="item" data-value="SplitByGroup">SplitByGroup</div>
@@ -351,14 +304,14 @@ class ModelTypeSimple extends React.Component{
   }
 };
 
-class EventSummaryModelType extends React.Component{
+class EventSummaryModelType extends React.Component {
   componentDidMount() {
     if (!this.props.value) this.props.onChange && this.props.onChange('Holistic');
   }
   render() {
     return (
       <Dropdown mode="select" {...this.props}>
-        <i className="dropdown icon"/>
+        <i className="dropdown icon" />
         <div className="menu">
           <div className="item" data-value="Holistic">Holistic</div>
           <div className="item" data-value="Threshold">Threshold</div>
@@ -369,10 +322,10 @@ class EventSummaryModelType extends React.Component{
   }
 };
 
-const  RareEventSensitivity = (props) => {
+const RareEventSensitivity = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item" data-value="1">Low</div>
         <div className="item" data-value="2">Medium Low</div>
@@ -384,10 +337,10 @@ const  RareEventSensitivity = (props) => {
   );
 };
 
-const  AnomalyThresholdSensitivity = (props) => {
+const AnomalyThresholdSensitivity = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item" data-value="0.99">Low</div>
         <div className="item" data-value="0.95">Medium Low</div>
@@ -399,10 +352,10 @@ const  AnomalyThresholdSensitivity = (props) => {
   );
 };
 
-const  AnomalyThreshold = (props) => {
+const AnomalyThreshold = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">0.99</div>
         <div className="item">0.97</div>
@@ -415,10 +368,10 @@ const  AnomalyThreshold = (props) => {
   );
 };
 
-const DurationThreshold =  (props) => {
+const DurationThreshold = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">1</div>
         <div className="item">2</div>
@@ -438,7 +391,7 @@ const DurationThreshold =  (props) => {
 const WindowWithWeek = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item" selected>1</div>
         <div className="item">2</div>
@@ -455,7 +408,7 @@ const WindowWithWeek = (props) => {
 const DurationHour = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">6</div>
         <div className="item">12</div>
@@ -469,7 +422,7 @@ const DurationHour = (props) => {
 const IncidentDurationMinute = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">0</div>
         <div className="item">5</div>
@@ -484,7 +437,7 @@ const IncidentDurationMinute = (props) => {
 const IncidentActionTaken = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">ignore</div>
         <div className="item">scale-up</div>
@@ -498,7 +451,7 @@ const IncidentActionTaken = (props) => {
 const NumberOfDays = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item" selected>1</div>
         <div className="item">3</div>
@@ -515,7 +468,7 @@ const NumberOfDays = (props) => {
 const TreeMapSchemeSelect = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item" data-value='anomaly'>Anomaly</div>
         <div className="item" data-value='cpu'>CPU Utilization</div>
@@ -528,7 +481,7 @@ const TreeMapSchemeSelect = (props) => {
 const PredictionWindowHour = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">4</div>
         <div className="item">12</div>
@@ -542,7 +495,7 @@ const PredictionWindowHour = (props) => {
 const ForecastIntervalHour = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">3</div>
         <div className="item">6</div>
@@ -556,7 +509,7 @@ const ForecastIntervalHour = (props) => {
 const EnvironmentSelect = (props) => {
   return (
     <Dropdown mode="select" {...props}>
-      <i className="dropdown icon"/>
+      <i className="dropdown icon" />
       <div className="menu">
         <div className="item">prod</div>
         <div className="item">staging</div>
@@ -607,7 +560,6 @@ const GroupingSeperateModelSelection = props => (
 
 export {
   ProjectSelection,
-  GroupSelection,
   LiveProjectSelection,
   OperationOptionsSelect,
   ModelNameSelection,

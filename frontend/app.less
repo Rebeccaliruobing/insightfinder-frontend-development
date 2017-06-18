@@ -128,6 +128,8 @@
     > .logo {
       width: 160px;
       background: #2196f3;
+      text-align: left;
+      padding-left: 16px;
       //background: #ffffff;
       //border-bottom: thin solid #2f88e1;
     }
@@ -814,6 +816,9 @@
   color: transparent !important;
   -webkit-transition: all 0s linear;
   transition: all 0s linear;
+  label {
+    color: rgba(0, 0, 0, 0.87);
+  }
 }
 
 .ui.loading.container:before {
@@ -954,10 +959,15 @@
 .dygraph.popup-content {
   font-size: 12px;
   overflow: auto;
-  max-height: 300px;
+  max-height: 200px;
   > .header {
     font-weight: bold;
+    font-size: 13px;
+    .icon {
+      padding-left: 2em;
+      cursor: pointer;
+      color: #4183C4;
+    }
   }
-  > .content {
-  }
+  > .content {}
 }

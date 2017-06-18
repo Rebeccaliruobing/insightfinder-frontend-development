@@ -1,9 +1,7 @@
 /* @flow */
-// import { Observable } from 'rxjs/Observable';
-import { REHYDRATE } from 'redux-persist/constants';
-import type { Action } from '../types';
+import type { Action, Message, Filters } from '../types';
 
-export const setCurrentTheme = (theme?: string): Action => ({
+export const setCurrentTheme = (theme: string): Action => ({
   type: 'SET_CURRENT_THEME',
   payload: { theme },
 });
@@ -13,9 +11,13 @@ export const setCurrentLocale = (locale: string): Action => ({
   payload: { locale },
 });
 
-export const setWindowSize = (width: number, height: number): Action => ({
-  type: 'SET_WINDOW_SIZE',
+export const setViewport = (width: number, height: number): Action => ({
+  type: 'SET_VIEWPORT',
   payload: { width, height },
+});
+
+export const appRehydrated = (): Action => ({
+  type: 'APP_REHYDRATED',
 });
 
 export const appStart = (): Action => ({
@@ -30,15 +32,35 @@ export const appStop = (): Action => ({
   type: 'APP_STOP',
 });
 
-export const appError = (error: Error): Action => ({
-  type: 'APP_ERROR',
-  payload: { error },
+export const setInitData = (data: Object): Action => ({
+  type: 'SET_INIT_DATA',
+  payload: data,
 });
 
-const appStartEpic = (action$: any) =>
-  action$.ofType(REHYDRATE)
-    .map(appStarted);
+export const showAppLoader = (): Action => ({
+  type: 'SHOW_APP_LOADER',
+});
 
-export const epics = [
-  appStartEpic,
-];
+export const hideAppLoader = (): Action => ({
+  type: 'HIDE_APP_LOADER',
+});
+
+export const setAppFilters = (filters: Filters): Action => ({
+  type: 'SET_APP_FILTERS',
+  payload: filters,
+});
+
+export const appError = (message: ?Message, error: ?Error): Action => ({
+  type: 'APP_ERROR',
+  payload: { message, error },
+});
+
+export const showAppAlert = (type: string, message: Message, params: ?Object): Action => ({
+  type: 'SHOW_APP_ALERT',
+  payload: { type, message, params },
+});
+
+export const hideAppAlert = (ids: Array<string>): Action => ({
+  type: 'HIDE_APP_ALERT',
+  payload: { ids },
+});

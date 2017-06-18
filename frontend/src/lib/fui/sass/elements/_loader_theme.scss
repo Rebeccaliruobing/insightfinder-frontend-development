@@ -1,0 +1,15 @@
+.fui.loader {
+  background-color: rgba($body-bg-color, 1.0);
+  > .content {
+    &:before {
+      border: 2px solid $loader-border-color;
+      background-color: $loader-bg-color;
+    }
+    &:after {
+      border-top-color: $primary-color;
+    }
+  }
+  &.full-screen {
+    background-color: $body-bg-color;
+  }
+}

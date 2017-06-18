@@ -1,14 +1,23 @@
 import 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { epics as appEpics } from './app/actions';
-import { epics as sessionEpics } from './session/actions';
+import appEpics from './app/epics';
+import authEpics from './auth/epics';
+import metricEpics from './metric/epics';
+import logEpics from './log/epics';
+import usecaseEpics from './usecase/epics';
 
 const epics = [
   ...appEpics,
-  ...sessionEpics,
+  ...authEpics,
+  ...metricEpics,
+  ...logEpics,
+  ...usecaseEpics,
 ];
 
 const configureEpics = deps => (action$, { getState }) =>
-  combineEpics(...epics)(action$, { ...deps, getState });
+  combineEpics(...epics)(action$, {
+    ...deps,
+    getState,
+  });
 
 export default configureEpics;

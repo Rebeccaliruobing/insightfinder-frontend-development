@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import shallowCompare from 'react-addons-shallow-compare';
-import CausalGraph from '../display-model/CausalGraph'
-import {Modal} from '../../../artui/react';
+import CausalGraph from '../display-model/CausalGraph';
+import { Modal } from '../../../artui/react';
 
 class TenderModal extends React.Component {
 
@@ -10,19 +11,20 @@ class TenderModal extends React.Component {
   }
 
   render() {
-    let {dataArray, startTimestamp, endTimestamp, types, ...rest} = this.props;
+    const { dataArray, startTimestamp, endTimestamp, types, ...rest } = this.props;
     if (dataArray && types) {
       return (
-        <Modal {...rest} size="big" closable={true}>
+        <Modal {...rest} size="big" closable>
           <div className="content">
-            <CausalGraph dataArray={dataArray}
-                         types={types}
-                         endTimestamp={endTimestamp}
-                         startTimestamp={startTimestamp}/>
+            <CausalGraph
+              dataArray={dataArray} types={types}
+              startTimestamp={startTimestamp} endTimestamp={endTimestamp}
+            />
           </div>
         </Modal>
       );
     }
+    return null;
   }
 }
 

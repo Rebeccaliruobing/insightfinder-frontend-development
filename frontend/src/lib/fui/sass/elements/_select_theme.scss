@@ -1,0 +1,12 @@
+.fui.select {
+  &.invalid {
+    > .Select-control {
+      border-color: $error-color;
+    }
+  }
+}
+.fui.select-wrapper {
+  .error-text {
+    color: $error-color;
+  }
+}

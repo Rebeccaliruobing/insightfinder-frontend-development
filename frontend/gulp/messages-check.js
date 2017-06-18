@@ -4,13 +4,13 @@ import loadLocaleMessages from '../src/common/loadLocaleMessages';
 import { diff } from './support/messages';
 
 gulp.task('messages-check', ['messages-extract'], () => {
-  const messages = loadLocaleMessages();
-  const messagesKeys = Object.keys(messages.en);
+  const locales = loadLocaleMessages();
+  const messagesKeys = Object.keys(locales.en.messages);
 
-  Object.keys(messages)
+  Object.keys(locales)
     .filter(locale => locale !== 'en')
     .forEach((locale) => {
-      const localeMessagesKeys = Object.keys(messages[locale]);
+      const localeMessagesKeys = Object.keys(locales[locale].messages);
       const missingMessagesKeys = diff(messagesKeys, localeMessagesKeys);
       const unusedMessagesKeys = diff(localeMessagesKeys, messagesKeys);
 

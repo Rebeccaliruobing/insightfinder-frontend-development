@@ -198,6 +198,7 @@ export function retrieveLiveAnalysis(projectName, modelType, instanceGroup, pval
           ret['eventsCausalRelation'] = data['eventsCausalRelation'] || {};
           // ret['incidentsTreeMap'] = buildTreemap(projectName, projectName+" ("+numberOfDays+"d)", statistics, heatmap);
           ret['incidents'] = incidentList;
+          ret['hasDataFlag'] = data.hasDataFlag;
 
           resolve(ret);
         } catch (e) {
