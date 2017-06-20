@@ -1,8 +1,11 @@
 /* @flow */
-import buildUrl from './buildUrl';
+import buildLocation from './buildLocation';
 
+/**
+ * Build the location based on the match object in routing.
+ */
 const buildMatchLocation = (match: Object, props: Object, params: ?Object) => {
-  return buildUrl(match.path, props, params);
+  return buildLocation(match.path, props, params);
 };
 
 export default buildMatchLocation;

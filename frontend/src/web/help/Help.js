@@ -48,7 +48,7 @@ class Help extends React.Component {
                 <div className="card">
                   <i className="dashboard icon" />
                   <h3>Dashboard</h3>
-                  <Link to={BaseUrls.MetricAnalysisBase} className="item">&bull; View and compare group level anomaly or resource statistics of your projects.</Link>
+                  <Link to={BaseUrls.MetricAnalysis} className="item">&bull; View and compare group level anomaly or resource statistics of your projects.</Link>
                   <Link to={BaseUrls.MetricEvents} className="item">&bull; View realtime anomaly detection and root cause analysis results.</Link>
                   <Link to={BaseUrls.MetricAppForecast} className="item">&bull; View application level forecast for resource planning.</Link>
                 </div>

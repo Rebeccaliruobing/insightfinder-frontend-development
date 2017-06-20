@@ -17,7 +17,7 @@ const loadWeeklyAnomalies = (
   credentials: Credentials,
   params: Object,
 ) => {
-  const { projectId, startTime, endTime } = params;
+  const { projectName, startTime, endTime } = params;
   const dateFormat = 'YYYY-MM-DD';
   const mStartTime = moment(startTime, dateFormat);
   const mEndTime = moment(endTime, dateFormat);
@@ -32,7 +32,7 @@ const loadWeeklyAnomalies = (
     getEndpoint('execDashboard'), {
       ...credentials,
       operation: 'loadAnomalyAll',
-      projectName: projectId,
+      projectName,
       modelType: 'Holistic',
       timezoneOffset: moment().utcOffset(),
       numberOfDays,

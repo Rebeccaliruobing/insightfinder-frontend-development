@@ -1,22 +1,18 @@
 /* @flow */
-import qs from 'qs';
-import { forEachObjIndexed } from 'ramda';
-import { isEmpty } from 'lodash';
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
 
-const buildUrl = (path: string, props: Object, params: ?Object) => {
-  forEachObjIndexed((val, key) => {
-    path = path.replace(`/:${key}?`, `/${val || ''}`);
-    path = path.replace(`/:${key}`, `/${val || ''}`);
-  }, props);
+import buildLocation from './buildLocation';
 
-  if (!params || isEmpty(params)) {
-    return path;
-  }
-
-  return {
-    pathname: path,
-    search: `?${qs.stringify(params)}`,
-  };
+/**
+ * Build the url string.
+ */
+const buildUrl = (path: String, props: ?Object, params: ?Object) => {
+  const { pathname, search } = buildLocation(path, props, params);
+  return pathname + (search || '');
 };
 
 export default buildUrl;

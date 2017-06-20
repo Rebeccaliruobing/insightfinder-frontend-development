@@ -8,17 +8,13 @@
 /**
  * The urls used for creating routing, and also for generating links. Keep all
  * urls here will make change urls easy.
- *
- * For urls with parameters, there is a base version of the url, the base version
- * is used for redirect or link with parameters.
  **/
 const BaseUrls = {
   Help: '/help',
   AccountInfo: '/account-info',
 
   Metric: '/metric',
-  MetricAnalysis: '/metric/live-analysis/:projectId?',
-  MetricAnalysisBase: '/metric/live-analysis',
+  MetricAnalysis: '/metric/live-analysis',
   MetricEvents: '/metric/events',
   MetricAppForecast: '/metric/app-forecast',
   MetricLineCharts: '/metric/line-charts',

@@ -63,6 +63,7 @@ export type MetricState = {
   currentHourlyEvents: ?Object,
   currentHourlyEventsLoading: bool,
   currentWeeklyAnomalies: ?Object,
+  currentErrorMessage: ?Message,
 };
 
 export type LogState = {

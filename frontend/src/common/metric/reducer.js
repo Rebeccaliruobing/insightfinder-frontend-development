@@ -6,6 +6,7 @@ const initialState: MetricState = {
   currentHourlyEvents: null,
   currentHourlyEventsLoading: false,
   currentWeeklyAnomalies: null,
+  currentErrorMessage: null,
 };
 
 const reducer = (

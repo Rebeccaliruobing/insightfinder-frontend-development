@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { autobind } from 'core-decorators';
 import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
-import { buildUrl } from '../../../common/utils';
+import { buildLocation } from '../../../common/utils';
 import { appMenusMessages } from '../../../common/app/messages';
 import { settingsMessages } from '../../../common/settings/messages';
 import { hideAppLoader, showAppAlert } from '../../../common/app/actions';
@@ -36,7 +36,7 @@ class SettingsProjectListCore extends React.Component {
   @autobind
   handleProjectClick({ rowData: project }) {
     const { push } = this.props;
-    push(buildUrl(BaseUrls.SettingsProject, {
+    push(buildLocation(BaseUrls.SettingsProject, {
       projectId: project.projectId,
     }));
   }

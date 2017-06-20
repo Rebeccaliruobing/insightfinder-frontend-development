@@ -1,15 +1,20 @@
 import qs from 'qs';
 import { isString } from 'lodash';
 
-const parseQueryString = (str) => {
-  if (isString(str) && str.length > 0) {
-    if (str[0] === '?') {
-      // Remove the charactor ?
-      return qs.parse(str.slice(1));
+/**
+ * Parse url query string into object, return empty object is empty string.
+ * The query string can be retrieved from location.search.
+ */
+const parseQueryString = (search) => {
+  let query = search;
+  if (isString(query) && query.length > 0) {
+    if (query[0] === '?') {
+      // Remove char ?
+      query = query.slice(1);
     }
-    return qs.parse(str);
+    return qs.parse(query);
   }
-  return null;
+  return {};
 };
 
 export default parseQueryString;

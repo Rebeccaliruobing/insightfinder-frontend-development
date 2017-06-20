@@ -16,7 +16,7 @@ const loadHourlyEvents = (
   credentials: Credentials,
   params: Object,
 ) => {
-  const { projectId, startTime, endTime, instanceGroup } = params;
+  const { projectName, startTime, endTime, instanceGroup } = params;
   const dateFormat = 'YYYY-MM-DD';
   const mStartTime = moment(startTime, dateFormat);
   const mEndTime = moment(endTime, dateFormat);
@@ -31,7 +31,7 @@ const loadHourlyEvents = (
     getEndpoint('execDashboard'), {
       ...credentials,
       operation: 'loadHourly',
-      projectName: projectId,
+      projectName,
       instanceGroup,
       modelType: 'Holistic',
       timezoneOffset: moment().utcOffset(),

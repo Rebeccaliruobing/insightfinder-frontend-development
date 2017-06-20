@@ -2,25 +2,25 @@
 import type { Action } from '../types';
 
 export const loadMetricHourlyEvents = (
-  projectId: String,
+  projectName: String,
   instanceGroup: String,
   startTime: String,
   endTime: String,
 ): Action => ({
   type: 'LOAD_METRIC_HOURLY_EVENTS',
   payload: {
-    projectId, instanceGroup, startTime, endTime,
+    projectName, instanceGroup, startTime, endTime,
   },
 });
 
 export const loadMetricWeeklyAnomalies = (
-  projectId: String,
+  projectName: String,
   startTime: String,
   endTime: String,
 ): Action => ({
   type: 'LOAD_METRIC_WEEKLY_ANOMALIES',
   payload: {
-    projectId, startTime, endTime,
+    projectName, startTime, endTime,
   },
 });
 

@@ -1,3 +1,4 @@
+export { default as buildLocation } from './buildLocation';
 export { default as buildMatchLocation } from './buildMatchLocation';
 export { default as buildUrl } from './buildUrl';
 export { default as getStartEndTimeRange } from './getStartEndTimeRange';

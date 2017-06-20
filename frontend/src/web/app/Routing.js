@@ -22,7 +22,11 @@ import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } 
 import AccountInfo from '../../../components/account-info';
 import EventSummary from '../../../containers/event-summary';
 import {
-  ForgotPassword, ResetPassword, ForgotUsername, Signup, SignupStep2,
+  ForgotPassword,
+  ResetPassword,
+  ForgotUsername,
+  Signup,
+  SignupStep2,
 } from '../../../components/auth';
 
 import {
@@ -54,7 +58,7 @@ const MetricRoutings = () => {
           path={BaseUrls.MetricLineCharts}
           render={() => React.createElement(liveMonitoringAppV1)}
         />
-        <Redirect from="*" to={BaseUrls.MetricAnalysisBase} />
+        <Redirect from="*" to={BaseUrls.MetricAnalysis} />
       </Switch>
     </SinglePage>
   );
@@ -100,13 +104,10 @@ const SettingsRoutings = () => {
  **/
 const PrivateRoutings = () => (
   <Switch>
-    <Route
-      path={BaseUrls.Help}
-      render={props => (<SinglePage><Help {...props} /></SinglePage>)}
-    />
+    <Route path={BaseUrls.Help} render={props => <SinglePage><Help {...props} /></SinglePage>} />
     <Route
       path={BaseUrls.AccountInfo}
-      render={props => (<SinglePage><AccountInfo {...props} /></SinglePage>)}
+      render={props => <SinglePage><AccountInfo {...props} /></SinglePage>}
     />
 
     <Route path={BaseUrls.Metric} component={MetricRoutings} />
@@ -115,24 +116,16 @@ const PrivateRoutings = () => (
 
     <Route path={BaseUrls.SettingsProjectList} component={SettingsRoutings} />
     <Route
-      path={BaseUrls.SettingsProjectWizard} exact
+      path={BaseUrls.SettingsProjectWizard}
+      exact
       render={props => (
         <SinglePage leftbar={<SettingsLeftbar {...props} />}><ProjectWizard /></SinglePage>
       )}
     />
 
-    <Route
-      path="/liveMonitoring"
-      render={() => React.createElement(liveMonitoringAppV1)}
-    />
-    <Route
-      path="/useCaseDetails"
-      render={() => React.createElement(useCaseAppV1)}
-    />
-    <Route
-      path="/filesMonitoring"
-      render={() => React.createElement(FilesMonitoringAppV1)}
-    />
+    <Route path="/liveMonitoring" render={() => React.createElement(liveMonitoringAppV1)} />
+    <Route path="/useCaseDetails" render={() => React.createElement(useCaseAppV1)} />
+    <Route path="/filesMonitoring" render={() => React.createElement(FilesMonitoringAppV1)} />
     <Route
       path="/filesdetectionMonitoring"
       render={() => React.createElement(FilesDetectionMonitoringAppV1)}

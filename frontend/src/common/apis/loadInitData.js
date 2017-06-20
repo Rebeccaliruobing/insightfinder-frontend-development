@@ -6,24 +6,15 @@
 /*  @flow */
 /* eslint-disable no-console */
 
-// TODO: Change dashboard-uservalues => loadProjectsInfo => loadInitData
-
 import { get } from 'lodash';
 import R from 'ramda';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
-import fetchPost from './fetchPost';
 
 const loadInitData = (
   credentials: Credentials,
 ) => {
-  // return fetchPost(
-  //   getEndpoint('dashboard-uservalues'),
-  //   {
-  //     ...credentials,
-  //     operation: 'display',
-  //   },
   return fetchGet(
     getEndpoint('loadProjectsInfo'), {
       ...credentials,

@@ -28,8 +28,12 @@ const appMessages = defineMessages({
     id: 'app.errors.general',
   },
   errorsProjectNotFound: {
-    defaultMessage: 'The project <b>{projectName}</b> doesn\' exists. Please choose the project to view.',
+    defaultMessage: 'The project <b>{projectName}</b> doesn\' exists. Please choose a right project to view.',
     id: 'app.errors.projectNotFound',
+  },
+  errorsNoMetricProject: {
+    defaultMessage: 'There is no metric project, please go to <a href="/settings/project-list">Settings</a> to register one.',
+    id: 'app.errors.noMetricProject',
   },
 });
 
