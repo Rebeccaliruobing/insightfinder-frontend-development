@@ -33,7 +33,7 @@
       "<rootDir>/src/"
     ],
     "setupFiles": [
-      "<rootDir>/setupJest.js"
+      "<rootDir>/setupTest.js"
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/gulp/",
