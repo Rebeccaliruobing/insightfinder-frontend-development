@@ -14,6 +14,16 @@ const weeklyAnomaliesEpic = (action$: any, { getState }: Deps) =>
       const state = getState();
       const { credentials } = state.auth;
 
+      // If projectId is emtpy, return a emtpy data.
+      if (!projectId) {
+        return Observable.concat(
+          Observable.of(setMetricCurrentInfo({
+            currentWeeklyAnomalies: {},
+          })),
+          Observable.of(hideAppLoader()),
+        );
+      }
+
       return Observable.concat(
         Observable.of(showAppLoader()),
         Observable

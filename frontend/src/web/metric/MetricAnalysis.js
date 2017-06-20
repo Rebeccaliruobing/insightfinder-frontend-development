@@ -19,7 +19,7 @@ import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../../common/utils';
 import { Container, Select } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages, appMessages } from '../../common/app/messages';
-import { showAppAlert } from '../../common/app/actions';
+import { showAppAlert, hideAppLoader } from '../../common/app/actions';
 import { BaseUrls } from '../app/Constants';
 import { loadMetricHourlyEvents, loadMetricWeeklyAnomalies } from '../../common/metric/actions';
 import HourlyHeatmap from '../../../components/statistics/hourly-heatmap';
@@ -29,13 +29,14 @@ import '../../../containers/executive-dashboard/executive-dashboard.less';
 type Props = {
   projects: Array<Object>,
   currentHourlyEvents: Object,
-  currentHourlyEventsLoading: bool,
+  currentHourlyEventsLoading: boolean,
   currentWeeklyAnomalies: Object,
   match: Object,
   location: Object,
   intl: Object,
   push: Function,
   showAppAlert: Function,
+  hideAppLoader: Function,
   loadMetricHourlyEvents: Function,
   loadMetricWeeklyAnomalies: Function,
 };
@@ -53,6 +54,7 @@ class MetricAnalysisCore extends React.PureComponent {
   componentDidMount() {
     const params = this.applyParamsAndRedirect(this.props);
     this.reloadData(params);
+    this.props.hideAppLoader();
   }
 
   componentWillReceiveProps(newProps) {
@@ -71,8 +73,12 @@ class MetricAnalysisCore extends React.PureComponent {
   reloadData(params, prevParams) {
     // Check whether the params are changed, if so reload the data.
     const { projectId, startTime, instanceGroup, endTime } = params || {};
-    const { projectId: prevProjectId, instanceGroup: prevInstanceGroup,
-      startTime: prevStartTime, endTime: prevEndTime } = prevParams || {};
+    const {
+      projectId: prevProjectId,
+      instanceGroup: prevInstanceGroup,
+      startTime: prevStartTime,
+      endTime: prevEndTime,
+    } = prevParams || {};
 
     // If the projectId not exists, show error message.
     if (projectId && projectId !== prevProjectId) {
@@ -82,15 +88,20 @@ class MetricAnalysisCore extends React.PureComponent {
       }
     }
 
-    if (projectId && (
-      projectId !== prevProjectId || instanceGroup !== prevInstanceGroup ||
-      startTime !== prevStartTime || endTime !== prevEndTime)) {
+    if (
+      projectId &&
+      (projectId !== prevProjectId ||
+        instanceGroup !== prevInstanceGroup ||
+        startTime !== prevStartTime ||
+        endTime !== prevEndTime)
+    ) {
       this.props.loadMetricHourlyEvents(projectId, instanceGroup, startTime, endTime);
     }
 
-    if (projectId && (
-      projectId !== prevProjectId ||
-      startTime !== prevStartTime || endTime !== prevEndTime)) {
+    if (
+      projectId &&
+      (projectId !== prevProjectId || startTime !== prevStartTime || endTime !== prevEndTime)
+    ) {
       this.props.loadMetricWeeklyAnomalies(projectId, startTime, endTime);
     }
   }
@@ -110,36 +121,56 @@ class MetricAnalysisCore extends React.PureComponent {
     }
 
     const timeRange = getStartEndTimeRange(
-      startTime, endTime, this.defaultNumberOfDays, this.dateFormat);
+      startTime,
+      endTime,
+      this.defaultNumberOfDays,
+      this.dateFormat,
+    );
     startTime = timeRange.startTime;
     endTime = timeRange.endTime;
 
-    if (projectId !== match.params.projectId ||
-      startTime !== query.startTime || endTime !== query.endTime
+    if (
+      projectId !== match.params.projectId ||
+      startTime !== query.startTime ||
+      endTime !== query.endTime
     ) {
-      const url = buildMatchLocation(match, { projectId }, {
-        startTime, endTime, instanceGroup });
+      const url = buildMatchLocation(
+        match,
+        { projectId },
+        {
+          startTime,
+          endTime,
+          instanceGroup,
+        },
+      );
       push(url);
     }
     return {
-      projectId, startTime, endTime, instanceGroup,
+      projectId,
+      startTime,
+      endTime,
+      instanceGroup,
     };
   }
 
-  @autobind
-  handleProjectChange(newValue) {
+  @autobind handleProjectChange(newValue) {
     const projectId = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const { startTime, endTime } = parseQueryString(location.search);
 
-    const url = buildMatchLocation(match, { projectId }, {
-      startTime, endTime, instanceGroup: null,
-    });
+    const url = buildMatchLocation(
+      match,
+      { projectId },
+      {
+        startTime,
+        endTime,
+        instanceGroup: null,
+      },
+    );
     push(url);
   }
 
-  @autobind
-  handleStartTimeChange(newDate) {
+  @autobind handleStartTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
 
@@ -160,8 +191,7 @@ class MetricAnalysisCore extends React.PureComponent {
     push(url);
   }
 
-  @autobind
-  handleEndTimeChange(newDate) {
+  @autobind handleEndTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
 
@@ -182,40 +212,44 @@ class MetricAnalysisCore extends React.PureComponent {
     push(url);
   }
 
-  @autobind
-  handleAnomalyListRowClick(projectName, instanceGroup) {
+  @autobind handleAnomalyListRowClick(projectName, instanceGroup) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     const { startTime, endTime } = params;
 
-    const url = buildMatchLocation(match, { projectId: projectName }, {
-      startTime, endTime, instanceGroup,
-    });
+    const url = buildMatchLocation(
+      match,
+      { projectId: projectName },
+      {
+        startTime,
+        endTime,
+        instanceGroup,
+      },
+    );
     push(url);
   }
 
-  @autobind
-  handleRefreshClick() {
+  @autobind handleRefreshClick() {
     const { match, location } = this.props;
     const { projectId } = match.params;
     const { startTime, endTime, instanceGroup } = parseQueryString(location.search) || {};
     this.reloadData({
-      projectId, startTime, endTime, instanceGroup,
+      projectId,
+      startTime,
+      endTime,
+      instanceGroup,
     });
   }
 
-  @autobind
-  handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
+  @autobind handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
     this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime);
   }
 
-  @autobind
-  handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
+  @autobind handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
     this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime, true);
   }
 
-  @autobind
-  handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
+  @autobind handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
     const { location } = this.props;
     const { startTime, endTime } = parseQueryString(location.search) || {};
     const mStartTime = moment(startTime, this.dateFormat);
@@ -226,7 +260,8 @@ class MetricAnalysisCore extends React.PureComponent {
     const query = {
       startTime: mStartTime.format(this.dateFormat),
       endTime: mEndTime.format(this.dateFormat),
-      numberOfDays, timezoneOffset,
+      numberOfDays,
+      timezoneOffset,
       projectName,
       instanceGroup,
     };
@@ -244,8 +279,15 @@ class MetricAnalysisCore extends React.PureComponent {
   }
 
   render() {
-    const { intl, match, location, projects,
-      currentHourlyEvents, currentHourlyEventsLoading, currentWeeklyAnomalies } = this.props;
+    const {
+      intl,
+      match,
+      location,
+      projects,
+      currentHourlyEvents,
+      currentHourlyEventsLoading,
+      currentWeeklyAnomalies,
+    } = this.props;
     const query = parseQueryString(location.search) || {};
 
     const { projectId } = match.params;
@@ -273,9 +315,12 @@ class MetricAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.metricAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project" inline style={{ width: 200 }}
+              name="project"
+              inline
+              style={{ width: 200 }}
               options={R.map(p => ({ label: p.projectId, value: p.projectName }), projects)}
-              value={projectId} onChange={this.handleProjectChange}
+              value={projectId}
+              onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
             {!!instanceGroup && <span className="divider">/</span>}
@@ -302,7 +347,9 @@ class MetricAnalysisCore extends React.PureComponent {
                 onChange={this.handleEndTimeChange}
               />
             </div>
-            <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>Refresh</div>
+            <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
+              Refresh
+            </div>
           </div>
         </Container>
         <Container fullHeight className="overflow-y-auto flex-col">
@@ -311,37 +358,46 @@ class MetricAnalysisCore extends React.PureComponent {
               <h4 style={{ marginBottom: '0.5em' }}>Detected Events (Hourly)</h4>
               <HourlyHeatmap
                 statSelector={d => d.totalAnomalyScore}
-                numberOfDays={numberOfDays} dataset={get(currentHourlyEvents, 'detected', {})}
+                numberOfDays={numberOfDays}
+                dataset={get(currentHourlyEvents, 'detected', {})}
                 onNameClick={this.handleListRowOpenDetectedAnomaly}
               />
             </div>
             <div className="heatmap-block">
               <h4 style={{ marginBottom: '0.5em' }}>Predicted Events (Hourly)</h4>
               <HourlyHeatmap
-                statSelector={d => d.totalAnomalyScore} rightEdge
-                numberOfDays={numberOfDays} dataset={get(currentHourlyEvents, 'predicted', {})}
+                statSelector={d => d.totalAnomalyScore}
+                rightEdge
+                numberOfDays={numberOfDays}
+                dataset={get(currentHourlyEvents, 'predicted', {})}
                 onNameClick={this.handleListRowOpenPredictedAnomaly}
               />
             </div>
             <div style={{ color: 'grey', marginLeft: '2em' }}>
               <i className="icon circle info" />
-              <span>Only start time of the event is shown, hover the cell to see event duration and details.</span>
+              <span>
+                Only start time of the event is shown, hover the cell to see event duration and details.
+              </span>
             </div>
           </Container>
-          { currentWeeklyAnomalies &&
-          <Container className="boxed flex-grow flex-col" style={{ marginTop: 0, minHeight: 200 }}>
-            <h4 style={{ textAlign: 'center', marginBottom: '0.5em' }}>Anomaly Statistcs (Weekly)</h4>
-            <TopListAnomaly
-              timeIntervalPrevious={timeIntervalPrevious}
-              timeIntervalCurrent={timeIntervalCurrent}
-              timeIntervalPredicted={timeIntervalPredicted}
-              autoExpandCount={1}
-              stats={currentWeeklyAnomalies || []}
-              onRowOpen={this.handleListRowOpenAnomaly}
-              onRowClick={this.handleAnomalyListRowClick}
-            />
-          </Container>
-          }
+          {currentWeeklyAnomalies &&
+            <Container
+              className="boxed flex-grow flex-col"
+              style={{ marginTop: 0, minHeight: 200 }}
+            >
+              <h4 style={{ textAlign: 'center', marginBottom: '0.5em' }}>
+                Anomaly Statistcs (Weekly)
+              </h4>
+              <TopListAnomaly
+                timeIntervalPrevious={timeIntervalPrevious}
+                timeIntervalCurrent={timeIntervalCurrent}
+                timeIntervalPredicted={timeIntervalPredicted}
+                autoExpandCount={1}
+                stats={currentWeeklyAnomalies || []}
+                onRowOpen={this.handleListRowOpenAnomaly}
+                onRowClick={this.handleAnomalyListRowClick}
+              />
+            </Container>}
         </Container>
       </Container>
     );
@@ -351,14 +407,17 @@ class MetricAnalysisCore extends React.PureComponent {
 const MetricAnalysis = injectIntl(MetricAnalysisCore);
 export default connect(
   (state: State) => {
-    const { currentHourlyEvents, currentHourlyEventsLoading,
+    const {
+      currentHourlyEvents,
+      currentHourlyEventsLoading,
       currentWeeklyAnomalies,
     } = state.metric;
     return {
       projects: R.filter(p => p.isMetric, state.app.projects),
-      currentHourlyEvents, currentHourlyEventsLoading,
+      currentHourlyEvents,
+      currentHourlyEventsLoading,
       currentWeeklyAnomalies,
     };
   },
-  { push, showAppAlert, loadMetricHourlyEvents, loadMetricWeeklyAnomalies },
+  { push, showAppAlert, hideAppLoader, loadMetricHourlyEvents, loadMetricWeeklyAnomalies },
 )(MetricAnalysis);

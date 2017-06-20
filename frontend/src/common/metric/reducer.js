@@ -4,7 +4,7 @@ import type { MetricState, Action } from '../types';
 
 const initialState: MetricState = {
   currentHourlyEvents: null,
-  currentHourlyEventsLoading: true,
+  currentHourlyEventsLoading: false,
   currentWeeklyAnomalies: null,
 };
 

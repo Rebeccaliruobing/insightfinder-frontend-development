@@ -13,6 +13,16 @@ const hourlyEventsEpic = (action$: any, { getState }: Deps) =>
       const state = getState();
       const { credentials } = state.auth;
 
+      // If projectId is emtpy, return a emtpy data.
+      if (!projectId) {
+        return Observable.concat(
+          Observable.of(setMetricCurrentInfo({
+            currentHourlyEvents: {},
+            currentHourlyEventsLoading: false,
+          })),
+        );
+      }
+
       return Observable.concat(
         Observable.of(setMetricCurrentInfo({
           currentHourlyEventsLoading: true,
