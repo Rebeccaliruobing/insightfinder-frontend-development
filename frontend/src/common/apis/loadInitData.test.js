@@ -87,6 +87,11 @@ describe('apis.loadInitData with admin account', () => {
     done();
   });
 
+  it('Expect at lease one metric projects', async () => {
+    const projects = R.filter(p => p.isMetric, data.projects);
+    expect(projects.length).toBeGreaterThan(0);
+  });
+
   it(`Expect contains metric project ${chalk.blue(metricProjectAdmin)}`, async () => {
     const projects = R.filter(p => p.isMetric, data.projects);
     const project = R.find(p => p.projectName === metricProjectAdmin, projects);
