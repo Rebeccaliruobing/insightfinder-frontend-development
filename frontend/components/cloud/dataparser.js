@@ -577,7 +577,7 @@ class DataParser {
         }
         let ts = new Date(parseInt(items[0]));
         _.each(items, function (item, seriesNo) {
-          if (seriesNo > 0) {
+          if (seriesNo > 0 && item !== 'timestamp') {
             if (soptions[seriesNo - 1] == null) {
             }
             soptions[seriesNo - 1].data.push([ts, parseFloat(item)]);
@@ -588,6 +588,10 @@ class DataParser {
 
     if(ts1 && ts2){
       this.interval = ts2-ts1;
+    }
+    // Clean the incorrect timestamp data
+    if (soptions[0].name === 'timestamp') {
+      delete soptions[0];
     }
     this.startTimestamp = ts1;
     this.endTimestamp = tsN;
