@@ -51,6 +51,7 @@ const weeklyAnomaliesEpic = (action$: any, { getState }: Deps) =>
     }
 
     return Observable.concat(
+      Observable.of(setMetricCurrentInfo({ currentErrorMessage: null })),
       Observable.of(showAppLoader()),
       Observable.from(
         loadWeeklyAnomalies(credentials, {
