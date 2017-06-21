@@ -80,7 +80,7 @@ class MetricAnalysisCore extends React.PureComponent {
 
     // If project changed, reset group to nul.
     if (projectName !== query.projectName) {
-      instanceGroup = null;
+      instanceGroup = undefined;
     }
 
     // Limit start/end time in n days.
@@ -134,7 +134,7 @@ class MetricAnalysisCore extends React.PureComponent {
     const params = parseQueryString(location.search);
     const { startTime, endTime } = params;
     // When project changed, set group to null.
-    const instanceGroup = null;
+    const instanceGroup = undefined;
     push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup }));
   }
 
@@ -178,14 +178,18 @@ class MetricAnalysisCore extends React.PureComponent {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     const { startTime, endTime } = params;
-    push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup }));
+    // Set instanceGroup to undefined if not exists to keep the url clean
+    push(
+      buildMatchLocation(
+        match,
+        {},
+        { projectName, startTime, endTime, instanceGroup: instanceGroup || undefined },
+      ),
+    );
   }
 
   @autobind handleRefreshClick() {
-    const { location } = this.props;
-    const params = parseQueryString(location.search);
-    const { projectName, startTime, endTime, instanceGroup } = params;
-    this.reloadData({ projectName, startTime, endTime, instanceGroup });
+    this.reloadData(this.props);
   }
 
   @autobind handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {

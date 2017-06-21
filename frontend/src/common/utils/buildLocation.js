@@ -29,12 +29,7 @@ const buildLocation = (path: String, props: ?Object, params: ?Object) => {
     };
   }
 
-  // Replace undefined in params with null to keep the param name in query string.
-  const query = {};
-  forEachObjIndexed((val, key) => {
-    query[key] = val || null;
-  }, params || {});
-  const search = `?${qs.stringify(query)}`;
+  const search = `?${qs.stringify(params || {})}`;
 
   return {
     pathname: path,
