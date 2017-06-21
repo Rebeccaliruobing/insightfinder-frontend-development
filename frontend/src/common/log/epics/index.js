@@ -1,9 +1,16 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import fileEpic from './fileEpic';
-import streamingEpic from './streamingEpic';
+import streamingListEpic from './streamingListEpic';
 
 const epics = [
   fileEpic,
-  streamingEpic,
+  streamingListEpic,
 ];
 
 export default epics;

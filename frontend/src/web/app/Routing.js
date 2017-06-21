@@ -14,7 +14,7 @@ import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { MetricAnalysis, HistoricalMetricAnalysis } from '../metric';
-import { LogLiveAnalysis, LogFileAnalysis } from '../log';
+import { LogAnalysis, LogFileAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
 
@@ -68,9 +68,9 @@ const LogRoutings = () => {
   return (
     <SinglePage>
       <Switch>
-        <Route path={BaseUrls.LogAnalysis} component={LogLiveAnalysis} />
+        <Route path={BaseUrls.LogAnalysis} component={LogAnalysis} />
         <Route path={BaseUrls.LogHistoricalLogAnalysis} component={LogFileAnalysis} />
-        <Redirect from="*" to={BaseUrls.LogAnalysisBase} />
+        <Redirect from="*" to={BaseUrls.LogAnalysis} />
       </Switch>
     </SinglePage>
   );

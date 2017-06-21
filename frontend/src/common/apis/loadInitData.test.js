@@ -20,11 +20,14 @@ const {
 } = global;
 
 describe('apis.loadInitData with invalid parameters', () => {
-  it('Expect PermissionError if invalid token', async () => {
+  it('Expect PermissionError if invalid token', async (done) => {
     try {
       await loadInitData(userBad);
+      done();
     } catch (e) {
       expect(e).toBeInstanceOf(PermissionError);
+    } finally {
+      done();
     }
   });
 });
@@ -37,7 +40,6 @@ describe('apis.loadInitData with guest account', () => {
     const resp = await loadInitData(userGuest);
     rawData = resp.rawData;
     data = resp.data;
-
     done();
   });
 

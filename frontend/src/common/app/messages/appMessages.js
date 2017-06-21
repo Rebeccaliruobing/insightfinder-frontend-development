@@ -35,6 +35,10 @@ const appMessages = defineMessages({
     defaultMessage: 'There is no metric project, please go to <a href="/settings/project-list">Settings</a> to register one.',
     id: 'app.errors.noMetricProject',
   },
+  errorsNoLogProject: {
+    defaultMessage: 'There is no log project, please go to <a href="/settings/project-list">Settings</a> to register one.',
+    id: 'app.errors.noLogProject',
+  },
 });
 
 export default appMessages;

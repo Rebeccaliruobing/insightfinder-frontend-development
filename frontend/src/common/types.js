@@ -71,6 +71,7 @@ export type LogState = {
   fileIncidentInfos: Object,
   streamingInfos: Object,
   streamingIncidentInfos: Object,
+  currentErrorMessage: ?Message,
 };
 
 export type UseCaseState = {
@@ -117,9 +118,8 @@ export type Action =
     }
   }
   | {
-    type: 'LOAD_LOG_STREAMING', payload: {
-      projectId: ?string, month: ?string, incidentId: ?string,
-      match: Object, params: ?Object, forceReload?: bool,
+    type: 'LOAD_LOG_STREAMING_LIST', payload: {
+      projectName: ?string, month: ?string,
     }
   }
   | {

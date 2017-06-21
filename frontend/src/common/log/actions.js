@@ -2,9 +2,11 @@
 import type { Action } from '../types';
 
 export const loadLogFile = (
-  projectId: ?string, incidentId: ?string,
-  match: Object, params: ?Object,
-  forceReload?: bool,
+  projectId: ?string,
+  incidentId: ?string,
+  match: Object,
+  params: ?Object,
+  forceReload?: boolean,
 ): Action => ({
   type: 'LOAD_LOG_FILE',
   payload: {
@@ -17,7 +19,10 @@ export const loadLogFile = (
 });
 
 export const setLogFile = (
-  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+  projectId: string,
+  projectInfo: Object,
+  incidentId: ?string,
+  incidentInfo: ?Object,
 ): Action => ({
   type: 'SET_LOG_FILE',
   payload: {
@@ -28,30 +33,34 @@ export const setLogFile = (
   },
 });
 
-export const loadLogStreaming = (
-  projectId: ?string, month: ?string, incidentId: ?string,
-  match: Object, params: ?Object,
-  forceReload?: bool,
-): Action => ({
-  type: 'LOAD_LOG_STREAMING',
+export const loadLogStreamingList = (projectName: ?string, month: ?string): Action => ({
+  type: 'LOAD_LOG_STREAMING_LIST',
   payload: {
-    projectId,
+    projectName,
     month,
-    incidentId,
-    match,
-    params,
-    forceReload,
   },
 });
 
-export const setLogStreaming = (
-  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+export const loadLogStreamingIncident = (
+  projectName: String,
+  month: String,
+  incidentId: String,
+  rareEventThreshold: String,
+  derivedPvalue: String,
 ): Action => ({
+  type: 'LOAD_LOG_STREAMING_INCIDENT',
+  payload: {
+    projectName,
+    month,
+    incidentId,
+    rareEventThreshold,
+    derivedPvalue,
+  },
+});
+
+export const setLogStreaming = (info: Object): Action => ({
   type: 'SET_LOG_STREAMING',
   payload: {
-    projectId,
-    projectInfo,
-    incidentId,
-    incidentInfo,
+    ...info,
   },
 });
