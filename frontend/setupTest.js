@@ -3,9 +3,9 @@ global.fetch = require('node-fetch');
 
 // Setup the base url for API endpoint
 window.BASE_URL =
-  // 'https://app.insightfinder.com'; // Prod 
+  'https://app.insightfinder.com'; // Prod 
   // 'https://insightfinderstaging.appspot.com'; // staging 
-  'http://if-local:8080'; // Local
+  // 'http://if-local:8080'; // Local
 // 'https://insightfindertesting.appspot.com'; // staging
 // 'https://insightfinderui.appspot.com'; // Test 
 
@@ -26,3 +26,5 @@ global.userBad = {
 
 global.metricProject = 'EC2CloudWatch2';
 global.metricProjectAdmin = 'EC2CloudWatch2@guest';
+global.logProject = 'WorkerSysLogs';
+global.logProjectAdmin = 'WorkerSysLogs@guest';
