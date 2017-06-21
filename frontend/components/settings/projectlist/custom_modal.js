@@ -43,6 +43,7 @@ class CustomProjectModal extends React.Component {
 
   handleSubmit() {
     let {projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, processName} = this.state;
+    let disabledInterval=(projectCloudType=="LogFile")||(dataType.length==1&&dataType.indexOf('Log')!=-1);
     if(!projectName){
       alert("Project name cannot be empty.");
       return false;
@@ -52,7 +53,7 @@ class CustomProjectModal extends React.Component {
       alert("Project name cannot contain _ : @ , or space.");
       return false;
     }
-    if (projectCloudType !== 'LogFile' && !samplingInterval) {
+    if (!disabledInterval && !samplingInterval) {
       alert('Sampling Interval cannot be empty.');
       return false;
     }
