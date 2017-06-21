@@ -121,6 +121,7 @@ class EventRare extends React.Component {
       <div className="flex-item flex-col-container" style={{ paddingBottom: 6 }}>
         <h4 className="ui header">{`Total Rare Events: ${eventCount}`}</h4>
         <DataChart
+          isLogCharts
           chartType="bar"
           data={barData}
           annotations={[]}

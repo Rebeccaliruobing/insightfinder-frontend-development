@@ -19,6 +19,7 @@ class Dygraph extends Component {
 
   static propTypes = {
     underlayCallback: T.func,
+    isLogCharts: T.bool,
   };
 
   static defaultProps = Object.assign({
@@ -94,14 +95,14 @@ class Dygraph extends Component {
   @autobind
   handleUnderlayCallback(canvas, area, g) {
     const { highlights, enableTriangleHighlight, latestDataTimestamp,
-      highlightStartTime, highlightEndTime, data,
+      highlightStartTime, highlightEndTime, data, isLogCharts,
     } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
     // Ignore the latestDataTimestamp, and use the current time?
     // const latestTime = latestDataTimestamp;
     const latestTime = moment().valueOf();
-    if (latestTime && data.length > 0) {
+    if (!isLogCharts && latestTime && data.length > 0) {
       const begin = data[0][0].valueOf();
       const last = data[data.length - 1][0].valueOf();
       if (latestTime < last) {

@@ -17,6 +17,7 @@ export class DataChart extends React.Component {
     showLineChartWithAnnotation: T.bool,
     dateWindow: T.any,
     chartType: T.string,
+    isLogCharts: T.bool,
   };
 
   static defaultProps = {
@@ -25,6 +26,7 @@ export class DataChart extends React.Component {
     showLineChartWithAnnotation: false,
     onAnnotationClick: () => { },
     chartType: 'line',
+    isLogCharts: false,
   };
 
   constructor(props) {
@@ -178,7 +180,7 @@ export class DataChart extends React.Component {
   render() {
     let { data, enableAnnotations, enableTriangleHighlight, chartType,
       onDateWindowChange, dateWindow,latestDataTimestamp,
-      eventEndTime, eventStartTime, annotations, onClick,
+      eventEndTime, eventStartTime, annotations, onClick, isLogCharts,
     } = this.props;
     const dowAnnotations = this.setWeekdaysForBarChar(data);
     annotations = annotations || dowAnnotations;
@@ -186,6 +188,7 @@ export class DataChart extends React.Component {
     return (
       <Dygraph
         style={{ width: '100%', height: '200px' }}
+        isLogCharts={isLogCharts}
         chartType={chartType}
         className={chartType}
         axisLabelWidth={55}
