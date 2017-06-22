@@ -12,60 +12,39 @@ import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadInitData = (
-  credentials: Credentials,
-) => {
-  return fetchGet(
-    getEndpoint('loadProjectsInfo'), {
-      ...credentials,
-    },
-  ).then((d) => {
-    // The string is split by ',' for projects, and split by ':' for each parts.
-    // The format is: projectName:projectType:instanceType:dataType.
-    const sinfo = get(d.data, 'projectString', '');
-    const infos = sinfo.split(',').filter(s => s.length !== 0);
+const loadInitData = (credentials: Credentials) => {
+  return fetchGet(getEndpoint('loadProjectsInfo'), {
+    ...credentials,
+  }).then((d) => {
+    // The basicProjectData contains the name => props map, convert to array.
+    let projects = [];
+    const basicProjectData = get(d.data, 'basicProjectData', {});
+    R.forEachObjIndexed((val) => {
+      projects.push(val);
+    }, basicProjectData);
 
-    let projects = R.map((si) => {
-      const parts = si.split(':');
-      const projectName = parts.length >= 1 ? parts[0] : '';
-      const projectType = parts.length >= 2 ? parts[1] : '';
-      const instanceType = parts.length >= 3 ? parts[2] : '';
-      const dataType = parts.length >= 4 ? parts[3] : '';
-
-      // Use the name as the Id, which might be changed in the further.
-      return {
-        projectId: projectName,
-        projectName, projectType, instanceType, dataType,
-      };
-    }, infos);
-
-    // Ignore project without name and order by name.
-    projects = R.filter((p) => {
-      if (p.projectName.length === 0) {
-        console.warn('Get project without name, ignore it.');
-      }
-      return (p.projectName.length !== 0);
-    }, projects);
-
-    projects = R.sort(
-      (a, b) => a.projectName.localeCompare(b.projectName),
-      projects,
-    );
+    // Order the projects by name
+    projects = R.sort((a, b) => a.projectName.localeCompare(b.projectName), projects);
 
     // Set flags based on the project info
     projects = R.map((p) => {
-      const { dataType, instanceType } = p;
+      const { projectName, dataType, cloudType } = p;
       // Streaming log analysis project
-      const isLogStreaming = dataType.toLowerCase() === 'log' && instanceType.toLowerCase() !== 'logfile';
+      const isLogStreaming =
+        dataType.toLowerCase() === 'log' && cloudType.toLowerCase() !== 'logfile';
 
       // Historical log analysis project
-      const isLogFile = dataType.toLowerCase() === 'log' && instanceType.toLowerCase() === 'logfile';
+      const isLogFile =
+        dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';
 
       // Metric project with replay and streaming.
       const isMetric = dataType.toLowerCase() === 'metric';
       return {
+        projectId: projectName,
         ...p,
-        isLogFile, isLogStreaming, isMetric,
+        isLogFile,
+        isLogStreaming,
+        isMetric,
       };
     }, projects);
 
