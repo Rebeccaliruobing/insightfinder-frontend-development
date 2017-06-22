@@ -33,6 +33,22 @@ export const setLogFile = (
   },
 });
 
+export const loadLogStreaming = (
+  projectId: ?string, month: ?string, incidentId: ?string,
+  match: Object, params: ?Object,
+  forceReload?: bool,
+): Action => ({
+  type: 'LOAD_LOG_STREAMING',
+  payload: {
+    projectId,
+    month,
+    incidentId,
+    match,
+    params,
+    forceReload,
+  },
+});
+
 export const loadLogStreamingList = (projectName: ?string, month: ?string): Action => ({
   type: 'LOAD_LOG_STREAMING_LIST',
   payload: {
@@ -64,3 +80,16 @@ export const setLogStreaming = (info: Object): Action => ({
     ...info,
   },
 });
+
+export const setLogStreaming1 = (
+  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+): Action => ({
+  type: 'SET_LOG_STREAMING1',
+  payload: {
+    projectId,
+    projectInfo,
+    incidentId,
+    incidentInfo,
+  },
+});
+

@@ -19,20 +19,25 @@ import { setLogStreaming } from '../actions';
 
 const streamingListEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING_LIST').concatMap((action) => {
+    // Need to handle several cases
+    //
+    // - projectName is empty, which also means there is no project to select, show message.
+    // - projectName is not in the list, show message.
+    // - params are correct, calls API and handler errors.
+
     const { projectName, month } = action.payload;
     const state = getState();
     const { credentials } = state.auth;
     const projects = R.filter(p => p.isLogStreaming, state.app.projects);
+    const streamingInfosParams = { projectName, month };
 
-    // When projectName empty, which also means there is no project to auto select.
-    // So we need to show message to help user create project.
-    console.log(projectName);
     if (!projectName) {
       return Observable.concat(
         Observable.of(
           setLogStreaming({
-            currentErrorMessage: appMessages.errorsNoLogProject,
-            streamingInfos: null,
+            streamingInfos: [],
+            streamingInfosParams,
+            streamingErrorMessage: appMessages.errorsNoLogProject,
           }),
         ),
         Observable.of(hideAppLoader()),
@@ -41,8 +46,9 @@ const streamingListEpic = (action$: any, { getState }: Deps) =>
       return Observable.concat(
         Observable.of(
           setLogStreaming({
-            currentErrorMessage: appMessages.errorsProjectNotFound,
-            streamingInfos: null,
+            streamingInfos: [],
+            streamingInfosParams,
+            streamingErrorMessage: appMessages.errorsProjectNotFound,
           }),
         ),
         Observable.of(hideAppLoader()),
@@ -51,7 +57,12 @@ const streamingListEpic = (action$: any, { getState }: Deps) =>
 
     const monthlyDate = moment(month, 'YYYY-MM').startOf('month').valueOf();
     return Observable.concat(
-      Observable.of(setLogStreaming({ currentErrorMessage: null })),
+      Observable.of(
+        setLogStreaming({
+          streamingErrorMessage: null,
+          streamingInfosParams,
+        }),
+      ),
       Observable.of(showAppLoader()),
       Observable.from(
         loadLogStreamingList(credentials, {

@@ -13,6 +13,8 @@ import moment from 'moment';
 import { injectIntl } from 'react-intl';
 import { autobind } from 'core-decorators';
 import { push } from 'react-router-redux';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
 import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation, buildUrl } from '../../common/utils';
@@ -24,14 +26,16 @@ import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCh
 import './log.scss';
 
 type Props = {
-  projects: Array<Object>,
-  streamingInfos: Object,
-  streamingIncidentInfos: Object,
+  intl: Object,
   match: Object,
   location: Object,
-  intl: Object,
   push: Function,
-  currentErrorMessage: ?Object,
+  projects: Array<Object>,
+  streamingInfos: Array<Object>,
+  streamingInfosParams: Object,
+  streamingIncidentInfo: Object,
+  streamingIncidentInfoParams: Object,
+  streamingErrorMessage: ?Object,
   loadLogStreamingList: Function,
   loadLogStreamingIncident: Function,
 };
@@ -46,7 +50,17 @@ class LogAnalysisCore extends React.PureComponent {
       rareEventThreshold: '3',
       derivedPvalue: '0.9',
     };
+
+    // General the monthy option list for one year.
     this.monthCount = 12;
+    this.monthOptions = R.map((offset) => {
+      const month = moment();
+      month.add(-offset, 'month').startOf('month');
+      return {
+        label: month.format('MMM YYYY'),
+        value: month.format('YYYY-MM'),
+      };
+    }, R.range(0, this.monthCount));
   }
 
   componentDidMount() {
@@ -57,28 +71,26 @@ class LogAnalysisCore extends React.PureComponent {
 
   componentWillReceiveProps(newProps) {
     if (!this.applyParamsAndRedirect(newProps)) {
-      this.reloadData(newProps, this.props);
+      this.reloadData(newProps);
     }
   }
 
   applyParamsAndRedirect(props) {
-    // Apply the default params if missing and redirect to new location if params changed.
-    // The return value will indicate whether redirection happens, if yes, no need to reload data
+    // Apply the default params if missing and redirect to new location if params changes.
+    // When redirection happens, we should not need to reload the data. The return value
     const { location, match, push, projects } = props;
     const query = parseQueryString(location.search);
     let { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = query;
     let redirect = false;
 
     // If no project is selected, choose the first project if exists. The project might
-    // be empty, which will be handled by API epic.
+    // be empty, which will be handled by epic.
     if (!projectName && projects.length > 0) {
       projectName = projects[0].projectName;
     }
 
-    // If no mont, set to this month
-    if (!month) {
-      month = moment().format('YYYY-MM');
-    }
+    // If no month, set to current month
+    month = month || moment().format('YYYY-MM');
 
     // Set default params for incident query. If it's not for incident, reset all.
     if (incidentId) {
@@ -90,45 +102,40 @@ class LogAnalysisCore extends React.PureComponent {
       derivedPvalue = undefined;
     }
 
-    // If any parts is different, we need redirect to the now location.
-    if (
-      projectName !== query.projectName ||
-      month !== query.month ||
-      incidentId !== query.incidentId ||
-      rareEventThreshold !== query.rareEventThreshold ||
-      derivedPvalue !== query.derivedPvalue
-    ) {
+    const newParams = {
+      projectName,
+      month,
+      incidentId,
+      rareEventThreshold,
+      derivedPvalue,
+    };
+
+    // Compare the new params with the origin params, if changed, redirect to new location.
+    // We need to remove the undefined and null value before comparing.
+    const pickNotNil = R.pickBy(a => !R.isNil(a));
+    if (!R.equals(pickNotNil(newParams), pickNotNil(query))) {
       redirect = true;
-      const url = buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      );
+      const url = buildMatchLocation(match, {}, newParams);
       push(url);
     }
 
     return redirect;
   }
 
-  reloadData(props, prevProps) {
-    // Check params changes and reload the data based on the params.
+  reloadData(props, force = false) {
+    // If incidentId is not empty, which means load incident data.
+    // Compare the current params with saved params, if it's different, dispatch action.
     const params = parseQueryString(get(props, 'location.search'));
-    const prevParam = parseQueryString(get(prevProps, 'location.search'));
+    const { streamingInfosParams, streamingIncidentInfoParams } = props;
     const { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = params;
 
-    // If no incidentId, load all incidents for the project and month, otherwise
-    // load the incident data.
+    // IMPORTANT: Need to check the new params with last params, otherwise it will
+    // cause infinite loop.
     if (!incidentId) {
-      if (projectName !== prevParam.projectName || month !== prevParam.month) {
+      if (force || !R.equals({ projectName, month }, streamingInfosParams)) {
         this.props.loadLogStreamingList(projectName, month);
       }
-    } else if (
-      projectName !== prevParam.projectName ||
-      month !== prevParam.month ||
-      incidentId !== prevParam.incidentId ||
-      rareEventThreshold !== prevParam.rareEventThreshold ||
-      derivedPvalue !== prevParam.derivedPvalue
-    ) {
+    } else if (force || !R.equals(params, streamingIncidentInfoParams)) {
       this.props.loadLogStreamingIncident(
         projectName,
         month,
@@ -145,7 +152,7 @@ class LogAnalysisCore extends React.PureComponent {
     const params = parseQueryString(location.search);
     const { month } = params;
 
-    // When project changed, reset incident related params.
+    // When project changed, remove incident related params.
     const incidentId = undefined;
     const rareEventThreshold = undefined;
     const derivedPvalue = undefined;
@@ -165,7 +172,7 @@ class LogAnalysisCore extends React.PureComponent {
     const params = parseQueryString(location.search);
     const { projectName } = params;
 
-    // When month changed, reset incident related params.
+    // When month changed, remove incident related params.
     const incidentId = undefined;
     const rareEventThreshold = undefined;
     const derivedPvalue = undefined;
@@ -183,46 +190,25 @@ class LogAnalysisCore extends React.PureComponent {
     const incidentId = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, month, rareEventThreshold, derivedPvalue } = params;
-    push(
-      buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      ),
-    );
+    push(buildMatchLocation(match, {}, { ...params, incidentId }));
   }
 
   @autobind handleRareEventSensitivityChange(newValue) {
     const rareEventThreshold = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, month, incidentId, derivedPvalue } = params;
-    push(
-      buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      ),
-    );
+    push(buildMatchLocation(match, {}, { ...params, rareEventThreshold }));
   }
 
   @autobind handleFrequencyAnomalySensitivity(newValue) {
     const derivedPvalue = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, month, incidentId, rareEventThreshold } = params;
-    push(
-      buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      ),
-    );
+    push(buildMatchLocation(match, {}, { ...params, derivedPvalue }));
   }
 
   @autobind handleRefreshClick() {
-    this.reloadData(this.props);
+    this.reloadData(this.props, true);
   }
 
   @autobind handleIncidentClick(incidentId) {
@@ -232,14 +218,7 @@ class LogAnalysisCore extends React.PureComponent {
 
       const { match, push, location } = this.props;
       const params = parseQueryString(location.search);
-      const { projectName, month, rareEventThreshold, derivedPvalue } = params;
-      push(
-        buildMatchLocation(
-          match,
-          {},
-          { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-        ),
-      );
+      push(buildMatchLocation(match, {}, { ...params, incidentId }));
     };
   }
 
@@ -250,12 +229,7 @@ class LogAnalysisCore extends React.PureComponent {
 
       const { match, location } = this.props;
       const params = parseQueryString(location.search);
-      const { projectName, month, rareEventThreshold, derivedPvalue } = params;
-      const url = buildUrl(
-        match.path,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      );
+      const url = buildUrl(match.path, {}, { ...params, incidentId });
       window.open(url, '_blank');
     };
   }
@@ -263,30 +237,24 @@ class LogAnalysisCore extends React.PureComponent {
   render() {
     const {
       intl,
-      projects,
-      streamingInfos,
       match,
       location,
-      currentErrorMessage,
-      streamingIncidentInfos,
+      projects,
+      streamingInfos,
+      streamingIncidentInfo,
+      streamingErrorMessage,
     } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = params;
-    const incident = get(streamingIncidentInfos, incidentId, null);
-    console.log('render', projectName);
+    const showIncident = !!incidentId && streamingIncidentInfo;
 
-    // General the monthy option list for one year.
-    const monthOptions = R.map((offset) => {
-      const month = moment();
-      month.add(-offset, 'month').startOf('month');
-      return {
-        label: month.format('MMM YYYY'),
-        value: month.format('YYYY-MM'),
-      };
-    }, R.range(0, this.monthCount));
-
+    // Select renderer to generate link to project and month.
     const projectValueRenderer = (option) => {
       const url = buildMatchLocation(match, {}, { projectName: option.value });
+      return <Select.Link to={url} className="label">{option.label}</Select.Link>;
+    };
+    const monthValueRender = (option) => {
+      const url = buildMatchLocation(match, {}, { projectName, month: option.value });
       return <Select.Link to={url} className="label">{option.label}</Select.Link>;
     };
 
@@ -304,45 +272,49 @@ class LogAnalysisCore extends React.PureComponent {
               value={projectName}
               onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
-              {...(incident ? { valueRenderer: projectValueRenderer } : {})}
+              {...(showIncident ? { valueRenderer: projectValueRenderer } : {})}
             />
             <span className="divider">/</span>
             <Select
               name="month"
               inline
               style={{ width: 140 }}
-              options={monthOptions}
+              placeholder="Select Month"
+              options={this.monthOptions}
               value={month}
               onChange={this.handleMonthChange}
+              {...(showIncident ? { valueRenderer: monthValueRender } : {})}
             />
-            {incident && <span className="divider">/</span>}
-            {incident &&
+            {showIncident && <span className="divider">/</span>}
+            {showIncident &&
+              streamingInfos.length > 0 &&
               <Select
                 name="incident"
                 inline
-                clearable
-                style={{ width: 248 }}
-                placeholder="Select Month"
+                style={{ width: 140 }}
                 options={R.map(i => ({ label: i.name, value: i.id }), streamingInfos)}
-                value={incidentId || null}
+                value={incidentId}
                 onChange={this.handleIncidentChange}
               />}
+            {showIncident &&
+              streamingInfos.length === 0 &&
+              <span>{moment(parseInt(incidentId, 10)).format('YYYY-MM-DD')}</span>}
           </div>
-          <div className="section float-right">
-            {incident &&
+          <div className="section float-right" style={{ fontSize: 12 }}>
+            {showIncident &&
               <span className="label" style={{ fontSize: 12 }}>
                 Rare Event Detection Sensitivity
               </span>}
-            {incident &&
+            {showIncident &&
               <Selectors.RareEventSensitivity
                 value={rareEventThreshold || 3}
                 onChange={this.handleRareEventSensitivityChange}
               />}
-            {incident &&
+            {showIncident &&
               <span className="label" style={{ fontSize: 12 }}>
                 Frequency Anomaly Detection Sensitivity
               </span>}
-            {incident &&
+            {showIncident &&
               <Selectors.AnomalyThresholdSensitivity
                 value={derivedPvalue || 0.9}
                 onChange={this.handleFrequencyAnomalySensitivity}
@@ -352,17 +324,30 @@ class LogAnalysisCore extends React.PureComponent {
             </div>
           </div>
         </Container>
-        {currentErrorMessage &&
+        {streamingErrorMessage &&
           <Container fullHeight>
             <div
               className="ui error message"
               style={{ marginTop: 16 }}
               dangerouslySetInnerHTML={{
-                __html: intl.formatMessage(currentErrorMessage, { projectName }),
+                __html: intl.formatMessage(streamingErrorMessage, { projectName }),
               }}
             />
           </Container>}
-        {!currentErrorMessage &&
+        {!streamingErrorMessage &&
+          !showIncident &&
+          streamingInfos.length === 0 &&
+          <Container fullHeight>
+            <div
+              className="ui warning message"
+              style={{ marginTop: 16 }}
+              dangerouslySetInnerHTML={{
+                __html: 'No log entries found, please select other month to view.',
+              }}
+            />
+          </Container>}
+        {!streamingErrorMessage &&
+          !showIncident &&
           streamingInfos.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -373,6 +358,18 @@ class LogAnalysisCore extends React.PureComponent {
                   onClick={this.handleIncidentClick(ic.id)}
                 >
                   <Box isLink>
+                    <div className="actions">
+                      <OverlayTrigger
+                        placement="top"
+                        delayShow={300}
+                        overlay={<Tooltip>Open in New Window</Tooltip>}
+                      >
+                        <i
+                          onClick={this.handleIncidentOpen(ic.id)}
+                          className="link external icon"
+                        />
+                      </OverlayTrigger>
+                    </div>
                     <div className="content">
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Start Time:</div>
@@ -385,6 +382,12 @@ class LogAnalysisCore extends React.PureComponent {
                         <div style={{ float: 'right' }}>
                           {moment(ic.incidentEndTime).format('YYYY/MM/DD hh:mm')}
                         </div>
+                      </div>
+                      <div>
+                        <div className="label" style={{ display: 'inline-block' }}>
+                          Total Events:
+                        </div>
+                        <div style={{ float: 'right' }} />
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
@@ -402,9 +405,12 @@ class LogAnalysisCore extends React.PureComponent {
               ))}
             </Tile>
           </Container>}
-        {!currentErrorMessage &&
-          incident &&
-          <Container className="log-charts"><LogAnalysisCharts data={incident} /></Container>}
+        {!streamingErrorMessage &&
+          showIncident &&
+          <Container className="log-charts">
+            incident
+            {false && <LogAnalysisCharts data={streamingIncidentInfo} />}
+          </Container>}
       </Container>
     );
   }
@@ -413,12 +419,20 @@ class LogAnalysisCore extends React.PureComponent {
 const LogAnalysis = injectIntl(LogAnalysisCore);
 export default connect(
   (state: State) => {
-    const { streamingInfos, streamingIncidentInfos, currentErrorMessage } = state.log;
+    const {
+      streamingInfos,
+      streamingInfosParams,
+      streamingIncidentInfo,
+      streamingIncidentInfoParams,
+      streamingErrorMessage,
+    } = state.log;
     return {
       projects: R.filter(p => p.isLogStreaming, state.app.projects),
       streamingInfos,
-      streamingIncidentInfos,
-      currentErrorMessage,
+      streamingInfosParams,
+      streamingIncidentInfo,
+      streamingIncidentInfoParams,
+      streamingErrorMessage,
     };
   },
   { push, loadLogStreamingList, loadLogStreamingIncident },

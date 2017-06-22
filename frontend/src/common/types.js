@@ -67,11 +67,15 @@ export type MetricState = {
 };
 
 export type LogState = {
+  // Historical log
   fileInfos: Object,
   fileIncidentInfos: Object,
-  streamingInfos: Object,
+  // Log streaming
+  streamingInfos: Array<Object>,
+  streamingInfosParams: Object,
   streamingIncidentInfos: Object,
-  currentErrorMessage: ?Message,
+  streamingIncidentInfosParams: Object,
+  streamingErrorMessage: ?Message,
 };
 
 export type UseCaseState = {

@@ -10,9 +10,24 @@
       .content {
         font-size: 12px;
         width: 248px;
-        height: 90px;
+        height: 108px;
         .label {
           font-weight: $font-weight-medium;
+        }
+      }
+      .actions {
+        display: none;
+        position: absolute;
+        right: 1em;
+        bottom: 0.5em;
+        font-size: 14px;
+        &:hover {
+          color: #4183C4;
+        }
+      }
+      &:hover {
+        .actions {
+          display: block;
         }
       }
     }

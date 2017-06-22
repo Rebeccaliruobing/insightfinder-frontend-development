@@ -22,10 +22,11 @@ const loadLogStreamingList = (credentials: Credentials, params: Object) => {
     // Add special properties for each incident.
     let incidentList = d.data;
     incidentList = R.map((i) => {
+      const startTime = moment(i.incidentStartTime);
       return {
         ...i,
-        id: i.incidentKey,
-        name: moment(i.incidentStartTime).format('YYYY-MM-DD'),
+        id: startTime.valueOf().toString(),
+        name: startTime.format('YYYY-MM-DD'),
       };
     }, incidentList);
 

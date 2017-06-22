@@ -6,11 +6,12 @@ import { get } from 'lodash';
 import { push } from 'react-router-redux';
 import R from 'ramda';
 import type { Deps } from '../../types';
-import { loadLogStreaming, loadLogStreamingIncident } from '../../apis';
+import loadLogStreaming from '../../apis/loadLogStreaming';
+import loadLogStreamingIncident from '../../apis/loadLogStreamingIncident1';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { buildMatchLocation } from '../../utils';
 import { apiEpicErrorHandle } from '../../errors';
-import { setLogStreaming } from '../actions';
+import { setLogStreaming1 } from '../actions';
 
 const streamingEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING')
@@ -23,6 +24,8 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
       const { streamingInfos } = state.log;
 
       let reloadProject = forceReload;
+
+      console.log('match', match);
 
       // Check whether the project id is a valid log project id.
       // If not, choose the first project.
@@ -63,7 +66,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
               if (!incident) {
                 return Observable.concat(
                   Observable.of(push(location)),
-                  Observable.of(setLogStreaming(projectId, projectData)),
+                  Observable.of(setLogStreaming1(projectId, projectData)),
                 );
               }
 
@@ -79,7 +82,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
                   return Observable.concat(
                     Observable.of(push(location)),
                     Observable.of(
-                      setLogStreaming(projectId, projectData, incidentId, incidentData)),
+                      setLogStreaming1(projectId, projectData, incidentId, incidentData)),
                   );
                 });
             })
@@ -118,7 +121,7 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
             return Observable.concat(
               Observable.of(push(location)),
               Observable.of(
-                setLogStreaming(projectId, streamingInfo, incidentId, incidentData)),
+                setLogStreaming1(projectId, streamingInfo, incidentId, incidentData)),
             );
           })
           .catch((err) => {
