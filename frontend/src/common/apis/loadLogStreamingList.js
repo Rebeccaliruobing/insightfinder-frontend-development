@@ -6,6 +6,7 @@
  **/
 
 import R from 'ramda';
+import { get } from 'lodash';
 import moment from 'moment';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
@@ -27,6 +28,9 @@ const loadLogStreamingList = (credentials: Credentials, params: Object) => {
         ...i,
         id: startTime.valueOf().toString(),
         name: startTime.format('YYYY-MM-DD'),
+        totalEventsCount: null,
+        rareEventsCount: i.rareEventsSize,
+        clusterCount: (i.cluster || []).length,
       };
     }, incidentList);
 

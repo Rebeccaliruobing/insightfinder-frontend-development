@@ -64,7 +64,7 @@ describe('apis.loadLogStreamingList with guest account', () => {
     expect(rawData).toBeInstanceOf(Array);
   });
 
-  it('Expect api response contains multiple incidents', () => {
+  it('Expect api response contains at least one incident', () => {
     expect(rawData.length).toBeGreaterThan(0);
   });
 
@@ -73,36 +73,43 @@ describe('apis.loadLogStreamingList with guest account', () => {
     expect(rawData.length - items.length).toBe(0);
   });
 
+  it('Expect parsed data contains no duplicate id', () => {
+    const items = R.uniq(R.map(i => i.id, data));
+    expect(data.length - items.length).toBe(0);
+  });
+
   it(`Expect api response contains no duplicate ${chalk.blue('incidentStartTime')} and ${chalk.blue('incidentEndTime')} pair`, () => {
     const items = R.uniq(R.map(i => `${i.incidentStartTime}_${i.incidentEndTime}`, rawData));
     expect(rawData.length - items.length).toBe(0);
   });
 
-  it(`Expect no incidents without ${chalk.blue('{incidentStartTime, incidentEndTime, cluster, rareEventsSize}')} fields`, () => {
-    const incidents = [];
-    R.forEach((i) => {
-      if (
-        !R.has('incidentStartTime')(i) ||
-        !R.has('incidentEndTime')(i) ||
-        !R.has('cluster')(i) ||
-        !R.has('rareEventsSize')(i)
-      ) {
-        incidents.push(i.incidentKey);
-      }
-    }, rawData);
-
-    expect(incidents.length).toBe(0);
+  it(`Expect api response incidents contain only fields ${chalk.blue('{incidentKey, incidentStartTime, incidentEndTime, clusterCount, totalEventsCount, rareEventsCount}')} fields`, () => {
+    const incidents = rawData;
+    if (incidents.length > 0) {
+      const incident = incidents[0];
+      expect(Object.keys(incident)).toEqual(
+        expect.arrayContaining([
+          'incidentKey',
+          'incidentStartTime',
+          'incidentEndTime',
+          'clusterCount',
+          'totalEventsCount',
+          'rareEventsCount',
+        ]),
+      );
+      expect(Object.keys(incident).length).toBe(6);
+    }
   });
 
-  it(`Expect no parsed incidents without ${chalk.blue('{id, name}')} fields`, () => {
-    const incidents = [];
+  it(`Expect parsed data not contains incidents without ${chalk.blue('{id, name}')} fields`, () => {
+    const ids = [];
     R.forEach((i) => {
       if (!R.has('id')(i) || !R.has('name')(i)) {
-        incidents.push(i.incidentKey);
+        ids.push(i.id);
       }
     }, data);
 
-    expect(incidents.length).toBe(0);
+    expect(ids.length).toBe(0);
   });
 });
 

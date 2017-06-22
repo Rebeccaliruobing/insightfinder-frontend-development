@@ -21,7 +21,6 @@ import { parseQueryString, buildMatchLocation, buildUrl } from '../../common/uti
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { loadLogStreamingList, loadLogStreamingIncident } from '../../common/log/actions';
-import { Selectors } from '../app/components';
 import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
 import './log.scss';
 
@@ -40,16 +39,17 @@ type Props = {
   loadLogStreamingIncident: Function,
 };
 
+const VIEW_CLUSTER = 'cluster';
+const VIEW_RARE = 'rare';
+
 class LogAnalysisCore extends React.PureComponent {
   props: Props;
 
   constructor(props) {
     super(props);
 
-    this.defaultParams = {
-      rareEventThreshold: '3',
-      derivedPvalue: '0.9',
-    };
+    this.defaultView = VIEW_CLUSTER;
+    this.pickNotNil = R.pickBy(a => !R.isNil(a));
 
     // General the monthy option list for one year.
     this.monthCount = 12;
@@ -65,7 +65,7 @@ class LogAnalysisCore extends React.PureComponent {
 
   componentDidMount() {
     if (!this.applyParamsAndRedirect(this.props)) {
-      this.reloadData(this.props);
+      this.reloadData(this.props, true);
     }
   }
 
@@ -78,9 +78,10 @@ class LogAnalysisCore extends React.PureComponent {
   applyParamsAndRedirect(props) {
     // Apply the default params if missing and redirect to new location if params changes.
     // When redirection happens, we should not need to reload the data. The return value
+    // indicates whethre rediction happens.
     const { location, match, push, projects } = props;
     const query = parseQueryString(location.search);
-    let { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = query;
+    let { projectName, month, incidentId, view } = query;
     let redirect = false;
 
     // If no project is selected, choose the first project if exists. The project might
@@ -92,28 +93,24 @@ class LogAnalysisCore extends React.PureComponent {
     // If no month, set to current month
     month = month || moment().format('YYYY-MM');
 
-    // Set default params for incident query. If it's not for incident, reset all.
+    // Set default incident params, if not show incident, set to undefined to keep url clean.
     if (incidentId) {
-      rareEventThreshold = rareEventThreshold || this.defaultParams.rareEventThreshold;
-      derivedPvalue = derivedPvalue || this.defaultParams.derivedPvalue;
+      view = view || this.defaultView;
     } else {
       incidentId = undefined;
-      rareEventThreshold = undefined;
-      derivedPvalue = undefined;
+      view = undefined;
     }
 
     const newParams = {
       projectName,
       month,
       incidentId,
-      rareEventThreshold,
-      derivedPvalue,
+      view,
     };
 
     // Compare the new params with the origin params, if changed, redirect to new location.
     // We need to remove the undefined and null value before comparing.
-    const pickNotNil = R.pickBy(a => !R.isNil(a));
-    if (!R.equals(pickNotNil(newParams), pickNotNil(query))) {
+    if (!R.equals(this.pickNotNil(newParams), this.pickNotNil(query))) {
       redirect = true;
       const url = buildMatchLocation(match, {}, newParams);
       push(url);
@@ -127,22 +124,21 @@ class LogAnalysisCore extends React.PureComponent {
     // Compare the current params with saved params, if it's different, dispatch action.
     const params = parseQueryString(get(props, 'location.search'));
     const { streamingInfosParams, streamingIncidentInfoParams } = props;
-    const { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = params;
+    const { projectName, month, incidentId, view } = params;
 
     // IMPORTANT: Need to check the new params with last params, otherwise it will
     // cause infinite loop.
-    if (!incidentId) {
-      if (force || !R.equals({ projectName, month }, streamingInfosParams)) {
-        this.props.loadLogStreamingList(projectName, month);
-      }
-    } else if (force || !R.equals(params, streamingIncidentInfoParams)) {
-      this.props.loadLogStreamingIncident(
-        projectName,
-        month,
-        incidentId,
-        rareEventThreshold,
-        derivedPvalue,
-      );
+    if (force || !R.equals({ projectName, month }, streamingInfosParams)) {
+      console.log('list', props, force, streamingInfosParams);
+      this.props.loadLogStreamingList(projectName, month);
+    }
+
+    if (
+      incidentId &&
+      (force || !R.equals({ projectName, incidentId, view }, streamingIncidentInfoParams))
+    ) {
+      console.log('incident', props, force, streamingInfosParams);
+      this.props.loadLogStreamingIncident(projectName, incidentId, view);
     }
   }
 
@@ -154,16 +150,9 @@ class LogAnalysisCore extends React.PureComponent {
 
     // When project changed, remove incident related params.
     const incidentId = undefined;
-    const rareEventThreshold = undefined;
-    const derivedPvalue = undefined;
+    const view = undefined;
 
-    push(
-      buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      ),
-    );
+    push(buildMatchLocation(match, {}, { projectName, month, incidentId, view }));
   }
 
   @autobind handleMonthChange(newValue) {
@@ -174,16 +163,9 @@ class LogAnalysisCore extends React.PureComponent {
 
     // When month changed, remove incident related params.
     const incidentId = undefined;
-    const rareEventThreshold = undefined;
-    const derivedPvalue = undefined;
+    const view = undefined;
 
-    push(
-      buildMatchLocation(
-        match,
-        {},
-        { projectName, month, incidentId, rareEventThreshold, derivedPvalue },
-      ),
-    );
+    push(buildMatchLocation(match, {}, { projectName, month, incidentId, view }));
   }
 
   @autobind handleIncidentChange(newValue) {
@@ -193,18 +175,15 @@ class LogAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { ...params, incidentId }));
   }
 
-  @autobind handleRareEventSensitivityChange(newValue) {
-    const rareEventThreshold = newValue ? newValue.value : null;
-    const { match, push, location } = this.props;
-    const params = parseQueryString(location.search);
-    push(buildMatchLocation(match, {}, { ...params, rareEventThreshold }));
-  }
+  @autobind handleViewChangeClick(view) {
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-  @autobind handleFrequencyAnomalySensitivity(newValue) {
-    const derivedPvalue = newValue ? newValue.value : null;
-    const { match, push, location } = this.props;
-    const params = parseQueryString(location.search);
-    push(buildMatchLocation(match, {}, { ...params, derivedPvalue }));
+      const { match, push, location } = this.props;
+      const params = parseQueryString(location.search);
+      push(buildMatchLocation(match, {}, { ...params, view }));
+    };
   }
 
   @autobind handleRefreshClick() {
@@ -245,14 +224,10 @@ class LogAnalysisCore extends React.PureComponent {
       streamingErrorMessage,
     } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, month, incidentId, rareEventThreshold, derivedPvalue } = params;
+    const { projectName, month, incidentId, view } = params;
     const showIncident = !!incidentId && streamingIncidentInfo;
 
-    // Select renderer to generate link to project and month.
-    const projectValueRenderer = (option) => {
-      const url = buildMatchLocation(match, {}, { projectName: option.value });
-      return <Select.Link to={url} className="label">{option.label}</Select.Link>;
-    };
+    // Select renderer to generate link to month.
     const monthValueRender = (option) => {
       const url = buildMatchLocation(match, {}, { projectName, month: option.value });
       return <Select.Link to={url} className="label">{option.label}</Select.Link>;
@@ -272,7 +247,6 @@ class LogAnalysisCore extends React.PureComponent {
               value={projectName}
               onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
-              {...(showIncident ? { valueRenderer: projectValueRenderer } : {})}
             />
             <span className="divider">/</span>
             <Select
@@ -296,29 +270,8 @@ class LogAnalysisCore extends React.PureComponent {
                 value={incidentId}
                 onChange={this.handleIncidentChange}
               />}
-            {showIncident &&
-              streamingInfos.length === 0 &&
-              <span>{moment(parseInt(incidentId, 10)).format('YYYY-MM-DD')}</span>}
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
-            {showIncident &&
-              <span className="label" style={{ fontSize: 12 }}>
-                Rare Event Detection Sensitivity
-              </span>}
-            {showIncident &&
-              <Selectors.RareEventSensitivity
-                value={rareEventThreshold || 3}
-                onChange={this.handleRareEventSensitivityChange}
-              />}
-            {showIncident &&
-              <span className="label" style={{ fontSize: 12 }}>
-                Frequency Anomaly Detection Sensitivity
-              </span>}
-            {showIncident &&
-              <Selectors.AnomalyThresholdSensitivity
-                value={derivedPvalue || 0.9}
-                onChange={this.handleFrequencyAnomalySensitivity}
-              />}
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
               Refresh
             </div>
@@ -387,17 +340,17 @@ class LogAnalysisCore extends React.PureComponent {
                         <div className="label" style={{ display: 'inline-block' }}>
                           Total Events:
                         </div>
-                        <div style={{ float: 'right' }} />
+                        <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
-                        <div style={{ float: 'right' }}>{(ic.cluster || []).length}</div>
+                        <div style={{ float: 'right' }}>{ic.clusterCount}</div>
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>
                           Rare Events:
                         </div>
-                        <div style={{ float: 'right' }}>{ic.rareEventsSize}</div>
+                        <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
                       </div>
                     </div>
                   </Box>
@@ -407,9 +360,10 @@ class LogAnalysisCore extends React.PureComponent {
           </Container>}
         {!streamingErrorMessage &&
           showIncident &&
-          <Container className="log-charts">
-            incident
-            {false && <LogAnalysisCharts data={streamingIncidentInfo} />}
+          <Container className="flex-grow flex-col">
+            <Container className="boxed flex-grow">
+              <div>fds</div>
+            </Container>
           </Container>}
       </Container>
     );

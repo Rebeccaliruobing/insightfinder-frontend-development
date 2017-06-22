@@ -43,11 +43,11 @@ describe('apis.loadInitData with guest account', () => {
     done();
   });
 
-  it('Expect api response contains "projectString"', () => {
-    expect(Object.keys(rawData)).toEqual(expect.arrayContaining(['projectString']));
+  it(`Expect api response contains ${chalk.blue('basicProjectData')}`, () => {
+    expect(Object.keys(rawData)).toEqual(expect.arrayContaining(['basicProjectData']));
   });
 
-  it(`Expect api response contains only 1 key: ${chalk.blue('projectString')}`, () => {
+  it(`Expect api response contains only 1 key: ${chalk.blue('basicProjectData')}`, () => {
     expect(Object.keys(rawData).length).toBe(1);
   });
 
@@ -78,7 +78,7 @@ describe('apis.loadInitData with guest account', () => {
       projectId: metricProject,
       projectName: metricProject,
       projectType: 'EC2',
-      instanceType: 'CloudWatch',
+      cloudType: 'CloudWatch',
       dataType: 'Metric',
       isMetric: true,
       isLogFile: false,

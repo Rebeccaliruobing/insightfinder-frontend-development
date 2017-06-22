@@ -16,7 +16,7 @@ import { setLogStreaming } from '../actions';
 
 const streamingIncidentEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING_INCIDENT').concatMap((action) => {
-    const { projectName, incidentId } = action.payload;
+    const { projectName, incidentId, view } = action.payload;
     const state = getState();
     const { credentials } = state.auth;
     const streamingIncidentInfoParams = action.payload;

@@ -59,18 +59,14 @@ export const loadLogStreamingList = (projectName: ?string, month: ?string): Acti
 
 export const loadLogStreamingIncident = (
   projectName: String,
-  month: String,
   incidentId: String,
-  rareEventThreshold: String,
-  derivedPvalue: String,
+  view: String,
 ): Action => ({
   type: 'LOAD_LOG_STREAMING_INCIDENT',
   payload: {
     projectName,
-    month,
     incidentId,
-    rareEventThreshold,
-    derivedPvalue,
+    view,
   },
 });
 
