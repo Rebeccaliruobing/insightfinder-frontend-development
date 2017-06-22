@@ -18,9 +18,10 @@ type Props = {
   picked: bool,
   pickProjectModel: Function,
   removeProjectModel: Function,
+  selectProjectModel: Function,
 };
 
-class ModelTile extends React.Component {
+class ModelTile extends React.PureComponent {
   props: Props;
 
   static defaultProps = {
@@ -57,6 +58,15 @@ class ModelTile extends React.Component {
 
     const { model, projectName, instanceGroup } = this.props;
     this.props.pickProjectModel(projectName, instanceGroup, model.modelKey);
+  }
+
+  @autobind
+  handleModelSelected(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const { model, projectName, instanceGroup } = this.props;
+    this.props.selectProjectModel(projectName, instanceGroup, model.modelKey);
   }
 
   @autobind
@@ -103,7 +113,7 @@ class ModelTile extends React.Component {
 
     return (
       <Tile className={cx('model-tile', { big, picked })}>
-        <Box isLink={!big}>
+        <Box isLink={!big} onClick={this.handleModelSelected}>
           <Heatmap dataset={dataset} countPerRow={count} style={{ width: size, height: size }} />
           <div className="meta">
             <div>{`${startTime} - ${endTime}`}</div>

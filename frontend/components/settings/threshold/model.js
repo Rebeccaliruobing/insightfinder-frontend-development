@@ -72,6 +72,13 @@ class ModelSettings extends React.Component {
   }
 
   @autobind
+  handleSelectProjectModel(projectName, instanceGroup, key) {
+    this.setState({
+      pickedModelKeys: [key],
+    });
+  }
+
+  @autobind
   handlePickProjectModel(projectName, instanceGroup, key) {
     const { models } = this.state;
     const pickedModel = R.find(m => m.modelKey === key, models);
@@ -125,7 +132,7 @@ class ModelSettings extends React.Component {
           isParent isVertical size={3}
           style={{ padding: 0, marginRight: 10 }}
         >
-          <h4>Picked Model</h4>
+          <h4>Model Details:</h4>
           {pickedModel &&
             <div style={{ paddingBottom: '1em', paddingRight: '1em' }}>
               {`You picked model 
@@ -162,6 +169,7 @@ class ModelSettings extends React.Component {
                 picked={R.find(R.equals(m.modelKey), pickedModelKeys)}
                 projectName={projectName}
                 instanceGroup={instanceGroup}
+                selectProjectModel={this.handleSelectProjectModel}
                 pickProjectModel={this.handlePickProjectModel}
                 removeProjectModel={this.handleRemoveProjectModel}
               />
