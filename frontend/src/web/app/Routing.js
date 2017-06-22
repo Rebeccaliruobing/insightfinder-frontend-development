@@ -69,7 +69,7 @@ const LogRoutings = () => {
     <SinglePage>
       <Switch>
         <Route path={BaseUrls.LogAnalysis + '1'} component={LogAnalysis} />
-        <Route path={BaseUrls.LogAnalysis} component={LogLiveAnalysis} />
+        <Route path="/log/live-analysis/:projectId?/:month?/:incidentId?" component={LogLiveAnalysis} />
         <Route path={BaseUrls.LogHistoricalLogAnalysis} component={LogFileAnalysis} />
         <Redirect from="*" to={BaseUrls.LogAnalysis} />
       </Switch>

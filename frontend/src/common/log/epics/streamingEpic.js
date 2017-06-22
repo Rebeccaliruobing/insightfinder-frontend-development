@@ -25,8 +25,6 @@ const streamingEpic = (action$: any, { getState }: Deps) =>
 
       let reloadProject = forceReload;
 
-      console.log('match', match);
-
       // Check whether the project id is a valid log project id.
       // If not, choose the first project.
       if (!projectId || !R.find(p => p.projectId === projectId, projects)) {
