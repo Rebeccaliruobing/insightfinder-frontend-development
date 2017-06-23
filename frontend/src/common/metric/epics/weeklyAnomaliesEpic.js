@@ -64,7 +64,7 @@ const weeklyAnomaliesEpic = (action$: any, { getState }: Deps) =>
           return Observable.of(
             setMetricCurrentInfo({
               currentErrorMessage: null,
-              currentWeeklyAnomalies: data,
+              currentWeeklyAnomalies: data.data,
             }),
           );
         })
