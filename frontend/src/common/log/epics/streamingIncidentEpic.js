@@ -9,17 +9,28 @@
 import { Observable } from 'rxjs/Observable';
 import { get } from 'lodash';
 import type { Deps } from '../../types';
-import { loadLogStreamingIncident } from '../../apis';
+import { loadLogStreamingPattern } from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
 import { setLogStreaming } from '../actions';
+
+const viewApis = {
+  cluster: loadLogStreamingPattern,
+  rare: loadLogStreamingPattern,
+};
 
 const streamingIncidentEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_STREAMING_INCIDENT').concatMap((action) => {
     const { projectName, incidentId, view } = action.payload;
     const state = getState();
     const { credentials } = state.auth;
+    const { streamingIncidentInfo } = state.log;
     const streamingIncidentInfoParams = action.payload;
+
+    // The data for each view is stored in incident info, we might reuse
+    // the existing data if we params are same, but now we just reload
+    // the data everytime.
+    const apiFunc = viewApis[view];
 
     return Observable.concat(
       Observable.of(showAppLoader()),
@@ -27,11 +38,12 @@ const streamingIncidentEpic = (action$: any, { getState }: Deps) =>
         setLogStreaming({
           streamingErrorMessage: null,
           streamingIncidentInfoParams,
-          streamingIncidentInfo: {},
+          // Reset the data for the current view only
+          streamingIncidentInfo: { ...streamingIncidentInfo, [view]: {} },
         }),
       ),
       Observable.from(
-        loadLogStreamingIncident(credentials, {
+        apiFunc(credentials, {
           projectName,
           incidentId,
         }),
@@ -39,7 +51,7 @@ const streamingIncidentEpic = (action$: any, { getState }: Deps) =>
         .concatMap((d) => {
           return Observable.of(
             setLogStreaming({
-              streamingIncidentInfo: get(d, 'data', {}),
+              streamingIncidentInfo: { ...streamingIncidentInfo, [view]: get(d, 'data', {}) },
             }),
           );
         })

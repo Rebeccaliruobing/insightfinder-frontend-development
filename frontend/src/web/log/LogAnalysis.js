@@ -22,6 +22,7 @@ import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { loadLogStreamingList, loadLogStreamingIncident } from '../../common/log/actions';
 import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
+import { LogClusteringResult, LogRareEvents } from './components';
 import './log.scss';
 
 type Props = {
@@ -39,17 +40,23 @@ type Props = {
   loadLogStreamingIncident: Function,
 };
 
-const VIEW_CLUSTER = 'cluster';
-const VIEW_RARE = 'rare';
-
 class LogAnalysisCore extends React.PureComponent {
   props: Props;
 
   constructor(props) {
     super(props);
 
-    this.defaultView = VIEW_CLUSTER;
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
+
+    // View name, key and React component used to create the view. The view component
+    // will take the same props.
+    this.viewInfos = [
+      { key: 'cluster', name: 'Clustering Result', component: LogClusteringResult },
+      { key: 'rare', name: 'Rare Events', component: LogRareEvents },
+      { key: 'freq', name: 'Frequency Based Anomaly Detection' },
+      { key: 'seq', name: 'Frequent Pattern Sequences' },
+    ];
+    this.defaultView = 'cluster';
 
     // General the monthy option list for one year.
     this.monthCount = 12;
@@ -95,7 +102,9 @@ class LogAnalysisCore extends React.PureComponent {
 
     // Set default incident params, if not show incident, set to undefined to keep url clean.
     if (incidentId) {
-      view = view || this.defaultView;
+      if (!view || !R.find(i => i.key === view, this.viewInfos)) {
+        view = this.defaultView;
+      }
     } else {
       incidentId = undefined;
       view = undefined;
@@ -226,6 +235,8 @@ class LogAnalysisCore extends React.PureComponent {
     const params = parseQueryString(location.search);
     const { projectName, month, incidentId, view } = params;
     const showIncident = !!incidentId && streamingIncidentInfo;
+    const viewInfo = R.find(info => info.key === view, this.viewInfos);
+    const viewInfoData = get(streamingIncidentInfo, view, {});
 
     // Select renderer to generate link to month.
     const monthValueRender = (option) => {
@@ -361,8 +372,28 @@ class LogAnalysisCore extends React.PureComponent {
         {!streamingErrorMessage &&
           showIncident &&
           <Container className="flex-grow flex-col">
-            <Container className="boxed flex-grow">
-              <div>fds</div>
+            <Container className="boxed flex-grow flex-col">
+              <div className="ui pointing secondary menu">
+                {R.map(
+                  info => (
+                    <a
+                      key={info.key}
+                      className={`${info.key === view ? 'active' : ''} item`}
+                      onClick={this.handleViewChangeClick(info.key)}
+                    >
+                      {info.name}
+                    </a>
+                  ),
+                  this.viewInfos,
+                )}
+              </div>
+              <div className="flex-grow">
+                <Container fullHeight>
+                  {React.createElement(viewInfo.component, {
+                    data: viewInfoData,
+                  })}
+                </Container>
+              </div>
             </Container>
           </Container>}
       </Container>
