@@ -54,8 +54,8 @@ class CausalGraphModal extends React.Component {
       relationProbability: 0.6,
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
-      currentZoom: 5,
-      showMetrics: true,
+      currentZoom: 1,
+      showMetrics: false,
       mergeMetrics: true,
     };
   }
@@ -89,10 +89,10 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 20 + (currentZoom * 40),
-      nodesep: 20 + (currentZoom * 16),
-      edgesep: 10 + (currentZoom * 4),
-      marginx: 20, marginy: 20,
+      ranksep: 5 + (currentZoom * 5),
+      nodesep: 5 + (currentZoom * 5),
+      edgesep: 4 + (currentZoom * 4),
+      marginx: 5, marginy: 10,
     });
 
     // Get unique left & right side of the relations as the node name.
