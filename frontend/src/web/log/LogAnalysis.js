@@ -139,7 +139,7 @@ class LogAnalysisCore extends React.PureComponent {
     // cause infinite loop.
     if (force || !R.equals({ projectName, month }, streamingInfosParams)) {
       console.log('list', props, force, streamingInfosParams);
-      this.props.loadLogStreamingList(projectName, month);
+      props.loadLogStreamingList(projectName, month);
     }
 
     if (
@@ -147,7 +147,7 @@ class LogAnalysisCore extends React.PureComponent {
       (force || !R.equals({ projectName, incidentId, view }, streamingIncidentInfoParams))
     ) {
       console.log('incident', props, force, streamingInfosParams);
-      this.props.loadLogStreamingIncident(projectName, incidentId, view);
+      props.loadLogStreamingIncident(projectName, incidentId, view);
     }
   }
 

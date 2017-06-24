@@ -8,4 +8,5 @@ export { default as loadLogFileIncident } from './loadLogFileIncident';
 export { default as loadLogStreamingList } from './loadLogStreamingList';
 export { default as loadLogStreamingPattern } from './loadLogStreamingPattern';
 export { default as loadLogStreamingIncident } from './loadLogStreamingIncident';
+export { default as loadProjectSettings } from './loadProjectSettings';
 export { default as loadWeeklyAnomalies } from './loadWeeklyAnomalies';

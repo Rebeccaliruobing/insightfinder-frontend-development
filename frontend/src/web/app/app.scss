@@ -2,6 +2,10 @@
 
 @import "../../lib/fui/fui";
 
+.ui.secondary.pointing.menu .active.item {
+  font-weight: normal !important;
+}
+
 .name {
   font-size: 14px;
   line-height: 20px;

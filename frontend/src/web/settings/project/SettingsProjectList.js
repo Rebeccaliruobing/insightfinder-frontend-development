@@ -1,3 +1,10 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import React from 'react';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
@@ -33,12 +40,13 @@ class SettingsProjectListCore extends React.Component {
     }
   }
 
-  @autobind
-  handleProjectClick({ rowData: project }) {
+  @autobind handleProjectClick({ rowData: project }) {
     const { push } = this.props;
-    push(buildLocation(BaseUrls.SettingsProject, {
-      projectId: project.projectId,
-    }));
+    push(
+      buildLocation(BaseUrls.SettingsProject, {
+        projectName: project.projectName,
+      }),
+    );
   }
 
   render() {
@@ -54,20 +62,23 @@ class SettingsProjectListCore extends React.Component {
             <span className="divider">/</span>
             <span>Projects</span>
           </div>
-          <div className="section float-right">
+          <div className="section" style={{ fontSize: 12, marginLeft: 40 }}>
             <NavLink to={BaseUrls.SettingsProjectWizard}>
               <div className="ui orange button">Add New Project...</div>
             </NavLink>
           </div>
         </Container>
         <Container
-          fullHeight className="overflow-y-auto"
+          fullHeight
+          className="overflow-y-auto"
           style={{ marginTop: '0.5em', marginBottom: '0.5em' }}
         >
           <AutoSizer>
             {({ width, height }) => (
               <Table
-                className="with-border" width={width} height={height}
+                className="with-border"
+                width={width}
+                height={height}
                 headerHeight={40}
                 rowHeight={40}
                 rowCount={projects.length}
@@ -75,11 +86,11 @@ class SettingsProjectListCore extends React.Component {
                 onRowClick={this.handleProjectClick}
               >
                 <Column width={240} label="Name" dataKey="projectName" />
-                <Column width={120} label="Created Time" dataKey="createdTime" />
+                <Column width={120} label="Project Type" dataKey="projectType" />
+                <Column width={240} label="Cloud Type" dataKey="cloudType" />
+                <Column width={240} label="Data Type" dataKey="dataType" />
                 <Column width={120} label="Status" dataKey="status" />
-                <Column width={240} label="Data Sources" dataKey="dataSources" />
                 <Column width={120} label="Owner" dataKey="owner" />
-                <Column width={120} label="Shared With" dataKey="sharedUsers" />
                 <Column width={240} flexGrow={1} label="Description" dataKey="desc" />
               </Table>
             )}
@@ -95,11 +106,7 @@ const SettingsProjectList = injectIntl(SettingsProjectListCore);
 export default connect(
   (state: State) => {
     const { projects } = state.app;
-    return {
-      projects,
-    };
+    return { projects };
   },
-  {
-    push, hideAppLoader, showAppAlert,
-  },
+  { push, hideAppLoader, showAppAlert },
 )(SettingsProjectList);

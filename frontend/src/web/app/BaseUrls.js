@@ -31,7 +31,7 @@ const BaseUrls = {
 
   Settings: '/settings',
   SettingsProjectList: '/settings/projects',
-  SettingsProject: '/settings/projects/:projectId',
+  SettingsProject: '/settings/projects/:projectName',
   SettingsProjectWizard: '/settings/project-wizard',
 };
 

@@ -78,6 +78,10 @@ export type LogState = {
   streamingErrorMessage: ?Message,
 };
 
+export type SettingsState = {
+  projectSettingsParams: Object,
+};
+
 export type UseCaseState = {
   opensourceSystemNames: Array<string>,
   bugRepository: Object,
@@ -88,6 +92,7 @@ export type State = {
   auth: AuthState,
   metric: MetricState,
   log: LogState,
+  settings: SettingsState,
   usecase: UseCaseState,
 };
 

@@ -1,9 +1,17 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import 'rxjs';
 import { combineEpics } from 'redux-observable';
 import appEpics from './app/epics';
 import authEpics from './auth/epics';
 import metricEpics from './metric/epics';
 import logEpics from './log/epics';
+import settingsEpics from './settings/epics.js';
 import usecaseEpics from './usecase/epics';
 
 const epics = [
@@ -11,6 +19,7 @@ const epics = [
   ...authEpics,
   ...metricEpics,
   ...logEpics,
+  ...settingsEpics,
   ...usecaseEpics,
 ];
 

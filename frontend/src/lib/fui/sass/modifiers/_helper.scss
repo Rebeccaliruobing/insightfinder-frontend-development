@@ -63,5 +63,11 @@
   border: 1px solid transparent;
 }
 
+.clearfix:after {
+  display: block;
+  content: "";
+  clear: both;
+}
+
 .hoverable {
 }
