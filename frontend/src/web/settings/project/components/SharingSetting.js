@@ -19,10 +19,9 @@ type Props = {
   currentLoadingComponents: Object,
   data: Object,
   saveProjectSettings: Function,
-  submitIsLoading: Boolean,
 };
 
-class ProjectSharing extends React.PureComponent {
+class SharingSetting extends React.PureComponent {
   props: Props;
 
   constructor(props) {
@@ -59,7 +58,7 @@ class ProjectSharing extends React.PureComponent {
   }
 
   render() {
-    const namesLink = VLink.state(this, 'sharedUserNames');
+    const namesLink = VLink.state(this, this.stateKey);
     const hasError = namesLink.error;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
 
@@ -91,4 +90,4 @@ class ProjectSharing extends React.PureComponent {
   }
 }
 
-export default ProjectSharing;
+export default SharingSetting;

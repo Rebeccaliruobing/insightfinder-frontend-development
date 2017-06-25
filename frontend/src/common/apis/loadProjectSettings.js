@@ -28,8 +28,11 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
     const sharedUsernamesStr = get(rawData, 'projectModelAllJSON.sharedUsernames', '').replace(/[[\]]/gi, '');
     const sharedUserNames = R.filter(R.identity, sharedUsernamesStr.split(/\s*,\s*/));
 
+    const predictionWindow = get(rawData, 'projectModelAllJSON.predictionWindow', '4');
+
     const data = {
       sharedUserNames,
+      predictionWindow,
     };
 
     return {

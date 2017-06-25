@@ -5,4 +5,5 @@
  * *****************************************************************************
  **/
 
-export { default as ProjectSharing } from './ProjectSharing';
+export { default as PredictionSetting } from './PredictionSetting';
+export { default as SharingSetting } from './SharingSetting';

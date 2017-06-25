@@ -26,7 +26,7 @@ import {
   appFieldsMessages,
   appButtonsMessages,
 } from '../../../common/app/messages';
-import { ProjectSharing } from './components';
+import { SharingSetting, PredictionSetting } from './components';
 // TODO: Remove hard code setting for internal user.
 
 type Props = {
@@ -66,8 +66,8 @@ class ProjectSettingsCore extends React.Component {
     this.metricSettingInfos = [
       { key: 'learning', name: 'Data Disqualifiers', component: TempComponent },
       { key: 'alert', name: 'Alert Sensitivity', component: TempComponent },
-      { key: 'prediction', name: 'Prediction', component: TempComponent },
-      { key: 'sharing', name: 'Project Sharing', component: ProjectSharing },
+      { key: 'prediction', name: 'Prediction', component: PredictionSetting },
+      { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
       { key: 'grouping', name: 'Grouping', component: TempComponent },
       { key: 'threshold', name: 'Threshold Overrides', component: TempComponent },
     ];
@@ -83,7 +83,7 @@ class ProjectSettingsCore extends React.Component {
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: TempComponent },
       { key: 'logthreshold', name: 'Sensitivity Settings', component: TempComponent },
-      { key: 'sharing', name: 'Project Sharing', component: ProjectSharing },
+      { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
     ];
     this.defaultMetricSetting = isInternalUser ? 'model' : 'learning';
     this.defaultLogSetting = 'episodeword';
