@@ -31,8 +31,10 @@ class Select extends React.PureComponent {
 
   @autobind
   handleChangeWithValueLink(obj) {
-    const { valueLink } = this.props;
-    if (Array.isArray(obj)) {
+    const { valueLink, multi } = this.props;
+    if (!multi && Array.isArray(obj) && obj.length === 0) {
+      valueLink.set(null);
+    } else if (Array.isArray(obj)) {
       valueLink.set(R.map(o => o.value, obj));
     } else {
       valueLink.set(obj.value);

@@ -1,6 +1,7 @@
 .ui.form{
   .field {
-    &.input {
+    &.input,
+    &.select {
       margin: 0em 0em 1.5em;
     }
     > label {
