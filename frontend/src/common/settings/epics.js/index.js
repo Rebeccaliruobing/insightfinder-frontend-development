@@ -5,10 +5,12 @@
  * *****************************************************************************
  **/
 
-import projectSettingsEpic from './projectSettingsEpic';
+import loadProjectSettingsEpic from './loadProjectSettingsEpic';
+import saveProjectSettingsEpic from './saveProjectSettingsEpic';
 
 const epics = [
-  projectSettingsEpic,
+  loadProjectSettingsEpic,
+  saveProjectSettingsEpic,
 ];
 
 export default epics;

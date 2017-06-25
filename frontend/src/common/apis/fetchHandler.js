@@ -48,7 +48,8 @@ const fetchHandler = (
       if (!json.success) {
         console.warn(
           ['Return error in a 200 response is deprecated, change API http status code.', json]);
-        if (json.code === 12) {
+        // TODO: Remove hack code for wrong code in displayProjectModel.
+        if (json.code === 12 && json.message.indexOf('Models') === -1) {
           throw new PermissionError(json.message, json.code, json);
         }
         throw new InvalidDataError(json.message, json.code, json);

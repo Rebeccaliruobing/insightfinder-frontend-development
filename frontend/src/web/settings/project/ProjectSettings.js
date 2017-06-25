@@ -19,13 +19,14 @@ import DatePicker from 'react-datepicker';
 import { State } from '../../../common/types';
 import { Container, Box, Select } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
-import { loadProjectSettings } from '../../../common/settings/actions';
+import { loadProjectSettings, saveProjectSettings } from '../../../common/settings/actions';
 import { parseQueryString, buildMatchLocation } from '../../../common/utils';
 import {
   appMenusMessages,
   appFieldsMessages,
   appButtonsMessages,
 } from '../../../common/app/messages';
+import { ProjectSharing } from './components';
 // TODO: Remove hard code setting for internal user.
 
 type Props = {
@@ -35,8 +36,12 @@ type Props = {
   push: Function,
   userInfo: Object,
   projects: Array<Object>,
+  projectSettings: Object,
+  currentLoadingComponents: Object,
   projectSettingsParams: Object,
+  currentErrorMessage: ?Message,
   loadProjectSettings: Function,
+  saveProjectSettings: Function,
 };
 
 const TempComponent = () => <div>TODO Setting</div>;
@@ -62,7 +67,7 @@ class ProjectSettingsCore extends React.Component {
       { key: 'learning', name: 'Data Disqualifiers', component: TempComponent },
       { key: 'alert', name: 'Alert Sensitivity', component: TempComponent },
       { key: 'prediction', name: 'Prediction', component: TempComponent },
-      { key: 'sharing', name: 'Project Sharing', component: TempComponent },
+      { key: 'sharing', name: 'Project Sharing', component: ProjectSharing },
       { key: 'grouping', name: 'Grouping', component: TempComponent },
       { key: 'threshold', name: 'Threshold Overrides', component: TempComponent },
     ];
@@ -78,7 +83,7 @@ class ProjectSettingsCore extends React.Component {
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: TempComponent },
       { key: 'logthreshold', name: 'Sensitivity Settings', component: TempComponent },
-      { key: 'sharing', name: 'Project Sharing', component: TempComponent },
+      { key: 'sharing', name: 'Project Sharing', component: ProjectSharing },
     ];
     this.defaultMetricSetting = isInternalUser ? 'model' : 'learning';
     this.defaultLogSetting = 'episodeword';
@@ -176,15 +181,15 @@ class ProjectSettingsCore extends React.Component {
     } else if (projectName !== get(projectSettingsParams, 'projectName')) {
       reload = true;
     } else if (
-        this.ifIn(setting, this.timeRangeSettings) &&
-        (startTime !== get(projectSettingsParams, 'startTime') ||
-          endTime !== get(projectSettingsParams, 'endTime'))
-      ) {
+      this.ifIn(setting, this.timeRangeSettings) &&
+      (startTime !== get(projectSettingsParams, 'startTime') ||
+        endTime !== get(projectSettingsParams, 'endTime'))
+    ) {
       reload = true;
     } else if (
-        this.ifIn(setting, this.instanceGroupSettings) &&
-        instanceGroup !== get(projectSettingsParams, 'instanceGroup')
-      ) {
+      this.ifIn(setting, this.instanceGroupSettings) &&
+      instanceGroup !== get(projectSettingsParams, 'instanceGroup')
+    ) {
       reload = true;
     }
 
@@ -234,14 +239,23 @@ class ProjectSettingsCore extends React.Component {
   }
 
   render() {
-    const { intl, match, projects } = this.props;
+    const {
+      intl,
+      match,
+      projects,
+      projectSettings,
+      currentLoadingComponents,
+      saveProjectSettings,
+      currentErrorMessage,
+    } = this.props;
     const { projectName } = match.params;
     const { setting, instanceGroup, startTime, endTime } = parseQueryString(location.search);
     const project = R.find(p => p.projectName === projectName, projects);
-    const dataType = project.dataType.toLowerCase();
+    const dataType = get(project, 'dataType', 'metric').toLowerCase();
     const settingInfos = dataType === 'metric' ? this.metricSettingInfos : this.logSettingInfos;
     const settingInfo = R.find(info => info.key === setting, settingInfos);
     const showTimeRange = this.ifIn(setting, this.timeRangeSettings);
+    const hasError = !!currentErrorMessage;
 
     return (
       <Container fullHeight withGutter className="flex-col">
@@ -269,10 +283,7 @@ class ProjectSettingsCore extends React.Component {
             </div>
           </div>
           {showTimeRange &&
-            <div
-              className="section float-right clearfix"
-              style={{ fontSize: 12, marginRight: '0.75em' }}
-            >
+            <div className="section float-right" style={{ fontSize: 12, marginRight: '0.75em' }}>
               <span className="label">Start Date:</span>
               <div className="ui input">
                 <DatePicker
@@ -295,36 +306,51 @@ class ProjectSettingsCore extends React.Component {
               </div>
             </div>}
         </Container>
-        <Container
-          fullHeight
-          className="overflow-y-auto"
-          style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
-        >
-          <Box style={{ minHeight: '100%' }}>
-            <div className="ui pointing secondary menu">
-              {R.map(
-                info => (
-                  <a
-                    key={info.key}
-                    className={`${info.key === setting ? 'active' : ''} item`}
-                    onClick={this.handleSettingChangeClick(info.key)}
-                  >
-                    {info.name}
-                  </a>
-                ),
-                settingInfos,
-              )}
-            </div>
-            <div className="flex-grow">
-              <Container fullHeight>
-                {settingInfo &&
-                  React.createElement(settingInfo.component, {
-                    data: {},
-                  })}
-              </Container>
-            </div>
-          </Box>
-        </Container>
+        {hasError &&
+          <Container fullHeight>
+            <div
+              className="ui error message"
+              style={{ marginTop: 16 }}
+              dangerouslySetInnerHTML={{
+                __html: intl.formatMessage(currentErrorMessage, { projectName }),
+              }}
+            />
+          </Container>}
+        {!hasError &&
+          <Container
+            fullHeight
+            className="overflow-y-auto"
+            style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+          >
+            <Box style={{ minHeight: '100%' }}>
+              <div className="ui pointing secondary menu">
+                {R.map(
+                  info => (
+                    <a
+                      key={info.key}
+                      className={`${info.key === setting ? 'active' : ''} item`}
+                      onClick={this.handleSettingChangeClick(info.key)}
+                    >
+                      {info.name}
+                    </a>
+                  ),
+                  settingInfos,
+                )}
+              </div>
+              <div className="flex-grow">
+                <Container fullHeight>
+                  {settingInfo &&
+                    React.createElement(settingInfo.component, {
+                      intl,
+                      projectName,
+                      currentLoadingComponents,
+                      data: projectSettings || {},
+                      saveProjectSettings,
+                    })}
+                </Container>
+              </div>
+            </Box>
+          </Container>}
       </Container>
     );
   }
@@ -336,8 +362,20 @@ export default connect(
   (state: State) => {
     const { projects } = state.app;
     const { userInfo } = state.auth;
-    const { projectSettingsParams } = state.settings;
-    return { projects, userInfo, projectSettingsParams };
+    const {
+      projectSettings,
+      currentLoadingComponents,
+      projectSettingsParams,
+      currentErrorMessage,
+    } = state.settings;
+    return {
+      projects,
+      userInfo,
+      projectSettings,
+      currentLoadingComponents,
+      projectSettingsParams,
+      currentErrorMessage,
+    };
   },
-  { push, loadProjectSettings },
+  { push, loadProjectSettings, saveProjectSettings },
 )(ProjectSettings);

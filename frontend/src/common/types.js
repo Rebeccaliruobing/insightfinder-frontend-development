@@ -79,7 +79,17 @@ export type LogState = {
 };
 
 export type SettingsState = {
+  // Object used to store current project's settings.
+  projectSettings: Object,
+
+  // Parameters used to get current project's setting.
   projectSettingsParams: Object,
+
+  // The current error message, set to null if no errors.
+  currentErrorMessage: ?Message,
+
+  // The map used to store the name of components in loading status.
+  currentLoadingComponents: ?Object,
 };
 
 export type UseCaseState = {

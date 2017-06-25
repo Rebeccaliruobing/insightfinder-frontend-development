@@ -48,14 +48,14 @@ const loadWeeklyAnomalies = (credentials: Credentials, params: Object) => {
     }).then((resourceData) => {
       const anomalyEventStats = anomalyData.data;
       const resourceEventStats = resourceData.data;
-          // Merge instance/group from resource into anomaly
-          R.forEachObjIndexed((resource, name) => {
-            R.forEachObjIndexed((stats, group) => {
-              const anomaly = anomalyEventStats[name][group];
-              anomaly.current.NumberOfInstances = stats.current.NumberOfInstances;
-              anomaly.current.NumberOfMetrics = stats.current.NumberOfMetrics;
-            }, resource);
-          }, resourceEventStats);
+      // Merge instance/group from resource into anomaly
+      R.forEachObjIndexed((resource, name) => {
+        R.forEachObjIndexed((stats, group) => {
+          const anomaly = anomalyEventStats[name][group];
+          anomaly.current.NumberOfInstances = stats.current.NumberOfInstances;
+          anomaly.current.NumberOfMetrics = stats.current.NumberOfMetrics;
+        }, resource);
+      }, resourceEventStats);
 
       return {
         rawData: {
