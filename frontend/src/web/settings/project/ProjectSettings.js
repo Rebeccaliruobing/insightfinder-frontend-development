@@ -26,7 +26,12 @@ import {
   appFieldsMessages,
   appButtonsMessages,
 } from '../../../common/app/messages';
-import { SharingSetting, PredictionSetting } from './components';
+import {
+  AlertSensitivitySetting,
+  DataDisqualifiersSetting,
+  SharingSetting,
+  PredictionSetting,
+} from './components';
 // TODO: Remove hard code setting for internal user.
 
 type Props = {
@@ -64,8 +69,8 @@ class ProjectSettingsCore extends React.Component {
     // Log and metric project has different settings. Meanwhile, model picking is
     // only used internal.
     this.metricSettingInfos = [
-      { key: 'learning', name: 'Data Disqualifiers', component: TempComponent },
-      { key: 'alert', name: 'Alert Sensitivity', component: TempComponent },
+      { key: 'learning', name: 'Data Disqualifiers', component: DataDisqualifiersSetting },
+      { key: 'alert', name: 'Alert Sensitivity', component: AlertSensitivitySetting },
       { key: 'prediction', name: 'Prediction', component: PredictionSetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
       { key: 'grouping', name: 'Grouping', component: TempComponent },

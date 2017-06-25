@@ -25,14 +25,29 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
 
     // sharedUsernames is an java list string, like [demo,test], convert into array
     // and do string trim and remove empty string.
-    const sharedUsernamesStr = get(rawData, 'projectModelAllJSON.sharedUsernames', '').replace(/[[\]]/gi, '');
+    const sharedUsernamesStr = get(rawData, 'projectModelAllJSON.sharedUsernames', '').replace(
+      /[[\]]/gi,
+      '',
+    );
     const sharedUserNames = R.filter(R.identity, sharedUsernamesStr.split(/\s*,\s*/));
 
     const predictionWindow = get(rawData, 'projectModelAllJSON.predictionWindow', '4');
+    const learningSkippingPeriod = get(rawData, 'projectModelAllJSON.learningSkippingPeriod ', '');
+    const detectionSkippingPeriod = get(rawData, 'projectModelAllJSON.detectionSkippingPeriod', '');
+    const pvalue = get(rawData, 'projectModelAllJSON.pvalue', '0.9');
+    const cvalue = get(rawData, 'projectModelAllJSON.cvalue', '5');
+    const emailpvalue = get(rawData, 'projectModelAllJSON.emailpvalue', '0.9');
+    const emailcvalue = get(rawData, 'projectModelAllJSON.emailcvalue', '5');
 
     const data = {
       sharedUserNames,
       predictionWindow,
+      learningSkippingPeriod,
+      detectionSkippingPeriod,
+      pvalue,
+      cvalue,
+      emailpvalue,
+      emailcvalue,
     };
 
     return {

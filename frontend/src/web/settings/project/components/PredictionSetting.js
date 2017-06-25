@@ -10,8 +10,8 @@ import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
 
-import { Select } from '../../../../lib/fui/react';
 import { settingsMessages } from '../../../../common/settings/messages';
+import { PredictionWindowHour } from '../../../app/components/Selectors';
 
 type Props = {
   intl: Object,
@@ -21,7 +21,7 @@ type Props = {
   saveProjectSettings: Function,
 };
 
-class ProjectSharing extends React.PureComponent {
+class PredictionSetting extends React.PureComponent {
   props: Props;
 
   constructor(props) {
@@ -30,12 +30,6 @@ class ProjectSharing extends React.PureComponent {
     this.stateKey = 'predictionWindow';
     this.submitLoadingKey = 'predictionWindow_submit';
     this.propsPath = ['data', this.stateKey];
-    this.predictionWindowHours = [
-      { label: '4', value: '4' },
-      { label: '12', value: '12' },
-      { label: '24', value: '24' },
-      { label: '48', value: '48' },
-    ];
 
     const predictionWindow = get(props, this.propsPath);
     this.state = {
@@ -72,14 +66,9 @@ class ProjectSharing extends React.PureComponent {
 
     return (
       <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-        <div className="select field" style={{ width: 200 }}>
+        <div className="select field" style={{ width: 180 }}>
           <label>Prediction Time Window (Hour)</label>
-          <Select
-            name={this.stateKey}
-            multi={false}
-            options={this.predictionWindowHours}
-            valueLink={predictionWindowLink}
-          />
+          <PredictionWindowHour name={this.stateKey} valueLink={predictionWindowLink} />
         </div>
         <div className="field">
           <div
@@ -94,4 +83,4 @@ class ProjectSharing extends React.PureComponent {
   }
 }
 
-export default ProjectSharing;
+export default PredictionSetting;
