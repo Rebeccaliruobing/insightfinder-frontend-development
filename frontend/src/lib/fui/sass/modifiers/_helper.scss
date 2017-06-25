@@ -14,17 +14,17 @@
 }
 
 .flex-col {
-  display: flex;
+  display: flex !important;
   flex-direction: column;
 }
 
 .flex-row {
-  display: flex;
+  display: flex !important;
   flex-direction: row;
 }
 
 .flex-grow {
-  flex: 1;
+  flex: 1 !important;
 }
 
 .overflow-y-auto {

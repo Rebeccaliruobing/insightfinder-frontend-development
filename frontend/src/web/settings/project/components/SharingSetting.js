@@ -11,7 +11,7 @@ import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
 
-import { Input } from '../../../../lib/fui/react';
+import { Container, Input } from '../../../../lib/fui/react';
 
 type Props = {
   intl: Object,
@@ -63,29 +63,31 @@ class SharingSetting extends React.PureComponent {
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
 
     return (
-      <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-        <h3>Project Sharing</h3>
-        <p>
-          If you are collaborating with other users, you may invite
-          them to view data associated with your Projects.
-        </p>
-        <p>
-          To share your project, enter their User ID(s) in the
-          field below and click "Update Sharing Settings".  Those
-          users will be able to view your project on their next login.
-        </p>
-        <div className="input field">
-          <Input valueLink={namesLink} />
-        </div>
-        <div className="field">
-          <div
-            className={`ui button ${isSubmitting ? 'loading' : ''} blue`}
-            {...(isSubmitting ? {} : { onClick: this.handleSaveClick })}
-          >
-            Update Sharing Settings
+      <Container fullHeight className="overflow-y-auto">
+        <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
+          <h3>Project Sharing</h3>
+          <p>
+            If you are collaborating with other users, you may invite
+            them to view data associated with your Projects.
+          </p>
+          <p>
+            To share your project, enter their User ID(s) in the
+            field below and click "Update Sharing Settings".  Those
+            users will be able to view your project on their next login.
+          </p>
+          <div className="input field">
+            <Input valueLink={namesLink} />
           </div>
-        </div>
-      </form>
+          <div className="field">
+            <div
+              className={`ui button ${isSubmitting ? 'loading' : ''} blue`}
+              {...(isSubmitting ? {} : { onClick: this.handleSaveClick })}
+            >
+              Update Sharing Settings
+            </div>
+          </div>
+        </form>
+      </Container>
     );
   }
 }

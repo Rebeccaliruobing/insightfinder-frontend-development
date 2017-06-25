@@ -10,7 +10,7 @@ import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
 
-import { Container } from '../../../../lib/fui/react';
+import { Container, Input } from '../../../../lib/fui/react';
 import { AnomalyThresholdSensitivity, DurationThreshold } from '../../../app/components/Selectors';
 import { settingsMessages } from '../../../../common/settings/messages';
 
@@ -22,7 +22,7 @@ type Props = {
   saveProjectSettings: Function,
 };
 
-class AlertSensitivitySetting extends React.PureComponent {
+class LogSensitivitySetting extends React.PureComponent {
   props: Props;
 
   constructor(props) {
@@ -30,36 +30,36 @@ class AlertSensitivitySetting extends React.PureComponent {
 
     this.pvalueStateKey = 'pvalue';
     this.cvalueStateKey = 'cvalue';
-    this.emailpvalueStateKey = 'emailpvalue';
-    this.emailcvalueStateKey = 'emailcvalue';
+    this.derivedpvalueStateKey = 'derivedpvalue';
+    this.logFreqWindowStateKey = 'logFreqWindow';
     this.submitLoadingKey = 'alertsensitivity_submit';
 
     this.pvaluePropsPath = ['data', this.pvalueStateKey];
     this.cvaluePropsPath = ['data', this.cvalueStateKey];
-    this.emailpvaluePropsPath = ['data', this.emailpvalueStateKey];
-    this.emailcvaluePropsPath = ['data', this.emailcvalueStateKey];
+    this.derivedpvaluePropsPath = ['data', this.derivedpvalueStateKey];
+    this.logFreqWindowPropsPath = ['data', this.logFreqWindowStateKey];
 
     const pvalue = get(props, this.pvaluePropsPath);
     const cvalue = get(props, this.cvaluePropsPath);
-    const emailpvalue = get(props, this.emailpvaluePropsPath);
-    const emailcvalue = get(props, this.emailcvaluePropsPath);
-    this.state = { pvalue, cvalue, emailpvalue, emailcvalue };
+    const derivedpvalue = get(props, this.derivedpvaluePropsPath);
+    const logFreqWindow = get(props, this.logFreqWindowPropsPath);
+    this.state = { pvalue, cvalue, derivedpvalue, logFreqWindow };
   }
 
   componentWillReceiveProps(newProps) {
     const pvalue = get(newProps, this.pvaluePropsPath);
     const cvalue = get(newProps, this.cvaluePropsPath);
-    const emailpvalue = get(newProps, this.emailpvaluePropsPath);
-    const emailcvalue = get(newProps, this.emailcvaluePropsPath);
+    const derivedpvalue = get(newProps, this.derivedpvaluePropsPath);
+    const logFreqWindow = get(newProps, this.logFreqWindowPropsPath);
 
     // If the props is changed, set the local state.
     if (
       pvalue !== get(this.props, this.pvaluePropsPath) ||
       cvalue !== get(this.props, this.cvaluePropsPath) ||
-      emailpvalue !== get(this.props, this.emailpvaluePropsPath) ||
-      emailcvalue !== get(this.props, this.emailcvaluePropsPath)
+      derivedpvalue !== get(this.props, this.derivedpvaluePropsPath) ||
+      logFreqWindow !== get(this.props, this.logFreqWindowPropsPath)
     ) {
-      this.setState({ pvalue, cvalue, emailpvalue, emailcvalue });
+      this.setState({ pvalue, cvalue, derivedpvalue, logFreqWindow });
     }
   }
 
@@ -67,12 +67,12 @@ class AlertSensitivitySetting extends React.PureComponent {
     const { saveProjectSettings, projectName } = this.props;
     const pvalue = this.state[this.pvalueStateKey];
     const cvalue = this.state[this.cvalueStateKey];
-    const emailpvalue = this.state[this.emailpvalueStateKey];
-    const emailcvalue = this.state[this.emailcvalueStateKey];
+    const derivedpvalue = this.state[this.derivedpvalueStateKey];
+    const logFreqWindow = this.state[this.logFreqWindowStateKey];
 
     saveProjectSettings(
       projectName,
-      { pvalue, cvalue, emailpvalue, emailcvalue },
+      { pvalue, cvalue, derivedpvalue, logFreqWindow },
       { [this.submitLoadingKey]: true },
     );
   }
@@ -87,27 +87,26 @@ class AlertSensitivitySetting extends React.PureComponent {
       x => Boolean(x),
       intl.formatMessage(settingsMessages.errorEmptySelection),
     );
-    const emailpvalueLink = VLink.state(this, this.emailpvalueStateKey).check(
+    const derivedpvalueLink = VLink.state(this, this.derivedpvalueStateKey).check(
       x => Boolean(x),
       intl.formatMessage(settingsMessages.errorEmptySelection),
     );
-    const emailcvalueLink = VLink.state(this, this.emailcvalueStateKey).check(
-      x => Boolean(x),
-      intl.formatMessage(settingsMessages.errorEmptySelection),
-    );
+    const logFreqWindowLink = VLink.state(this, this.logFreqWindowStateKey)
+      .check(x => Boolean(x), intl.formatMessage(settingsMessages.errorEmptyInput))
+      .check(x => !isNaN(x), intl.formatMessage(settingsMessages.errorNotNumberInput));
+
     const hasError =
-      pvalueLink.error || cvalueLink.error || emailpvalueLink.error || emailcvalueLink.error;
+      pvalueLink.error || cvalueLink.error || derivedpvalueLink.error || logFreqWindowLink.error;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
 
     return (
       <Container fullHeight className="overflow-y-auto">
         <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-          <h3>Dashboard Alert</h3>
+          <h3>Clustering Sensitivity</h3>
           <p>
             This setting controls the sensitivity with which
-            InsightFinder will detect and create anomaly events and
-            display them in the Dashboard. With higher sensitivity,
-            system detects more anomalies.
+            InsightFinder will cluster logs and detect anomalous
+            logs. With higher sensitivity, system detects more anomalies.
           </p>
           <div className="select field" style={{ width: 180 }}>
             <label>Anomaly Sensitivity</label>
@@ -117,19 +116,19 @@ class AlertSensitivitySetting extends React.PureComponent {
             <label>Number of Samples</label>
             <DurationThreshold valueLink={cvalueLink} />
           </div>
-          <h3>Email Alert</h3>
+          <h3>Frequency Anomaly Detection Settings</h3>
           <p>
-            This setting controls when InsightFinder will notify you via
-            email and any configured External Service. With higher sensitivity,
-            system detects more anomalies.
+            Sensitivity: This setting controls sensitivity InsightFinder will
+            alert on frequency anomaly in given a time window.
+            With higher sensitivity, system detects more anomalies.
           </p>
           <div className="select field" style={{ width: 180 }}>
             <label>Anomaly Sensitivity</label>
-            <AnomalyThresholdSensitivity valueLink={emailpvalueLink} />
+            <AnomalyThresholdSensitivity valueLink={derivedpvalueLink} />
           </div>
-          <div className="select field" style={{ width: 180 }}>
+          <div className="input field" style={{ width: 180 }}>
             <label>Number of Samples</label>
-            <DurationThreshold valueLink={emailcvalueLink} />
+            <Input valueLink={logFreqWindowLink} />
           </div>
           <div className="field">
             <div
@@ -145,4 +144,4 @@ class AlertSensitivitySetting extends React.PureComponent {
   }
 }
 
-export default AlertSensitivitySetting;
+export default LogSensitivitySetting;

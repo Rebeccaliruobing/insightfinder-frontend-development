@@ -10,6 +10,7 @@ import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
 
+import { Container } from '../../../../lib/fui/react';
 import { settingsMessages } from '../../../../common/settings/messages';
 import { PredictionWindowHour } from '../../../app/components/Selectors';
 
@@ -65,20 +66,22 @@ class PredictionSetting extends React.PureComponent {
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
 
     return (
-      <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-        <div className="select field" style={{ width: 180 }}>
-          <label>Prediction Time Window (Hour)</label>
-          <PredictionWindowHour name={this.stateKey} valueLink={predictionWindowLink} />
-        </div>
-        <div className="field">
-          <div
-            className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
-            {...(isSubmitting || hasError ? {} : { onClick: this.handleSaveClick })}
-          >
-            Update Alert Settings
+      <Container fullHeight className="overflow-y-auto">
+        <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
+          <div className="select field" style={{ width: 180 }}>
+            <label>Prediction Time Window (Hour)</label>
+            <PredictionWindowHour name={this.stateKey} valueLink={predictionWindowLink} />
           </div>
-        </div>
-      </form>
+          <div className="field">
+            <div
+              className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
+              {...(isSubmitting || hasError ? {} : { onClick: this.handleSaveClick })}
+            >
+              Update Alert Settings
+            </div>
+          </div>
+        </form>
+      </Container>
     );
   }
 }

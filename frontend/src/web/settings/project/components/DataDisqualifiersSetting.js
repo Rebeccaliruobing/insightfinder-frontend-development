@@ -11,7 +11,7 @@ import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
 
-import { Input } from '../../../../lib/fui/react';
+import { Container, Input } from '../../../../lib/fui/react';
 
 type Props = {
   intl: Object,
@@ -92,52 +92,54 @@ class DataDisqualifiersSetting extends React.PureComponent {
     );
 
     return (
-      <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-        <h3>Time-Based Exclusions</h3>
-        <p>
-          As InsightFinder continuously learns about your
-          environment, you will identify times that reflect
-          invalid data that should <i>not</i> be used to
-          identify performance baselines for your systems.
-          These periods may include service windows, scheduled
-          or unscheduled downtime, etc.
-        </p>
-        <p>
-          You may specify your timeframe here as either a
-          one-time or recurring period.  Examples include:
-        </p>
-        <ul>
-          <li>Recurring: Every Sunday</li>
-          <li>Recurring: Every Saturday 00:00-01:00 GMT</li>
-          <li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
-        </ul>
-        <p>
-          If you need assistance or have questions, please contact
-          us at support@insightfinder.com.
-        </p>
-        <div className="input field">
-          <Input valueLink={learningSkippingPeriodLink} />
-        </div>
-        <div className="field">
-          <div
-            className={`ui button ${isLearningSubmitting ? 'loading' : ''} blue`}
-            {...(isLearningSubmitting ? {} : { onClick: this.handleLearningSaveClick })}
-          >
-            Update Learning Settings
+      <Container fullHeight className="overflow-y-auto">
+        <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
+          <h3>Time-Based Exclusions</h3>
+          <p>
+            As InsightFinder continuously learns about your
+            environment, you will identify times that reflect
+            invalid data that should <i>not</i> be used to
+            identify performance baselines for your systems.
+            These periods may include service windows, scheduled
+            or unscheduled downtime, etc.
+          </p>
+          <p>
+            You may specify your timeframe here as either a
+            one-time or recurring period.  Examples include:
+          </p>
+          <ul>
+            <li>Recurring: Every Sunday</li>
+            <li>Recurring: Every Saturday 00:00-01:00 GMT</li>
+            <li>One-Time: 2016-12-25 02:00-07:00 GMT</li>
+          </ul>
+          <p>
+            If you need assistance or have questions, please contact
+            us at support@insightfinder.com.
+          </p>
+          <div className="input field">
+            <Input valueLink={learningSkippingPeriodLink} />
           </div>
-        </div>
-        <div className="input field">
-          <Input valueLink={learningSkippingPeriodLink} />
-        </div>
-        <div className="field">
-          <div
-            className={`ui button ${isDetectionSubmitting ? 'loading' : ''} blue`}
-            {...(isDetectionSubmitting ? {} : { onClick: this.handleDetectionSaveClick })}
-          >
-            Update Detection Settings
+          <div className="field">
+            <div
+              className={`ui button ${isLearningSubmitting ? 'loading' : ''} blue`}
+              {...(isLearningSubmitting ? {} : { onClick: this.handleLearningSaveClick })}
+            >
+              Update Learning Settings
+            </div>
           </div>
-        </div>
-      </form>
+          <div className="input field">
+            <Input valueLink={learningSkippingPeriodLink} />
+          </div>
+          <div className="field">
+            <div
+              className={`ui button ${isDetectionSubmitting ? 'loading' : ''} blue`}
+              {...(isDetectionSubmitting ? {} : { onClick: this.handleDetectionSaveClick })}
+            >
+              Update Detection Settings
+            </div>
+          </div>
+        </form>
+      </Container>
     );
   }
 }

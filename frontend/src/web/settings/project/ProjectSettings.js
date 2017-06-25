@@ -31,6 +31,7 @@ import {
   DataDisqualifiersSetting,
   SharingSetting,
   PredictionSetting,
+  LogSensitivitySetting,
 } from './components';
 // TODO: Remove hard code setting for internal user.
 
@@ -87,7 +88,7 @@ class ProjectSettingsCore extends React.Component {
 
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: TempComponent },
-      { key: 'logthreshold', name: 'Sensitivity Settings', component: TempComponent },
+      { key: 'logthreshold', name: 'Sensitivity Settings', component: LogSensitivitySetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
     ];
     this.defaultMetricSetting = isInternalUser ? 'model' : 'learning';
@@ -327,7 +328,7 @@ class ProjectSettingsCore extends React.Component {
             className="overflow-y-auto"
             style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
           >
-            <Box style={{ minHeight: '100%' }}>
+            <Box className="flex-col" style={{ height: '100%' }}>
               <div className="ui pointing secondary menu">
                 {R.map(
                   info => (
@@ -342,17 +343,15 @@ class ProjectSettingsCore extends React.Component {
                   settingInfos,
                 )}
               </div>
-              <div className="flex-grow">
-                <Container fullHeight>
-                  {settingInfo &&
-                    React.createElement(settingInfo.component, {
-                      intl,
-                      projectName,
-                      currentLoadingComponents,
-                      data: projectSettings || {},
-                      saveProjectSettings,
-                    })}
-                </Container>
+              <div className="flex-grow" style={{ overflow: 'hidden' }}>
+                {settingInfo &&
+                  React.createElement(settingInfo.component, {
+                    intl,
+                    projectName,
+                    currentLoadingComponents,
+                    data: projectSettings || {},
+                    saveProjectSettings,
+                  })}
               </div>
             </Box>
           </Container>}

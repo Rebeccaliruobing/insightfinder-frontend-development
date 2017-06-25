@@ -38,7 +38,8 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
     const cvalue = get(rawData, 'projectModelAllJSON.cvalue', '5');
     const emailpvalue = get(rawData, 'projectModelAllJSON.emailpvalue', '0.9');
     const emailcvalue = get(rawData, 'projectModelAllJSON.emailcvalue', '5');
-
+    const derivedpvalue = get(rawData, 'projectModelAllJSON.derivedpvalue', '0.9');
+    const logFreqWindow = get(rawData, 'projectModelAllJSON.logFreqWindow', '10');
     const data = {
       sharedUserNames,
       predictionWindow,
@@ -48,6 +49,8 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       cvalue,
       emailpvalue,
       emailcvalue,
+      derivedpvalue,
+      logFreqWindow,
     };
 
     return {
