@@ -18,8 +18,8 @@ const saveProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('SAVE_PROJECT_SETTINGS').concatMap((action) => {
     const state = getState();
     const { credentials } = state.auth;
-    const { setting, instanceGroup, startTime, endTime } = state.settings.projectSettingsParams;
-    const { projectName, settings, components } = action.payload;
+    const { projectName, ...params } = state.settings.projectSettingsParams;
+    const { settings, components } = action.payload;
 
     console.log('save epic', state, action.payload);
     // TODO: Based on the settings, call different API to check settings.
@@ -36,9 +36,7 @@ const saveProjectSettingsEpic = (action$: any, { getState }: Deps) =>
       // Reset all loading components' status.
       Observable.of(setLoadingComponents(R.mapObjIndexed(() => false, components))),
       // Reload the settings
-      Observable.of(
-        loadProjectSettings(projectName, setting, instanceGroup, startTime, endTime, true),
-      ),
+      Observable.of(loadProjectSettings(projectName, params, true)),
     );
   });
 

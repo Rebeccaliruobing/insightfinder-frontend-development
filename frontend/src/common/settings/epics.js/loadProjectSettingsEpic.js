@@ -20,11 +20,12 @@ import { setProjectSettings } from '../actions';
 
 const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_PROJECT_SETTINGS').concatMap((action) => {
-    const { projectName, setting, instanceGroup, startTime, endTime, force } = action.payload;
+    const { projectName, params, force } = action.payload;
     const state = getState();
     const { credentials } = state.auth;
     const { projects } = state.app;
-    const projectSettingsParams = R.omit(['force'], action.payload);
+    const projectSettingsParams = { projectName, ...params };
+    const { setting, instanceGroup, startTime, endTime } = params;
     const prevProjectName = get(state.settings, 'projectSettingsParams.projectName');
     const prevProjectSettings = state.settings.projectSettings || {};
     const dateFormat = 'YYYY-MM-DD';
@@ -47,7 +48,7 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
       );
     }
 
-    // There are two apis used to get project settings, one for modelsl, the other
+    // There are two apis used to get project settings, one for models, the other
     // is for other settings.
     // If setting is model, if projectName is changed, we need call all apis, otherwse
     // we just the model api. We also need call api to get project grouping.
@@ -88,6 +89,7 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
           return apiEpicErrorHandle(err);
         });
     } else if (setting === 'episodeword' && (force || projectName !== prevProjectName)) {
+      apiAction$ = Observable.empty();
       // Load log project episodes and words
     } else if (setting === 'model') {
       // Call model API only, as the settings already exists.

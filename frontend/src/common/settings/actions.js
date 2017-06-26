@@ -13,14 +13,11 @@ import type { Action } from '../types';
  */
 export const loadProjectSettings = (
   projectName: String,
-  setting: ?String,
-  instanceGroup: ?String,
-  startTime: ?String,
-  endTime: ?String,
+  params: Object,
   force: Boolean = false,
 ): Action => ({
   type: 'LOAD_PROJECT_SETTINGS',
-  payload: { projectName, setting, instanceGroup, startTime, endTime, force },
+  payload: { projectName, params, force },
 });
 
 /**

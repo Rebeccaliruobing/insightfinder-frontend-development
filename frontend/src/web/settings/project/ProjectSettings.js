@@ -185,23 +185,22 @@ class ProjectSettingsCore extends React.Component {
     let reload = false;
     if (force) {
       reload = true;
-    } else if (projectName !== get(projectSettingsParams, 'projectName')) {
+    } else if (projectName !== projectSettingsParams.projectName) {
       reload = true;
     } else if (
       this.ifIn(setting, this.timeRangeSettings) &&
-      (startTime !== get(projectSettingsParams, 'startTime') ||
-        endTime !== get(projectSettingsParams, 'endTime'))
+      (startTime !== projectSettingsParams.startTime || endTime !== projectSettingsParams.endTime)
     ) {
       reload = true;
     } else if (
       this.ifIn(setting, this.instanceGroupSettings) &&
-      instanceGroup !== get(projectSettingsParams, 'instanceGroup')
+      instanceGroup !== projectSettingsParams.instanceGroup
     ) {
       reload = true;
     }
 
     if (reload) {
-      loadProjectSettings(projectName, setting, instanceGroup, startTime, endTime);
+      loadProjectSettings(projectName, params);
     }
   }
 
