@@ -155,6 +155,7 @@ class AppCore extends React.Component {
     return new Promise((resolve) => {
       apis.postJSONDashboardUserValues().then((result) => {
         const resp = this.convertUservalues(result.data);
+        console.log(resp);
         this.setState({
           dashboardUservalues: resp,
         }, () => resolve(this));

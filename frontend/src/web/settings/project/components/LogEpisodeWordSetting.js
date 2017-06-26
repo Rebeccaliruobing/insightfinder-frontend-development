@@ -102,7 +102,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
     return (
       <Container fullHeight className="overflow-y-auto">
         <form className={`ui ${hasError ? 'error' : ''} form flex-col`} style={{ fontSize: 12, width: 800 }}>
-          <div className="field" style={{ textAlign: 'right' }}>
+          <div className="field" style={{ textAlign: 'right', marginBottom: 0 }}>
             <div
               className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
               style={{ width: 180 }}
