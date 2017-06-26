@@ -87,6 +87,8 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
         .catch((err) => {
           return apiEpicErrorHandle(err);
         });
+    } else if (setting === 'episodeword' && (force || projectName !== prevProjectName)) {
+      // Load log project episodes and words
     } else if (setting === 'model') {
       // Call model API only, as the settings already exists.
       apiAction$ = Observable.from(
