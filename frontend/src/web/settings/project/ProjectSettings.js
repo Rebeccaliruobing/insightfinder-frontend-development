@@ -32,6 +32,7 @@ import {
   SharingSetting,
   PredictionSetting,
   LogSensitivitySetting,
+  LogEpisodeWordSetting,
 } from './components';
 // TODO: Remove hard code setting for internal user.
 
@@ -87,7 +88,7 @@ class ProjectSettingsCore extends React.Component {
     }
 
     this.logSettingInfos = [
-      { key: 'episodeword', name: 'Episode and Word Selection', component: TempComponent },
+      { key: 'episodeword', name: 'Episode and Word Selection', component: LogEpisodeWordSetting },
       { key: 'logthreshold', name: 'Sensitivity Settings', component: LogSensitivitySetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
     ];

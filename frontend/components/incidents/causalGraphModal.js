@@ -9,6 +9,7 @@ import * as d3 from 'd3';
 import dagre from 'dagre';
 import Slider from 'rc-slider';
 import { Modal, Dropdown } from '../../artui/react';
+import { Select } from '../../src/lib/fui/react';
 import retrieveEventData from '../../apis/retrieve-event-data';
 import dagreD3 from '../ui/dagre-d3';
 import WindowResizeListener from '../ui/window-resize-listener';
@@ -54,9 +55,10 @@ class CausalGraphModal extends React.Component {
       relationProbability: 0.6,
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
-      currentZoom: 1,
+      currentZoom: 0,
       showMetrics: false,
       mergeMetrics: true,
+      selectedNode: '',
     };
   }
 
@@ -89,10 +91,10 @@ class CausalGraphModal extends React.Component {
 
     g.setGraph({
       rankdir: 'LR', align: 'DR', ranker: 'tight-tree',
-      ranksep: 5 + (currentZoom * 5),
-      nodesep: 5 + (currentZoom * 5),
-      edgesep: 4 + (currentZoom * 4),
-      marginx: 5, marginy: 10,
+      ranksep: 5 + (currentZoom * 20),
+      nodesep: 5 + (currentZoom * 20),
+      edgesep: 5 + (currentZoom * 10),
+      marginx: 10, marginy: 10,
     });
 
     // Get unique left & right side of the relations as the node name.
@@ -311,6 +313,8 @@ class CausalGraphModal extends React.Component {
   selectTab(tab) {
     return () => {
       this.setState({
+        selectedNode: '',
+        currentZoom: 0,
         activeTab: tab,
       }, () => {
         this.renderGraph();
@@ -332,10 +336,13 @@ class CausalGraphModal extends React.Component {
   getFilteredRelations() {
     // Filter the dataset and transform into relations array.
     const { eventsCausalRelations, relationTimeThreshold,
-      metaDataKPIs, relationProbability } = this.state;
+      metaDataKPIs, relationProbability, selectedNode } = this.state;
 
     let relations = eventsCausalRelations[relationTimeThreshold] || [];
     relations = relations.filter(r => r.probability >= relationProbability);
+    if (selectedNode) {
+      relations = relations.filter(r => r.src === selectedNode || r.target === selectedNode);
+    }
     const shortName = R.map(n => this.getMetricShortNames(n));
 
     relations = relations.map(
@@ -362,10 +369,13 @@ class CausalGraphModal extends React.Component {
 
   @autobind
   getFilteredCorrelations() {
-    const { eventsCorrelations, correlationProbability, metaDataKPIs } = this.state;
+    const { eventsCorrelations, correlationProbability, selectedNode, metaDataKPIs } = this.state;
 
     let relations = eventsCorrelations || [];
     relations = relations.filter(r => r.probability >= correlationProbability);
+    if (selectedNode) {
+      relations = relations.filter(r => r.elem1 === selectedNode || r.elem2 === selectedNode);
+    }
 
     relations = relations.map(
       (r) => {
@@ -468,7 +478,7 @@ class CausalGraphModal extends React.Component {
   @autobind
   zoomOut() {
     let { currentZoom } = this.state;
-    currentZoom = Math.max(currentZoom - 1, 1);
+    currentZoom = Math.max(currentZoom - 1, 0);
     this.setState({
       currentZoom,
     }, () => {
@@ -494,6 +504,16 @@ class CausalGraphModal extends React.Component {
     });
   }
 
+  @autobind handleNodeSelected(newValue) {
+    const selectedNode = newValue ? newValue.value : '';
+    this.setState({
+      selectedNode,
+      currentZoom: selectedNode ? 3: 0,
+    }, () => {
+      this.renderGraph();
+    });
+  }
+
   render() {
     const rest = R.omit([
       'projectName', 'loadGroup', 'instanceGroup', 'endTime', 'numberOfDays',
@@ -501,10 +521,28 @@ class CausalGraphModal extends React.Component {
     const { loading, activeTab, containerHeight, containerWidth,
       relationTimeThreshold, relationProbability,
       correlationProbability, kpiPredictionProbability, showMetrics, mergeMetrics,
-      metaDataKpiUnits, metricUnits,
+      metaDataKpiUnits, metricUnits, selectedNode,
     } = this.state;
 
     const filteredDataset = this.getFilteredDataset();
+
+    // Get the nodes to select.
+    let nodeOptions = [];
+    if (activeTab === 'relation') {
+      const { eventsCausalRelations } = this.state;
+      let relations = eventsCausalRelations[relationTimeThreshold] || [];
+      relations = relations.filter(r => r.probability >= relationProbability);
+      nodeOptions = [...R.map(r => r.src, relations), ...R.map(r => r.target, relations)];
+      nodeOptions = R.filter(R.identity, R.uniq(nodeOptions));
+      nodeOptions = R.map(n => ({ label: n, value: n }), nodeOptions);
+    } else if (activeTab === 'correlation') {
+      const { eventsCorrelations } = this.state;
+      let relations = eventsCorrelations || [];
+      relations = relations.filter(r => r.probability >= correlationProbability);
+      nodeOptions = [...R.map(r => r.elem1, relations), ...R.map(r => r.elem2, relations)];
+      nodeOptions = R.filter(R.identity, R.uniq(nodeOptions));
+      nodeOptions = R.map(n => ({ label: n, value: n }), nodeOptions);
+    }
 
     return (
       <Modal
@@ -653,23 +691,34 @@ class CausalGraphModal extends React.Component {
             </div>
           }
           <div className="settings">
-            <div className="ui checkbox">
-              <input
-                type="checkbox" tabIndex="0" checked={showMetrics}
-                onChange={this.setShowMetrics}
-              />
-              <label>Show Metrics</label>
+            <div style={{ display: (activeTab === 'kpiPrediction' ? 'none' : 'inline-block'), textAlign: 'left', fontSize: 12, marginRight: '1em' }}>
+              <label style={{ margin: '0.5em 1em 0 0', float: 'left', display: 'inline-block' }}>Selected Node:</label>
+              <div style={{ width: 180, display: 'inline-block' }}>
+                <Select
+                  options={nodeOptions} clearable value={selectedNode} placeholder=""
+                  onChange={this.handleNodeSelected}
+                />
+              </div>
             </div>
-            <div className="ui checkbox">
-              <input
-                type="checkbox" tabIndex="0" checked={mergeMetrics}
-                onChange={this.setMergeMetrics}
-              />
-              <label>Merge Similar Metrics</label>
-            </div>
-            <div>
-              <i className="minus icon" onClick={this.zoomOut} />
-              <i className="plus icon" onClick={this.zoomIn} />
+            <div style={{ display: 'inline-block' }}>
+              <div className="ui checkbox">
+                <input
+                  type="checkbox" tabIndex="0" checked={showMetrics}
+                  onChange={this.setShowMetrics}
+                />
+                <label>Show Metrics</label>
+              </div>
+              <div className="ui checkbox">
+                <input
+                  type="checkbox" tabIndex="0" checked={mergeMetrics}
+                  onChange={this.setMergeMetrics}
+                />
+                <label>Merge Similar Metrics</label>
+              </div>
+              <div>
+                <i className="minus icon" onClick={this.zoomOut} />
+                <i className="plus icon" onClick={this.zoomIn} />
+              </div>
             </div>
           </div>
           {activeTab === 'relation' && filteredDataset.relation.length === 0 &&
