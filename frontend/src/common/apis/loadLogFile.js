@@ -19,7 +19,7 @@ const loadLogFile = (
   const { projectName } = params;
   const incidentAllInfo = JSON.parse(d.data.incidentAllInfo);
   const project = R.find(i => i.projectName === projectName, incidentAllInfo) || {};
-  const timeFormat = 'YYYY/MM/DD mm:ss';
+  const timeFormat = 'YYYY/MM/DD hh:mm';
 
   let incidentList = get(project, 'incidentList', []);
   // Create id based on props of incident
