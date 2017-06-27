@@ -12,7 +12,7 @@ const loadLogIncident = (
   const { modelType,
     incidentStartTime: startTime, incidentEndTime: endTime,
     derivedPvalue,
-    pValue: pvalue, cValue: cvalue, modelStartTime, modelEndTime } = incident;
+    pvalue, cValue: cvalue, modelStartTime, modelEndTime } = incident;
   return fetchPost(
     getEndpoint('logAnalysis'), {
       ...credentials,
