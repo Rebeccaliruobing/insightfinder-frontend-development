@@ -56,7 +56,7 @@ class SettingsProjectListCore extends React.Component {
       <Container fullHeight withGutter className="flex-col">
         <Container breadcrumb>
           <div className="section">
-            <NavLink to={BaseUrls.Settings}>
+            <NavLink to={BaseUrls.SettingsProjectList}>
               <span className="label">{intl.formatMessage(appMenusMessages.settings)}</span>
             </NavLink>
             <span className="divider">/</span>
