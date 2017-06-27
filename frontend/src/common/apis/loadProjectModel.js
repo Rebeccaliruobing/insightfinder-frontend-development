@@ -5,6 +5,8 @@
  * *****************************************************************************
  **/
 
+import { get } from 'lodash';
+
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
@@ -17,7 +19,9 @@ const loadProjectModel = (credentials: Credentials, projectName: String, params:
     ...params,
   }).then((d) => {
     const rawData = d.data;
-    const data = rawData;
+    const data = {
+      models: get(rawData, 'modelKeys', []),
+    };
 
     return {
       rawData,

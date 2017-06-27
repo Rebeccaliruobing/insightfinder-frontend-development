@@ -32,7 +32,7 @@ class AlertSensitivitySetting extends React.PureComponent {
     this.cvalueStateKey = 'cvalue';
     this.emailpvalueStateKey = 'emailpvalue';
     this.emailcvalueStateKey = 'emailcvalue';
-    this.submitLoadingKey = 'alertsensitivity_submit';
+    this.submitLoadingKey = 'settings_alertsensitivity_submit';
 
     this.pvaluePropsPath = ['data', this.pvalueStateKey];
     this.cvaluePropsPath = ['data', this.cvalueStateKey];
@@ -47,7 +47,6 @@ class AlertSensitivitySetting extends React.PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('alert received');
     const pvalue = get(newProps, this.pvaluePropsPath);
     const cvalue = get(newProps, this.cvaluePropsPath);
     const emailpvalue = get(newProps, this.emailpvaluePropsPath);

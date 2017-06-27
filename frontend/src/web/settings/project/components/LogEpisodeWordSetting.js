@@ -22,6 +22,7 @@ type Props = {
   saveProjectSettings: Function,
 };
 
+// TODO: Just change the class name, need implement it.
 class LogEpisodeWordSetting extends React.PureComponent {
   props: Props;
 
@@ -32,7 +33,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
     this.cvalueStateKey = 'cvalue';
     this.derivedpvalueStateKey = 'derivedpvalue';
     this.logFreqWindowStateKey = 'logFreqWindow';
-    this.submitLoadingKey = 'alertsensitivity_submit';
+    this.submitLoadingKey = 'settings_logtivity_submit';
 
     this.pvaluePropsPath = ['data', this.pvalueStateKey];
     this.cvaluePropsPath = ['data', this.cvalueStateKey];

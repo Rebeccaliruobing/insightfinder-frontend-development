@@ -29,8 +29,8 @@ class DataDisqualifiersSetting extends React.PureComponent {
 
     this.learningStateKey = 'learningSkippingPeriod';
     this.detectionStateKey = 'detectionSkippingPeriod';
-    this.learningSubmitLoadingKey = 'sharedUserNames_learning_submit';
-    this.detectionSubmitLoadingKey = 'sharedUserNames_detection_submit';
+    this.learningSubmitLoadingKey = 'settings_sharedUserNames_learning_submit';
+    this.detectionSubmitLoadingKey = 'settings_sharedUserNames_detection_submit';
     this.learningPropsPath = ['data', this.learningStateKey];
     this.detectionPropsPath = ['data', this.detectionStateKey];
 

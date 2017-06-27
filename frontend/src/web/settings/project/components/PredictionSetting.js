@@ -29,7 +29,7 @@ class PredictionSetting extends React.PureComponent {
     super(props);
 
     this.stateKey = 'predictionWindow';
-    this.submitLoadingKey = 'predictionWindow_submit';
+    this.submitLoadingKey = 'settings_predictionWindow_submit';
     this.propsPath = ['data', this.stateKey];
 
     const predictionWindow = get(props, this.propsPath);

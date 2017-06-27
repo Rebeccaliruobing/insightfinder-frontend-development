@@ -28,7 +28,7 @@ class SharingSetting extends React.PureComponent {
     super(props);
 
     this.stateKey = 'sharedUserNames';
-    this.submitLoadingKey = 'sharedUserNames_submit';
+    this.submitLoadingKey = 'settings_sharedUserNames_submit';
     this.namesSeparator = ',';
     this.propsPath = ['data', this.stateKey];
 

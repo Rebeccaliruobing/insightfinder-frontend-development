@@ -32,7 +32,7 @@ class LogSensitivitySetting extends React.PureComponent {
     this.cvalueStateKey = 'cvalue';
     this.derivedpvalueStateKey = 'derivedpvalue';
     this.logFreqWindowStateKey = 'logFreqWindow';
-    this.submitLoadingKey = 'alertsensitivity_submit';
+    this.submitLoadingKey = 'setting_alertsensitivity_submit';
 
     this.pvaluePropsPath = ['data', this.pvalueStateKey];
     this.cvaluePropsPath = ['data', this.cvalueStateKey];
