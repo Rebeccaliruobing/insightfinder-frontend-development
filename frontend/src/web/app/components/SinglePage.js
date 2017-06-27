@@ -58,7 +58,7 @@ const SinglePageCore = ({
           >
             {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
-          <NavLink to={BaseUrls.Settings} className="item">
+          <NavLink to={BaseUrls.SettingsProjectList} className="item">
             {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
           <NavLink to={BaseUrls.UsecaseBase} className="item">
