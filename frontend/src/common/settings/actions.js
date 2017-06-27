@@ -38,10 +38,9 @@ export const saveProjectSettings = (
 });
 
 /**
- * Set the components loading status. The components contains the name and true/false value.
- * This action is handled by reducer.
+ * Set the current APIs parameters. Used to check whether API call is needed.
  */
-export const setLoadingComponents = (components: ?Object) => ({
+export const setApisParams = (components: ?Object) => ({
   type: 'SET_LOADING_COMPONENTS',
   payload: {
     ...components,

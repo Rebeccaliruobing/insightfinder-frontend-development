@@ -47,6 +47,7 @@ class AlertSensitivitySetting extends React.PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log('alert received');
     const pvalue = get(newProps, this.pvaluePropsPath);
     const cvalue = get(newProps, this.cvaluePropsPath);
     const emailpvalue = get(newProps, this.emailpvaluePropsPath);

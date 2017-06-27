@@ -31,7 +31,7 @@ class LogFileAnalysisCore extends React.PureComponent {
   constructor(props) {
     super(props);
     this.defaultParams = {
-      rareEventThreshold: '3',
+      pvalue: '0.9',
       derivedPvalue: '0.9',
     };
   }
@@ -69,11 +69,11 @@ class LogFileAnalysisCore extends React.PureComponent {
 
   @autobind
   handleRareEventSensitivityChange(newValue) {
-    const rareEventThreshold = newValue ? newValue.value : null;
+    const pvalue = newValue ? newValue.value : null;
     const { match, location } = this.props;
     const params = {
       ...this.defaultParams,
-      ...parseQueryString(location.search), rareEventThreshold,
+      ...parseQueryString(location.search), pvalue,
     };
     const { projectId, incidentId } = match.params;
     this.props.loadLogFile(projectId, incidentId, match, params, false);
@@ -107,7 +107,7 @@ class LogFileAnalysisCore extends React.PureComponent {
   render() {
     const { intl, projects, fileInfos, match, location, fileIncidentInfos } = this.props;
     const { projectId, incidentId } = match.params;
-    const { derivedPvalue, rareEventThreshold } = parseQueryString(location.search) || {};
+    const { derivedPvalue, pvalue } = parseQueryString(location.search) || {};
     const project = get(fileInfos, projectId, {});
     const incidentList = project.incidentList || [];
     const incident = get(fileIncidentInfos, incidentId, null);
@@ -147,14 +147,14 @@ class LogFileAnalysisCore extends React.PureComponent {
           <div className="section float-right">
             {incident && <span className="label">Rare Event Detection Sensitivity</span>}
             {incident &&
-              <Selectors.RareEventSensitivity
-                value={rareEventThreshold || 3} onChange={this.handleRareEventSensitivityChange}
+              <Selectors.AnomalyThresholdSensitivity
+                value={pvalue || 0.9} onChange={this.handleRareEventSensitivityChange}
               />
             }
             {incident && <span className="label">Frequency Anomaly Detection Sensitivity</span>}
             {incident &&
               <Selectors.AnomalyThresholdSensitivity
-                value={derivedPvalue || 0.9} onChange={this.handleFrequencyAnomalySensitivity}
+                value={derivedPvalue || 0.9} onChange={this.handleFrequencyAnomalySensitivityChange}
               />
             }
           </div>

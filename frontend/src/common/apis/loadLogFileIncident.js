@@ -11,14 +11,14 @@ const loadLogIncident = (
   const { projectName, incident } = params;
   const { modelType,
     incidentStartTime: startTime, incidentEndTime: endTime,
-    derivedPvalue, rareEventThreshold,
+    derivedPvalue,
     pValue: pvalue, cValue: cvalue, modelStartTime, modelEndTime } = incident;
   return fetchPost(
     getEndpoint('logAnalysis'), {
       ...credentials,
       operation: '',
       projectName,
-      modelType, startTime, endTime, derivedPvalue, rareEventThreshold,
+      modelType, startTime, endTime, derivedPvalue,
       pvalue, cvalue, modelStartTime, modelEndTime,
       isExistentIncident: true,
     },

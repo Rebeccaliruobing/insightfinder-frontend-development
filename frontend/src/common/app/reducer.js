@@ -2,7 +2,6 @@
 /* eslint-disable no-console */
 import { REHYDRATE } from 'redux-persist/constants';
 import R from 'ramda';
-import { get } from 'lodash';
 import type { AppState, Action } from '../types';
 import loadLocaleMessages from '../loadLocaleMessages';
 
@@ -35,6 +34,7 @@ const initialState = {
     'AWSCloudWatch', 'GoogleCloudMonitoring', 'DataDog', 'NewRelic',
     'AWSEC2', 'cAdvisor',
   ], // TODO: used to filter enabled data source
+  currentLoadingComponents: {},
 };
 
 const reducer = (
@@ -145,6 +145,14 @@ const reducer = (
         ...action.payload,
       },
     };
+  } else if (action.type === 'SET_LOADING_COMPONENTS') {
+    // Merge the current loadings components with the new components status
+    // And remove the false components to reduce the state size.
+    const currentLoadingComponents = R.filter(R.identity, {
+      ...state.currentLoadingComponents,
+      ...action.payload,
+    });
+    console.log('loading', currentLoadingComponents);
   }
   return { ...initialState, ...state };
 };

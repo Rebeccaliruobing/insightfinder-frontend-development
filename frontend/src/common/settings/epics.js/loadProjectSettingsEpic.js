@@ -9,7 +9,6 @@
 import { Observable } from 'rxjs/Observable';
 import moment from 'moment';
 import R from 'ramda';
-import { get } from 'lodash';
 
 import type { Deps } from '../../types';
 import { loadProjectSettings, loadProjectModel } from '../../apis';
@@ -20,42 +19,38 @@ import { setProjectSettings } from '../actions';
 
 const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_PROJECT_SETTINGS').concatMap((action) => {
-    const { projectName, params, force } = action.payload;
+    const pickNotNil = R.pickBy(a => !R.isNil(a));
+    const dateFormat = 'YYYY-MM-DD';
+
     const state = getState();
+    const { projectName, params, force } = action.payload;
     const { credentials } = state.auth;
     const { projects } = state.app;
-    const projectSettingsParams = { projectName, ...params };
     const { setting, instanceGroup, startTime, endTime } = params;
-    const prevProjectName = get(state.settings, 'projectSettingsParams.projectName');
-    const prevProjectSettings = state.settings.projectSettings || {};
-    const dateFormat = 'YYYY-MM-DD';
+
+    const projectSettingsParams = pickNotNil({ projectName, ...params });
+
+    const prevProjectSettingsParams = state.settings.projectSettingsParams || {};
 
     console.log('epic called', action.payload);
 
-    // The routing will guarantee the projectName is not empty, but we need
-    // to check whether the projectName is a valid project.
-    if (!R.find(p => p.projectName === projectName, projects)) {
-      return Observable.concat(
-        Observable.of(showAppLoader),
-        Observable.of(
-          setProjectSettings({
-            projectSettings: {},
-            projectSettingsParams,
-            currentErrorMessage: appMessages.errorsProjectNotFound,
-          }),
-        ),
-        Observable.of(hideAppLoader()),
-      );
-    }
-
-    // There are two apis used to get project settings, one for models, the other
-    // is for other settings.
-    // If setting is model, if projectName is changed, we need call all apis, otherwse
-    // we just the model api. We also need call api to get project grouping.
-    // If setting is not model, we can just call general api
+    let currentErrorMessage = null;
     let apiAction$ = null;
-    if (setting === 'model' && (force || projectName !== prevProjectName)) {
-      // Call settings api first, and then model api, set the data when all APIs return.
+
+    // If force or project changed, we need to reload the setting and reset the stored
+    // settings.
+    const refresh = force || projectName !== prevProjectSettingsParams.projectName;
+    const prevProjectSettings = refresh ? {} : (state.settings.projectSettings || {});
+
+    if (!R.find(p => p.projectName === projectName, projects)) {
+      // The routing will guarantee the projectName is not empty, but we need
+      // to check whether the projectName is a valid project. If invalid, set
+      // error and clean the current settings.
+
+      currentErrorMessage = appMessages.errorsProjectNotFound;
+      apiAction$ = Observable.of(setProjectSettings({ projectSettings: {} }));
+    } else if (refresh && setting === 'model') {
+      // reload
 
       apiAction$ = Observable.from(loadProjectSettings(credentials, { projectName }))
         .concatMap((settingsData) => {
@@ -88,7 +83,9 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
         .catch((err) => {
           return apiEpicErrorHandle(err);
         });
-    } else if (setting === 'episodeword' && (force || projectName !== prevProjectName)) {
+    } else if (
+      setting === 'episodeword' && (force || projectName !== prevProjectSettingsParams.projectName)
+    ) {
       apiAction$ = Observable.empty();
       // Load log project episodes and words
     } else if (setting === 'model') {
@@ -125,14 +122,10 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
         });
     }
 
+    // Return the general sequence for all API calls.
     return Observable.concat(
       Observable.of(showAppLoader),
-      Observable.of(
-        setProjectSettings({
-          currentErrorMessage: null,
-          projectSettingsParams,
-        }),
-      ),
+      Observable.of(setProjectSettings({ currentErrorMessage, projectSettingsParams })),
       apiAction$,
       Observable.of(hideAppLoader()),
     );

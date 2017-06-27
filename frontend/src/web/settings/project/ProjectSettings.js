@@ -34,7 +34,6 @@ import {
   LogSensitivitySetting,
   LogEpisodeWordSetting,
 } from './components';
-// TODO: Remove hard code setting for internal user.
 
 type Props = {
   match: Object,
@@ -53,7 +52,7 @@ type Props = {
 
 const TempComponent = () => <div>TODO Setting</div>;
 
-class ProjectSettingsCore extends React.Component {
+class ProjectSettingsCore extends React.PureComponent {
   props: Props;
 
   constructor(props) {
@@ -62,14 +61,13 @@ class ProjectSettingsCore extends React.Component {
     // Helper function
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
-
-    const isInternalUser = ['admin', 'guest'].indexOf(props.userInfo.userName) !== -1;
-
     this.defaultModelDays = 14;
     this.dateFormat = 'YYYY-MM-DD';
+    this.isInternalUser = ['admin', 'guest'].indexOf(props.userInfo.userName) !== -1;
 
+    // TODO: cleanup for admin/guest hardcode.
     // Log and metric project has different settings. Meanwhile, model picking is
-    // only used internal.
+    // only used internal and shown only for admin/guest account.
     this.metricSettingInfos = [
       { key: 'learning', name: 'Data Disqualifiers', component: DataDisqualifiersSetting },
       { key: 'alert', name: 'Alert Sensitivity', component: AlertSensitivitySetting },
@@ -79,7 +77,7 @@ class ProjectSettingsCore extends React.Component {
       { key: 'threshold', name: 'Threshold Overrides', component: TempComponent },
     ];
     // Show model picking only for admin/guest
-    if (isInternalUser) {
+    if (this.isInternalUser) {
       this.metricSettingInfos.push({
         key: 'model',
         name: 'Model Picking',
@@ -92,13 +90,14 @@ class ProjectSettingsCore extends React.Component {
       { key: 'logthreshold', name: 'Sensitivity Settings', component: LogSensitivitySetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
     ];
-    this.defaultMetricSetting = isInternalUser ? 'model' : 'learning';
+
+    this.defaultMetricSetting = this.isInternalUser ? 'model' : 'learning';
     this.defaultLogSetting = 'episodeword';
 
-    // The settings which needs start/end time
+    // The settings which need start/end time parameters
     this.timeRangeSettings = ['model'];
 
-    // The settings which needs instanceGroup
+    // The settings which need instanceGroup parameters
     this.instanceGroupSettings = ['model'];
   }
 
@@ -109,19 +108,24 @@ class ProjectSettingsCore extends React.Component {
   }
 
   componentWillReceiveProps(newProps) {
+    console.log('setting received');
     if (!this.applyParamsAndRedirect(newProps)) {
       this.reloadData(newProps);
     }
   }
 
   applyParamsAndRedirect(props) {
+    // This method will set the default parameters in different situation. If parameters
+    // are changed, it will redirect to the new url. In this case, we don't need to load
+    // data. After redirection, the data will be loaded.
     const { location, match, push, projects } = props;
     const params = parseQueryString(location.search);
     const { projectName } = match.params;
     let { setting, instanceGroup, startTime, endTime } = params;
     let redirect = false;
 
-    // Get the project object
+    // Get the project data type which will decide the settings' profile, if project not
+    // exist, select the default metric profile.
     const project = R.find(p => p.projectName === projectName, projects);
     const dataType = get(project, 'dataType', 'metric').toLowerCase();
 
@@ -130,7 +134,7 @@ class ProjectSettingsCore extends React.Component {
       instanceGroup = undefined;
     }
 
-    // If setting not selected or incorrect, use the default setting.
+    // If setting not selected or incorrect, use the default setting for each datatype.
     if (dataType === 'metric') {
       if (!setting || !R.find(i => i.key === setting, this.metricSettingInfos)) {
         setting = this.defaultMetricSetting;
@@ -139,14 +143,13 @@ class ProjectSettingsCore extends React.Component {
       setting = this.defaultLogSetting;
     }
 
-    // If it's model setting, check whether start/end time is valid timestamp and set default.
-    // Otherwise, remove these params.
+    // If it's setting needs start/end time params, set the default or to valid value.
+    // Otherwise, clean these params.
     if (this.ifIn(setting, this.timeRangeSettings)) {
       const mEndTime = endTime ? moment(endTime, this.dateFormat) : moment().endOf('day');
       const mStartTime = startTime
         ? moment(startTime, this.dateFormat)
         : mEndTime.clone().subtract(this.defaultModelDays, 'days').startOf('day');
-
       startTime = mStartTime.format(this.dateFormat);
       endTime = mEndTime.format(this.dateFormat);
     } else {
@@ -154,53 +157,30 @@ class ProjectSettingsCore extends React.Component {
       endTime = undefined;
     }
 
-    const newParams = { setting, instanceGroup, startTime, endTime };
+    const newParams = this.pickNotNil({ setting, instanceGroup, startTime, endTime });
 
-    // If any parts is different, we need redirect to the now location.
-    if (
-      projectName !== match.params.projectName ||
-      !R.equals(this.pickNotNil(newParams), this.pickNotNil(params))
-    ) {
+    // If projectName or params are changed, redirect to new location.
+    if (projectName !== match.params.projectName || !R.equals(newParams, this.pickNotNil(params))) {
       redirect = true;
-      push(
-        buildMatchLocation(match, { projectName }, { setting, instanceGroup, startTime, endTime }),
-      );
+      push(buildMatchLocation(match, { projectName }, newParams));
     }
 
     return redirect;
   }
 
   reloadData(props, force = false) {
-    // If incidentId is not empty, which means load incident data.
-    // Compare the current params with saved params, if it's different, dispatch action.
+    // IMPORTANT: Need to compare the new params with last params. If they are the same
+    // we cannot dispath the action, which will change the props again and cause a loop.
+
     const { match, location, projectSettingsParams, loadProjectSettings } = props;
     const params = parseQueryString(location.search);
     const { projectName } = match.params;
-    const { setting, instanceGroup, startTime, endTime } = params;
+    const nextProjectSettingsParams = this.pickNotNil({ projectName, ...params });
 
-    // IMPORTANT: Need to check the new params with last params, otherwise it will
-    // cause infinite loop.
-    // If setting is not related with time range or instance, reload data when project change.
-    // Otherwise only reload if projectName changed.
-    let reload = false;
     if (force) {
-      reload = true;
-    } else if (projectName !== projectSettingsParams.projectName) {
-      reload = true;
-    } else if (
-      this.ifIn(setting, this.timeRangeSettings) &&
-      (startTime !== projectSettingsParams.startTime || endTime !== projectSettingsParams.endTime)
-    ) {
-      reload = true;
-    } else if (
-      this.ifIn(setting, this.instanceGroupSettings) &&
-      instanceGroup !== projectSettingsParams.instanceGroup
-    ) {
-      reload = true;
-    }
-
-    if (reload) {
-      loadProjectSettings(projectName, params);
+      loadProjectSettings(projectName, params, true);
+    } else if (!R.equals(projectSettingsParams, nextProjectSettingsParams)) {
+      loadProjectSettings(projectName, params, false);
     }
   }
 
@@ -364,11 +344,10 @@ const ProjectSettings = injectIntl(ProjectSettingsCore);
 
 export default connect(
   (state: State) => {
-    const { projects } = state.app;
+    const { projects, currentLoadingComponents } = state.app;
     const { userInfo } = state.auth;
     const {
       projectSettings,
-      currentLoadingComponents,
       projectSettingsParams,
       currentErrorMessage,
     } = state.settings;

@@ -12,7 +12,8 @@ import R from 'ramda';
 import type { Deps } from '../../types';
 import { saveProjectSettings } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
-import { setLoadingComponents, loadProjectSettings } from '../actions';
+import { setLoadingComponents } from '../../app/actions';
+import { loadProjectSettings } from '../actions';
 
 const saveProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('SAVE_PROJECT_SETTINGS').concatMap((action) => {

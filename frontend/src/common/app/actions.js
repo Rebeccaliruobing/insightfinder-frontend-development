@@ -64,3 +64,14 @@ export const hideAppAlert = (ids: Array<string>): Action => ({
   type: 'HIDE_APP_ALERT',
   payload: { ids },
 });
+
+/**
+ * Set the components loading status. The components contains the name and true/false value.
+ * This action is handled by reducer.
+ */
+export const setLoadingComponents = (components: ?Object) => ({
+  type: 'SET_LOADING_COMPONENTS',
+  payload: {
+    ...components,
+  },
+});

@@ -49,6 +49,9 @@ export type AppState = {
   projects: Array<Object>,
   filters: Filters,
   enabledDataSourceIds: Array<string>,
+
+  // The map used to store the name of components in loading status.
+  currentLoadingComponents: Object,
 };
 
 export type AuthState = {
@@ -82,14 +85,14 @@ export type SettingsState = {
   // Object used to store current project's settings.
   projectSettings: Object,
 
-  // Parameters used to get current project's setting.
+  // Parameters get the current project's setting, used to check reload needed.
   projectSettingsParams: Object,
+
+  // Current parameters for each APIs, used to check whether API call is needed.
+  currentApisParams: Object,
 
   // The current error message, set to null if no errors.
   currentErrorMessage: ?Message,
-
-  // The map used to store the name of components in loading status.
-  currentLoadingComponents: ?Object,
 };
 
 export type UseCaseState = {
