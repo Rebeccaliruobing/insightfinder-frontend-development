@@ -23,6 +23,18 @@ const settingsMessages = defineMessages({
     defaultMessage: 'There is no model found for <b>{projectName}</b>, please change start/end date or choose other groups.',
     id: 'settings.error.noProjectModel',
   },
+  warnProjectModelNotExists: {
+    defaultMessage: 'The project model not exists, please select another one',
+    id: 'settings.warn.projectModelNotExists',
+  },
+  infoProjectModelPicked: {
+    defaultMessage: 'The project model is picked',
+    id: 'settings.info.projectModelPicked',
+  },
+  infoProjectModelRemoved: {
+    defaultMessage: 'The project model is removed',
+    id: 'settings.info.projectModelRemoved',
+  },
 });
 
 export default settingsMessages;

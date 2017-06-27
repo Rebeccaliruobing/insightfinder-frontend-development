@@ -54,3 +54,40 @@ export const setProjectSettings = (info: Object): Action => ({
   type: 'SET_PROJECT_SETTINGS',
   payload: { ...info },
 });
+
+/**
+ * Action used to remove the project model.
+ * This action is handled by epic.
+ */
+export const removeProjectModel = (
+  projectName: String,
+  instanceGroup,
+  modelKey: String,
+  params: Object,
+): Action => ({
+  type: 'REMOVE_PROJECT_MODEL',
+  payload: { projectName, instanceGroup, modelKey, params },
+});
+
+/**
+ * Action used to pick the project model.
+ * This action is handled by epic.
+ */
+export const pickProjectModel = (
+  projectName: String,
+  instanceGroup,
+  modelKey: String,
+  params: Object,
+): Action => ({
+  type: 'PICK_PROJECT_MODEL',
+  payload: { projectName, instanceGroup, modelKey, params },
+});
+
+/**
+ * Update the project model's status, the status can be 'removed', 'picked'.
+ * This action is handled by reducer.
+ */
+export const updateProjectModelStatus = (modelKey: String, status: String): Action => ({
+  type: 'UPDATE_PROJECT_MODEL_STATUS',
+  payload: { modelKey, status },
+});

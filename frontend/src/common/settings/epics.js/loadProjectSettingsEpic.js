@@ -25,8 +25,6 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     const dateFormat = 'YYYY-MM-DD';
     const apisParamsKey = 'project';
 
-    console.log('epic load');
-
     const state = getState();
     const { projectName, params, force } = action.payload;
     const { credentials } = state.auth;

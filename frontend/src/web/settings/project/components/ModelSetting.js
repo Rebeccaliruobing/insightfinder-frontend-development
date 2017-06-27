@@ -6,6 +6,7 @@
  **/
 
 import React from 'react';
+import moment from 'moment';
 import R from 'ramda';
 import { get } from 'lodash';
 import { autobind } from 'core-decorators';
@@ -16,10 +17,13 @@ import { settingsMessages } from '../../../../common/settings/messages';
 
 type Props = {
   intl: Object,
+  credentials: Object,
+  projectSettingsParams: Object,
   projectName: String,
-  currentLoadingComponents: Object,
+  instanceGroup: String,
   data: Object,
-  saveProjectSettings: Function,
+  pickProjectModel: Function,
+  removeProjectModel: Function,
 };
 
 class ModelSetting extends React.PureComponent {
@@ -35,8 +39,26 @@ class ModelSetting extends React.PureComponent {
     };
   }
 
+  @autobind handleModelSelect(key) {
+    this.setState({
+      selectedModelKey: key,
+    });
+  }
+
+  @autobind handleModelPick(modelKey) {
+    // projectSettingsParams is used for reload
+    const { projectName, instanceGroup, pickProjectModel, projectSettingsParams } = this.props;
+    pickProjectModel(projectName, instanceGroup, modelKey, projectSettingsParams);
+  }
+
+  @autobind handleModelRemove(modelKey) {
+    // projectSettingsParams is used for reload
+    const { projectName, instanceGroup, removeProjectModel, projectSettingsParams } = this.props;
+    removeProjectModel(projectName, instanceGroup, modelKey, projectSettingsParams);
+  }
+
   render() {
-    const { intl, projectName } = this.props;
+    const { intl, credentials, projectName, instanceGroup } = this.props;
     const models = get(this.props.data, this.stateKey, []);
     const isEmpty = models.length === 0;
     const hasError = isEmpty;
@@ -45,12 +67,14 @@ class ModelSetting extends React.PureComponent {
     // or the first model.
     let { selectedModelKey } = this.state;
     let selectedModel = null;
+    let selectionIsPicked = false;
     if (!isEmpty) {
       selectedModel = R.find(m => m.modelKey === selectedModelKey, models);
       if (!selectedModel) {
-        selectedModel = R.find(m => m.pickableFlag, models) || models[0];
+        selectedModel = R.find(m => m.picked, models) || models[0];
       }
       selectedModelKey = selectedModel.modelKey;
+      selectionIsPicked = selectedModel.picked;
     }
 
     return (
@@ -66,9 +90,20 @@ class ModelSetting extends React.PureComponent {
           </Container>}
         {!hasError &&
           <Container className="flex-col" style={{ width: 420, padding: '0 1em' }}>
-            <div style={{ paddingBottom: '1em' }}>
-              <h4>Model Details:</h4>
-              <ModelTile big key={`selected_${selectedModelKey}`} model={selectedModel} />
+            <div style={{ paddingBottom: '1em', fontSize: 12 }}>
+              <h4 style={{ paddingBottom: 0 }}>Model Details:</h4>
+              {selectionIsPicked &&
+                <div>
+                  {`You picked model ${moment(selectedModel.startTimestamp).format('MM/DD HH:mm')}-
+              ${moment(selectedModel.endTimestamp).format('MM/DD HH:mm')}
+              to be used ${selectedModel.pickedExpiry ? `till ${moment(selectedModel.pickedExpiry).format('MM/DD HH:mm')}` : 'for the next 24 hours'}.`}
+                </div>}
+              <ModelTile
+                style={{ marginTop: '0.5em' }}
+                big
+                key={`selected_${selectedModelKey}`}
+                model={selectedModel}
+              />
             </div>
             <Container className="flex-grow">
               <AutoSizer>
@@ -82,7 +117,13 @@ class ModelSetting extends React.PureComponent {
                     rowCount={selectedModel.metrics.length}
                     rowGetter={({ index }) => selectedModel.metrics[index]}
                   >
-                    <Column width={260} className="no-wrap" flexGrow={1} label="Metric" dataKey="name" />
+                    <Column
+                      width={260}
+                      className="no-wrap"
+                      flexGrow={1}
+                      label="Metric"
+                      dataKey="name"
+                    />
                     <Column width={80} label="Max" dataKey="max" />
                     <Column width={80} label="Min" dataKey="min" />
                   </Table>
@@ -102,7 +143,18 @@ class ModelSetting extends React.PureComponent {
             </div>
             <Container fullHeight className="flex-grow overflow-y-auto">
               <Tile isParent isFluid style={{ padding: 0 }}>
-                {models.map(m => <ModelTile key={m.modelKey} model={m} />)}
+                {models.map(m => (
+                  <ModelTile
+                    key={m.modelKey}
+                    model={m}
+                    credentials={credentials}
+                    projectName={projectName}
+                    instanceGroup={instanceGroup}
+                    onModelSelect={this.handleModelSelect}
+                    onModelRemove={this.handleModelRemove}
+                    onModelPick={this.handleModelPick}
+                  />
+                ))}
               </Tile>
             </Container>
           </Container>}

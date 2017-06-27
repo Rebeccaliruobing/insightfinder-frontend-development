@@ -23,6 +23,34 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
       ...state,
       ...action.payload,
     };
+  } else if (action.type === 'UPDATE_PROJECT_MODEL_STATUS') {
+    // This action doesn't work.
+    console.log('BUG: update model', action.payload);
+    const { projectSettings } = state;
+    const { modelKey, status } = action.payload;
+    let models = projectSettings.models || [];
+
+    const idx = R.findIndex(m => m.modelKey === modelKey, models);
+    let changed = false;
+    if (idx >= 0) {
+      if (status === 'removed') {
+        models = R.slice(idx, 1, models);
+        changed = true;
+      } else if (status === 'picked') {
+        let model = models[idx];
+        model = {
+          ...model,
+          picked: true,
+        };
+        models = [...R.slice(0, idx, models), model, ...R.slice(idx, models)];
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      return { ...state, projectSettings: { ...projectSettings, models } };
+    }
+    return state;
   } else if (action.type === 'SET_SETTINGS_API_PARAMS') {
     const { name, params } = action.payload;
     return {

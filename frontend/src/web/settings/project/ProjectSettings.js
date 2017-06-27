@@ -19,9 +19,18 @@ import DatePicker from 'react-datepicker';
 import { State } from '../../../common/types';
 import { Container, Box, Select } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
-import { loadProjectSettings, saveProjectSettings } from '../../../common/settings/actions';
+import {
+  loadProjectSettings,
+  saveProjectSettings,
+  pickProjectModel,
+  removeProjectModel,
+} from '../../../common/settings/actions';
 import { parseQueryString, buildMatchLocation } from '../../../common/utils';
-import { appMenusMessages, appFieldsMessages, appButtonsMessages } from '../../../common/app/messages';
+import {
+  appMenusMessages,
+  appFieldsMessages,
+  appButtonsMessages,
+} from '../../../common/app/messages';
 import {
   AlertSensitivitySetting,
   DataDisqualifiersSetting,
@@ -37,7 +46,7 @@ type Props = {
   location: Object,
   intl: Object,
   push: Function,
-  userInfo: Object,
+  credentials: Object,
   projects: Array<Object>,
   projectGroups: Array<String>,
   projectSettings: Object,
@@ -46,6 +55,8 @@ type Props = {
   currentErrorMessage: ?Message,
   loadProjectSettings: Function,
   saveProjectSettings: Function,
+  pickProjectModel: Function,
+  removeProjectModel: Function,
 };
 
 const TempComponent = () => <div>TODO Setting</div>;
@@ -61,7 +72,7 @@ class ProjectSettingsCore extends React.PureComponent {
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
     this.defaultModelDays = 7;
     this.dateFormat = 'YYYY-MM-DD';
-    this.isInternalUser = ['admin', 'guest'].indexOf(props.userInfo.userName) !== -1;
+    this.isInternalUser = ['admin', 'guest'].indexOf(props.credentials.userName) !== -1;
 
     // TODO: cleanup for admin/guest hardcode.
     // Log and metric project has different settings. Meanwhile, model picking is
@@ -81,7 +92,11 @@ class ProjectSettingsCore extends React.PureComponent {
     ];
     // Show model picking only for admin/guest
     if (this.isInternalUser) {
-      this.metricSettingInfos.push({ key: 'model', name: 'Model Picking', component: ModelSetting });
+      this.metricSettingInfos.push({
+        key: 'model',
+        name: 'Model Picking',
+        component: ModelSetting,
+      });
       this.logSettingInfos.push({ key: 'model', name: 'Model Picking', component: ModelSetting });
     }
 
@@ -236,12 +251,16 @@ class ProjectSettingsCore extends React.PureComponent {
     const {
       intl,
       match,
+      credentials,
       projects,
       projectGroups,
       projectSettings,
+      projectSettingsParams,
       currentLoadingComponents,
       saveProjectSettings,
       currentErrorMessage,
+      pickProjectModel,
+      removeProjectModel,
     } = this.props;
     const { projectName } = match.params;
     const { setting, instanceGroup, startTime, endTime } = parseQueryString(location.search);
@@ -325,7 +344,11 @@ class ProjectSettingsCore extends React.PureComponent {
             />
           </Container>}
         {!hasError &&
-          <Container fullHeight className="overflow-y-auto" style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
+          <Container
+            fullHeight
+            className="overflow-y-auto"
+            style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+          >
             <Box className="flex-col" style={{ height: '100%', paddingTop: 0 }}>
               <div className="ui pointing secondary menu">
                 {R.map(
@@ -346,9 +369,14 @@ class ProjectSettingsCore extends React.PureComponent {
                   React.createElement(settingInfo.component, {
                     intl,
                     projectName,
+                    projectSettingsParams,
                     currentLoadingComponents,
                     data: projectSettings || {},
                     saveProjectSettings,
+                    instanceGroup,
+                    credentials,
+                    pickProjectModel,
+                    removeProjectModel,
                   })}
               </div>
             </Box>
@@ -363,11 +391,16 @@ const ProjectSettings = injectIntl(ProjectSettingsCore);
 export default connect(
   (state: State) => {
     const { projects, currentLoadingComponents } = state.app;
-    const { userInfo } = state.auth;
-    const { projectGroups, projectSettings, projectSettingsParams, currentErrorMessage } = state.settings;
+    const { credentials } = state.auth;
+    const {
+      projectGroups,
+      projectSettings,
+      projectSettingsParams,
+      currentErrorMessage,
+    } = state.settings;
     return {
       projects,
-      userInfo,
+      credentials,
       projectGroups,
       projectSettings,
       currentLoadingComponents,
@@ -375,5 +408,5 @@ export default connect(
       currentErrorMessage,
     };
   },
-  { push, loadProjectSettings, saveProjectSettings },
+  { push, loadProjectSettings, saveProjectSettings, pickProjectModel, removeProjectModel },
 )(ProjectSettings);
