@@ -12,14 +12,14 @@ import fetchGet from './fetchGet';
 const loadProjectModel = (
   credentials: Credentials,
   projectName: String,
-  instanceGroup: String,
+  params: Object,
   modelKeyObj: Object,
 ) => {
   return fetchGet(getEndpoint('modelPicking'), {
     ...credentials,
-    projectName,
-    instanceGroup,
     operation: 'delete',
+    projectName,
+    ...params,
     modelKeyObj: JSON.stringify(modelKeyObj),
   }).then((d) => {
     return d;

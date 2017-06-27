@@ -7,6 +7,7 @@
 
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
+import moment from 'moment';
 import R from 'ramda';
 import { get } from 'lodash';
 
@@ -19,9 +20,12 @@ import { loadProjectSettings } from '../actions';
 
 const pickProjectModelEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('PICK_PROJECT_MODEL').concatMap((action) => {
+    const dateFormat = 'YYYY-MM-DD';
+
     const state = getState();
     const { credentials } = state.auth;
-    const { projectName, instanceGroup, modelKey, params } = action.payload;
+    const { projectName, modelKey, params } = action.payload;
+    const { instanceGroup, startTime, endTime } = params;
     const models = get(state.settings, 'projectSettings.models', []);
 
     // Find the model with the key, if cannot find, just send warning message.
@@ -34,7 +38,18 @@ const pickProjectModelEpic = (action$: any, { getState }: Deps) =>
     const { startTimestamp, endTimestamp } = model;
     const modelKeyObj = { startTimestamp, endTimestamp, modelKey };
 
-    return Observable.from(pickProjectModel(credentials, projectName, instanceGroup, modelKeyObj))
+    return Observable.from(
+      pickProjectModel(
+        credentials,
+        projectName,
+        {
+          instanceGroup,
+          modelStartTime: moment(startTime, dateFormat).valueOf(),
+          modelEndTime: moment(endTime, dateFormat).valueOf(),
+        },
+        modelKeyObj,
+      ),
+    )
       .concatMap(() => {
         return Observable.concat(
           Observable.of(showAppAlert('info', settingsMessages.infoProjectModelPicked)),
