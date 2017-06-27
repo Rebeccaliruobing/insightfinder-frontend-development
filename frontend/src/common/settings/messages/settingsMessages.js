@@ -27,6 +27,10 @@ const settingsMessages = defineMessages({
     defaultMessage: 'The project model not exists, please select another one',
     id: 'settings.warn.projectModelNotExists',
   },
+  infoProjectSettingSaved: {
+    defaultMessage: 'The setting is saved',
+    id: 'settings.info.projectSettingSaved',
+  },
   infoProjectModelPicked: {
     defaultMessage: 'The project model is picked',
     id: 'settings.info.projectModelPicked',

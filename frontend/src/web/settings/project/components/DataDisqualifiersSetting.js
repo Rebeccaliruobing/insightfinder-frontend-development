@@ -128,7 +128,7 @@ class DataDisqualifiersSetting extends React.PureComponent {
             </div>
           </div>
           <div className="input field">
-            <Input valueLink={learningSkippingPeriodLink} />
+            <Input valueLink={detectionSkippingPeriodLink} />
           </div>
           <div className="field">
             <div

@@ -54,7 +54,7 @@ class AppAlertCore extends React.Component {
     const { intl, alertMessages, hideAppAlert } = this.props;
     if (alertMessages.length > 0) {
       return (
-        <div className="fui alert container" style={{ paddingTop: 48, paddingBottom: 16 }}>
+        <div className="fui alert container" style={{ paddingTop: 80, paddingBottom: 16 }}>
           {alertMessages.map((alert) => {
             // Get locale message and replace placeholders with params.
             const { params } = alert;

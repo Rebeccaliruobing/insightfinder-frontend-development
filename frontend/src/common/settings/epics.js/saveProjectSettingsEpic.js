@@ -12,8 +12,9 @@ import R from 'ramda';
 import type { Deps } from '../../types';
 import { saveProjectSettings } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
-import { setLoadingComponents } from '../../app/actions';
+import { showAppAlert, setLoadingComponents } from '../../app/actions';
 import { loadProjectSettings } from '../actions';
+import { settingsMessages } from '../messages';
 
 const saveProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('SAVE_PROJECT_SETTINGS').concatMap((action) => {
@@ -29,7 +30,7 @@ const saveProjectSettingsEpic = (action$: any, { getState }: Deps) =>
       Observable.from(saveProjectSettings(credentials, projectName, settings))
         .concatMap(() => {
           // The response must be sucess, otherwise it will throw error.
-          return Observable.empty();
+          return Observable.of(showAppAlert('info', settingsMessages.infoProjectSettingSaved));
         })
         .catch((err) => {
           return apiEpicErrorHandle(err);
