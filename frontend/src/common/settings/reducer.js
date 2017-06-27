@@ -22,6 +22,15 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
       ...state,
       ...action.payload,
     };
+  } else if (action.type === 'SET_SETTINGS_API_PARAMS') {
+    const { name, params } = action.payload;
+    return {
+      ...state,
+      currentApisParams: {
+        ...state.currentApisParams,
+        [name]: params,
+      },
+    };
   }
   return { ...initialState, ...state };
 };

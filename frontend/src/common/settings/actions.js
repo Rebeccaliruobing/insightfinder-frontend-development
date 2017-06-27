@@ -38,13 +38,12 @@ export const saveProjectSettings = (
 });
 
 /**
- * Set the current APIs parameters. Used to check whether API call is needed.
+ * Set the current settings APIs parameters, if parameters not changed, will reuse the data
+ * instead of calling the API. Each API will has it's own status.
  */
-export const setApisParams = (components: ?Object) => ({
-  type: 'SET_LOADING_COMPONENTS',
-  payload: {
-    ...components,
-  },
+export const setSettingsApisParams = (name: String, params: Object) => ({
+  type: 'SET_SETTINGS_API_PARAMS',
+  payload: { name, params },
 });
 
 /**
@@ -53,7 +52,5 @@ export const setApisParams = (components: ?Object) => ({
  */
 export const setProjectSettings = (info: Object): Action => ({
   type: 'SET_PROJECT_SETTINGS',
-  payload: {
-    ...info,
-  },
+  payload: { ...info },
 });

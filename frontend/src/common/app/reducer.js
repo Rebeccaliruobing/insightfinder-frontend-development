@@ -152,7 +152,10 @@ const reducer = (
       ...state.currentLoadingComponents,
       ...action.payload,
     });
-    console.log('loading', currentLoadingComponents);
+    return {
+      ...state,
+      currentLoadingComponents,
+    };
   }
   return { ...initialState, ...state };
 };

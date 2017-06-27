@@ -8,19 +8,22 @@
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
 import moment from 'moment';
+import { get } from 'lodash';
 import R from 'ramda';
 
 import type { Deps } from '../../types';
-import { loadProjectSettings, loadProjectModel } from '../../apis';
+import { loadProjectSettings, loadProjectModel, loadProjectEpisodeWord } from '../../apis';
 import { appMessages } from '../../app/messages';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
-import { setProjectSettings } from '../actions';
+import { setProjectSettings, setSettingsApisParams } from '../actions';
 
 const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_PROJECT_SETTINGS').concatMap((action) => {
     const pickNotNil = R.pickBy(a => !R.isNil(a));
+    const ifIn = (i, items) => items.indexOf(i) !== -1;
     const dateFormat = 'YYYY-MM-DD';
+    const apisParamsKey = 'project';
 
     const state = getState();
     const { projectName, params, force } = action.payload;
@@ -28,19 +31,37 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     const { projects } = state.app;
     const { setting, instanceGroup, startTime, endTime } = params;
 
+    // Different setting uses different API, if the setting are using the same API,
+    // we should not call the same API when setting changed. So we store the params
+    // for each API, and compare with the current params individually.
+    //
+    // Meanwhile, we also need to support refresh.
     const projectSettingsParams = pickNotNil({ projectName, ...params });
-
     const prevProjectSettingsParams = state.settings.projectSettingsParams || {};
 
-    console.log('epic called', action.payload);
+    const settingApiParamsKey = ifIn(setting, ['model', 'episodeword']) ? setting : 'general';
+    const prevCurrentApisParams = get(state.settings.currentApisParams, apisParamsKey, {});
+    const prevSettingApiParams = get(prevCurrentApisParams, settingApiParamsKey, {});
+
+    // Get the Api params for the current setting's api.
+    let settingApiParams = { projectName };
+    if (setting === 'model') {
+      settingApiParams = pickNotNil({ projectName, instanceGroup, startTime, endTime });
+    }
+
+    let currentApisParams = { [settingApiParamsKey]: settingApiParams };
+    const refresh = force || projectName !== prevProjectSettingsParams.projectName;
+    let settingReload = refresh;
+    if (!refresh) {
+      settingReload = !R.equals(prevSettingApiParams, settingApiParams);
+      currentApisParams = { ...prevCurrentApisParams, ...currentApisParams };
+    }
+
+    // If refresh, reset all project settings.
+    const prevProjectSettings = refresh ? {} : state.settings.projectSettings || {};
 
     let currentErrorMessage = null;
     let apiAction$ = null;
-
-    // If force or project changed, we need to reload the setting and reset the stored
-    // settings.
-    const refresh = force || projectName !== prevProjectSettingsParams.projectName;
-    const prevProjectSettings = refresh ? {} : (state.settings.projectSettings || {});
 
     if (!R.find(p => p.projectName === projectName, projects)) {
       // The routing will guarantee the projectName is not empty, but we need
@@ -49,83 +70,58 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
 
       currentErrorMessage = appMessages.errorsProjectNotFound;
       apiAction$ = Observable.of(setProjectSettings({ projectSettings: {} }));
-    } else if (refresh && setting === 'model') {
-      // reload
-
-      apiAction$ = Observable.from(loadProjectSettings(credentials, { projectName }))
-        .concatMap((settingsData) => {
-          return Observable.from(
-            loadProjectModel(credentials, {
-              projectName,
-              instanceGroup,
-              startTime: moment(startTime, dateFormat).valueOf(),
-              endTime: moment(endTime, dateFormat).valueOf(),
-            }),
-          )
-            .concatMap((modelData) => {
-              // Project changed, so we reset all settings.
-              return Observable.of(
-                setProjectSettings({
-                  projectSettings: { ...settingsData.data, ...modelData.data },
-                }),
-              );
-            })
-            .catch((err) => {
-              // TODO: API error, ignore it now.
-              return Observable.of(
-                setProjectSettings({
-                  projectSettings: { ...prevProjectSettings, ...settingsData.data },
-                }),
-              );
-              // return apiEpicErrorHandle(err);
-            });
-        })
-        .catch((err) => {
-          return apiEpicErrorHandle(err);
-        });
-    } else if (
-      setting === 'episodeword' && (force || projectName !== prevProjectSettingsParams.projectName)
-    ) {
-      apiAction$ = Observable.empty();
-      // Load log project episodes and words
-    } else if (setting === 'model') {
-      // Call model API only, as the settings already exists.
+    } else if (settingReload && setting === 'model') {
       apiAction$ = Observable.from(
-        loadProjectModel(credentials, {
-          projectName,
+        loadProjectModel(credentials, projectName, {
           instanceGroup,
-          startTime: moment(startTime, dateFormat).valueOf(),
-          endTime: moment(endTime, dateFormat).valueOf(),
+          modelStartTime: moment(startTime, dateFormat).valueOf(),
+          modelEndTime: moment(endTime, dateFormat).valueOf(),
         }),
       )
-        .concatMap((modelData) => {
-          // Project not changed, only load model, so needs keep other settings.
+        .concatMap((d) => {
           return Observable.of(
             setProjectSettings({
-              projectSettings: { ...prevProjectSettings, ...modelData.data },
+              projectSettings: { ...prevProjectSettings, ...d.data },
             }),
           );
         })
         .catch((err) => {
-          // TODO: API error, ignore it now.
-          return Observable.empty();
-          // return apiEpicErrorHandle(err);
+          return apiEpicErrorHandle(err);
         });
-    } else {
-      apiAction$ = Observable.from(loadProjectSettings(credentials, { projectName }))
-        .concatMap((settingsData) => {
-          // Reset all settings.
-          return Observable.of(setProjectSettings({ projectSettings: { ...settingsData.data } }));
+    } else if (settingReload && setting === 'episodeword') {
+      apiAction$ = Observable.from(loadProjectEpisodeWord(credentials, projectName))
+        .concatMap((d) => {
+          return Observable.of(
+            setProjectSettings({
+              projectSettings: { ...prevProjectSettings, ...d.data },
+            }),
+          );
         })
         .catch((err) => {
           return apiEpicErrorHandle(err);
         });
+    } else if (settingReload) {
+      apiAction$ = Observable.from(loadProjectSettings(credentials, { projectName }))
+        .concatMap((d) => {
+          // Reset all settings.
+          return Observable.of(
+            setProjectSettings({
+              projectSettings: { ...prevProjectSettings, ...d.data },
+            }),
+          );
+        })
+        .catch((err) => {
+          return apiEpicErrorHandle(err);
+        });
+    } else {
+      apiAction$ = Observable.empty();
     }
 
     // Return the general sequence for all API calls.
     return Observable.concat(
       Observable.of(showAppLoader),
       Observable.of(setProjectSettings({ currentErrorMessage, projectSettingsParams })),
+      Observable.of(setSettingsApisParams(apisParamsKey, currentApisParams)),
       apiAction$,
       Observable.of(hideAppLoader()),
     );

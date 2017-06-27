@@ -21,11 +21,7 @@ import { Container, Box, Select } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { loadProjectSettings, saveProjectSettings } from '../../../common/settings/actions';
 import { parseQueryString, buildMatchLocation } from '../../../common/utils';
-import {
-  appMenusMessages,
-  appFieldsMessages,
-  appButtonsMessages,
-} from '../../../common/app/messages';
+import { appMenusMessages, appFieldsMessages, appButtonsMessages } from '../../../common/app/messages';
 import {
   AlertSensitivitySetting,
   DataDisqualifiersSetting,
@@ -61,7 +57,7 @@ class ProjectSettingsCore extends React.PureComponent {
     // Helper function
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
-    this.defaultModelDays = 14;
+    this.defaultModelDays = 7;
     this.dateFormat = 'YYYY-MM-DD';
     this.isInternalUser = ['admin', 'guest'].indexOf(props.userInfo.userName) !== -1;
 
@@ -76,20 +72,16 @@ class ProjectSettingsCore extends React.PureComponent {
       { key: 'grouping', name: 'Grouping', component: TempComponent },
       { key: 'threshold', name: 'Threshold Overrides', component: TempComponent },
     ];
-    // Show model picking only for admin/guest
-    if (this.isInternalUser) {
-      this.metricSettingInfos.push({
-        key: 'model',
-        name: 'Model Picking',
-        component: TempComponent,
-      });
-    }
-
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: LogEpisodeWordSetting },
       { key: 'logthreshold', name: 'Sensitivity Settings', component: LogSensitivitySetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
     ];
+    // Show model picking only for admin/guest
+    if (this.isInternalUser) {
+      this.metricSettingInfos.push({ key: 'model', name: 'Model Picking', component: TempComponent });
+      this.logSettingInfos.push({ key: 'model', name: 'Model Picking', component: TempComponent });
+    }
 
     this.defaultMetricSetting = this.isInternalUser ? 'model' : 'learning';
     this.defaultLogSetting = 'episodeword';
@@ -108,7 +100,6 @@ class ProjectSettingsCore extends React.PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    console.log('setting received');
     if (!this.applyParamsAndRedirect(newProps)) {
       this.reloadData(newProps);
     }
@@ -303,11 +294,7 @@ class ProjectSettingsCore extends React.PureComponent {
             />
           </Container>}
         {!hasError &&
-          <Container
-            fullHeight
-            className="overflow-y-auto"
-            style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
-          >
+          <Container fullHeight className="overflow-y-auto" style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
             <Box className="flex-col" style={{ height: '100%' }}>
               <div className="ui pointing secondary menu">
                 {R.map(
@@ -346,11 +333,7 @@ export default connect(
   (state: State) => {
     const { projects, currentLoadingComponents } = state.app;
     const { userInfo } = state.auth;
-    const {
-      projectSettings,
-      projectSettingsParams,
-      currentErrorMessage,
-    } = state.settings;
+    const { projectSettings, projectSettingsParams, currentErrorMessage } = state.settings;
     return {
       projects,
       userInfo,

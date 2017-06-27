@@ -5,19 +5,19 @@
  * *****************************************************************************
  **/
 
-import R from 'ramda';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadProjectModel = (credentials: Credentials, params: Object) => {
-  return fetchGet(getEndpoint('displayProjectModel'), {
+const loadProjectModel = (credentials: Credentials, projectName: String, params: Object) => {
+  return fetchGet(getEndpoint('modelPicking'), {
     ...credentials,
+    projectName,
+    operation: 'list',
     ...params,
-    origin: '',
   }).then((d) => {
     const rawData = d.data;
-    const data = {};
+    const data = rawData;
 
     return {
       rawData,
