@@ -88,6 +88,9 @@ export type SettingsState = {
   // Parameters get the current project's setting, used to check reload needed.
   projectSettingsParams: Object,
 
+  // The current project's groups
+  projectGroups: Array<String>,
+
   // Current parameters for each APIs, used to check whether API call is needed.
   currentApisParams: Object,
 

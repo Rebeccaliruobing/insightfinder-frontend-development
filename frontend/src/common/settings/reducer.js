@@ -12,6 +12,7 @@ import type { LogState, Action } from '../types';
 const initialState: LogState = {
   projectSettings: {},
   projectSettingsParams: {},
+  projectGroups: [],
   currentApisParams: {},
   currentErrorMessage: null,
 };

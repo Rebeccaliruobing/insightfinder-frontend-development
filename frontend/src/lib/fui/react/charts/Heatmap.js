@@ -12,7 +12,7 @@ type Props = {
   valueAccessor: Function,
 };
 
-class Heatmap extends React.Component {
+class Heatmap extends React.PureComponent {
   props: Props;
 
   static defaultProps = {

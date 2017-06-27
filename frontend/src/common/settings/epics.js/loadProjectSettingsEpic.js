@@ -12,7 +12,7 @@ import { get } from 'lodash';
 import R from 'ramda';
 
 import type { Deps } from '../../types';
-import { loadProjectSettings, loadProjectModel, loadProjectEpisodeWord } from '../../apis';
+import { loadProjectSettings, loadProjectModel, loadProjectEpisodeWord, loadProjectGroupList } from '../../apis';
 import { appMessages } from '../../app/messages';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -24,6 +24,8 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     const ifIn = (i, items) => items.indexOf(i) !== -1;
     const dateFormat = 'YYYY-MM-DD';
     const apisParamsKey = 'project';
+
+    console.log('epic load');
 
     const state = getState();
     const { projectName, params, force } = action.payload;
@@ -57,11 +59,24 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
       currentApisParams = { ...prevCurrentApisParams, ...currentApisParams };
     }
 
-    // If refresh, reset all project settings.
-    const prevProjectSettings = refresh ? {} : state.settings.projectSettings || {};
-
     let currentErrorMessage = null;
     let apiAction$ = null;
+
+    // If refresh, reset all project settings.
+    let prevProjectSettings = state.settings.projectSettings || {};
+    let projectGroups = state.settings.projectGroups || [];
+    let grouplistAction$ = Observable.empty();
+    if (refresh) {
+      prevProjectSettings = {};
+      projectGroups = [];
+      grouplistAction$ = Observable.from(loadProjectGroupList(credentials, projectName))
+        .concatMap((d) => {
+          return Observable.of(setProjectSettings({ projectGroups: d.data.groups }));
+        })
+        .catch((err) => {
+          return apiEpicErrorHandle(err);
+        });
+    }
 
     if (!R.find(p => p.projectName === projectName, projects)) {
       // The routing will guarantee the projectName is not empty, but we need
@@ -120,8 +135,9 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     // Return the general sequence for all API calls.
     return Observable.concat(
       Observable.of(showAppLoader),
-      Observable.of(setProjectSettings({ currentErrorMessage, projectSettingsParams })),
+      Observable.of(setProjectSettings({ projectGroups, currentErrorMessage, projectSettingsParams })),
       Observable.of(setSettingsApisParams(apisParamsKey, currentApisParams)),
+      grouplistAction$,
       apiAction$,
       Observable.of(hideAppLoader()),
     );

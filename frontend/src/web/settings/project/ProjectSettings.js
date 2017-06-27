@@ -28,6 +28,7 @@ import {
   SharingSetting,
   PredictionSetting,
   LogSensitivitySetting,
+  ModelSetting,
   LogEpisodeWordSetting,
 } from './components';
 
@@ -38,6 +39,7 @@ type Props = {
   push: Function,
   userInfo: Object,
   projects: Array<Object>,
+  projectGroups: Array<String>,
   projectSettings: Object,
   currentLoadingComponents: Object,
   projectSettingsParams: Object,
@@ -79,12 +81,13 @@ class ProjectSettingsCore extends React.PureComponent {
     ];
     // Show model picking only for admin/guest
     if (this.isInternalUser) {
-      this.metricSettingInfos.push({ key: 'model', name: 'Model Picking', component: TempComponent });
-      this.logSettingInfos.push({ key: 'model', name: 'Model Picking', component: TempComponent });
+      this.metricSettingInfos.push({ key: 'model', name: 'Model Picking', component: ModelSetting });
+      this.logSettingInfos.push({ key: 'model', name: 'Model Picking', component: ModelSetting });
     }
 
     this.defaultMetricSetting = this.isInternalUser ? 'model' : 'learning';
     this.defaultLogSetting = 'episodeword';
+    this.defaultInstanceGroup = 'All';
 
     // The settings which need start/end time parameters
     this.timeRangeSettings = ['model'];
@@ -148,6 +151,13 @@ class ProjectSettingsCore extends React.PureComponent {
       endTime = undefined;
     }
 
+    // Also set the install group default
+    if (this.ifIn(setting, this.instanceGroupSettings)) {
+      instanceGroup = R.isNil(instanceGroup) ? this.defaultInstanceGroup : instanceGroup;
+    } else {
+      instanceGroup = undefined;
+    }
+
     const newParams = this.pickNotNil({ setting, instanceGroup, startTime, endTime });
 
     // If projectName or params are changed, redirect to new location.
@@ -182,6 +192,13 @@ class ProjectSettingsCore extends React.PureComponent {
     // Reset setting to default as project type might change.
     const setting = undefined;
     push(buildMatchLocation(match, { projectName }, { ...params, setting }));
+  }
+
+  @autobind handleInstanceGroupChange(newValue) {
+    const instanceGroup = newValue ? newValue.value : null;
+    const { match, push, location } = this.props;
+    const params = parseQueryString(location.search);
+    push(buildMatchLocation(match, match.params, { ...params, instanceGroup }));
   }
 
   @autobind handleSettingChangeClick(setting) {
@@ -220,6 +237,7 @@ class ProjectSettingsCore extends React.PureComponent {
       intl,
       match,
       projects,
+      projectGroups,
       projectSettings,
       currentLoadingComponents,
       saveProjectSettings,
@@ -232,6 +250,7 @@ class ProjectSettingsCore extends React.PureComponent {
     const settingInfos = dataType === 'metric' ? this.metricSettingInfos : this.logSettingInfos;
     const settingInfo = R.find(info => info.key === setting, settingInfos);
     const showTimeRange = this.ifIn(setting, this.timeRangeSettings);
+    const showInstanceGroup = this.ifIn(setting, this.instanceGroupSettings);
     const hasError = !!currentErrorMessage;
 
     return (
@@ -253,6 +272,18 @@ class ProjectSettingsCore extends React.PureComponent {
               onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
+            {showInstanceGroup && <span className="divider">/</span>}
+            {showInstanceGroup &&
+              <Select
+                clearable
+                name="group"
+                inline
+                style={{ width: 200 }}
+                options={R.map(g => ({ label: g, value: g }), projectGroups)}
+                value={instanceGroup}
+                onChange={this.handleInstanceGroupChange}
+                placeholder="Select Group"
+              />}
           </div>
           <div className="section float-right clearfix" style={{ fontSize: 12, marginRight: 0 }}>
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
@@ -295,7 +326,7 @@ class ProjectSettingsCore extends React.PureComponent {
           </Container>}
         {!hasError &&
           <Container fullHeight className="overflow-y-auto" style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
-            <Box className="flex-col" style={{ height: '100%' }}>
+            <Box className="flex-col" style={{ height: '100%', paddingTop: 0 }}>
               <div className="ui pointing secondary menu">
                 {R.map(
                   info => (
@@ -333,10 +364,11 @@ export default connect(
   (state: State) => {
     const { projects, currentLoadingComponents } = state.app;
     const { userInfo } = state.auth;
-    const { projectSettings, projectSettingsParams, currentErrorMessage } = state.settings;
+    const { projectGroups, projectSettings, projectSettingsParams, currentErrorMessage } = state.settings;
     return {
       projects,
       userInfo,
+      projectGroups,
       projectSettings,
       currentLoadingComponents,
       projectSettingsParams,

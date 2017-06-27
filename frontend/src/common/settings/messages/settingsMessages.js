@@ -19,6 +19,10 @@ const settingsMessages = defineMessages({
     defaultMessage: 'This setting value is invalid, please input number value.',
     id: 'settings.error.notNumberInput',
   },
+  errorNoProjectModel: {
+    defaultMessage: 'There is no model found for <b>{projectName}</b>, please change start/end date or choose other groups.',
+    id: 'settings.error.noProjectModel',
+  },
 });
 
 export default settingsMessages;
