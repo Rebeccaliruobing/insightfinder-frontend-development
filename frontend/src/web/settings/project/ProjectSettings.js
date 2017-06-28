@@ -34,11 +34,13 @@ import {
 import {
   AlertSensitivitySetting,
   DataDisqualifiersSetting,
+  GroupSetting,
   SharingSetting,
   PredictionSetting,
   LogSensitivitySetting,
   ModelSetting,
   LogEpisodeWordSetting,
+  ThresholdSetting,
 } from './components';
 
 type Props = {
@@ -58,8 +60,6 @@ type Props = {
   pickProjectModel: Function,
   removeProjectModel: Function,
 };
-
-const TempComponent = () => <div>TODO Setting</div>;
 
 class ProjectSettingsCore extends React.PureComponent {
   props: Props;
@@ -82,8 +82,8 @@ class ProjectSettingsCore extends React.PureComponent {
       { key: 'alert', name: 'Alert Sensitivity', component: AlertSensitivitySetting },
       { key: 'prediction', name: 'Prediction', component: PredictionSetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
-      { key: 'grouping', name: 'Grouping', component: TempComponent },
-      { key: 'threshold', name: 'Threshold Overrides', component: TempComponent },
+      { key: 'grouping', name: 'Grouping', component: GroupSetting },
+      { key: 'threshold', name: 'Threshold Overrides', component: ThresholdSetting },
     ];
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: LogEpisodeWordSetting },
