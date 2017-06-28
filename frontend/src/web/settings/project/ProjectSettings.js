@@ -82,7 +82,7 @@ class ProjectSettingsCore extends React.PureComponent {
       { key: 'alert', name: 'Alert Sensitivity', component: AlertSensitivitySetting },
       { key: 'prediction', name: 'Prediction', component: PredictionSetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
-      { key: 'grouping', name: 'Grouping', component: GroupSetting },
+      // { key: 'grouping', name: 'Grouping', component: GroupSetting },
       { key: 'threshold', name: 'Threshold Overrides', component: MetricSetting },
     ];
     this.logSettingInfos = [
