@@ -6,7 +6,7 @@
  **/
 
 import R from 'ramda';
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
@@ -41,8 +41,48 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
     const derivedpvalue = get(rawData, 'projectModelAllJSON.derivedpvalue', '0.9');
     const logFreqWindow = get(rawData, 'projectModelAllJSON.logFreqWindow', '10');
 
-    // The metricSettings is a string, converted it into array.
-    const metricSettings = JSON.parse(get(rawData, 'projectSettingsAllInfoJSON.metricSettings', '[]'));
+    // The metricUnitMapping and metricSettings is a string, converted it into array.
+    // Meanwhile, needs merge metric info from both string.
+    const metricSettings = JSON.parse(
+      get(rawData, 'projectSettingsAllInfoJSON.metricSettings', '[]'),
+    );
+    const metricUnitMapping = JSON.parse(get(rawData, 'metricUnitMapping', '[]'));
+
+    const metricUnitMap = {};
+    R.forEach((item) => {
+      const { unit, shortMetric } = item;
+      metricUnitMap[item.metric] = { unit, shortMetric };
+    }, metricUnitMapping);
+
+    const metrics = R.map((setting) => {
+      let smetric = setting.smetric;
+      const pos = smetric.indexOf('/');
+      if (pos !== -1) {
+        smetric = smetric.substring(0, pos);
+      }
+      let { unit, shortMetric } = metricUnitMap[smetric] || {};
+      const pos2 = unit.indexOf('(');
+      const pos3 = unit.indexOf(')');
+      if (pos2 !== -1 && pos3 !== -1) {
+        unit = unit.substring(pos2 + 1, pos3);
+      }
+      let isCustomMetric = false;
+      if (
+        (!isNumber(setting.groupId) ||
+          (isNumber(setting.groupId) && parseInt(setting.groupId, 10) < 1000)) &&
+        unit === ''
+      ) {
+        // has group id<1000 and not AWS/GAE metrics
+        isCustomMetric = true;
+      }
+      return {
+        ...setting,
+        unit,
+        shortMetric,
+        isCustomMetric,
+      };
+    }, metricSettings);
+
     const data = {
       sharedUserNames,
       predictionWindow,
@@ -54,7 +94,7 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       emailcvalue,
       derivedpvalue,
       logFreqWindow,
-      metricSettings,
+      metrics,
     };
 
     return {

@@ -25,25 +25,42 @@ class MetricSetting extends React.PureComponent {
 
   constructor(props) {
     super(props);
-    this.submitLoadingKey = 'settings_threshold_submit';
+
+    this.stateKey = 'metrics';
+    this.propsPath = ['data', this.stateKey];
+    this.submitLoadingKey = 'settings_metric_submit';
+
+    const metrics = get(props, this.propsPath, []);
+    this.state = {
+      [this.stateKey]: metrics,
+    };
+  }
+
+  componentWillReceiveProps(newProps) {
+    const metrics = get(newProps, this.propsPath, []);
+    if (metrics !== get(this.props, this.propsPath)) {
+      this.setState({
+        [this.stateKey]: metrics,
+      });
+    }
   }
 
   @autobind handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
-    const metricSettings = [];
-    saveProjectSettings(projectName, { metricSettings }, { [this.submitLoadingKey]: true });
+    const { metrics } = this.state;
+    saveProjectSettings(projectName, { metrics }, { [this.submitLoadingKey]: true });
   }
 
   render() {
     const { intl } = this.props;
+    const { metrics } = this.state;
     const hasError = false;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
-    const testData = [];
     return (
       <Container fullHeight className="overflow-y-auto">
         <form
           className={`ui ${hasError ? 'error' : ''} form full-height flex-col`}
-          style={{ fontSize: 12, width: 1048 }}
+          style={{ fontSize: 12, width: 900 }}
         >
           <Container className="field">
             <h3>Metric Override Thresholds</h3>
@@ -68,22 +85,23 @@ class MetricSetting extends React.PureComponent {
                   height={height}
                   headerHeight={40}
                   rowHeight={40}
-                  rowCount={testData.length}
-                  rowGetter={({ index }) => testData[index]}
+                  rowCount={metrics.length}
+                  rowGetter={({ index }) => metrics[index]}
                 >
                   <Column
                     width={140}
                     className="no-wrap"
                     flexGrow={1}
                     label="Metric"
-                    dataKey="metric"
+                    dataKey="smetric"
                   />
-                  <Column width={50} label="Unit" dataKey="name" />
-                  <Column width={200} label="Normalization Group" dataKey="name" />
-                  <Column width={140} label="Alert Threshold" dataKey="max" />
-                  <Column width={140} label="No Alert Threshold" dataKey="min" />
-                  <Column width={140} label="KPI" dataKey="min" />
-                  <Column width={100} label="Custom Metric" dataKey="min" />
+                  <Column width={80} label="Unit" dataKey="unit" />
+                  <Column width={80} label="Custom Metric" dataKey="isCustomMetric" />
+                  <Column width={80} label="Short Metric" dataKey="shortMetric" />
+                  <Column width={140} label="Normalization Group" dataKey="groupId" />
+                  <Column width={180} label="Alert Threshold" dataKey="thresholdAlert" />
+                  <Column width={180} label="No Alert Threshold" dataKey="thresholdNoAlert" />
+                  <Column width={40} label="KPI" dataKey="isKPI" />
                 </Table>
               )}
             </AutoSizer>
