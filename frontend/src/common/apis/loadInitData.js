@@ -31,7 +31,7 @@ const loadInitData = (credentials: Credentials) => {
       const { projectName, dataType, cloudType } = p;
       // Streaming log analysis project
       const isLogStreaming =
-        dataType.toLowerCase() === 'log' && cloudType.toLowerCase() !== 'logfile';
+        dataType.toLowerCase() === 'log';
 
       // Historical log analysis project
       const isLogFile =
