@@ -300,24 +300,6 @@ class MetricAnalysisCore extends React.PureComponent {
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
           </div>
-          <div className="section center" style={{ fontSize: 12 }}>
-            <div>
-              <div
-                className={`ui ${view === 'anomaly' ? 'grey active' : 'orange'} button`}
-                style={{ borderRadius: 0, margin: 0 }}
-                onClick={this.handleViewChange('anomaly')}
-              >
-                Anomaly View
-              </div>
-              <div
-                className={`ui ${view === 'resource' ? 'grey active' : 'orange'} button`}
-                style={{ borderRadius: 0, margin: 0 }}
-                onClick={this.handleViewChange('resource')}
-              >
-                Resource View
-              </div>
-            </div>
-          </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
             <span className="label">Start Date:</span>
             <div className="ui input">
@@ -344,6 +326,24 @@ class MetricAnalysisCore extends React.PureComponent {
             </div>
           </div>
         </Container>
+        <div className="section" style={{ fontSize: 12, marginTop: '0.5em' }}>
+          <div>
+            <div
+              className={`ui ${view === 'anomaly' ? 'grey active' : 'orange'} button`}
+              style={{ borderRadius: 0, margin: 0 }}
+              onClick={this.handleViewChange('anomaly')}
+            >
+              Anomaly View
+            </div>
+            <div
+              className={`ui ${view === 'resource' ? 'grey active' : 'orange'} button`}
+              style={{ borderRadius: 0, margin: 0 }}
+              onClick={this.handleViewChange('resource')}
+            >
+              Resource View
+            </div>
+          </div>
+        </div>
         <Container fullHeight className="overflow-y-auto flex-col">
           {currentErrorMessage &&
             <Container fullHeight>
@@ -359,7 +359,7 @@ class MetricAnalysisCore extends React.PureComponent {
             currentHourlyEvents &&
             <Container
               className={`boxed ${currentHourlyEventsLoading ? 'loading' : ''}`}
-              style={showAnomalyView ? {} : { display: 'none' }}
+              style={showAnomalyView ? { marginTop: 0 } : { display: 'none', marginTop: 0 }}
             >
               {!!instanceGroup &&
                 <span
@@ -421,7 +421,10 @@ class MetricAnalysisCore extends React.PureComponent {
               />
             </Container>}
           {!currentErrorMessage &&
-            <Container className={`boxed flex-grow flex-col ${showResourceView ? '' : 'hide'}`}>
+            <Container
+              className={`boxed flex-grow flex-col ${showResourceView ? '' : 'hide'}`}
+              style={{ marginTop: 0 }}
+            >
               <h4 style={{ textAlign: 'center', marginBottom: '0.5em' }}>
                 Resource Statistcs (Weekly)
               </h4>
@@ -431,6 +434,7 @@ class MetricAnalysisCore extends React.PureComponent {
                 timeIntervalPredicted={timeIntervalPredicted}
                 autoExpandCount={1}
                 stats={get(currentWeeklyAnomalies, 'resourceEventStats', [])}
+                onRowOpen={this.handleListRowOpenAnomaly}
               />
             </Container>}
         </Container>
