@@ -3,6 +3,9 @@
 
 .fui.container {
   position: relative;
+  &.hide {
+    display: none !important;
+  }
   &.boxed {
     background-color: white;
     border-radius: $border-radius;
@@ -81,6 +84,15 @@
       }
       &.label {
         font-weight: $font-weight-medium;
+      }
+    }
+    &.center {
+      position: absolute;
+      height: 0;
+      left: 0;
+      right: 0;
+      > div {
+        margin: auto;
       }
     }
   }

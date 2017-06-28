@@ -62,7 +62,10 @@ const loadWeeklyAnomalies = (credentials: Credentials, params: Object) => {
           anomalyEventStats,
           resourceEventStats,
         },
-        data: normalizeStats(anomalyEventStats),
+        data: {
+          anomalyEventStats: normalizeStats(anomalyEventStats),
+          resourceEventStats: normalizeStats(resourceEventStats, 'current.AvgCPUUtilization'),
+        },
       };
     });
   });
