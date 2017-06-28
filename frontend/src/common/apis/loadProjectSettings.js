@@ -40,6 +40,9 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
     const emailcvalue = get(rawData, 'projectModelAllJSON.emailcvalue', '5');
     const derivedpvalue = get(rawData, 'projectModelAllJSON.derivedpvalue', '0.9');
     const logFreqWindow = get(rawData, 'projectModelAllJSON.logFreqWindow', '10');
+
+    // The metricSettings is a string, converted it into array.
+    const metricSettings = JSON.parse(get(rawData, 'projectSettingsAllInfoJSON.metricSettings', '[]'));
     const data = {
       sharedUserNames,
       predictionWindow,
@@ -51,6 +54,7 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       emailcvalue,
       derivedpvalue,
       logFreqWindow,
+      metricSettings,
     };
 
     return {

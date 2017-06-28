@@ -20,7 +20,7 @@ type Props = {
   saveProjectSettings: Function,
 };
 
-class ThresholdSetting extends React.PureComponent {
+class MetricSetting extends React.PureComponent {
   props: Props;
 
   constructor(props) {
@@ -30,19 +30,15 @@ class ThresholdSetting extends React.PureComponent {
 
   @autobind handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
-    saveProjectSettings(projectName, {}, { [this.submitLoadingKey]: true });
+    const metricSettings = [];
+    saveProjectSettings(projectName, { metricSettings }, { [this.submitLoadingKey]: true });
   }
 
   render() {
     const { intl } = this.props;
     const hasError = false;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
-    const testData = [
-      { name: 'test', max: 10, min: 20 },
-      { name: 'test', max: 10, min: 20 },
-      { name: 'test', max: 10, min: 20 },
-      { name: 'test', max: 10, min: 20 },
-    ];
+    const testData = [];
     return (
       <Container fullHeight className="overflow-y-auto">
         <form
@@ -106,4 +102,4 @@ class ThresholdSetting extends React.PureComponent {
   }
 }
 
-export default ThresholdSetting;
+export default MetricSetting;

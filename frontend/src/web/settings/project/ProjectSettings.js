@@ -38,9 +38,9 @@ import {
   SharingSetting,
   PredictionSetting,
   LogSensitivitySetting,
+  MetricSetting,
   ModelSetting,
   LogEpisodeWordSetting,
-  ThresholdSetting,
 } from './components';
 
 type Props = {
@@ -83,7 +83,7 @@ class ProjectSettingsCore extends React.PureComponent {
       { key: 'prediction', name: 'Prediction', component: PredictionSetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
       { key: 'grouping', name: 'Grouping', component: GroupSetting },
-      { key: 'threshold', name: 'Threshold Overrides', component: ThresholdSetting },
+      { key: 'threshold', name: 'Threshold Overrides', component: MetricSetting },
     ];
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: LogEpisodeWordSetting },
