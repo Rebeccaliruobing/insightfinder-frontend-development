@@ -21,6 +21,8 @@ import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } 
 // TODO: v1 components needs upgrade
 import AccountInfo from '../../../components/account-info';
 import EventSummary from '../../../containers/event-summary';
+import MetricAppForecast from '../../../containers/app-forecast';
+
 import {
   ForgotPassword,
   ResetPassword,
@@ -54,6 +56,7 @@ const MetricRoutings = () => {
           component={HistoricalMetricAnalysis}
         />
         <Route path={BaseUrls.MetricEvents} component={EventSummary} />
+        <Route path={BaseUrls.MetricAppForecast} component={MetricAppForecast} />
         <Route
           path={BaseUrls.MetricLineCharts}
           render={() => React.createElement(liveMonitoringAppV1)}

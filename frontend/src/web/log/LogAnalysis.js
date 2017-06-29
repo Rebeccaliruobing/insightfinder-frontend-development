@@ -145,13 +145,13 @@ class LogAnalysisCore extends React.PureComponent {
     let refresh = force;
     if (!refresh) {
       refresh = isIncident
-        ? !R.equals({ projectName, incidentId, view }, incidentParams)
+        ? !R.equals({ projectName, month, incidentId, view }, incidentParams)
         : !R.equals({ projectName, month }, incidentListParams);
     }
 
     if (refresh) {
       if (isIncident) {
-        props.loadLogIncident(projectName, { incidentId, view }, force);
+        props.loadLogIncident(projectName, { month, incidentId, view }, force);
       } else {
         props.loadLogIncidentList(projectName, { month }, force);
       }

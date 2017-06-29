@@ -40,17 +40,11 @@ const logIncidentListEpic = (action$: any, { getState }: Deps) =>
     if (!projectName) {
       apiAction$ = Observable.of(setLogInfo({ currentError: appMessages.errorsNoLogProject }));
     } else if (!R.find(p => p.projectName === projectName, projects)) {
-      apiAction$ = Observable.of(
-        setLogInfo({ currentError: appMessages.errorsProjectNotFound }),
-      );
+      apiAction$ = Observable.of(setLogInfo({ currentError: appMessages.errorsProjectNotFound }));
     } else {
       apiAction$ = Observable.from(loadLogIncidentList(credentials, projectName, { monthlyDate }))
         .concatMap((d) => {
-          return Observable.of(
-            setLogInfo({
-              incidentList: d.data.incidentList,
-            }),
-          );
+          return Observable.of(setLogInfo({ incidentList: d.data.incidentList }));
         })
         .catch((err) => {
           return apiEpicErrorHandle(err);

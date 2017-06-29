@@ -254,6 +254,33 @@ class MetricAnalysisCore extends React.PureComponent {
     window.open(buildUrl(BaseUrls.MetricEvents, {}, query), '_blank');
   }
 
+  @autobind handleListRowOpenResource(projectName, instanceGroup, datetime) {
+    const { location } = this.props;
+    const params = parseQueryString(location.search);
+    const { startTime, endTime } = params;
+    const mStartTime = moment(startTime, this.dateFormat);
+    const mEndTime = moment(endTime, this.dateFormat);
+    const timezoneOffset = moment().utcOffset();
+
+    const numberOfDays = mEndTime.diff(mStartTime, 'days') + 1;
+    const query = {
+      startTime: mStartTime.format(this.dateFormat),
+      endTime: mEndTime.format(this.dateFormat),
+      numberOfDays,
+      timezoneOffset,
+      projectName,
+      instanceGroup,
+    };
+
+    if (datetime) {
+      query.startTime = datetime.clone().startOf('day').format(this.dateFormat);
+      query.endTime = datetime.clone().endOf('day').format(this.dateFormat);
+      query.numberOfDays = 1;
+    }
+
+    window.open(buildUrl(BaseUrls.MetricAppForecast, {}, query), '_blank');
+  }
+
   render() {
     const {
       intl,
@@ -434,7 +461,7 @@ class MetricAnalysisCore extends React.PureComponent {
                 timeIntervalPredicted={timeIntervalPredicted}
                 autoExpandCount={1}
                 stats={get(currentWeeklyAnomalies, 'resourceEventStats', [])}
-                onRowOpen={this.handleListRowOpenAnomaly}
+                onRowOpen={this.handleListRowOpenResource}
               />
             </Container>}
         </Container>

@@ -24,11 +24,12 @@ const loadLogRareEventList = (credentials: Credentials, projectName: String, par
   }).then((d) => {
     // TODO: This API response not in data format, need to change to d.data.
 
+    const { incidentStartTime, incidentEndTime } = params;
     const rawData = d;
     const events = get(rawData, 'eventArray', []);
 
-    const mStartTime = moment(parseInt(incidentId, 10)).startOf('day');
-    const mEndTime = mStartTime.clone().endOf('day');
+    const mStartTime = moment(incidentStartTime);
+    const mEndTime = moment(incidentEndTime);
     const startTime = mStartTime.valueOf();
     const endTime = mEndTime.valueOf();
 
@@ -36,11 +37,13 @@ const loadLogRareEventList = (credentials: Credentials, projectName: String, par
     const size = Math.ceil((endTime - startTime) / logFreqWindow);
     const tsEvents = range(size).map(i => [new Date(startTime + i * logFreqWindow), 0]);
 
+    console.log(size);
     const eventBuckets = {};
     R.forEach((e) => {
       const etimeVal = moment(e.timestamp).valueOf();
       const idx = Math.floor((etimeVal - startTime) / logFreqWindow);
       if (idx >= 0) {
+        console.log(idx);
         const time = tsEvents[idx][0].valueOf().toString();
         tsEvents[idx][1] += 1;
 
