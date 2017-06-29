@@ -21,7 +21,12 @@ import { parseQueryString, buildMatchLocation, buildUrl } from '../../common/uti
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
 import { loadLogIncidentList, loadLogIncident } from '../../common/log/actions';
-import { LogClusteringResult, LogRareEvents } from './components';
+import {
+  LogClusters,
+  LogFrequencyAnomalies,
+  LogRareEvents,
+  LogPatternSequences,
+} from './components';
 import './log.scss';
 
 type Props = {
@@ -62,9 +67,9 @@ class LogAnalysisCore extends React.PureComponent {
     // will take the same props.
     this.viewInfos = [
       { key: 'rare', name: 'Rare Events', component: LogRareEvents },
-      { key: 'cluster', name: 'Clustering Result', component: LogClusteringResult },
-      { key: 'freq', name: 'Frequency Based Anomaly Detection', LogClusteringResult },
-      { key: 'seq', name: 'Frequent Pattern Sequences', LogClusteringResult },
+      { key: 'cluster', name: 'Clusters Detected', component: LogClusters },
+      { key: 'freq', name: 'Log Frequency Anomalies', component: LogFrequencyAnomalies },
+      { key: 'seq', name: 'Frequent Pattern Sequences', component: LogPatternSequences },
     ];
 
     // Create the select options for month picker.
@@ -227,7 +232,6 @@ class LogAnalysisCore extends React.PureComponent {
     const viewInfo = R.find(info => info.key === view, this.viewInfos);
     const viewInfoData = get(incident, view);
 
-    console.log(viewInfo, viewInfoData);
     const showIncident = Boolean(incidentId);
 
     // Select renderer to generate link to month.
@@ -366,7 +370,6 @@ class LogAnalysisCore extends React.PureComponent {
           </Container>}
         {!hasError &&
           showIncident &&
-          viewInfoData &&
           <Container className="flex-grow flex-col">
             <Container className="boxed flex-grow flex-col">
               <div className="ui pointing secondary menu">
@@ -383,12 +386,13 @@ class LogAnalysisCore extends React.PureComponent {
                   this.viewInfos,
                 )}
               </div>
-              <div className="flex-grow" style={{ overflowY: 'hidden' }}>
-                {React.createElement(viewInfo.component, {
-                  data: viewInfoData,
-                  projectName,
-                })}
-              </div>
+              {viewInfoData &&
+                <div className="flex-grow" style={{ overflowY: 'hidden' }}>
+                  {React.createElement(viewInfo.component, {
+                    data: viewInfoData,
+                    projectName,
+                  })}
+                </div>}
             </Container>
           </Container>}
       </Container>

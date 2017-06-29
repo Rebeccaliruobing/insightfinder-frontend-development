@@ -6,5 +6,6 @@
         "**/.happypack": true,
         "**/_legacy": true
     },
-    "prettier.printWidth": 100
+    "prettier.printWidth": 100,
+    "editor.formatOnSave": true
 }

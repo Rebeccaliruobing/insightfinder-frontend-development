@@ -7,10 +7,10 @@
 
 import React from 'react';
 
-class LogClusteringResult extends React.Component {
+class LogPatternSequences extends React.PureComponent {
   render() {
-    return <div>Log Cluster</div>;
+    return <div>Log LogPatternSequences</div>;
   }
 }
 
-export default LogClusteringResult;
+export default LogPatternSequences;

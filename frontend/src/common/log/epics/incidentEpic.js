@@ -9,7 +9,12 @@
 import R from 'ramda';
 import { Observable } from 'rxjs/Observable';
 import type { Deps } from '../../types';
-import { loadLogRareEventList, loadLogClusterList } from '../../apis';
+import {
+  loadLogRareEventList,
+  loadLogFrequencyAnomalyList,
+  loadLogClusterList,
+  loadLogPatternSequenceList,
+} from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
 import { setLogInfo } from '../actions';
@@ -17,6 +22,8 @@ import { setLogInfo } from '../actions';
 const viewApis = {
   rare: loadLogRareEventList,
   cluster: loadLogClusterList,
+  freq: loadLogFrequencyAnomalyList,
+  seq: loadLogPatternSequenceList,
 };
 
 const incidentEpic = (action$: any, { getState }: Deps) =>
