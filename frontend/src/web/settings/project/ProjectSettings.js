@@ -78,12 +78,12 @@ class ProjectSettingsCore extends React.PureComponent {
     // Log and metric project has different settings. Meanwhile, model picking is
     // only used internal and shown only for admin/guest account.
     this.metricSettingInfos = [
+      { key: 'threshold', name: 'Threshold Overrides', component: MetricSetting },
       { key: 'learning', name: 'Data Disqualifiers', component: DataDisqualifiersSetting },
       { key: 'alert', name: 'Alert Sensitivity', component: AlertSensitivitySetting },
       { key: 'prediction', name: 'Prediction', component: PredictionSetting },
       { key: 'sharing', name: 'Project Sharing', component: SharingSetting },
       // { key: 'grouping', name: 'Grouping', component: GroupSetting },
-      { key: 'threshold', name: 'Threshold Overrides', component: MetricSetting },
     ];
     this.logSettingInfos = [
       { key: 'episodeword', name: 'Episode and Word Selection', component: LogEpisodeWordSetting },
@@ -100,7 +100,7 @@ class ProjectSettingsCore extends React.PureComponent {
       this.logSettingInfos.push({ key: 'model', name: 'Model Picking', component: ModelSetting });
     }
 
-    this.defaultMetricSetting = this.isInternalUser ? 'model' : 'learning';
+    this.defaultMetricSetting = 'threshold';
     this.defaultLogSetting = 'episodeword';
     this.defaultInstanceGroup = 'All';
 
