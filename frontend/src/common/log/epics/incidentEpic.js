@@ -9,13 +9,14 @@
 import R from 'ramda';
 import { Observable } from 'rxjs/Observable';
 import type { Deps } from '../../types';
-import { loadLogRareEventList } from '../../apis';
+import { loadLogRareEventList, loadLogClusterList } from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
 import { setLogInfo } from '../actions';
 
 const viewApis = {
   rare: loadLogRareEventList,
+  cluster: loadLogClusterList,
 };
 
 const incidentEpic = (action$: any, { getState }: Deps) =>
@@ -25,7 +26,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
     const state = getState();
     const { credentials } = state.auth;
     const { incident } = state.log;
-    const { projectName, params, force } = action.payload;
+    const { projectName, params } = action.payload;
     const { view } = params;
     const incidentParams = pickNotNil({ projectName, ...params });
 

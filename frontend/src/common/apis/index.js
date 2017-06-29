@@ -9,6 +9,7 @@ export { default as loadBugRepository } from './loadBugRepository';
 export { default as loadHourlyEvents } from './loadHourlyEvents';
 export { default as login } from './login';
 export { default as loadInitData } from './loadInitData';
+export { default as loadLogClusterList } from './loadLogClusterList';
 export { default as loadLogFile } from './loadLogFile';
 export { default as loadLogStreamingEvent } from './loadLogStreamingEvent';
 export { default as loadLogIncidentList } from './loadLogIncidentList';
