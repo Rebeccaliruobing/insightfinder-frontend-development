@@ -24,7 +24,7 @@ const loadLogRareEventList = (credentials: Credentials, projectName: String, par
   }).then((d) => {
     // TODO: This API response not in data format, need to change to d.data.
 
-    const { incidentStartTime, incidentEndTime } = params;
+    const { incidentStartTime, incidentEndTime, totalEventsCount } = params;
     const rawData = d;
     const events = get(rawData, 'eventArray', []);
 
@@ -76,6 +76,7 @@ const loadLogRareEventList = (credentials: Credentials, projectName: String, par
         startTime,
         endTime,
         logFreqWindow,
+        totalEventsCount,
       },
     };
   });

@@ -10,7 +10,7 @@ import { get } from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 
-import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
+import { Container, AutoSizer } from '../../../lib/fui/react';
 import { DataChart } from '../../../../components/share/charts';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
 
@@ -71,13 +71,13 @@ class LogRareEvents extends React.PureComponent {
   render() {
     const data = this.props.data || {};
     const { selectedBucket } = this.state;
-    const { events, tsEvents } = data;
+    const { events, tsEvents, totalEventsCount } = data;
     const barData = { sdata: tsEvents, sname: ['Datetime', 'Events Count'] };
     const selectedEvents = get(selectedBucket, 'events', []);
 
     return (
       <Container fullHeight className="flex-col">
-        <h4 className="ui header">{`Total Rare Events: ${events.length}`}</h4>
+        <h4 className="ui header">{`Total Rare Events: ${events.length}, Total Events: ${totalEventsCount}`}</h4>
         <DataChart
           style={{ height: 150 }}
           isLogCharts

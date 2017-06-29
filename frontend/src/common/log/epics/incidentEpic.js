@@ -63,6 +63,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
               ...params,
               incidentStartTime: incidentInfo.incidentStartTime,
               incidentEndTime: incidentInfo.incidentEndTime,
+              totalEventsCount: incidentInfo.totalEventsCount,
               logFreqWindow: 10 * 60 * 1000,
             }),
           )
@@ -89,6 +90,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
           ...params,
           incidentStartTime: incidentInfo.incidentStartTime,
           incidentEndTime: incidentInfo.incidentEndTime,
+          totalEventsCount: incidentInfo.totalEventsCount,
           logFreqWindow: 10 * 60 * 1000,
         }),
       )
