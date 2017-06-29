@@ -6,6 +6,7 @@
  **/
 
 import React from 'react';
+import { get } from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 
@@ -48,12 +49,10 @@ class LogRareEvents extends React.PureComponent {
 
   render() {
     const data = this.props.data || {};
-    const events = data.events || [];
     const { selectedBucket } = this.state;
     const { tsEvents } = data;
     const barData = { sdata: tsEvents, sname: ['Datetime', 'Events Count'] };
-
-    console.log(selectedBucket);
+    const events = get(selectedBucket, 'events', []);
 
     return (
       <Container fullHeight className="flex-col">
@@ -66,7 +65,7 @@ class LogRareEvents extends React.PureComponent {
           annotations={[]}
           onClick={this.handleBucketPointClick}
         />
-        <Container className="flex-grow" style={{ marginTop: '1em' }}>
+        <Container className="flex-grow" style={{ margin: '20px 20px 0' }}>
           <AutoSizer>
             {({ height }) => (
               <Table

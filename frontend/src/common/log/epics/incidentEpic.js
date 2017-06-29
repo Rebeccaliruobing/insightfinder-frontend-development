@@ -40,7 +40,6 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
     const { month, incidentId, view } = params;
     const incidentParams = pickNotNil({ projectName, ...params });
     const incidentListParams = pickNotNil({ projectName, month });
-    console.log(incidentParams, incidentListParams, prevIncidentListParams);
     const monthlyDate = moment(month, monthFormat).startOf('month').valueOf();
 
     // The data for each view is stored in incident, we might reuse
@@ -59,7 +58,6 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
           const incidentList = listData.data.incidentList;
           // Add more params which can get from project info.
           const incidentInfo = R.find(i => i.id === incidentId, incidentList);
-          console.log(listData.data.incidentList, incidentInfo);
           return Observable.from(
             apiFunc(credentials, projectName, {
               ...params,

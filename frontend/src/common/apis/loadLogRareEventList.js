@@ -34,16 +34,14 @@ const loadLogRareEventList = (credentials: Credentials, projectName: String, par
     const endTime = mEndTime.valueOf();
 
     // Prepare the ts data used by charts.
-    const size = Math.ceil((endTime - startTime) / logFreqWindow);
+    const size = Math.ceil((endTime - startTime + 2) / logFreqWindow);
     const tsEvents = range(size).map(i => [new Date(startTime + i * logFreqWindow), 0]);
 
-    console.log(size);
     const eventBuckets = {};
     R.forEach((e) => {
       const etimeVal = moment(e.timestamp).valueOf();
       const idx = Math.floor((etimeVal - startTime) / logFreqWindow);
-      if (idx >= 0) {
-        console.log(idx);
+      if (idx >= 0 && idx < size) {
         const time = tsEvents[idx][0].valueOf().toString();
         tsEvents[idx][1] += 1;
 

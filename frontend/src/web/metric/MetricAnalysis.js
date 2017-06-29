@@ -81,6 +81,7 @@ class MetricAnalysisCore extends React.PureComponent {
 
     // If project changed, reset group to nul.
     if (projectName !== query.projectName) {
+      view = 'anomaly';
       instanceGroup = undefined;
     }
 
@@ -142,7 +143,9 @@ class MetricAnalysisCore extends React.PureComponent {
     const projectName = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { startTime, endTime, view } = params;
+    const { startTime, endTime } = params;
+    const view = 'anomaly';
+
     // When project changed, set group to null.
     const instanceGroup = undefined;
     push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
