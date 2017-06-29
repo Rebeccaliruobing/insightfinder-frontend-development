@@ -60,7 +60,8 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       if (pos !== -1) {
         smetric = smetric.substring(0, pos);
       }
-      let { unit, shortMetric } = metricUnitMap[smetric] || {};
+      let unit = get(metricUnitMap, [smetric, 'unit'], '');
+      const shortMetric = get(metricUnitMap, [smetric, 'shortMetric'], '');
       const pos2 = unit.indexOf('(');
       const pos3 = unit.indexOf(')');
       if (pos2 !== -1 && pos3 !== -1) {
