@@ -240,6 +240,12 @@ class LogLiveAnalysisCore extends React.PureComponent {
                         </div>
                       </div>
                       <div>
+                        <div className="label" style={{ display: 'inline-block' }}>
+                          Total Events:
+                        </div>
+                        <div style={{ float: 'right' }}>{ic.logentrycount}</div>
+                      </div>
+                      <div>
                         <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
                         <div style={{ float: 'right' }}>{(ic.cluster || []).length}</div>
                       </div>

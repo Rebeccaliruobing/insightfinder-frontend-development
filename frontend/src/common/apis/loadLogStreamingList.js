@@ -28,11 +28,12 @@ const loadLogStreamingList = (credentials: Credentials, params: Object) => {
         ...i,
         id: startTime.valueOf().toString(),
         name: startTime.format('YYYY-MM-DD'),
-        totalEventsCount: null,
+        totalEventsCount: i.logentrycount,
         rareEventsCount: i.rareEventsSize,
         clusterCount: (i.cluster || []).length,
       };
     }, incidentList);
+    console.log(incidentList);
 
     return {
       rawData,
