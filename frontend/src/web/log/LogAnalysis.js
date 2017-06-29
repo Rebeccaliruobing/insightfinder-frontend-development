@@ -56,7 +56,7 @@ class LogAnalysisCore extends React.PureComponent {
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
 
     // General the monthy option list for one year.
-    this.monthCount = 12;
+    this.monthCount = 36;
 
     // The default view when incident is displayed.
     this.defaultIncidentView = 'rare';

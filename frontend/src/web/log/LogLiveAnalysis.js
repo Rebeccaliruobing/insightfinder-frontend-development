@@ -40,7 +40,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
       rareEventThreshold: '3',
       derivedPvalue: '0.9',
     };
-    this.monthCount = 12;
+    this.monthCount = 36;
   }
 
   componentDidMount() {
@@ -53,23 +53,20 @@ class LogLiveAnalysisCore extends React.PureComponent {
     this.props.loadLogStreaming(projectId, month, incidentId, match, params, true);
   }
 
-  @autobind
-  handleProjectChange(newValue) {
+  @autobind handleProjectChange(newValue) {
     const { match } = this.props;
     const projectId = newValue ? newValue.value : null;
     this.props.loadLogStreaming(projectId, null, null, match, null, true);
   }
 
-  @autobind
-  handleMonthChange(newValue) {
+  @autobind handleMonthChange(newValue) {
     const { match } = this.props;
     const { projectId } = match.params;
     const month = newValue ? newValue.value : null;
     this.props.loadLogStreaming(projectId, month, null, match, null, true);
   }
 
-  @autobind
-  handleIncidentChange(newValue) {
+  @autobind handleIncidentChange(newValue) {
     const { match, location } = this.props;
     let params = parseQueryString(location.search);
     const { projectId, month } = match.params;
@@ -82,20 +79,19 @@ class LogLiveAnalysisCore extends React.PureComponent {
     this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
-  @autobind
-  handleRareEventSensitivityChange(newValue) {
+  @autobind handleRareEventSensitivityChange(newValue) {
     const rareEventThreshold = newValue ? newValue.value : null;
     const { match, location } = this.props;
     const params = {
       ...this.defaultParams,
-      ...parseQueryString(location.search), rareEventThreshold,
+      ...parseQueryString(location.search),
+      rareEventThreshold,
     };
     const { projectId, month, incidentId } = match.params;
     this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
-  @autobind
-  handleFrequencyAnomalySensitivity(newValue) {
+  @autobind handleFrequencyAnomalySensitivity(newValue) {
     const derivedPvalue = newValue ? newValue.value : null;
     const { match, location } = this.props;
     const params = { ...this.defaultParams, ...parseQueryString(location.search), derivedPvalue };
@@ -103,8 +99,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
     this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
   }
 
-  @autobind
-  handleIncidentClick(incidentId) {
+  @autobind handleIncidentClick(incidentId) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -112,9 +107,15 @@ class LogLiveAnalysisCore extends React.PureComponent {
       const { match, location } = this.props;
       const params = { ...this.defaultParams, ...parseQueryString(location.search) };
       const { projectId, month } = match.params;
-      const { pathname, search } = buildMatchLocation(match, {
-        projectId, month, incidentId,
-      }, params);
+      const { pathname, search } = buildMatchLocation(
+        match,
+        {
+          projectId,
+          month,
+          incidentId,
+        },
+        params,
+      );
       const url = pathname + search;
       window.open(url, '_blank');
       // this.props.loadLogStreaming(projectId, month, incidentId, match, params, false);
@@ -145,9 +146,7 @@ class LogLiveAnalysisCore extends React.PureComponent {
         month: moment().format('YYYY-MM'),
         incidentId: null,
       });
-      return (
-        <Select.Link to={url} className="label">{option.label}</Select.Link>
-      );
+      return <Select.Link to={url} className="label">{option.label}</Select.Link>;
     };
 
     return (
@@ -157,74 +156,97 @@ class LogLiveAnalysisCore extends React.PureComponent {
             <span className="label">{intl.formatMessage(appMenusMessages.streamLogAnalysis)}</span>
             <span className="divider">/</span>
             <Select
-              name="project" inline style={{ width: 200 }}
+              name="project"
+              inline
+              style={{ width: 200 }}
               options={R.map(p => ({ label: p.projectName, value: p.projectId }), projects)}
-              value={projectId} onChange={this.handleProjectChange}
+              value={projectId}
+              onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
-              {...incident ? { valueRenderer: projectValueRenderer } : {}}
+              {...(incident ? { valueRenderer: projectValueRenderer } : {})}
             />
             <span className="divider">/</span>
             <Select
-              name="month" inline style={{ width: 140 }}
+              name="month"
+              inline
+              style={{ width: 140 }}
               options={monthOptions}
-              value={month} onChange={this.handleMonthChange}
+              value={month}
+              onChange={this.handleMonthChange}
             />
             {incident && <span className="divider">/</span>}
             {incident &&
               <Select
-                name="incident" inline clearable style={{ width: 248 }}
+                name="incident"
+                inline
+                clearable
+                style={{ width: 248 }}
                 placeholder="Select Month"
                 options={R.map(i => ({ label: i.name, value: i.id }), incidentList)}
-                value={incidentId || null} onChange={this.handleIncidentChange}
-              />
-            }
+                value={incidentId || null}
+                onChange={this.handleIncidentChange}
+              />}
           </div>
           <div className="section float-right">
-            {incident && <span className="label" style={{ fontSize: 12 }}>Rare Event Detection Sensitivity</span>}
+            {incident &&
+              <span className="label" style={{ fontSize: 12 }}>
+                Rare Event Detection Sensitivity
+              </span>}
             {incident &&
               <Selectors.RareEventSensitivity
-                value={rareEventThreshold || 3} onChange={this.handleRareEventSensitivityChange}
-              />
-            }
-            {incident && <span className="label" style={{ fontSize: 12 }}>Frequency Anomaly Detection Sensitivity</span>}
+                value={rareEventThreshold || 3}
+                onChange={this.handleRareEventSensitivityChange}
+              />}
+            {incident &&
+              <span className="label" style={{ fontSize: 12 }}>
+                Frequency Anomaly Detection Sensitivity
+              </span>}
             {incident &&
               <Selectors.AnomalyThresholdSensitivity
-                value={derivedPvalue || 0.9} onChange={this.handleFrequencyAnomalySensitivity}
-              />
-            }
+                value={derivedPvalue || 0.9}
+                onChange={this.handleFrequencyAnomalySensitivity}
+              />}
           </div>
         </Container>
-        {!incident && incidentList.length === 0 &&
+        {!incident &&
+          incidentList.length === 0 &&
           <Container fullHeight>
             <div className="ui warning message" style={{ marginTop: 10 }}>
               No streaming log data available yet, Please check back later
             </div>
-          </Container>
-        }
-        {!incident && incidentList.length > 0 &&
+          </Container>}
+        {!incident &&
+          incidentList.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
               {incidentList.map(ic => (
                 <Tile
-                  key={`${projectId}-${ic.id}`} className="incident-tile"
+                  key={`${projectId}-${ic.id}`}
+                  className="incident-tile"
                   onClick={this.handleIncidentClick(ic.id)}
                 >
                   <Box isLink>
                     <div className="content">
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Start Time:</div>
-                        <div style={{ float: 'right' }}>{moment(ic.incidentStartTime).format('YYYY/MM/DD hh:mm')}</div>
+                        <div style={{ float: 'right' }}>
+                          {moment(ic.incidentStartTime).format('YYYY/MM/DD hh:mm')}
+                        </div>
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>End Time:</div>
-                        <div style={{ float: 'right' }}>{moment(ic.incidentEndTime).format('YYYY/MM/DD hh:mm')}</div>
+                        <div style={{ float: 'right' }}>
+                          {moment(ic.incidentEndTime).format('YYYY/MM/DD hh:mm')}
+                        </div>
                       </div>
                       <div>
                         <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
                         <div style={{ float: 'right' }}>{(ic.cluster || []).length}</div>
                       </div>
                       <div>
-                        <div className="label" style={{ display: 'inline-block' }}>Rare Events:</div>
+                        <div className="label" style={{ display: 'inline-block' }}>
+                          Rare Events:
+                        </div>
                         <div style={{ float: 'right' }}>{ic.rareEventsSize}</div>
                       </div>
                     </div>
@@ -232,11 +254,9 @@ class LogLiveAnalysisCore extends React.PureComponent {
                 </Tile>
               ))}
             </Tile>
-          </Container>
-        }
+          </Container>}
         {incident &&
-          <Container className="log-charts"><LogAnalysisCharts data={incident} /></Container>
-        }
+          <Container className="log-charts"><LogAnalysisCharts data={incident} /></Container>}
       </Container>
     );
   }
@@ -253,6 +273,7 @@ export default connect(
     };
   },
   {
-    push, loadLogStreaming,
+    push,
+    loadLogStreaming,
   },
 )(LogLiveAnalysis);

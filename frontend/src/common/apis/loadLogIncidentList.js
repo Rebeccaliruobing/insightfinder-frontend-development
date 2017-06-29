@@ -29,7 +29,7 @@ const loadLogIncidentList = (credentials: Credentials, projectName: String, para
         ...i,
         id: startTime.valueOf().toString(),
         name: startTime.format('YYYY-MM-DD'),
-        totalEventsCount: null,
+        totalEventsCount: i.logentrycount,
         rareEventsCount: i.rareEventsSize,
         clusterCount: (i.cluster || []).length,
       };
