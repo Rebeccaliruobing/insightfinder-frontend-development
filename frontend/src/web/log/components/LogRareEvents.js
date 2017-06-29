@@ -12,6 +12,7 @@ import { autobind } from 'core-decorators';
 
 import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { DataChart } from '../../../../components/share/charts';
+import EventGroup from '../../../../components/log/loganalysis/event-group';
 
 type Props = {
   data: Object,
@@ -37,6 +38,26 @@ class LogRareEvents extends React.PureComponent {
     };
   }
 
+  componentWillReceiveProps(newProps) {
+    const events = get(newProps.data, 'events', []);
+    const eventBuckets = get(newProps.data, 'eventBuckets', {});
+
+    // If the users prop is changed, set the local state.
+    if (!R.identical(events, get(this.props.data, 'events'))) {
+      let selectedBucket = null;
+
+      // Auto select the oldest bucket in the list.
+      const keys = R.sort((a, b) => a > b, R.keys(eventBuckets));
+      if (keys.length) {
+        selectedBucket = eventBuckets[keys[0]];
+      }
+
+      this.state = {
+        selectedBucket,
+      };
+    }
+  }
+
   @autobind handleBucketPointClick(startTs) {
     const { eventBuckets } = this.props.data;
     const bucket = eventBuckets[startTs];
@@ -50,9 +71,9 @@ class LogRareEvents extends React.PureComponent {
   render() {
     const data = this.props.data || {};
     const { selectedBucket } = this.state;
-    const { tsEvents } = data;
+    const { events, tsEvents } = data;
     const barData = { sdata: tsEvents, sname: ['Datetime', 'Events Count'] };
-    const events = get(selectedBucket, 'events', []);
+    const selectedEvents = get(selectedBucket, 'events', []);
 
     return (
       <Container fullHeight className="flex-col">
@@ -68,19 +89,13 @@ class LogRareEvents extends React.PureComponent {
         <Container className="flex-grow" style={{ margin: '20px 20px 0' }}>
           <AutoSizer>
             {({ height }) => (
-              <Table
-                className="with-border"
-                width={1048}
-                height={height}
-                headerHeight={28}
-                rowHeight={28}
-                rowCount={events.length}
-                rowGetter={({ index }) => events[index]}
-              >
-                <Column width={40} className="no-wrap" label="#" dataKey="timestamp" />
-                <Column width={80} label="Time" dataKey="timestamp" />
-                <Column width={600} flexGrow={1} label="Event" dataKey="event" />
-              </Table>
+              <EventGroup
+                style={{ height, width: 900 }}
+                className="flex-item flex-col-container"
+                name=""
+                eventDataset={selectedEvents}
+                showFE={false}
+              />
             )}
           </AutoSizer>
         </Container>

@@ -239,6 +239,14 @@ class LogAnalysisCore extends React.PureComponent {
       const url = buildMatchLocation(match, {}, { projectName, month: option.value });
       return <Select.Link to={url} className="label">{option.label}</Select.Link>;
     };
+    const incidentCountBy = (i) => {
+      if (view === 'rare') {
+        return `${i.name}      (${i.rareEventsCount.toString()})`;
+      } else if (view === 'cluster') {
+        return `${i.name}      (${i.clusterCount.toString()})`;
+      }
+      return '';
+    };
 
     return (
       <Container fullHeight withGutter className="flex-col log-live">
@@ -268,18 +276,17 @@ class LogAnalysisCore extends React.PureComponent {
             />
             {showIncident && <span className="divider">/</span>}
             {showIncident &&
-              incidentList.length > 0 &&
               <Select
                 name="incident"
                 inline
-                style={{ width: 140 }}
-                options={R.map(i => ({ label: i.name, value: i.id }), incidentList)}
+                style={{ width: 200 }}
+                options={R.map(
+                  i => ({ label: `${incidentCountBy(i)}`, value: i.id }),
+                  incidentList,
+                )}
                 value={incidentId}
                 onChange={this.handleIncidentChange}
               />}
-            {showIncident &&
-              incidentList.length === 0 &&
-              <span>{moment(parseInt(incidentId, 10)).format('YYYY-MM-DD')}</span>}
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
