@@ -56,7 +56,7 @@ class CausalGraphModal extends React.Component {
       correlationProbability: 0.8,
       kpiPredictionProbability: '0.75',
       currentZoom: 0,
-      showMetrics: false,
+      showMetrics: true,
       mergeMetrics: true,
       selectedNode: '',
     };
