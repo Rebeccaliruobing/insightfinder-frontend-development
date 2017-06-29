@@ -16,7 +16,7 @@ import fetchGet from './fetchGet';
 const loadLogClusterList = (credentials: Credentials, projectName: String, params: Object) => {
   // Use the time as the incident id.
   const { incidentId } = params;
-  return fetchGet(getEndpoint('logstreamingsetpattern'), {
+  return fetchGet(getEndpoint('logstreaminglistpatterns'), {
     ...credentials,
     projectName,
     dayTimeMillis: incidentId,
