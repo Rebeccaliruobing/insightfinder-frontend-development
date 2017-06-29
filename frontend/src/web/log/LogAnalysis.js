@@ -20,8 +20,7 @@ import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation, buildUrl } from '../../common/utils';
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
-import { loadLogStreamingList, loadLogStreamingIncident } from '../../common/log/actions';
-import LogAnalysisCharts from '../../../components/log/loganalysis/LogAnalysisCharts';
+import { loadLogIncidentList, loadLogIncident } from '../../common/log/actions';
 import { LogClusteringResult, LogRareEvents } from './components';
 import './log.scss';
 
@@ -30,14 +29,16 @@ type Props = {
   match: Object,
   location: Object,
   push: Function,
+
   projects: Array<Object>,
-  streamingInfos: Array<Object>,
-  streamingInfosParams: Object,
-  streamingIncidentInfo: Object,
-  streamingIncidentInfoParams: Object,
-  streamingErrorMessage: ?Object,
-  loadLogStreamingList: Function,
-  loadLogStreamingIncident: Function,
+  incidentList: Array<Object>,
+  incidentListParams: Object,
+  incident: Object,
+  incidentParams: Object,
+  currentError: ?Object,
+
+  loadLogIncidentList: Function,
+  loadLogIncident: Function,
 };
 
 class LogAnalysisCore extends React.PureComponent {
@@ -47,25 +48,32 @@ class LogAnalysisCore extends React.PureComponent {
     super(props);
 
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
+    this.ifIn = (i, items) => items.indexOf(i) !== -1;
+
+    // General the monthy option list for one year.
+    this.monthCount = 12;
+
+    // The default view when incident is displayed.
+    this.defaultIncidentView = 'rare';
+
+    this.monthFormat = 'YYYY-MM';
 
     // View name, key and React component used to create the view. The view component
     // will take the same props.
     this.viewInfos = [
-      { key: 'cluster', name: 'Clustering Result', component: LogClusteringResult },
       { key: 'rare', name: 'Rare Events', component: LogRareEvents },
-      { key: 'freq', name: 'Frequency Based Anomaly Detection' },
-      { key: 'seq', name: 'Frequent Pattern Sequences' },
+      { key: 'cluster', name: 'Clustering Result', component: LogClusteringResult },
+      { key: 'freq', name: 'Frequency Based Anomaly Detection', LogClusteringResult },
+      { key: 'seq', name: 'Frequent Pattern Sequences', LogClusteringResult },
     ];
-    this.defaultView = 'cluster';
 
-    // General the monthy option list for one year.
-    this.monthCount = 12;
+    // Create the select options for month picker.
     this.monthOptions = R.map((offset) => {
       const month = moment();
       month.add(-offset, 'month').startOf('month');
       return {
         label: month.format('MMM YYYY'),
-        value: month.format('YYYY-MM'),
+        value: month.format(this.monthFormat),
       };
     }, R.range(0, this.monthCount));
   }
@@ -87,67 +95,61 @@ class LogAnalysisCore extends React.PureComponent {
     // When redirection happens, we should not need to reload the data. The return value
     // indicates whethre rediction happens.
     const { location, match, push, projects } = props;
-    const query = parseQueryString(location.search);
-    let { projectName, month, incidentId, view } = query;
+    const params = parseQueryString(location.search);
+    let { projectName, month, incidentId, view } = params;
+    const isIncident = Boolean(incidentId);
     let redirect = false;
 
-    // If no project is selected, choose the first project if exists. The project might
-    // be empty, which will be handled by epic.
+    // The project name might be emtpy, which will be handled by epic.
     if (!projectName && projects.length > 0) {
       projectName = projects[0].projectName;
     }
 
-    // If no month, set to current month
-    month = month || moment().format('YYYY-MM');
+    month = month || moment().format(this.monthFormat);
 
-    // Set default incident params, if not show incident, set to undefined to keep url clean.
-    if (incidentId) {
+    if (isIncident) {
       if (!view || !R.find(i => i.key === view, this.viewInfos)) {
-        view = this.defaultView;
+        view = this.defaultIncidentView;
       }
     } else {
       incidentId = undefined;
       view = undefined;
     }
 
-    const newParams = {
-      projectName,
-      month,
-      incidentId,
-      view,
-    };
+    // Remove the empty params, otherwise it will affect the comparation.
+    const newParams = this.pickNotNil({ projectName, month, incidentId, view });
 
     // Compare the new params with the origin params, if changed, redirect to new location.
-    // We need to remove the undefined and null value before comparing.
-    if (!R.equals(this.pickNotNil(newParams), this.pickNotNil(query))) {
+    if (!R.equals(newParams, params)) {
       redirect = true;
-      const url = buildMatchLocation(match, {}, newParams);
-      push(url);
+      push(buildMatchLocation(match, {}, newParams));
     }
 
     return redirect;
   }
 
   reloadData(props, force = false) {
-    // If incidentId is not empty, which means load incident data.
-    // Compare the current params with saved params, if it's different, dispatch action.
-    const params = parseQueryString(get(props, 'location.search'));
-    const { streamingInfosParams, streamingIncidentInfoParams } = props;
+    // We use incidentId to check whether we want to display list or incident.
+    // In both case, we need to compare the new params with current params, if
+    // it's not changed, we CANNOT load data, Otherwise, it might cause infinite loop.
+    const params = this.pickNotNil(parseQueryString(get(props, 'location.search')));
+    const { incidentListParams, incidentParams } = props;
     const { projectName, month, incidentId, view } = params;
+    const isIncident = Boolean(incidentId);
 
-    // IMPORTANT: Need to check the new params with last params, otherwise it will
-    // cause infinite loop.
-    if (force || !R.equals({ projectName, month }, streamingInfosParams)) {
-      console.log('list', props, force, streamingInfosParams);
-      props.loadLogStreamingList(projectName, month);
+    let refresh = force;
+    if (!refresh) {
+      refresh = isIncident
+        ? !R.equals({ projectName, incidentId, view }, incidentParams)
+        : !R.equals({ projectName, month }, incidentListParams);
     }
 
-    if (
-      incidentId &&
-      (force || !R.equals({ projectName, incidentId, view }, streamingIncidentInfoParams))
-    ) {
-      console.log('incident', props, force, streamingInfosParams);
-      props.loadLogStreamingIncident(projectName, incidentId, view);
+    if (refresh) {
+      if (isIncident) {
+        props.loadLogIncident(projectName, { incidentId, view }, force);
+      } else {
+        props.loadLogIncidentList(projectName, { month }, force);
+      }
     }
   }
 
@@ -158,10 +160,7 @@ class LogAnalysisCore extends React.PureComponent {
     const { month } = params;
 
     // When project changed, remove incident related params.
-    const incidentId = undefined;
-    const view = undefined;
-
-    push(buildMatchLocation(match, {}, { projectName, month, incidentId, view }));
+    push(buildMatchLocation(match, {}, { projectName, month }));
   }
 
   @autobind handleMonthChange(newValue) {
@@ -171,10 +170,7 @@ class LogAnalysisCore extends React.PureComponent {
     const { projectName } = params;
 
     // When month changed, remove incident related params.
-    const incidentId = undefined;
-    const view = undefined;
-
-    push(buildMatchLocation(match, {}, { projectName, month, incidentId, view }));
+    push(buildMatchLocation(match, {}, { projectName, month }));
   }
 
   @autobind handleIncidentChange(newValue) {
@@ -193,10 +189,6 @@ class LogAnalysisCore extends React.PureComponent {
       const params = parseQueryString(location.search);
       push(buildMatchLocation(match, {}, { ...params, view }));
     };
-  }
-
-  @autobind handleRefreshClick() {
-    this.reloadData(this.props, true);
   }
 
   @autobind handleIncidentClick(incidentId) {
@@ -222,21 +214,20 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
+  @autobind handleRefreshClick() {
+    this.reloadData(this.props, true);
+  }
+
   render() {
-    const {
-      intl,
-      match,
-      location,
-      projects,
-      streamingInfos,
-      streamingIncidentInfo,
-      streamingErrorMessage,
-    } = this.props;
+    const { intl, match, projects, incidentList, incident, currentError } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, month, incidentId, view } = params;
-    const showIncident = !!incidentId && streamingIncidentInfo;
+
+    const hasError = Boolean(currentError);
     const viewInfo = R.find(info => info.key === view, this.viewInfos);
-    const viewInfoData = get(streamingIncidentInfo, view, {});
+    const viewInfoData = get(incident, view);
+
+    const showIncident = Boolean(incidentId);
 
     // Select renderer to generate link to month.
     const monthValueRender = (option) => {
@@ -248,7 +239,7 @@ class LogAnalysisCore extends React.PureComponent {
       <Container fullHeight withGutter className="flex-col log-live">
         <Container breadcrumb>
           <div className="section">
-            <span className="label">{intl.formatMessage(appMenusMessages.streamLogAnalysis)}</span>
+            <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
             <span className="divider">/</span>
             <Select
               name="project"
@@ -272,15 +263,18 @@ class LogAnalysisCore extends React.PureComponent {
             />
             {showIncident && <span className="divider">/</span>}
             {showIncident &&
-              streamingInfos.length > 0 &&
+              incidentList.length > 0 &&
               <Select
                 name="incident"
                 inline
                 style={{ width: 140 }}
-                options={R.map(i => ({ label: i.name, value: i.id }), streamingInfos)}
+                options={R.map(i => ({ label: i.name, value: i.id }), incidentList)}
                 value={incidentId}
                 onChange={this.handleIncidentChange}
               />}
+            {showIncident &&
+              incidentList.length === 0 &&
+              <span>{moment(parseInt(incidentId, 10)).format('YYYY-MM-DD')}</span>}
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
@@ -288,36 +282,36 @@ class LogAnalysisCore extends React.PureComponent {
             </div>
           </div>
         </Container>
-        {streamingErrorMessage &&
+        {hasError &&
           <Container fullHeight>
             <div
               className="ui error message"
               style={{ marginTop: 16 }}
               dangerouslySetInnerHTML={{
-                __html: intl.formatMessage(streamingErrorMessage, { projectName }),
+                __html: intl.formatMessage(currentError, { projectName }),
               }}
             />
           </Container>}
-        {!streamingErrorMessage &&
+        {!hasError &&
           !showIncident &&
-          streamingInfos.length === 0 &&
+          incidentList.length === 0 &&
           <Container fullHeight>
             <div
               className="ui warning message"
               style={{ marginTop: 16 }}
               dangerouslySetInnerHTML={{
-                __html: 'No log entries found, please select other month to view.',
+                __html: 'No log entries found during this period, please select other month to view.',
               }}
             />
           </Container>}
-        {!streamingErrorMessage &&
+        {!hasError &&
           !showIncident &&
-          streamingInfos.length > 0 &&
+          incidentList.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
-              {streamingInfos.map(ic => (
+              {incidentList.map(ic => (
                 <Tile
-                  key={`${projectName}-${ic.id}`}
+                  key={`${projectName}-${ic.incidentKey}`}
                   className="incident-tile"
                   onClick={this.handleIncidentClick(ic.id)}
                 >
@@ -369,8 +363,9 @@ class LogAnalysisCore extends React.PureComponent {
               ))}
             </Tile>
           </Container>}
-        {!streamingErrorMessage &&
+        {!hasError &&
           showIncident &&
+          viewInfoData &&
           <Container className="flex-grow flex-col">
             <Container className="boxed flex-grow flex-col">
               <div className="ui pointing secondary menu">
@@ -387,12 +382,11 @@ class LogAnalysisCore extends React.PureComponent {
                   this.viewInfos,
                 )}
               </div>
-              <div className="flex-grow">
-                <Container fullHeight>
-                  {React.createElement(viewInfo.component, {
-                    data: viewInfoData,
-                  })}
-                </Container>
+              <div className="flex-grow" style={{ overflowY: 'hidden' }}>
+                {React.createElement(viewInfo.component, {
+                  data: viewInfoData,
+                  projectName,
+                })}
               </div>
             </Container>
           </Container>}
@@ -404,21 +398,15 @@ class LogAnalysisCore extends React.PureComponent {
 const LogAnalysis = injectIntl(LogAnalysisCore);
 export default connect(
   (state: State) => {
-    const {
-      streamingInfos,
-      streamingInfosParams,
-      streamingIncidentInfo,
-      streamingIncidentInfoParams,
-      streamingErrorMessage,
-    } = state.log;
+    const { incidentList, incidentListParams, incident, incidentParams, currentError } = state.log;
     return {
-      projects: R.filter(p => p.isLogStreaming, state.app.projects),
-      streamingInfos,
-      streamingInfosParams,
-      streamingIncidentInfo,
-      streamingIncidentInfoParams,
-      streamingErrorMessage,
+      projects: R.filter(p => p.isLog, state.app.projects),
+      incidentList,
+      incidentListParams,
+      incident,
+      incidentParams,
+      currentError,
     };
   },
-  { push, loadLogStreamingList, loadLogStreamingIncident },
+  { push, loadLogIncidentList, loadLogIncident },
 )(LogAnalysis);

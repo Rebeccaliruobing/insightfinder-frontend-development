@@ -11,6 +11,8 @@ export { default as login } from './login';
 export { default as loadInitData } from './loadInitData';
 export { default as loadLogFile } from './loadLogFile';
 export { default as loadLogStreamingEvent } from './loadLogStreamingEvent';
+export { default as loadLogIncidentList } from './loadLogIncidentList';
+export { default as loadLogRareEventList } from './loadLogRareEventList';
 export { default as loadLogFileIncident } from './loadLogFileIncident';
 export { default as loadLogStreamingList } from './loadLogStreamingList';
 export { default as loadLogStreamingPattern } from './loadLogStreamingPattern';

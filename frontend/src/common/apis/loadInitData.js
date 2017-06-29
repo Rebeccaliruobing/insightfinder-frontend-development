@@ -30,21 +30,22 @@ const loadInitData = (credentials: Credentials) => {
     projects = R.map((p) => {
       const { projectName, dataType, cloudType } = p;
       // Streaming log analysis project
-      const isLogStreaming =
-        dataType.toLowerCase() === 'log';
+      const isLogStreaming = dataType.toLowerCase() === 'log';
 
       // Historical log analysis project
       const isLogFile =
         dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';
 
-      // Metric project with replay and streaming.
+      const isLog = dataType.toLowerCase() === 'log';
       const isMetric = dataType.toLowerCase() === 'metric';
+
       return {
         projectId: projectName,
         ...p,
+        isLog,
+        isMetric,
         isLogFile,
         isLogStreaming,
-        isMetric,
       };
     }, projects);
 

@@ -180,14 +180,14 @@ export class DataChart extends React.Component {
   render() {
     let { data, enableAnnotations, enableTriangleHighlight, chartType,
       onDateWindowChange, dateWindow,latestDataTimestamp,
-      eventEndTime, eventStartTime, annotations, onClick, isLogCharts,
+      eventEndTime, eventStartTime, annotations, onClick, isLogCharts, style,
     } = this.props;
     const dowAnnotations = this.setWeekdaysForBarChar(data);
     annotations = annotations || dowAnnotations;
     const listenDrawCallback = !!onDateWindowChange;
     return (
       <Dygraph
-        style={{ width: '100%', height: '200px' }}
+        style={{ width: '100%', height: '200px', ...style }}
         isLogCharts={isLogCharts}
         chartType={chartType}
         className={chartType}

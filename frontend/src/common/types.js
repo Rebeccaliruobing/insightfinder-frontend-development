@@ -70,15 +70,28 @@ export type MetricState = {
 };
 
 export type LogState = {
-  // Historical log
   fileInfos: Object,
   fileIncidentInfos: Object,
-  // Log streaming
   streamingInfos: Array<Object>,
   streamingInfosParams: Object,
   streamingIncidentInfos: Object,
   streamingIncidentInfosParams: Object,
   streamingErrorMessage: ?Message,
+
+  // The current list of log incidents.
+  incidentList: Array<Object>,
+
+  // The params used to get log incidents list.
+  incidentListParams: Object,
+
+  // The current log incident.
+  incident: Object,
+
+  // The params used to get the current log incident.
+  incidentParams: Object,
+
+  // The current error message, set to null if no errors.
+  currentError: ?Message,
 };
 
 export type SettingsState = {

@@ -45,6 +45,8 @@ const fetchHandler = (
     })
     .then(res => res.json())
     .then((json) => {
+      // TODO: Add back data type.
+      /*
       if (!json.success) {
         console.warn(
           ['Return error in a 200 response is deprecated, change API http status code.', json]);
@@ -54,6 +56,7 @@ const fetchHandler = (
         }
         throw new InvalidDataError(json.message, json.code, json);
       }
+      */
       return json;
     });
 

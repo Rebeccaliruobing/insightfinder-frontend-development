@@ -1,5 +1,43 @@
 /* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import type { Action } from '../types';
+
+/**
+ * Action used to load log incident list, handled by epic.
+ */
+export const loadLogIncidentList = (
+  projectName: String,
+  params: Object,
+  force: Boolean,
+): Action => ({
+  type: 'LOAD_LOG_INCIDENT_LIST',
+  payload: { projectName, params, force },
+});
+
+/**
+ * Action used to load one log incident, handled by epic.
+ */
+export const loadLogIncident = (projectName: String, params: Object, force: Boolean): Action => ({
+  type: 'LOAD_LOG_INCIDENT',
+  payload: {
+    projectName,
+    params,
+    force,
+  },
+});
+
+/**
+ * This action will set the log state, it's handled by reducer.
+ */
+export const setLogInfo = (info: Object): Action => ({
+  type: 'SET_LOG_INFO',
+  payload: info,
+});
 
 export const loadLogFile = (
   projectId: ?string,
@@ -34,9 +72,12 @@ export const setLogFile = (
 });
 
 export const loadLogStreaming = (
-  projectId: ?string, month: ?string, incidentId: ?string,
-  match: Object, params: ?Object,
-  forceReload?: bool,
+  projectId: ?string,
+  month: ?string,
+  incidentId: ?string,
+  match: Object,
+  params: ?Object,
+  forceReload?: boolean,
 ): Action => ({
   type: 'LOAD_LOG_STREAMING',
   payload: {
@@ -78,7 +119,10 @@ export const setLogStreaming = (info: Object): Action => ({
 });
 
 export const setLogStreaming1 = (
-  projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object,
+  projectId: string,
+  projectInfo: Object,
+  incidentId: ?string,
+  incidentInfo: ?Object,
 ): Action => ({
   type: 'SET_LOG_STREAMING1',
   payload: {
@@ -88,4 +132,3 @@ export const setLogStreaming1 = (
     incidentInfo,
   },
 });
-
