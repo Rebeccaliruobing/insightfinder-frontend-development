@@ -39,10 +39,10 @@ class SharingSetting extends React.PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    const newUsers = get(newProps, this.propsPath, []);
+    const newUsers = get(newProps, this.propsPath);
 
     // If the users prop is changed, set the local state.
-    if (!R.equals(newUsers, get(this.props, this.propsPath, []))) {
+    if (!R.identical(newUsers, get(this.state, this.propsPath))) {
       this.setState({
         [this.stateKey]: newUsers.join(this.namesSeparator),
       });
@@ -53,7 +53,7 @@ class SharingSetting extends React.PureComponent {
     const { saveProjectSettings, projectName } = this.props;
     const sharedUserNamesStr = this.state.sharedUserNames || '';
     // The user might input , or ; as the seperators, convert string to array and remove empty names
-    const sharedUserNames = R.filter(R.identical, sharedUserNamesStr.split(/\s*[,;]\s*/));
+    const sharedUserNames = R.filter(n => Boolean(n), sharedUserNamesStr.split(/\s*[,;]\s*/));
     saveProjectSettings(projectName, { sharedUserNames }, { [this.submitLoadingKey]: true });
   }
 

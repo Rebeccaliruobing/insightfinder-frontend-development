@@ -15,8 +15,10 @@ const initialState = {
   currentTheme: 'light',
   currentLocale: null,
   viewport: {
-    width: 0, height: 0,
-    widthDiff: 0, heightDiff: 0,
+    width: 0,
+    height: 0,
+    widthDiff: 0,
+    heightDiff: 0,
   },
   locales,
   messages,
@@ -31,16 +33,17 @@ const initialState = {
   projects: [],
   filters: {},
   enabledDataSourceNames: [
-    'AWSCloudWatch', 'GoogleCloudMonitoring', 'DataDog', 'NewRelic',
-    'AWSEC2', 'cAdvisor',
+    'AWSCloudWatch',
+    'GoogleCloudMonitoring',
+    'DataDog',
+    'NewRelic',
+    'AWSEC2',
+    'cAdvisor',
   ], // TODO: used to filter enabled data source
   currentLoadingComponents: {},
 };
 
-const reducer = (
-  state: AppState = initialState,
-  action: Action,
-): AppState => {
+const reducer = (state: AppState = initialState, action: Action): AppState => {
   if (action.type === REHYDRATE) {
     // When doing rehydrate, if returns different state object,
     // autoRehydrate will be skipped.
@@ -61,7 +64,8 @@ const reducer = (
     return {
       ...state,
       viewport: {
-        width, height,
+        width,
+        height,
         widthDiff: width - currentWidth,
         heightDiff: height - currentHeight,
       },
@@ -119,12 +123,15 @@ const reducer = (
   } else if (action.type === 'SHOW_APP_ALERT') {
     const { type, message, params } = action.payload;
     let alerts = state.alerts;
-    alerts = [...alerts, {
-      id: Date.now().toString(),
-      type,
-      message,
-      params: params || {},
-    }];
+    alerts = [
+      ...alerts,
+      {
+        id: Date.now().toString(),
+        type,
+        message,
+        params: params || {},
+      },
+    ];
     return {
       ...state,
       alerts,
@@ -148,7 +155,7 @@ const reducer = (
   } else if (action.type === 'SET_LOADING_COMPONENTS') {
     // Merge the current loadings components with the new components status
     // And remove the false components to reduce the state size.
-    const currentLoadingComponents = R.filter(R.identity, {
+    const currentLoadingComponents = R.filter(x => Boolean(x), {
       ...state.currentLoadingComponents,
       ...action.payload,
     });

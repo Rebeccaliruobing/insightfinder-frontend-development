@@ -51,7 +51,7 @@ class PredictionSetting extends React.PureComponent {
 
   @autobind handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
-    const predictionWindow = this.state[this.stateKey];
+    const predictionWindow = parseInt(this.state[this.stateKey], 10);
     // The user might input , or ; as the seperators, convert string to array and remove empty names
     saveProjectSettings(projectName, { predictionWindow }, { [this.submitLoadingKey]: true });
   }

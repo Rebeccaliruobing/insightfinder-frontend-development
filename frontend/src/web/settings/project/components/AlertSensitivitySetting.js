@@ -65,10 +65,10 @@ class AlertSensitivitySetting extends React.PureComponent {
 
   @autobind handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
-    const pvalue = this.state[this.pvalueStateKey];
-    const cvalue = this.state[this.cvalueStateKey];
-    const emailpvalue = this.state[this.emailpvalueStateKey];
-    const emailcvalue = this.state[this.emailcvalueStateKey];
+    const pvalue = parseFloat(this.state[this.pvalueStateKey]);
+    const cvalue = parseFloat(this.state[this.cvalueStateKey]);
+    const emailpvalue = parseFloat(this.state[this.emailpvalueStateKey]);
+    const emailcvalue = parseFloat(this.state[this.emailcvalueStateKey]);
 
     saveProjectSettings(
       projectName,

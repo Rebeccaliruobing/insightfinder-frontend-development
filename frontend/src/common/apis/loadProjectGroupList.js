@@ -20,7 +20,10 @@ const loadProjectGroupList = (credentials: Credentials, projectName: String) => 
   }).then((d) => {
     const rawData = d.data;
     const groupstr = get(rawData, 'groupingString', '');
-    const groups = R.sort((a, b) => a.localeCompare(b), R.filter(R.identity, groupstr.split(',')));
+    const groups = R.sort(
+      (a, b) => a.localeCompare(b),
+      R.filter(g => Boolean(g), groupstr.split(',')),
+    );
 
     const data = {
       groups,

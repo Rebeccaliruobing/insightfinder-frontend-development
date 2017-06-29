@@ -29,7 +29,7 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       /[[\]]/gi,
       '',
     );
-    const sharedUserNames = R.filter(R.identity, sharedUsernamesStr.split(/\s*,\s*/));
+    const sharedUserNames = R.filter(n => Boolean(n), sharedUsernamesStr.split(/\s*,\s*/));
 
     const predictionWindow = get(rawData, 'projectModelAllJSON.predictionWindow', '4');
     const learningSkippingPeriod = get(rawData, 'projectModelAllJSON.learningSkippingPeriod ', '');

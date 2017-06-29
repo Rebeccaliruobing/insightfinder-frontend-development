@@ -87,7 +87,7 @@ class DataDisqualifiersSetting extends React.PureComponent {
     );
     const isDetectionSubmitting = get(
       this.props.currentLoadingComponents,
-      this.learningSubmitLoadingKey,
+      this.detectionSubmitLoadingKey,
       false,
     );
 

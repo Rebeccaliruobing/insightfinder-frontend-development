@@ -55,14 +55,10 @@ class LogSensitivitySetting extends React.PureComponent {
 
   @autobind handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
-    const pvalue = this.state[this.pvalueStateKey];
-    const derivedpvalue = this.state[this.derivedpvalueStateKey];
+    const pvalue = parseFloat(this.state[this.pvalueStateKey]);
+    const derivedpvalue = parseFloat(this.state[this.derivedpvalueStateKey]);
 
-    saveProjectSettings(
-      projectName,
-      { pvalue, derivedpvalue },
-      { [this.submitLoadingKey]: true },
-    );
+    saveProjectSettings(projectName, { pvalue, derivedpvalue }, { [this.submitLoadingKey]: true });
   }
 
   render() {
@@ -76,8 +72,7 @@ class LogSensitivitySetting extends React.PureComponent {
       intl.formatMessage(settingsMessages.errorEmptySelection),
     );
 
-    const hasError =
-      pvalueLink.error || derivedpvalueLink.error;
+    const hasError = pvalueLink.error || derivedpvalueLink.error;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
 
     return (
