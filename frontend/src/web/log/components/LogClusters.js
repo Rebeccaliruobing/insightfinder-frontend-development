@@ -82,7 +82,7 @@ class LogClusters extends React.PureComponent {
 
     return (
       <Container fullHeight className="flex-row">
-        <Container fullHeight style={{ width: 300, marginRight: '1em' }}>
+        <Container fullHeight style={{ width: 420, marginRight: '1em' }}>
           <AutoSizer>
             {({ width, height }) => (
               <Table
@@ -95,7 +95,7 @@ class LogClusters extends React.PureComponent {
                 rowGetter={({ index }) => patterns[index]}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={240} label="Cluster" dataKey="name" />
+                <Column width={380} label="Cluster" dataKey="name" />
                 <Column
                   width={40}
                   label="Count"

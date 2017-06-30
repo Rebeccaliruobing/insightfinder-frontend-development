@@ -44,9 +44,7 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
         ),
       );
       //
-      const name = p.patternName === `Pattern ${p.nid}`
-        ? R.take(6, keywords).join('-')
-        : p.patternName;
+      const name = p.patternName === `Pattern ${p.nid}` ? keywords.join('-') : p.patternName;
       return {
         nid: p.nid,
         keywords,
