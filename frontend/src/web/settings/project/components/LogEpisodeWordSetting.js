@@ -50,7 +50,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
     const showWords = currentTab === 'words';
     const showEpisodes = currentTab === 'episodes';
 
-    const booleanCellRender = ({ cellData }) => (cellData ? 'YES' : 'NO');
+    const booleanCellRender = ({ cellData }) => (cellData ? 'Yes' : 'No');
 
     return (
       <Container fullHeight className="overflow-y-auto">

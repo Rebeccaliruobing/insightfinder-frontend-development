@@ -55,13 +55,14 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
     }, metricUnitMapping);
 
     const metrics = R.map((setting) => {
-      let smetric = setting.smetric;
-      const pos = smetric.indexOf('/');
+      let name = setting.smetric;
+      const isKPI = Boolean(setting.isKPI);
+      const pos = name.indexOf('/');
       if (pos !== -1) {
-        smetric = smetric.substring(0, pos);
+        name = name.substring(0, pos);
       }
-      let unit = get(metricUnitMap, [smetric, 'unit'], '');
-      const shortMetric = get(metricUnitMap, [smetric, 'shortMetric'], '');
+      let unit = get(metricUnitMap, [name, 'unit'], '');
+      const shortMetric = get(metricUnitMap, [name, 'shortMetric'], '');
       const pos2 = unit.indexOf('(');
       const pos3 = unit.indexOf(')');
       if (pos2 !== -1 && pos3 !== -1) {
@@ -78,6 +79,8 @@ const loadProjectSettings = (credentials: Credentials, params: Object) => {
       }
       return {
         ...setting,
+        isKPI,
+        name,
         unit,
         shortMetric,
         isCustomMetric,

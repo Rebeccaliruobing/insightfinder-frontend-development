@@ -56,10 +56,20 @@
 .ReactVirtualized__Table__rowColumn {
   margin-right: 10px;
   min-width: 0px;
+  &.no-wrap {
+    > .ReactVirtualized__Table__headerTruncatedText {
+      white-space: normal;
+    }
+  }
 }
 .ReactVirtualized__Table__rowColumn {
   text-overflow: ellipsis;
   white-space: nowrap;
+  .fui.input {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
 }
 
 .ReactVirtualized__Table__headerColumn:first-of-type,
