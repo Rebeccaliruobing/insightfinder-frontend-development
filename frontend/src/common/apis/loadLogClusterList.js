@@ -50,7 +50,7 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
         keywords,
         name,
         patternName: p.patternName,
-        eventsCount: 0, // TODO
+        eventsCount: p.count,
       };
     }, patterns);
 
