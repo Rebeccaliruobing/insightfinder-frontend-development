@@ -17,7 +17,7 @@ const loadLogEventList = (credentials: Credentials, projectName: String, params:
   let { dayTimeMillis } = params;
 
   if (!dayTimeMillis) {
-    dayTimeMillis = moment(params.startTimeMillis).startOf('day').valueOf();
+    dayTimeMillis = params.startTimeMillis;
   }
   // Use the time as the incident id.
   return fetchGet(getEndpoint('logstreamingevent'), {
