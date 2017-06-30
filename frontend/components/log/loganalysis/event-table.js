@@ -19,25 +19,21 @@ const EventTable = ({ highlightWord, eventDataset, ...props }) => {
       <table className="log-event-table">
         <thead>
           <tr>
-            <th width={40} className="no">#</th>
-            <th width={110}>Time</th>
-            <th>Event</th>
+            <th width={130}>Timestamp</th>
+            <th>Message</th>
           </tr>
         </thead>
         <tbody>
-          {
-            ds.map((event, idx) => (
-              <tr key={idx}>
-                <td className="no">{idx + 1}</td>
-                <td>{event.datetime}</td>
-                <td
-                  dangerouslySetInnerHTML={{
-                    __html: highlightContent(event.rawData, highlightWord),
-                  }}
-                />
-              </tr>
-            ))
-          }
+          {ds.map((event, idx) => (
+            <tr key={idx}>
+              <td>{event.datetime}</td>
+              <td
+                dangerouslySetInnerHTML={{
+                  __html: highlightContent(event.rawData, highlightWord),
+                }}
+              />
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

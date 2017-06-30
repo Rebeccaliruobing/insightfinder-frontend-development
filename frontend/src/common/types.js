@@ -38,10 +38,10 @@ export type AppState = {
   viewport: Object,
   locales: Array<string>,
   messages: Array<Message>,
-  rehydrated: bool,
-  starting: bool,
-  started: bool,
-  inited: bool,
+  rehydrated: boolean,
+  starting: boolean,
+  started: boolean,
+  inited: boolean,
   appLoaderVisible: boolean,
   pageLoaderVisible: boolean,
   lastError: ?ErrorMessage,
@@ -55,8 +55,8 @@ export type AppState = {
 };
 
 export type AuthState = {
-  loggedIn: bool,
-  loggingIn: bool,
+  loggedIn: boolean,
+  loggingIn: boolean,
   credentials: ?Credentials,
   userInfo: ?Object,
   loginReason: ?string,
@@ -64,7 +64,7 @@ export type AuthState = {
 
 export type MetricState = {
   currentHourlyEvents: ?Object,
-  currentHourlyEventsLoading: bool,
+  currentHourlyEventsLoading: boolean,
   currentWeeklyAnomalies: ?Object,
   currentErrorMessage: ?Message,
 };
@@ -92,6 +92,9 @@ export type LogState = {
 
   // The current error message, set to null if no errors.
   currentError: ?Message,
+
+  // The object used to store the states for each view. The key is the view name.
+  viewsState: Object,
 };
 
 export type SettingsState = {
@@ -127,44 +130,58 @@ export type State = {
 
 // Actions
 export type Action =
-  { type: 'SET_CURRENT_LOCALE', payload: { locale: string } }
-  | { type: 'SET_CURRENT_THEME', payload: { theme: string } }
-  | { type: 'SET_VIEWPORT', payload: { width: number, height: number } }
-  | { type: 'APP_REHYDRATED' }
-  | { type: 'APP_START' }
-  | { type: 'APP_STARTED' }
-  | { type: 'APP_STOP' }
-  | { type: 'SET_INIT_DATA', payload: Object }
-  | { type: 'SHOW_APP_LOADER' }
-  | { type: 'HIDE_APP_LOADER' }
-  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message, params: ?Object } }
-  | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
-  | { type: 'SET_APP_FILTERS', payload: Filters }
-  | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
-  | { type: 'LOGIN', payload: { userName: string, password: string } }
-  | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
-  | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
-  | { type: 'LOGOFF' }
+  | { type: "SET_CURRENT_LOCALE", payload: { locale: string } }
+  | { type: "SET_CURRENT_THEME", payload: { theme: string } }
+  | { type: "SET_VIEWPORT", payload: { width: number, height: number } }
+  | { type: "APP_REHYDRATED" }
+  | { type: "APP_START" }
+  | { type: "APP_STARTED" }
+  | { type: "APP_STOP" }
+  | { type: "SET_INIT_DATA", payload: Object }
+  | { type: "SHOW_APP_LOADER" }
+  | { type: "HIDE_APP_LOADER" }
+  | { type: "SHOW_APP_ALERT", payload: { type: string, message: Message, params: ?Object } }
+  | { type: "HIDE_APP_ALERT", payload: { ids: Array<string> } }
+  | { type: "SET_APP_FILTERS", payload: Filters }
+  | { type: "APP_ERROR", payload: { message: ?Message, error: ?Error } }
+  | { type: "LOGIN", payload: { userName: string, password: string } }
+  | { type: "LOGIN_SUCCESS", payload: { credentials: Credentials, userInfo: ?Object } }
+  | { type: "LOGIN_FAILURE", payload: { message: ?Message, error: ?Error } }
+  | { type: "LOGOFF" }
   | {
-    type: 'LOAD_LOG_FILE', payload: {
-      projectId: ?string, incidentId: ?string, match: Object, params: ?Object, forceReload?: bool,
+      type: "LOAD_LOG_FILE",
+      payload: {
+        projectId: ?string,
+        incidentId: ?string,
+        match: Object,
+        params: ?Object,
+        forceReload?: boolean,
+      },
     }
-  }
   | {
-    type: 'SET_LOG_FILE', payload: {
-      projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
+      type: "SET_LOG_FILE",
+      payload: {
+        projectId: string,
+        projectInfo: Object,
+        incidentId: ?string,
+        incidentInfo: ?Object,
+      },
     }
-  }
   | {
-    type: 'LOAD_LOG_STREAMING_LIST', payload: {
-      projectName: ?string, month: ?string,
+      type: "LOAD_LOG_STREAMING_LIST",
+      payload: {
+        projectName: ?string,
+        month: ?string,
+      },
     }
-  }
   | {
-    type: 'SET_LOG_STREAMING', payload: {
-      projectId: string, projectInfo: Object, incidentId: ?string, incidentInfo: ?Object
+      type: "SET_LOG_STREAMING",
+      payload: {
+        projectId: string,
+        projectInfo: Object,
+        incidentId: ?string,
+        incidentInfo: ?Object,
+      },
     }
-  }
-  | { type: 'LOAD_BUG_REPOSITORY', payload: {} }
-  | { type: 'SET_BUG_REPOSITORY', payload: { bugRepository: Object } }
-  ;
+  | { type: "LOAD_BUG_REPOSITORY", payload: {} }
+  | { type: "SET_BUG_REPOSITORY", payload: { bugRepository: Object } };

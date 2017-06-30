@@ -5,6 +5,7 @@
  * *****************************************************************************
  **/
 
+import eventListEpic from './eventListEpic';
 import incidentEpic from './incidentEpic';
 import incidentListEpic from './incidentListEpic';
 import fileEpic from './fileEpic';
@@ -13,6 +14,7 @@ import streamingListEpic from './streamingListEpic';
 import streamingIncidentEpic from './streamingIncidentEpic';
 
 const epics = [
+  eventListEpic,
   incidentEpic,
   incidentListEpic,
   fileEpic,

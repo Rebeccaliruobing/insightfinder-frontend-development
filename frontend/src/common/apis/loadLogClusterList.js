@@ -23,20 +23,46 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
   }).then((d) => {
     // TODO: This API response not in data format, need to change to d.data.
 
+    const { incidentStartTime, incidentEndTime, totalEventsCount } = params;
     const rawData = d;
-    const events = get(rawData, 'eventArray', []);
 
-    const mStartTime = moment(parseInt(incidentId, 10)).startOf('day');
-    const mEndTime = mStartTime.clone().endOf('day');
+    const mStartTime = moment(incidentStartTime);
+    const mEndTime = moment(incidentEndTime);
     const startTime = mStartTime.valueOf();
     const endTime = mEndTime.valueOf();
+    let patterns = get(rawData, 'patternArray', []);
+
+    patterns = R.map((p) => {
+      // Convert the topK string into array.
+      const keywords = R.filter(
+        k => Boolean(k),
+        R.map(
+          k => k.trim(),
+          p.topK && p.topK.length > 0
+            ? p.topK.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',')
+            : [],
+        ),
+      );
+      //
+      const name = p.patternName === `Pattern ${p.nid}`
+        ? R.take(6, keywords).join('-')
+        : p.patternName;
+      return {
+        nid: p.nid,
+        keywords,
+        name,
+        patternName: p.patternName,
+        eventsCount: 0, // TODO
+      };
+    }, patterns);
 
     return {
       rawData,
       data: {
-        events,
+        patterns,
         startTime,
         endTime,
+        totalEventsCount,
       },
     };
   });

@@ -20,7 +20,12 @@ import { State } from '../../common/types';
 import { parseQueryString, buildMatchLocation, buildUrl } from '../../common/utils';
 import { Container, Select, Tile, Box } from '../../lib/fui/react';
 import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
-import { loadLogIncidentList, loadLogIncident } from '../../common/log/actions';
+import {
+  loadLogIncidentList,
+  loadLogIncident,
+  loadLogEventList,
+  selectLogPattern,
+} from '../../common/log/actions';
 import {
   LogClusters,
   LogFrequencyAnomalies,
@@ -35,15 +40,19 @@ type Props = {
   location: Object,
   push: Function,
 
+  currentLoadingComponents: Object,
   projects: Array<Object>,
   incidentList: Array<Object>,
   incidentListParams: Object,
   incident: Object,
   incidentParams: Object,
   currentError: ?Object,
+  viewsState: Object,
 
   loadLogIncidentList: Function,
   loadLogIncident: Function,
+  selectLogPattern: Function,
+  loadLogEventList: Function,
 };
 
 class LogAnalysisCore extends React.PureComponent {
@@ -224,7 +233,18 @@ class LogAnalysisCore extends React.PureComponent {
   }
 
   render() {
-    const { intl, match, projects, incidentList, incident, currentError } = this.props;
+    const {
+      intl,
+      match,
+      projects,
+      incidentList,
+      incident,
+      currentError,
+      viewsState,
+      selectLogPattern,
+      loadLogEventList,
+      currentLoadingComponents,
+    } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, month, incidentId, view } = params;
 
@@ -233,6 +253,7 @@ class LogAnalysisCore extends React.PureComponent {
     const viewInfoData = get(incident, view);
 
     const showIncident = Boolean(incidentId);
+    const incidentInfo = incidentId ? R.find(i => i.id === incidentId, incidentList) : {};
 
     // Select renderer to generate link to month.
     const monthValueRender = (option) => {
@@ -398,6 +419,12 @@ class LogAnalysisCore extends React.PureComponent {
                   {React.createElement(viewInfo.component, {
                     data: viewInfoData,
                     projectName,
+                    selectLogPattern,
+                    loadLogEventList,
+                    currentLoadingComponents,
+                    ...get(viewsState, view, {}),
+                    startTimeMillis: moment(incidentInfo.incidentStartTime).valueOf(),
+                    endTimeMillis: moment(incidentInfo.incidentEndTime).valueOf(),
                   })}
                 </div>}
             </Container>
@@ -410,15 +437,27 @@ class LogAnalysisCore extends React.PureComponent {
 const LogAnalysis = injectIntl(LogAnalysisCore);
 export default connect(
   (state: State) => {
-    const { incidentList, incidentListParams, incident, incidentParams, currentError } = state.log;
-    return {
-      projects: R.filter(p => p.isLog, state.app.projects),
+    const { projects, currentLoadingComponents } = state.app;
+    const {
       incidentList,
       incidentListParams,
       incident,
       incidentParams,
       currentError,
+      eventList,
+      viewsState,
+    } = state.log;
+    return {
+      projects: R.filter(p => p.isLog, projects),
+      incidentList,
+      incidentListParams,
+      incident,
+      incidentParams,
+      currentError,
+      eventList,
+      viewsState,
+      currentLoadingComponents,
     };
   },
-  { push, loadLogIncidentList, loadLogIncident },
+  { push, loadLogIncidentList, loadLogIncident, selectLogPattern, loadLogEventList },
 )(LogAnalysis);

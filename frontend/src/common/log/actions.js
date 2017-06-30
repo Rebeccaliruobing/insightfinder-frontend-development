@@ -32,6 +32,27 @@ export const loadLogIncident = (projectName: String, params: Object, force: Bool
 });
 
 /**
+ * Select the pattern in the view. Handled by reducer and epic.
+ */
+export const selectLogPattern = (view: String, patternId: String): Action => ({
+  type: 'SELECT_LOG_PATTERN',
+  payload: { view, patternId },
+});
+
+/**
+ * Load the events based on condition and store at the related storePath.
+ */
+export const loadLogEventList = (
+  projectName: String,
+  view: String,
+  params: Object,
+  components: Object,
+) => ({
+  type: 'LOAD_LOG_EVENTLIST',
+  payload: { projectName, view, params, components },
+});
+
+/**
  * This action will set the log state, it's handled by reducer.
  */
 export const setLogInfo = (info: Object): Action => ({
@@ -47,13 +68,7 @@ export const loadLogFile = (
   forceReload?: boolean,
 ): Action => ({
   type: 'LOAD_LOG_FILE',
-  payload: {
-    projectId,
-    incidentId,
-    match,
-    params,
-    forceReload,
-  },
+  payload: { projectId, incidentId, match, params, forceReload },
 });
 
 export const setLogFile = (

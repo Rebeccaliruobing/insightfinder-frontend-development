@@ -23,6 +23,7 @@ const initialState: LogState = {
   incident: {},
   incidentParams: {},
   currentError: null,
+  viewsState: {},
 };
 
 const reducer = (state: LogState = initialState, action: Action): LogState => {
@@ -35,6 +36,21 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
       ...state,
       ...info,
     };
+  } else if (action.type === 'SELECT_LOG_PATTERN') {
+    let { viewsState } = state;
+    const { view, patternId } = action.payload;
+    if (view === 'cluster') {
+      // Set the current pattern id, and reset the event list.
+      viewsState = {
+        ...viewsState,
+        [view]: {
+          currentPatternId: patternId,
+          currentEventList: [],
+        },
+      };
+      return { ...state, viewsState };
+    }
+    return state;
   } else if (action.type === 'SET_LOG_STREAMING1') {
     const { projectId, projectInfo, incidentId, incidentInfo } = action.payload;
     let { streamingInfos, streamingIncidentInfos } = state;

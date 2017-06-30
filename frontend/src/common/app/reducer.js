@@ -155,9 +155,14 @@ const reducer = (state: AppState = initialState, action: Action): AppState => {
   } else if (action.type === 'SET_LOADING_COMPONENTS') {
     // Merge the current loadings components with the new components status
     // And remove the false components to reduce the state size.
+    const components = action.payload;
+    if (R.isNil(components) || R.isEmpty(components)) {
+      return state;
+    }
+
     const currentLoadingComponents = R.filter(x => Boolean(x), {
       ...state.currentLoadingComponents,
-      ...action.payload,
+      ...components,
     });
     return {
       ...state,
