@@ -5,8 +5,8 @@
  * *****************************************************************************
  **/
 
+import R from 'ramda';
 import { get } from 'lodash';
-import moment from 'moment';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
@@ -24,21 +24,55 @@ const loadLogPatternSequenceList = (
     projectName,
     dayTimeMillis: incidentId,
   }).then((d) => {
-    // TODO: This API response not in data format, need to change to d.data.
-    const rawData = d;
-    const events = get(rawData, 'eventArray', []);
+    const rawData = d.data;
+    const sequences = rawData || [];
 
-    const mStartTime = moment(parseInt(incidentId, 10)).startOf('day');
-    const mEndTime = mStartTime.clone().endOf('day');
-    const startTime = mStartTime.valueOf();
-    const endTime = mEndTime.valueOf();
+    // Merge sequences and patters into a array, with different type.
+    let sequenceAndPatterns = [];
+
+    R.forEach((seq) => {
+      const { count, pattern } = seq;
+      const id = '0';
+
+      // TODO: Convert the pattern id string into a object will be replaced later.
+      let patterns = R.filter(p => Boolean(p), R.map(p => p.trim(), (pattern || '').split(',')));
+      const seqKeywords = [];
+      patterns = R.map((p) => {
+        const nid = p;
+        const patternName = `Pattern ${p}`;
+        const keywords = [patternName];
+
+        const name = patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
+        if (keywords.length > 0) {
+          seqKeywords.push(keywords[0]);
+        }
+
+        return {
+          id: nid,
+          isPattern: true,
+          name,
+          count: '',
+          keywords,
+        };
+      }, patterns);
+
+      sequenceAndPatterns = [
+        ...sequenceAndPatterns,
+        {
+          id,
+          isPattern: false,
+          name: seqKeywords.join('-'),
+          count,
+          keywords: [],
+        },
+        ...patterns,
+      ];
+    }, sequences);
 
     return {
       rawData,
       data: {
-        events,
-        startTime,
-        endTime,
+        sequences: sequenceAndPatterns,
       },
     };
   });

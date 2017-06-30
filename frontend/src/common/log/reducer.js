@@ -39,7 +39,7 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
   } else if (action.type === 'SELECT_LOG_PATTERN') {
     let { viewsState } = state;
     const { view, patternId } = action.payload;
-    if (view === 'cluster') {
+    if (Boolean(view) && Boolean(patternId)) {
       // Set the current pattern id, and reset the event list.
       viewsState = {
         ...viewsState,

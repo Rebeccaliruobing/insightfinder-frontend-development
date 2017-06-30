@@ -266,7 +266,7 @@ class LogAnalysisCore extends React.PureComponent {
       } else if (view === 'cluster') {
         return `${i.name}      (${i.clusterCount.toString()})`;
       }
-      return '';
+      return i.name;
     };
 
     return (
