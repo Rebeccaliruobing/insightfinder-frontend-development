@@ -30,99 +30,14 @@ class MetricSetting extends React.PureComponent {
     this.propsPath = ['data', this.stateKey];
     this.submitLoadingKey = 'settings_metric_submit';
     this.booleanCellRender = ({ cellData }) => (cellData ? 'Yes' : 'No');
-    const metrics = get(props, this.propsPath, []);
-
-    this.localMetrics = R.clone(metrics);
-    this.state = {
-      changedMetrics: [],
-    };
-  }
-
-  componentWillReceiveProps(newProps) {
-    const metrics = get(newProps, this.propsPath, []);
-    // If metrics changes, reset the changed state.
-    if (!R.identical(metrics, get(this.props, this.propsPath))) {
-      this.localMetrics = R.clone(metrics);
-      console.log('reset');
-      this.setState({
-        changedMetrics: [],
-      });
-    }
-  }
-
-  @autobind handleSaveClick() {
-    const { saveProjectSettings, projectName } = this.props;
-    const projectSettings = R.map(
-      m => ({
-        smetric: m.name,
-        isKPI: true,
-      }),
-      R.filter(m => m.isChanged, this.localMetrics),
-    );
-    console.log(projectSettings);
-    saveProjectSettings(projectName, { projectSettings }, { [this.submitLoadingKey]: true });
-  }
-
-  @autobind handleInputChanged(rowData, dataKey) {
-    return (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-
-      const target = e.target;
-      const name = rowData.name;
-      let newVal = target.value || '';
-
-      if (dataKey === 'isKPI') {
-        newVal = target.checked;
-      }
-
-      console.log('changed', newVal);
-
-      rowData[dataKey] = newVal;
-      rowData.isChanged = true;
-      this.table.forceUpdateGrid();
-      /*
-      let { changedMetrics } = this.state;
-
-      let changed = null;
-      const idx = R.findIndex(m => m.name === name, changedMetrics);
-      if (idx >= 0) {
-        changed = { ...changedMetrics[idx], [dataKey]: newVal };
-        changedMetrics = [
-          ...R.slice(0, idx, changedMetrics),
-          changed,
-          ...R.slice(idx + 1, Infinity, changedMetrics),
-        ];
-      } else {
-        changed = { name, [dataKey]: newVal };
-        changedMetrics = [...changedMetrics, changed];
-      }
-
-      if (changed) {
-        this.setState({ changedMetrics }, () => {
-          if (this.table) {
-            this.table.forceUpdateGrid();
-          }
-        });
-      }
-      */
-    };
-  }
-
-  @autobind inputCellRender({ dataKey, rowData, cellData }) {
-    return (
+    this.inputCellRender = ({ dataKey, rowData, cellData }) => (
       <input
-        key={dataKey}
         className="fui input"
         value={cellData}
         onChange={this.handleInputChanged(rowData, dataKey)}
       />
     );
-  }
-
-  @autobind checkboxCellRender({ dataKey, rowData, cellData }) {
-    console.log('cell', cellData, rowData);
-    return (
+    this.checkboxCellRender = ({ dataKey, rowData, cellData }) => (
       <input
         className="fui input"
         type="checkbox"
@@ -130,35 +45,89 @@ class MetricSetting extends React.PureComponent {
         onChange={this.handleInputChanged(rowData, dataKey)}
       />
     );
+
+    const metrics = get(props, this.propsPath, []);
+    // Make a full copy of the data to avoid side affect with other components.
+    this.localMetrics = R.clone(metrics);
+    const checked = !R.find(m => !m.isKPI, this.localMetrics);
+
+    // State
+    this.state = {
+      isKpiAll: checked,
+    };
   }
 
-  getMergedMetrics() {
+  componentWillReceiveProps(newProps) {
+    const metrics = get(newProps, this.propsPath, []);
+    // If metrics changes, reset the changed state, and get an new clone.
+    if (!R.identical(metrics, get(this.props, this.propsPath))) {
+      this.localMetrics = R.clone(metrics);
+      // If any one is not kpi, unselected.
+      const checked = !R.find(m => !m.isKPI, this.localMetrics);
+      this.setState({ isKpiAll: checked });
+    }
+  }
+
+  @autobind handleSaveClick() {
     const metrics = get(this.props, this.propsPath, []);
-    const { changedMetrics } = this.state;
 
-    const mergedMetrics = [];
+    const diff = R.difference(this.localMetrics, metrics);
+    const { saveProjectSettings, projectName } = this.props;
+    const projectSettings = R.map(
+      m => ({
+        smetric: m.name,
+        isKPI: m.isKPI ? true : undefined,
+        thresholdAlert: m.thresholdAlert,
+        thresholdNoAlert: m.thresholdNoAlert,
+        groupId: m.groupId,
+      }),
+      diff,
+    );
+    saveProjectSettings(projectName, { projectSettings }, { [this.submitLoadingKey]: true });
+  }
+
+  @autobind handleInputChanged(rowData, dataKey) {
+    return (e) => {
+      const target = e.target;
+      const newVal = target.type === 'checkbox' ? target.checked : target.value || '';
+
+      // Save the data and force update.
+      rowData[dataKey] = newVal;
+      this.table.forceUpdateGrid();
+    };
+  }
+
+  @autobind handleIsKpiAllChecked(e) {
+    const checked = e.target.checked;
+
     R.forEach((m) => {
-      const { name, ...rest } = m;
-      const cm = R.find(cm => cm.name === name, changedMetrics);
-      if (cm) {
-        console.log('found', cm);
-        mergedMetrics.push({ name, ...rest, ...cm });
-      } else {
-        console.log('copy', cm);
-        mergedMetrics.push({ ...m });
-      }
-    }, metrics);
-
-    console.log(mergedMetrics);
-
-    return mergedMetrics;
+      m.isKPI = checked;
+    }, this.localMetrics);
+    this.setState({ isKpiAll: checked });
   }
 
   render() {
     const { intl } = this.props;
     const metrics = this.localMetrics;
+
     const hasError = false;
     const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
+
+    const checkAllHeaderRender = () => {
+      const { isKpiAll } = this.state;
+      return (
+        <div>
+          <span>isKPI</span>
+          <input
+            className="fui input"
+            type="checkbox"
+            checked={isKpiAll}
+            onChange={this.handleIsKpiAllChecked}
+          />
+        </div>
+      );
+    };
+
     return (
       <Container fullHeight className="overflow-y-auto">
         <form
@@ -234,6 +203,7 @@ class MetricSetting extends React.PureComponent {
                     dataKey="isKPI"
                     className="text-center"
                     headerClassName="text-center"
+                    headerRenderer={checkAllHeaderRender}
                     cellRenderer={this.checkboxCellRender}
                   />
                 </Table>
