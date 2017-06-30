@@ -359,14 +359,14 @@ class MetricAnalysisCore extends React.PureComponent {
         <div className="section" style={{ fontSize: 12, marginTop: '0.5em' }}>
           <div>
             <div
-              className={`ui ${view === 'anomaly' ? 'grey active' : 'orange'} button`}
+              className={`ui ${view !== 'anomaly' ? 'grey active' : 'orange'} button`}
               style={{ borderRadius: 0, margin: 0 }}
               onClick={this.handleViewChange('anomaly')}
             >
               Anomaly View
             </div>
             <div
-              className={`ui ${view === 'resource' ? 'grey active' : 'orange'} button`}
+              className={`ui ${view !== 'resource' ? 'grey active' : 'orange'} button`}
               style={{ borderRadius: 0, margin: 0 }}
               onClick={this.handleViewChange('resource')}
             >
