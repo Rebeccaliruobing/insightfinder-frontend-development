@@ -8,11 +8,8 @@
 import React from 'react';
 import { get } from 'lodash';
 import { autobind } from 'core-decorators';
-import VLink from 'valuelink';
 
-import { Container, Input } from '../../../../lib/fui/react';
-import { AnomalyThresholdSensitivity, DurationThreshold } from '../../../app/components/Selectors';
-import { settingsMessages } from '../../../../common/settings/messages';
+import { Table, Column, AutoSizer, Container } from '../../../../lib/fui/react';
 
 type Props = {
   intl: Object,
@@ -22,88 +19,46 @@ type Props = {
   saveProjectSettings: Function,
 };
 
-// TODO: Just change the class name, need implement it.
 class LogEpisodeWordSetting extends React.PureComponent {
   props: Props;
 
   constructor(props) {
     super(props);
 
-    this.pvalueStateKey = 'pvalue';
-    this.cvalueStateKey = 'cvalue';
-    this.derivedpvalueStateKey = 'derivedpvalue';
-    this.logFreqWindowStateKey = 'logFreqWindow';
-    this.submitLoadingKey = 'settings_logtivity_submit';
+    this.wordsStateKey = 'words';
+    this.episodesStateKey = 'episodes';
 
-    this.pvaluePropsPath = ['data', this.pvalueStateKey];
-    this.cvaluePropsPath = ['data', this.cvalueStateKey];
-    this.derivedpvaluePropsPath = ['data', this.derivedpvalueStateKey];
-    this.logFreqWindowPropsPath = ['data', this.logFreqWindowStateKey];
-
-    const pvalue = get(props, this.pvaluePropsPath);
-    const cvalue = get(props, this.cvaluePropsPath);
-    const derivedpvalue = get(props, this.derivedpvaluePropsPath);
-    const logFreqWindow = get(props, this.logFreqWindowPropsPath);
-    this.state = { pvalue, cvalue, derivedpvalue, logFreqWindow };
+    this.state = {
+      currentTab: 'episodes',
+    };
   }
 
-  componentWillReceiveProps(newProps) {
-    const pvalue = get(newProps, this.pvaluePropsPath);
-    const cvalue = get(newProps, this.cvaluePropsPath);
-    const derivedpvalue = get(newProps, this.derivedpvaluePropsPath);
-    const logFreqWindow = get(newProps, this.logFreqWindowPropsPath);
-
-    // If the props is changed, set the local state.
-    if (
-      pvalue !== get(this.props, this.pvaluePropsPath) ||
-      cvalue !== get(this.props, this.cvaluePropsPath) ||
-      derivedpvalue !== get(this.props, this.derivedpvaluePropsPath) ||
-      logFreqWindow !== get(this.props, this.logFreqWindowPropsPath)
-    ) {
-      this.setState({ pvalue, cvalue, derivedpvalue, logFreqWindow });
-    }
+  @autobind selectTab(e, name) {
+    this.setState({ currentTab: name });
   }
 
-  @autobind handleSaveClick() {
-    const { saveProjectSettings, projectName } = this.props;
-    const pvalue = this.state[this.pvalueStateKey];
-    const cvalue = this.state[this.cvalueStateKey];
-    const derivedpvalue = this.state[this.derivedpvalueStateKey];
-    const logFreqWindow = this.state[this.logFreqWindowStateKey];
-
-    saveProjectSettings(
-      projectName,
-      { pvalue, cvalue, derivedpvalue, logFreqWindow },
-      { [this.submitLoadingKey]: true },
-    );
-  }
+  @autobind handleSaveClick() {}
 
   render() {
     const { intl } = this.props;
-    const pvalueLink = VLink.state(this, this.pvalueStateKey).check(
-      x => Boolean(x),
-      intl.formatMessage(settingsMessages.errorEmptySelection),
-    );
-    const cvalueLink = VLink.state(this, this.cvalueStateKey).check(
-      x => Boolean(x),
-      intl.formatMessage(settingsMessages.errorEmptySelection),
-    );
-    const derivedpvalueLink = VLink.state(this, this.derivedpvalueStateKey).check(
-      x => Boolean(x),
-      intl.formatMessage(settingsMessages.errorEmptySelection),
-    );
-    const logFreqWindowLink = VLink.state(this, this.logFreqWindowStateKey)
-      .check(x => Boolean(x), intl.formatMessage(settingsMessages.errorEmptyInput))
-      .check(x => !isNaN(x), intl.formatMessage(settingsMessages.errorNotNumberInput));
+    const hasError = false;
+    const isSubmitting = false;
 
-    const hasError =
-      pvalueLink.error || cvalueLink.error || derivedpvalueLink.error || logFreqWindowLink.error;
-    const isSubmitting = get(this.props.currentLoadingComponents, this.submitLoadingKey, false);
+    const { currentTab } = this.state;
+    const words = get(this.props, ['data', this.wordsStateKey], []);
+    const episodes = get(this.props, ['data', this.episodesStateKey], []);
+    const showWords = currentTab === 'words';
+    const showEpisodes = currentTab === 'episodes';
+
+    const booleanCellRender = ({ cellData }) => (cellData ? 'YES' : 'NO');
 
     return (
       <Container fullHeight className="overflow-y-auto">
-        <form className={`ui ${hasError ? 'error' : ''} form flex-col`} style={{ fontSize: 12, width: 800 }}>
-          <div className="field" style={{ textAlign: 'right', marginBottom: 0 }}>
+        <form
+          className={`ui ${hasError ? 'error' : ''} form flex-col full-height`}
+          style={{ fontSize: 12, width: 800 }}
+        >
+          <div className="field" style={{ textAlign: 'right', marginBottom: 0, display: 'none' }}>
             <div
               className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
               style={{ width: 180 }}
@@ -113,14 +68,97 @@ class LogEpisodeWordSetting extends React.PureComponent {
             </div>
           </div>
           <div className="ui pointing secondary menu" style={{ margin: 0 }}>
-            <a className="item" onClick={e => this.selectTab(e, 'episode')}>
+            <a
+              className={`${currentTab === 'episodes' ? 'active ' : ''}item`}
+              onClick={e => this.selectTab(e, 'episodes')}
+            >
               Frequent Episode List
             </a>
-            <a className="item" onClick={e => this.selectTab(e, 'word')}>Word List</a>
+            <a
+              className={`${currentTab === 'words' ? 'active ' : ''}item`}
+              onClick={e => this.selectTab(e, 'words')}
+            >
+              Word List
+            </a>
           </div>
-          <Container fullHeight className="overflow-y-auto">
-            <div style={{ height: 2000 }}></div>
-          </Container>
+          {showWords &&
+            <Container className="flex-grow field">
+              <AutoSizer>
+                {({ width, height }) => (
+                  <Table
+                    className="with-border"
+                    width={width}
+                    height={height}
+                    headerHeight={40}
+                    rowHeight={40}
+                    rowCount={words.length}
+                    rowGetter={({ index }) => words[index]}
+                  >
+                    <Column
+                      width={600}
+                      className="no-wrap"
+                      flexGrow={1}
+                      label="Pattern"
+                      dataKey="pattern"
+                    />
+                    <Column
+                      width={100}
+                      className="text-right"
+                      headerClassName="text-right"
+                      label="Count"
+                      dataKey="count"
+                    />
+                    <Column
+                      width={100}
+                      headerClassName="text-center"
+                      className="text-center"
+                      label="Interesting"
+                      dataKey="selected"
+                      cellRenderer={booleanCellRender}
+                    />
+                  </Table>
+                )}
+              </AutoSizer>
+            </Container>}
+          {showEpisodes &&
+            <Container className="flex-grow field">
+              <AutoSizer>
+                {({ width, height }) => (
+                  <Table
+                    className="with-border"
+                    width={width}
+                    height={height}
+                    headerHeight={40}
+                    rowHeight={40}
+                    rowCount={episodes.length}
+                    rowGetter={({ index }) => episodes[index]}
+                  >
+                    <Column
+                      width={600}
+                      className="no-wrap"
+                      flexGrow={1}
+                      label="Frequent Episode List"
+                      dataKey="pattern"
+                    />
+                    <Column
+                      width={100}
+                      headerClassName="text-right"
+                      className="text-right"
+                      label="Count"
+                      dataKey="count"
+                    />
+                    <Column
+                      width={100}
+                      headerClassName="text-center"
+                      className="text-center"
+                      label="Interesting"
+                      dataKey="selected"
+                      cellRenderer={booleanCellRender}
+                    />
+                  </Table>
+                )}
+              </AutoSizer>
+            </Container>}
         </form>
       </Container>
     );

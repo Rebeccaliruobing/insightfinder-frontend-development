@@ -9,8 +9,7 @@ import React from 'react';
 import { get } from 'lodash';
 import { autobind } from 'core-decorators';
 
-import { Container } from '../../../../lib/fui/react';
-import { Table, Column, AutoSizer } from '../../../../lib/fui/react';
+import { Table, Column, AutoSizer, Container } from '../../../../lib/fui/react';
 
 type Props = {
   intl: Object,
