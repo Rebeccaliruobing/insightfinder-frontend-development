@@ -43,11 +43,13 @@ const loadProjectModel = (credentials: Credentials, projectName: String, params:
       const mins = JSON.parse(minValues || '[]');
 
       const mapIndexed = R.addIndex(R.map);
-      const metrics = mapIndexed((val, idx) => ({
-        name: val,
-        max: maxs[idx].toFixed(2),
-        min: mins[idx].toFixed(2),
-      }), names);
+      const metrics = mapIndexed((val, idx) => {
+        return {
+          name: val,
+          max: maxs[idx] ? maxs[idx].toFixed(2) : NaN,
+          min: mins[idx] ? mins[idx].toFixed(2) : NaN,
+        };
+      }, names);
 
       const dataset = get(m, 'mapData[0].NASValues', []);
       const heatmap = dataset.map(d => parseFloat(d.split(',')[1]));
