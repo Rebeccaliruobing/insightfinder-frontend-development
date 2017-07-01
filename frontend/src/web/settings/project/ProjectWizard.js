@@ -229,6 +229,7 @@ class ProjectWizardCore extends React.Component {
           <DataSourceSelector
             className="flex-grow"
             intl={intl}
+            radioMode
             selectedDataSources={selectedDataSources}
             configuredDataSources={configuredDataSources}
             onSelectionChange={ds =>
@@ -239,6 +240,7 @@ class ProjectWizardCore extends React.Component {
           <div className="inline field text-right">
             <div
               className={`ui grey button ${skipable ? '' : 'disabled'}`}
+              style={{ display: 'none' }}
               onClick={this.handleStep2SkipClick}
             >
               Skip
@@ -336,7 +338,7 @@ class ProjectWizardCore extends React.Component {
           </div>
           <div className="inline field text-right">
             <div className="ui grey button" onClick={this.handleStep3AddMoreClick}>
-              Add More Data Source
+              Select Data Source
             </div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
