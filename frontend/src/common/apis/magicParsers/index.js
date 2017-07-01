@@ -5,5 +5,6 @@
  * *****************************************************************************
  **/
 
+export { default as logPatternAnomalyToArray } from './logPatternAnomalyToArray';
 export { default as logPatternNameToId } from './logPatternNameToId';
-export { default as logPatternTopK2Array } from './logPatternTopK2Array';
+export { default as logPatternTopKToArray } from './logPatternTopKToArray';

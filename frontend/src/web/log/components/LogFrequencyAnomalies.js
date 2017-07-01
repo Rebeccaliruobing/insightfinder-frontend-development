@@ -133,7 +133,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
     const eventList = this.getSelectedEventList();
     const { currentPatternId } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
-    const { freqTsData, keywords } = patternInfo;
+    const { freqTsData, keywords, barColors } = patternInfo;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
     return (
@@ -167,6 +167,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
             {freqTsData &&
               <DataChart
                 chartType="bar"
+                barColors={barColors}
                 data={{ sdata: freqTsData, sname: ['Time', 'Frequency'] }}
                 annotations={[]}
                 onClick={this.handlePatternPointClick}
