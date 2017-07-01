@@ -1,11 +1,10 @@
 {
   "parser": "babel-eslint",
-  "plugins": [
-  ],
+  "plugins": [],
   "env": {
     "browser": true,
     "node": true,
-    "jest": true 
+    "jest": true
   },
   "extends": [
     "airbnb"
@@ -23,18 +22,25 @@
     // Allow object react prop types.
     "react/forbid-prop-types": "off",
     "react/no-danger": "off",
-    "react/sort-comp": ["warn", {
-      "order": [
-        "type-annotations",
-        "static-methods",
-        "hifecycle",
-        "everything-else",
-        "render"
-      ]
-    }],
+    "react/sort-comp": [
+      "warn",
+      {
+        "order": [
+          "type-annotations",
+          "static-methods",
+          "hifecycle",
+          "everything-else",
+          "render"
+        ]
+      }
+    ],
     // For immutable types.
     "new-cap": [
-      "error", { "capIsNew": false, "newIsCap": true }
+      "error",
+      {
+        "capIsNew": false,
+        "newIsCap": true
+      }
     ],
     // redux action might has one export
     "import/prefer-default-export": "off",
@@ -44,7 +50,10 @@
     // TODO: Turn on devDependencies check until issue fixed
     // https://github.com/benmosher/eslint-plugin-import/issues/602
     "import/no-extraneous-dependencies": [
-      "error", { "devDependencies": true }
+      "error",
+      {
+        "devDependencies": true
+      }
     ],
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/label-has-for": "off"

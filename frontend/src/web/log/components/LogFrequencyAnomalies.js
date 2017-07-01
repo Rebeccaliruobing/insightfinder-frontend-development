@@ -10,6 +10,7 @@ import { get } from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
 
+import { DataChart } from '../../../../components/share/charts';
 import { Container, AutoSizer, Table, Column } from '../../../lib/fui/react';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
 
@@ -32,10 +33,15 @@ class LogFrequencyAnomalies extends React.PureComponent {
     super(props);
     this.viewName = 'freq';
     this.loadingComponentPath = 'log_freq_eventlist';
+
+    this.patternsPropsPath = ['data', 'patterns'];
+    this.state = {
+      selectedStartTs: null,
+    };
   }
 
   componentDidMount() {
-    const patterns = get(this.props.data, 'patterns', []);
+    const patterns = get(this.props, this.patternsPropsPath, []);
     if (patterns.length > 0) {
       const patternId = patterns[0].nid;
       this.reloadPattern(this.props, patternId);
@@ -43,11 +49,15 @@ class LogFrequencyAnomalies extends React.PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    const patterns = get(newProps.data, 'patterns');
-    if (!R.identical(patterns, get(this.props.data, 'patterns'))) {
+    const patterns = get(newProps, this.patternsPropsPath);
+    if (!R.identical(patterns, get(this.props, this.patternsPropsPath))) {
       if (patterns.length > 0) {
         const patternId = patterns[0].nid;
         this.reloadPattern(newProps, patternId);
+        // Reset the selected start and end ts
+        this.setState({
+          selectedStartTs: null,
+        });
       }
     }
   }
@@ -72,22 +82,68 @@ class LogFrequencyAnomalies extends React.PureComponent {
       { [this.loadingComponentPath]: true },
     );
   }
+  @autobind handlePatternPointClick(startTs, position) {
+    this.setState({
+      selectedStartTs: startTs,
+    });
+  }
 
-  render() {
-    const patterns = get(this.props.data, 'patterns', []);
-    const eventList = this.props.currentEventList || [];
+  getSelectedTimeRange() {
+    // If not selected, get the first ts in the freq ts.
+    let startTs = this.state.selectedStartTs;
+    let endTs = null;
+    const patterns = get(this.props, this.patternsPropsPath, []);
     const { currentPatternId } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
+    const freqTsData = patternInfo.freqTsData || [];
+
+    if (!startTs) {
+      if (freqTsData.length > 0) {
+        // The time in freq vector is a Date object
+        startTs = freqTsData[0][0].valueOf();
+      }
+      if (freqTsData.length > 1) {
+        endTs = freqTsData[1][0].valueOf();
+      }
+    } else {
+      const idx = R.findIndex(f => f[0].valueOf() === startTs, freqTsData);
+      if (idx >= 0) {
+        endTs = freqTsData[idx + 1] ? freqTsData[idx + 1][0].valueOf() : null;
+      }
+    }
+
+    return { startTs, endTs };
+  }
+
+  getSelectedEventList() {
+    let eventList = this.props.currentEventList || [];
+    const { startTs, endTs } = this.getSelectedTimeRange();
+
+    if (startTs) {
+      eventList = R.filter(e => e.datetime >= startTs, eventList);
+    }
+    if (endTs) {
+      eventList = R.filter(e => e.datetime < endTs, eventList);
+    }
+    return eventList;
+  }
+
+  render() {
+    const patterns = get(this.props, this.patternsPropsPath, []);
+    const eventList = this.getSelectedEventList();
+    const { currentPatternId } = this.props;
+    const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
+    const { freqTsData, keywords } = patternInfo;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
     return (
       <Container fullHeight className="flex-row">
-        <Container fullHeight style={{ width: 420, marginRight: '1em' }}>
-          <AutoSizer>
-            {({ width, height }) => (
+        <Container fullHeight style={{ marginRight: '1em' }}>
+          <AutoSizer disableWidth>
+            {({ height }) => (
               <Table
                 className="with-border"
-                width={width}
+                width={380}
                 height={height}
                 headerHeight={40}
                 rowHeight={40}
@@ -96,30 +152,38 @@ class LogFrequencyAnomalies extends React.PureComponent {
                 onRowClick={this.handlePatternClick}
               >
                 <Column width={380} label="Cluster" dataKey="name" />
-                <Column
-                  width={40}
-                  label="Count"
-                  className="text-right number"
-                  dataKey="eventsCount"
-                />
               </Table>
             )}
           </AutoSizer>
         </Container>
-        <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
-          <AutoSizer>
-            {({ height }) => (
-              <EventGroup
-                style={{ height, width: 900 }}
-                name={patternInfo.name || ''}
-                className="flex-item flex-col-container"
-                eventDataset={eventList}
-                showFE
-                keywords={get(patternInfo, 'keywords', [])}
-                episodes={get(patternInfo, 'episodes', [])}
-              />
-            )}
-          </AutoSizer>
+        <Container className="flex-grow">
+          <Container fullHeight className={`flex-col ${isLoading ? 'loading' : ''}`}>
+            <h3 className="ui header" style={{ marginBottom: 0 }}>
+              {patternInfo.name || ''}
+            </h3>
+            {keywords &&
+              keywords.length > 0 &&
+              <div style={{ marginBottom: '0.5em' }}>{`Top keywords: ${keywords.join(',')}`}</div>}
+            {freqTsData &&
+              <DataChart
+                chartType="bar"
+                data={{ sdata: freqTsData, sname: ['Time', 'Frequency'] }}
+                annotations={[]}
+                onClick={this.handlePatternPointClick}
+              />}
+            <Container className="flex-grow" style={{ margin: '1em 0 0 2em' }}>
+              <AutoSizer>
+                {({ height, width }) => (
+                  <EventGroup
+                    style={{ height, width, paddingLeft: 0 }}
+                    className="flex-item flex-col-container"
+                    name=""
+                    eventDataset={eventList}
+                  />
+                )}
+              </AutoSizer>
+            </Container>
+          </Container>
         </Container>
       </Container>
     );

@@ -88,9 +88,9 @@ class LogRareEvents extends React.PureComponent {
         />
         <Container className="flex-grow" style={{ margin: '20px 20px 0' }}>
           <AutoSizer>
-            {({ height }) => (
+            {({ height, width }) => (
               <EventGroup
-                style={{ height, width: 900 }}
+                style={{ height, width }}
                 className="flex-item flex-col-container"
                 name=""
                 eventDataset={selectedEvents}

@@ -100,7 +100,7 @@ class LogPatternSequences extends React.PureComponent {
 
     return (
       <Container fullHeight className="flex-row">
-        <Container fullHeight style={{ width: 420, marginRight: '1em' }}>
+        <Container fullHeight style={{ width: 380, marginRight: '1em' }}>
           <AutoSizer>
             {({ width, height }) => (
               <Table
@@ -114,7 +114,7 @@ class LogPatternSequences extends React.PureComponent {
                 onRowClick={this.handlePatternClick}
               >
                 <Column
-                  width={380}
+                  width={340}
                   label="Pattern Sequences"
                   dataKey="name"
                   cellRenderer={nameRender}

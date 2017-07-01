@@ -532,7 +532,7 @@ class LogAnalysisCharts extends React.Component {
               padding: 10,
               margin: 0,
             }}
-          >Pattern List</h4>
+          >Pattern List1</h4>
           <div className="flex-item" style={{ overflowY: 'auto' }}>
             <table className="ui selectable celled table" style={{ border: 0 }}>
               <tbody>
