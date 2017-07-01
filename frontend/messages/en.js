@@ -21,12 +21,20 @@ export default [
     "defaultMessage": "Connection timeout, please network connection.",
   },
   {
+    "id": "app.errors.noLogProject",
+    "defaultMessage": "There is no log project, please go to <a href=\"/settings/project-list\">Settings</a> to register one.",
+  },
+  {
+    "id": "app.errors.noMetricProject",
+    "defaultMessage": "There is no metric project, please go to <a href=\"/settings/project-list\">Settings</a> to register one.",
+  },
+  {
     "id": "app.errors.notFound",
     "defaultMessage": "The requested resource not exists",
   },
   {
     "id": "app.errors.projectNotFound",
-    "defaultMessage": "The project <b>{projectName}</b> doesn' exists. Please choose the project to view.",
+    "defaultMessage": "The project <b>{projectName}</b> doesn' exists.",
   },
   {
     "id": "app.errors.server",
@@ -149,6 +157,38 @@ export default [
     "defaultMessage": "There is no project, please create new one.",
   },
   {
+    "id": "settings.error.emptyInput",
+    "defaultMessage": "This setting cannot be empty, please input value.",
+  },
+  {
+    "id": "settings.error.emptySelection",
+    "defaultMessage": "This setting cannot be empty, please select from options.",
+  },
+  {
+    "id": "settings.error.noProjectModel",
+    "defaultMessage": "There is no model found for <b>{projectName}</b>, please change start/end date or choose other groups.",
+  },
+  {
+    "id": "settings.error.notNumberInput",
+    "defaultMessage": "This setting value is invalid, please input number value.",
+  },
+  {
+    "id": "settings.info.projectlRemoved",
+    "defaultMessage": "The project is removed",
+  },
+  {
+    "id": "settings.info.projectModelPicked",
+    "defaultMessage": "The project model is picked",
+  },
+  {
+    "id": "settings.info.projectModelRemoved",
+    "defaultMessage": "The project model is removed",
+  },
+  {
+    "id": "settings.info.projectSettingSaved",
+    "defaultMessage": "The setting is saved",
+  },
+  {
     "id": "settings.menus.externalService",
     "defaultMessage": "External Service",
   },
@@ -182,18 +222,22 @@ export default [
   },
   {
     "id": "settings.projectWizard.step1Introduction",
-    "defaultMessage": "<b>[TODO]Revise needed:</b> A project is the scope of the data analyse, all data in the same project will be analyzed together. \nIf data has no relations with each others, we might add different data sources into different projects \nto improve the performance. <br>\nIf you are collaborating with other users, you may invite them to view data associated with your Projects.",
+    "defaultMessage": "A project is the scope of the data analyse, all data in the same project will be analyzed together. \nIf data has no relations with each others, we might add different data sources into different projects \nto improve the performance.",
   },
   {
     "id": "settings.projectWizard.step2Introduction",
-    "defaultMessage": "<b>[TODO]Revise needed:</b> Project is created, now you need to add some data sources for this project.\nYou can filter the data sources by the OS, platform or application and select the data sources you want to add. \n<br> You can skip this step and add the data sources in the project settings.",
+    "defaultMessage": "Please select the data source for this project.\nYou can filter the data sources by the OS, platform or application and select the data sources you want to add.",
   },
   {
     "id": "settings.projectWizard.step3Introduction",
-    "defaultMessage": "<b>[TODO]Revise needed:</b> Following the precedure to config settings or install agent for all the selected data sources. \nMark it \"Completed\" if you finished the needed precedures.",
+    "defaultMessage": "Following the precedure to config settings or install agent for all the selected data sources. \nMark it \"Completed\" if you finished the needed precedures.",
   },
   {
     "id": "settings.projectWizard.step4Introduction",
-    "defaultMessage": "<b>[TODO]Revise needed:</b> Congratulation, you have setup the project. If you have added data source for this project, it might\ntake several minutes for the data source agent to work, you can check the status of the data source in the <a href=\"/settings/projects\">Project Settings</a>.",
+    "defaultMessage": "Congratulation, you have setup the project. It might take several minutes for the data source agent to work, \nyou can check the status of the data source in the <a href=\"/settings/projects\">Project Settings</a>.",
+  },
+  {
+    "id": "settings.warn.projectModelNotExists",
+    "defaultMessage": "The project model not exists, please select another one",
   },
 ];

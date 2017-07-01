@@ -1,3 +1,10 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import React from 'react';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
@@ -6,6 +13,7 @@ import { push } from 'react-router-redux';
 import { NavLink } from 'react-router-dom';
 import VLink from 'valuelink';
 import { autobind } from 'core-decorators';
+
 import { Container, Box, Input } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { appMenusMessages } from '../../../common/app/messages';
@@ -17,6 +25,7 @@ import { State } from '../../../common/types';
 type Props = {
   intl: Object,
   push: Function,
+  projects: Array<Object>,
   hideAppLoader: Function,
 };
 
@@ -28,7 +37,7 @@ type States = {
   selectedDataSources: Array<string>,
   configuredDataSources: Array<string>,
   currentDataSourceName: string,
-}
+};
 
 class ProjectWizardCore extends React.Component {
   props: Props;
@@ -39,15 +48,14 @@ class ProjectWizardCore extends React.Component {
     currentStep: 1,
     selectedDataSources: [],
     configuredDataSources: [],
-  }
+  };
 
   componentDidMount() {
     const { hideAppLoader } = this.props;
     hideAppLoader();
   }
 
-  @autobind
-  handleStep1CreateClick(e) {
+  @autobind handleStep1CreateClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -56,8 +64,7 @@ class ProjectWizardCore extends React.Component {
     });
   }
 
-  @autobind
-  handleStep2SkipClick(e) {
+  @autobind handleStep2SkipClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -68,8 +75,7 @@ class ProjectWizardCore extends React.Component {
     });
   }
 
-  @autobind
-  handleStep2SelectedClick(e) {
+  @autobind handleStep2SelectedClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -77,15 +83,14 @@ class ProjectWizardCore extends React.Component {
     // Otherwise, select the first data source.
     const { selectedDataSources, configuredDataSources } = this.state;
     const diff = R.difference(selectedDataSources, configuredDataSources);
-    const currentDataSourceName = diff.length > 0 ? diff[0] : (selectedDataSources[0] || null);
+    const currentDataSourceName = diff.length > 0 ? diff[0] : selectedDataSources[0] || null;
     this.setState({
       currentStep: 3,
       currentDataSourceName,
     });
   }
 
-  @autobind
-  handleStep3AddMoreClick(e) {
+  @autobind handleStep3AddMoreClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -95,8 +100,7 @@ class ProjectWizardCore extends React.Component {
     });
   }
 
-  @autobind
-  handleStep3DataSourceClick(name) {
+  @autobind handleStep3DataSourceClick(name) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -107,8 +111,7 @@ class ProjectWizardCore extends React.Component {
     };
   }
 
-  @autobind
-  handleStep3RemoveClick(name) {
+  @autobind handleStep3RemoveClick(name) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -118,8 +121,7 @@ class ProjectWizardCore extends React.Component {
       if (index >= 0) {
         selectedDataSources = R.remove(index, 1, selectedDataSources);
         // Get the next data source in the list to display
-        const currentDataSourceName = selectedDataSources[index] ||
-          selectedDataSources[0] || null;
+        const currentDataSourceName = selectedDataSources[index] || selectedDataSources[0] || null;
 
         this.setState({
           selectedDataSources,
@@ -129,8 +131,7 @@ class ProjectWizardCore extends React.Component {
     };
   }
 
-  @autobind
-  handleStep3MarkCompletedClick(name) {
+  @autobind handleStep3MarkCompletedClick(name) {
     return (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -142,8 +143,7 @@ class ProjectWizardCore extends React.Component {
     };
   }
 
-  @autobind
-  handleStep3ConfiguredClick(e) {
+  @autobind handleStep3ConfiguredClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -152,17 +152,25 @@ class ProjectWizardCore extends React.Component {
     });
   }
 
-  @autobind
-  handleCompleteClick(e) {
+  @autobind handleCompleteClick(e) {
     e.preventDefault();
     e.stopPropagation();
     this.props.push('/settings/projects');
   }
 
   renderStep1() {
-    const { intl } = this.props;
+    const { intl, projects } = this.props;
     const projectNameLink = VLink.state(this, 'projectName')
-      .check(x => x, 'Project Name is required');
+      .check(x => Boolean(x), 'Project name is required')
+      .check(
+        name => !R.find(p => p.projectName.toLowerCase(0) === name.toLowerCase(), projects),
+        'Project name already exists, please use another one',
+      )
+      .check(
+        name => !/[\s_:@,]/g.test(name),
+        'Project name cannot contains special characters: _ : @ , or space.',
+      );
+
     const descriptionLink = VLink.state(this, 'description');
     const sharedUsersLink = VLink.state(this, 'sharedUsers');
     const valid = !projectNameLink.error;
@@ -184,7 +192,7 @@ class ProjectWizardCore extends React.Component {
             <label>Description: (Optional)</label>
             <Input valueLink={descriptionLink} />
           </div>
-          <div className="inline field">
+          <div className="inline field" style={{ display: 'none' }}>
             <label>Sharing: (Optional)</label>
             <Input valueLink={sharedUsersLink} />
             <div className="desc">
@@ -194,8 +202,10 @@ class ProjectWizardCore extends React.Component {
           <div className="inline field text-right">
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
-              {...valid ? { onClick: this.handleStep1CreateClick } : {}}
-            >Create Project</div>
+              {...(valid ? { onClick: this.handleStep1CreateClick } : {})}
+            >
+              Create Project
+            </div>
           </div>
         </div>
       </Box>
@@ -217,21 +227,28 @@ class ProjectWizardCore extends React.Component {
             }}
           />
           <DataSourceSelector
-            className="flex-grow" intl={intl}
-            selectedDataSources={selectedDataSources} configuredDataSources={configuredDataSources}
-            onSelectionChange={ds => this.setState({
-              selectedDataSources: ds,
-            })}
+            className="flex-grow"
+            intl={intl}
+            selectedDataSources={selectedDataSources}
+            configuredDataSources={configuredDataSources}
+            onSelectionChange={ds =>
+              this.setState({
+                selectedDataSources: ds,
+              })}
           />
           <div className="inline field text-right">
             <div
               className={`ui grey button ${skipable ? '' : 'disabled'}`}
               onClick={this.handleStep2SkipClick}
-            >Skip</div>
+            >
+              Skip
+            </div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
-              {...valid ? { onClick: this.handleStep2SelectedClick } : {}}
-            >Selected</div>
+              {...(valid ? { onClick: this.handleStep2SelectedClick } : {})}
+            >
+              Selected
+            </div>
           </div>
         </div>
       </Box>
@@ -241,7 +258,8 @@ class ProjectWizardCore extends React.Component {
   renderStep3() {
     const { intl } = this.props;
     const { selectedDataSources, configuredDataSources, currentDataSourceName } = this.state;
-    const valid = configuredDataSources.length > 0 &&
+    const valid =
+      configuredDataSources.length > 0 &&
       selectedDataSources.length === configuredDataSources.length;
 
     // Get the data source component of the current name.
@@ -256,7 +274,9 @@ class ProjectWizardCore extends React.Component {
         currentDataSourceConfigManually = dataSource[4];
       }
       currentDataSourceConfigured = !!R.find(
-        d => d === currentDataSourceName, configuredDataSources);
+        d => d === currentDataSourceName,
+        configuredDataSources,
+      );
     }
 
     return (
@@ -271,54 +291,59 @@ class ProjectWizardCore extends React.Component {
           <div className="flex-row flex-grow">
             <div className="overflow-y-auto">
               <div className="ui vertical secondary pointing menu">
-                {
-                  R.map((d) => {
-                    const selected = currentDataSourceName === d;
-                    const configured = !!R.find(c => c === d, configuredDataSources);
-                    return (
-                      <div
-                        key={d}
-                        className={`${selected ? 'active ' : ''}item`}
-                        onClick={this.handleStep3DataSourceClick(d)}
-                      >
-                        <span>{d}</span>
-                        {configured && <i className="checkmark icon" />}
-                      </div>
-                    );
-                  }, selectedDataSources)
-                }
+                {R.map((d) => {
+                  const selected = currentDataSourceName === d;
+                  const configured = !!R.find(c => c === d, configuredDataSources);
+                  return (
+                    <div
+                      key={d}
+                      className={`${selected ? 'active ' : ''}item`}
+                      onClick={this.handleStep3DataSourceClick(d)}
+                    >
+                      <span>{d}</span>
+                      {configured && <i className="checkmark icon" />}
+                    </div>
+                  );
+                }, selectedDataSources)}
               </div>
             </div>
             <div className="flex-col flex-grow" style={{ marginLeft: '1em' }}>
-              {currentDataSourceName && !currentDataSourceConfigured && (
+              {currentDataSourceName &&
+                !currentDataSourceConfigured &&
                 <div className="text-right" style={{ marginBottom: '0.5em' }}>
                   <div
                     className="ui small grey button"
                     onClick={this.handleStep3RemoveClick(currentDataSourceName)}
-                  >Remove this Data Source</div>
-                </div>
-              )}
-              {currentDataSourceComponent && (
+                  >
+                    Remove this Data Source
+                  </div>
+                </div>}
+              {currentDataSourceComponent &&
                 <div className="overflow-y-auto flex-grow">
                   {React.createElement(currentDataSourceComponent, { intl })}
-                  {!currentDataSourceConfigured && currentDataSourceConfigManually && (
+                  {!currentDataSourceConfigured &&
+                    currentDataSourceConfigManually &&
                     <div className="inline fiel text-right">
                       <div
                         className="ui small blue button"
                         onClick={this.handleStep3MarkCompletedClick(currentDataSourceName)}
-                      >Mark Completed</div>
-                    </div>
-                  )}
-                </div>
-              )}
+                      >
+                        Mark Completed
+                      </div>
+                    </div>}
+                </div>}
             </div>
           </div>
           <div className="inline field text-right">
-            <div className="ui grey button" onClick={this.handleStep3AddMoreClick}>Add More Data Source</div>
+            <div className="ui grey button" onClick={this.handleStep3AddMoreClick}>
+              Add More Data Source
+            </div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
-              {...valid ? { onClick: this.handleStep3ConfiguredClick } : {}}
-            >Configured</div>
+              {...(valid ? { onClick: this.handleStep3ConfiguredClick } : {})}
+            >
+              Configured
+            </div>
           </div>
         </div>
       </Box>
@@ -353,7 +378,7 @@ class ProjectWizardCore extends React.Component {
       if (currentStep === step) {
         return 'active';
       }
-      return (currentStep > step) ? 'completed' : '';
+      return currentStep > step ? 'completed' : '';
     };
 
     return (
@@ -384,8 +409,9 @@ class ProjectWizardCore extends React.Component {
                 <div className="title">
                   <span>Data Source</span>
                   {selectedDataSources.length > 0 &&
-                    <span className="ui grey mini circular label">{selectedDataSources.length}</span>
-                  }
+                    <span className="ui grey mini circular label">
+                      {selectedDataSources.length}
+                    </span>}
                 </div>
                 <div className="description">Select data sources for project</div>
               </div>
@@ -395,10 +421,11 @@ class ProjectWizardCore extends React.Component {
                 <div className="title">
                   <span>Configure</span>
                   {configuredDataSources.length > 0 &&
-                    <span className="ui orange mini circular label">{configuredDataSources.length}</span>
-                  }
+                    <span className="ui orange mini circular label">
+                      {configuredDataSources.length}
+                    </span>}
                 </div>
-                <div className="description">Settings for each data source</div>
+                <div className="description">Settings for the data source</div>
               </div>
             </div>
             <div className={`${stepState(4, currentStep)} step`}>
@@ -410,7 +437,8 @@ class ProjectWizardCore extends React.Component {
           </div>
         </Container>
         <Container
-          fullHeight className="overflow-y-auto wizard"
+          fullHeight
+          className="overflow-y-auto wizard"
           style={{ paddingTop: '1px', paddingBottom: '0.5em' }}
         >
           {currentStep === 1 && this.renderStep1()}
@@ -426,9 +454,8 @@ class ProjectWizardCore extends React.Component {
 const ProjectWizard = injectIntl(ProjectWizardCore);
 export default connect(
   (state: State) => {
-    return {};
+    const { projects } = state.app;
+    return { projects };
   },
-  {
-    push, hideAppLoader,
-  },
+  { push, hideAppLoader },
 )(ProjectWizard);
