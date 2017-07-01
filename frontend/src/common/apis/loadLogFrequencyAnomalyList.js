@@ -5,6 +5,7 @@
  * *****************************************************************************
  **/
 
+import R from 'ramda';
 import { get } from 'lodash';
 import moment from 'moment';
 
@@ -19,28 +20,50 @@ const loadLogFrequencyAnomalyList = (
 ) => {
   // Use the time as the incident id.
   const { incidentId } = params;
-  return fetchGet(getEndpoint('logstreamingevent'), {
+  return fetchGet(getEndpoint('logfrequencyanomaly'), {
     ...credentials,
     projectName,
     dayTimeMillis: incidentId,
     isRare: true,
   }).then((d) => {
-    // TODO: This API response not in data format, need to change to d.data.
+    const rawData = d.data;
+    const { incidentStartTime, incidentEndTime } = params;
 
-    const rawData = d;
-    const events = get(rawData, 'eventArray', []);
-
-    const mStartTime = moment(parseInt(incidentId, 10)).startOf('day');
-    const mEndTime = mStartTime.clone().endOf('day');
+    const mStartTime = moment(incidentStartTime);
+    const mEndTime = moment(incidentEndTime);
     const startTime = mStartTime.valueOf();
     const endTime = mEndTime.valueOf();
+
+    let patterns = get(rawData, 'patternList', []);
+
+    patterns = R.map((p) => {
+      // Convert the topK string into array.
+      const keywords = R.filter(
+        k => Boolean(k),
+        R.map(
+          k => k.trim(),
+          p.topK && p.topK.length > 0
+            ? p.topK.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',')
+            : [],
+        ),
+      );
+      //
+      const name = p.patternName === `Pattern ${p.nid}` ? keywords.join('-') : p.patternName;
+      return {
+        nid: p.nid,
+        keywords,
+        name,
+        patternName: p.patternName,
+        eventsCount: p.count,
+      };
+    }, patterns);
 
     return {
       rawData,
       data: {
-        events,
         startTime,
         endTime,
+        patterns,
       },
     };
   });
