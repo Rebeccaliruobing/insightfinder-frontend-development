@@ -24,7 +24,7 @@ const BaseUrls = {
   UsecaseBase: '/usecase',
 
   Log: '/log',
-  LogAnalysis: '/log/live-analysis',
+  LogAnalysis: '/log/analysis',
   // LogAnalysis: '/log/live-analysis/:projectId?/:month?/:incidentId?',
   LogHistoricalLogAnalysis: '/log/historical-log-analysis/:projectId?/:incidentId?',
   LogHistoricalLogAnalysisBase: '/log/historical-log-analysis',

@@ -453,6 +453,7 @@ class MetricAnalysisCore extends React.PureComponent {
               />
             </Container>}
           {!currentErrorMessage &&
+            currentWeeklyAnomalies &&
             <Container
               className={`boxed flex-grow flex-col ${showResourceView ? '' : 'hide'}`}
               style={{ marginTop: 0 }}

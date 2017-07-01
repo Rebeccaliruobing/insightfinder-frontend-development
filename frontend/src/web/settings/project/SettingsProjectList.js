@@ -74,7 +74,7 @@ class SettingsProjectListCore extends React.Component {
     const actionRenderer = ({ cellData }) => {
       return (
         <div>
-          <div className="ui orange button">Details</div>
+          <div className="ui grey button">Details</div>
           <div className="ui red button" onClick={this.handleProjectRemove(cellData)}>Remove</div>
         </div>
       );
@@ -96,7 +96,7 @@ class SettingsProjectListCore extends React.Component {
             </NavLink>
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
-            <div className="ui grey button" tabIndex="0" onClick={this.handleRefreshClick}>
+            <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
               Refresh
             </div>
           </div>
