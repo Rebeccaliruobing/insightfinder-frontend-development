@@ -32,27 +32,30 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
     const endTime = mEndTime.valueOf();
     let patterns = get(rawData, 'patternArray', []);
 
-    patterns = R.map((p) => {
-      // Convert the topK string into array.
-      const keywords = R.filter(
-        k => Boolean(k),
-        R.map(
-          k => k.trim(),
-          p.topK && p.topK.length > 0
-            ? p.topK.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',')
-            : [],
-        ),
-      );
-      //
-      const name = p.patternName === `Pattern ${p.nid}` ? keywords.join('-') : p.patternName;
-      return {
-        nid: p.nid,
-        keywords,
-        name,
-        patternName: p.patternName,
-        eventsCount: p.count,
-      };
-    }, patterns);
+    patterns = R.sort(
+      (a, b) => a.eventsCount > b.eventsCount,
+      R.map((p) => {
+        // Convert the topK string into array.
+        const keywords = R.filter(
+          k => Boolean(k),
+          R.map(
+            k => k.trim(),
+            p.topK && p.topK.length > 0
+              ? p.topK.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',')
+              : [],
+          ),
+        );
+        //
+        const name = p.patternName === `Pattern ${p.nid}` ? keywords.join('-') : p.patternName;
+        return {
+          nid: p.nid,
+          keywords,
+          name,
+          patternName: p.patternName,
+          eventsCount: p.count,
+        };
+      }, patterns),
+    );
 
     return {
       rawData,
