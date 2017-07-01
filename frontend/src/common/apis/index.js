@@ -5,10 +5,11 @@
  * *****************************************************************************
  **/
 
+export { default as deleteProject } from './deleteProject';
 export { default as loadBugRepository } from './loadBugRepository';
 export { default as loadHourlyEvents } from './loadHourlyEvents';
 export { default as login } from './login';
-export { default as loadInitData } from './loadInitData';
+export { default as getProjectList } from './getProjectList';
 export { default as loadLogClusterList } from './loadLogClusterList';
 export { default as loadLogEventList } from './loadLogEventList';
 export { default as loadLogFile } from './loadLogFile';

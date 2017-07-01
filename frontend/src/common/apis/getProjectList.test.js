@@ -6,7 +6,7 @@
 
 import R from 'ramda';
 import chalk from 'chalk';
-import loadInitData from './loadInitData';
+import getProjectList from './getProjectList';
 import { PermissionError } from '../errors';
 
 const {
@@ -19,10 +19,10 @@ const {
   logProjectAdmin,
 } = global;
 
-describe('apis.loadInitData with invalid parameters', () => {
+describe('apis.getProjectList with invalid parameters', () => {
   it('Expect PermissionError if invalid token', async (done) => {
     try {
-      await loadInitData(userBad);
+      await getProjectList(userBad);
       done();
     } catch (e) {
       expect(e).toBeInstanceOf(PermissionError);
@@ -32,12 +32,12 @@ describe('apis.loadInitData with invalid parameters', () => {
   });
 });
 
-describe('apis.loadInitData with guest account', () => {
+describe('apis.getProjectList with guest account', () => {
   let rawData = null;
   let data = null;
 
   beforeAll(async (done) => {
-    const resp = await loadInitData(userGuest);
+    const resp = await getProjectList(userGuest);
     rawData = resp.rawData;
     data = resp.data;
     done();
@@ -99,12 +99,12 @@ describe('apis.loadInitData with guest account', () => {
   });
 });
 
-describe('apis.loadInitData with admin account', () => {
+describe('apis.getProjectList with admin account', () => {
   let rawData = null;
   let data = null;
 
   beforeAll(async (done) => {
-    const resp = await loadInitData(userAdmin);
+    const resp = await getProjectList(userAdmin);
     rawData = resp.rawData;
     data = resp.data;
     done();

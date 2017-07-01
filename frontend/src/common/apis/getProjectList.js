@@ -12,7 +12,7 @@ import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadInitData = (credentials: Credentials) => {
+const getProjectList = (credentials: Credentials) => {
   return fetchGet(getEndpoint('loadProjectsInfo'), {
     ...credentials,
   }).then((d) => {
@@ -33,8 +33,7 @@ const loadInitData = (credentials: Credentials) => {
       const isLogStreaming = dataType.toLowerCase() === 'log';
 
       // Historical log analysis project
-      const isLogFile =
-        dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';
+      const isLogFile = dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';
 
       const isLog = dataType.toLowerCase() === 'log';
       const isMetric = dataType.toLowerCase() === 'metric';
@@ -58,4 +57,4 @@ const loadInitData = (credentials: Credentials) => {
   });
 };
 
-export default loadInitData;
+export default getProjectList;

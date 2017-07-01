@@ -38,6 +38,14 @@ export const saveProjectSettings = (
 });
 
 /**
+ * Remove the project.
+ */
+export const removeProject = (projectName: String): Action => ({
+  type: 'REMOVE_PROJECT',
+  payload: { projectName },
+});
+
+/**
  * Set the current settings APIs parameters, if parameters not changed, will reuse the data
  * instead of calling the API. Each API will has it's own status.
  */

@@ -313,6 +313,7 @@ class MetricAnalysisCore extends React.PureComponent {
     const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
     const showAnomalyView = view === 'anomaly';
     const showResourceView = view === 'resource';
+    const hasProject = projects.length === 0;
 
     return (
       <Container fullHeight withGutter className="flex-col metric-analysis">
@@ -356,24 +357,25 @@ class MetricAnalysisCore extends React.PureComponent {
             </div>
           </div>
         </Container>
-        <div className="section" style={{ fontSize: 12, marginTop: '0.5em' }}>
-          <div>
-            <div
-              className={`ui ${view !== 'anomaly' ? 'grey active' : 'orange'} button`}
-              style={{ borderRadius: 0, margin: 0 }}
-              onClick={this.handleViewChange('anomaly')}
-            >
-              Anomaly View
+        {!hasProject &&
+          <div className="section" style={{ fontSize: 12, marginTop: '0.5em' }}>
+            <div>
+              <div
+                className={`ui ${view !== 'anomaly' ? 'grey active' : 'orange'} button`}
+                style={{ borderRadius: 0, margin: 0 }}
+                onClick={this.handleViewChange('anomaly')}
+              >
+                Anomaly View
+              </div>
+              <div
+                className={`ui ${view !== 'resource' ? 'grey active' : 'orange'} button`}
+                style={{ borderRadius: 0, margin: 0 }}
+                onClick={this.handleViewChange('resource')}
+              >
+                Resource View
+              </div>
             </div>
-            <div
-              className={`ui ${view !== 'resource' ? 'grey active' : 'orange'} button`}
-              style={{ borderRadius: 0, margin: 0 }}
-              onClick={this.handleViewChange('resource')}
-            >
-              Resource View
-            </div>
-          </div>
-        </div>
+          </div>}
         <Container fullHeight className="overflow-y-auto flex-col">
           {currentErrorMessage &&
             <Container fullHeight>

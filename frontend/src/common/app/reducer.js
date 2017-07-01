@@ -87,6 +87,9 @@ const reducer = (state: AppState = initialState, action: Action): AppState => {
       starting: false,
       started: true,
     };
+  } else if (action.type === 'SET_PROJECT_LIST') {
+    const projects = action.payload;
+    return { ...state, projects };
   } else if (action.type === 'SET_INIT_DATA') {
     const { data } = action.payload;
     return {

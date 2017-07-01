@@ -4,7 +4,7 @@ import { defineMessages } from 'react-intl';
 
 const appMessages = defineMessages({
   errorsServer: {
-    defaultMessage: 'Sorry, we\'ve had a server error, Please refresh and try again.',
+    defaultMessage: "Sorry, we've had a server error, Please refresh and try again.",
     id: 'app.errors.server',
   },
   errorsNetwork: {
@@ -28,7 +28,7 @@ const appMessages = defineMessages({
     id: 'app.errors.general',
   },
   errorsProjectNotFound: {
-    defaultMessage: 'The project <b>{projectName}</b> doesn\' exists. Please choose a right project to view.',
+    defaultMessage: "The project <b>{projectName}</b> doesn' exists.",
     id: 'app.errors.projectNotFound',
   },
   errorsNoMetricProject: {

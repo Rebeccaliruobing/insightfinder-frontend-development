@@ -11,12 +11,14 @@ import { injectIntl } from 'react-intl';
 import { push } from 'react-router-redux';
 import { NavLink } from 'react-router-dom';
 import { autobind } from 'core-decorators';
+
 import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { buildLocation } from '../../../common/utils';
 import { appMenusMessages } from '../../../common/app/messages';
 import { settingsMessages } from '../../../common/settings/messages';
-import { hideAppLoader, showAppAlert } from '../../../common/app/actions';
+import { removeProject } from '../../../common/settings/actions';
+import { loadProjectList, hideAppLoader, showAppAlert } from '../../../common/app/actions';
 import { State } from '../../../common/types';
 
 type Props = {
@@ -25,6 +27,8 @@ type Props = {
   push: Function,
   hideAppLoader: Function,
   showAppAlert: Function,
+  removeProject: Function,
+  loadProjectList: Function,
 };
 
 class SettingsProjectListCore extends React.Component {
@@ -49,8 +53,32 @@ class SettingsProjectListCore extends React.Component {
     );
   }
 
+  @autobind handleProjectRemove(projectName) {
+    return (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (window.confirm('Delete this project?')) {
+        this.props.removeProject(projectName);
+      }
+    };
+  }
+
+  @autobind handleRefreshClick() {
+    this.props.loadProjectList();
+  }
+
   render() {
     const { intl, projects } = this.props;
+
+    const actionRenderer = ({ cellData }) => {
+      return (
+        <div>
+          <div className="ui orange button">Details</div>
+          <div className="ui red button" onClick={this.handleProjectRemove(cellData)}>Remove</div>
+        </div>
+      );
+    };
 
     return (
       <Container fullHeight withGutter className="flex-col">
@@ -64,8 +92,13 @@ class SettingsProjectListCore extends React.Component {
           </div>
           <div className="section" style={{ fontSize: 12, marginLeft: 40 }}>
             <NavLink to={BaseUrls.SettingsProjectWizard}>
-              <div className="ui orange button">Add New Project...</div>
+              <div className="ui positive button">Add New Project...</div>
             </NavLink>
+          </div>
+          <div className="section float-right" style={{ fontSize: 12 }}>
+            <div className="ui grey button" tabIndex="0" onClick={this.handleRefreshClick}>
+              Refresh
+            </div>
           </div>
         </Container>
         <Container
@@ -92,6 +125,14 @@ class SettingsProjectListCore extends React.Component {
                 <Column width={120} label="Status" dataKey="status" />
                 <Column width={120} label="Owner" dataKey="owner" />
                 <Column width={240} flexGrow={1} label="Description" dataKey="desc" />
+                <Column
+                  width={160}
+                  label="Action"
+                  headerClassName="text-center"
+                  className="text-center"
+                  cellRenderer={actionRenderer}
+                  dataKey="projectName"
+                />
               </Table>
             )}
           </AutoSizer>
@@ -108,5 +149,5 @@ export default connect(
     const { projects } = state.app;
     return { projects };
   },
-  { push, hideAppLoader, showAppAlert },
+  { push, hideAppLoader, showAppAlert, removeProject, loadProjectList },
 )(SettingsProjectList);

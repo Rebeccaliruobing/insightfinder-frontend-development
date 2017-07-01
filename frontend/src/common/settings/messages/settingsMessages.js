@@ -35,6 +35,10 @@ const settingsMessages = defineMessages({
     defaultMessage: 'The project model is picked',
     id: 'settings.info.projectModelPicked',
   },
+  infoProjectlRemoved: {
+    defaultMessage: 'The project is removed',
+    id: 'settings.info.projectlRemoved',
+  },
   infoProjectModelRemoved: {
     defaultMessage: 'The project model is removed',
     id: 'settings.info.projectModelRemoved',

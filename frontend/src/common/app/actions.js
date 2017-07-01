@@ -66,6 +66,21 @@ export const hideAppAlert = (ids: Array<string>): Action => ({
 });
 
 /**
+ * Load project list. It's handled by epic.
+ */
+export const loadProjectList = (): Action => ({
+  type: 'LOAD_PROJECT_LIST',
+});
+
+/**
+ * Update project list, it's handled by reducer.
+ */
+export const setProjectList = (projects: Array<Object>): Action => ({
+  type: 'SET_PROJECT_LIST',
+  payload: projects,
+});
+
+/**
  * Set the components loading status. The components contains the name and true/false value.
  * This action is handled by reducer.
  */
