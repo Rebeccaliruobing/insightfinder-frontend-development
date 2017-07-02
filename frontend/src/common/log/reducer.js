@@ -51,6 +51,21 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
       return { ...state, viewsState };
     }
     return state;
+  } else if (action.type === 'SELECT_LOG_PATTERN_SEQUENCE') {
+    let { viewsState } = state;
+    const { view, sequenceId, patterns } = action.payload;
+    if (Boolean(view) && Boolean(patterns) && Boolean(sequenceId)) {
+      viewsState = {
+        ...viewsState,
+        [view]: {
+          currentSequenceId: sequenceId,
+          currentSequencePatters: patterns,
+          currentEventList: [],
+        },
+      };
+      return { ...state, viewsState };
+    }
+    return state;
   } else if (action.type === 'SET_LOG_STREAMING1') {
     const { projectId, projectInfo, incidentId, incidentInfo } = action.payload;
     let { streamingInfos, streamingIncidentInfos } = state;

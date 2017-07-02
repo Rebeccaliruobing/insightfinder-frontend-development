@@ -10,6 +10,7 @@ export { default as loadBugRepository } from './loadBugRepository';
 export { default as loadHourlyEvents } from './loadHourlyEvents';
 export { default as login } from './login';
 export { default as getLogRerunDetection } from './getLogRerunDetection';
+export { default as getLogSequenceEventList } from './getLogSequenceEventList';
 export { default as getProjectList } from './getProjectList';
 export { default as loadLogClusterList } from './loadLogClusterList';
 export { default as loadLogEventList } from './loadLogEventList';

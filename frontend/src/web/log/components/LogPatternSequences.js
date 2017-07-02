@@ -20,9 +20,13 @@ type Props = {
   startTimeMillis: Number,
   endTimeMillis: Number,
   currentPatternId: String,
+  currentSequenceId: String,
   currentEventList: Array<Object>,
+  currentSequenceEventList: Array<Array<Object>>,
   selectLogPattern: Function,
+  selectLogPatternSequence: Function,
   loadLogEventList: Function,
+  loadLogSequenceEventList: Function,
 };
 
 class LogPatternSequences extends React.PureComponent {
@@ -39,20 +43,20 @@ class LogPatternSequences extends React.PureComponent {
   componentDidMount() {
     const sequences = get(this.props.data, this.statePath, []);
     // Find the first patterns in the sequences.
-    const pattern = R.find(s => s.isPattern, sequences);
-    if (pattern) {
-      const patternId = pattern.id;
-      this.reloadPattern(this.props, patternId);
+    const sequence = R.find(s => s.isSequence, sequences);
+    if (sequence) {
+      const { patterns, id } = sequence;
+      this.reloadPatternSequence(this.props, id, patterns);
     }
   }
 
-  componentWillReceiveProps(newProps) {
-    const sequences = get(newProps.data, this.statePath);
+  componentWillReceiveProps(nextProps) {
+    const sequences = get(nextProps.data, this.statePath);
     if (!R.identical(sequences, get(this.props.data, this.statePath))) {
-      const pattern = R.find(s => s.isPattern, sequences);
-      if (pattern) {
-        const patternId = pattern.id;
-        this.reloadPattern(this.props, patternId);
+      const sequence = R.find(s => s.isSequence, sequences);
+      if (sequence) {
+        const { patterns, id } = sequence;
+        this.reloadPatternSequence(nextProps, id, patterns);
       }
     }
   }
@@ -60,6 +64,8 @@ class LogPatternSequences extends React.PureComponent {
   @autobind handlePatternClick({ rowData: sequence }) {
     if (sequence.isPattern) {
       this.reloadPattern(this.props, sequence.id);
+    } else if (sequence.isSequence) {
+      this.reloadPatternSequence(this.props, sequence.id, sequence.patterns);
     }
   }
 
@@ -84,11 +90,33 @@ class LogPatternSequences extends React.PureComponent {
     );
   }
 
+  @autobind reloadPatternSequence(props, sequenceId, patterns) {
+    const {
+      projectName,
+      startTimeMillis,
+      endTimeMillis,
+      selectLogPatternSequence,
+      loadLogSequenceEventList,
+    } = props;
+    selectLogPatternSequence(this.viewName, sequenceId, patterns);
+    loadLogSequenceEventList(
+      projectName,
+      this.viewName,
+      { startTimeMillis, endTimeMillis, patterns },
+      { [this.loadingComponentPath]: true },
+    );
+  }
+
   render() {
     const sequences = get(this.props.data, this.statePath, []);
     const eventList = this.props.currentEventList || [];
-    const { currentPatternId } = this.props;
-    const sequenceInfo = R.find(s => s.id === currentPatternId, sequences) || {};
+    const sequenceEventList = this.props.currentSequenceEventList || [];
+    const { currentPatternId, currentSequenceId } = this.props;
+    const sequenceInfo = R.find(
+      s => s.id === currentPatternId || s.id === currentSequenceId,
+      sequences,
+    ) || {};
+    const isSequence = sequenceInfo.isSequence;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
     const nameRender = ({ rowData }) => {
@@ -124,21 +152,39 @@ class LogPatternSequences extends React.PureComponent {
             )}
           </AutoSizer>
         </Container>
-        <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
-          <AutoSizer>
-            {({ height }) => (
-              <EventGroup
-                style={{ height, width: 900 }}
-                name={sequenceInfo.name || ''}
-                className="flex-item flex-col-container"
-                keywords={get(sequenceInfo, 'keywords', [])}
-                episodes={get(sequenceInfo, 'episodes', [])}
-                eventDataset={eventList}
-                showFE
-              />
-            )}
-          </AutoSizer>
-        </Container>
+        {isSequence &&
+          <Container className={`flex-col flex-grow ${isLoading ? 'loading' : ''}`}>
+            <h4>{sequenceInfo.name || ''}</h4>
+            <div className="flex-grow overflow-y-auto">
+              {R.addIndex(R.map)((seqEvents, idx) => {
+                return (
+                  <EventGroup
+                    name=""
+                    key={idx}
+                    className="flex-item flex-col-container"
+                    eventDataset={seqEvents}
+                    showFE={false}
+                  />
+                );
+              }, sequenceEventList)}
+            </div>
+          </Container>}
+        {!isSequence &&
+          <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
+            <AutoSizer>
+              {({ height }) => (
+                <EventGroup
+                  style={{ height, width: 900 }}
+                  name={sequenceInfo.name || ''}
+                  className="flex-item flex-col-container"
+                  keywords={get(sequenceInfo, 'keywords', [])}
+                  episodes={get(sequenceInfo, 'episodes', [])}
+                  eventDataset={eventList}
+                  showFE
+                />
+              )}
+            </AutoSizer>
+          </Container>}
       </Container>
     );
   }
