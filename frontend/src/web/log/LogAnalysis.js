@@ -25,6 +25,7 @@ import {
   loadLogIncident,
   loadLogEventList,
   selectLogPattern,
+  rerunLogDetection,
 } from '../../common/log/actions';
 import {
   LogClusters,
@@ -49,6 +50,7 @@ type Props = {
   currentError: ?Object,
   viewsState: Object,
 
+  rerunLogDetection: Function,
   loadLogIncidentList: Function,
   loadLogIncident: Function,
   selectLogPattern: Function,
@@ -228,6 +230,19 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
+  @autobind handleRedectionClick(incidentId) {
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const { location, rerunLogDetection } = this.props;
+      const params = parseQueryString(location.search);
+      const { projectName } = params;
+
+      rerunLogDetection(projectName, incidentId);
+    };
+  }
+
   @autobind handleRefreshClick() {
     this.reloadData(this.props, true);
   }
@@ -353,6 +368,13 @@ class LogAnalysisCore extends React.PureComponent {
                       <OverlayTrigger
                         placement="top"
                         delayShow={300}
+                        overlay={<Tooltip>Rerun Detection</Tooltip>}
+                      >
+                        <i onClick={this.handleRedectionClick(ic.id)} className="repeat icon" />
+                      </OverlayTrigger>
+                      <OverlayTrigger
+                        placement="top"
+                        delayShow={300}
                         overlay={<Tooltip>Open in New Window</Tooltip>}
                       >
                         <i
@@ -459,5 +481,12 @@ export default connect(
       currentLoadingComponents,
     };
   },
-  { push, loadLogIncidentList, loadLogIncident, selectLogPattern, loadLogEventList },
+  {
+    push,
+    loadLogIncidentList,
+    loadLogIncident,
+    selectLogPattern,
+    loadLogEventList,
+    rerunLogDetection,
+  },
 )(LogAnalysis);

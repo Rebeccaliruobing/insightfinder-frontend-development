@@ -20,7 +20,10 @@
         position: absolute;
         right: 1em;
         bottom: 0.5em;
-        font-size: 14px;
+        font-size: 16px;
+        .icon {
+          margin-left: 0.5em;
+        }
         &:hover {
           color: #4183C4;
         }

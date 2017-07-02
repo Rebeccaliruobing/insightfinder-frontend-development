@@ -47,9 +47,17 @@ export const loadLogEventList = (
   view: String,
   params: Object,
   components: Object,
-) => ({
+): Action => ({
   type: 'LOAD_LOG_EVENTLIST',
   payload: { projectName, view, params, components },
+});
+
+/**
+ * Rerun the log detection.
+ */
+export const rerunLogDetection = (projectName: String, incidentId: String): Action => ({
+  type: 'RERUN_LOG_DETECTION',
+  payload: { projectName, incidentId },
 });
 
 /**

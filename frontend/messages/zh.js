@@ -153,6 +153,14 @@ export default [
     "defaultMessage": "用户名?",
   },
   {
+    "id": "log.error.errorNoIncident",
+    "defaultMessage": "The incident cannot find, please refresh and try again.",
+  },
+  {
+    "id": "log.error.infoRerunTriggerred",
+    "defaultMessage": "Rerun detection for this log incident has been triggerred.",
+  },
+  {
     "id": "settings.alert.noProject",
     "defaultMessage": "There is no project, please create new one.",
   },
@@ -163,6 +171,10 @@ export default [
   {
     "id": "settings.error.emptySelection",
     "defaultMessage": "This setting cannot be empty, please select from options.",
+  },
+  {
+    "id": "settings.error.errorNoIncident",
+    "defaultMessage": "The incident cannot find, please refresh and try again.",
   },
   {
     "id": "settings.error.noProjectModel",
