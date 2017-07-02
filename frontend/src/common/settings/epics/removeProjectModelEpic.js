@@ -60,11 +60,7 @@ const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
         return apiEpicErrorHandle(err);
       });
 
-    return Observable.concat(
-      Observable.of(showAppLoader),
-      apiAction$,
-      Observable.of(hideAppLoader()),
-    );
+    return Observable.concat(apiAction$);
   });
 
 export default removeProjectModelEpic;

@@ -14,8 +14,7 @@ You can filter the data sources by the OS, platform or application and select th
 `;
 
 const step3Introduction = `
-Following the precedure to config settings or install agent for all the selected data sources. 
-Mark it "Completed" if you finished the needed precedures.
+Following the precedure to config settings or install agent for the selected data sources.
 `;
 
 const step4Introduction = `
@@ -24,11 +23,20 @@ you can check the status of the data source in the <a href="/settings/projects">
 `;
 
 const PublicCloudIntro = `
-<b>[TODO:] Revise ME!</b> Uses public Cloud APIs to monitor and report system metrics for your Google instances.
+Uses public Cloud APIs to monitor and report system metrics for your instances.
+`;
+
+const PublicDataDogIntro = `
+Uses DataDog APIs to monitor and report system metrics for your instances.
+`;
+
+const PublicNewRelicIntro = `
+Uses New Relic APIs to monitor and report system metrics for your instances.
 `;
 
 const InsightAgentIntro = `
-<b>[TODO:] Revise ME!</b> Uses InsightAgent to monitor and report system metrics for your Google instances.
+Uses <b>InsightAgent</b> to monitor and report system metrics for your instances. For details, please visit 
+<a href="https://github.com/insightfinder/InsightAgent" target="_blank">https://github.com/insightfinder/InsightAgent</a>.
 `;
 
 const AWSCloudWatchIntro = `
@@ -173,6 +181,14 @@ const projectWizardMessages = defineMessages({
   GoogleCloudMonitoringIntro: {
     defaultMessage: GoogleCloudMonitoringIntro,
     id: 'settings.projectWizard.GoogleCloudMonitoringIntro',
+  },
+  PublicDataDogIntro: {
+    defaultMessage: PublicDataDogIntro,
+    id: 'settings.projectWizard.PublicDataDogIntro',
+  },
+  PublicNewRelicIntro: {
+    defaultMessage: PublicNewRelicIntro,
+    id: 'settings.projectWizard.PublicNewRelicIntro',
   },
   cAdvisorIntro: {
     defaultMessage: cAdvisorIntro,

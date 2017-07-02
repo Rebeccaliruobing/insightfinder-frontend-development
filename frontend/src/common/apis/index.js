@@ -27,6 +27,7 @@ export { default as loadProjectGroupList } from './loadProjectGroupList';
 export { default as loadProjectModel } from './loadProjectModel';
 export { default as loadProjectSettings } from './loadProjectSettings';
 export { default as loadWeeklyAnomalies } from './loadWeeklyAnomalies';
+export { default as newAWSCloudWatchProject } from './newAWSCloudWatchProject';
 export { default as pickProjectModel } from './pickProjectModel';
 export { default as removeProjectModel } from './removeProjectModel';
 export { default as saveProjectSettings } from './saveProjectSettings';

@@ -112,6 +112,9 @@ export type SettingsState = {
 
   // The current error message, set to null if no errors.
   currentErrorMessage: ?Message,
+
+  // The project creation status
+  projectCreationStatus: String,
 };
 
 export type UseCaseState = {

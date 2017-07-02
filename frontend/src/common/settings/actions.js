@@ -38,6 +38,27 @@ export const saveProjectSettings = (
 });
 
 /**
+ * Create project, the project parameters are different with each type.
+ * This action is handled by epic and reducer.
+ */
+export const createProject = (
+  projectName: String,
+  projectType: String,
+  params: Object,
+): Action => ({
+  type: 'CREATE_PROJECT',
+  payload: { projectName, projectType, params },
+});
+
+/**
+ * Set the project creation status.
+ */
+export const setProjectCreationStatus = (status: String): Action => ({
+  type: 'SET_PROJECT_CREATION_STATUS',
+  payload: status,
+});
+
+/**
  * Remove the project.
  */
 export const removeProject = (projectName: String): Action => ({

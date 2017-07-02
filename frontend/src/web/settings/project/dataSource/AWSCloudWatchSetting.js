@@ -1,3 +1,10 @@
+/* @flow */
+/**
+ * *****************************************************************************
+ * Copyright InsightFinder Inc., 2017
+ * *****************************************************************************
+ **/
+
 import React from 'react';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
@@ -6,6 +13,10 @@ import { projectWizardMessages } from '../../../../common/settings/messages';
 
 type Props = {
   intl: Object,
+  projectName: String,
+  projectCreationStatus: String,
+  createProject: Function,
+  onSuccess: Function,
 };
 
 type States = {
@@ -24,32 +35,55 @@ class AWSCloudWatchSetting extends React.PureComponent {
     secretAccessKey: '',
   };
 
-  @autobind
-  handleRegisterClick(e) {
+  @autobind handleRegisterClick(e) {
     e.preventDefault();
     e.stopPropagation();
 
-    const { instanceTypes, region } = this.state;
-    console.log([instanceTypes, region]);
+    const { projectName } = this.props;
+    const { instanceTypes, region, iamAccessKey, secretAccessKey } = this.state;
+    this.props.createProject(projectName, 'AWSCloudWatch', {
+      instanceTypes,
+      region,
+      iamAccessKey,
+      secretAccessKey,
+    });
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { projectCreationStatus, onSuccess } = nextProps;
+    if (projectCreationStatus === 'success') {
+      onSuccess();
+    }
   }
 
   render() {
-    const { intl } = this.props;
-    const regionLink = VLink.state(this, 'region')
-      .check(x => x, 'The region is required');
-    const instanceTypesLink = VLink.state(this, 'instanceTypes')
-      .check(x => x.length > 0, 'Select at least one instance type');
-    const iamAccessKeyLink = VLink.state(this, 'iamAccessKey')
-      .check(x => x, 'IAM Access Key is required');
-    const secretAccessKeyLink = VLink.state(this, 'secretAccessKey')
-      .check(x => x, 'Secret Access Key is required');
-    const valid = !regionLink.error && !instanceTypesLink.error &&
-      !iamAccessKeyLink.error && !secretAccessKeyLink.error;
+    const { intl, projectCreationStatus } = this.props;
+    const regionLink = VLink.state(this, 'region').check(x => x, 'The region is required');
+    const instanceTypesLink = VLink.state(this, 'instanceTypes').check(
+      x => x.length > 0,
+      'Select at least one instance type',
+    );
+    const iamAccessKeyLink = VLink.state(this, 'iamAccessKey').check(
+      x => x,
+      'IAM Access Key is required',
+    );
+    const secretAccessKeyLink = VLink.state(this, 'secretAccessKey').check(
+      x => x,
+      'Secret Access Key is required',
+    );
+    const hasError =
+      regionLink.error ||
+      instanceTypesLink.error ||
+      iamAccessKeyLink.error ||
+      secretAccessKeyLink.error;
+
+    const isSubmitting = projectCreationStatus === 'creating';
 
     return (
       <div style={{ fontSize: 14 }}>
         <div
-          className="text" style={{ paddingBottom: '1em' }}
+          className="text"
+          style={{ paddingBottom: '1em' }}
           dangerouslySetInnerHTML={{
             __html: intl.formatMessage(projectWizardMessages.AWSCloudWatchIntro),
           }}
@@ -57,7 +91,8 @@ class AWSCloudWatchSetting extends React.PureComponent {
         <div className="field">
           <label>Instance Type</label>
           <Select
-            multi valueLink={instanceTypesLink}
+            multi
+            valueLink={instanceTypesLink}
             options={[
               { label: 'EC2', value: 'EC2' },
               { label: 'RDS', value: 'RDS' },
@@ -92,9 +127,11 @@ class AWSCloudWatchSetting extends React.PureComponent {
         </div>
         <div className="inline field text-right">
           <div
-            className={`ui blue button ${valid ? '' : 'disabled'}`}
-            {...valid ? { onClick: this.handleRegisterClick } : {}}
-          >Register</div>
+            className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
+            {...(isSubmitting || hasError ? {} : { onClick: this.handleRegisterClick })}
+          >
+            Register
+          </div>
         </div>
       </div>
     );

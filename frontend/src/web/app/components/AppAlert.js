@@ -20,7 +20,7 @@ class AppAlertCore extends React.Component {
   props: Props;
 
   static defaultProps = {
-    timeout: 5000,
+    timeout: 500,
   };
 
   componentDidMount() {
@@ -37,8 +37,7 @@ class AppAlertCore extends React.Component {
     }
   }
 
-  @autobind
-  cleanOutdatedAlerts() {
+  @autobind cleanOutdatedAlerts() {
     const { alertMessages, hideAppAlert, setTimeout, timeout } = this.props;
     const expired = Date.now().valueOf() - timeout;
     // Get the outdated alerts based on the id.
@@ -46,7 +45,7 @@ class AppAlertCore extends React.Component {
     if (ids.length > 0) {
       hideAppAlert(ids);
     } else {
-      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
+      setTimeout(this.cleanOutdatedAlerts, Math.min(500, timeout));
     }
   }
 
@@ -60,13 +59,16 @@ class AppAlertCore extends React.Component {
             const { params } = alert;
             const message = intl.formatMessage(alert.message, params);
 
-            return (<div
-              className={`fui ${alert.type} message`}
-              key={alert.id}
-            >
-              <Icon name="close" onClick={() => { hideAppAlert([alert.id]); }} />
-              <span className="title" dangerouslySetInnerHTML={{ __html: message }} />
-            </div>
+            return (
+              <div className={`fui ${alert.type} message`} key={alert.id}>
+                <Icon
+                  name="close"
+                  onClick={() => {
+                    hideAppAlert([alert.id]);
+                  }}
+                />
+                <span className="title" dangerouslySetInnerHTML={{ __html: message }} />
+              </div>
             );
           })}
         </div>
@@ -81,7 +83,8 @@ const AppAlert = injectIntl(ReactTimeout(AppAlertCore));
 export default connect(
   (state: State) => ({
     alertMessages: state.app.alerts,
-  }), {
+  }),
+  {
     hideAppAlert,
   },
 )(AppAlert);

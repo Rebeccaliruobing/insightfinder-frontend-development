@@ -15,6 +15,7 @@ const initialState: LogState = {
   projectGroups: [],
   currentApisParams: {},
   currentErrorMessage: null,
+  projectCreationStatus: '',
 };
 
 const reducer = (state: LogState = initialState, action: Action): LogState => {
@@ -22,6 +23,16 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
     return {
       ...state,
       ...action.payload,
+    };
+  } else if (action.type === 'CREATE_PROJECT') {
+    return {
+      ...state,
+      projectCreationStatus: 'creating',
+    };
+  } else if (action.type === 'SET_PROJECT_CREATION_STATUS') {
+    return {
+      ...state,
+      projectCreationStatus: action.payload,
     };
   } else if (action.type === 'UPDATE_PROJECT_MODEL_STATUS') {
     // This action doesn't work.

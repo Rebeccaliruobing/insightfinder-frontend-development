@@ -35,6 +35,14 @@
   flex-direction: row;
   align-items: center;
   border-bottom: 1px solid transparent;
+  &:hover {
+    .hover-show {
+      display: block;
+    }
+  }
+  .hover-show {
+    display: none;
+  }
   &.active:before {
     content: '';
     position: absolute;

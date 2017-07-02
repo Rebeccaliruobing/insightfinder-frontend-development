@@ -135,7 +135,7 @@ class DataSourceSelector extends React.PureComponent {
               const configured = !!R.find(d => d === name, configuredDataSources);
 
               return (
-                <Tile size={6} key={name}>
+                <Tile size={12} key={name}>
                   <Box
                     className="hoverable"
                     style={{

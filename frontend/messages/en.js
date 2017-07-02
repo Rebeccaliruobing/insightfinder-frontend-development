@@ -214,11 +214,19 @@ export default [
   },
   {
     "id": "settings.projectWizard.InsightAgentIntro",
-    "defaultMessage": "<b>[TODO:] Revise ME!</b> Uses InsightAgent to monitor and report system metrics for your Google instances.",
+    "defaultMessage": "Uses <b>InsightAgent</b> to monitor and report system metrics for your instances. For details, please visit \n<a href=\"https://github.com/insightfinder/InsightAgent\" target=\"_blank\">https://github.com/insightfinder/InsightAgent</a>.",
   },
   {
     "id": "settings.projectWizard.PublicCloudIntro",
-    "defaultMessage": "<b>[TODO:] Revise ME!</b> Uses public Cloud APIs to monitor and report system metrics for your Google instances.",
+    "defaultMessage": "Uses public Cloud APIs to monitor and report system metrics for your instances.",
+  },
+  {
+    "id": "settings.projectWizard.PublicDataDogIntro",
+    "defaultMessage": "Uses DataDog APIs to monitor and report system metrics for your instances.",
+  },
+  {
+    "id": "settings.projectWizard.PublicNewRelicIntro",
+    "defaultMessage": "Uses New Relic APIs to monitor and report system metrics for your instances.",
   },
   {
     "id": "settings.projectWizard.step1Introduction",
@@ -230,7 +238,7 @@ export default [
   },
   {
     "id": "settings.projectWizard.step3Introduction",
-    "defaultMessage": "Following the precedure to config settings or install agent for all the selected data sources. \nMark it \"Completed\" if you finished the needed precedures.",
+    "defaultMessage": "Following the precedure to config settings or install agent for the selected data sources.",
   },
   {
     "id": "settings.projectWizard.step4Introduction",

@@ -73,8 +73,8 @@ class SettingsProjectListCore extends React.Component {
 
     const removeRenderer = ({ cellData }) => {
       return (
-        <div>
-          <div className="ui grey button" onClick={this.handleProjectRemove(cellData)}>Remove</div>
+        <div className="hover-show ui grey button" onClick={this.handleProjectRemove(cellData)}>
+          Remove
         </div>
       );
     };
@@ -83,7 +83,9 @@ class SettingsProjectListCore extends React.Component {
       return (
         <div>
           <span>{cellData}</span>
-          <div style={{ marginLeft: '2em' }} className="ui orange button">Settings</div>
+          <div style={{ marginLeft: '2em' }} className="ui orange button">
+            Settings
+          </div>
         </div>
       );
     };

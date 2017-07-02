@@ -221,6 +221,14 @@ export default [
     "defaultMessage": "<b>[TODO:] Revise ME!</b> Uses public Cloud APIs to monitor and report system metrics for your Google instances.",
   },
   {
+    "id": "settings.projectWizard.PublicDataDogIntro",
+    "defaultMessage": "Uses DataDog APIs to monitor and report system metrics for your instances.",
+  },
+  {
+    "id": "settings.projectWizard.PublicNewRelicIntro",
+    "defaultMessage": "Uses New Relic APIs to monitor and report system metrics for your instances.",
+  },
+  {
     "id": "settings.projectWizard.step1Introduction",
     "defaultMessage": "A project is the scope of the data analyse, all data in the same project will be analyzed together. If data has no relations\nwith each others, we might add different data sources into different projects to improve the performance. <br/>\nIf you are collaborating with other users, you may invite them to view data associated with your Projects. <b>TODO: Revise</b>",
   },

@@ -19,6 +19,7 @@ import { BaseUrls } from '../../app/Constants';
 import { appMenusMessages } from '../../../common/app/messages';
 import { projectWizardMessages } from '../../../common/settings/messages';
 import { hideAppLoader } from '../../../common/app/actions';
+import { createProject } from '../../../common/settings/actions';
 import { DataSourceSelector, dataSourcesMetadata } from './dataSource';
 import { State } from '../../../common/types';
 
@@ -26,7 +27,9 @@ type Props = {
   intl: Object,
   push: Function,
   projects: Array<Object>,
+  projectCreationStatus: String,
   hideAppLoader: Function,
+  createProject: Function,
 };
 
 type States = {
@@ -155,7 +158,7 @@ class ProjectWizardCore extends React.Component {
   @autobind handleCompleteClick(e) {
     e.preventDefault();
     e.stopPropagation();
-    this.props.push('/settings/projects');
+    this.props.push(BaseUrls.SettingsProjectList);
   }
 
   renderStep1() {
@@ -249,7 +252,7 @@ class ProjectWizardCore extends React.Component {
               className={`ui orange button ${valid ? '' : 'disabled'}`}
               {...(valid ? { onClick: this.handleStep2SelectedClick } : {})}
             >
-              Selected
+              Next
             </div>
           </div>
         </div>
@@ -257,9 +260,20 @@ class ProjectWizardCore extends React.Component {
     );
   }
 
+  @autobind handleCreationSuccess() {
+    this.setState({
+      currentStep: 4,
+    });
+  }
+
   renderStep3() {
-    const { intl } = this.props;
-    const { selectedDataSources, configuredDataSources, currentDataSourceName } = this.state;
+    const { intl, createProject, projectCreationStatus } = this.props;
+    const {
+      projectName,
+      selectedDataSources,
+      configuredDataSources,
+      currentDataSourceName,
+    } = this.state;
     const valid =
       configuredDataSources.length > 0 &&
       selectedDataSources.length === configuredDataSources.length;
@@ -312,7 +326,7 @@ class ProjectWizardCore extends React.Component {
             <div className="flex-col flex-grow" style={{ marginLeft: '1em' }}>
               {currentDataSourceName &&
                 !currentDataSourceConfigured &&
-                <div className="text-right" style={{ marginBottom: '0.5em' }}>
+                <div className="text-right" style={{ marginBottom: '0.5em', display: 'none' }}>
                   <div
                     className="ui small grey button"
                     onClick={this.handleStep3RemoveClick(currentDataSourceName)}
@@ -322,7 +336,13 @@ class ProjectWizardCore extends React.Component {
                 </div>}
               {currentDataSourceComponent &&
                 <div className="overflow-y-auto flex-grow">
-                  {React.createElement(currentDataSourceComponent, { intl })}
+                  {React.createElement(currentDataSourceComponent, {
+                    intl,
+                    projectName,
+                    projectCreationStatus,
+                    createProject,
+                    onSuccess: this.handleCreationSuccess,
+                  })}
                   {!currentDataSourceConfigured &&
                     currentDataSourceConfigManually &&
                     <div className="inline fiel text-right">
@@ -336,12 +356,13 @@ class ProjectWizardCore extends React.Component {
                 </div>}
             </div>
           </div>
-          <div className="inline field text-right">
+          <div className="inline field text-left">
             <div className="ui grey button" onClick={this.handleStep3AddMoreClick}>
-              Select Data Source
+              Change Data Source
             </div>
             <div
               className={`ui orange button ${valid ? '' : 'disabled'}`}
+              style={{ display: 'none' }}
               {...(valid ? { onClick: this.handleStep3ConfiguredClick } : {})}
             >
               Configured
@@ -411,7 +432,7 @@ class ProjectWizardCore extends React.Component {
                 <div className="title">
                   <span>Data Source</span>
                   {selectedDataSources.length > 0 &&
-                    <span className="ui grey mini circular label">
+                    <span className="ui grey mini circular label" style={{ display: 'none' }}>
                       {selectedDataSources.length}
                     </span>}
                 </div>
@@ -423,7 +444,7 @@ class ProjectWizardCore extends React.Component {
                 <div className="title">
                   <span>Configure</span>
                   {configuredDataSources.length > 0 &&
-                    <span className="ui orange mini circular label">
+                    <span className="ui orange mini circular label" style={{ display: 'none' }}>
                       {configuredDataSources.length}
                     </span>}
                 </div>
@@ -457,7 +478,8 @@ const ProjectWizard = injectIntl(ProjectWizardCore);
 export default connect(
   (state: State) => {
     const { projects } = state.app;
-    return { projects };
+    const { projectCreationStatus } = state.settings;
+    return { projects, projectCreationStatus };
   },
-  { push, hideAppLoader },
+  { push, hideAppLoader, createProject },
 )(ProjectWizard);
