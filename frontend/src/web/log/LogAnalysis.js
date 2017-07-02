@@ -275,6 +275,7 @@ class LogAnalysisCore extends React.PureComponent {
 
     const showIncident = Boolean(incidentId);
     const incidentInfo = incidentId ? R.find(i => i.id === incidentId, incidentList) : {};
+    console.log(viewsState);
 
     // Select renderer to generate link to month.
     const monthValueRender = (option) => {
