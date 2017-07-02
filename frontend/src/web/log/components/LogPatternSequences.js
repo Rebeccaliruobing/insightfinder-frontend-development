@@ -126,6 +126,17 @@ class LogPatternSequences extends React.PureComponent {
       return rowData.name;
     };
 
+    const sequenceRowClassName = ({ index }) => {
+      // Ignore header row.
+      if (index >= 0) {
+        const item = sequences[index];
+        if (item.id === currentPatternId || item.id === currentSequenceId) {
+          return 'active';
+        }
+      }
+      return '';
+    };
+
     return (
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ width: 380, marginRight: '1em' }}>
@@ -139,6 +150,7 @@ class LogPatternSequences extends React.PureComponent {
                 rowHeight={40}
                 rowCount={sequences.length}
                 rowGetter={({ index }) => sequences[index]}
+                rowClassName={sequenceRowClassName}
                 onRowClick={this.handlePatternClick}
               >
                 <Column

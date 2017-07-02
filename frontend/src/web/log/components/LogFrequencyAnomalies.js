@@ -136,6 +136,17 @@ class LogFrequencyAnomalies extends React.PureComponent {
     const { freqTsData, keywords, barColors } = patternInfo;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
+    const clusterRowClassName = ({ index }) => {
+      // Ignore header row.
+      if (index >= 0) {
+        const item = patterns[index];
+        if (item.nid === currentPatternId) {
+          return 'active';
+        }
+      }
+      return '';
+    };
+
     return (
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ marginRight: '1em' }}>
@@ -149,6 +160,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
                 rowHeight={40}
                 rowCount={patterns.length}
                 rowGetter={({ index }) => patterns[index]}
+                rowClassName={clusterRowClassName}
                 onRowClick={this.handlePatternClick}
               >
                 <Column width={380} label="Cluster" dataKey="name" />

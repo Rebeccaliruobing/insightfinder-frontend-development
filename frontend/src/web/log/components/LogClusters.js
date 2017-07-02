@@ -80,6 +80,17 @@ class LogClusters extends React.PureComponent {
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
+    const clusterRowClassName = ({ index }) => {
+      // Ignore header row.
+      if (index >= 0) {
+        const item = patterns[index];
+        if (item.nid === currentPatternId) {
+          return 'active';
+        }
+      }
+      return '';
+    };
+
     return (
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ width: 380, marginRight: '1em' }}>
@@ -92,6 +103,7 @@ class LogClusters extends React.PureComponent {
                 headerHeight={40}
                 rowHeight={40}
                 rowCount={patterns.length}
+                rowClassName={clusterRowClassName}
                 rowGetter={({ index }) => patterns[index]}
                 onRowClick={this.handlePatternClick}
               >
