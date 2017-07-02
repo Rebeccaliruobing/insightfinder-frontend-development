@@ -1,5 +1,6 @@
 import React from 'react';
 import AWSCloudWatchSetting from './AWSCloudWatchSetting';
+import InsightAgentSetting from './InsightAgentSetting';
 import { projectWizardMessages } from '../../../../common/settings/messages';
 // import cAdvisorSetting from './cAdvisorSetting';
 
@@ -9,7 +10,7 @@ const DataSourceSetting = () => <div>[TODO]:Procedure for setting up the data so
 // The item is tuple with [name, description, matchRules, Component, manualConfig].
 // The matchRules: 'Linux,AWS Cloud,*' os, platform, application, Can use *.
 const dataSourcesMetadata = [
-  ['Insight Agent', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, false],
+  ['Insight Agent', projectWizardMessages.InsightAgentIntro, '*,,', InsightAgentSetting, false],
   ['AWS CloudWatch', projectWizardMessages.AWSCloudWatchIntro, '*,,', AWSCloudWatchSetting, false],
   [
     'Google Cloud Monitoring',

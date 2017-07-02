@@ -11,7 +11,7 @@ import R from 'ramda';
 import type { Deps } from '../../types';
 import { setProjectCreationStatus } from '../actions';
 import { loadProjectList } from '../../app/actions';
-import { newAWSCloudWatchProject } from '../../apis';
+import { newAWSCloudWatchProject, newCustomProject } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
 
 const createProjectEpic = (action$: any, { getState }: Deps) =>
@@ -21,10 +21,12 @@ const createProjectEpic = (action$: any, { getState }: Deps) =>
     const { credentials } = state.auth;
     const { projectName, projectType, params } = action.payload;
 
-    let api = null;
+    let api = Observable.empty();
 
     if (projectType === 'AWSCloudWatch') {
       api = newAWSCloudWatchProject(credentials, projectName, params);
+    } else if (projectType === 'InsightAgent') {
+      api = newCustomProject(credentials, projectName, params);
     }
 
     return Observable.from(api)

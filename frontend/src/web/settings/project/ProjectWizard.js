@@ -19,7 +19,7 @@ import { BaseUrls } from '../../app/Constants';
 import { appMenusMessages } from '../../../common/app/messages';
 import { projectWizardMessages } from '../../../common/settings/messages';
 import { hideAppLoader } from '../../../common/app/actions';
-import { createProject } from '../../../common/settings/actions';
+import { createProject, setProjectCreationStatus } from '../../../common/settings/actions';
 import { DataSourceSelector, dataSourcesMetadata } from './dataSource';
 import { State } from '../../../common/types';
 
@@ -150,6 +150,7 @@ class ProjectWizardCore extends React.Component {
     e.preventDefault();
     e.stopPropagation();
 
+    this.props.projectCreationStatus('');
     this.setState({
       currentStep: 4,
     });
