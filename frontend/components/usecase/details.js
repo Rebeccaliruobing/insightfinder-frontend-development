@@ -6,7 +6,6 @@ import apis from '../../apis';
 import LiveAnalysisCharts from '../cloud/liveanalysis/LiveAnalysisCharts';
 
 const ProjectDetails = class extends React.Component {
-
   static propTypes = {
     updateData: React.PropTypes.func,
   };
@@ -26,12 +25,24 @@ const ProjectDetails = class extends React.Component {
     (this.props.updateData || this.updateData)(this);
   }
 
-  @autobind
-  updateData() {
+  @autobind updateData() {
     const { query } = this.props.location;
-    const { pvalue, cvalue, modelKey, modelName,
-      projectName, groupId, modelType, fromUser, dataChunkName, metaData, modelStartTime, modelEndTime,
-      latestDataTimestamp, caller } = query;
+    const {
+      pvalue,
+      cvalue,
+      modelKey,
+      modelName,
+      projectName,
+      groupId,
+      modelType,
+      fromUser,
+      dataChunkName,
+      metaData,
+      modelStartTime,
+      modelEndTime,
+      latestDataTimestamp,
+      caller,
+    } = query;
     let startTimestamp;
     let endTimestamp;
     if (dataChunkName && dataChunkName.split('_').length > 4) {
@@ -41,15 +52,29 @@ const ProjectDetails = class extends React.Component {
     }
 
     this.setState({ loading: true }, () => {
-      apis.postUseCase(pvalue, cvalue, modelKey, modelName,
-        projectName, groupId, modelType, fromUser,
-        dataChunkName, metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller)
+      apis
+        .postUseCase(
+          pvalue,
+          cvalue,
+          modelKey,
+          modelName,
+          projectName,
+          groupId,
+          modelType,
+          fromUser,
+          dataChunkName,
+          metaData,
+          modelStartTime,
+          modelEndTime,
+          latestDataTimestamp,
+          caller,
+        )
         .then((resp) => {
           resp.loading = false;
           this.setState(resp, () => {
             // fetch syscall results
             if (projectName && startTimestamp && endTimestamp) {
-              const projectName0 = `${projectName  }@${  fromUser}`;
+              const projectName0 = `${projectName}@${fromUser}`;
               apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then((resp2) => {
                 if (resp2.success) {
                   this.setState({
@@ -59,7 +84,7 @@ const ProjectDetails = class extends React.Component {
                     showSysCall: true,
                   });
                 } else {
-                  console.log(`${resp2.message  }, start:${  startTimestamp  },end:${  endTimestamp}`);
+                  console.log(`${resp2.message}, start:${startTimestamp},end:${endTimestamp}`);
                 }
               });
             }
@@ -74,7 +99,7 @@ const ProjectDetails = class extends React.Component {
   render() {
     const { data, loading, debugData, timeRanking, freqRanking } = this.state;
     const { query } = this.props.location;
-    let { projectName, modelName, pvalue, cvalue, modelType, bugId } = query;
+    let { projectName, modelName, pvalue, cvalue, modelType, bugId, latestDataTimestamp } = query;
     if (projectName === '') {
       projectName = modelName;
     }
@@ -83,18 +108,25 @@ const ProjectDetails = class extends React.Component {
       <Console>
         <Console.Topbar logo={require('../../images/logo_white.png')}>
           <div className="topbar-text">
-            {bugId && <div className="title">
-              Please view incident name / bug ID: <b>{bugId}</b><br />
-            </div>}
-            {!bugId && <div className="title">
-              Please view snapshot of email alert.<br />
-            </div>}
+            {bugId &&
+              <div className="title">
+                Please view incident name / bug ID: <b>{bugId}</b><br />
+              </div>}
+            {!bugId &&
+              <div className="title">
+                Please view snapshot of email alert.<br />
+              </div>}
           </div>
         </Console.Topbar>
         <LiveAnalysisCharts
           projectName={projectName}
-          data={data} debugData={debugData}
-          timeRanking={timeRanking} freqRanking={freqRanking} bugId={bugId} loading={loading}
+          data={data}
+          debugData={debugData}
+          latestDataTimestamp={latestDataTimestamp}
+          timeRanking={timeRanking}
+          freqRanking={freqRanking}
+          bugId={bugId}
+          loading={loading}
         />
       </Console>
     );

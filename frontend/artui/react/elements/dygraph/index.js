@@ -16,20 +16,22 @@ import { DygraphDefaultProps, spreadDygraphProps } from './options';
 const DygraphBase = require('dygraphs/dygraph-combined-dev');
 
 class Dygraph extends Component {
-
   static propTypes = {
     underlayCallback: T.func,
     isLogCharts: T.bool,
   };
 
-  static defaultProps = Object.assign({
-    labelsDivStyles: {
-      backgroundColor: 'transparent',
-      float: 'right',
-      textAlign: 'right',
+  static defaultProps = Object.assign(
+    {
+      labelsDivStyles: {
+        backgroundColor: 'transparent',
+        float: 'right',
+        textAlign: 'right',
+      },
+      isZoomedIgnoreProgrammaticZoom: true,
     },
-    isZoomedIgnoreProgrammaticZoom: true,
-  }, DygraphDefaultProps);
+    DygraphDefaultProps,
+  );
 
   constructor(props) {
     super(props);
@@ -41,22 +43,33 @@ class Dygraph extends Component {
     this.highlightBarHeight = 12;
   }
 
-  @autobind
-  drawHighlightRange(canvas, area, g, x_start, x_end) {
+  @autobind drawHighlightRange(canvas, area, g, x_start, x_end) {
     const left = g.toDomXCoord(x_start);
     const right = g.toDomXCoord(x_end);
     canvas.fillStyle = '#88bbee';
     canvas.fillRect(left, area.y, right - left, 12);
   }
 
-  _highlight_period(canvas, area, g, x_start, x_end, val, latestDataTimestamp = undefined, enableTriangleHighlight = false, isMissingValue = false) {
+  _highlight_period(
+    canvas,
+    area,
+    g,
+    x_start,
+    x_end,
+    val,
+    latestDataTimestamp = undefined,
+    enableTriangleHighlight = false,
+    isMissingValue = false,
+  ) {
     // val between 0-green to 1-yellow to 10-red (logarithmic)
     var canvas_left_x = g.toDomXCoord(x_start);
     var canvas_right_x = g.toDomXCoord(x_end);
     var canvas_height = 12;
     let area_y = area.y;
     var canvas_width = Math.max(canvas_right_x - canvas_left_x, 5);
-    var rcolor, gcolor, bcolor = 0;
+    var rcolor,
+      gcolor,
+      bcolor = 0;
     let gcolorMax = 205;
     let sign = 0;
     if (val < 0) {
@@ -74,7 +87,8 @@ class Dygraph extends Component {
       rcolor = 255;
       gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
     }
-    canvas.fillStyle = "rgba(" + rcolor.toString() + "," + gcolor.toString() + "," + bcolor.toString() + ",1.0)";
+    canvas.fillStyle =
+      `rgba(${rcolor.toString()},${gcolor.toString()},${bcolor.toString()},1.0)`;
     if (!enableTriangleHighlight || isMissingValue || sign == 0) {
       canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
     } else if (sign < 0) {
@@ -92,16 +106,19 @@ class Dygraph extends Component {
     }
   }
 
-  @autobind
-  handleUnderlayCallback(canvas, area, g) {
-    const { highlights, enableTriangleHighlight, latestDataTimestamp,
-      highlightStartTime, highlightEndTime, data, isLogCharts,
+  @autobind handleUnderlayCallback(canvas, area, g) {
+    const {
+      highlights,
+      enableTriangleHighlight,
+      latestDataTimestamp,
+      highlightStartTime,
+      highlightEndTime,
+      data,
+      isLogCharts,
     } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
-    // Ignore the latestDataTimestamp, and use the current time?
-    // const latestTime = latestDataTimestamp;
-    const latestTime = moment().valueOf();
+    const latestTime = latestDataTimestamp ? parseInt(latestDataTimestamp, 10) : moment().valueOf();
     if (!isLogCharts && latestTime && data.length > 0) {
       const begin = data[0][0].valueOf();
       const last = data[data.length - 1][0].valueOf();
@@ -109,7 +126,7 @@ class Dygraph extends Component {
         const start = Math.max(latestTime, begin);
         const x = g.toDomXCoord(start);
         const y = area.y;
-        const w = (area.w + area.x) - x;
+        const w = area.w + area.x - x;
         const h = area.h;
         if (w > 0) {
           canvas.fillStyle = this.predicatedRangeFillStyle;
@@ -120,9 +137,18 @@ class Dygraph extends Component {
 
     // If has highlights, draw the highlight bar.
     if (highlights) {
-      highlights.forEach(o => {
-        this._highlight_period(canvas, area, g, o.start, o.end, o.val,
-        this.props.latestDataTimestamp, enableTriangleHighlight, o.isMissingValue);
+      highlights.forEach((o) => {
+        this._highlight_period(
+          canvas,
+          area,
+          g,
+          o.start,
+          o.end,
+          o.val,
+          this.props.latestDataTimestamp,
+          enableTriangleHighlight,
+          o.isMissingValue,
+        );
       });
     }
 
@@ -208,9 +234,7 @@ class Dygraph extends Component {
     const { className, style } = this.props;
     const classes = classNames('ui', className, 'graph');
 
-    return (
-      <div ref={c => this._el = c} className={classes} style={style} />
-    );
+    return <div ref={c => this._el = c} className={classes} style={style} />;
   }
 }
 
