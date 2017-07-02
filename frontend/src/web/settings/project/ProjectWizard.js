@@ -409,9 +409,7 @@ class ProjectWizardCore extends React.Component {
       <Container fullHeight withGutter className="flex-col settings">
         <Container breadcrumb>
           <div className="section">
-            <NavLink to={BaseUrls.Settings}>
-              <span className="label">{intl.formatMessage(appMenusMessages.settings)}</span>
-            </NavLink>
+            <span className="label">{intl.formatMessage(appMenusMessages.settings)}</span>
             <span className="divider">/</span>
             <NavLink to={BaseUrls.SettingsProjectList}>
               <span className="label">Projects</span>
