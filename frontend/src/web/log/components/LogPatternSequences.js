@@ -158,13 +158,21 @@ class LogPatternSequences extends React.PureComponent {
             <div className="flex-grow overflow-y-auto">
               {R.addIndex(R.map)((seqEvents, idx) => {
                 return (
-                  <EventGroup
-                    name=""
-                    key={idx}
-                    className="flex-item flex-col-container"
-                    eventDataset={seqEvents}
-                    showFE={false}
-                  />
+                  <Container key={idx}>
+                    <div
+                      className="ui grey mini label horizontal"
+                      style={{ position: 'absolute', top: '1em' }}
+                    >
+                      {idx + 1}
+                    </div>
+                    <EventGroup
+                      name=""
+                      style={{ marginLeft: 20 }}
+                      className="flex-item flex-col-container"
+                      eventDataset={seqEvents}
+                      showFE={false}
+                    />
+                  </Container>
                 );
               }, sequenceEventList)}
             </div>
