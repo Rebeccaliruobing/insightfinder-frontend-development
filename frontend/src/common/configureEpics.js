@@ -11,7 +11,7 @@ import appEpics from './app/epics';
 import authEpics from './auth/epics';
 import metricEpics from './metric/epics';
 import logEpics from './log/epics';
-import settingsEpics from './settings/epics.js';
+import settingsEpics from './settings/epics';
 import usecaseEpics from './usecase/epics';
 
 const epics = [
