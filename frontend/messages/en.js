@@ -22,11 +22,11 @@ export default [
   },
   {
     "id": "app.errors.noLogProject",
-    "defaultMessage": "There is no log project, please go to <a href=\"/settings/project-list\">Settings</a> to register one.",
+    "defaultMessage": "There is no log project, please go to <a href=\"/settings/project-wizard\">Settings</a> to register one.",
   },
   {
     "id": "app.errors.noMetricProject",
-    "defaultMessage": "There is no metric project, please go to <a href=\"/settings/project-list\">Settings</a> to register one.",
+    "defaultMessage": "There is no metric project, please go to <a href=\"/settings/project-wizard\">Settings</a> to register one.",
   },
   {
     "id": "app.errors.notFound",

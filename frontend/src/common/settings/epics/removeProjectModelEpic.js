@@ -11,7 +11,7 @@ import moment from 'moment';
 import R from 'ramda';
 import { get } from 'lodash';
 
-import { showAppAlert } from '../../app/actions';
+import { showAppAlert, showAppLoader, hideAppLoader } from '../../app/actions';
 import type { Deps } from '../../types';
 import { removeProjectModel } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
@@ -38,7 +38,7 @@ const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
     const { startTimestamp, endTimestamp } = model;
     const modelKeyObj = { startTimestamp, endTimestamp, modelKey };
 
-    return Observable.from(
+    const apiAction$ = Observable.from(
       removeProjectModel(
         credentials,
         projectName,
@@ -59,6 +59,12 @@ const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
       .catch((err) => {
         return apiEpicErrorHandle(err);
       });
+
+    return Observable.concat(
+      Observable.of(showAppLoader),
+      apiAction$,
+      Observable.of(hideAppLoader()),
+    );
   });
 
 export default removeProjectModelEpic;

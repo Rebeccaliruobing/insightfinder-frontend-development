@@ -71,11 +71,19 @@ class SettingsProjectListCore extends React.Component {
   render() {
     const { intl, projects } = this.props;
 
-    const actionRenderer = ({ cellData }) => {
+    const removeRenderer = ({ cellData }) => {
       return (
         <div>
-          <div className="ui grey button">Details</div>
-          <div className="ui red button" onClick={this.handleProjectRemove(cellData)}>Remove</div>
+          <div className="ui grey button" onClick={this.handleProjectRemove(cellData)}>Remove</div>
+        </div>
+      );
+    };
+
+    const projectRenderer = ({ cellData }) => {
+      return (
+        <div>
+          <span>{cellData}</span>
+          <div style={{ marginLeft: '2em' }} className="ui orange button">Settings</div>
         </div>
       );
     };
@@ -118,19 +126,22 @@ class SettingsProjectListCore extends React.Component {
                 rowGetter={({ index }) => projects[index]}
                 onRowClick={this.handleProjectClick}
               >
-                <Column width={240} label="Name" dataKey="projectName" />
-                <Column width={120} label="Project Type" dataKey="projectType" />
-                <Column width={240} label="Cloud Type" dataKey="cloudType" />
-                <Column width={240} label="Data Type" dataKey="dataType" />
-                <Column width={120} label="Status" dataKey="status" />
-                <Column width={120} label="Owner" dataKey="owner" />
-                <Column width={240} flexGrow={1} label="Description" dataKey="desc" />
                 <Column
-                  width={160}
-                  label="Action"
-                  headerClassName="text-center"
-                  className="text-center"
-                  cellRenderer={actionRenderer}
+                  width={480}
+                  label="Name"
+                  flexGrow={1}
+                  dataKey="projectName"
+                  cellRenderer={projectRenderer}
+                />
+                <Column width={160} label="Project Type" dataKey="projectType" />
+                <Column width={160} label="Cloud Type" dataKey="cloudType" />
+                <Column width={160} label="Data Type" dataKey="dataType" />
+                <Column width={160} label="Owner" dataKey="owner" />
+                <Column
+                  width={100}
+                  label=""
+                  className="text-right"
+                  cellRenderer={removeRenderer}
                   dataKey="projectName"
                 />
               </Table>
