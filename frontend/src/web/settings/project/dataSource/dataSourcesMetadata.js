@@ -1,10 +1,11 @@
-import React from 'react';
 import AWSCloudWatchSetting from './AWSCloudWatchSetting';
 import InsightAgentSetting from './InsightAgentSetting';
+import DataDogSetting from './DataDogSetting';
+
 import { projectWizardMessages } from '../../../../common/settings/messages';
 // import cAdvisorSetting from './cAdvisorSetting';
 
-const DataSourceSetting = () => <div>[TODO]:Procedure for setting up the data source.</div>;
+// const DataSourceSetting = () => <div>[TODO]:Procedure for setting up the data source.</div>;
 
 // UI shows the order of the data source based on the array order.
 // The item is tuple with [name, description, matchRules, Component, manualConfig].
@@ -12,6 +13,8 @@ const DataSourceSetting = () => <div>[TODO]:Procedure for setting up the data so
 const dataSourcesMetadata = [
   ['Insight Agent', projectWizardMessages.InsightAgentIntro, '*,,', InsightAgentSetting, false],
   ['AWS CloudWatch', projectWizardMessages.AWSCloudWatchIntro, '*,,', AWSCloudWatchSetting, false],
+  ['DataDog', projectWizardMessages.PublicDataDogIntro, '*,,', DataDogSetting, false],
+  /*
   [
     'Google Cloud Monitoring',
     projectWizardMessages.GoogleCloudMonitoringIntro,
@@ -19,9 +22,7 @@ const dataSourcesMetadata = [
     DataSourceSetting,
     false,
   ],
-  ['DataDog', projectWizardMessages.PublicDataDogIntro, '*,,', DataSourceSetting, false],
   ['New Relic', projectWizardMessages.PublicNewRelicIntro, '*,,', DataSourceSetting, false],
-  /*
   ['DataDog Agent', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
   ['AWS EC2', projectWizardMessages.InsightAgentIntro, '*,,', DataSourceSetting, true],
   ['cAdvisor', projectWizardMessages.cAdvisorIntro, '*,,', cAdvisorSetting, true],

@@ -6,12 +6,16 @@
  **/
 
 import { Observable } from 'rxjs/Observable';
-import R from 'ramda';
 
 import type { Deps } from '../../types';
 import { setProjectCreationStatus } from '../actions';
 import { loadProjectList } from '../../app/actions';
-import { newAWSCloudWatchProject, newCustomProject } from '../../apis';
+import {
+  newAWSCloudWatchProject,
+  newCustomProject,
+  newDataDogProject,
+  newGoogleProject,
+} from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
 
 const createProjectEpic = (action$: any, { getState }: Deps) =>
@@ -27,6 +31,10 @@ const createProjectEpic = (action$: any, { getState }: Deps) =>
       api = newAWSCloudWatchProject(credentials, projectName, params);
     } else if (projectType === 'InsightAgent') {
       api = newCustomProject(credentials, projectName, params);
+    } else if (projectType === 'DataDog') {
+      api = newDataDogProject(credentials, projectName, params);
+    } else if (projectType === 'Google') {
+      api = newGoogleProject(credentials, projectName, params);
     }
 
     return Observable.from(api)

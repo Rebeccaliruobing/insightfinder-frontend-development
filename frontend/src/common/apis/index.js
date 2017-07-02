@@ -29,6 +29,8 @@ export { default as loadProjectSettings } from './loadProjectSettings';
 export { default as loadWeeklyAnomalies } from './loadWeeklyAnomalies';
 export { default as newAWSCloudWatchProject } from './newAWSCloudWatchProject';
 export { default as newCustomProject } from './newCustomProject';
+export { default as newDataDogProject } from './newDataDogProject';
+export { default as newGoogleProject } from './newGoogleProject';
 export { default as pickProjectModel } from './pickProjectModel';
 export { default as removeProjectModel } from './removeProjectModel';
 export { default as saveProjectSettings } from './saveProjectSettings';
