@@ -82,7 +82,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
       { [this.loadingComponentPath]: true },
     );
   }
-  @autobind handlePatternPointClick(startTs, position) {
+  @autobind handlePatternPointClick(startTs) {
     this.setState({
       selectedStartTs: startTs,
     });
@@ -98,12 +98,14 @@ class LogFrequencyAnomalies extends React.PureComponent {
     const freqTsData = patternInfo.freqTsData || [];
 
     if (!startTs) {
-      if (freqTsData.length > 0) {
-        // The time in freq vector is a Date object
-        startTs = freqTsData[0][0].valueOf();
-      }
-      if (freqTsData.length > 1) {
-        endTs = freqTsData[1][0].valueOf();
+      const idx = R.findIndex(f => f[1] > 0, freqTsData);
+      if (idx >= 0) {
+        startTs = freqTsData[idx][0].valueOf();
+
+        // Check the next item still exist
+        if (idx < freqTsData.length - 1) {
+          endTs = freqTsData[idx + 1][0].valueOf();
+        }
       }
     } else {
       const idx = R.findIndex(f => f[0].valueOf() === startTs, freqTsData);
