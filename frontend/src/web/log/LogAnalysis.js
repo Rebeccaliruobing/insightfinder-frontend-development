@@ -24,7 +24,9 @@ import {
   loadLogIncidentList,
   loadLogIncident,
   loadLogEventList,
+  loadLogSequenceEventList,
   selectLogPattern,
+  selectLogPatternSequence,
   rerunLogDetection,
 } from '../../common/log/actions';
 import {
@@ -54,7 +56,9 @@ type Props = {
   loadLogIncidentList: Function,
   loadLogIncident: Function,
   selectLogPattern: Function,
+  selectLogPatternSequence: Function,
   loadLogEventList: Function,
+  loadLogSequenceEventList: Function,
 };
 
 class LogAnalysisCore extends React.PureComponent {
@@ -257,6 +261,8 @@ class LogAnalysisCore extends React.PureComponent {
       currentError,
       viewsState,
       selectLogPattern,
+      selectLogPatternSequence,
+      loadLogSequenceEventList,
       loadLogEventList,
       currentLoadingComponents,
     } = this.props;
@@ -269,6 +275,7 @@ class LogAnalysisCore extends React.PureComponent {
 
     const showIncident = Boolean(incidentId);
     const incidentInfo = incidentId ? R.find(i => i.id === incidentId, incidentList) : {};
+    console.log(viewsState);
 
     // Select renderer to generate link to month.
     const monthValueRender = (option) => {
@@ -442,7 +449,9 @@ class LogAnalysisCore extends React.PureComponent {
                     data: viewInfoData,
                     projectName,
                     selectLogPattern,
+                    selectLogPatternSequence,
                     loadLogEventList,
+                    loadLogSequenceEventList,
                     currentLoadingComponents,
                     ...get(viewsState, view, {}),
                     startTimeMillis: moment(incidentInfo.incidentStartTime).valueOf(),
@@ -486,7 +495,9 @@ export default connect(
     loadLogIncidentList,
     loadLogIncident,
     selectLogPattern,
+    selectLogPatternSequence,
     loadLogEventList,
+    loadLogSequenceEventList,
     rerunLogDetection,
   },
 )(LogAnalysis);

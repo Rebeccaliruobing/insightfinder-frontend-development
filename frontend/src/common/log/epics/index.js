@@ -9,6 +9,7 @@ import eventListEpic from './eventListEpic';
 import incidentEpic from './incidentEpic';
 import incidentListEpic from './incidentListEpic';
 import logDetectionEpic from './logDetectionEpic';
+import sequenceEventListEpic from './sequenceEventListEpic';
 import fileEpic from './fileEpic';
 import streamingEpic from './streamingEpic';
 import streamingListEpic from './streamingListEpic';
@@ -18,6 +19,7 @@ const epics = [
   eventListEpic,
   incidentEpic,
   incidentListEpic,
+  sequenceEventListEpic,
   logDetectionEpic,
   fileEpic,
   streamingEpic,

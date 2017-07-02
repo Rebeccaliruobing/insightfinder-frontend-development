@@ -32,11 +32,20 @@ export const loadLogIncident = (projectName: String, params: Object, force: Bool
 });
 
 /**
- * Select the pattern in the view. Handled by reducer and epic.
+ * Select the pattern in the view. Handled by reducer.
  */
 export const selectLogPattern = (view: String, patternId: String): Action => ({
   type: 'SELECT_LOG_PATTERN',
   payload: { view, patternId },
+});
+
+export const selectLogPatternSequence = (
+  view: String,
+  sequenceId: String,
+  patterns: String,
+): Action => ({
+  type: 'SELECT_LOG_PATTERN_SEQUENCE',
+  payload: { view, sequenceId, patterns },
 });
 
 /**
@@ -49,6 +58,16 @@ export const loadLogEventList = (
   components: Object,
 ): Action => ({
   type: 'LOAD_LOG_EVENTLIST',
+  payload: { projectName, view, params, components },
+});
+
+export const loadLogSequenceEventList = (
+  projectName: String,
+  view: String,
+  params: Object,
+  components: Object,
+): Action => ({
+  type: 'LOAD_LOG_SEQUENCE_EVENTLIST',
   payload: { projectName, view, params, components },
 });
 

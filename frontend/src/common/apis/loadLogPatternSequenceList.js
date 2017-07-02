@@ -30,9 +30,9 @@ const loadLogPatternSequenceList = (
     // Merge sequences and patters into a array, with different type.
     let sequenceAndPatterns = [];
 
-    R.forEach((seq) => {
+    R.addIndex(R.forEach)((seq, idx) => {
       const { count, pattern } = seq;
-      const id = '0';
+      const id = `seq-${idx}`;
 
       // TODO: Convert the pattern id string into a object will be replaced later.
       let patterns = R.filter(p => Boolean(p), R.map(p => p.trim(), (pattern || '').split(',')));
@@ -60,10 +60,11 @@ const loadLogPatternSequenceList = (
         ...sequenceAndPatterns,
         {
           id,
-          isPattern: false,
+          patterns: seq.pattern,
+          isSequence: true,
           name: seqKeywords.join('-'),
+          keywords: seqKeywords,
           count,
-          keywords: [],
         },
         ...patterns,
       ];
