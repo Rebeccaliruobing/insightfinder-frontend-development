@@ -294,7 +294,6 @@ class ProjectSettingsCore extends React.PureComponent {
             {showInstanceGroup && <span className="divider">/</span>}
             {showInstanceGroup &&
               <Select
-                clearable
                 name="group"
                 inline
                 style={{ width: 200 }}
