@@ -10,7 +10,7 @@ import { Observable } from 'rxjs/Observable';
 import R from 'ramda';
 import moment from 'moment';
 import type { Deps } from '../../types';
-import { loadLogIncidentList } from '../../apis';
+import { getLogIncidentList } from '../../apis';
 import { appMessages } from '../../app/messages';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -24,7 +24,6 @@ const logIncidentListEpic = (action$: any, { getState }: Deps) =>
     // - projectName is not in the list, show message.
     // - params are correct, calls API and handler errors.
     const pickNotNil = R.pickBy(a => !R.isNil(a));
-    const monthFormat = 'YYYY-MM';
 
     const state = getState();
     const { projectName, params } = action.payload;
@@ -33,7 +32,6 @@ const logIncidentListEpic = (action$: any, { getState }: Deps) =>
     const { month } = params;
 
     const incidentListParams = pickNotNil({ projectName, month });
-    const monthlyDate = moment(month, monthFormat).startOf('month').valueOf();
 
     let apiAction$ = null;
 
@@ -42,7 +40,7 @@ const logIncidentListEpic = (action$: any, { getState }: Deps) =>
     } else if (!R.find(p => p.projectName === projectName, projects)) {
       apiAction$ = Observable.of(setLogInfo({ currentError: appMessages.errorsProjectNotFound }));
     } else {
-      apiAction$ = Observable.from(loadLogIncidentList(credentials, projectName, { monthlyDate }))
+      apiAction$ = Observable.from(getLogIncidentList(credentials, projectName, { month }))
         .concatMap((d) => {
           return Observable.of(setLogInfo({ incidentList: d.data.incidentList }));
         })

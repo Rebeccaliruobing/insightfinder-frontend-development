@@ -7,16 +7,23 @@
 
 import R from 'ramda';
 import moment from 'moment';
+
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadLogIncidentList = (credentials: Credentials, projectName: String, params: Object) => {
+const getLogIncidentList = (credentials: Credentials, projectName: String, params: Object) => {
+  const monthFormat = 'YYYY-MM';
+  const { month } = params;
+  // Convert the month into utc time.
+  console.log(month);
+  const monthlyDate = moment.utc(month, monthFormat).startOf('month').valueOf();
+
   return fetchGet(getEndpoint('logstreaming'), {
     ...credentials,
     operation: 'list',
     projectName,
-    ...params,
+    monthlyDate,
   }).then((d) => {
     const rawData = d.data;
 
@@ -42,4 +49,4 @@ const loadLogIncidentList = (credentials: Credentials, projectName: String, para
   });
 };
 
-export default loadLogIncidentList;
+export default getLogIncidentList;

@@ -4,10 +4,9 @@
  * Copyright InsightFinder Inc., 2017
  * *****************************************************************************
  **/
-
 /* eslint-disable no-console */
+
 import R from 'ramda';
-import moment from 'moment';
 import { Observable } from 'rxjs/Observable';
 import type { Deps } from '../../types';
 import {
@@ -15,7 +14,7 @@ import {
   loadLogFrequencyAnomalyList,
   loadLogClusterList,
   loadLogPatternSequenceList,
-  loadLogIncidentList,
+  getLogIncidentList,
 } from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -31,7 +30,6 @@ const viewApis = {
 const incidentEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_LOG_INCIDENT').concatMap((action) => {
     const pickNotNil = R.pickBy(a => !R.isNil(a));
-    const monthFormat = 'YYYY-MM';
 
     const state = getState();
     const { credentials } = state.auth;
@@ -40,7 +38,6 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
     const { month, incidentId, view } = params;
     const incidentParams = pickNotNil({ projectName, ...params });
     const incidentListParams = pickNotNil({ projectName, month });
-    const monthlyDate = moment(month, monthFormat).startOf('month').valueOf();
 
     // The data for each view is stored in incident, we might reuse
     // the existing data if we params are same, but now we just reload
@@ -53,7 +50,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
     // We need to load the incident list first, which contains detail inforation
     // about the incident. By checking the incidentlist params.
     if (!R.equals(incidentListParams, prevIncidentListParams)) {
-      apiAction$ = Observable.from(loadLogIncidentList(credentials, projectName, { monthlyDate }))
+      apiAction$ = Observable.from(getLogIncidentList(credentials, projectName, { month }))
         .concatMap((listData) => {
           const incidentList = listData.data.incidentList;
           // Add more params which can get from project info.
