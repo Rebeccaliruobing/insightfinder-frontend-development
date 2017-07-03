@@ -7,18 +7,27 @@
 
 import { get } from 'lodash';
 import R from 'ramda';
+import moment from 'moment';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadProjectModel = (credentials: Credentials, projectName: String, params: Object) => {
-  console.log(params);
+const getProjectModel = (credentials: Credentials, projectName: String, params: Object) => {
+  const { instanceGroup, startTime, endTime } = params;
+  const dateFormat = 'YYYY-MM-DD';
+
+  // The start time & end time is in logical format, like 2017-06-26, convert it into GMT time.
+  const modelStartTime = moment(startTime, dateFormat).subtract(1, 'day').endOf('day').valueOf();
+  const modelEndTime = moment(endTime, dateFormat).endOf('day').valueOf();
+
   return fetchGet(getEndpoint('modelPicking'), {
     ...credentials,
     projectName,
     operation: 'list',
-    ...params,
+    instanceGroup,
+    modelStartTime,
+    modelEndTime,
   }).then((d) => {
     const rawData = d.data;
     const rawModels = get(rawData, 'modelKeys', []);
@@ -79,4 +88,4 @@ const loadProjectModel = (credentials: Credentials, projectName: String, params:
   });
 };
 
-export default loadProjectModel;
+export default getProjectModel;

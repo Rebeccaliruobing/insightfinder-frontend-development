@@ -12,7 +12,12 @@ import { get } from 'lodash';
 import R from 'ramda';
 
 import type { Deps } from '../../types';
-import { loadProjectSettings, loadProjectModel, loadProjectEpisodeWord, loadProjectGroupList } from '../../apis';
+import {
+  loadProjectSettings,
+  getProjectModel,
+  loadProjectEpisodeWord,
+  loadProjectGroupList,
+} from '../../apis';
 import { appMessages } from '../../app/messages';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -22,7 +27,6 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_PROJECT_SETTINGS').concatMap((action) => {
     const pickNotNil = R.pickBy(a => !R.isNil(a));
     const ifIn = (i, items) => items.indexOf(i) !== -1;
-    const dateFormat = 'YYYY-MM-DD';
     const apisParamsKey = 'project';
 
     const state = getState();
@@ -85,10 +89,10 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
       apiAction$ = Observable.of(setProjectSettings({ projectSettings: {} }));
     } else if (settingReload && setting === 'model') {
       apiAction$ = Observable.from(
-        loadProjectModel(credentials, projectName, {
+        getProjectModel(credentials, projectName, {
           instanceGroup,
-          modelStartTime: moment(startTime, dateFormat).valueOf(),
-          modelEndTime: moment(endTime, dateFormat).valueOf(),
+          startTime,
+          endTime,
         }),
       )
         .concatMap((d) => {
@@ -133,7 +137,9 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     // Return the general sequence for all API calls.
     return Observable.concat(
       Observable.of(showAppLoader),
-      Observable.of(setProjectSettings({ projectGroups, currentErrorMessage, projectSettingsParams })),
+      Observable.of(
+        setProjectSettings({ projectGroups, currentErrorMessage, projectSettingsParams }),
+      ),
       Observable.of(setSettingsApisParams(apisParamsKey, currentApisParams)),
       grouplistAction$,
       apiAction$,
