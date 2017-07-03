@@ -16,7 +16,6 @@ const getLogIncidentList = (credentials: Credentials, projectName: String, param
   const monthFormat = 'YYYY-MM';
   const { month } = params;
   // Convert the month into utc time.
-  console.log(month);
   const monthlyDate = moment.utc(month, monthFormat).startOf('month').valueOf();
 
   return fetchGet(getEndpoint('logstreaming'), {
