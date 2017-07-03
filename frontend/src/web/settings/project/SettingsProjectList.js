@@ -82,10 +82,7 @@ class SettingsProjectListCore extends React.Component {
     const projectRenderer = ({ cellData }) => {
       return (
         <div>
-          <span>{cellData}</span>
-          <div style={{ marginLeft: '2em' }} className="ui orange button">
-            Settings
-          </div>
+          <i className="icon orange settings" style={{ fontSize: 14 }} /> <span>{cellData}</span>
         </div>
       );
     };

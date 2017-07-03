@@ -32,6 +32,9 @@ const getProjectList = (credentials: Credentials) => {
       // Streaming log analysis project
       const isLogStreaming = dataType.toLowerCase() === 'log';
 
+      // Get the owner based on the project name with format project@owner
+      const owner = p.owner || projectName.split('@')[1] || '';
+
       // Historical log analysis project
       const isLogFile = dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';
 
@@ -41,6 +44,7 @@ const getProjectList = (credentials: Credentials) => {
       return {
         projectId: projectName,
         ...p,
+        owner,
         isLog,
         isMetric,
         isLogFile,
