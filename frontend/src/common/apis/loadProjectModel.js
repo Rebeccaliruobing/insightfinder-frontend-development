@@ -13,6 +13,7 @@ import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
 const loadProjectModel = (credentials: Credentials, projectName: String, params: Object) => {
+  console.log(params);
   return fetchGet(getEndpoint('modelPicking'), {
     ...credentials,
     projectName,

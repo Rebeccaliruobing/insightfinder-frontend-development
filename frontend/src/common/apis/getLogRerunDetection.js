@@ -11,7 +11,7 @@ import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadProjectModel = (credentials: Credentials, projectName: String, params: Object) => {
+const getLogRerunDetection = (credentials: Credentials, projectName: String, params: Object) => {
   const { startTime, endTime } = params;
 
   const startTimeStampMillis = moment(startTime).valueOf();
@@ -28,4 +28,4 @@ const loadProjectModel = (credentials: Credentials, projectName: String, params:
   });
 };
 
-export default loadProjectModel;
+export default getLogRerunDetection;

@@ -13,7 +13,7 @@ import { get } from 'lodash';
 
 import { showAppAlert } from '../../app/actions';
 import type { Deps } from '../../types';
-import { pickProjectModel } from '../../apis';
+import { updateProjectModel } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
 import { settingsMessages } from '../messages';
 import { loadProjectSettings } from '../actions';
@@ -39,7 +39,7 @@ const pickProjectModelEpic = (action$: any, { getState }: Deps) =>
     const modelKeyObj = { startTimestamp, endTimestamp, modelKey };
 
     return Observable.from(
-      pickProjectModel(
+      updateProjectModel(
         credentials,
         projectName,
         {

@@ -16,6 +16,7 @@ const getProjectList = (credentials: Credentials) => {
   return fetchGet(getEndpoint('loadProjectsInfo'), {
     ...credentials,
   }).then((d) => {
+    const { userName } = credentials;
     // The basicProjectData contains the name => props map, convert to array.
     let projects = [];
     const basicProjectData = get(d.data, 'basicProjectData', {});
@@ -33,7 +34,7 @@ const getProjectList = (credentials: Credentials) => {
       const isLogStreaming = dataType.toLowerCase() === 'log';
 
       // Get the owner based on the project name with format project@owner
-      const owner = p.owner || projectName.split('@')[1] || '';
+      const owner = p.owner || projectName.split('@')[1] || userName;
 
       // Historical log analysis project
       const isLogFile = dataType.toLowerCase() === 'log' && cloudType.toLowerCase() === 'logfile';

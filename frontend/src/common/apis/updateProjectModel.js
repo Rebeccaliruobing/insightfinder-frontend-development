@@ -9,7 +9,7 @@ import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
-const loadProjectModel = (
+const updateProjectModel = (
   credentials: Credentials,
   projectName: String,
   params: Object,
@@ -26,4 +26,4 @@ const loadProjectModel = (
   });
 };
 
-export default loadProjectModel;
+export default updateProjectModel;

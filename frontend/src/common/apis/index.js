@@ -6,6 +6,7 @@
  **/
 
 export { default as deleteProject } from './deleteProject';
+export { default as deleteProjectModel } from './deleteProjectModel';
 export { default as loadBugRepository } from './loadBugRepository';
 export { default as loadHourlyEvents } from './loadHourlyEvents';
 export { default as login } from './login';
@@ -33,6 +34,5 @@ export { default as newAWSCloudWatchProject } from './newAWSCloudWatchProject';
 export { default as newCustomProject } from './newCustomProject';
 export { default as newDataDogProject } from './newDataDogProject';
 export { default as newGoogleProject } from './newGoogleProject';
-export { default as pickProjectModel } from './pickProjectModel';
-export { default as removeProjectModel } from './removeProjectModel';
+export { default as updateProjectModel } from './updateProjectModel';
 export { default as saveProjectSettings } from './saveProjectSettings';

@@ -11,9 +11,9 @@ import moment from 'moment';
 import R from 'ramda';
 import { get } from 'lodash';
 
-import { showAppAlert, showAppLoader, hideAppLoader } from '../../app/actions';
+import { showAppAlert } from '../../app/actions';
 import type { Deps } from '../../types';
-import { removeProjectModel } from '../../apis';
+import { deleteProjectModel } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
 import { settingsMessages } from '../messages';
 import { loadProjectSettings } from '../actions';
