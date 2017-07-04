@@ -16,7 +16,7 @@ type Props = {
   className: string,
   intl: Object,
   userInfo: Object,
-  pageLoaderVisible: bool,
+  pageLoaderVisible: boolean,
   leftbar: any, // React component
   localeOptions: Array,
   children: Element<any>,
@@ -25,9 +25,14 @@ type Props = {
 };
 
 const SinglePageCore = ({
-  className, userInfo, intl, pageLoaderVisible,
-  localeOptions, children,
-  setCurrentLocale, logoff,
+  className,
+  userInfo,
+  intl,
+  pageLoaderVisible,
+  localeOptions,
+  children,
+  setCurrentLocale,
+  logoff,
   leftbar,
 }: Props) => {
   const { userName } = userInfo;
@@ -47,32 +52,29 @@ const SinglePageCore = ({
       <Topbar>
         <div className="ui menu">
           <NavLink
-            to={BaseUrls.Metric} className="item"
+            to={BaseUrls.Metric}
+            className="item"
             isActive={isActiveIgnoreUrls(BaseUrls.MetricHistoricalMetricAnalysis)}
           >
             {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
           <NavLink
-            to={BaseUrls.Log} className="item"
+            to={BaseUrls.Log}
+            className="item"
             isActive={isActiveIgnoreUrls(BaseUrls.LogHistoricalLogAnalysisBase)}
           >
             {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
-          <NavLink to={BaseUrls.SettingsProjectList} className="item">
-            {intl.formatMessage(appMenusMessages.settings)}
-          </NavLink>
           <NavLink to={BaseUrls.UsecaseBase} className="item">
             {intl.formatMessage(appMenusMessages.issues)}
           </NavLink>
-          {false && <NavLink to={BaseUrls.MetricHistoricalMetricAnalysis} className="item">
-            {intl.formatMessage(appMenusMessages.historicalMetricAnalysis)}
-          </NavLink>}
-          {isAdmin && <NavLink to={BaseUrls.LogHistoricalLogAnalysisBase} className="item">
-            {intl.formatMessage(appMenusMessages.historicalLogAnalysis)}
-          </NavLink>}
-          {isAdmin && <NavLink to="/filetabs" className="item">
-            {intl.formatMessage(appMenusMessages.fileAnalysis)}
-          </NavLink>}
+          <NavLink to={BaseUrls.SettingsProjectList} className="item">
+            {intl.formatMessage(appMenusMessages.settings)}
+          </NavLink>
+          {isAdmin &&
+            <NavLink to="/filetabs" className="item">
+              {intl.formatMessage(appMenusMessages.fileAnalysis)}
+            </NavLink>}
           <NavLink to={BaseUrls.Help} className="item">
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
@@ -80,14 +82,11 @@ const SinglePageCore = ({
             <div className="ui dropdown language item" style={{ display: 'none' }}>
               <i className="translate icon" />
               <div className="right-align menu">
-                {
-                  localeOptions.map(l => (
-                    <a
-                      key={l.value} className="item"
-                      onClick={() => setCurrentLocale(l.value)}
-                    >{l.label}</a>
-                  ))
-                }
+                {localeOptions.map(l => (
+                  <a key={l.value} className="item" onClick={() => setCurrentLocale(l.value)}>
+                    {l.label}
+                  </a>
+                ))}
               </div>
             </div>
             <div className="ui dropdown user item">
@@ -95,7 +94,8 @@ const SinglePageCore = ({
               <span>{userName}</span>
               <div className="right-align menu">
                 <Link to={BaseUrls.AccountInfo} className="item">
-                  <i className="settings icon" />{intl.formatMessage(appMenusMessages.accountProfile)}
+                  <i className="settings icon" />
+                  {intl.formatMessage(appMenusMessages.accountProfile)}
                 </Link>
                 <a className="item" onClick={() => logoff()}>
                   <i className="sign out icon" />{intl.formatMessage(appMenusMessages.signout)}
@@ -109,8 +109,7 @@ const SinglePageCore = ({
         <div className="content">
           <SinglePageLoader key="loader" visible={pageLoaderVisible} />
           {children}
-        </div>
-      }
+        </div>}
       {!!leftbar && leftbar}
       {!!leftbar &&
         <div className="content with-leftbar">
@@ -118,8 +117,7 @@ const SinglePageCore = ({
             <SinglePageLoader key="loader" visible={pageLoaderVisible} />
             {children}
           </div>
-        </div>
-      }
+        </div>}
     </Container>
   );
 };

@@ -369,7 +369,7 @@ class LogAnalysisCore extends React.PureComponent {
                   className="incident-tile"
                   onClick={this.handleIncidentClick(ic.id)}
                 >
-                  <Box isLink>
+                  <Box isLink style={{ paddingTop: 0 }}>
                     <div className="actions">
                       <OverlayTrigger
                         placement="top"
@@ -390,33 +390,29 @@ class LogAnalysisCore extends React.PureComponent {
                       </OverlayTrigger>
                     </div>
                     <div className="content">
-                      <div>
-                        <div className="label" style={{ display: 'inline-block' }}>Start Time:</div>
-                        <div style={{ float: 'right' }}>
-                          {moment(ic.incidentStartTime).format('YYYY/MM/DD hh:mm')}
-                        </div>
+                      <div
+                        className="text-right"
+                        style={{ float: 'left', fontSize: 38, width: 42, color: 'grey' }}
+                      >
+                        {moment(ic.incidentStartTime).date()}
                       </div>
-                      <div>
-                        <div className="label" style={{ display: 'inline-block' }}>End Time:</div>
-                        <div style={{ float: 'right' }}>
-                          {moment(ic.incidentEndTime).format('YYYY/MM/DD hh:mm')}
+                      <div style={{ marginLeft: 52, paddingTop: 12 }}>
+                        <div>
+                          <div className="label" style={{ display: 'inline-block' }}>
+                            Total Events:
+                          </div>
+                          <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
                         </div>
-                      </div>
-                      <div>
-                        <div className="label" style={{ display: 'inline-block' }}>
-                          Total Events:
+                        <div>
+                          <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
+                          <div style={{ float: 'right' }}>{ic.clusterCount}</div>
                         </div>
-                        <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
-                      </div>
-                      <div>
-                        <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
-                        <div style={{ float: 'right' }}>{ic.clusterCount}</div>
-                      </div>
-                      <div>
-                        <div className="label" style={{ display: 'inline-block' }}>
-                          Rare Events:
+                        <div>
+                          <div className="label" style={{ display: 'inline-block' }}>
+                            Rare Events:
+                          </div>
+                          <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
                         </div>
-                        <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
                       </div>
                     </div>
                   </Box>
