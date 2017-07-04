@@ -35,11 +35,13 @@ const logDetectionEpic = (action$: any, { getState }: Deps) =>
           endTime: incidentEndTime,
         }),
       )
-        .concatMap(() => Observable.of(showAppAlert('info', logMessages.infoRerunTriggerred)))
-        .catch((err) => {
-          return apiEpicErrorHandle(err);
-        }),
-      Observable.of(hideAppLoader()),
+        .concatMap(() =>
+          Observable.concat(
+            Observable.of(hideAppLoader()),
+            Observable.of(showAppAlert('info', logMessages.infoRerunTriggerred)),
+          ),
+        )
+        .catch(err => Observable.concat(Observable.of(hideAppLoader()), apiEpicErrorHandle(err))),
     );
   });
 

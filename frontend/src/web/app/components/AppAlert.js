@@ -45,7 +45,7 @@ class AppAlertCore extends React.Component {
     if (ids.length > 0) {
       hideAppAlert(ids);
     } else {
-      setTimeout(this.cleanOutdatedAlerts, Math.min(500, timeout));
+      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
     }
   }
 
