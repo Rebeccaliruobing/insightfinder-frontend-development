@@ -370,7 +370,11 @@ class LogAnalysisCore extends React.PureComponent {
           !showIncident &&
           incidentList.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
-            <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
+            <Tile
+              isParent
+              isFluid
+              style={{ paddingLeft: 0, paddingRight: 0, width: 1316, margin: 'auto' }}
+            >
               {paddingRange.map(day => (
                 <Tile key={day} style={{ cursor: 'default' }} className="incident-tile">
                   <Box
