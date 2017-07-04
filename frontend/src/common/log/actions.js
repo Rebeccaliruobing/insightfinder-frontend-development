@@ -39,13 +39,9 @@ export const selectLogPattern = (view: String, patternId: String): Action => ({
   payload: { view, patternId },
 });
 
-export const selectLogPatternSequence = (
-  view: String,
-  sequenceId: String,
-  patterns: String,
-): Action => ({
+export const selectLogPatternSequence = (view: String, sequenceId: String): Action => ({
   type: 'SELECT_LOG_PATTERN_SEQUENCE',
-  payload: { view, sequenceId, patterns },
+  payload: { view, sequenceId },
 });
 
 /**

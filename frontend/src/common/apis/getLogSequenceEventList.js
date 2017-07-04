@@ -23,7 +23,7 @@ const getLogSequenceEventList = (credentials: Credentials, projectName: String, 
     ...credentials,
     projectName,
     dayTimeMillis,
-    patternSequence: params.patterns,
+    patternSequence: JSON.stringify(params.patterns),
   }).then((d) => {
     const rawData = d.data;
     let sequences = rawData;

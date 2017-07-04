@@ -4,13 +4,15 @@
  * Copyright InsightFinder Inc., 2017
  * *****************************************************************************
  **/
+/* eslint-disable no-console */
 
 import R from 'ramda';
-import { get } from 'lodash';
+import { isArray } from 'lodash';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
+import { logPatternTopKToArray } from './magicParsers';
 
 const loadLogPatternSequenceList = (
   credentials: Credentials,
@@ -31,38 +33,44 @@ const loadLogPatternSequenceList = (
     let sequenceAndPatterns = [];
 
     R.addIndex(R.forEach)((seq, idx) => {
-      const { count, pattern } = seq;
+      const { count, pattern, patternInfoList } = seq;
       const id = `seq-${idx}`;
 
-      // TODO: Convert the pattern id string into a object will be replaced later.
-      let patterns = R.filter(p => Boolean(p), R.map(p => p.trim(), (pattern || '').split(',')));
-      const seqKeywords = [];
-      patterns = R.map((p) => {
-        const nid = p;
-        const patternName = `Pattern ${p}`;
-        const keywords = [patternName];
+      if (pattern && !isArray(patternInfoList)) {
+        console.error("[IF] Pattern sequence doesn't contains patternInfoList array", seq);
+      }
 
-        const name = patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
-        if (keywords.length > 0) {
-          seqKeywords.push(keywords[0]);
+      const patternsInfo = patternInfoList || [];
+      const seqNameWords = [];
+      let seqKeywords = [];
+      const seqPatterns = [];
+      const patterns = R.map((p) => {
+        const { nid, patternName, count } = p;
+        const keywords = logPatternTopKToArray(p.topK);
+        let name = patternName;
+        if (name === `Pattern ${nid}`) {
+          seqNameWords.push(keywords[0] || name);
+          name = keywords.join('-') || name;
         }
+        seqKeywords = seqKeywords.concat(keywords);
+        seqPatterns.push(nid);
 
         return {
           id: nid,
           isPattern: true,
           name,
-          count: '',
+          count,
           keywords,
         };
-      }, patterns);
+      }, patternsInfo);
 
       sequenceAndPatterns = [
         ...sequenceAndPatterns,
         {
           id,
-          patterns: seq.pattern,
+          patterns: seqPatterns,
           isSequence: true,
-          name: seqKeywords.join('-'),
+          name: seqNameWords.join('-'),
           keywords: seqKeywords,
           count,
         },

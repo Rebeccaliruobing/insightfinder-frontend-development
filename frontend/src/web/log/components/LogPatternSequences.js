@@ -98,7 +98,7 @@ class LogPatternSequences extends React.PureComponent {
       selectLogPatternSequence,
       loadLogSequenceEventList,
     } = props;
-    selectLogPatternSequence(this.viewName, sequenceId, patterns);
+    selectLogPatternSequence(this.viewName, sequenceId);
     loadLogSequenceEventList(
       projectName,
       this.viewName,

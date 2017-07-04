@@ -53,13 +53,12 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
     return state;
   } else if (action.type === 'SELECT_LOG_PATTERN_SEQUENCE') {
     let { viewsState } = state;
-    const { view, sequenceId, patterns } = action.payload;
-    if (Boolean(view) && Boolean(patterns) && Boolean(sequenceId)) {
+    const { view, sequenceId } = action.payload;
+    if (Boolean(view) && Boolean(sequenceId)) {
       viewsState = {
         ...viewsState,
         [view]: {
           currentSequenceId: sequenceId,
-          currentSequencePatters: patterns,
           currentEventList: [],
         },
       };
