@@ -99,7 +99,16 @@ const ProjectDetails = class extends React.Component {
   render() {
     const { data, loading, debugData, timeRanking, freqRanking } = this.state;
     const { query } = this.props.location;
-    let { projectName, modelName, pvalue, cvalue, modelType, bugId, latestDataTimestamp } = query;
+    let {
+      projectName,
+      modelName,
+      pvalue,
+      cvalue,
+      modelType,
+      bugId,
+      latestDataTimestamp,
+      caller,
+    } = query;
     if (projectName === '') {
       projectName = modelName;
     }
@@ -123,6 +132,7 @@ const ProjectDetails = class extends React.Component {
           data={data}
           debugData={debugData}
           latestDataTimestamp={latestDataTimestamp}
+          isEmailAert={caller.toLowerCase() === 'emailalert'}
           timeRanking={timeRanking}
           freqRanking={freqRanking}
           bugId={bugId}

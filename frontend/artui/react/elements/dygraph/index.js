@@ -87,8 +87,7 @@ class Dygraph extends Component {
       rcolor = 255;
       gcolor = Math.floor(gcolorMax - (val - 1) / 9 * gcolorMax);
     }
-    canvas.fillStyle =
-      `rgba(${rcolor.toString()},${gcolor.toString()},${bcolor.toString()},1.0)`;
+    canvas.fillStyle = `rgba(${rcolor.toString()},${gcolor.toString()},${bcolor.toString()},1.0)`;
     if (!enableTriangleHighlight || isMissingValue || sign == 0) {
       canvas.fillRect(canvas_left_x, area.y, canvas_width, 12);
     } else if (sign < 0) {
@@ -114,11 +113,14 @@ class Dygraph extends Component {
       highlightStartTime,
       highlightEndTime,
       data,
+      isEmailAert,
       isLogCharts,
     } = this.props;
 
     // Draw predicated range if latestDataTimestamp is specified.
-    const latestTime = latestDataTimestamp ? parseInt(latestDataTimestamp, 10) : moment().valueOf();
+    const latestTime = isEmailAert && latestDataTimestamp
+      ? parseInt(latestDataTimestamp, 10)
+      : moment().valueOf();
     if (!isLogCharts && latestTime && data.length > 0) {
       const begin = data[0][0].valueOf();
       const last = data[data.length - 1][0].valueOf();

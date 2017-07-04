@@ -55,7 +55,7 @@ class LiveAnalysisCharts extends React.Component {
     loading: true,
     enablePublish: false,
     chartType: 'line',
-    onRefresh: () => { },
+    onRefresh: () => {},
     predictedFlag: '',
     isForecast: false,
   };
@@ -69,9 +69,9 @@ class LiveAnalysisCharts extends React.Component {
 
     this.state = {
       instanceName: false,
-      view: (store.get(DefaultView, initView)).toLowerCase(),
-      columns: (store.get(GridColumns, 'four')).toLowerCase(),
-      showSummaryFlag: (store.get(ShowSummaryFlag, 'yes')),
+      view: store.get(DefaultView, initView).toLowerCase(),
+      columns: store.get(GridColumns, 'four').toLowerCase(),
+      showSummaryFlag: store.get(ShowSummaryFlag, 'yes'),
       selectedGroupId: undefined,
       selectedAnnotation: null,
       showSettingModal: false,
@@ -98,12 +98,19 @@ class LiveAnalysisCharts extends React.Component {
     return shallowCompare(this, nextProps, nextState);
   }
 
-  @autobind
-  calculateData() {
+  @autobind calculateData() {
     // Cache the data, and recalculate it if changed.
-    const { data, loading, onRefresh,
-      projectName, instanceName, metricName,
-      startTimestamp, detectSuccess, ...rest } = this.props;
+    const {
+      data,
+      loading,
+      onRefresh,
+      projectName,
+      instanceName,
+      metricName,
+      startTimestamp,
+      detectSuccess,
+      ...rest
+    } = this.props;
     if (this.latestData !== data && !!data) {
       this.dp = new DataParser(data, rest);
       this.dp.getSummaryData();
@@ -142,8 +149,11 @@ class LiveAnalysisCharts extends React.Component {
       }
     }
     if (instanceName && data) {
-      const metricAvgRaw = _.get(data.instanceMetricJson,
-        ['instanceStatsJson', instanceName, 'statsByMetricJson'], {});
+      const metricAvgRaw = _.get(
+        data.instanceMetricJson,
+        ['instanceStatsJson', instanceName, 'statsByMetricJson'],
+        {},
+      );
       const avgNumberOfDays = data.instanceMetricJson && data.instanceMetricJson.avgNumberOfDays;
       if (metricAvgRaw && avgNumberOfDays) {
         const metricAvg = {};
@@ -180,7 +190,8 @@ class LiveAnalysisCharts extends React.Component {
     const endTimestamp = parseInt(fieldsN[0]);
 
     this.setState({ loading: true }, () => {
-      apis.postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp)
+      apis
+        .postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp)
         .then((resp) => {
           if (resp.success) {
             alert(resp.message);
@@ -214,13 +225,11 @@ class LiveAnalysisCharts extends React.Component {
     document.body.removeChild(a);
   }
 
-  @autobind
-  handleDateWindowSync(dateWindow) {
+  @autobind handleDateWindowSync(dateWindow) {
     this.setState({ chartDateWindow: dateWindow });
   }
 
-  @autobind
-  handleAnnotationClick(anno) {
+  @autobind handleAnnotationClick(anno) {
     if (anno && anno.text && this.groups) {
       const re = /(?:metric:)(.*)(?:,)/gi;
       let metrics = [];
@@ -233,21 +242,23 @@ class LiveAnalysisCharts extends React.Component {
       if (metrics.length > 0) {
         const { names, selectedGroups } = getSelectedGroup(metrics.join(','), this.groups);
         // Use hideGroupSelector to remove the node, otherwise Dropdown works strange.
-        this.setState({
-          hideGroupSelector: true,
-        }, () => {
-          this.setState({
-            selectedMetrics: names.join(','),
-            selectedGroups,
-            hideGroupSelector: false,
-          });
-        });
+        this.setState(
+          {
+            hideGroupSelector: true,
+          },
+          () => {
+            this.setState({
+              selectedMetrics: names.join(','),
+              selectedGroups,
+              hideGroupSelector: false,
+            });
+          },
+        );
       }
     }
   }
 
-  @autobind
-  handleMetricSelectionChange(value) {
+  @autobind handleMetricSelectionChange(value) {
     if (this.groups) {
       const { names, selectedGroups } = getSelectedGroup(value, this.groups);
       this.setState({
@@ -259,11 +270,30 @@ class LiveAnalysisCharts extends React.Component {
   }
 
   render() {
-    let { loading, onRefresh, enablePublish, enableComments,
-      debugData, timeRanking, freqRanking, projectName,
-      periodMap, data, chartType, alertMissingData, bugId } = this.props;
-    const { view, columns, showSummaryFlag,
-      isForecast, selectedMetrics, hideGroupSelector } = this.state;
+    let {
+      loading,
+      onRefresh,
+      enablePublish,
+      enableComments,
+      debugData,
+      timeRanking,
+      freqRanking,
+      projectName,
+      periodMap,
+      data,
+      chartType,
+      alertMissingData,
+      bugId,
+      isEmailAert,
+    } = this.props;
+    const {
+      view,
+      columns,
+      showSummaryFlag,
+      isForecast,
+      selectedMetrics,
+      hideGroupSelector,
+    } = this.state;
     let { selectedGroups } = this.state;
 
     const userName = store.get('userName');
@@ -272,7 +302,7 @@ class LiveAnalysisCharts extends React.Component {
     freqRanking = freqRanking || [];
     this.calculateData();
 
-    const isFileDetection = (data && data.caller && data.caller === 'fileDetection');
+    const isFileDetection = data && data.caller && data.caller === 'fileDetection';
     const summary = this.summary;
     const dataArray = this.causalDataArray;
     const types = this.causalTypes;
@@ -282,10 +312,11 @@ class LiveAnalysisCharts extends React.Component {
     }
     const errorMsg = this.errorMsg;
     const metricAvg = this.metricAvg;
-    const settingData = (_.keysIn(debugData)).length != 0 || timeRanking.length != 0 || freqRanking != 0;
+    const settingData =
+      _.keysIn(debugData).length != 0 || timeRanking.length != 0 || freqRanking != 0;
     const propsData = this.props.data ? this.props.data.instanceMetricJson : {};
     const latestDataTimestamp = propsData ? propsData.latestDataTimestamp : '';
-    const instances = (propsData && propsData.instances) ? propsData.instances.split(',').length : 1;
+    const instances = propsData && propsData.instances ? propsData.instances.split(',').length : 1;
     // incident table
     let incidents = [];
     const dataChunkName = data && data.dataChunkName;
@@ -325,35 +356,38 @@ class LiveAnalysisCharts extends React.Component {
             <div className="ui vertical segment">
               <Button
                 className="orange labeled icon"
-                onClick={() => this.setState({ showTenderModal: true })} style={{ display: 'none' }}
+                onClick={() => this.setState({ showTenderModal: true })}
+                style={{ display: 'none' }}
               >
                 <i className="icon random" /><span>Causal Graph</span>
               </Button>
               <Button
-                className="labeled icon" style={{ display: !enablePublish && 'none' }}
+                className="labeled icon"
+                style={{ display: !enablePublish && 'none' }}
                 onClick={() => this.setState({ showShareModal: true })}
               >
                 <i className="icon share alternate" /><span>Publish</span>
               </Button>
               <Button
-                className="labeled icon" style={{ display: !enableComments && 'none' }}
+                className="labeled icon"
+                style={{ display: !enableComments && 'none' }}
                 onClick={() => this.setState({ showComments: true })}
               >
                 <i className="icon comments" /><span>Comments</span>
               </Button>
-              {!bugId && !isForecast &&
+              {!bugId &&
+                !isForecast &&
                 <Button className="labeled icon" onClick={() => onRefresh()}>
-                  <i className="icon refresh" /><span>Refresh</span></Button>
-              }
+                  <i className="icon refresh" /><span>Refresh</span>
+                </Button>}
               {!isForecast &&
                 <Button className="labeled icon" onClick={() => this.exportData()}>
-                  <i className="icon download" /><span>Export</span></Button>
-              }
+                  <i className="icon download" /><span>Export</span>
+                </Button>}
               {projectName !== undefined &&
                 <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
                   <i className="icon cloud" /><span>Save To Storage</span>
-                </Button>
-              }
+                </Button>}
               <Button
                 className="orange labeled icon"
                 onClick={() => this.setState({ showDebug: true })}
@@ -366,111 +400,106 @@ class LiveAnalysisCharts extends React.Component {
                   {!bugId &&
                     <Button onClick={() => this.setState({ showSettingModal: true })}>
                       <i className="icon setting" />
-                    </Button>
-                  }
-                  <Button
-                    active={view === 'list'}
-                    onClick={() => this.setState({ view: 'list' })}
-                  >
+                    </Button>}
+                  <Button active={view === 'list'} onClick={() => this.setState({ view: 'list' })}>
                     <i className="align justify icon" />
                   </Button>
-                  <Button
-                    active={view === 'grid'}
-                    onClick={() => this.setState({ view: 'grid' })}
-                  >
+                  <Button active={view === 'grid'} onClick={() => this.setState({ view: 'grid' })}>
                     <i className="grid layout icon" />
                   </Button>
-                </ButtonGroup>
-              }
+                </ButtonGroup>}
             </div>
             <div className="ui vertical segment">
               <div className="ui grid">
-                {(!summary) && (!groups || groups.length === 0) &&
-                  <h3>{errorMsg}</h3>
-                }
-                {showSummaryFlag.toLowerCase() === 'yes' && !!summary &&
+                {!summary && (!groups || groups.length === 0) && <h3>{errorMsg}</h3>}
+                {showSummaryFlag.toLowerCase() === 'yes' &&
+                  !!summary &&
                   <DataSummaryChart
                     key="summary_chart"
                     summary={summary}
                     latestDataTimestamp={latestDataTimestamp}
+                    isEmailAert={isEmailAert}
                     onDateWindowChange={this.handleDateWindowSync}
                     dateWindow={this.state.chartDateWindow}
                     showLineChartWithAnnotation
                     onAnnotationClick={this.handleAnnotationClick}
-                  />
-                }
-                {!!groups && groups.length > 0 &&
+                  />}
+                {!!groups &&
+                  groups.length > 0 &&
                   <div className="sixteen wide column" style={{ paddingTop: 0 }}>
                     <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric Filters:</label>
                     {!hideGroupSelector &&
                       <Dropdown
-                        className="forecast" mode="select" multiple
+                        className="forecast"
+                        mode="select"
+                        multiple
                         value={selectedMetrics}
                         onChange={this.handleMetricSelectionChange}
                         style={{ minWidth: 200 }}
                       >
                         <div className="menu">
-                          {
-                            groups.map(g => (
-                              <div
-                                className="item" key={g.metrics}
-                                data-value={g.metrics}
-                              >{g.metrics}</div>
-                            ))
-                          }
+                          {groups.map(g => (
+                            <div className="item" key={g.metrics} data-value={g.metrics}>
+                              {g.metrics}
+                            </div>
+                          ))}
                         </div>
-                      </Dropdown>
-                    }
-                  </div>
-                }
-                {!!selectedGroups && selectedGroups.length > 0 &&
+                      </Dropdown>}
+                  </div>}
+                {!!selectedGroups &&
+                  selectedGroups.length > 0 &&
                   <DataGroupCharts
                     chartType={chartType}
-                    key={`${view}_group_charts`} metricTags={metricTags}
-                    groups={selectedGroups} view={view} columns={columns}
+                    key={`${view}_group_charts`}
+                    metricTags={metricTags}
+                    groups={selectedGroups}
+                    view={view}
+                    columns={columns}
                     latestDataTimestamp={latestDataTimestamp}
+                    isEmailAert={isEmailAert}
                     alertMissingData={alertMissingData}
                     periodMap={periodMap}
                     metricAvg={metricAvg}
                     onDateWindowChange={this.handleDateWindowSync}
                     dateWindow={this.state.chartDateWindow}
-                  />
-                }
+                  />}
               </div>
             </div>
           </div>
           {this.state.showSettingModal &&
-            <SettingModal onClose={() => this.setState({ showSettingModal: false })} />
-          }
+            <SettingModal onClose={() => this.setState({ showSettingModal: false })} />}
           {this.state.showDebug &&
             <SysCallModal
-              timeRanking={timeRanking} freqRanking={freqRanking}
-              dataArray={debugData} onClose={() => this.setState({ showDebug: false })}
-            />
-          }
+              timeRanking={timeRanking}
+              freqRanking={freqRanking}
+              dataArray={debugData}
+              onClose={() => this.setState({ showDebug: false })}
+            />}
           {this.state.showTenderModal &&
             <TenderModal
-              dataArray={dataArray} types={types}
+              dataArray={dataArray}
+              types={types}
               endTimestamp={this.state.endTimestamp}
               startTimestamp={this.state.startTimestamp}
               onClose={() => this.setState({ showTenderModal: false })}
-            />
-          }
+            />}
           {this.state.showShareModal &&
             <ShareModal
               dataArray={dataArray}
-              types={types} dp={this.dp}
+              types={types}
+              dp={this.dp}
               dataChunkName={dataChunkName}
-              latestDataTimestamp={latestDataTimestamp} fromUser={userName}
+              latestDataTimestamp={latestDataTimestamp}
+              fromUser={userName}
               onClose={() => this.setState({ showShareModal: false })}
-            />
-          }
+            />}
           {this.state.showComments &&
             <CommentsModal
-              dataArray={dataArray} types={types} dp={this.dp}
+              dataArray={dataArray}
+              types={types}
+              dp={this.dp}
               onClose={() => this.setState({ showComments: false })}
-            />
-          }
+            />}
         </Console.Content>
       </Console.Wrapper>
     );

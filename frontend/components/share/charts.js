@@ -179,7 +179,7 @@ export class DataChart extends React.Component {
 
   render() {
     let { data, enableAnnotations, enableTriangleHighlight, chartType,
-      onDateWindowChange, dateWindow,latestDataTimestamp,
+      onDateWindowChange, dateWindow,latestDataTimestamp, isEmailAert,
       eventEndTime, eventStartTime, annotations, onClick, isLogCharts, style,
     } = this.props;
     const dowAnnotations = this.setWeekdaysForBarChar(data);
@@ -203,6 +203,7 @@ export class DataChart extends React.Component {
         highlightStartTime={eventStartTime}
         highlightEndTime={eventEndTime}
         latestDataTimestamp={latestDataTimestamp}
+        isEmailAert={isEmailAert}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
         {...dateWindow ? { dateWindow } : {}}
         annotations={enableAnnotations || chartType === 'bar' ? annotations : null}
@@ -216,7 +217,7 @@ export class DataChart extends React.Component {
 }
 
 export const DataSummaryChart = ({
-  summary, onDateWindowChange, dateWindow, latestDataTimestamp,
+  summary, onDateWindowChange, dateWindow, latestDataTimestamp, isEmailAert,
   onAnnotationClick = (() => { }), showLineChartWithAnnotation,
 }) => {
   return (
@@ -226,6 +227,7 @@ export const DataSummaryChart = ({
         <DataChart
           enableTriangleHighlight={false}
           enableAnnotations={true} data={summary}
+          isEmailAert={isEmailAert}
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
           latestDataTimestamp={latestDataTimestamp}
@@ -268,7 +270,7 @@ export class DataGroupCharts extends React.Component {
   render() {
 
     const { groups, view, columns, orderByMetric,
-      latestDataTimestamp, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
+      latestDataTimestamp, isEmailAert, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
@@ -364,6 +366,7 @@ export class DataGroupCharts extends React.Component {
                     enableTriangleHighlight={true}
                     data={group}
                     latestDataTimestamp={latestDataTimestamp}
+                    isEmailAert={isEmailAert}
                     onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
                     dateWindow={ syncDateWindow ? this.props.dateWindow : null}
                   />
@@ -396,6 +399,7 @@ export class DataGroupCharts extends React.Component {
                       chartType={chartType}
                       enableTriangleHighlight={true}
                       latestDataTimestamp={latestDataTimestamp}
+                      isEmailAert={isEmailAert}
                       enableAnnotations={true} data={selectedGroup}
                     />
                     <i onClick={()=>this.setState({ selectedIndex: undefined })} className="close icon"
