@@ -4,12 +4,12 @@
 
 .log-live {
   .incident-tile {
-    margin: 0 $x-gutter $y-gutter 0;
+    margin: 0 8px 8px 0;
     cursor: pointer;
     > .fui.box {
       .content {
         font-size: 12px;
-        width: 178px;
+        width: 160px;
         height: 80px;
         .label {
           font-weight: $font-weight-medium;

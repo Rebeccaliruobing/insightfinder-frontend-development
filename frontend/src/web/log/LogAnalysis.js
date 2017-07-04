@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, range } from 'lodash';
 import R from 'ramda';
 import moment from 'moment';
 import { injectIntl } from 'react-intl';
@@ -290,6 +290,11 @@ class LogAnalysisCore extends React.PureComponent {
       return i.name;
     };
 
+    let paddingRange = [];
+    if (incidentList.length > 0) {
+      paddingRange = range(0, incidentList[0].weekday, 1);
+    }
+
     return (
       <Container fullHeight withGutter className="flex-col log-live">
         <Container breadcrumb>
@@ -322,9 +327,12 @@ class LogAnalysisCore extends React.PureComponent {
                 name="incident"
                 inline
                 style={{ width: 200 }}
-                options={R.map(
-                  i => ({ label: `${incidentCountBy(i)}`, value: i.id }),
-                  incidentList,
+                options={R.filter(
+                  i => i,
+                  R.map(
+                    i => (i.isEmpty ? null : { label: `${incidentCountBy(i)}`, value: i.id }),
+                    incidentList,
+                  ),
                 )}
                 value={incidentId}
                 onChange={this.handleIncidentChange}
@@ -363,57 +371,84 @@ class LogAnalysisCore extends React.PureComponent {
           incidentList.length > 0 &&
           <Container fullHeight className="overflow-y-auto">
             <Tile isParent isFluid style={{ paddingLeft: 0, paddingRight: 0 }}>
+              {paddingRange.map(day => (
+                <Tile key={day} style={{ cursor: 'default' }} className="incident-tile">
+                  <Box
+                    isLink={false}
+                    style={{
+                      borderColor: 'transparent',
+                      background: 'transparent',
+                      paddingTop: 0,
+                      paddingLeft: 4,
+                    }}
+                  >
+                    <div className="content" />
+                  </Box>
+                </Tile>
+              ))}
               {incidentList.map(ic => (
                 <Tile
                   key={`${projectName}-${ic.incidentKey}`}
                   className="incident-tile"
-                  onClick={this.handleIncidentClick(ic.id)}
+                  style={ic.isEmpty ? { cursor: 'default' } : {}}
+                  {...(ic.isEmpty ? {} : { onClick: this.handleIncidentClick(ic.id) })}
                 >
-                  <Box isLink style={{ paddingTop: 0 }}>
-                    <div className="actions">
-                      <OverlayTrigger
-                        placement="top"
-                        delayShow={300}
-                        overlay={<Tooltip>Rerun Detection</Tooltip>}
-                      >
-                        <i onClick={this.handleRedectionClick(ic.id)} className="repeat icon" />
-                      </OverlayTrigger>
-                      <OverlayTrigger
-                        placement="top"
-                        delayShow={300}
-                        overlay={<Tooltip>Open in New Window</Tooltip>}
-                      >
-                        <i
-                          onClick={this.handleIncidentOpen(ic.id)}
-                          className="link external icon"
-                        />
-                      </OverlayTrigger>
-                    </div>
+                  <Box
+                    isLink={!ic.isEmpty}
+                    style={{
+                      paddingTop: 0,
+                      paddingLeft: 4,
+                      ...(ic.weekday === 6 || ic.weekday === 0 ? { background: '#efefef' } : {}),
+                    }}
+                  >
+                    {!ic.isEmpty &&
+                      <div className="actions">
+                        <OverlayTrigger
+                          placement="top"
+                          delayShow={300}
+                          overlay={<Tooltip>Rerun Detection</Tooltip>}
+                        >
+                          <i onClick={this.handleRedectionClick(ic.id)} className="repeat icon" />
+                        </OverlayTrigger>
+                        <OverlayTrigger
+                          placement="top"
+                          delayShow={300}
+                          overlay={<Tooltip>Open in New Window</Tooltip>}
+                        >
+                          <i
+                            onClick={this.handleIncidentOpen(ic.id)}
+                            className="link external icon"
+                          />
+                        </OverlayTrigger>
+                      </div>}
                     <div className="content">
                       <div
-                        className="text-right"
-                        style={{ float: 'left', fontSize: 38, width: 42, color: 'grey' }}
+                        className="text-center"
+                        style={{ float: 'left', fontSize: 32, width: 42, color: 'grey' }}
                       >
-                        {moment(ic.incidentStartTime).date()}
+                        {ic.dayOfMonth}
                       </div>
-                      <div style={{ marginLeft: 52, paddingTop: 12 }}>
-                        <div>
-                          <div className="label" style={{ display: 'inline-block' }}>
-                            Total Events:
+                      {!ic.isEmpty &&
+                        <div style={{ marginLeft: 48, paddingTop: 12 }}>
+                          <div>
+                            <div className="label" style={{ display: 'inline-block' }}>
+                              Total Events:
+                            </div>
+                            <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
                           </div>
-                          <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
-                        </div>
-                        <div>
-                          <div className="label" style={{ display: 'inline-block' }}>Clusters:</div>
-                          <div style={{ float: 'right' }}>{ic.clusterCount}</div>
-                        </div>
-                        <div>
-                          <div className="label" style={{ display: 'inline-block' }}>
-                            Rare Events:
+                          <div>
+                            <div className="label" style={{ display: 'inline-block' }}>
+                              Clusters:
+                            </div>
+                            <div style={{ float: 'right' }}>{ic.clusterCount}</div>
                           </div>
-                          <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
-                        </div>
-                      </div>
+                          <div>
+                            <div className="label" style={{ display: 'inline-block' }}>
+                              Rare Events:
+                            </div>
+                            <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
+                          </div>
+                        </div>}
                     </div>
                   </Box>
                 </Tile>
