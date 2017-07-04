@@ -68,7 +68,7 @@ const loadLogPatternSequenceList = (
         ...sequenceAndPatterns,
         {
           id,
-          patterns: seqPatterns,
+          patterns: seq.pattern,
           isSequence: true,
           name: seqNameWords.join('-'),
           keywords: seqKeywords,
