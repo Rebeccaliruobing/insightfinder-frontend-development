@@ -420,7 +420,7 @@ class LogAnalysisCore extends React.PureComponent {
                     style={{
                       paddingTop: 0,
                       paddingLeft: 4,
-                      ...(ic.weekday === 6 || ic.weekday === 0 ? { background: '#efefef' } : {}),
+                      ...(ic.isEmpty ? { background: '#efefef' } : {}),
                     }}
                   >
                     {!ic.isEmpty &&
