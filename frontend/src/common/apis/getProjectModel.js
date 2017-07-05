@@ -5,7 +5,7 @@
  * *****************************************************************************
  **/
 
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 import R from 'ramda';
 import moment from 'moment';
 
@@ -28,12 +28,12 @@ const getProjectModel = (credentials: Credentials, projectName: String, params: 
     instanceGroup,
     modelStartTime,
     modelEndTime,
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
     const rawModels = get(rawData, 'modelKeys', []);
 
     // Convert
-    const models = R.map((m) => {
+    const models = R.map(m => {
       const {
         startTimestamp,
         endTimestamp,
@@ -56,8 +56,8 @@ const getProjectModel = (credentials: Credentials, projectName: String, params: 
       const metrics = mapIndexed((val, idx) => {
         return {
           name: val,
-          max: maxs[idx] ? maxs[idx].toFixed(2) : NaN,
-          min: mins[idx] ? mins[idx].toFixed(2) : NaN,
+          max: isNumber(maxs[idx]) ? maxs[idx].toFixed(2) : NaN,
+          min: isNumber(mins[idx]) ? mins[idx].toFixed(2) : NaN,
         };
       }, names);
 
