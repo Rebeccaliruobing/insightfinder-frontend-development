@@ -44,6 +44,18 @@ export const selectLogPatternSequence = (view: String, sequenceId: String): Acti
   payload: { view, sequenceId },
 });
 
+export const setLogPatternName = (
+  projectName: String,
+  incidentId: String,
+  view: String,
+  patternId: Number,
+  patternName: String,
+  components: Object,
+): Action => ({
+  type: 'SET_LOG_PATTERN_NAME',
+  payload: { projectName, view, incidentId, patternId, patternName, components },
+});
+
 /**
  * Load the events based on condition and store at the related storePath.
  */

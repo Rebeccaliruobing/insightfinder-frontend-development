@@ -14,17 +14,18 @@ import $ from 'jquery';
 import classNames from 'classnames';
 
 const Modal = class Modal extends React.Component {
-
   constructor(props) {
     super(props);
 
     this._$el = null;
+    this.close = this.close.bind(this);
+    this.modal = null;
   }
 
   componentDidMount() {
-
-    if (this._$el) {
-      this._$el.find('.ui.modal')
+    if (this._$el && !this.modal) {
+      this.modal = this._$el
+        .find('.ui.modal')
         .modal({
           closable: this.props['closable'],
           allowMultiple: false,
@@ -32,43 +33,67 @@ const Modal = class Modal extends React.Component {
           blurring: this.props['dimmer'] === 'blurring',
           transition: this.props['transition'],
           duration: 0,
-          onHidden: () => { this.props.onClose(); },
-          onCancel: () => { this.props.onCancel(); },
-          onOK: () => { this.props.onOK(); }
+          onHidden: () => {
+            this.props.onClose();
+          },
+          onCancel: () => {
+            this.props.onCancel();
+          },
+          onOK: () => {
+            this.props.onOK();
+          },
         })
         .modal('show');
     }
   }
 
+  close() {
+    if (this.modal) {
+      this.modal.modal('hide');
+      if (this.modal[0] && this.modal[0].remove) {
+        this.modal[0].remove();
+      }
+    }
+  }
+
   componentWillUnmount() {
-    if (this._$el) {
-      this._$el.find('.ui.modal').remove();
+    if (this.modal) {
+      this.modal.modal('hide');
+      if (this.modal[0] && this.modal[0].remove) {
+        this.modal[0].remove();
+      }
     }
   }
 
   componentDidUpdate() {
-    if (this._$el) {
-      this._$el.find('.ui.modal').modal('refresh');
+    if (this.modalel) {
+      this.modal.modal('refresh');
     }
   }
 
   render() {
-
-    let {type, size, className, transition, onClose, onCancel, onOK, closable, ...other} = this.props;
+    let {
+      type,
+      size,
+      className,
+      transition,
+      onClose,
+      onCancel,
+      onOK,
+      closable,
+      ...other
+    } = this.props;
     let classes = classNames('ui modal', size, type, className);
 
     // 在Modal外添加一个div元素, 用于避免React Unmount时异常.
-    return(
-      <div ref={c => this._$el = $(c)}>
+    return (
+      <div ref={c => (this._$el = $(c))}>
         <div className={classes} {...other}>
-          {
-            closable &&
-            <i className="close icon"/>
-          }
+          {closable && <i className="close icon" />}
           {this.props.children}
         </div>
       </div>
-    )
+    );
   }
 };
 
@@ -78,17 +103,17 @@ Modal.propTypes = {
   size: React.PropTypes.oneOf(['mini', 'tiny', 'small', 'large', 'big', 'huge', 'massive']),
   transition: React.PropTypes.string,
   dimmer: React.PropTypes.string,
-  
+
   // 在onClose回调函数中, 需删除本react组件以删除创建的dom对象.
   onClose: React.PropTypes.func.isRequired,
   onOK: React.PropTypes.func,
-  onCancel: React.PropTypes.func
+  onCancel: React.PropTypes.func,
 };
 
 Modal.defaultProps = {
   closable: true,
   onOK: () => {},
-  onCancel: () => {}
+  onCancel: () => {},
 };
 
 export default Modal;

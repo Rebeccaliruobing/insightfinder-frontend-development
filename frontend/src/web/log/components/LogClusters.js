@@ -8,10 +8,12 @@
 import React from 'react';
 import { get } from 'lodash';
 import R from 'ramda';
+import VLink from 'valuelink';
 import { autobind } from 'core-decorators';
 
 import { Container, AutoSizer, Table, Column } from '../../../lib/fui/react';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
+import PatternNameModal from './PatternNameModal';
 
 type Props = {
   data: Object,
@@ -23,15 +25,23 @@ type Props = {
   currentEventList: Array<Object>,
   selectLogPattern: Function,
   loadLogEventList: Function,
+  setLogPatternName: Function,
 };
 
-class LogClusters extends React.PureComponent {
+class LogClusters extends React.Component {
   props: Props;
 
   constructor(props) {
     super(props);
     this.viewName = 'cluster';
     this.loadingComponentPath = 'log_cluster_eventlist';
+
+    this.state = {
+      showNameModal: false,
+      editingPatternId: null,
+      editingPatternName: null,
+      newPatternName: '',
+    };
   }
 
   componentDidMount() {
@@ -52,11 +62,13 @@ class LogClusters extends React.PureComponent {
     }
   }
 
-  @autobind handlePatternClick({ rowData: pattern }) {
+  @autobind
+  handlePatternClick({ rowData: pattern }) {
     this.reloadPattern(this.props, pattern.nid);
   }
 
-  @autobind reloadPattern(props, patternId) {
+  @autobind
+  reloadPattern(props, patternId) {
     const {
       projectName,
       startTimeMillis,
@@ -73,12 +85,40 @@ class LogClusters extends React.PureComponent {
     );
   }
 
+  @autobind
+  handlePatternNameClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      showNameModal: true,
+    });
+  }
+
+  @autobind
+  handleModalClose() {
+    this.setState({
+      showNameModal: false,
+      newPatternName: '',
+    });
+  }
+
   render() {
     const patterns = get(this.props.data, 'patterns', []);
     const eventList = this.props.currentEventList || [];
-    const { currentPatternId } = this.props;
+    const {
+      currentPatternId,
+      projectName,
+      setLogPatternName,
+      currentLoadingComponents,
+    } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
+
+    const { showNameModal } = this.state;
+    const newPatternNameLink = VLink.state(this, 'newPatternName').check(
+      x => x,
+      'Pattern name cannot be empty',
+    );
 
     const clusterRowClassName = ({ index }) => {
       // Ignore header row.
@@ -95,7 +135,7 @@ class LogClusters extends React.PureComponent {
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ width: 380, marginRight: '1em' }}>
           <AutoSizer>
-            {({ width, height }) => (
+            {({ width, height }) =>
               <Table
                 className="with-border"
                 width={width}
@@ -114,24 +154,43 @@ class LogClusters extends React.PureComponent {
                   className="text-right number"
                   dataKey="eventsCount"
                 />
-              </Table>
-            )}
+              </Table>}
           </AutoSizer>
         </Container>
-        <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
-          <AutoSizer>
-            {({ height }) => (
-              <EventGroup
-                style={{ height, width: 900 }}
-                name={patternInfo.name || ''}
-                className="flex-item flex-col-container"
-                eventDataset={eventList}
-                showFE
-                keywords={get(patternInfo, 'keywords', [])}
-                episodes={get(patternInfo, 'episodes', [])}
-              />
-            )}
-          </AutoSizer>
+        <Container className={`flex-grow flex-col ${isLoading ? 'loading' : ''}`}>
+          <h3 className="pattern-name">
+            <span>
+              {patternInfo.name || ''}
+            </span>
+            <i
+              className="write icon"
+              onClick={this.handlePatternNameClick}
+              style={{ display: 'none' }}
+            />
+          </h3>
+          {showNameModal &&
+            <PatternNameModal
+              newNameLink={newPatternNameLink}
+              projectName={projectName}
+              viewName={this.viewName}
+              patternId={currentPatternId}
+              setLogPatternName={setLogPatternName}
+              currentLoadingComponents={currentLoadingComponents}
+              onClose={this.handleModalClose}
+            />}
+          <Container className="flex-grow">
+            <AutoSizer>
+              {({ height }) =>
+                <EventGroup
+                  style={{ height, width: 900 }}
+                  className="flex-item flex-col-container"
+                  eventDataset={eventList}
+                  showFE
+                  keywords={get(patternInfo, 'keywords', [])}
+                  episodes={get(patternInfo, 'episodes', [])}
+                />}
+            </AutoSizer>
+          </Container>
         </Container>
       </Container>
     );

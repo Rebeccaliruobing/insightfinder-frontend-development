@@ -12,6 +12,7 @@
   "rules": {
     // Used by webpack-isomorphic-tools and React Native.
     "global-require": "off",
+    "arrow-parens": "off",
     // Easy for naming local variable
     "no-param-reassign": "off",
     "object-property-newline": "off",

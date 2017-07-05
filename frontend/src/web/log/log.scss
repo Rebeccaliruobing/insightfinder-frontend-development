@@ -3,6 +3,14 @@
 @import "../../lib/fui/sass/variables";
 
 .log-live {
+  .pattern-name {
+    margin-left: 1em;
+    color: #4183C4;
+    .write.icon {
+      margin-left: 0.5em;
+      cursor: pointer;
+    }
+  }
   .incident-tile {
     margin: 0 8px 8px 0;
     cursor: pointer;

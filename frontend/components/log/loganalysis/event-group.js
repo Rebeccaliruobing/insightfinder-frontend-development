@@ -8,7 +8,7 @@ import EventTable from './event-table';
 
 class EventGroup extends React.Component {
   static propTypes = {
-    name: T.string.isRequired,
+    name: T.string,
     eventDataset: T.array,
     keywords: T.array,
     episodes: T.array,
@@ -19,6 +19,7 @@ class EventGroup extends React.Component {
   }
 
   static defaultProps = {
+    name: '',
     eventDataset: [],
     nameEditable: false,
     showFE: true,

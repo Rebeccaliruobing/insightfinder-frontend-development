@@ -28,6 +28,7 @@ import {
   selectLogPattern,
   selectLogPatternSequence,
   rerunLogDetection,
+  setLogPatternName,
 } from '../../common/log/actions';
 import {
   LogClusters,
@@ -59,6 +60,7 @@ type Props = {
   selectLogPatternSequence: Function,
   loadLogEventList: Function,
   loadLogSequenceEventList: Function,
+  setLogPatternName: Function,
 };
 
 class LogAnalysisCore extends React.PureComponent {
@@ -88,7 +90,7 @@ class LogAnalysisCore extends React.PureComponent {
     ];
 
     // Create the select options for month picker.
-    this.monthOptions = R.map((offset) => {
+    this.monthOptions = R.map(offset => {
       const month = moment();
       month.add(-offset, 'month').startOf('month');
       return {
@@ -173,7 +175,8 @@ class LogAnalysisCore extends React.PureComponent {
     }
   }
 
-  @autobind handleProjectChange(newValue) {
+  @autobind
+  handleProjectChange(newValue) {
     const projectName = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
@@ -183,7 +186,8 @@ class LogAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { projectName, month }));
   }
 
-  @autobind handleMonthChange(newValue) {
+  @autobind
+  handleMonthChange(newValue) {
     const month = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
@@ -193,15 +197,17 @@ class LogAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { projectName, month }));
   }
 
-  @autobind handleIncidentChange(newValue) {
+  @autobind
+  handleIncidentChange(newValue) {
     const incidentId = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     push(buildMatchLocation(match, {}, { ...params, incidentId }));
   }
 
-  @autobind handleViewChangeClick(view) {
-    return (e) => {
+  @autobind
+  handleViewChangeClick(view) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -211,8 +217,9 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
-  @autobind handleIncidentClick(incidentId) {
-    return (e) => {
+  @autobind
+  handleIncidentClick(incidentId) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -222,8 +229,9 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
-  @autobind handleIncidentOpen(incidentId) {
-    return (e) => {
+  @autobind
+  handleIncidentOpen(incidentId) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -234,8 +242,9 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
-  @autobind handleRedectionClick(incidentId) {
-    return (e) => {
+  @autobind
+  handleRedectionClick(incidentId) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -247,7 +256,8 @@ class LogAnalysisCore extends React.PureComponent {
     };
   }
 
-  @autobind handleRefreshClick() {
+  @autobind
+  handleRefreshClick() {
     this.reloadData(this.props, true);
   }
 
@@ -265,6 +275,7 @@ class LogAnalysisCore extends React.PureComponent {
       loadLogSequenceEventList,
       loadLogEventList,
       currentLoadingComponents,
+      setLogPatternName,
     } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, month, incidentId, view } = params;
@@ -277,11 +288,15 @@ class LogAnalysisCore extends React.PureComponent {
     const incidentInfo = incidentId ? R.find(i => i.id === incidentId, incidentList) : {};
 
     // Select renderer to generate link to month.
-    const monthValueRender = (option) => {
+    const monthValueRender = option => {
       const url = buildMatchLocation(match, {}, { projectName, month: option.value });
-      return <Select.Link to={url} className="label">{option.label}</Select.Link>;
+      return (
+        <Select.Link to={url} className="label">
+          {option.label}
+        </Select.Link>
+      );
     };
-    const incidentCountBy = (i) => {
+    const incidentCountBy = i => {
       if (view === 'rare') {
         return `${i.name}      (${i.rareEventsCount.toString()})`;
       } else if (view === 'cluster') {
@@ -299,7 +314,9 @@ class LogAnalysisCore extends React.PureComponent {
       <Container fullHeight withGutter className="flex-col log-live">
         <Container breadcrumb>
           <div className="section">
-            <span className="label">{intl.formatMessage(appMenusMessages.logAnalysis)}</span>
+            <span className="label">
+              {intl.formatMessage(appMenusMessages.logAnalysis)}
+            </span>
             <span className="divider">/</span>
             <Select
               name="project"
@@ -362,7 +379,8 @@ class LogAnalysisCore extends React.PureComponent {
               className="ui warning message"
               style={{ marginTop: 16 }}
               dangerouslySetInnerHTML={{
-                __html: 'No log entries found during this period, please select other month to view.',
+                __html:
+                  'No log entries found during this period, please select other month to view.',
               }}
             />
           </Container>}
@@ -375,7 +393,7 @@ class LogAnalysisCore extends React.PureComponent {
               isFluid
               style={{ paddingLeft: 0, paddingRight: 0, width: 1316, margin: 'auto' }}
             >
-              {paddingRange.map(day => (
+              {paddingRange.map(day =>
                 <Tile key={day} style={{ cursor: 'default' }} className="incident-tile">
                   <Box
                     isLink={false}
@@ -388,9 +406,9 @@ class LogAnalysisCore extends React.PureComponent {
                   >
                     <div className="content" />
                   </Box>
-                </Tile>
-              ))}
-              {incidentList.map(ic => (
+                </Tile>,
+              )}
+              {incidentList.map(ic =>
                 <Tile
                   key={`${projectName}-${ic.incidentKey}`}
                   className="incident-tile"
@@ -438,25 +456,31 @@ class LogAnalysisCore extends React.PureComponent {
                             <div className="label" style={{ display: 'inline-block' }}>
                               Total Events:
                             </div>
-                            <div style={{ float: 'right' }}>{ic.totalEventsCount}</div>
+                            <div style={{ float: 'right' }}>
+                              {ic.totalEventsCount}
+                            </div>
                           </div>
                           <div>
                             <div className="label" style={{ display: 'inline-block' }}>
                               Clusters:
                             </div>
-                            <div style={{ float: 'right' }}>{ic.clusterCount}</div>
+                            <div style={{ float: 'right' }}>
+                              {ic.clusterCount}
+                            </div>
                           </div>
                           <div>
                             <div className="label" style={{ display: 'inline-block' }}>
                               Rare Events:
                             </div>
-                            <div style={{ float: 'right' }}>{ic.rareEventsCount}</div>
+                            <div style={{ float: 'right' }}>
+                              {ic.rareEventsCount}
+                            </div>
                           </div>
                         </div>}
                     </div>
                   </Box>
-                </Tile>
-              ))}
+                </Tile>,
+              )}
             </Tile>
           </Container>}
         {!hasError &&
@@ -465,15 +489,14 @@ class LogAnalysisCore extends React.PureComponent {
             <Container className="boxed flex-grow flex-col">
               <div className="ui pointing secondary menu">
                 {R.map(
-                  info => (
+                  info =>
                     <a
                       key={info.key}
                       className={`${info.key === view ? 'active' : ''} item`}
                       onClick={this.handleViewChangeClick(info.key)}
                     >
                       {info.name}
-                    </a>
-                  ),
+                    </a>,
                   this.viewInfos,
                 )}
               </div>
@@ -487,6 +510,7 @@ class LogAnalysisCore extends React.PureComponent {
                     loadLogEventList,
                     loadLogSequenceEventList,
                     currentLoadingComponents,
+                    setLogPatternName,
                     ...get(viewsState, view, {}),
                     startTimeMillis: moment(incidentInfo.incidentStartTime).valueOf(),
                     endTimeMillis: moment(incidentInfo.incidentEndTime).valueOf(),
@@ -533,5 +557,6 @@ export default connect(
     loadLogEventList,
     loadLogSequenceEventList,
     rerunLogDetection,
+    setLogPatternName,
   },
 )(LogAnalysis);
