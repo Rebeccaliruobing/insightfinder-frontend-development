@@ -72,8 +72,7 @@ class LogAnalysisCore extends React.PureComponent {
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
 
-    // General the monthy option list for one year.
-    this.monthCount = 5 * 12;
+    this.yearCount = 20;
 
     // The default view when incident is displayed.
     this.defaultIncidentView = 'rare';
@@ -91,13 +90,22 @@ class LogAnalysisCore extends React.PureComponent {
 
     // Create the select options for month picker.
     this.monthOptions = R.map(offset => {
-      const month = moment();
-      month.add(-offset, 'month').startOf('month');
+      const month = moment().startOf('year');
+      month.add(offset, 'month').startOf('month');
       return {
-        label: month.format('MMM YYYY'),
-        value: month.format(this.monthFormat),
+        label: month.format('MMMM'),
+        value: month.format('MM'),
       };
-    }, R.range(0, this.monthCount));
+    }, R.range(0, 12));
+
+    this.yearOptions = R.map(offset => {
+      const year = moment();
+      year.add(-offset, 'year').startOf('month');
+      return {
+        label: year.format('YYYY'),
+        value: year.format('YYYY'),
+      };
+    }, R.range(0, this.yearCount));
   }
 
   componentDidMount() {
@@ -187,22 +195,42 @@ class LogAnalysisCore extends React.PureComponent {
   }
 
   @autobind
+  handleYearChange(newValue) {
+    const year = newValue ? newValue.value : null;
+    const { match, push, location } = this.props;
+    const params = parseQueryString(location.search);
+    const oldMonth = params.month;
+    const monthObj = moment(oldMonth, this.monthFormat);
+    const month = monthObj.format('MM');
+
+    const { projectName } = params;
+
+    // When month changed, remove incident related params.
+    push(buildMatchLocation(match, {}, { projectName, month: `${year}-${month}` }));
+  }
+
+  @autobind
   handleMonthChange(newValue) {
     const month = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
+    const oldMonth = params.month;
+    const monthObj = moment(oldMonth, this.monthFormat);
+    const year = monthObj.format('YYYY');
+
     const { projectName } = params;
 
     // When month changed, remove incident related params.
-    push(buildMatchLocation(match, {}, { projectName, month }));
+    push(buildMatchLocation(match, {}, { projectName, month: `${year}-${month}` }));
   }
 
   @autobind
   handleIncidentChange(newValue) {
-    const incidentId = newValue ? newValue.value : null;
+    const incidentId = newValue ? newValue.value : undefined;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    push(buildMatchLocation(match, {}, { ...params, incidentId }));
+    const view = !incidentId ? undefined : params.view;
+    push(buildMatchLocation(match, {}, { ...params, incidentId, view }));
   }
 
   @autobind
@@ -287,16 +315,7 @@ class LogAnalysisCore extends React.PureComponent {
     const showIncident = Boolean(incidentId);
     const incidentInfo = incidentId ? R.find(i => i.id === incidentId, incidentList) : {};
 
-    // Select renderer to generate link to month.
-    const monthValueRender = option => {
-      const url = buildMatchLocation(match, {}, { projectName, month: option.value });
-      return (
-        <Select.Link to={url} className="label">
-          {option.label}
-        </Select.Link>
-      );
-    };
-
+    const monthObj = moment(month, this.monthFormat);
     let paddingRange = [];
     if (incidentList.length > 0) {
       paddingRange = range(0, incidentList[0].weekday, 1);
@@ -321,19 +340,28 @@ class LogAnalysisCore extends React.PureComponent {
             />
             <span className="divider">/</span>
             <Select
+              name="year"
+              inline
+              style={{ width: 80 }}
+              placeholder="year"
+              options={this.yearOptions}
+              value={monthObj.format('YYYY')}
+              onChange={this.handleYearChange}
+            />
+            <Select
               name="month"
               inline
-              style={{ width: 130 }}
-              placeholder="Select Month"
+              style={{ width: 80 }}
+              placeholder="month"
               options={this.monthOptions}
-              value={month}
+              value={monthObj.format('MM')}
               onChange={this.handleMonthChange}
-              {...(showIncident ? { valueRenderer: monthValueRender } : {})}
             />
             {showIncident && <span className="divider">/</span>}
             {showIncident &&
               <Select
                 name="incident"
+                clearable
                 inline
                 style={{ width: 130 }}
                 options={R.filter(
@@ -345,7 +373,7 @@ class LogAnalysisCore extends React.PureComponent {
               />}
             {showIncident &&
               incidentInfo &&
-              <div style={{ position: 'absolute', left: 560 }}>
+              <div style={{ position: 'absolute', left: 620 }}>
                 <span
                   style={{ marginLeft: '2em', cursor: 'pointer', textDecoration: 'underline' }}
                   onClick={this.handleViewChangeClick('rare')}
