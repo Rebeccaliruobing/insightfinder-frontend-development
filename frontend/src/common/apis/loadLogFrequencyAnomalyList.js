@@ -25,7 +25,7 @@ const loadLogFrequencyAnomalyList = (
     ...credentials,
     projectName,
     dayTimeMillis: incidentId,
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
 
     const toIntArray = R.pipe(R.filter(f => Boolean(f)), R.map(n => parseInt(n.trim(), 10)));
@@ -63,7 +63,7 @@ const loadLogFrequencyAnomalyList = (
 
     let patterns = get(rawData, 'patternList', []);
     // TODO: sort the patterns by anomaly ratio
-    patterns = R.map((p) => {
+    patterns = R.map(p => {
       const { nid, patternName } = p;
       const keywords = logPatternTopKToArray(p.topK);
       const name = p.patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
@@ -84,11 +84,24 @@ const loadLogFrequencyAnomalyList = (
       // TODO: Needs hints
       const freqTsData = [];
       const barColors = {};
+      // Push some empty data before and after the sequence
+      if (freqTimestamps.length > 0) {
+        const tsObj = moment(freqTimestamps[0]).subtract(5, 'minutes');
+        barColors[tsObj.valueOf()] = 'teal';
+        freqTsData.push([new Date(tsObj.valueOf()), 0]);
+      }
+
       R.addIndex(R.forEach)((ts, idx) => {
         const t = new Date(ts);
         barColors[t.valueOf()] = 'teal'; // blue & red
         freqTsData.push([t, freqs[idx] || 0]);
       }, freqTimestamps);
+
+      if (freqTimestamps.length > 0) {
+        const tsObj = moment(freqTimestamps[freqTimestamps.length - 1]).add(5, 'minutes');
+        barColors[tsObj.valueOf()] = 'teal';
+        freqTsData.push([new Date(tsObj.valueOf()), 0]);
+      }
 
       return {
         nid,

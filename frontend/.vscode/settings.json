@@ -6,6 +6,7 @@
         "**/.happypack": true,
         "**/_legacy": true
     },
+    "flow.useNPMPackagedFlow": true,
     "prettier.printWidth": 100,
     "prettier.singleQuote": true,
     "prettier.bracketSpacing": true,
