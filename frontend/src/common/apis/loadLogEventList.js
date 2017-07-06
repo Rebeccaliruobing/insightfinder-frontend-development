@@ -14,23 +14,22 @@ import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
 const loadLogEventList = (credentials: Credentials, projectName: String, params: Object) => {
-  let { dayTimeMillis } = params;
+  const { dayTimeMillis, startTimeMillis, endTimeMillis, ...rest } = params;
 
-  if (!dayTimeMillis) {
-    dayTimeMillis = params.startTimeMillis;
-  }
+  const dayTime = dayTimeMillis || startTimeMillis;
+
   // Use the time as the incident id.
   return fetchGet(getEndpoint('logstreamingevent'), {
     ...credentials,
     projectName,
-    ...params,
-    dayTimeMillis,
-  }).then((d) => {
+    ...rest,
+    dayTimeMillis: dayTime,
+  }).then(d => {
     // TODO: This API response not in data format, need to change to d.data.
 
     const rawData = d;
     let events = get(rawData, 'eventArray', []);
-    events = R.map((e) => {
+    events = R.map(e => {
       const etimeVal = moment(e.timestamp).valueOf();
       return {
         datetime: e.timestamp,

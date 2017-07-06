@@ -78,18 +78,12 @@ class LogFrequencyAnomalies extends React.PureComponent {
 
   @autobind
   reloadPattern(props, patternId) {
-    const {
-      projectName,
-      startTimeMillis,
-      endTimeMillis,
-      selectLogPattern,
-      loadLogEventList,
-    } = props;
+    const { projectName, startTimeMillis, selectLogPattern, loadLogEventList } = props;
     selectLogPattern(this.viewName, patternId);
     loadLogEventList(
       projectName,
       this.viewName,
-      { startTimeMillis, endTimeMillis, patternId },
+      { dayTimeMillis: startTimeMillis, patternId },
       { [this.loadingComponentPath]: true },
     );
   }
