@@ -62,11 +62,13 @@ class LogFrequencyAnomalies extends React.PureComponent {
     }
   }
 
-  @autobind handlePatternClick({ rowData: pattern }) {
+  @autobind
+  handlePatternClick({ rowData: pattern }) {
     this.reloadPattern(this.props, pattern.nid);
   }
 
-  @autobind reloadPattern(props, patternId) {
+  @autobind
+  reloadPattern(props, patternId) {
     const {
       projectName,
       startTimeMillis,
@@ -82,7 +84,8 @@ class LogFrequencyAnomalies extends React.PureComponent {
       { [this.loadingComponentPath]: true },
     );
   }
-  @autobind handlePatternPointClick(startTs) {
+  @autobind
+  handlePatternPointClick(startTs) {
     this.setState({
       selectedStartTs: startTs,
     });
@@ -117,22 +120,34 @@ class LogFrequencyAnomalies extends React.PureComponent {
     return { startTs, endTs };
   }
 
-  getSelectedEventList() {
-    let eventList = this.props.currentEventList || [];
-    const { startTs, endTs } = this.getSelectedTimeRange();
+  getSelectedTimeData() {
+    const patterns = get(this.props, this.patternsPropsPath, []);
+    const { currentPatternId, currentEventList } = this.props;
+    let eventList = currentEventList || [];
+    const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
 
+    const { startTs, endTs } = this.getSelectedTimeRange();
     if (startTs) {
       eventList = R.filter(e => e.datetime >= startTs, eventList);
     }
     if (endTs) {
       eventList = R.filter(e => e.datetime < endTs, eventList);
     }
-    return eventList;
+
+    const anomaly = get(patternInfo, ['anomalies', startTs]);
+    let anomalyText = '';
+    if (anomaly) {
+      const pct = anomaly.pct;
+      anomalyText = `Frequency of this pattern is ${Math.abs(pct).toFixed(2)}% ${pct > 0
+        ? 'higher'
+        : 'lower'} then normal.`;
+    }
+    return { anomaly, anomalyText, eventList, startTs };
   }
 
   render() {
     const patterns = get(this.props, this.patternsPropsPath, []);
-    const eventList = this.getSelectedEventList();
+    const { eventList, anomalyText } = this.getSelectedTimeData();
     const { currentPatternId } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
     const { freqTsData, keywords, barColors } = patternInfo;
@@ -153,7 +168,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ marginRight: '1em' }}>
           <AutoSizer disableWidth>
-            {({ height }) => (
+            {({ height }) =>
               <Table
                 className="with-border"
                 width={380}
@@ -165,9 +180,9 @@ class LogFrequencyAnomalies extends React.PureComponent {
                 rowClassName={clusterRowClassName}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={380} label="Cluster" dataKey="name" />
-              </Table>
-            )}
+                <Column width={340} label="Cluster" dataKey="name" />
+                <Column width={40} label="Count" className="text-right" dataKey="anomalyCount" />
+              </Table>}
           </AutoSizer>
         </Container>
         <Container className="flex-grow">
@@ -179,23 +194,27 @@ class LogFrequencyAnomalies extends React.PureComponent {
               keywords.length > 0 &&
               <div style={{ marginBottom: '0.5em' }}>{`Top keywords: ${keywords.join(',')}`}</div>}
             {freqTsData &&
-              <DataChart
-                chartType="bar"
-                barColors={barColors}
-                data={{ sdata: freqTsData, sname: ['Time', 'Frequency'] }}
-                annotations={[]}
-                onClick={this.handlePatternPointClick}
-              />}
-            <Container className="flex-grow" style={{ margin: '1em 0 0 2em' }}>
+              <div>
+                <DataChart
+                  chartType="bar"
+                  barColors={barColors}
+                  data={{ sdata: freqTsData, sname: ['Time', 'Frequency'] }}
+                  annotations={[]}
+                  onClick={this.handlePatternPointClick}
+                />
+                <div style={{ color: 'red', fontSize: '1.1rem', margin: '0.5em 0 0 2em' }}>
+                  {anomalyText}
+                </div>
+              </div>}
+            <Container className="flex-grow" style={{ margin: '0 0 0 2em' }}>
               <AutoSizer>
-                {({ height, width }) => (
+                {({ height, width }) =>
                   <EventGroup
                     style={{ height, width, paddingLeft: 0 }}
                     className="flex-item flex-col-container"
                     name=""
                     eventDataset={eventList}
-                  />
-                )}
+                  />}
               </AutoSizer>
             </Container>
           </Container>

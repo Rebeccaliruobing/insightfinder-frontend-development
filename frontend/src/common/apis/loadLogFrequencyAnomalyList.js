@@ -6,13 +6,13 @@
  **/
 /* eslint-disable no-console */
 import R from 'ramda';
-import { get } from 'lodash';
+import { get, isArray } from 'lodash';
 import moment from 'moment';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
-import { logPatternTopKToArray, logPatternAnomalyToArray } from './magicParsers';
+import { logPatternTopKToArray, logPatternAnomalyToMap } from './magicParsers';
 
 const loadLogFrequencyAnomalyList = (
   credentials: Credentials,
@@ -52,14 +52,13 @@ const loadLogFrequencyAnomalyList = (
       );
     }
 
-    let derivedAnomalyString = get(rawData, 'derivedAnomalyString[0].anomalies');
-    if (typeof derivedAnomalyString !== 'string') {
-      derivedAnomalyString = '';
-      console.error('[IF] derivedAnomalyString is empty or not a one item Array, Q:splitId="0"?');
+    let derivedAnomalyString = get(rawData, 'derivedAnomalyString');
+    if (!isArray(derivedAnomalyString)) {
+      derivedAnomalyString = [];
+      console.error('[IF] expect derivedAnomalyString to be an Array', derivedAnomalyString);
     }
 
-    const allAnomalies = logPatternAnomalyToArray(derivedAnomalyString);
-    let matchedAnomalyCount = 0;
+    const allAnomalies = logPatternAnomalyToMap(derivedAnomalyString);
 
     let patterns = get(rawData, 'patternList', []);
     // TODO: sort the patterns by anomaly ratio
@@ -68,23 +67,21 @@ const loadLogFrequencyAnomalyList = (
       const keywords = logPatternTopKToArray(p.topK);
       const name = p.patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
 
-      const anomalies = R.filter(a => !isNaN(a.nid) && a.nid === nid, allAnomalies);
-      // Get the mean anomaly ratio
-      const anomalyMeanRatio = R.mean(R.map(a => a.ratio, anomalies));
-      matchedAnomalyCount += anomalies.length;
+      const anomalies = allAnomalies[nid.toString()] || {};
+      const anomalyCount = R.keys(anomalies).length;
 
       // Get the freq vector
       const freqs = toIntArray(get(freqVectorObj, p.patternName, '').split(','));
       if (freqs.length !== freqTimestamps.length) {
         console.error(
-          `[IF] ${patternName} freqVectorObj not match timestamp, will left align and 0 pad.`,
+          `[IF] ${patternName} freqVectorObj not match timestamp`,
+          freqs,
+          freqTimestamps,
         );
       }
 
-      // TODO: Needs hints
       const freqTsData = [];
       const barColors = {};
-      // Push some empty data before and after the sequence
       if (freqTimestamps.length > 0) {
         const tsObj = moment(freqTimestamps[0]).subtract(5, 'minutes');
         barColors[tsObj.valueOf()] = 'teal';
@@ -93,8 +90,13 @@ const loadLogFrequencyAnomalyList = (
 
       R.addIndex(R.forEach)((ts, idx) => {
         const t = new Date(ts);
-        barColors[t.valueOf()] = 'teal'; // blue & red
-        freqTsData.push([t, freqs[idx] || 0]);
+        const anomaly = anomalies[ts.toString()];
+
+        barColors[ts] = 'teal';
+        if (anomaly) {
+          barColors[ts] = anomaly.pct > 0 ? 'red' : 'blue';
+        }
+        freqTsData.push([t, freqs[idx] || 0, get(anomaly, 'pct')]);
       }, freqTimestamps);
 
       if (freqTimestamps.length > 0) {
@@ -112,17 +114,10 @@ const loadLogFrequencyAnomalyList = (
         eventsCount: p.count,
         freqTsData,
         barColors,
-        anomalyMeanRatio,
+        anomalyCount,
       };
     }, patterns);
-    patterns = R.sort((a, b) => a.anomalyMeanRatio > b.anomalyMeanRatio, patterns);
-
-    if (matchedAnomalyCount !== allAnomalies.length) {
-      console.warn(
-        `[IF] Not all anomalies have matched pattern, matched: ${matchedAnomalyCount}`,
-        allAnomalies,
-      );
-    }
+    patterns = R.sortWith([R.descend(R.prop('anomalyCount'))], patterns);
 
     return {
       rawData,
