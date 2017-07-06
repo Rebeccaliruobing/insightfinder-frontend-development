@@ -4,6 +4,7 @@
  * Copyright InsightFinder Inc., 2017
  * *****************************************************************************
  **/
+/* eslint-disable no-console */
 
 import R from 'ramda';
 import moment from 'moment';
@@ -24,12 +25,12 @@ const getLogSequenceEventList = (credentials: Credentials, projectName: String, 
     projectName,
     dayTimeMillis,
     patternSequence: params.patterns,
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
     let sequences = rawData;
 
-    sequences = R.map((seq) => {
-      return R.map((e) => {
+    sequences = R.map(seq => {
+      return R.map(e => {
         const etimeVal = moment(e.timestamp).valueOf();
         return {
           datetime: e.timestamp,
@@ -38,6 +39,10 @@ const getLogSequenceEventList = (credentials: Credentials, projectName: String, 
         };
       }, seq);
     }, sequences);
+
+    if (sequences.length === 0) {
+      console.warn(`[IF] Empty event list for patterns: ${params.patterns}`);
+    }
 
     return {
       rawData,

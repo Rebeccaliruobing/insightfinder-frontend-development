@@ -237,7 +237,7 @@ class LogPatternSequences extends React.PureComponent {
             </div>
           </Container>}
         {!isSequence &&
-          <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
+          <Container className={`flex-grow flex-col ${isLoading ? 'loading' : ''}`}>
             <h3 className="pattern-name" style={{ marginBottom: 0 }}>
               <span>
                 {sequenceInfo.name || ''}
@@ -256,17 +256,19 @@ class LogPatternSequences extends React.PureComponent {
                 currentLoadingComponents={currentLoadingComponents}
                 onClose={this.handleModalClose}
               />}
-            <AutoSizer>
-              {({ height }) =>
-                <EventGroup
-                  style={{ height, width: 900 }}
-                  className="flex-item flex-col-container"
-                  keywords={get(sequenceInfo, 'keywords', [])}
-                  episodes={get(sequenceInfo, 'episodes', [])}
-                  eventDataset={eventList}
-                  showFE
-                />}
-            </AutoSizer>
+            <Container className="flex-grow">
+              <AutoSizer>
+                {({ height }) =>
+                  <EventGroup
+                    style={{ height, width: 900 }}
+                    className="flex-item flex-col-container"
+                    keywords={get(sequenceInfo, 'keywords', [])}
+                    episodes={get(sequenceInfo, 'episodes', [])}
+                    eventDataset={eventList}
+                    showFE
+                  />}
+              </AutoSizer>
+            </Container>
           </Container>}
       </Container>
     );
