@@ -6,6 +6,7 @@
  **/
 
 import R from 'ramda';
+import { get } from 'lodash';
 
 import type { LogState, Action } from '../types';
 
@@ -63,6 +64,29 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
         },
       };
       return { ...state, viewsState };
+    }
+    return state;
+  } else if (action.type === 'UPDATE_LOG_PATTERN_NAME') {
+    const { view, patternId, patternName } = action.payload;
+    const nid = parseInt(patternId, 10);
+    let changed = false;
+    const incident = state.incident;
+    const viewData = incident[view];
+    let patterns = viewData.patterns || [];
+
+    patterns = R.map(p => {
+      if (p.nid === nid) {
+        changed = true;
+        return { ...p, name: patternName, patternName };
+      }
+      return p;
+    }, patterns);
+
+    if (changed) {
+      return {
+        ...state,
+        incident: { ...incident, [view]: { ...viewData, patterns } },
+      };
     }
     return state;
   } else if (action.type === 'SET_LOG_STREAMING1') {

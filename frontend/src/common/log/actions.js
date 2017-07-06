@@ -56,6 +56,15 @@ export const setLogPatternName = (
   payload: { projectName, view, incidentId, patternId, patternName, components },
 });
 
+export const updateLogPatternName = (
+  view: String,
+  patternId: String,
+  patternName: String,
+): Action => ({
+  type: 'UPDATE_LOG_PATTERN_NAME',
+  payload: { view, patternId, patternName },
+});
+
 /**
  * Load the events based on condition and store at the related storePath.
  */

@@ -8,12 +8,12 @@
 /* eslint-disable no-console */
 import { Observable } from 'rxjs/Observable';
 import R from 'ramda';
-import { get } from 'lodash';
+
 import type { Deps } from '../../types';
 import { postLogPatternName } from '../../apis';
 import { setLoadingComponents } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
-import { setLogInfo } from '../actions';
+import { updateLogPatternName } from '../actions';
 
 const setPatternNameEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('SET_LOG_PATTERN_NAME').concatMap(action => {
@@ -24,9 +24,8 @@ const setPatternNameEpic = (action$: any, { getState }: Deps) =>
     const apiAction$ = Observable.from(
       postLogPatternName(credentials, projectName, { incidentId, patternId, patternName }),
     )
-      .concatMap(d => {
-        console.log(d);
-        return Observable.empty();
+      .concatMap(() => {
+        return Observable.of(updateLogPatternName(view, patternId, patternName));
       })
       .catch(err => {
         return apiEpicErrorHandle(err);

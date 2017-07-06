@@ -6,17 +6,21 @@
  **/
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
-import fetchPost from './fetchPost';
+import fetchPostJson from './fetchPostJson';
 
 const postLogPatternName = (credentials: Credentials, projectName: String, params: Object) => {
-  const { patternId, patternName } = params;
-  return fetchPost(getEndpoint('logstreamingsetpattern'), {
-    ...credentials,
-    projectName,
-    patterns: {
+  const { incidentId, patternId, patternName } = params;
+  return fetchPostJson(
+    getEndpoint('logstreamingsetpattern'),
+    {
+      ...credentials,
+      projectName,
+      dayTimeMillis: incidentId,
+    },
+    {
       [patternId.toString()]: patternName,
     },
-  }).then(d => {
+  ).then(d => {
     return d;
   });
 };

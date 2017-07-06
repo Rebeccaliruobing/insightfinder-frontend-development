@@ -7,6 +7,8 @@ import { Input } from '../../../lib/fui/react';
 type Props = {
   newNameLink: Object,
   projectName: String,
+  patternName: String,
+  incidentId: String,
   viewName: String,
   patternId: String,
   currentLoadingComponents: Object,
@@ -20,17 +22,11 @@ class PatternNameModal extends React.Component {
   constructor(props) {
     super(props);
     this.loadingComponentPath = `log_${props.viewName}_pattern_name`;
-
     this.sumbitting = false;
   }
 
-  @autobind
-  handleSumbit() {
-    const { projectName, viewName, patternId, setLogPatternName, newNameLink } = this.props;
-    this.sumbitting = true;
-    setLogPatternName(projectName, viewName, patternId, newNameLink.value, {
-      [this.loadingComponentPath]: true,
-    });
+  componentDidMount() {
+    this.props.newNameLink.set(this.props.patternName);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -40,6 +36,22 @@ class PatternNameModal extends React.Component {
       this.sumbitting = false;
       this.modal.close();
     }
+  }
+
+  @autobind
+  handleSumbit() {
+    const {
+      projectName,
+      incidentId,
+      viewName,
+      patternId,
+      setLogPatternName,
+      newNameLink,
+    } = this.props;
+    this.sumbitting = true;
+    setLogPatternName(projectName, incidentId, viewName, patternId, newNameLink.value, {
+      [this.loadingComponentPath]: true,
+    });
   }
 
   render() {

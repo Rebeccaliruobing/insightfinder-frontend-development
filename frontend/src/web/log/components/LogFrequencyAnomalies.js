@@ -9,21 +9,25 @@ import React from 'react';
 import { get } from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
+import VLink from 'valuelink';
 
 import { DataChart } from '../../../../components/share/charts';
 import { Container, AutoSizer, Table, Column } from '../../../lib/fui/react';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
+import PatternNameModal from './PatternNameModal';
 
 type Props = {
   data: Object,
   currentLoadingComponents: Object,
   projectName: String,
+  incidentId: String,
   startTimeMillis: Number,
   endTimeMillis: Number,
   currentPatternId: String,
   currentEventList: Array<Object>,
   selectLogPattern: Function,
   loadLogEventList: Function,
+  setLogPatternName: Function,
 };
 
 class LogFrequencyAnomalies extends React.PureComponent {
@@ -37,6 +41,8 @@ class LogFrequencyAnomalies extends React.PureComponent {
     this.patternsPropsPath = ['data', 'patterns'];
     this.state = {
       selectedStartTs: null,
+      showNameModal: false,
+      newPatternName: '',
     };
   }
 
@@ -48,16 +54,19 @@ class LogFrequencyAnomalies extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps(newProps) {
-    const patterns = get(newProps, this.patternsPropsPath);
+  componentWillReceiveProps(nextProps) {
+    const patterns = get(nextProps, this.patternsPropsPath);
     if (!R.identical(patterns, get(this.props, this.patternsPropsPath))) {
-      if (patterns.length > 0) {
-        const patternId = patterns[0].nid;
-        this.reloadPattern(newProps, patternId);
-        // Reset the selected start and end ts
-        this.setState({
-          selectedStartTs: null,
-        });
+      const { currentPatternId } = this.props;
+      if (!currentPatternId) {
+        if (patterns.length > 0) {
+          const patternId = patterns[0].nid;
+          this.reloadPattern(nextProps, patternId);
+          // Reset the selected start and end ts
+          this.setState({
+            selectedStartTs: null,
+          });
+        }
       }
     }
   }
@@ -145,13 +154,42 @@ class LogFrequencyAnomalies extends React.PureComponent {
     return { anomaly, anomalyText, eventList, startTs };
   }
 
+  @autobind
+  handlePatternNameClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      showNameModal: true,
+    });
+  }
+
+  @autobind
+  handleModalClose() {
+    this.setState({
+      showNameModal: false,
+      newPatternName: '',
+    });
+  }
+
   render() {
     const patterns = get(this.props, this.patternsPropsPath, []);
     const { eventList, anomalyText } = this.getSelectedTimeData();
-    const { currentPatternId } = this.props;
+    const {
+      currentPatternId,
+      projectName,
+      incidentId,
+      currentLoadingComponents,
+      setLogPatternName,
+    } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
     const { freqTsData, keywords, barColors } = patternInfo;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
+
+    const { showNameModal } = this.state;
+    const newPatternNameLink = VLink.state(this, 'newPatternName').check(
+      x => x,
+      'Pattern name cannot be empty',
+    );
 
     const clusterRowClassName = ({ index }) => {
       // Ignore header row.
@@ -187,12 +225,29 @@ class LogFrequencyAnomalies extends React.PureComponent {
         </Container>
         <Container className="flex-grow">
           <Container fullHeight className={`flex-col ${isLoading ? 'loading' : ''}`}>
-            <h3 className="ui header" style={{ marginBottom: 0 }}>
-              {patternInfo.name || ''}
+            <h3 className="pattern-name" style={{ marginBottom: 0 }}>
+              <span>
+                {patternInfo.name || ''}
+              </span>
+              <i className="write icon" onClick={this.handlePatternNameClick} />
             </h3>
+            {showNameModal &&
+              <PatternNameModal
+                newNameLink={newPatternNameLink}
+                projectName={projectName}
+                patternName={patternInfo.name}
+                viewName={this.viewName}
+                patternId={currentPatternId}
+                incidentId={incidentId}
+                setLogPatternName={setLogPatternName}
+                currentLoadingComponents={currentLoadingComponents}
+                onClose={this.handleModalClose}
+              />}
             {keywords &&
               keywords.length > 0 &&
-              <div style={{ marginBottom: '0.5em' }}>{`Top keywords: ${keywords.join(',')}`}</div>}
+              <div
+                style={{ marginLeft: 16, marginBottom: '0.5em' }}
+              >{`Top keywords: ${keywords.join(',')}`}</div>}
             {freqTsData &&
               <div>
                 <DataChart

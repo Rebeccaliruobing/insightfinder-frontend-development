@@ -65,13 +65,13 @@ const loadLogFrequencyAnomalyList = (
     patterns = R.map(p => {
       const { nid, patternName } = p;
       const keywords = logPatternTopKToArray(p.topK);
-      const name = p.patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
+      const name = patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
 
       const anomalies = allAnomalies[nid.toString()] || {};
       const anomalyCount = R.keys(anomalies).length;
 
       // Get the freq vector
-      const freqs = toIntArray(get(freqVectorObj, p.patternName, '').split(','));
+      const freqs = toIntArray(get(freqVectorObj, `Pattern ${nid}`, '').split(','));
       if (freqs.length !== freqTimestamps.length) {
         console.error(
           `[IF] ${patternName} freqVectorObj not match timestamp`,

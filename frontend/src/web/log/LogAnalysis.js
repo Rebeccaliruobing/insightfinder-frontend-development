@@ -513,6 +513,7 @@ class LogAnalysisCore extends React.PureComponent {
                   {React.createElement(viewInfo.component, {
                     data: viewInfoData,
                     projectName,
+                    incidentId,
                     selectLogPattern,
                     selectLogPatternSequence,
                     loadLogEventList,

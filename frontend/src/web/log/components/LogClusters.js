@@ -25,6 +25,7 @@ type Props = {
   data: Object,
   currentLoadingComponents: Object,
   projectName: String,
+  incidentId: String,
   startTimeMillis: Number,
   endTimeMillis: Number,
   currentPatternId: String,
@@ -41,11 +42,8 @@ class LogClusters extends React.Component {
     super(props);
     this.viewName = 'cluster';
     this.loadingComponentPath = 'log_cluster_eventlist';
-
     this.state = {
       showNameModal: false,
-      editingPatternId: null,
-      editingPatternName: null,
       newPatternName: '',
     };
   }
@@ -58,12 +56,15 @@ class LogClusters extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
-    const patterns = get(newProps.data, 'patterns');
+  componentWillReceiveProps(nextProps) {
+    const patterns = get(nextProps.data, 'patterns');
     if (!R.identical(patterns, get(this.props.data, 'patterns'))) {
-      if (patterns.length > 0) {
-        const patternId = patterns[0].nid;
-        this.reloadPattern(newProps, patternId);
+      const { currentPatternId } = this.props;
+      if (!currentPatternId) {
+        if (patterns.length > 0) {
+          const patternId = patterns[0].nid;
+          this.reloadPattern(nextProps, patternId);
+        }
       }
     }
   }
@@ -114,6 +115,7 @@ class LogClusters extends React.Component {
     const {
       currentPatternId,
       projectName,
+      incidentId,
       setLogPatternName,
       currentLoadingComponents,
     } = this.props;
@@ -173,18 +175,16 @@ class LogClusters extends React.Component {
             <span>
               {patternInfo.name || ''}
             </span>
-            <i
-              className="write icon"
-              onClick={this.handlePatternNameClick}
-              style={{ display: 'none' }}
-            />
+            <i className="write icon" onClick={this.handlePatternNameClick} />
           </h3>
           {showNameModal &&
             <PatternNameModal
               newNameLink={newPatternNameLink}
               projectName={projectName}
+              patternName={patternInfo.name}
               viewName={this.viewName}
               patternId={currentPatternId}
+              incidentId={incidentId}
               setLogPatternName={setLogPatternName}
               currentLoadingComponents={currentLoadingComponents}
               onClose={this.handleModalClose}
