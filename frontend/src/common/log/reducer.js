@@ -70,23 +70,44 @@ const reducer = (state: LogState = initialState, action: Action): LogState => {
     const { view, patternId, patternName } = action.payload;
     const nid = parseInt(patternId, 10);
     let changed = false;
+
     const incident = state.incident;
     const viewData = incident[view];
-    let patterns = viewData.patterns || [];
 
-    patterns = R.map(p => {
-      if (p.nid === nid) {
-        changed = true;
-        return { ...p, name: patternName, patternName };
+    if (view !== 'seq') {
+      let patterns = viewData.patterns || [];
+
+      patterns = R.map(p => {
+        if (p.nid === nid) {
+          changed = true;
+          return { ...p, name: patternName, patternName };
+        }
+        return p;
+      }, patterns);
+
+      if (changed) {
+        return {
+          ...state,
+          incident: { ...incident, [view]: { ...viewData, patterns } },
+        };
       }
-      return p;
-    }, patterns);
+    } else {
+      let sequences = viewData.sequences || [];
 
-    if (changed) {
-      return {
-        ...state,
-        incident: { ...incident, [view]: { ...viewData, patterns } },
-      };
+      sequences = R.map(p => {
+        if (p.id === nid) {
+          changed = true;
+          return { ...p, name: patternName, patternName };
+        }
+        return p;
+      }, sequences);
+
+      if (changed) {
+        return {
+          ...state,
+          incident: { ...incident, [view]: { ...viewData, sequences } },
+        };
+      }
     }
     return state;
   } else if (action.type === 'SET_LOG_STREAMING1') {

@@ -9,14 +9,17 @@ import React from 'react';
 import { get } from 'lodash';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
+import VLink from 'valuelink';
 
 import { Container, AutoSizer, Table, Column } from '../../../lib/fui/react';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
+import PatternNameModal from './PatternNameModal';
 
 type Props = {
   data: Object,
   currentLoadingComponents: Object,
   projectName: String,
+  incidentId: String,
   startTimeMillis: Number,
   endTimeMillis: Number,
   currentPatternId: String,
@@ -27,6 +30,7 @@ type Props = {
   selectLogPatternSequence: Function,
   loadLogEventList: Function,
   loadLogSequenceEventList: Function,
+  setLogPatternName: Function,
 };
 
 class LogPatternSequences extends React.PureComponent {
@@ -38,6 +42,11 @@ class LogPatternSequences extends React.PureComponent {
     this.viewName = 'seq';
     this.statePath = 'sequences';
     this.loadingComponentPath = 'log_seq_eventlist';
+
+    this.state = {
+      showNameModal: false,
+      newPatternName: '',
+    };
   }
 
   componentDidMount() {
@@ -53,10 +62,13 @@ class LogPatternSequences extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     const sequences = get(nextProps.data, this.statePath);
     if (!R.identical(sequences, get(this.props.data, this.statePath))) {
-      const sequence = R.find(s => s.isSequence, sequences);
-      if (sequence) {
-        const { patterns, id } = sequence;
-        this.reloadPatternSequence(nextProps, id, patterns);
+      const { currentPatternId } = this.props;
+      if (!currentPatternId) {
+        const sequence = R.find(s => s.isSequence, sequences);
+        if (sequence) {
+          const { patterns, id } = sequence;
+          this.reloadPatternSequence(nextProps, id, patterns);
+        }
       }
     }
   }
@@ -110,15 +122,44 @@ class LogPatternSequences extends React.PureComponent {
     );
   }
 
+  @autobind
+  handlePatternNameClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    this.setState({
+      showNameModal: true,
+    });
+  }
+
+  @autobind
+  handleModalClose() {
+    this.setState({
+      showNameModal: false,
+      newPatternName: '',
+    });
+  }
+
   render() {
     const sequences = get(this.props.data, this.statePath, []);
     const eventList = this.props.currentEventList || [];
     const sequenceEventList = this.props.currentSequenceEventList || [];
-    const { currentPatternId, currentSequenceId } = this.props;
+    const {
+      currentPatternId,
+      currentSequenceId,
+      projectName,
+      incidentId,
+      setLogPatternName,
+      currentLoadingComponents,
+    } = this.props;
     const sequenceInfo =
       R.find(s => s.id === currentPatternId || s.id === currentSequenceId, sequences) || {};
     const isSequence = sequenceInfo.isSequence;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
+    const { showNameModal } = this.state;
+    const newPatternNameLink = VLink.state(this, 'newPatternName').check(
+      x => x,
+      'Pattern name cannot be empty',
+    );
 
     const nameRender = ({ rowData }) => {
       if (rowData.isPattern) {
@@ -197,11 +238,28 @@ class LogPatternSequences extends React.PureComponent {
           </Container>}
         {!isSequence &&
           <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
+            <h3 className="pattern-name" style={{ marginBottom: 0 }}>
+              <span>
+                {sequenceInfo.name || ''}
+              </span>
+              <i className="write icon" onClick={this.handlePatternNameClick} />
+            </h3>
+            {showNameModal &&
+              <PatternNameModal
+                newNameLink={newPatternNameLink}
+                projectName={projectName}
+                patternName={sequenceInfo.name}
+                viewName={this.viewName}
+                patternId={currentPatternId}
+                incidentId={incidentId}
+                setLogPatternName={setLogPatternName}
+                currentLoadingComponents={currentLoadingComponents}
+                onClose={this.handleModalClose}
+              />}
             <AutoSizer>
               {({ height }) =>
                 <EventGroup
                   style={{ height, width: 900 }}
-                  name={sequenceInfo.name || ''}
                   className="flex-item flex-col-container"
                   keywords={get(sequenceInfo, 'keywords', [])}
                   episodes={get(sequenceInfo, 'episodes', [])}
