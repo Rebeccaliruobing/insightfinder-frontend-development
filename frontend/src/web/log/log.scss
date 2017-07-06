@@ -3,9 +3,18 @@
 @import "../../lib/fui/sass/variables";
 
 .log-live {
+  .ReactVirtualized__Table__rowColumn {
+    z-index: 10;
+  }
+  .pattern-percent {
+    height: 95%;
+    position: absolute;
+    left: 0;
+    background: rgba(33, 133, 208, 1);
+  }
   .pattern-name {
     margin-left: 1em;
-    color: #4183C4;
+    color: #4183c4;
     .write.icon {
       margin-left: 0.5em;
       cursor: pointer;
@@ -33,7 +42,7 @@
           margin-left: 0.5em;
         }
         &:hover {
-          color: #4183C4;
+          color: #4183c4;
         }
       }
       &:hover {

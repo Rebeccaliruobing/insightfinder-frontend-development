@@ -296,14 +296,6 @@ class LogAnalysisCore extends React.PureComponent {
         </Select.Link>
       );
     };
-    const incidentCountBy = i => {
-      if (view === 'rare') {
-        return `${i.name}      (${i.rareEventsCount.toString()})`;
-      } else if (view === 'cluster') {
-        return `${i.name}      (${i.clusterCount.toString()})`;
-      }
-      return i.name;
-    };
 
     let paddingRange = [];
     if (incidentList.length > 0) {
@@ -331,7 +323,7 @@ class LogAnalysisCore extends React.PureComponent {
             <Select
               name="month"
               inline
-              style={{ width: 140 }}
+              style={{ width: 130 }}
               placeholder="Select Month"
               options={this.monthOptions}
               value={month}
@@ -343,7 +335,7 @@ class LogAnalysisCore extends React.PureComponent {
               <Select
                 name="incident"
                 inline
-                style={{ width: 200 }}
+                style={{ width: 130 }}
                 options={R.filter(
                   i => i,
                   R.map(i => (i.isEmpty ? null : { label: i.name, value: i.id }), incidentList),
@@ -353,7 +345,7 @@ class LogAnalysisCore extends React.PureComponent {
               />}
             {showIncident &&
               incidentInfo &&
-              <div style={{ marginLeft: '3em' }}>
+              <div style={{ position: 'absolute', left: 560 }}>
                 <span
                   style={{ marginLeft: '2em', cursor: 'pointer', textDecoration: 'underline' }}
                   onClick={this.handleViewChangeClick('rare')}

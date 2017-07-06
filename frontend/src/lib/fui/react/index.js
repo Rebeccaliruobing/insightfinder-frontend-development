@@ -10,5 +10,5 @@ export { default as Select } from './elements/Select';
 export { AutoSizer } from 'react-virtualized';
 
 export { default as Tile } from './grid/Tile';
-export { Column, Table } from 'react-virtualized';
+export { Column, Table, defaultTableRowRenderer } from 'react-virtualized';
 export { default as Container } from './layouts/Container';

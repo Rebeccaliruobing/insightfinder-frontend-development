@@ -11,7 +11,13 @@ import R from 'ramda';
 import VLink from 'valuelink';
 import { autobind } from 'core-decorators';
 
-import { Container, AutoSizer, Table, Column } from '../../../lib/fui/react';
+import {
+  Container,
+  AutoSizer,
+  Table,
+  Column,
+  defaultTableRowRenderer,
+} from '../../../lib/fui/react';
 import EventGroup from '../../../../components/log/loganalysis/event-group';
 import PatternNameModal from './PatternNameModal';
 
@@ -129,6 +135,16 @@ class LogClusters extends React.Component {
         }
       }
       return '';
+    };
+
+    // TODO: Add the row background, looks not very good.
+    const rowRenderer = (props: { rowData: Object }) => {
+      const { rowData } = props;
+      const pct = isFinite(rowData.totalPercent) ? rowData.totalPercent : 0.0;
+      const width = `${Math.max(0.0, pct) * 100}%`;
+      const bgElem = <div key="bg_percent" className="pattern-percent" style={{ width }} />;
+      const columns = [...props.columns, bgElem];
+      return defaultTableRowRenderer({ ...props, columns });
     };
 
     return (

@@ -48,7 +48,8 @@
     position: absolute;
     width: 3px;
     height: 100%;
-    left:0;
+    z-index: 10;
+    left: 0;
   }
 }
 

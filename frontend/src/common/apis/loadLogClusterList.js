@@ -20,7 +20,7 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
     ...credentials,
     projectName,
     dayTimeMillis: incidentId,
-  }).then((d) => {
+  }).then(d => {
     // TODO: This API response not in data format, need to change to d.data.
 
     const { incidentStartTime, incidentEndTime, totalEventsCount } = params;
@@ -32,9 +32,9 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
     const endTime = mEndTime.valueOf();
     let patterns = get(rawData, 'patternArray', []);
 
-    patterns = R.sort(
-      (a, b) => a.eventsCount > b.eventsCount,
-      R.map((p) => {
+    patterns = R.sortWith(
+      [R.ascend(R.prop('eventsCount'))],
+      R.map(p => {
         // Convert the topK string into array.
         const keywords = R.filter(
           k => Boolean(k),
@@ -53,6 +53,7 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
           name,
           patternName: p.patternName,
           eventsCount: p.count,
+          totalPercent: p.count / totalEventsCount,
         };
       }, patterns),
     );
