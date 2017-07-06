@@ -346,10 +346,7 @@ class LogAnalysisCore extends React.PureComponent {
                 style={{ width: 200 }}
                 options={R.filter(
                   i => i,
-                  R.map(
-                    i => (i.isEmpty ? null : { label: `${incidentCountBy(i)}`, value: i.id }),
-                    incidentList,
-                  ),
+                  R.map(i => (i.isEmpty ? null : { label: i.name, value: i.id }), incidentList),
                 )}
                 value={incidentId}
                 onChange={this.handleIncidentChange}
