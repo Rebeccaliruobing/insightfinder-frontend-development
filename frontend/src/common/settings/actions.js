@@ -120,3 +120,19 @@ export const updateProjectModelStatus = (modelKey: String, status: String): Acti
   type: 'UPDATE_PROJECT_MODEL_STATUS',
   payload: { modelKey, status },
 });
+
+/**
+ * Load external service list, which is handled by epic.
+ */
+export const loadExternalServiceList = (): Action => ({
+  type: 'LOAD_EXTERNAL_SERVICE_LIST',
+  payload: {},
+});
+
+/**
+ * General action to update settings state, which is handled by reducer.
+ */
+export const setSettingsInfo = (info: Object): Action => ({
+  type: 'SET_SETTINGS_INFO',
+  payload: { ...info },
+});

@@ -14,9 +14,15 @@ import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { MetricAnalysis, HistoricalMetricAnalysis } from '../metric';
-import { LogAnalysis, LogLiveAnalysis, LogFileAnalysis } from '../log';
+import { LogAnalysis } from '../log';
 import { BugRepository } from '../usecase';
-import { SettingsLeftbar, ProjectSettings, ProjectWizard, SettingsProjectList } from '../settings';
+import {
+  SettingsLeftbar,
+  ProjectSettings,
+  ProjectWizard,
+  SettingsProjectList,
+  ExternalServiceList,
+} from '../settings';
 
 // TODO: v1 components needs upgrade
 import AccountInfo from '../../../components/account-info';
@@ -94,6 +100,7 @@ const SettingsRoutings = () => {
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
         <Route path={BaseUrls.SettingsProjectList} exact component={SettingsProjectList} />
+        <Route path={BaseUrls.SettingsExternalService} exact component={ExternalServiceList} />
         <Route path={BaseUrls.SettingsProject} exact component={ProjectSettings} />
       </Switch>
     </SinglePage>
@@ -126,6 +133,7 @@ const PrivateRoutings = () =>
     <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
 
     <Route path={BaseUrls.SettingsProjectList} component={SettingsRoutings} />
+    <Route path={BaseUrls.ExternalServiceList} component={SettingsRoutings} />
     <Route
       path={BaseUrls.SettingsProjectWizard}
       exact

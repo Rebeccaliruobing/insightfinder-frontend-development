@@ -115,6 +115,9 @@ export type SettingsState = {
 
   // The project creation status
   projectCreationStatus: String,
+
+  // External service list
+  externalServiceList: Array<Object>,
 };
 
 export type UseCaseState = {
@@ -133,26 +136,26 @@ export type State = {
 
 // Actions
 export type Action =
-  | { type: "SET_CURRENT_LOCALE", payload: { locale: string } }
-  | { type: "SET_CURRENT_THEME", payload: { theme: string } }
-  | { type: "SET_VIEWPORT", payload: { width: number, height: number } }
-  | { type: "APP_REHYDRATED" }
-  | { type: "APP_START" }
-  | { type: "APP_STARTED" }
-  | { type: "APP_STOP" }
-  | { type: "SET_INIT_DATA", payload: Object }
-  | { type: "SHOW_APP_LOADER" }
-  | { type: "HIDE_APP_LOADER" }
-  | { type: "SHOW_APP_ALERT", payload: { type: string, message: Message, params: ?Object } }
-  | { type: "HIDE_APP_ALERT", payload: { ids: Array<string> } }
-  | { type: "SET_APP_FILTERS", payload: Filters }
-  | { type: "APP_ERROR", payload: { message: ?Message, error: ?Error } }
-  | { type: "LOGIN", payload: { userName: string, password: string } }
-  | { type: "LOGIN_SUCCESS", payload: { credentials: Credentials, userInfo: ?Object } }
-  | { type: "LOGIN_FAILURE", payload: { message: ?Message, error: ?Error } }
-  | { type: "LOGOFF" }
+  | { type: 'SET_CURRENT_LOCALE', payload: { locale: string } }
+  | { type: 'SET_CURRENT_THEME', payload: { theme: string } }
+  | { type: 'SET_VIEWPORT', payload: { width: number, height: number } }
+  | { type: 'APP_REHYDRATED' }
+  | { type: 'APP_START' }
+  | { type: 'APP_STARTED' }
+  | { type: 'APP_STOP' }
+  | { type: 'SET_INIT_DATA', payload: Object }
+  | { type: 'SHOW_APP_LOADER' }
+  | { type: 'HIDE_APP_LOADER' }
+  | { type: 'SHOW_APP_ALERT', payload: { type: string, message: Message, params: ?Object } }
+  | { type: 'HIDE_APP_ALERT', payload: { ids: Array<string> } }
+  | { type: 'SET_APP_FILTERS', payload: Filters }
+  | { type: 'APP_ERROR', payload: { message: ?Message, error: ?Error } }
+  | { type: 'LOGIN', payload: { userName: string, password: string } }
+  | { type: 'LOGIN_SUCCESS', payload: { credentials: Credentials, userInfo: ?Object } }
+  | { type: 'LOGIN_FAILURE', payload: { message: ?Message, error: ?Error } }
+  | { type: 'LOGOFF' }
   | {
-      type: "LOAD_LOG_FILE",
+      type: 'LOAD_LOG_FILE',
       payload: {
         projectId: ?string,
         incidentId: ?string,
@@ -162,7 +165,7 @@ export type Action =
       },
     }
   | {
-      type: "SET_LOG_FILE",
+      type: 'SET_LOG_FILE',
       payload: {
         projectId: string,
         projectInfo: Object,
@@ -171,14 +174,14 @@ export type Action =
       },
     }
   | {
-      type: "LOAD_LOG_STREAMING_LIST",
+      type: 'LOAD_LOG_STREAMING_LIST',
       payload: {
         projectName: ?string,
         month: ?string,
       },
     }
   | {
-      type: "SET_LOG_STREAMING",
+      type: 'SET_LOG_STREAMING',
       payload: {
         projectId: string,
         projectInfo: Object,
@@ -186,5 +189,5 @@ export type Action =
         incidentInfo: ?Object,
       },
     }
-  | { type: "LOAD_BUG_REPOSITORY", payload: {} }
-  | { type: "SET_BUG_REPOSITORY", payload: { bugRepository: Object } };
+  | { type: 'LOAD_BUG_REPOSITORY', payload: {} }
+  | { type: 'SET_BUG_REPOSITORY', payload: { bugRepository: Object } };

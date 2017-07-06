@@ -6,6 +6,7 @@
  **/
 
 import createProjectEpic from './createProjectEpic';
+import loadExternalServiceListEpic from './loadExternalServiceListEpic';
 import loadProjectSettingsEpic from './loadProjectSettingsEpic';
 import pickProjectModelEpic from './pickProjectModelEpic';
 import removeProjectEpic from './removeProjectEpic';
@@ -14,6 +15,7 @@ import saveProjectSettingsEpic from './saveProjectSettingsEpic';
 
 const epics = [
   createProjectEpic,
+  loadExternalServiceListEpic,
   loadProjectSettingsEpic,
   pickProjectModelEpic,
   removeProjectEpic,

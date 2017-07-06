@@ -10,6 +10,7 @@ export { default as deleteProjectModel } from './deleteProjectModel';
 export { default as loadBugRepository } from './loadBugRepository';
 export { default as loadHourlyEvents } from './loadHourlyEvents';
 export { default as login } from './login';
+export { default as getExternalServiceList } from './getExternalServiceList';
 export { default as getLogIncidentList } from './getLogIncidentList';
 export { default as getLogRerunDetection } from './getLogRerunDetection';
 export { default as getLogSequenceEventList } from './getLogSequenceEventList';

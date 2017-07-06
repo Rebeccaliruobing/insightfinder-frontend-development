@@ -16,6 +16,7 @@ const initialState: LogState = {
   currentApisParams: {},
   currentErrorMessage: null,
   projectCreationStatus: '',
+  externalServiceList: [],
 };
 
 const reducer = (state: LogState = initialState, action: Action): LogState => {

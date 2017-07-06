@@ -33,6 +33,12 @@ const BaseUrls = {
   SettingsProjectList: '/settings/projects',
   SettingsProject: '/settings/projects/:projectName',
   SettingsProjectWizard: '/settings/project-wizard',
+  SettingsExternalService: '/settings/extsvc',
+
+  PagerDutyImg: 'https://pagerduty.com/assets/pd_connect_button.png',
+  SlackImg: 'https://slack.com/img/slack_logo_240.png',
+  PagerDutyUrl:
+    'https://connect.pagerduty.com/connect?vendor=ad2938f1f094d65d86fa&amp;callback=https://apps.insightfinder.com/settings/extsvc',
 };
 
 export default BaseUrls;
