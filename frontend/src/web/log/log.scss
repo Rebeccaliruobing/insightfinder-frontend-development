@@ -6,6 +6,11 @@
   .ReactVirtualized__Table__rowColumn {
     z-index: 10;
   }
+  .ReactVirtualized__Table__row.active:before {
+    left: initial;
+    width: 4px;
+    right: 0;
+  }
   .pattern-percent {
     height: 95%;
     position: absolute;
