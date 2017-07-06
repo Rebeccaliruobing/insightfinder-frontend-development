@@ -180,8 +180,8 @@ class LogFrequencyAnomalies extends React.PureComponent {
                 rowClassName={clusterRowClassName}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={340} label="Cluster" dataKey="name" />
-                <Column width={40} label="Count" className="text-right" dataKey="anomalyCount" />
+                <Column width={330} label="Cluster" dataKey="name" />
+                <Column width={50} label="Events" className="text-right" dataKey="anomalyCount" />
               </Table>}
           </AutoSizer>
         </Container>

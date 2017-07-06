@@ -58,7 +58,8 @@ class LogRareEvents extends React.PureComponent {
     }
   }
 
-  @autobind handleBucketPointClick(startTs) {
+  @autobind
+  handleBucketPointClick(startTs) {
     const { eventBuckets } = this.props.data;
     const bucket = eventBuckets[startTs];
     if (bucket) {
@@ -71,13 +72,12 @@ class LogRareEvents extends React.PureComponent {
   render() {
     const data = this.props.data || {};
     const { selectedBucket } = this.state;
-    const { events, tsEvents, totalEventsCount } = data;
+    const { tsEvents } = data;
     const barData = { sdata: tsEvents, sname: ['Datetime', 'Events Count'] };
     const selectedEvents = get(selectedBucket, 'events', []);
 
     return (
       <Container fullHeight className="flex-col">
-        <h4 className="ui header">{`Total Rare Events: ${events.length}, Total Events: ${totalEventsCount}`}</h4>
         <DataChart
           style={{ height: 150 }}
           isLogCharts
@@ -88,15 +88,14 @@ class LogRareEvents extends React.PureComponent {
         />
         <Container className="flex-grow" style={{ margin: '20px 20px 0' }}>
           <AutoSizer>
-            {({ height, width }) => (
+            {({ height, width }) =>
               <EventGroup
                 style={{ height, width }}
                 className="flex-item flex-col-container"
                 name=""
                 eventDataset={selectedEvents}
                 showFE={false}
-              />
-            )}
+              />}
           </AutoSizer>
         </Container>
       </Container>

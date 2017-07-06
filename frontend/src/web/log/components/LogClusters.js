@@ -147,13 +147,8 @@ class LogClusters extends React.Component {
                 rowGetter={({ index }) => patterns[index]}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={340} label="Cluster" dataKey="name" />
-                <Column
-                  width={40}
-                  label="Count"
-                  className="text-right number"
-                  dataKey="eventsCount"
-                />
+                <Column width={330} label="Cluster" dataKey="name" />
+                <Column width={50} label="Events" className="text-right" dataKey="eventsCount" />
               </Table>}
           </AutoSizer>
         </Container>

@@ -61,7 +61,8 @@ class LogPatternSequences extends React.PureComponent {
     }
   }
 
-  @autobind handlePatternClick({ rowData: sequence }) {
+  @autobind
+  handlePatternClick({ rowData: sequence }) {
     if (sequence.isPattern) {
       this.reloadPattern(this.props, sequence.id);
     } else if (sequence.isSequence) {
@@ -69,7 +70,8 @@ class LogPatternSequences extends React.PureComponent {
     }
   }
 
-  @autobind reloadPattern(props, patternId) {
+  @autobind
+  reloadPattern(props, patternId) {
     if (R.isNil(patternId)) {
       return;
     }
@@ -90,7 +92,8 @@ class LogPatternSequences extends React.PureComponent {
     );
   }
 
-  @autobind reloadPatternSequence(props, sequenceId, patterns) {
+  @autobind
+  reloadPatternSequence(props, sequenceId, patterns) {
     const {
       projectName,
       startTimeMillis,
@@ -112,16 +115,18 @@ class LogPatternSequences extends React.PureComponent {
     const eventList = this.props.currentEventList || [];
     const sequenceEventList = this.props.currentSequenceEventList || [];
     const { currentPatternId, currentSequenceId } = this.props;
-    const sequenceInfo = R.find(
-      s => s.id === currentPatternId || s.id === currentSequenceId,
-      sequences,
-    ) || {};
+    const sequenceInfo =
+      R.find(s => s.id === currentPatternId || s.id === currentSequenceId, sequences) || {};
     const isSequence = sequenceInfo.isSequence;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
     const nameRender = ({ rowData }) => {
       if (rowData.isPattern) {
-        return <span style={{ marginLeft: '1em' }}>{rowData.name}</span>;
+        return (
+          <span style={{ marginLeft: '1em' }}>
+            {rowData.name}
+          </span>
+        );
       }
       return rowData.name;
     };
@@ -141,7 +146,7 @@ class LogPatternSequences extends React.PureComponent {
       <Container fullHeight className="flex-row">
         <Container fullHeight style={{ width: 380, marginRight: '1em' }}>
           <AutoSizer>
-            {({ width, height }) => (
+            {({ width, height }) =>
               <Table
                 className="with-border"
                 width={width}
@@ -154,19 +159,20 @@ class LogPatternSequences extends React.PureComponent {
                 onRowClick={this.handlePatternClick}
               >
                 <Column
-                  width={340}
+                  width={330}
                   label="Pattern Sequences"
                   dataKey="name"
                   cellRenderer={nameRender}
                 />
-                <Column width={40} label="Count" className="text-right number" dataKey="count" />
-              </Table>
-            )}
+                <Column width={50} label="Count" className="text-right number" dataKey="count" />
+              </Table>}
           </AutoSizer>
         </Container>
         {isSequence &&
           <Container className={`flex-col flex-grow ${isLoading ? 'loading' : ''}`}>
-            <h4>{sequenceInfo.name || ''}</h4>
+            <h4>
+              {sequenceInfo.name || ''}
+            </h4>
             <div className="flex-grow overflow-y-auto">
               {R.addIndex(R.map)((seqEvents, idx) => {
                 return (
@@ -192,7 +198,7 @@ class LogPatternSequences extends React.PureComponent {
         {!isSequence &&
           <Container className={`flex-grow ${isLoading ? 'loading' : ''}`}>
             <AutoSizer>
-              {({ height }) => (
+              {({ height }) =>
                 <EventGroup
                   style={{ height, width: 900 }}
                   name={sequenceInfo.name || ''}
@@ -201,8 +207,7 @@ class LogPatternSequences extends React.PureComponent {
                   episodes={get(sequenceInfo, 'episodes', [])}
                   eventDataset={eventList}
                   showFE
-                />
-              )}
+                />}
             </AutoSizer>
           </Container>}
       </Container>

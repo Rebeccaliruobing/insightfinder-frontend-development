@@ -72,11 +72,6 @@ const LogRoutings = () => {
     <SinglePage>
       <Switch>
         <Route path={`${BaseUrls.LogAnalysis}`} component={LogAnalysis} />
-        <Route
-          path="/log/live-analysis/:projectId?/:month?/:incidentId?"
-          component={LogLiveAnalysis}
-        />
-        <Route path={BaseUrls.LogHistoricalLogAnalysis} component={LogFileAnalysis} />
         <Redirect from="*" to={BaseUrls.LogAnalysis} />
       </Switch>
     </SinglePage>
@@ -109,12 +104,21 @@ const SettingsRoutings = () => {
  * The private routing defines the routings needs authentication. When access these pages
  * without login, it will be redirected to login page and be redirected back after login.
  **/
-const PrivateRoutings = () => (
+const PrivateRoutings = () =>
   <Switch>
-    <Route path={BaseUrls.Help} render={props => <SinglePage><Help {...props} /></SinglePage>} />
+    <Route
+      path={BaseUrls.Help}
+      render={props =>
+        <SinglePage>
+          <Help {...props} />
+        </SinglePage>}
+    />
     <Route
       path={BaseUrls.AccountInfo}
-      render={props => <SinglePage><AccountInfo {...props} /></SinglePage>}
+      render={props =>
+        <SinglePage>
+          <AccountInfo {...props} />
+        </SinglePage>}
     />
 
     <Route path={BaseUrls.Metric} component={MetricRoutings} />
@@ -125,9 +129,10 @@ const PrivateRoutings = () => (
     <Route
       path={BaseUrls.SettingsProjectWizard}
       exact
-      render={props => (
-        <SinglePage leftbar={<SettingsLeftbar {...props} />}><ProjectWizard /></SinglePage>
-      )}
+      render={props =>
+        <SinglePage leftbar={<SettingsLeftbar {...props} />}>
+          <ProjectWizard />
+        </SinglePage>}
     />
 
     <Route path="/liveMonitoring" render={() => React.createElement(liveMonitoringAppV1)} />
@@ -141,14 +146,13 @@ const PrivateRoutings = () => (
     <Route path="/filetabs" component={RoutingV1FileTabs} />
 
     <Redirect from="*" to={BaseUrls.Metric} />
-  </Switch>
-);
+  </Switch>;
 
 type Props = {
   history: Object,
 };
 
-const Routing = ({ history }: Props) => (
+const Routing = ({ history }: Props) =>
   <Router history={history}>
     <Switch>
       <Route path="/login" component={Login} />
@@ -159,7 +163,6 @@ const Routing = ({ history }: Props) => (
       <Route path="/resetPassword" component={ResetPassword} />
       <PrivateRoute component={PrivateRoutings} />
     </Switch>
-  </Router>
-);
+  </Router>;
 
 export default Routing;

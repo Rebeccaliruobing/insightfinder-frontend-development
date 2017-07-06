@@ -354,6 +354,25 @@ class LogAnalysisCore extends React.PureComponent {
                 value={incidentId}
                 onChange={this.handleIncidentChange}
               />}
+            {showIncident &&
+              incidentInfo &&
+              <div style={{ marginLeft: '3em' }}>
+                <span
+                  style={{ marginLeft: '2em', cursor: 'pointer', textDecoration: 'underline' }}
+                  onClick={this.handleViewChangeClick('rare')}
+                >
+                  {`Rare Events:  ${incidentInfo.rareEventsCount}`}
+                </span>
+                <span
+                  style={{ marginLeft: '2em', cursor: 'pointer', textDecoration: 'underline' }}
+                  onClick={this.handleViewChangeClick('cluster')}
+                >
+                  {`Clusters:  ${incidentInfo.clusterCount}`}
+                </span>
+                <span style={{ marginLeft: '2em' }}>
+                  {`Total Events:  ${incidentInfo.totalEventsCount}`}
+                </span>
+              </div>}
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
