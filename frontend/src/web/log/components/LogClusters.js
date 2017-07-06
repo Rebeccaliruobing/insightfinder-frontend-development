@@ -137,7 +137,6 @@ class LogClusters extends React.Component {
       return '';
     };
 
-    // TODO: Add the row background, looks not very good.
     const rowRenderer = (props: { rowData: Object }) => {
       const { rowData } = props;
       const pct = isFinite(rowData.totalPercent) ? rowData.totalPercent : 0.0;
@@ -160,6 +159,7 @@ class LogClusters extends React.Component {
                 rowHeight={40}
                 rowCount={patterns.length}
                 rowClassName={clusterRowClassName}
+                rowRenderer={rowRenderer}
                 rowGetter={({ index }) => patterns[index]}
                 onRowClick={this.handlePatternClick}
               >
