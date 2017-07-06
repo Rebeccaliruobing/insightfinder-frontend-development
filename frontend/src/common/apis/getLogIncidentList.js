@@ -24,7 +24,7 @@ const getLogIncidentList = (credentials: Credentials, projectName: String, param
     projectName,
     // Convert the month into utc time.
     monthlyDate: moment.utc(month, monthFormat).startOf('month').valueOf(),
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
 
     if (!isArray(d.data)) {
@@ -38,8 +38,8 @@ const getLogIncidentList = (credentials: Credentials, projectName: String, param
 
     // Sort by incidents start time.
     const incidents = [];
-    R.forEach((i) => {
-      const startTime = moment(i.incidentStartTime);
+    R.forEach(i => {
+      const startTime = moment.utc(i.incidentStartTime);
       const dayOfMonth = startTime.date();
       // If there is any missing day, add a empty one.
       while (currentDay < dayOfMonth) {
