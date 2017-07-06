@@ -20,7 +20,12 @@ const initialState: LogState = {
 };
 
 const reducer = (state: LogState = initialState, action: Action): LogState => {
-  if (action.type === 'SET_PROJECT_SETTINGS') {
+  if (action.type === 'SET_SETTINGS_INFO') {
+    return {
+      ...state,
+      ...action.payload,
+    };
+  } else if (action.type === 'SET_PROJECT_SETTINGS') {
     return {
       ...state,
       ...action.payload,

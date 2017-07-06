@@ -133,7 +133,7 @@ const PrivateRoutings = () =>
     <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
 
     <Route path={BaseUrls.SettingsProjectList} component={SettingsRoutings} />
-    <Route path={BaseUrls.ExternalServiceList} component={SettingsRoutings} />
+    <Route path={BaseUrls.SettingsExternalServiceList} component={SettingsRoutings} />
     <Route
       path={BaseUrls.SettingsProjectWizard}
       exact

@@ -13,13 +13,14 @@ import { autobind } from 'core-decorators';
 import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import { settingsMessages } from '../../../common/settings/messages';
-import { loadExternalServiceList } from '../../../common/settings/actions';
+import { loadExternalServiceList, removeExternalService } from '../../../common/settings/actions';
 import { State } from '../../../common/types';
 
 type Props = {
   intl: Object,
   externalServiceList: Array<Object>,
   loadExternalServiceList: Function,
+  removeExternalService: Function,
 };
 
 class ExternalServiceListCore extends React.Component {
@@ -29,8 +30,27 @@ class ExternalServiceListCore extends React.Component {
     this.props.loadExternalServiceList();
   }
 
+  @autobind
+  handleExtsvcRemove(serviceId) {
+    return e => {
+      if (serviceId) {
+        this.props.removeExternalService(serviceId);
+      }
+    };
+  }
+
   render() {
     const { intl, externalServiceList } = this.props;
+    const removeRenderer = ({ cellData, rowData }) => {
+      return (
+        <div
+          className={`hover-show ui grey button ${rowData.status === 'removing'}`}
+          onClick={this.handleExtsvcRemove(cellData)}
+        >
+          Remove
+        </div>
+      );
+    };
 
     return (
       <Container fullHeight withGutter className="flex-col" style={{ padding: '1em 0' }}>
@@ -62,23 +82,30 @@ class ExternalServiceListCore extends React.Component {
             Add WebHook
           </button>
           <hr />
-          <h3>Currently Registered External Services</h3>
+          <h3 style={{ marginBottom: '1em' }}>Currently Registered External Services</h3>
         </Container>
         <Container fullHeight className="flex-grow">
           <AutoSizer disableWidth>
             {({ height }) =>
               <Table
                 className="with-border"
-                width={800}
+                width={1000}
                 height={height}
                 headerHeight={40}
                 rowHeight={40}
                 rowCount={externalServiceList.length}
                 rowGetter={({ index }) => externalServiceList[index]}
               >
-                <Column width={160} label="Service Type" dataKey="serviceType" />
-                <Column width={160} label="Account" dataKey="account" />
-                <Column width={160} label="ServiceKey" dataKey="serviceKey" />
+                <Column width={400} label="Service Type" dataKey="serviceProvider" />
+                <Column width={250} label="Account" dataKey="account" />
+                <Column width={250} label="ServiceKey" dataKey="serviceKey" />
+                <Column
+                  width={100}
+                  label=""
+                  className="text-right"
+                  cellRenderer={removeRenderer}
+                  dataKey="id"
+                />
               </Table>}
           </AutoSizer>
         </Container>
@@ -94,5 +121,5 @@ export default connect(
     const { externalServiceList } = state.settings;
     return { externalServiceList };
   },
-  { loadExternalServiceList },
+  { loadExternalServiceList, removeExternalService },
 )(ExternalServiceList);

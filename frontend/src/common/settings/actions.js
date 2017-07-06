@@ -130,6 +130,14 @@ export const loadExternalServiceList = (): Action => ({
 });
 
 /**
+ * Remove external service, which is handled by epic.
+ */
+export const removeExternalService = (serviceId): Action => ({
+  type: 'REMOVE_EXTERNAL_SERVICE',
+  payload: { serviceId },
+});
+
+/**
  * General action to update settings state, which is handled by reducer.
  */
 export const setSettingsInfo = (info: Object): Action => ({

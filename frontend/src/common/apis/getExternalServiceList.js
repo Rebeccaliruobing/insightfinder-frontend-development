@@ -6,19 +6,21 @@
 /*  @flow */
 /* eslint-disable no-console */
 
+import { get } from 'lodash';
+
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
 
 const getExternalServiceList = (credentials: Credentials) => {
-  // TODO: Change to real api.
-  return fetchGet(getEndpoint('loadProjectsInfo'), {
+  // TODO: Replace dashboard-uservalues API
+  return fetchGet(getEndpoint('dashboard-uservalues'), {
     ...credentials,
   }).then(d => {
-    const externalServiceList = [];
+    const extServiceAllInfo = JSON.parse(get(d.data, 'extServiceAllInfo', '[]'));
     return {
       rawData: d.data,
-      data: externalServiceList,
+      data: extServiceAllInfo,
     };
   });
 };

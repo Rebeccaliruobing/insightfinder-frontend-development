@@ -1,13 +1,18 @@
 /* @flow */
 /* eslint-disable no-console */
 import {
-  BadRequestError, ContentTypeError, HttpError, InvalidDataError,
-  NetworkError, NotFoundError, PermissionError,
+  BadRequestError,
+  ContentTypeError,
+  HttpError,
+  InvalidDataError,
+  NetworkError,
+  NotFoundError,
+  PermissionError,
 } from '../errors';
 
 /**
  * General response handler for fetch command.
- * The response json format is:
+ * If isJsonResponse is <c>true</c>, the forat should be:
  * {
  *   success: true|false
  *   data: object,  // Data object if success is true.
@@ -16,12 +21,12 @@ import {
  *
  * @param {Promise} command The promise of the fetch command.
  */
-const fetchHandler = (
-  command: Object,
-) =>
-  command
-    .catch((err) => { throw new NetworkError(err); })
-    .then((resp) => {
+const fetchHandler = (command: Object, isJsonResponse: Boolean = true) => {
+  const cmd = command
+    .catch(err => {
+      throw new NetworkError(err);
+    })
+    .then(resp => {
       if (resp.ok) {
         return resp;
       } else if (resp.status === 401 || resp.status === 403) {
@@ -34,30 +39,37 @@ const fetchHandler = (
       } else {
         throw new HttpError(resp.status, resp.statusText, resp);
       }
-    })
-    .then((resp) => {
-      const ctype = resp.headers.get('Content-Type');
-      const expect = 'application/json';
-      if (ctype !== expect) {
-        throw new ContentTypeError(expect, ctype, resp);
-      }
-      return resp;
-    })
-    .then(res => res.json())
-    .then((json) => {
-      // TODO: Add back data type.
-      /*
-      if (!json.success) {
-        console.warn(
-          ['Return error in a 200 response is deprecated, change API http status code.', json]);
-        // TODO: Remove hack code for wrong code in displayProjectModel.
-        if (json.code === 12 && json.message.indexOf('Models') === -1) {
-          throw new PermissionError(json.message, json.code, json);
-        }
-        throw new InvalidDataError(json.message, json.code, json);
-      }
-      */
-      return json;
     });
+
+  if (isJsonResponse) {
+    return cmd
+      .then(resp => {
+        const ctype = resp.headers.get('Content-Type');
+        const expect = 'application/json';
+        if (ctype !== expect) {
+          throw new ContentTypeError(expect, ctype, resp);
+        }
+        return resp;
+      })
+      .then(res => res.json())
+      .then(json => {
+        // TODO: Add back data type check.
+        // if (!json.success) {
+        //   console.warn([
+        //     'Return error in a 200 response is deprecated, change API http status code.',
+        //     json,
+        //   ]);
+        //   // TODO: Remove hack code for wrong code in displayProjectModel.
+        //   if (json.code === 12 && json.message.indexOf('Models') === -1) {
+        //     throw new PermissionError(json.message, json.code, json);
+        //   }
+        //   throw new InvalidDataError(json.message, json.code, json);
+        // }
+        return json;
+      });
+  }
+
+  return cmd;
+};
 
 export default fetchHandler;

@@ -5,6 +5,7 @@
  * *****************************************************************************
  **/
 
+export { default as deleteExternalService } from './deleteExternalService';
 export { default as deleteProject } from './deleteProject';
 export { default as deleteProjectModel } from './deleteProjectModel';
 export { default as loadBugRepository } from './loadBugRepository';

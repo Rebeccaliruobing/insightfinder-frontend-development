@@ -14,11 +14,9 @@ import fetchHandler from './fetchHandler';
  *
  * @param {string} url The url of the api
  * @param {object} data The data to post.
+ * @param {boolean} isJsonResponse whether response is in json format.
  */
-const fetchPost = (
-  url: string,
-  data: Object,
-) =>
+const fetchPost = (url: string, data: Object, isJsonResponse: Boolean = true) =>
   fetchHandler(
     fetch(url, {
       method: 'POST',
@@ -29,6 +27,7 @@ const fetchPost = (
       },
       body: qs.stringify(data),
     }),
+    isJsonResponse,
   );
 
 export default fetchPost;
