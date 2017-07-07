@@ -14,11 +14,10 @@ const BaseUrls = {
   AccountInfo: '/account-info',
 
   Metric: '/metric',
-  MetricAnalysis: '/metric/live-analysis',
+  MetricAnalysis: '/metric/analysis',
   MetricEvents: '/metric/events',
   MetricAppForecast: '/metric/app-forecast',
   MetricLineCharts: '/metric/line-charts',
-  MetricHistoricalMetricAnalysis: '/metric/historical-metric-analysis',
 
   Usecase: '/usecase/:system?',
   UsecaseBase: '/usecase',

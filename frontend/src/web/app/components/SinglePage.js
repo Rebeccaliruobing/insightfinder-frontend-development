@@ -51,11 +51,7 @@ const SinglePageCore = ({
     <Container fullHeight className={`single-page ${className || ''}`}>
       <Topbar>
         <div className="ui menu">
-          <NavLink
-            to={BaseUrls.Metric}
-            className="item"
-            isActive={isActiveIgnoreUrls(BaseUrls.MetricHistoricalMetricAnalysis)}
-          >
+          <NavLink to={BaseUrls.Metric} className="item">
             {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
           <NavLink

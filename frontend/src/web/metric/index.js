@@ -5,5 +5,4 @@
  * *****************************************************************************
  **/
 
-export { default as HistoricalMetricAnalysis } from './HistoricalMetricAnalysis';
 export { default as MetricAnalysis } from './MetricAnalysis';

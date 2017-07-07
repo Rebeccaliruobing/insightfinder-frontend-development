@@ -13,7 +13,7 @@ import { BaseUrls } from './Constants';
 import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
-import { MetricAnalysis, HistoricalMetricAnalysis } from '../metric';
+import { MetricAnalysis } from '../metric';
 import { LogAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import {
@@ -57,10 +57,6 @@ const MetricRoutings = () => {
     <SinglePage>
       <Switch>
         <Route path={BaseUrls.MetricAnalysis} component={MetricAnalysis} />
-        <Route
-          path={BaseUrls.MetricHistoricalMetricAnalysis}
-          component={HistoricalMetricAnalysis}
-        />
         <Route path={BaseUrls.MetricEvents} component={EventSummary} />
         <Route path={BaseUrls.MetricAppForecast} component={MetricAppForecast} />
         <Route
