@@ -15,12 +15,12 @@ import fetchGet from './fetchGet';
 const getProjectList = (credentials: Credentials) => {
   return fetchGet(getEndpoint('loadProjectsInfo'), {
     ...credentials,
-  }).then((d) => {
+  }).then(d => {
     const { userName } = credentials;
     // The basicProjectData contains the name => props map, convert to array.
     let projects = [];
     const basicProjectData = get(d.data, 'basicProjectData', {});
-    R.forEachObjIndexed((val) => {
+    R.forEachObjIndexed(val => {
       projects.push(val);
     }, basicProjectData);
 
@@ -28,8 +28,8 @@ const getProjectList = (credentials: Credentials) => {
     projects = R.sort((a, b) => a.projectName.localeCompare(b.projectName), projects);
 
     // Set flags based on the project info
-    projects = R.map((p) => {
-      const { projectName, dataType, cloudType } = p;
+    projects = R.map(p => {
+      const { projectName, projectType, dataType, cloudType } = p;
       // Streaming log analysis project
       const isLogStreaming = dataType.toLowerCase() === 'log';
 
@@ -44,7 +44,10 @@ const getProjectList = (credentials: Credentials) => {
 
       return {
         projectId: projectName,
-        ...p,
+        projectName,
+        projectType: projectType.toLowerCase() === 'custom' ? 'Agent' : projectType,
+        dataType,
+        cloudType,
         owner,
         isLog,
         isMetric,
