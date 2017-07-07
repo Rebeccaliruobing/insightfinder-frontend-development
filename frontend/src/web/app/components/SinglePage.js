@@ -71,10 +71,6 @@ const SinglePageCore = ({
           <NavLink to={BaseUrls.SettingsProjectList} className="item">
             {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
-          {isAdmin &&
-            <NavLink to="/filetabs" className="item">
-              {intl.formatMessage(appMenusMessages.fileAnalysis)}
-            </NavLink>}
           <NavLink to={BaseUrls.Help} className="item">
             {intl.formatMessage(appMenusMessages.help)}
           </NavLink>
@@ -82,23 +78,28 @@ const SinglePageCore = ({
             <div className="ui dropdown language item" style={{ display: 'none' }}>
               <i className="translate icon" />
               <div className="right-align menu">
-                {localeOptions.map(l => (
+                {localeOptions.map(l =>
                   <a key={l.value} className="item" onClick={() => setCurrentLocale(l.value)}>
                     {l.label}
-                  </a>
-                ))}
+                  </a>,
+                )}
               </div>
             </div>
             <div className="ui dropdown user item">
-              <i className="circular inverted icon">{userName[0]}</i>
-              <span>{userName}</span>
+              <i className="circular inverted icon">
+                {userName[0]}
+              </i>
+              <span>
+                {userName}
+              </span>
               <div className="right-align menu">
                 <Link to={BaseUrls.AccountInfo} className="item">
                   <i className="settings icon" />
                   {intl.formatMessage(appMenusMessages.accountProfile)}
                 </Link>
                 <a className="item" onClick={() => logoff()}>
-                  <i className="sign out icon" />{intl.formatMessage(appMenusMessages.signout)}
+                  <i className="sign out icon" />
+                  {intl.formatMessage(appMenusMessages.signout)}
                 </a>
               </div>
             </div>
