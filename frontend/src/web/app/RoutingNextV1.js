@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch, Redirect, Route } from 'react-router-dom';
 import { App as AppV1 } from '../../../root';
-import { Settings, ExtSvc } from '../../../components/settings';
 
 import {
   FileTabs,
@@ -59,18 +58,5 @@ export const RoutingV1FileTabs = () =>
           </FileTabs>}
       />
       <Redirect from="/filetabs" to="/filetabs/fileNewModel" />
-    </Switch>
-  </AppV1>;
-
-export const RoutingV1Settings = () =>
-  <AppV1>
-    <Switch>
-      <Route
-        path="/settings/extsvc1"
-        render={() =>
-          <Settings>
-            <ExtSvc />
-          </Settings>}
-      />
     </Switch>
   </AppV1>;

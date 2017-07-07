@@ -35,6 +35,7 @@ export { default as loadWeeklyAnomalies } from './loadWeeklyAnomalies';
 export { default as newAWSCloudWatchProject } from './newAWSCloudWatchProject';
 export { default as newCustomProject } from './newCustomProject';
 export { default as newDataDogProject } from './newDataDogProject';
+export { default as newExternalService } from './newExternalService';
 export { default as newGoogleProject } from './newGoogleProject';
 export { default as postLogPatternName } from './postLogPatternName';
 export { default as updateProjectModel } from './updateProjectModel';

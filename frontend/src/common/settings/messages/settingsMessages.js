@@ -20,7 +20,8 @@ const settingsMessages = defineMessages({
     id: 'settings.error.notNumberInput',
   },
   errorNoProjectModel: {
-    defaultMessage: 'There is no model found for <b>{projectName}</b>, please change start/end date or choose other groups.',
+    defaultMessage:
+      'There is no model found for <b>{projectName}</b>, please change start/end date or choose other groups.',
     id: 'settings.error.noProjectModel',
   },
   errorNoIncident: {
@@ -46,6 +47,10 @@ const settingsMessages = defineMessages({
   infoProjectModelRemoved: {
     defaultMessage: 'The project model is removed',
     id: 'settings.info.projectModelRemoved',
+  },
+  infoExternalServcieAdded: {
+    defaultMessage: 'The external service is added',
+    id: 'settings.info.externalServiceAdded',
   },
 });
 

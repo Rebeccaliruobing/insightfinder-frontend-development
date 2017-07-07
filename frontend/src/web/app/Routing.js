@@ -45,7 +45,7 @@ import {
 } from '../../../root';
 
 import withRouteApp from './withRouteApp';
-import { RoutingV1Settings, RoutingV1FileTabs } from './RoutingNextV1';
+import { RoutingV1FileTabs } from './RoutingNextV1';
 
 const liveMonitoringAppV1 = withRouteApp(liveMonitoringApp);
 const FilesMonitoringAppV1 = withRouteApp(FilesMonitoringApp);
@@ -94,14 +94,14 @@ const UseCaseRoutings = () => {
   );
 };
 
-// TODO: Merge with routing in RoutingNextV1.
 const SettingsRoutings = () => {
   return (
     <SinglePage leftbar={<SettingsLeftbar />}>
       <Switch>
         <Route path={BaseUrls.SettingsProjectList} exact component={SettingsProjectList} />
-        <Route path={BaseUrls.SettingsExternalService} exact component={ExternalServiceList} />
+        <Route path={BaseUrls.SettingsExternalServiceList} exact component={ExternalServiceList} />
         <Route path={BaseUrls.SettingsProject} exact component={ProjectSettings} />
+        <Route path={BaseUrls.SettingsProjectWizard} exact component={ProjectWizard} />
       </Switch>
     </SinglePage>
   );
@@ -131,17 +131,7 @@ const PrivateRoutings = () =>
     <Route path={BaseUrls.Metric} component={MetricRoutings} />
     <Route path={BaseUrls.Log} component={LogRoutings} />
     <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
-
-    <Route path={BaseUrls.SettingsProjectList} component={SettingsRoutings} />
-    <Route path={BaseUrls.SettingsExternalServiceList} component={SettingsRoutings} />
-    <Route
-      path={BaseUrls.SettingsProjectWizard}
-      exact
-      render={props =>
-        <SinglePage leftbar={<SettingsLeftbar {...props} />}>
-          <ProjectWizard />
-        </SinglePage>}
-    />
+    <Route path={BaseUrls.Settings} component={SettingsRoutings} />
 
     <Route path="/liveMonitoring" render={() => React.createElement(liveMonitoringAppV1)} />
     <Route path="/useCaseDetails" render={() => React.createElement(useCaseAppV1)} />
@@ -150,7 +140,6 @@ const PrivateRoutings = () =>
       path="/filesdetectionMonitoring"
       render={() => React.createElement(FilesDetectionMonitoringAppV1)}
     />
-    <Route path="/settings" component={RoutingV1Settings} />
     <Route path="/filetabs" component={RoutingV1FileTabs} />
 
     <Redirect from="*" to={BaseUrls.Metric} />

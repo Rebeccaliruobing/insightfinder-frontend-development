@@ -130,6 +130,19 @@ export const loadExternalServiceList = (): Action => ({
 });
 
 /**
+ * Add a external service with the type. The params is different from each type.
+ * This is handled by epic.
+ */
+export const addExternalService = (
+  type: String,
+  params: Object,
+  components: Object = {},
+): Action => ({
+  type: 'ADD_EXTERNAL_SERVICE',
+  payload: { type, params, components },
+});
+
+/**
  * Remove external service, which is handled by epic.
  */
 export const removeExternalService = (serviceId): Action => ({

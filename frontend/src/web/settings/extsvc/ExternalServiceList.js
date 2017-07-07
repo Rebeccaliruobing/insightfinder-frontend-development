@@ -12,13 +12,20 @@ import { autobind } from 'core-decorators';
 
 import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
-import { settingsMessages } from '../../../common/settings/messages';
-import { loadExternalServiceList, removeExternalService } from '../../../common/settings/actions';
+import { appButtonsMessages } from '../../../common/app/messages';
+import { settingsButtonMessages } from '../../../common/settings/messages';
+import {
+  loadExternalServiceList,
+  removeExternalService,
+  addExternalService,
+} from '../../../common/settings/actions';
 import { State } from '../../../common/types';
+import SlackModal from './SlackModal';
 
 type Props = {
   intl: Object,
   externalServiceList: Array<Object>,
+  currentLoadingComponents: Object,
   loadExternalServiceList: Function,
   removeExternalService: Function,
 };
@@ -26,64 +33,90 @@ type Props = {
 class ExternalServiceListCore extends React.Component {
   props: Props;
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      showSlackModal: false,
+    };
+
+    const { intl } = props;
+
+    // Column renderer for remove button
+    this.removeRenderer = ({ cellData, rowData }) => {
+      return (
+        <div
+          className={`hover-show ui grey button ${rowData.status === 'removing' ? 'loading' : ''}`}
+          onClick={this.handleExtsvcRemove(cellData)}
+        >
+          {intl.formatMessage(appButtonsMessages.remove)}
+        </div>
+      );
+    };
+  }
+
   componentDidMount() {
     this.props.loadExternalServiceList();
   }
 
   @autobind
   handleExtsvcRemove(serviceId) {
-    return e => {
+    return () => {
       if (serviceId) {
         this.props.removeExternalService(serviceId);
       }
     };
   }
 
-  render() {
-    const { intl, externalServiceList } = this.props;
-    const removeRenderer = ({ cellData, rowData }) => {
-      return (
-        <div
-          className={`hover-show ui grey button ${rowData.status === 'removing'}`}
-          onClick={this.handleExtsvcRemove(cellData)}
-        >
-          Remove
-        </div>
-      );
-    };
+  @autobind
+  handleShowSlackModal() {
+    this.setState({
+      showSlackModal: true,
+    });
+  }
 
+  @autobind
+  handleSlackModalClose() {
+    this.setState({
+      showSlackModal: false,
+    });
+  }
+
+  render() {
+    const { intl, externalServiceList, currentLoadingComponents, addExternalService } = this.props;
+    const { showSlackModal } = this.state;
     return (
       <Container fullHeight withGutter className="flex-col" style={{ padding: '1em 0' }}>
+        <h3>PagerDuty Settings</h3>
         <Container>
-          <h3>PagerDuty Settings</h3>
           <div className="text">
             You can manage your alerts with your PagerDuty account. Click the button below to
             integrate your account alerts with PagerDuty.
           </div>
           <a target="_blank" rel="noopener noreferrer" href={BaseUrls.PagerDutyUrl}>
-            <img alt="Connect_button" height="40px" src={BaseUrls.PagerDutyImg} />
+            <img alt="PagerDuty" height="40px" src={BaseUrls.PagerDutyImg} />
           </a>
           <hr />
         </Container>
+        <h3>Slack Integration</h3>
         <Container>
-          <h3>Slack Integration</h3>
           <div className="text">
             Register your Incoming WebHook from Slack to integrate your account alerts with Slack.
           </div>
-          <img alt="Connect_button" height="40px" src={BaseUrls.SlackImg} />
+          <img alt="Slack" height="40px" src={BaseUrls.SlackImg} />
           <br />
-          <button
-            id="btn-slack"
-            className="ui small positive action button"
-            onClick={e => {
-              this.setState({ showModal: true });
-            }}
-          >
-            Add WebHook
-          </button>
+          <div className="ui small positive action button" onClick={this.handleShowSlackModal}>
+            {intl.formatMessage(settingsButtonMessages.addWebHook)}
+          </div>
           <hr />
-          <h3 style={{ marginBottom: '1em' }}>Currently Registered External Services</h3>
+          {showSlackModal &&
+            <SlackModal
+              intl={intl}
+              currentLoadingComponents={currentLoadingComponents}
+              addExternalService={addExternalService}
+              onClose={this.handleSlackModalClose}
+            />}
         </Container>
+        <h3 style={{ marginBottom: '1em' }}>Currently Registered External Services</h3>
         <Container fullHeight className="flex-grow">
           <AutoSizer disableWidth>
             {({ height }) =>
@@ -103,7 +136,7 @@ class ExternalServiceListCore extends React.Component {
                   width={100}
                   label=""
                   className="text-right"
-                  cellRenderer={removeRenderer}
+                  cellRenderer={this.removeRenderer}
                   dataKey="id"
                 />
               </Table>}
@@ -119,7 +152,8 @@ const ExternalServiceList = injectIntl(ExternalServiceListCore);
 export default connect(
   (state: State) => {
     const { externalServiceList } = state.settings;
-    return { externalServiceList };
+    const { currentLoadingComponents } = state.app;
+    return { externalServiceList, currentLoadingComponents };
   },
-  { loadExternalServiceList, removeExternalService },
+  { loadExternalServiceList, removeExternalService, addExternalService },
 )(ExternalServiceList);
