@@ -6,3 +6,4 @@
  **/
 
 export { default as MetricAnalysis } from './MetricAnalysis';
+export { default as MetricEventSummary } from './MetricEventSummary';

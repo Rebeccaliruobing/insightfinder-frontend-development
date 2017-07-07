@@ -67,6 +67,12 @@ export type MetricState = {
   currentHourlyEventsLoading: boolean,
   currentWeeklyAnomalies: ?Object,
   currentErrorMessage: ?Message,
+
+  // The current error message
+  currentError: ?Message,
+
+  // Event summary parameters for each view used to get data.
+  eventSummaryParams: Object,
 };
 
 export type LogState = {

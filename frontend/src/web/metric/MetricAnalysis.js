@@ -139,7 +139,8 @@ class MetricAnalysisCore extends React.PureComponent {
     }
   }
 
-  @autobind handleProjectChange(newValue) {
+  @autobind
+  handleProjectChange(newValue) {
     const projectName = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
@@ -151,8 +152,9 @@ class MetricAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
   }
 
-  @autobind handleViewChange(view) {
-    return (e) => {
+  @autobind
+  handleViewChange(view) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -165,7 +167,8 @@ class MetricAnalysisCore extends React.PureComponent {
     };
   }
 
-  @autobind handleStartTimeChange(newDate) {
+  @autobind
+  handleStartTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, instanceGroup, view } = params;
@@ -182,7 +185,8 @@ class MetricAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
   }
 
-  @autobind handleEndTimeChange(newDate) {
+  @autobind
+  handleEndTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, instanceGroup, view } = params;
@@ -201,7 +205,8 @@ class MetricAnalysisCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
   }
 
-  @autobind handleAnomalyListRowClick(projectName, instanceGroup) {
+  @autobind
+  handleAnomalyListRowClick(projectName, instanceGroup) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     const { startTime, endTime, view } = params;
@@ -215,20 +220,24 @@ class MetricAnalysisCore extends React.PureComponent {
     );
   }
 
-  @autobind handleRefreshClick() {
+  @autobind
+  handleRefreshClick() {
     this.reloadData(this.props);
   }
 
-  @autobind handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
+  @autobind
+  handleListRowOpenDetectedAnomaly(projectName, instanceGroup, datetime) {
     this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime);
   }
 
-  @autobind handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
+  @autobind
+  handleListRowOpenPredictedAnomaly(projectName, instanceGroup, datetime) {
     this.handleListRowOpenAnomaly(projectName, instanceGroup, datetime, true);
   }
 
-  @autobind handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
-    const { location } = this.props;
+  @autobind
+  handleListRowOpenAnomaly(projectName, instanceGroup, datetime, predicted = false) {
+    const { location, push } = this.props;
     const params = parseQueryString(location.search);
     const { startTime, endTime } = params;
     const mStartTime = moment(startTime, this.dateFormat);
@@ -253,11 +262,11 @@ class MetricAnalysisCore extends React.PureComponent {
     if (predicted) {
       query.predicted = true;
     }
-
     window.open(buildUrl(BaseUrls.MetricEvents, {}, query), '_blank');
   }
 
-  @autobind handleListRowOpenResource(projectName, instanceGroup, datetime) {
+  @autobind
+  handleListRowOpenResource(projectName, instanceGroup, datetime) {
     const { location } = this.props;
     const params = parseQueryString(location.search);
     const { startTime, endTime } = params;
@@ -308,9 +317,13 @@ class MetricAnalysisCore extends React.PureComponent {
     const endTimePrevious = mEndTime.clone().subtract(numberOfDays, 'day');
     const startTimePredicted = mStartTime.clone().add(numberOfDays, 'day');
     const endTimePredicted = mEndTime.clone().add(numberOfDays, 'day');
-    const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format('M/D')}`;
+    const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format(
+      'M/D',
+    )}`;
     const timeIntervalCurrent = `${mStartTime.format('M/D')} - ${mEndTime.format('M/D')}`;
-    const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format('M/D')}`;
+    const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format(
+      'M/D',
+    )}`;
     const showAnomalyView = view === 'anomaly';
     const showResourceView = view === 'resource';
     const hasProject = projects.length === 0;
@@ -319,7 +332,9 @@ class MetricAnalysisCore extends React.PureComponent {
       <Container fullHeight withGutter className="flex-col metric-analysis">
         <Container breadcrumb>
           <div className="section">
-            <span className="label">{intl.formatMessage(appMenusMessages.metricAnalysis)}</span>
+            <span className="label">
+              {intl.formatMessage(appMenusMessages.metricAnalysis)}
+            </span>
             <span className="divider">/</span>
             <Select
               name="project"
@@ -429,7 +444,8 @@ class MetricAnalysisCore extends React.PureComponent {
               <div style={{ color: 'grey', marginLeft: '2em', fontSize: 12 }}>
                 <i className="icon circle info" />
                 <span>
-                  Only start time of the event is shown, hover the cell to see event duration and details.
+                  Only start time of the event is shown, hover the cell to see event duration and
+                  details.
                 </span>
               </div>
             </Container>}
