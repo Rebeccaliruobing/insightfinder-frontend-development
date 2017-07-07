@@ -8,7 +8,8 @@ const initialState: MetricState = {
   currentWeeklyAnomalies: null,
   currentErrorMessage: null,
 
-  currentError: null,
+  mainError: null,
+  eventSummary: {},
   eventSummaryParams: {},
 };
 
@@ -20,6 +21,19 @@ const reducer = (state: MetricState = initialState, action: Action): MetricState
     };
   } else if (action.type === 'SET_METRIC_EVENT_SUMMARY') {
     const { view, params, info } = action.payload;
+    const { eventSummaryParams, eventSummary } = state;
+
+    return {
+      ...state,
+      eventSummaryParams: {
+        ...eventSummaryParams,
+        [view]: params,
+      },
+      eventSummary: {
+        ...eventSummary,
+        [view]: info,
+      },
+    };
   }
   return { ...initialState, ...state };
 };

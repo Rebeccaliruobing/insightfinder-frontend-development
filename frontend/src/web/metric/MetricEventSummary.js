@@ -12,9 +12,10 @@ import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
 import { push } from 'react-router-redux';
+import DatePicker from 'react-datepicker';
 import { autobind } from 'core-decorators';
 
-import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
+import { appFieldsMessages, appMenusMessages, appButtonsMessages } from '../../common/app/messages';
 import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../../common/utils';
 import { loadMetricEventSummary } from '../../common/metric/actions';
 import { Container, Select } from '../../lib/fui/react';
@@ -106,11 +107,11 @@ class MetricEventSummaryCore extends React.PureComponent {
     let refresh = force;
     if (!refresh) {
       // If params are different, need to reload the data
-      refresh = !R.equals(this.pickNotNil(storedParams), R.omit(['view'], params));
+      refresh = !R.equals(this.pickNotNil(storedParams), this.pickNotNil(R.omit(['view'], params)));
     }
 
     if (refresh) {
-      loadMetricEventSummary(projectName, { instanceGroup, startTime, endTime, view }, true);
+      loadMetricEventSummary(projectName, instanceGroup, { startTime, endTime, view });
     }
   }
 
@@ -126,10 +127,55 @@ class MetricEventSummaryCore extends React.PureComponent {
     push(buildMatchLocation(match, {}, { ...params, projectName, instanceGroup, view }));
   }
 
+  @autobind
+  handleStartTimeChange(newDate) {
+    const { match, push, location } = this.props;
+    const params = parseQueryString(location.search);
+
+    const nowObj = moment();
+    const startTimeObj = newDate.clone().startOf('day');
+    let endTimeObj = startTimeObj.clone().add(this.defaultNumberOfDays - 1, 'day').endOf('day');
+
+    if (endTimeObj >= nowObj) {
+      endTimeObj = nowObj.endOf('day');
+    }
+    const startTime = startTimeObj.format(this.dateFormat);
+    const endTime = endTimeObj.format(this.dateFormat);
+    push(buildMatchLocation(match, {}, { ...params, startTime, endTime }));
+  }
+
+  @autobind
+  handleEndTimeChange(newDate) {
+    const { match, push, location } = this.props;
+    const params = parseQueryString(location.search);
+
+    const nowObj = moment();
+    let startTimeObj = moment(params.startTime, this.dateFormat);
+    let endTimeObj = newDate.clone().endOf('day');
+
+    if (endTimeObj >= nowObj) {
+      endTimeObj = nowObj.endOf('day');
+    }
+    startTimeObj = endTimeObj.clone().subtract(this.defaultNumberOfDays - 1, 'day').startOf('day');
+    const startTime = startTimeObj.format(this.dateFormat);
+    const endTime = endTimeObj.format(this.dateFormat);
+
+    push(buildMatchLocation(match, {}, { ...params, startTime, endTime }));
+  }
+
+  @autobind
+  handleRefreshClick() {
+    this.reloadData(this.props, true);
+  }
+
   render() {
     const { intl, projects } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, startTime, endTime, instanceGroup, view } = params;
+
+    const nowObj = moment();
+    const startTimeObj = moment(startTime, this.dateFormat);
+    const endTimeObj = moment(endTime, this.dateFormat);
 
     return (
       <Container fullHeight withGutter className="flex-col metric-analysis">
@@ -149,6 +195,35 @@ class MetricEventSummaryCore extends React.PureComponent {
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
             />
           </div>
+          <div className="section float-right" style={{ fontSize: 12 }}>
+            <span className="label">
+              {intl.formatMessage(appFieldsMessages.startDate)}
+            </span>
+            <div className="ui input">
+              <DatePicker
+                todayButton="Today"
+                dateFormat={this.dateFormat}
+                selected={startTimeObj}
+                maxDate={nowObj}
+                onChange={this.handleStartTimeChange}
+              />
+            </div>
+            <span className="label">
+              {intl.formatMessage(appFieldsMessages.endDate)}
+            </span>
+            <div className="ui input">
+              <DatePicker
+                todayButton="Today"
+                dateFormat={this.dateFormat}
+                selected={endTimeObj}
+                maxDate={nowObj}
+                onChange={this.handleEndTimeChange}
+              />
+            </div>
+            <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
+              {intl.formatMessage(appButtonsMessages.refresh)}
+            </div>
+          </div>
         </Container>
       </Container>
     );
@@ -158,9 +233,9 @@ class MetricEventSummaryCore extends React.PureComponent {
 const MetricEventSummary = injectIntl(MetricEventSummaryCore);
 export default connect(
   (state: State) => {
-    const { projects, eventSummaryParams } = state.app;
+    const { eventSummaryParams } = state.metric;
     return {
-      projects: R.filter(p => p.isMetric, projects),
+      projects: R.filter(p => p.isMetric, state.app.projects),
       eventSummaryParams,
     };
   },

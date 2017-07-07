@@ -14,6 +14,14 @@ const appFieldsMessages = defineMessages({
     defaultMessage: 'Project',
     id: 'app.fields.project',
   },
+  startDate: {
+    defaultMessage: 'Start Date',
+    id: 'app.fields.startDate',
+  },
+  endDate: {
+    defaultMessage: 'Start Date',
+    id: 'app.fields.endDate',
+  },
 });
 
 export default appFieldsMessages;

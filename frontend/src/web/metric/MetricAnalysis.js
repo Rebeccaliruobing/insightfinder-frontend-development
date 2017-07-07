@@ -22,7 +22,7 @@ import {
   getStartEndTimeRange,
 } from '../../common/utils';
 import { Container, Select } from '../../lib/fui/react';
-import { appFieldsMessages, appMenusMessages } from '../../common/app/messages';
+import { appFieldsMessages, appMenusMessages, appButtonsMessages } from '../../common/app/messages';
 import { BaseUrls } from '../app/Constants';
 import { loadMetricHourlyEvents, loadMetricWeeklyAnomalies } from '../../common/metric/actions';
 import HourlyHeatmap from '../../../components/statistics/hourly-heatmap';
@@ -171,38 +171,36 @@ class MetricAnalysisCore extends React.PureComponent {
   handleStartTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, instanceGroup, view } = params;
 
-    const mNow = moment();
-    const mStartTime = newDate.clone().startOf('day');
-    let mEndTime = mStartTime.clone().add(this.defaultNumberOfDays - 1, 'day').endOf('day');
+    const nowObj = moment();
+    const startTimeObj = newDate.clone().startOf('day');
+    let endTimeObj = startTimeObj.clone().add(this.defaultNumberOfDays - 1, 'day').endOf('day');
 
-    if (mEndTime >= mNow) {
-      mEndTime = mNow.endOf('day');
+    if (endTimeObj >= nowObj) {
+      endTimeObj = nowObj.endOf('day');
     }
-    const startTime = mStartTime.format(this.dateFormat);
-    const endTime = mEndTime.format(this.dateFormat);
-    push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
+    const startTime = startTimeObj.format(this.dateFormat);
+    const endTime = endTimeObj.format(this.dateFormat);
+    push(buildMatchLocation(match, {}, { ...params, startTime, endTime }));
   }
 
   @autobind
   handleEndTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
-    const { projectName, instanceGroup, view } = params;
 
-    const mNow = moment();
-    let mStartTime = moment(params.startTime, this.dateFormat);
-    let mEndTime = newDate.clone().endOf('day');
+    const nowObj = moment();
+    let startTimeObj = moment(params.startTime, this.dateFormat);
+    let endTimeObj = newDate.clone().endOf('day');
 
-    if (mEndTime >= mNow) {
-      mEndTime = mNow.endOf('day');
+    if (endTimeObj >= nowObj) {
+      endTimeObj = nowObj.endOf('day');
     }
-    mStartTime = mEndTime.clone().subtract(this.defaultNumberOfDays - 1, 'day').startOf('day');
-    const startTime = mStartTime.format(this.dateFormat);
-    const endTime = mEndTime.format(this.dateFormat);
+    startTimeObj = endTimeObj.clone().subtract(this.defaultNumberOfDays - 1, 'day').startOf('day');
+    const startTime = startTimeObj.format(this.dateFormat);
+    const endTime = endTimeObj.format(this.dateFormat);
 
-    push(buildMatchLocation(match, {}, { projectName, startTime, endTime, instanceGroup, view }));
+    push(buildMatchLocation(match, {}, { ...params, startTime, endTime }));
   }
 
   @autobind
@@ -306,21 +304,19 @@ class MetricAnalysisCore extends React.PureComponent {
     const params = parseQueryString(location.search);
     const { projectName, startTime, endTime, instanceGroup, view } = params;
 
-    const mNow = moment();
-    const mStartTime = moment(startTime, this.dateFormat);
-    const mMaxStartTime = mNow;
-    const mEndTime = moment(endTime, this.dateFormat);
-    const mMaxEndTime = mNow;
-    const numberOfDays = mEndTime.diff(mStartTime, 'days') + 1;
+    const nowObj = moment();
+    const startTimeObj = moment(startTime, this.dateFormat);
+    const endTimeObj = moment(endTime, this.dateFormat);
+    const numberOfDays = endTimeObj.diff(startTimeObj, 'days') + 1;
 
-    const startTimePrevious = mStartTime.clone().subtract(numberOfDays, 'day');
-    const endTimePrevious = mEndTime.clone().subtract(numberOfDays, 'day');
-    const startTimePredicted = mStartTime.clone().add(numberOfDays, 'day');
-    const endTimePredicted = mEndTime.clone().add(numberOfDays, 'day');
+    const startTimePrevious = startTimeObj.clone().subtract(numberOfDays, 'day');
+    const endTimePrevious = endTimeObj.clone().subtract(numberOfDays, 'day');
+    const startTimePredicted = startTimeObj.clone().add(numberOfDays, 'day');
+    const endTimePredicted = endTimeObj.clone().add(numberOfDays, 'day');
     const timeIntervalPrevious = `${startTimePrevious.format('M/D')} - ${endTimePrevious.format(
       'M/D',
     )}`;
-    const timeIntervalCurrent = `${mStartTime.format('M/D')} - ${mEndTime.format('M/D')}`;
+    const timeIntervalCurrent = `${startTimeObj.format('M/D')} - ${endTimeObj.format('M/D')}`;
     const timeIntervalPredicted = `${startTimePredicted.format('M/D')} - ${endTimePredicted.format(
       'M/D',
     )}`;
@@ -347,28 +343,32 @@ class MetricAnalysisCore extends React.PureComponent {
             />
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
-            <span className="label">Start Date:</span>
+            <span className="label">
+              {intl.formatMessage(appFieldsMessages.startDate)}
+            </span>
             <div className="ui input">
               <DatePicker
                 todayButton="Today"
                 dateFormat={this.dateFormat}
-                selected={mStartTime}
-                maxDate={mMaxStartTime}
+                selected={startTimeObj}
+                maxDate={nowObj}
                 onChange={this.handleStartTimeChange}
               />
             </div>
-            <span className="label">End Date:</span>
+            <span className="label">
+              {intl.formatMessage(appFieldsMessages.endDate)}
+            </span>
             <div className="ui input">
               <DatePicker
                 todayButton="Today"
                 dateFormat={this.dateFormat}
-                selected={mEndTime}
-                maxDate={mMaxEndTime}
+                selected={endTimeObj}
+                maxDate={nowObj}
                 onChange={this.handleEndTimeChange}
               />
             </div>
             <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
-              Refresh
+              {intl.formatMessage(appButtonsMessages.refresh)}
             </div>
           </div>
         </Container>

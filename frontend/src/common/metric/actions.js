@@ -49,9 +49,10 @@ export const setMetricEventSummary = (view: String, params: Object, info: any): 
  */
 export const loadMetricEventSummary = (
   projectName: String,
+  instanceGroup: String,
   params: Object,
   loader: any = true,
 ): Action => ({
   type: 'LOAD_METRIC_EVENT_SUMMARY',
-  payload: { projectName, params, loader },
+  payload: { projectName, instanceGroup, params, loader },
 });

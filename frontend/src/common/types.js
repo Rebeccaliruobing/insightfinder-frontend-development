@@ -68,8 +68,11 @@ export type MetricState = {
   currentWeeklyAnomalies: ?Object,
   currentErrorMessage: ?Message,
 
-  // The current error message
-  currentError: ?Message,
+  // The main error message to show in the main content.
+  mainError: ?Message,
+
+  // Event summary data for each view
+  eventSummary: Object,
 
   // Event summary parameters for each view used to get data.
   eventSummaryParams: Object,

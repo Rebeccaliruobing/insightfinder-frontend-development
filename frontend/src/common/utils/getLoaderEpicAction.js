@@ -12,8 +12,9 @@ import { setLoadingComponents, showAppLoader, hideAppLoader } from '../app/actio
 
 /**
  * Get epic action for loader, the return object contains show & hide loader action.
+ * The default will use the app loader.
  */
-const getLoaderEpicAction = loader => {
+const getLoaderEpicAction = (loader: any = true) => {
   let showLoader = Observable.empty();
   let hideLoader = Observable.empty();
 
