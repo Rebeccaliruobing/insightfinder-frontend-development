@@ -25,7 +25,8 @@ const ProjectDetails = class extends React.Component {
     (this.props.updateData || this.updateData)(this);
   }
 
-  @autobind updateData() {
+  @autobind
+  updateData() {
     const { query } = this.props.location;
     const {
       pvalue,
@@ -69,13 +70,13 @@ const ProjectDetails = class extends React.Component {
           latestDataTimestamp,
           caller,
         )
-        .then((resp) => {
+        .then(resp => {
           resp.loading = false;
           this.setState(resp, () => {
             // fetch syscall results
             if (projectName && startTimestamp && endTimestamp) {
               const projectName0 = `${projectName}@${fromUser}`;
-              apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then((resp2) => {
+              apis.postSysCallResult(projectName0, startTimestamp, endTimestamp).then(resp2 => {
                 if (resp2.success) {
                   this.setState({
                     debugData: resp2.data.syscallResults,
@@ -90,7 +91,7 @@ const ProjectDetails = class extends React.Component {
             }
           });
         })
-        .catch((err) => {
+        .catch(err => {
           this.setState({ loading: false });
         });
     });
@@ -119,7 +120,8 @@ const ProjectDetails = class extends React.Component {
           <div className="topbar-text">
             {bugId &&
               <div className="title">
-                Please view incident name / bug ID: <b>{bugId}</b><br />
+                Please view incident name / bug ID: <b>{bugId}</b>
+                <br />
               </div>}
             {!bugId &&
               <div className="title">
@@ -132,7 +134,7 @@ const ProjectDetails = class extends React.Component {
           data={data}
           debugData={debugData}
           latestDataTimestamp={latestDataTimestamp}
-          isEmailAert={caller.toLowerCase() === 'emailalert'}
+          isEmailAert={(caller || '').toLowerCase() === 'emailalert'}
           timeRanking={timeRanking}
           freqRanking={freqRanking}
           bugId={bugId}
