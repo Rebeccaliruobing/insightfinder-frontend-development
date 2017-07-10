@@ -2,9 +2,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-export function aggregateToMultiHourData(
-  dataset, endTime, numberOfDays,
-) {
+export function aggregateToMultiHourData(dataset, endTime, numberOfDays) {
   if (!dataset) return {};
 
   // Initial an empty vector to hold the hourly object.
@@ -14,6 +12,7 @@ export function aggregateToMultiHourData(
   const predictedVector = _.range(size).map(() => ({ items: [] }));
 
   const startTime = moment(endTime).startOf('day').subtract(numberOfDays - 1, 'day');
+  const nowObj = moment();
   const predictedStartTime = moment(endTime).startOf('day');
 
   // Populate the data into vector.
@@ -30,7 +29,10 @@ export function aggregateToMultiHourData(
             const vector = predicted ? predictedVector : detectedVector;
             const idx = h.diff(predicted ? predictedStartTime : startTime, 'hours');
 
-            if (idx >= 0 && idx < size) {
+            // Ignore the prediction if it's today and old than now.
+            const ignore = predicted && h.diff(nowObj, 'days') === 0 && h < nowObj;
+
+            if (!ignore && idx >= 0 && idx < size) {
               vector[idx].items.push({
                 project,
                 group,
@@ -45,22 +47,26 @@ export function aggregateToMultiHourData(
   });
 
   // Aggregate the stats hourly
-  _.forEach([detectedVector, predictedVector], (vector) => {
+  _.forEach([detectedVector, predictedVector], vector => {
     _.forEach(vector, (hour, index) => {
       const items = hour.items;
 
       hour.x = index % numberOfHours;
       hour.y = Math.floor(index / numberOfHours);
 
-      const hourStats = _.reduce(items, (sum, item) => {
-        const ret = {};
-        // Sum all stats
-        _.forEach(item.stats, (val, stat) => {
-          ret[stat] = (sum[stat] || 0) + (val || 0);
-        });
-        ret.count = sum.count + 1;
-        return ret;
-      }, { count: 0 });
+      const hourStats = _.reduce(
+        items,
+        (sum, item) => {
+          const ret = {};
+          // Sum all stats
+          _.forEach(item.stats, (val, stat) => {
+            ret[stat] = (sum[stat] || 0) + (val || 0);
+          });
+          ret.count = sum.count + 1;
+          return ret;
+        },
+        { count: 0 },
+      );
 
       hour.stats = hourStats;
 
@@ -75,21 +81,37 @@ export function aggregateToMultiHourData(
   });
 
   const timeLabels = [
-    '', '', '3a',
-    '', '', '6a',
-    '', '', '9a',
-    '', '', '12p',
-    '', '', '3p',
-    '', '', '6p',
-    '', '', '9p',
-    '', '', '12a',
+    '',
+    '',
+    '3a',
+    '',
+    '',
+    '6a',
+    '',
+    '',
+    '9a',
+    '',
+    '',
+    '12p',
+    '',
+    '',
+    '3p',
+    '',
+    '',
+    '6p',
+    '',
+    '',
+    '9p',
+    '',
+    '',
+    '12a',
   ];
 
-  const detectedDayLabels = _.range(0, numberOfDays).map(
-    diff => moment(endTime).subtract(numberOfDays - diff - 1, 'days').format('MM/DD'),
+  const detectedDayLabels = _.range(0, numberOfDays).map(diff =>
+    moment(endTime).subtract(numberOfDays - diff - 1, 'days').format('MM/DD'),
   );
-  const predictedDayLabels = _.range(0, numberOfDays).map(
-    diff => moment(endTime).add(diff, 'days').format('MM/DD'),
+  const predictedDayLabels = _.range(0, numberOfDays).map(diff =>
+    moment(endTime).add(diff, 'days').format('MM/DD'),
   );
 
   return {
