@@ -35,8 +35,9 @@ const loadWeeklyAnomalies = (credentials: Credentials, params: Object) => {
     modelType: 'Holistic',
     timezoneOffset: moment().utcOffset(),
     numberOfDays,
+    startTimestamp: mStartTime.valueOf(),
     endTimestamp: realEndTime,
-  }).then((anomalyData) => {
+  }).then(anomalyData => {
     return fetchPost(getEndpoint('execDashboard'), {
       ...credentials,
       operation: 'loadResourceAll',
@@ -44,8 +45,9 @@ const loadWeeklyAnomalies = (credentials: Credentials, params: Object) => {
       modelType: 'Holistic',
       timezoneOffset: moment().utcOffset(),
       numberOfDays,
+      startTimestamp: mStartTime.valueOf(),
       endTimestamp: realEndTime,
-    }).then((resourceData) => {
+    }).then(resourceData => {
       const anomalyEventStats = anomalyData.data;
       const resourceEventStats = resourceData.data;
       // Merge instance/group from resource into anomaly

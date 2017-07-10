@@ -200,7 +200,8 @@ class ProjectSettingsCore extends React.PureComponent {
     }
   }
 
-  @autobind handleProjectChange(newValue) {
+  @autobind
+  handleProjectChange(newValue) {
     const projectName = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
@@ -209,15 +210,17 @@ class ProjectSettingsCore extends React.PureComponent {
     push(buildMatchLocation(match, { projectName }, { ...params, setting }));
   }
 
-  @autobind handleInstanceGroupChange(newValue) {
+  @autobind
+  handleInstanceGroupChange(newValue) {
     const instanceGroup = newValue ? newValue.value : null;
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
     push(buildMatchLocation(match, match.params, { ...params, instanceGroup }));
   }
 
-  @autobind handleSettingChangeClick(setting) {
-    return (e) => {
+  @autobind
+  handleSettingChangeClick(setting) {
+    return e => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -227,7 +230,8 @@ class ProjectSettingsCore extends React.PureComponent {
     };
   }
 
-  @autobind handleStartTimeChange(newDate) {
+  @autobind
+  handleStartTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
 
@@ -235,7 +239,8 @@ class ProjectSettingsCore extends React.PureComponent {
     push(buildMatchLocation(match, match.params, { ...params, startTime }));
   }
 
-  @autobind handleEndTimeChange(newDate) {
+  @autobind
+  handleEndTimeChange(newDate) {
     const { match, push, location } = this.props;
     const params = parseQueryString(location.search);
 
@@ -243,7 +248,8 @@ class ProjectSettingsCore extends React.PureComponent {
     push(buildMatchLocation(match, match.params, { ...params, endTime }));
   }
 
-  @autobind handleRefreshClick() {
+  @autobind
+  handleRefreshClick() {
     this.reloadData(this.props, true);
   }
 
@@ -253,7 +259,6 @@ class ProjectSettingsCore extends React.PureComponent {
       match,
       credentials,
       projects,
-      projectGroups,
       projectSettings,
       projectSettingsParams,
       currentLoadingComponents,
@@ -263,20 +268,28 @@ class ProjectSettingsCore extends React.PureComponent {
       removeProjectModel,
     } = this.props;
     const { projectName } = match.params;
+    let { projectGroups } = this.props;
     const { setting, instanceGroup, startTime, endTime } = parseQueryString(location.search);
     const project = R.find(p => p.projectName === projectName, projects);
     const dataType = get(project, 'dataType', 'metric').toLowerCase();
+    const isLogProject = Boolean(project.isLog);
     const settingInfos = dataType === 'metric' ? this.metricSettingInfos : this.logSettingInfos;
     const settingInfo = R.find(info => info.key === setting, settingInfos);
     const showTimeRange = this.ifIn(setting, this.timeRangeSettings);
     const showInstanceGroup = this.ifIn(setting, this.instanceGroupSettings);
     const hasError = !!currentErrorMessage;
 
+    if (isLogProject) {
+      projectGroups = ['All', 'rawLog', 'derivedLog'];
+    }
+
     return (
       <Container fullHeight withGutter className="flex-col">
         <Container breadcrumb>
           <div className="section">
-            <span className="label">{intl.formatMessage(appMenusMessages.settings)}</span>
+            <span className="label">
+              {intl.formatMessage(appMenusMessages.settings)}
+            </span>
             <span className="divider">/</span>
             <NavLink to={BaseUrls.SettingsProjectList}>
               <span className="label">Projects</span>
@@ -351,15 +364,14 @@ class ProjectSettingsCore extends React.PureComponent {
             <Box className="flex-col" style={{ height: '100%', paddingTop: 0 }}>
               <div className="ui pointing secondary menu">
                 {R.map(
-                  info => (
+                  info =>
                     <a
                       key={info.key}
                       className={`${info.key === setting ? 'active' : ''} item`}
                       onClick={this.handleSettingChangeClick(info.key)}
                     >
                       {info.name}
-                    </a>
-                  ),
+                    </a>,
                   settingInfos,
                 )}
               </div>
