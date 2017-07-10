@@ -103,6 +103,7 @@ class ProjectSettingsCore extends React.PureComponent {
     this.defaultMetricSetting = 'threshold';
     this.defaultLogSetting = 'episodeword';
     this.defaultInstanceGroup = 'All';
+    this.defaultLogInstanceGroup = 'rawLog';
 
     // The settings which need start/end time parameters
     this.timeRangeSettings = ['model'];
@@ -168,7 +169,11 @@ class ProjectSettingsCore extends React.PureComponent {
 
     // Also set the install group default
     if (this.ifIn(setting, this.instanceGroupSettings)) {
-      instanceGroup = R.isNil(instanceGroup) ? this.defaultInstanceGroup : instanceGroup;
+      if (dataType === 'metric') {
+        instanceGroup = R.isNil(instanceGroup) ? this.defaultInstanceGroup : instanceGroup;
+      } else {
+        instanceGroup = R.isNil(instanceGroup) ? this.defaultLogInstanceGroup : instanceGroup;
+      }
     } else {
       instanceGroup = undefined;
     }
@@ -280,7 +285,7 @@ class ProjectSettingsCore extends React.PureComponent {
     const hasError = !!currentErrorMessage;
 
     if (isLogProject) {
-      projectGroups = ['All', 'rawLog', 'derivedLog'];
+      projectGroups = ['rawLog', 'derivedLog'];
     }
 
     return (
