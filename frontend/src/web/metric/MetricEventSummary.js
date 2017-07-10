@@ -27,6 +27,7 @@ type Props = {
   intl: Object,
   push: Function,
   projects: Array<Object>,
+  instanceGroupList: Array<String>,
   loadMetricEventSummary: Function,
 };
 
@@ -169,7 +170,7 @@ class MetricEventSummaryCore extends React.PureComponent {
   }
 
   render() {
-    const { intl, projects } = this.props;
+    const { intl, projects, instanceGroupList } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, startTime, endTime, instanceGroup, view } = params;
 
@@ -193,6 +194,16 @@ class MetricEventSummaryCore extends React.PureComponent {
               value={projectName}
               onChange={this.handleProjectChange}
               placeholder={`${intl.formatMessage(appFieldsMessages.project)}...`}
+            />
+            <span className="divider">/</span>
+            <Select
+              name="group"
+              inline
+              style={{ width: 200 }}
+              options={R.map(g => ({ label: g, value: g }), instanceGroupList)}
+              value={instanceGroup}
+              onChange={this.handleInstanceGroupChange}
+              placeholder="Select Group"
             />
           </div>
           <div className="section float-right" style={{ fontSize: 12 }}>
@@ -234,8 +245,10 @@ const MetricEventSummary = injectIntl(MetricEventSummaryCore);
 export default connect(
   (state: State) => {
     const { eventSummaryParams } = state.metric;
+    const { projects, currentProjectGroupList } = state.app;
     return {
-      projects: R.filter(p => p.isMetric, state.app.projects),
+      projects: R.filter(p => p.isMetric, projects),
+      instanceGroupList: currentProjectGroupList,
       eventSummaryParams,
     };
   },

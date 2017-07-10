@@ -90,3 +90,25 @@ export const setLoadingComponents = (components: ?Object) => ({
     ...components,
   },
 });
+
+/**
+ * Load project group list, which is handled by epic.
+ */
+export const loadProjectGroupList = (projectName: String, loader: ?any) => ({
+  type: 'LOAD_PROJECT_GROUP_LIST',
+  payload: {
+    projectName,
+    loader,
+  },
+});
+
+/**
+ * Set the current project group list, which is handled by reducer.
+ */
+export const setProjectGroupList = (projectName: String, groupList: Array<String>) => ({
+  type: 'SET_PROJECT_GROUP_LIST',
+  payload: {
+    projectName,
+    groupList,
+  },
+});

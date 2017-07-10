@@ -52,6 +52,12 @@ export type AppState = {
 
   // The map used to store the name of components in loading status.
   currentLoadingComponents: Object,
+
+  // The current project name.
+  currentProjectName: String,
+
+  // The current group list for currentProjectName
+  currentProjectGroupList: Array<String>,
 };
 
 export type AuthState = {

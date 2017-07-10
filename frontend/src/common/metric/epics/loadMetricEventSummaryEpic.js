@@ -13,6 +13,7 @@ import R from 'ramda';
 import type { Deps } from '../../types';
 import { getLoaderEpicAction } from '../../utils';
 import { setMetricEventSummary } from '../actions';
+import { loadProjectGroupList } from '../../app/actions';
 
 const loadMetricEventSummaryEpic = (action$: any, { getState }: Deps) =>
   action$.ofType('LOAD_METRIC_EVENT_SUMMARY').concatMap(action => {
@@ -30,6 +31,7 @@ const loadMetricEventSummaryEpic = (action$: any, { getState }: Deps) =>
     return Observable.concat(
       showLoader,
       Observable.of(setMetricEventSummary(view, viewParams)),
+      Observable.of(loadProjectGroupList(projectName)),
       hideLoader,
     );
   });

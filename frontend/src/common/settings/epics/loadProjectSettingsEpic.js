@@ -16,7 +16,7 @@ import {
   loadProjectSettings,
   getProjectModel,
   loadProjectEpisodeWord,
-  loadProjectGroupList,
+  getProjectGroupList,
 } from '../../apis';
 import { appMessages } from '../../app/messages';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
@@ -24,7 +24,7 @@ import { apiEpicErrorHandle } from '../../errors';
 import { setProjectSettings, setSettingsApisParams } from '../actions';
 
 const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('LOAD_PROJECT_SETTINGS').concatMap((action) => {
+  action$.ofType('LOAD_PROJECT_SETTINGS').concatMap(action => {
     const pickNotNil = R.pickBy(a => !R.isNil(a));
     const ifIn = (i, items) => items.indexOf(i) !== -1;
     const apisParamsKey = 'project';
@@ -71,11 +71,11 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
     if (refresh) {
       prevProjectSettings = {};
       projectGroups = [];
-      grouplistAction$ = Observable.from(loadProjectGroupList(credentials, projectName))
-        .concatMap((d) => {
+      grouplistAction$ = Observable.from(getProjectGroupList(credentials, projectName))
+        .concatMap(d => {
           return Observable.of(setProjectSettings({ projectGroups: d.data.groups }));
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     }
@@ -95,31 +95,31 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
           endTime,
         }),
       )
-        .concatMap((d) => {
+        .concatMap(d => {
           return Observable.of(
             setProjectSettings({
               projectSettings: { ...prevProjectSettings, ...d.data },
             }),
           );
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     } else if (settingReload && setting === 'episodeword') {
       apiAction$ = Observable.from(loadProjectEpisodeWord(credentials, projectName))
-        .concatMap((d) => {
+        .concatMap(d => {
           return Observable.of(
             setProjectSettings({
               projectSettings: { ...prevProjectSettings, ...d.data },
             }),
           );
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     } else if (settingReload) {
       apiAction$ = Observable.from(loadProjectSettings(credentials, { projectName }))
-        .concatMap((d) => {
+        .concatMap(d => {
           // Reset all settings.
           return Observable.of(
             setProjectSettings({
@@ -127,7 +127,7 @@ const loadProjectSettingsEpic = (action$: any, { getState }: Deps) =>
             }),
           );
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     } else {

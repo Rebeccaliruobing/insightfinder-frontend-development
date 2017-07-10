@@ -41,6 +41,9 @@ const initialState = {
     'cAdvisor',
   ], // TODO: used to filter enabled data source
   currentLoadingComponents: {},
+
+  currentProjectName: null,
+  currentProjectGroupList: [],
 };
 
 const reducer = (state: AppState = initialState, action: Action): AppState => {
@@ -170,6 +173,13 @@ const reducer = (state: AppState = initialState, action: Action): AppState => {
     return {
       ...state,
       currentLoadingComponents,
+    };
+  } else if (action.type === 'SET_PROJECT_GROUP_LIST') {
+    const { projectName, groupList } = action.payload;
+    return {
+      ...state,
+      currentProjectName: projectName,
+      currentProjectGroupList: groupList || [],
     };
   }
   return { ...initialState, ...state };

@@ -12,12 +12,12 @@ import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchPost from './fetchPost';
 
-const loadProjectGroupList = (credentials: Credentials, projectName: String) => {
+const getProjectGroupList = (credentials: Credentials, projectName: String) => {
   return fetchPost(getEndpoint('instanceGrouping'), {
     ...credentials,
     projectName,
     operation: 'getGrouping',
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
     const groupstr = get(rawData, 'groupingString', '');
     const groups = R.sort(
@@ -36,4 +36,4 @@ const loadProjectGroupList = (credentials: Credentials, projectName: String) => 
   });
 };
 
-export default loadProjectGroupList;
+export default getProjectGroupList;
