@@ -17,11 +17,19 @@ import { autobind } from 'core-decorators';
 
 import { State } from '../../common/types';
 import { appFieldsMessages, appMenusMessages, appButtonsMessages } from '../../common/app/messages';
-import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../../common/utils';
+import {
+  parseQueryString,
+  buildUrl,
+  buildMatchLocation,
+  getStartEndTimeRange,
+} from '../../common/utils';
+import { BaseUrls } from '../app/Constants';
 import { loadMetricEventSummary } from '../../common/metric/actions';
 import { Container, Select, AutoSizer } from '../../lib/fui/react';
 import EventLegend from './components/EventLegend';
 import EventList from './components/EventList';
+import TakeActionModal from '../../../components/incidents/takeActionModal';
+import CausalGraphModal from '../../../components/incidents/causalGraphModal';
 
 type Props = {
   match: Object,
@@ -52,6 +60,11 @@ class MetricEventSummaryCore extends React.PureComponent {
 
     this.pickNotNil = R.pickBy(a => !R.isNil(a));
     this.ifIn = (i, items) => items.indexOf(i) !== -1;
+
+    this.state = {
+      showCausalGraphModal: false,
+      showTakeActionModal: false,
+    };
   }
 
   componentDidMount() {
@@ -198,6 +211,28 @@ class MetricEventSummaryCore extends React.PureComponent {
     this.reloadData(this.props, true);
   }
 
+  @autobind
+  showInstanceChart() {
+    const { location } = this.props;
+    const params = parseQueryString(location.search);
+
+    const { projectName, instanceGroup, startTime, endTime, view } = params;
+    const startTimeObj = moment(startTime, this.dateFormat).startOf('day');
+    const endTimeObj = moment(endTime, this.dateFormat).endOf('day');
+    const modelType = 'Holistic';
+    const urlParams = {
+      projectName,
+      instanceGroup,
+      version: 3,
+      modelType,
+      predictedFlag: view === 'predicted',
+      startTimestamp: startTimeObj.valueOf(),
+      endTimestamp: endTimeObj.valueOf(),
+    };
+
+    window.open(buildUrl(BaseUrls.LiveMonitoring, {}, urlParams), '_blank');
+  }
+
   render() {
     const { intl, projects, instanceGroupList, eventSummary } = this.props;
     const params = parseQueryString(location.search);
@@ -212,6 +247,8 @@ class MetricEventSummaryCore extends React.PureComponent {
     const nowObj = moment();
     const startTimeObj = moment(startTime, this.dateFormat);
     const endTimeObj = moment(endTime, this.dateFormat);
+    const eventEndTime = moment(endTimeObj).endOf('day').valueOf();
+    const numberOfDays = endTimeObj.diff(startTimeObj, 'days') + 1;
 
     return (
       <Container fullHeight withGutter className="flex-col metric-analysis">
@@ -288,6 +325,16 @@ class MetricEventSummaryCore extends React.PureComponent {
               >
                 Causal Analysis
               </div>
+              {this.state.showCausalGraphModal &&
+                <CausalGraphModal
+                  projectName={projectName}
+                  instanceGroup={instanceGroup}
+                  endTime={eventEndTime}
+                  numberOfDays={numberOfDays}
+                  loadGroup
+                  onClose={() => this.setState({ showCausalGraphModal: false })}
+                  onCancel={() => this.setState({ showCausalGraphModal: false })}
+                />}
               <div
                 className="ui tiny orange button"
                 style={{ position: 'absolute', left: 450, top: 5 }}
@@ -299,6 +346,12 @@ class MetricEventSummaryCore extends React.PureComponent {
               >
                 Overall Chart
               </div>
+              {this.state.showTakeActionModal &&
+                <TakeActionModal
+                  incident={this.state.activeIncident}
+                  projectName={projectName}
+                  onClose={() => this.setState({ showTakeActionModal: false })}
+                />}
               <div className="ui pointing secondary menu" style={{ marginTop: 0, marginBottom: 4 }}>
                 {R.map(
                   info =>

@@ -33,6 +33,7 @@ const BaseUrls = {
   SettingsProject: '/settings/projects/:projectName',
   SettingsProjectWizard: '/settings/project-wizard',
   SettingsExternalServiceList: '/settings/extsvc',
+  LiveMonitoring: '/liveMonitoring',
 
   PagerDutyImg: 'https://pagerduty.com/assets/pd_connect_button.png',
   SlackImg: 'https://slack.com/img/slack_logo_240.png',

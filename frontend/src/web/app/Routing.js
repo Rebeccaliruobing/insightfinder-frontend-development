@@ -130,7 +130,7 @@ const PrivateRoutings = () =>
     <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
     <Route path={BaseUrls.Settings} component={SettingsRoutings} />
 
-    <Route path="/liveMonitoring" render={() => React.createElement(liveMonitoringAppV1)} />
+    <Route path={BaseUrls.LiveMonitoring} render={() => React.createElement(liveMonitoringAppV1)} />
     <Route path="/useCaseDetails" render={() => React.createElement(useCaseAppV1)} />
     <Route path="/filesMonitoring" render={() => React.createElement(FilesMonitoringAppV1)} />
     <Route
