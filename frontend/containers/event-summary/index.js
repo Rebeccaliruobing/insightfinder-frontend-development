@@ -80,15 +80,18 @@ class EventSummaryCore extends React.Component {
       // If we don't set project name in url, select the first project; Otherwise
       // check whether the project name is in the list.
       if (projectName) {
-        if (!R.find(
-          p => p.projectName.toLowerCase() === projectName.toLowerCase(),
-          projects)) {
+        if (!R.find(p => p.projectName.toLowerCase() === projectName.toLowerCase(), projects)) {
           projectName = null;
-          this.setState({
-            projectNotFound: true,
-            groupNotFound: true,
-            loading: false,
-          });
+          this.setState(
+            {
+              projectNotFound: true,
+              groupNotFound: true,
+              loading: false,
+            },
+            () => {
+              this.props.hideAppLoader();
+            },
+          );
         }
       } else {
         projectName = projects[0].projectName;
@@ -154,17 +157,25 @@ class EventSummaryCore extends React.Component {
         stats.newInstances = data.instanceMetricJson.newInstances;
       }
 
-      incidentsTreeMap =
-        buildTreemap(projectName, caption, stats, incident.anomalyMapJson, incident,
-          data.statistics.instanceStatsJson,
-        );
+      incidentsTreeMap = buildTreemap(
+        projectName,
+        caption,
+        stats,
+        incident.anomalyMapJson,
+        incident,
+        data.statistics.instanceStatsJson,
+      );
     } else {
       groupIdMap = _.get(data, 'instanceMetricJson.groupIdMap');
       const caption = `${projectName} (${numberOfDays}d)`;
       data.statistics.maxAnomalyRatio = maxAnomalyRatio;
       data.statistics.minAnomalyRatio = minAnomalyRatio;
       incidentsTreeMap = buildTreemap(
-        projectName, caption, data.statistics, data.anomalyMapJson, null,
+        projectName,
+        caption,
+        data.statistics,
+        data.anomalyMapJson,
+        null,
         data.statistics.instanceStatsJson,
       );
     }
@@ -233,7 +244,8 @@ class EventSummaryCore extends React.Component {
   handleInstanceGroupChange(instanceGroup) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, instanceGroup,
+      ...location.query,
+      instanceGroup,
     });
     router.push({
       pathname: location.pathname,
@@ -257,8 +269,10 @@ class EventSummaryCore extends React.Component {
     const startTime = moment(query.startTime).startOf('day');
 
     const curTime = moment();
-    const realEndTime = ((endTime > curTime &&
-      endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = (endTime > curTime &&
+    endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')
+      ? curTime
+      : endTime).valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
     const { projectName, instanceGroup } = query;
 
@@ -266,84 +280,117 @@ class EventSummaryCore extends React.Component {
     const pvalue = pinfo ? pinfo.pvalue : '0.99';
     const cvalue = pinfo ? pinfo.cvalue : '1';
 
-    this.setState({
-      loading: true,
-      dataLoaded: false,
-      groupNotFound: false,
-    }, () => {
-      apis.retrieveLiveAnalysis(projectName, modelType, instanceGroup,
-        pvalue, cvalue, realEndTime.valueOf(), numberOfDays, 3)
-        .then((data) => {
-          // console.log(['eventSummary', data]);
-          // console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
-          const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
-          const maxAnomalyRatio = _.max(anomalyRatioLists);
-          const minAnomalyRatio = _.min(anomalyRatioLists);
+    this.setState(
+      {
+        loading: true,
+        dataLoaded: false,
+        groupNotFound: false,
+      },
+      () => {
+        apis
+          .retrieveLiveAnalysis(
+            projectName,
+            modelType,
+            instanceGroup,
+            pvalue,
+            cvalue,
+            realEndTime.valueOf(),
+            numberOfDays,
+            3,
+          )
+          .then(data => {
+            // console.log(['eventSummary', data]);
+            // console.log(['instanceStatsJson', _.get(data, 'instanceMetricJson.instanceStatsJson', {})]);
+            const anomalyRatioLists = data.incidents.map(inc => inc.anomalyRatio);
+            const maxAnomalyRatio = _.max(anomalyRatioLists);
+            const minAnomalyRatio = _.min(anomalyRatioLists);
 
-          let detectedEvents = [];
-          let predictedEvents = [];
-          let gname = instanceGroup;
-          if (instanceGroup.indexOf(':') >= 0) {
-            gname = instanceGroup.split(':')[1];
-          }
-          const detectedPromise = apis.loadEvents(projectName, instanceGroup,
-            startTime.valueOf(), realEndTime.valueOf(), 'detected')
-            .then((data) => {
-              detectedEvents = data[gname] || [];
-            });
-          const predictedPromise = apis.loadEvents(projectName, instanceGroup,
-            startTime.valueOf(), realEndTime.valueOf(), 'predicted')
-            .then((data) => {
-              const tsNow = (new Date()).valueOf();
-              predictedEvents = R.filter(e => e.endTimestamp >= tsNow, data[gname] || []);
-            });
-
-          Promise.all([detectedPromise, predictedPromise])
-            .then(() => {
-              const incidents = _.concat(detectedEvents, predictedEvents);
-              data.incidents = incidents;
-              this.setState({
-                loading: false,
-                dataLoaded: true,
-                // incidentsTreeMap: data.incidentsTreeMap,
-                data,
-                maxAnomalyRatio,
-                minAnomalyRatio,
-                detectedEvents, predictedEvents,
-                startTimestamp: data.startTimestamp,
-                endTimestamp: data.endTimestamp,
-              }, () => {
-                hideAppLoader();
+            let detectedEvents = [];
+            let predictedEvents = [];
+            let gname = instanceGroup;
+            if (instanceGroup.indexOf(':') >= 0) {
+              gname = instanceGroup.split(':')[1];
+            }
+            const detectedPromise = apis
+              .loadEvents(
+                projectName,
+                instanceGroup,
+                startTime.valueOf(),
+                realEndTime.valueOf(),
+                'detected',
+              )
+              .then(data => {
+                detectedEvents = data[gname] || [];
               });
-            }).catch((msg) => {
-              this.setState({ loading: false });
-              hideAppLoader();
-              console.log(msg);
-            });
-        }).catch((msg) => {
-          this.setState({ loading: false });
-          hideAppLoader();
-          console.log(msg);
-        });
-    });
+            const predictedPromise = apis
+              .loadEvents(
+                projectName,
+                instanceGroup,
+                startTime.valueOf(),
+                realEndTime.valueOf(),
+                'predicted',
+              )
+              .then(data => {
+                const tsNow = new Date().valueOf();
+                predictedEvents = R.filter(e => e.endTimestamp >= tsNow, data[gname] || []);
+              });
+
+            Promise.all([detectedPromise, predictedPromise])
+              .then(() => {
+                const incidents = _.concat(detectedEvents, predictedEvents);
+                data.incidents = incidents;
+                this.setState(
+                  {
+                    loading: false,
+                    dataLoaded: true,
+                    // incidentsTreeMap: data.incidentsTreeMap,
+                    data,
+                    maxAnomalyRatio,
+                    minAnomalyRatio,
+                    detectedEvents,
+                    predictedEvents,
+                    startTimestamp: data.startTimestamp,
+                    endTimestamp: data.endTimestamp,
+                  },
+                  () => {
+                    hideAppLoader();
+                  },
+                );
+              })
+              .catch(msg => {
+                this.setState({ loading: false });
+                hideAppLoader();
+                console.log(msg);
+              });
+          })
+          .catch(msg => {
+            this.setState({ loading: false });
+            hideAppLoader();
+            console.log(msg);
+          });
+      },
+    );
   }
 
   @autobind
   handleProjectChange(projectName) {
     const projects = this.getLiveProjectInfos();
     const project = R.find(
-      p => p.projectName.toLowerCase() === projectName.toLowerCase(), projects);
+      p => p.projectName.toLowerCase() === projectName.toLowerCase(),
+      projects,
+    );
     const { predictionWindow } = project;
 
-    this.setState({
-      loading: true,
-      dataLoaded: false,
-      projectNotFound: false,
-      predictionWindow,
-      currentTreemapData: undefined,
-    }, () => {
-      apis.loadInstanceGrouping(projectName, 'getGrouping')
-        .then((resp) => {
+    this.setState(
+      {
+        loading: true,
+        dataLoaded: false,
+        projectNotFound: false,
+        predictionWindow,
+        currentTreemapData: undefined,
+      },
+      () => {
+        apis.loadInstanceGrouping(projectName, 'getGrouping').then(resp => {
           let groups = [];
           if (resp.groupingString) {
             groups = resp.groupingString.split(',').sort();
@@ -383,17 +430,21 @@ class EventSummaryCore extends React.Component {
               query,
             });
 
-            this.setState({
-              groupNotFound,
-              instanceGroup,
-              instanceGroups: groups,
-              loading: false,
-            }, () => {
-              this.refreshInstanceGroup(query);
-            });
+            this.setState(
+              {
+                groupNotFound,
+                instanceGroup,
+                instanceGroups: groups,
+                loading: false,
+              },
+              () => {
+                this.refreshInstanceGroup(query);
+              },
+            );
           }
         });
-    });
+      },
+    );
   }
 
   @autobind
@@ -429,16 +480,20 @@ class EventSummaryCore extends React.Component {
     if (eventStartTimestamp && !startTime) {
       startTime = moment(parseInt(eventStartTimestamp, 10))
         .subtract(2, 'days')
-        .startOf('day').format(this.dateFormat);
+        .startOf('day')
+        .format(this.dateFormat);
     } else {
-      startTime = moment().subtract(this.defaultNumberOfDays - 1, 'days')
-        .startOf('day').format(this.dateFormat);
+      startTime = moment()
+        .subtract(this.defaultNumberOfDays - 1, 'days')
+        .startOf('day')
+        .format(this.dateFormat);
     }
 
     if (eventStartTimestamp && !endTime) {
       endTime = moment(parseInt(eventStartTimestamp, 10))
         .add(2, 'days')
-        .endOf('day').format(this.dateFormat);
+        .endOf('day')
+        .format(this.dateFormat);
     } else {
       endTime = moment().endOf('day').format(this.dateFormat);
     }
@@ -459,11 +514,21 @@ class EventSummaryCore extends React.Component {
     const { modelType, eventStartTimestamp } = params;
     const predicted = params.predicted === 'true';
     let { startTime, endTime } = params;
-    const { loading, data, incidentsTreeMap, predictionWindow,
-      treeMapCPUThreshold, treeMapAvailabilityThreshold, treeMapScheme,
-      instanceGroups, groupIdMap, dataLoaded,
-      detectedEvents, predictedEvents,
-      projectNotFound, groupNotFound,
+    const {
+      loading,
+      data,
+      incidentsTreeMap,
+      predictionWindow,
+      treeMapCPUThreshold,
+      treeMapAvailabilityThreshold,
+      treeMapScheme,
+      instanceGroups,
+      groupIdMap,
+      dataLoaded,
+      detectedEvents,
+      predictedEvents,
+      projectNotFound,
+      groupNotFound,
     } = this.state;
     const projectName = projectNotFound ? null : params.projectName;
     const instanceGroup = groupNotFound ? null : params.instanceGroup;
@@ -474,7 +539,10 @@ class EventSummaryCore extends React.Component {
     const curTime = moment();
     const maxEndTime = curTime;
     const maxStartTime = curTime;
-    const realEndTime = ((endTime > curTime && endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')) ? curTime : endTime).valueOf();
+    const realEndTime = (endTime > curTime &&
+    endTime.format('YYYY-MM-DD') === curTime.format('YYYY-MM-DD')
+      ? curTime
+      : endTime).valueOf();
     const eventEndTime = moment(endTime).endOf('day').valueOf();
     const numberOfDays = endTime.diff(startTime, 'days') + 1;
 
@@ -484,8 +552,8 @@ class EventSummaryCore extends React.Component {
     const instanceMetaData = data.instanceMetaData || {};
     const projectType = data.projectType || '';
 
-    const hasTreeMapData = incidentsTreeMap && incidentsTreeMap.children
-      && incidentsTreeMap.children.length > 0;
+    const hasTreeMapData =
+      incidentsTreeMap && incidentsTreeMap.children && incidentsTreeMap.children.length > 0;
     const hasDataFlag = !!data.hasDataFlag;
 
     return (
@@ -504,7 +572,9 @@ class EventSummaryCore extends React.Component {
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection
-                style={{ minWidth: 150 }} value={projectName} onChange={this.handleProjectChange}
+                style={{ minWidth: 150 }}
+                value={projectName}
+                onChange={this.handleProjectChange}
               />
             </div>
             <div className="field">
@@ -518,11 +588,11 @@ class EventSummaryCore extends React.Component {
                 style={{ minWidth: 150 }}
               >
                 <div className="menu">
-                  {
-                    instanceGroups.map(g => (
-                      <div className="item" key={g} data-value={g}>{g}</div>
-                    ))
-                  }
+                  {instanceGroups.map(g =>
+                    <div className="item" key={g} data-value={g}>
+                      {g}
+                    </div>,
+                  )}
                 </div>
               </Dropdown>
             </div>
@@ -551,86 +621,108 @@ class EventSummaryCore extends React.Component {
               </div>
             </div>
             <div className="field">
-              <div
-                className="ui orange button" tabIndex="0"
-                onClick={this.handleRefreshClick}
-              >Refresh</div>
+              <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
+                Refresh
+              </div>
             </div>
           </div>
           {projectNotFound &&
             <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
-              Project <b>{params.projectName}</b> not found, please choose the project from the list.
-            </div>
-          }
-          {!projectNotFound && groupNotFound &&
+              Project <b>{params.projectName}</b> not found, please choose the project from the
+              list.
+            </div>}
+          {!projectNotFound &&
+            groupNotFound &&
             <div className="ui error message" style={{ fontSize: '14px', margin: '60px auto' }}>
-              Project group <b>{params.instanceGroup}</b> not found, please choose group from the list.
-            </div>
-          }
-          {!projectNotFound && !groupNotFound && <div
-            className="ui vertical segment flex-item flex-row-container"
-            style={{ background: 'white', padding: 10, marginBottom: 10 }}
-          >
-            <div style={{ width: '45%', paddingRight: 10 }}>
-              {dataLoaded &&
-                <IncidentsList
-                  projectName={projectName} projectType={projectType}
-                  instanceGroup={instanceGroup} eventEndTime={eventEndTime}
-                  endTime={realEndTime} numberOfDays={numberOfDays} modelType={modelType}
-                  incidents={data.incidents}
-                  detectedEvents={detectedEvents} predictedEvents={predictedEvents}
-                  activeTab={predicted ? 'predicted' : 'detected'}
-                  eventStartTimestamp={eventStartTimestamp}
-                  onIncidentSelected={this.handleIncidentSelected}
-                  causalDataArray={data.causalDataArray}
-                  eventsCausalRelation={data.eventsCausalRelation}
-                  causalTypes={data.causalTypes}
-                  latestTimestamp={latestTimestamp}
-                  predictionWindow={predictionWindow}
-                />
-              }
-            </div>
-            <div className="flex-item flex-col-container" style={{ width: '55%' }}>
-              <div style={{ padding: '5px 0px 6px', borderBottom: '2px solid rgba(34,36,38,.15)' }}>
-                {treeMapScheme === 'anomaly' && <b style={{ paddingRight: '1em' }}>Show event by:</b>}
-                {treeMapScheme !== 'anomaly' && <b style={{ paddingRight: '1em' }}>Show instance by:</b>}
-                <TreeMapSchemeSelect
-                  style={{ width: 130 }} value={treeMapScheme}
-                  text={treeMapSchemeText}
-                  onChange={this.handleTreeMapScheme}
-                />
-                {treeMapScheme === 'cpu' && <TreeMapCPUThresholdSelect
-                  style={{ minWidth: 10 }} value={treeMapCPUThreshold}
-                  text={`<=${treeMapCPUThreshold}%`}
-                  onChange={this.handleTreeMapCPUThreshold}
-                />}
-                {treeMapScheme === 'availability' && <TreeMapAvailabilityThresholdSelect
-                  style={{ minWidth: 10 }} value={treeMapAvailabilityThreshold}
-                  text={`<=${treeMapAvailabilityThreshold}%`}
-                  onChange={this.handleTreeMapAvailabilityThreshold}
-                />
-                }
+              Project group <b>{params.instanceGroup}</b> not found, please choose group from the
+              list.
+            </div>}
+          {!projectNotFound &&
+            !groupNotFound &&
+            <div
+              className="ui vertical segment flex-item flex-row-container"
+              style={{ background: 'white', padding: 10, marginBottom: 10 }}
+            >
+              <div style={{ width: '45%', paddingRight: 10 }}>
+                {dataLoaded &&
+                  <IncidentsList
+                    projectName={projectName}
+                    projectType={projectType}
+                    instanceGroup={instanceGroup}
+                    eventEndTime={eventEndTime}
+                    endTime={realEndTime}
+                    numberOfDays={numberOfDays}
+                    modelType={modelType}
+                    incidents={data.incidents}
+                    detectedEvents={detectedEvents}
+                    predictedEvents={predictedEvents}
+                    activeTab={predicted ? 'predicted' : 'detected'}
+                    eventStartTimestamp={eventStartTimestamp}
+                    onIncidentSelected={this.handleIncidentSelected}
+                    causalDataArray={data.causalDataArray}
+                    eventsCausalRelation={data.eventsCausalRelation}
+                    causalTypes={data.causalTypes}
+                    latestTimestamp={latestTimestamp}
+                    predictionWindow={predictionWindow}
+                  />}
               </div>
-              {hasTreeMapData &&
-                <IncidentsTreeMap
-                  data={incidentsTreeMap} instanceMetaData={instanceMetaData}
-                  endTime={realEndTime} numberOfDays={numberOfDays}
-                  instanceStatsJson={instanceStatsMap}
-                  treeMapScheme={treeMapScheme} groupIdMap={groupIdMap}
-                  treeMapCPUThreshold={treeMapCPUThreshold}
-                  treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
-                  predictedFlag={predicted} instanceGroup={instanceGroup}
-                />
-              }
-              {!hasTreeMapData && hasDataFlag &&
-                <div className="ui warning message">Metric data are being sent to InsightFinder intelligence engine successfully. Model training requires several hours of data. Please check back later</div>
-              }
-              {!hasTreeMapData && !hasDataFlag &&
-                <div className="ui warning message">Metric data collection failed. Please check your data source to make sure data are being sent to InsightFinder intelligence engine correctly</div>
-              }
-            </div>
-          </div>
-          }
+              <div className="flex-item flex-col-container" style={{ width: '55%' }}>
+                <div
+                  style={{ padding: '5px 0px 6px', borderBottom: '2px solid rgba(34,36,38,.15)' }}
+                >
+                  {treeMapScheme === 'anomaly' &&
+                    <b style={{ paddingRight: '1em' }}>Show event by:</b>}
+                  {treeMapScheme !== 'anomaly' &&
+                    <b style={{ paddingRight: '1em' }}>Show instance by:</b>}
+                  <TreeMapSchemeSelect
+                    style={{ width: 130 }}
+                    value={treeMapScheme}
+                    text={treeMapSchemeText}
+                    onChange={this.handleTreeMapScheme}
+                  />
+                  {treeMapScheme === 'cpu' &&
+                    <TreeMapCPUThresholdSelect
+                      style={{ minWidth: 10 }}
+                      value={treeMapCPUThreshold}
+                      text={`<=${treeMapCPUThreshold}%`}
+                      onChange={this.handleTreeMapCPUThreshold}
+                    />}
+                  {treeMapScheme === 'availability' &&
+                    <TreeMapAvailabilityThresholdSelect
+                      style={{ minWidth: 10 }}
+                      value={treeMapAvailabilityThreshold}
+                      text={`<=${treeMapAvailabilityThreshold}%`}
+                      onChange={this.handleTreeMapAvailabilityThreshold}
+                    />}
+                </div>
+                {hasTreeMapData &&
+                  <IncidentsTreeMap
+                    data={incidentsTreeMap}
+                    instanceMetaData={instanceMetaData}
+                    endTime={realEndTime}
+                    numberOfDays={numberOfDays}
+                    instanceStatsJson={instanceStatsMap}
+                    treeMapScheme={treeMapScheme}
+                    groupIdMap={groupIdMap}
+                    treeMapCPUThreshold={treeMapCPUThreshold}
+                    treeMapAvailabilityThreshold={treeMapAvailabilityThreshold}
+                    predictedFlag={predicted}
+                    instanceGroup={instanceGroup}
+                  />}
+                {!hasTreeMapData &&
+                  hasDataFlag &&
+                  <div className="ui warning message">
+                    Metric data are being sent to InsightFinder intelligence engine successfully.
+                    Model training requires several hours of data. Please check back later
+                  </div>}
+                {!hasTreeMapData &&
+                  !hasDataFlag &&
+                  <div className="ui warning message">
+                    Metric data collection failed. Please check your data source to make sure data
+                    are being sent to InsightFinder intelligence engine correctly
+                  </div>}
+              </div>
+            </div>}
         </div>
       </Console.Content>
     );
@@ -647,4 +739,3 @@ export default connect(
   },
   { hideAppLoader },
 )(EventSummary);
-
