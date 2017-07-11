@@ -15,8 +15,8 @@ import { aggregateToMultiHourData } from '../../../containers/executive-dashboar
 const loadHourlyEvents = (credentials: Credentials, params: Object) => {
   const { projectName, startTime, endTime, instanceGroup } = params;
   const dateFormat = 'YYYY-MM-DD';
-  const mStartTime = moment(startTime, dateFormat);
-  const mEndTime = moment(endTime, dateFormat);
+  const mStartTime = moment(startTime, dateFormat).startOf('day');
+  const mEndTime = moment(endTime, dateFormat).endOf('day');
 
   const diffDays = mEndTime.diff(mStartTime, 'days');
   const numberOfDays = diffDays + 1;

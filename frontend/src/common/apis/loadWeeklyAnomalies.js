@@ -17,8 +17,8 @@ import normalizeStats from '../../../containers/executive-dashboard/normalize-st
 const loadWeeklyAnomalies = (credentials: Credentials, params: Object) => {
   const { projectName, startTime, endTime } = params;
   const dateFormat = 'YYYY-MM-DD';
-  const mStartTime = moment(startTime, dateFormat);
-  const mEndTime = moment(endTime, dateFormat);
+  const mStartTime = moment(startTime, dateFormat).startOf('day');
+  const mEndTime = moment(endTime, dateFormat).endOf('day');
 
   const diffDays = mEndTime.diff(mStartTime, 'days');
   const numberOfDays = diffDays + 1;
