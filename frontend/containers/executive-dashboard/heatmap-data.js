@@ -45,7 +45,7 @@ export function aggregateToMultiHourData(dataset, endTime, numberOfDays) {
               });
             } else {
               console.warn(
-                `[IF] Ignored event: predictedFlag=${predicted}, hour=${hour}, local StartTime=${startTimeObj.format(
+                `[IF] Ignored event: predictedFlag=${predicted}, Server hour=${hour}, local StartTime=${startTimeObj.format(
                   'YYYYMMDDHH',
                 )}, diff Hours=${idx} (0 <= diff < ${size})`,
               );
