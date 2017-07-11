@@ -15,11 +15,13 @@ import { push } from 'react-router-redux';
 import DatePicker from 'react-datepicker';
 import { autobind } from 'core-decorators';
 
+import { State } from '../../common/types';
 import { appFieldsMessages, appMenusMessages, appButtonsMessages } from '../../common/app/messages';
 import { parseQueryString, buildMatchLocation, getStartEndTimeRange } from '../../common/utils';
 import { loadMetricEventSummary } from '../../common/metric/actions';
-import { Container, Select } from '../../lib/fui/react';
-import { State } from '../../common/types';
+import { Container, Select, AutoSizer } from '../../lib/fui/react';
+import EventLegend from './components/EventLegend';
+import EventList from './components/EventList';
 
 type Props = {
   match: Object,
@@ -28,6 +30,8 @@ type Props = {
   push: Function,
   projects: Array<Object>,
   instanceGroupList: Array<String>,
+  eventSummary: Object,
+  eventSummaryParams: Object,
   loadMetricEventSummary: Function,
 };
 
@@ -38,7 +42,11 @@ class MetricEventSummaryCore extends React.PureComponent {
     super(props);
 
     this.defaultInstanceGroup = 'All';
-    this.views = ['detect', 'predict'];
+    this.views = ['detected', 'predicted'];
+    this.viewInfos = [
+      { key: 'detected', name: 'Detected Events' },
+      { key: 'predicted', name: 'Predicted Events' },
+    ];
     this.defaultNumberOfDays = 7;
     this.dateFormat = 'YYYY-MM-DD';
 
@@ -71,7 +79,7 @@ class MetricEventSummaryCore extends React.PureComponent {
 
     // If project changed, reset instanceGroup and view.
     if (projectName !== params.projectName) {
-      view = this.views[0];
+      view = this.viewInfos[0].key;
       instanceGroup = this.defaultInstanceGroup;
     }
 
@@ -86,7 +94,8 @@ class MetricEventSummaryCore extends React.PureComponent {
     endTime = timeRange.endTime;
 
     instanceGroup = instanceGroup || this.defaultInstanceGroup;
-    view = view && this.ifIn(view, this.views) ? view : this.views[0];
+    view =
+      view && this.ifIn(view, R.map(v => v.key, this.viewInfos)) ? view : this.viewInfos[0].key;
 
     const newParams = { projectName, startTime, endTime, instanceGroup, view };
     if (!R.equals(this.pickNotNil(params), this.pickNotNil(newParams))) {
@@ -112,7 +121,7 @@ class MetricEventSummaryCore extends React.PureComponent {
     }
 
     if (refresh) {
-      loadMetricEventSummary(projectName, instanceGroup, { startTime, endTime, view });
+      loadMetricEventSummary(projectName, instanceGroup, { startTime, endTime, view }, force, true);
     }
   }
 
@@ -124,8 +133,16 @@ class MetricEventSummaryCore extends React.PureComponent {
 
     // Reset the instanceGroup and view to default
     const instanceGroup = this.defaultInstanceGroup;
-    const view = this.views[0];
+    const view = this.viewInfos[0].key;
     push(buildMatchLocation(match, {}, { ...params, projectName, instanceGroup, view }));
+  }
+
+  @autobind
+  handleInstanceGroupChange(newValue) {
+    const instanceGroup = newValue ? newValue.value : null;
+    const { match, push, location } = this.props;
+    const params = parseQueryString(location.search);
+    push(buildMatchLocation(match, {}, { ...params, instanceGroup }));
   }
 
   @autobind
@@ -165,14 +182,32 @@ class MetricEventSummaryCore extends React.PureComponent {
   }
 
   @autobind
+  handleViewChangeClick(view) {
+    return e => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const { match, push, location } = this.props;
+      const params = parseQueryString(location.search);
+      push(buildMatchLocation(match, {}, { ...params, view }));
+    };
+  }
+
+  @autobind
   handleRefreshClick() {
     this.reloadData(this.props, true);
   }
 
   render() {
-    const { intl, projects, instanceGroupList } = this.props;
+    const { intl, projects, instanceGroupList, eventSummary } = this.props;
     const params = parseQueryString(location.search);
     const { projectName, startTime, endTime, instanceGroup, view } = params;
+
+    const showDetected = view === 'detected';
+    const showPredicted = view === 'predicted';
+    const viewData = get(eventSummary, view, {});
+    const eventList = viewData.eventList || [];
+    const { maxAnomalyRatio, minAnomalyRatio } = viewData;
 
     const nowObj = moment();
     const startTimeObj = moment(startTime, this.dateFormat);
@@ -236,6 +271,78 @@ class MetricEventSummaryCore extends React.PureComponent {
             </div>
           </div>
         </Container>
+        <Container
+          className="flex-grow flex-col overflow-y-auto"
+          style={{ paddingTop: 8, paddingBottom: 8 }}
+        >
+          <Container className="boxed flex-grow flex-row" style={{ margin: 0, minHeight: 400 }}>
+            <Container className="flex-col" style={{ width: 620 }}>
+              <div
+                className="ui tiny orange button"
+                style={{ position: 'absolute', left: 320, top: 5 }}
+                title="Causal Analysis"
+                onClick={e => {
+                  e.stopPropagation();
+                  this.setState({ showCausalGraphModal: true });
+                }}
+              >
+                Causal Analysis
+              </div>
+              <div
+                className="ui tiny orange button"
+                style={{ position: 'absolute', left: 450, top: 5 }}
+                title="Overall Chart"
+                onClick={e => {
+                  e.stopPropagation();
+                  this.showInstanceChart();
+                }}
+              >
+                Overall Chart
+              </div>
+              <div className="ui pointing secondary menu" style={{ marginTop: 0, marginBottom: 4 }}>
+                {R.map(
+                  info =>
+                    <a
+                      key={info.key}
+                      className={`${info.key === view ? 'active' : ''} item`}
+                      onClick={this.handleViewChangeClick(info.key)}
+                    >
+                      {info.name}
+                    </a>,
+                  this.viewInfos,
+                )}
+              </div>
+              {showDetected &&
+                <Container className="flex-grow">
+                  <AutoSizer>
+                    {({ width, height }) =>
+                      <EventList
+                        width={width}
+                        height={height}
+                        incidents={eventList}
+                        maxAnomalyRatio={maxAnomalyRatio}
+                        minAnomalyRatio={minAnomalyRatio}
+                      />}
+                  </AutoSizer>
+                </Container>}
+              {showPredicted &&
+                <Container className="flex-grow">
+                  <AutoSizer>
+                    {({ width, height }) =>
+                      <EventList
+                        width={width}
+                        height={height}
+                        incidents={eventList}
+                        maxAnomalyRatio={maxAnomalyRatio}
+                        minAnomalyRatio={minAnomalyRatio}
+                      />}
+                  </AutoSizer>
+                </Container>}
+              <EventLegend />
+            </Container>
+            <Container className="flex-grow">fsdfds</Container>
+          </Container>
+        </Container>
       </Container>
     );
   }
@@ -244,12 +351,13 @@ class MetricEventSummaryCore extends React.PureComponent {
 const MetricEventSummary = injectIntl(MetricEventSummaryCore);
 export default connect(
   (state: State) => {
-    const { eventSummaryParams } = state.metric;
+    const { eventSummaryParams, eventSummary } = state.metric;
     const { projects, currentProjectGroupList } = state.app;
     return {
       projects: R.filter(p => p.isMetric, projects),
       instanceGroupList: currentProjectGroupList,
       eventSummaryParams,
+      eventSummary,
     };
   },
   { push, loadMetricEventSummary },

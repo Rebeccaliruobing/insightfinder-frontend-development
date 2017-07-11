@@ -107,8 +107,7 @@ const SinglePageCore = ({
           <SinglePageLoader key="loader" visible={pageLoaderVisible} />
           {children}
         </div>}
-      {!!leftbar && leftbar}
-      {!!leftbar &&
+      {Boolean(leftbar) &&
         <div className="content with-leftbar">
           <div className="full-height">
             <SinglePageLoader key="loader" visible={pageLoaderVisible} />

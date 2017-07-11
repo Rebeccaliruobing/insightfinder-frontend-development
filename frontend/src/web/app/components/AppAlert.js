@@ -20,24 +20,25 @@ class AppAlertCore extends React.Component {
   props: Props;
 
   static defaultProps = {
-    timeout: 500,
+    timeout: 2000,
   };
 
   componentDidMount() {
     const { alertMessages, setTimeout, timeout } = this.props;
     if (alertMessages.length > 0) {
-      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
+      setTimeout(this.cleanOutdatedAlerts, timeout);
     }
   }
 
   componentDidUpdate() {
     const { alertMessages, setTimeout, timeout } = this.props;
     if (alertMessages.length > 0) {
-      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
+      setTimeout(this.cleanOutdatedAlerts, timeout);
     }
   }
 
-  @autobind cleanOutdatedAlerts() {
+  @autobind
+  cleanOutdatedAlerts() {
     const { alertMessages, hideAppAlert, setTimeout, timeout } = this.props;
     const expired = Date.now().valueOf() - timeout;
     // Get the outdated alerts based on the id.
@@ -45,7 +46,7 @@ class AppAlertCore extends React.Component {
     if (ids.length > 0) {
       hideAppAlert(ids);
     } else {
-      setTimeout(this.cleanOutdatedAlerts, Math.min(1000, timeout));
+      setTimeout(this.cleanOutdatedAlerts, timeout);
     }
   }
 
@@ -54,7 +55,7 @@ class AppAlertCore extends React.Component {
     if (alertMessages.length > 0) {
       return (
         <div className="fui alert container" style={{ paddingTop: 80, paddingBottom: 16 }}>
-          {alertMessages.map((alert) => {
+          {alertMessages.map(alert => {
             // Get locale message and replace placeholders with params.
             const { params } = alert;
             const message = intl.formatMessage(alert.message, params);

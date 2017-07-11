@@ -51,8 +51,9 @@ export const loadMetricEventSummary = (
   projectName: String,
   instanceGroup: String,
   params: Object,
+  force: Boolean = false,
   loader: any = true,
 ): Action => ({
   type: 'LOAD_METRIC_EVENT_SUMMARY',
-  payload: { projectName, instanceGroup, params, loader },
+  payload: { projectName, instanceGroup, params, force, loader },
 });
