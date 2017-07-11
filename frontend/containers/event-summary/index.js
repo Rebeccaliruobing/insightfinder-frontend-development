@@ -332,7 +332,10 @@ class EventSummaryCore extends React.Component {
               )
               .then(data => {
                 const tsNow = new Date().valueOf();
-                predictedEvents = R.filter(e => e.endTimestamp >= tsNow, data[gname] || []);
+                predictedEvents = R.filter(
+                  e => e.endTimestamp >= realEndTime.valueOf(),
+                  data[gname] || [],
+                );
               });
 
             Promise.all([detectedPromise, predictedPromise])
