@@ -4,8 +4,10 @@ import React, { Component } from 'react';
 import { autobind } from 'core-decorators';
 import { connect } from 'react-redux';
 import cx from 'classnames';
+import DatePicker from 'react-datepicker';
 import R from 'ramda';
 import store from 'store';
+import moment from 'moment';
 import _ from 'lodash';
 import { State } from '../../src/common/types';
 import withRouter from '../withRouter';
@@ -23,7 +25,7 @@ const getSelectedGroup = (value, appGroups) => {
   if (appGroups && value) {
     const names = value.split(',');
     const groups = [];
-    _.forEach(names, (n) => {
+    _.forEach(names, n => {
       const gp = _.find(appGroups, g => g.metrics === n);
       if (gp) {
         groups.push(gp);
@@ -40,7 +42,6 @@ const getSelectedGroup = (value, appGroups) => {
 };
 
 const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
-
   const dataObj = appObj.appForecastData;
   const appPeriodMap = periodMap[appName] || {};
 
@@ -66,6 +67,9 @@ const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
 class AppForecastCore extends Component {
   constructor(props) {
     super(props);
+
+    this.defaultNumberOfDays = 7;
+    this.dateFormat = 'YYYY-MM-DD';
 
     this.state = {
       data: {},
@@ -94,8 +98,10 @@ class AppForecastCore extends Component {
       router.push('/settings/project-list/custom');
     } else {
       let projectName = location.query.projectName || store.get('liveAnalysisProjectName');
-      if (!projectName ||
-        (projectName && !projects.find(item => item.projectName === projectName))) {
+      if (
+        !projectName ||
+        (projectName && !projects.find(item => item.projectName === projectName))
+      ) {
         projectName = projects[0].projectName;
       }
       this.handleProjectChange(projectName);
@@ -109,8 +115,12 @@ class AppForecastCore extends Component {
   @autobind()
   handleAppNameSelected(appName) {
     const { appObj, metricUnitMapping, periodMap, selectedMetrics } = this.state;
-    const { appData, appPeriodMap, appGroups } =
-      getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+    const { appData, appPeriodMap, appGroups } = getSelectedAppData(
+      appName,
+      appObj,
+      metricUnitMapping,
+      periodMap,
+    );
     const { names, selectedGroups } = getSelectedGroup(selectedMetrics, appGroups);
 
     this.setState({
@@ -153,83 +163,116 @@ class AppForecastCore extends Component {
   }
 
   @autobind
+  refreshDataByTime(startTime) {
+    const { location, router } = this.props;
+    const query = this.applyDefaultParams({
+      ...location.query,
+      startTime: startTime.format(this.dateFormat),
+    });
+
+    router.push({
+      pathname: location.pathname,
+      query,
+    });
+
+    this.refreshInstanceGroup(query);
+  }
+
+  @autobind
+  handleStartTimeChange(newDate) {
+    const startTime = newDate.clone().startOf('day');
+    this.refreshDataByTime(startTime);
+  }
+
+  @autobind
   refreshInstanceGroup(params) {
     const { location, hideAppLoader } = this.props;
     const query = params || this.applyDefaultParams(location.query);
-    const { projectName, instanceGroup } = query;
+    const { projectName, instanceGroup, startTime } = query;
 
     const self = this;
     let selectedMetrics = store.get(`${projectName}-forecast-metrics`, '');
     store.set('liveAnalysisProjectName', projectName);
 
-    this.setState({
-      loading: true,
-      projectName,
-      selectedMetrics,
-      hideGroupSelector: true,
-    }, () => {
-      apis.retrieveAppForecastData(projectName, instanceGroup)
-        .then((resp) => {
-          let appNames = resp.appNames;
-          const appObj = resp.appObj;
-          const appCpuJson = resp.appCpuJson;
-          const periodMap = resp.periodMap;
-          const metricUnitMapping = resp.metricUnitMapping;
-          let appName = null;
-          let data = null;
-          let thisPeriodMap = null;
-          let appGroups = null;
-          let selectedGroups = null;
+    this.setState(
+      {
+        loading: true,
+        projectName,
+        selectedMetrics,
+        hideGroupSelector: true,
+      },
+      () => {
+        apis
+          .retrieveAppForecastData(projectName, instanceGroup, startTime)
+          .then(resp => {
+            let appNames = resp.appNames;
+            const appObj = resp.appObj;
+            const appCpuJson = resp.appCpuJson;
+            const periodMap = resp.periodMap;
+            const metricUnitMapping = resp.metricUnitMapping;
+            let appName = null;
+            let data = null;
+            let thisPeriodMap = null;
+            let appGroups = null;
+            let selectedGroups = null;
 
-          appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
-          if (appNames.length > 0) {
-            appName = appNames[0];
-            const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
-            data = d.appData;
-            thisPeriodMap = d.appPeriodMap;
-            appGroups = d.appGroups;
-            const g = getSelectedGroup(selectedMetrics, appGroups);
-            selectedGroups = g.selectedGroups;
-            selectedMetrics = g.names.join(',');
-            store.set(`${projectName}-forecast-metrics`, selectedMetrics);
-          }
+            appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
+            if (appNames.length > 0) {
+              appName = appNames[0];
+              const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+              data = d.appData;
+              thisPeriodMap = d.appPeriodMap;
+              appGroups = d.appGroups;
+              const g = getSelectedGroup(selectedMetrics, appGroups);
+              selectedGroups = g.selectedGroups;
+              selectedMetrics = g.names.join(',');
+              store.set(`${projectName}-forecast-metrics`, selectedMetrics);
+            }
 
-          this.setState({
-            loading: false,
-            appNames,
-            appCpuJson,
-            appObj,
-            periodMap,
-            metricUnitMapping,
-            selectedAppName: appName,
-            data,
-            thisPeriodMap,
-            appGroups,
-            selectedGroups,
-            selectedMetrics,
-            hideGroupSelector: false,
-            showErrorMsg: false,
-          }, () => {
-            hideAppLoader();
+            this.setState(
+              {
+                loading: false,
+                appNames,
+                appCpuJson,
+                appObj,
+                periodMap,
+                metricUnitMapping,
+                selectedAppName: appName,
+                data,
+                thisPeriodMap,
+                appGroups,
+                selectedGroups,
+                selectedMetrics,
+                hideGroupSelector: false,
+                showErrorMsg: false,
+              },
+              () => {
+                hideAppLoader();
+              },
+            );
+          })
+          .catch(() => {
+            // reset UI
+            this.setState(
+              {
+                showErrorMsg: true,
+                loading: false,
+              },
+              () => {
+                hideAppLoader();
+              },
+            );
           });
-        })
-        .catch(() => {
-          // reset UI
-          this.setState({
-            showErrorMsg: true,
-            loading: false,
-          }, () => {
-            hideAppLoader();
-          });
-        });
-    });
+      },
+    );
   }
 
   @autobind
   handleInstanceGroupChange(instanceGroup) {
     const { location, router } = this.props;
     const query = this.applyDefaultParams({
-      ...location.query, instanceGroup,
+      ...location.query,
+      instanceGroup,
     });
     router.push({
       pathname: location.pathname,
@@ -241,11 +284,12 @@ class AppForecastCore extends Component {
 
   @autobind
   handleProjectChange(projectName) {
-    this.setState({
-      loading: true,
-    }, () => {
-      apis.loadInstanceGrouping(projectName, 'getGrouping')
-        .then((resp) => {
+    this.setState(
+      {
+        loading: true,
+      },
+      () => {
+        apis.loadInstanceGrouping(projectName, 'getGrouping').then(resp => {
           if (resp.groupingString) {
             let groups = resp.groupingString.split(',').sort();
             const pos = groups.indexOf('All');
@@ -278,14 +322,18 @@ class AppForecastCore extends Component {
               query,
             });
 
-            this.setState({
-              instanceGroups: groups,
-            }, () => {
-              this.refreshInstanceGroup(query);
-            });
+            this.setState(
+              {
+                instanceGroups: groups,
+              },
+              () => {
+                this.refreshInstanceGroup(query);
+              },
+            );
           }
         });
-    });
+      },
+    );
   }
 
   @autobind
@@ -301,19 +349,38 @@ class AppForecastCore extends Component {
   }
 
   applyDefaultParams(params) {
+    let { startTime } = params;
+    if (!startTime) {
+      startTime = moment()
+        .subtrace(this.defaultNumberOfDays, 'days')
+        .startOf('day')
+        .format(this.dateFormat);
+    }
+
     return {
       instanceGroup: 'All',
+      startTime,
       ...params,
     };
   }
 
   render() {
     const { location } = this.props;
-    const { projectName, instanceGroup } = this.applyDefaultParams(location.query);
+    const { startTime, projectName, instanceGroup } = this.applyDefaultParams(location.query);
     const {
-      loading, data, instanceGroups, appNames, appGroups, selectedGroups,
-      thisPeriodMap, showErrorMsg, selectedMetrics, hideGroupSelector,
+      loading,
+      data,
+      instanceGroups,
+      appNames,
+      appGroups,
+      selectedGroups,
+      thisPeriodMap,
+      showErrorMsg,
+      selectedMetrics,
+      hideGroupSelector,
     } = this.state;
+    const startTimeObj = moment(startTime, this.dateFormat);
+    const nowObj = moment();
     return (
       <Console.Content
         className={`app-forecast ${loading ? 'ui form loading' : ''}`}
@@ -323,15 +390,13 @@ class AppForecastCore extends Component {
           className="ui main tiny container"
           style={{ minHeight: '100%', display: loading && 'none' }}
         >
-          <div
-            className="ui right aligned vertical inline segment"
-            style={{ zIndex: 200 }}
-          >
+          <div className="ui right aligned vertical inline segment" style={{ zIndex: 200 }}>
             <div className="field">
               <label style={{ fontWeight: 'bold' }}>Project Name:</label>
               <LiveProjectSelection
                 value={projectName}
-                onChange={this.handleProjectChange} style={{ minWidth: 200 }}
+                onChange={this.handleProjectChange}
+                style={{ minWidth: 200 }}
               />
             </div>
             <div className="field">
@@ -345,101 +410,105 @@ class AppForecastCore extends Component {
                 style={{ minWidth: 200 }}
               >
                 <div className="menu">
-                  {
-                    instanceGroups.map(g => (
-                      <div className="item" key={g} data-value={g}>{g}</div>
-                    ))
-                  }
+                  {instanceGroups.map(g =>
+                    <div className="item" key={g} data-value={g}>
+                      {g}
+                    </div>,
+                  )}
                 </div>
               </Dropdown>
             </div>
             <div className="field">
-              <div
-                className="ui orange button" tabIndex="0"
-                onClick={this.handleRefreshClick}
-              >Refresh
+              <label style={{ fontWeight: 'bold' }}>Start Date:</label>
+              <div className="ui input">
+                <DatePicker
+                  selected={startTimeObj}
+                  todayButton="Today"
+                  dateFormat={this.dateFormat}
+                  maxDate={nowObj}
+                  onChange={this.handleStartTimeChange}
+                />
+              </div>
+            </div>
+            <div className="field">
+              <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
+                Refresh
               </div>
             </div>
           </div>
-          {showErrorMsg ?
-            <h3>Forecast data unavailable for this project.</h3>
-            : (
-              <div className="ui grid">
+          {showErrorMsg
+            ? <h3>Forecast data unavailable for this project.</h3>
+            : <div className="ui grid">
                 <div className="three wide column">
                   <table className="ui selectable celled table">
                     <thead>
                       <tr>
-                        <th><span
-                          style={{ fontWeight: 'bold' }}
-                        >Application Names</span>
+                        <th>
+                          <span style={{ fontWeight: 'bold' }}>Application Names</span>
                           <br />(sorted by CPU usage)
-                    </th>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {appNames.map((appName, i) => (
+                      {appNames.map((appName, i) =>
                         <tr
                           key={i}
                           onClick={() => this.handleAppNameSelected(appName)}
-                          className={cx(
-                            { active: appName === this.state.selectedAppName })
-                          } style={{ cursor: 'pointer' }}
+                          className={cx({ active: appName === this.state.selectedAppName })}
+                          style={{ cursor: 'pointer' }}
                         >
-                          <td>{appName}</td>
-                        </tr>
-                      ))}
+                          <td>
+                            {appName}
+                          </td>
+                        </tr>,
+                      )}
                     </tbody>
                   </table>
                 </div>
                 <div className="thirteen wide column">
-                  {selectedGroups && appGroups &&
-                    <div
-                      className="field"
-                      style={{ paddingTop: 10, paddingBottom: 10 }}
-                    >
-                      <label style={{ fontWeight: 'bold', paddingRight: 10 }}>Metric
-                      Filters:</label>
+                  {selectedGroups &&
+                    appGroups &&
+                    <div className="field" style={{ paddingTop: 10, paddingBottom: 10 }}>
+                      <label style={{ fontWeight: 'bold', paddingRight: 10 }}>
+                        Metric Filters:
+                      </label>
                       {!hideGroupSelector &&
                         <Dropdown
                           key={projectName}
-                          className="forecast" mode="select" multiple
+                          className="forecast"
+                          mode="select"
+                          multiple
                           value={selectedMetrics}
                           onChange={this.handleMetricSelectionChange}
                           style={{ minWidth: 200 }}
                         >
                           <div className="menu">
-                            {
-                              appGroups.map(g => (
-                                <div
-                                  className="item" key={g.metrics}
-                                  data-value={g.metrics}
-                                >{g.metrics}</div>
-                              ))
-                            }
+                            {appGroups.map(g =>
+                              <div className="item" key={g.metrics} data-value={g.metrics}>
+                                {g.metrics}
+                              </div>,
+                            )}
                           </div>
-                        </Dropdown>
-                      }
-                    </div>
-                  }
+                        </Dropdown>}
+                    </div>}
                   {!!selectedGroups &&
                     <div className="ui grid">
                       <DataGroupCharts
                         orderByMetric={false}
                         chartType="bar"
-                        groups={selectedGroups} view="list"
+                        groups={selectedGroups}
+                        view="list"
                         latestDataTimestamp={data.instanceMetricJson.latestDataTimestamp}
                         periodMap={thisPeriodMap}
                         alertMissingData={false}
                         onDateWindowChange={this.handleDateWindowSync}
                         dateWindow={this.state.chartDateWindow}
                       />
-                    </div>
-                  }
+                    </div>}
                 </div>
-              </div>
-            )}
+              </div>}
         </div>
-      </Console.Content >
+      </Console.Content>
     );
   }
 }

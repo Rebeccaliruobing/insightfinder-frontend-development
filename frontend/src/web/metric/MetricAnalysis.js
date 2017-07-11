@@ -275,8 +275,8 @@ class MetricAnalysisCore extends React.PureComponent {
     const numberOfDays = mEndTime.diff(mStartTime, 'days') + 1;
     const query = {
       startTime: mStartTime.format(this.dateFormat),
-      endTime: mEndTime.format(this.dateFormat),
-      numberOfDays,
+      // endTime: mEndTime.format(this.dateFormat),
+      // numberOfDays,
       timezoneOffset,
       projectName,
       instanceGroup,
