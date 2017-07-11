@@ -15,14 +15,15 @@ import { setMetricCurrentInfo } from '../actions';
 import { apiEpicErrorHandle } from '../../errors';
 
 const hourlyEventsEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('LOAD_METRIC_HOURLY_EVENTS').concatMap((action) => {
+  action$.ofType('LOAD_METRIC_HOURLY_EVENTS').concatMap(action => {
     const { projectName, instanceGroup, startTime, endTime } = action.payload;
     const state = getState();
     const { credentials } = state.auth;
     const projects = R.filter(p => p.isMetric, state.app.projects);
+    const currentProject = R.find(p => p.projectName === projectName, projects);
 
     // If project is emtpy, or the project is not in the list, just return empty value.
-    if (!projectName || !R.find(p => p.projectName === projectName, projects)) {
+    if (!projectName || !currentProject) {
       return Observable.concat(
         Observable.of(
           setMetricCurrentInfo({
@@ -45,16 +46,17 @@ const hourlyEventsEpic = (action$: any, { getState }: Deps) =>
           instanceGroup,
           startTime,
           endTime,
+          isStationary: currentProject.isStationary,
         }),
       )
-        .concatMap((data) => {
+        .concatMap(data => {
           return Observable.of(
             setMetricCurrentInfo({
               currentHourlyEvents: data,
             }),
           );
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         }),
       Observable.of(

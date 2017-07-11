@@ -41,6 +41,8 @@ const getProjectList = (credentials: Credentials) => {
 
       const isLog = dataType.toLowerCase() === 'log';
       const isMetric = dataType.toLowerCase() === 'metric';
+      const isStationary =
+        cloudType.toLowerCase() === 'metricfile' || cloudType.toLowerCase() === 'logfile';
 
       return {
         projectId: projectName,
@@ -51,6 +53,7 @@ const getProjectList = (credentials: Credentials) => {
         owner,
         isLog,
         isMetric,
+        isStationary,
         isLogFile,
         isLogStreaming,
       };

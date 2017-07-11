@@ -13,7 +13,7 @@ import fetchPost from './fetchPost';
 import { aggregateToMultiHourData } from '../../../containers/executive-dashboard/heatmap-data';
 
 const loadHourlyEvents = (credentials: Credentials, params: Object) => {
-  const { projectName, startTime, endTime, instanceGroup } = params;
+  const { projectName, startTime, endTime, instanceGroup, isStationary } = params;
   const dateFormat = 'YYYY-MM-DD';
   const mStartTime = moment(startTime, dateFormat).startOf('day');
   const mEndTime = moment(endTime, dateFormat).endOf('day');
@@ -35,7 +35,7 @@ const loadHourlyEvents = (credentials: Credentials, params: Object) => {
     startTimestamp: mStartTime.valueOf(),
     endTimestamp: realEndTime,
   }).then(d => {
-    return aggregateToMultiHourData(d.data, realEndTime, numberOfDays);
+    return aggregateToMultiHourData(d.data, realEndTime, numberOfDays, isStationary);
   });
 };
 

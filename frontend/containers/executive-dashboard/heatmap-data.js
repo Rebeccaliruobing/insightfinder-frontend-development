@@ -2,7 +2,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 
-export function aggregateToMultiHourData(dataset, endTime, numberOfDays) {
+export function aggregateToMultiHourData(dataset, endTime, numberOfDays, isStationary = false) {
   if (!dataset) return {};
 
   // Initial an empty vector to hold the hourly object.
@@ -30,7 +30,7 @@ export function aggregateToMultiHourData(dataset, endTime, numberOfDays) {
             let startTimeObj = predicted ? predictedStartTime : startTime;
 
             // Ignore the prediction if it's today and old than now.
-            if (predicted && startTimeObj.diff(nowObj, 'days') === 0) {
+            if (predicted && startTimeObj.diff(nowObj, 'days') === 0 && !isStationary) {
               startTimeObj = nowObj;
             }
 

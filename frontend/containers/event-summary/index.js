@@ -262,7 +262,7 @@ class EventSummaryCore extends React.Component {
 
   @autobind
   refreshInstanceGroup(params) {
-    const { location, hideAppLoader } = this.props;
+    const { location, hideAppLoader, projects } = this.props;
     const query = params || this.applyDefaultParams(location.query);
     const modelType = query.modelType;
     const endTime = moment(query.endTime).endOf('day');
@@ -287,6 +287,9 @@ class EventSummaryCore extends React.Component {
         groupNotFound: false,
       },
       () => {
+        const currentProject = R.find(p => p.projectName === projectName, projects);
+        const isStationary = currentProject.isStationary;
+
         apis
           .retrieveLiveAnalysis(
             projectName,
@@ -331,11 +334,14 @@ class EventSummaryCore extends React.Component {
                 'predicted',
               )
               .then(data => {
-                const tsNow = new Date().valueOf();
-                predictedEvents = R.filter(
-                  e => e.endTimestamp >= realEndTime.valueOf(),
-                  data[gname] || [],
-                );
+                predictedEvents = data[gname] || [];
+
+                if (!isStationary) {
+                  predictedEvents = R.filter(
+                    e => e.endTimestamp >= realEndTime.valueOf(),
+                    data[gname] || [],
+                  );
+                }
               });
 
             Promise.all([detectedPromise, predictedPromise])
