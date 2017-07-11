@@ -313,7 +313,7 @@ class MetricEventSummaryCore extends React.PureComponent {
           style={{ paddingTop: 8, paddingBottom: 8 }}
         >
           <Container className="boxed flex-grow flex-row" style={{ margin: 0, minHeight: 400 }}>
-            <Container className="flex-col" style={{ width: 620 }}>
+            <Container className="flex-col" style={{ width: 720 }}>
               <div
                 className="ui tiny orange button"
                 style={{ position: 'absolute', left: 320, top: 5 }}

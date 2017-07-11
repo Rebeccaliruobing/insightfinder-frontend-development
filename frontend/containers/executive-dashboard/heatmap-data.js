@@ -27,18 +27,28 @@ export function aggregateToMultiHourData(dataset, endTime, numberOfDays) {
             // Split the detected & predicted items and ignore data out of time window
             const predicted = !!stats.predictedFlag;
             const vector = predicted ? predictedVector : detectedVector;
-            const idx = h.diff(predicted ? predictedStartTime : startTime, 'hours');
+            let startTimeObj = predicted ? predictedStartTime : startTime;
 
             // Ignore the prediction if it's today and old than now.
-            const ignore = predicted && h.diff(nowObj, 'days') === 0 && h < nowObj;
+            if (predicted && startTimeObj.diff(nowObj, 'days') === 0) {
+              startTimeObj = nowObj;
+            }
 
-            if (!ignore && idx >= 0 && idx < size) {
+            const idx = h.diff(startTimeObj, 'hours');
+
+            if (idx >= 0 && idx < size) {
               vector[idx].items.push({
                 project,
                 group,
                 datetime: h,
                 stats,
               });
+            } else {
+              console.warn(
+                `[IF] Ignored event: predictedFlag=${predicted}, hour=${hour}, local StartTime=${startTimeObj.format(
+                  'YYYYMMDDHH',
+                )}, diff Hours=${idx} (0 <= diff < ${size})`,
+              );
             }
           });
         }

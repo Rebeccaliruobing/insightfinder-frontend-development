@@ -19,7 +19,7 @@ const appFieldsMessages = defineMessages({
     id: 'app.fields.startDate',
   },
   endDate: {
-    defaultMessage: 'Start Date',
+    defaultMessage: 'End Date',
     id: 'app.fields.endDate',
   },
 });
