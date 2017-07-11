@@ -8,7 +8,6 @@ import { autobind } from 'core-decorators';
 import { Dygraph } from '../../artui/react/dataviz';
 
 export class DataChart extends React.Component {
-
   static propTypes = {
     enableTriangleHighlight: T.bool,
     enableAnnotations: T.bool,
@@ -24,7 +23,7 @@ export class DataChart extends React.Component {
     enableTriangleHighlight: true,
     enableAnnotations: false,
     showLineChartWithAnnotation: false,
-    onAnnotationClick: () => { },
+    onAnnotationClick: () => {},
     chartType: 'line',
     isLogCharts: false,
   };
@@ -40,7 +39,7 @@ export class DataChart extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      metricTags: nextProps.metricTags
+      metricTags: nextProps.metricTags,
     });
   }
   shouldComponentUpdate(nextProps, nextState) {
@@ -106,7 +105,6 @@ export class DataChart extends React.Component {
   handleDrawCallback(g) {
     const { onDateWindowChange } = this.props;
     if (onDateWindowChange) {
-
       const dw = g.xAxisRange();
       if (!_.isEqual(dw, this.dateWindow)) {
         onDateWindowChange(g.xAxisRange());
@@ -127,9 +125,9 @@ export class DataChart extends React.Component {
     let minSep = Infinity;
     for (let i = 1; i < points.length; i++) {
       const sep = points[i].canvasx - points[i - 1].canvasx;
-      if (sep < minSep) minSep = sep;
+      if (sep > 0 && sep < minSep) minSep = sep;
     }
-    const barWidth = Math.floor((2.0 / 3) * minSep);
+    const barWidth = Math.floor(2.0 / 3 * minSep);
 
     // Do the actual plotting.
     for (let i = 0; i < points.length; i++) {
@@ -146,20 +144,23 @@ export class DataChart extends React.Component {
 
   @autobind
   setWeekdaysForBarChar() {
-    const {data, chartType} = this.props;
+    const { data, chartType } = this.props;
 
     const days = [
-      ['Su', 'Sunday'], ['Mo', 'Monday'],
-      ['Tu', 'Tuesday'], ['We', 'Wednesday'],
-      ['Th', 'Thursday'], ['Fr', 'Friday'],
-      ['Sa', 'Saturday']
+      ['Su', 'Sunday'],
+      ['Mo', 'Monday'],
+      ['Tu', 'Tuesday'],
+      ['We', 'Wednesday'],
+      ['Th', 'Thursday'],
+      ['Fr', 'Friday'],
+      ['Sa', 'Saturday'],
     ];
 
     if (chartType === 'bar' && data.sdata && data.sname) {
       const yname = data.sname[1];
       const annotations = [];
       // Skip the last one to make annotation looks better.
-      for(let i = 0; i < data.sdata.length - 1; ++i) {
+      for (let i = 0; i < data.sdata.length - 1; ++i) {
         const value = data.sdata[i];
         const x = moment(value[0]);
         const wd = x.weekday();
@@ -178,9 +179,21 @@ export class DataChart extends React.Component {
   }
 
   render() {
-    let { data, enableAnnotations, enableTriangleHighlight, chartType,
-      onDateWindowChange, dateWindow,latestDataTimestamp, isEmailAert,
-      eventEndTime, eventStartTime, annotations, onClick, isLogCharts, style,
+    let {
+      data,
+      enableAnnotations,
+      enableTriangleHighlight,
+      chartType,
+      onDateWindowChange,
+      dateWindow,
+      latestDataTimestamp,
+      isEmailAert,
+      eventEndTime,
+      eventStartTime,
+      annotations,
+      onClick,
+      isLogCharts,
+      style,
     } = this.props;
     const dowAnnotations = this.setWeekdaysForBarChar(data);
     annotations = annotations || dowAnnotations;
@@ -192,7 +205,8 @@ export class DataChart extends React.Component {
         chartType={chartType}
         className={chartType}
         axisLabelWidth={55}
-        highlightCircleSize={2} strokeWidth={2}
+        highlightCircleSize={2}
+        strokeWidth={2}
         labelsDivStyles={{ padding: '4px', margin: '15px' }}
         highlightSeriesOpts={{ strokeWidth: 2, strokeBorderWidth: 1, highlightCircleSize: 3 }}
         includeZero
@@ -205,7 +219,7 @@ export class DataChart extends React.Component {
         latestDataTimestamp={latestDataTimestamp}
         isEmailAert={isEmailAert}
         drawCallback={listenDrawCallback ? this.handleDrawCallback : null}
-        {...dateWindow ? { dateWindow } : {}}
+        {...(dateWindow ? { dateWindow } : {})}
         annotations={enableAnnotations || chartType === 'bar' ? annotations : null}
         plotter={chartType === 'bar' ? this.barChartPlotter : null}
         onAnnotationClick={chartType === 'bar' ? null : this.handleAnnotationClick}
@@ -217,16 +231,24 @@ export class DataChart extends React.Component {
 }
 
 export const DataSummaryChart = ({
-  summary, onDateWindowChange, dateWindow, latestDataTimestamp, isEmailAert,
-  onAnnotationClick = (() => { }), showLineChartWithAnnotation,
+  summary,
+  onDateWindowChange,
+  dateWindow,
+  latestDataTimestamp,
+  isEmailAert,
+  onAnnotationClick = () => {},
+  showLineChartWithAnnotation,
 }) => {
   return (
     <div key="summary_chart" className="sixteen wide column" style={{ paddingTop: 0 }}>
       <div className="detail-charts" style={{ position: 'relative' }}>
-        <h4 className="ui header">{summary.title}</h4>
+        <h4 className="ui header">
+          {summary.title}
+        </h4>
         <DataChart
           enableTriangleHighlight={false}
-          enableAnnotations={true} data={summary}
+          enableAnnotations={true}
+          data={summary}
           isEmailAert={isEmailAert}
           onDateWindowChange={onDateWindowChange}
           dateWindow={dateWindow}
@@ -240,7 +262,6 @@ export const DataSummaryChart = ({
 };
 
 export class DataGroupCharts extends React.Component {
-
   static propTypes = {
     groups: T.any.isRequired,
     view: T.string.isRequired,
@@ -260,7 +281,7 @@ export class DataGroupCharts extends React.Component {
 
     this.state = {
       selectedIndex: void 0,
-    }
+    };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -268,46 +289,56 @@ export class DataGroupCharts extends React.Component {
   }
 
   render() {
-
-    const { groups, view, columns, orderByMetric,
-      latestDataTimestamp, isEmailAert, alertMissingData, chartType, periodMap, metricAvg, } = this.props;
+    const {
+      groups,
+      view,
+      columns,
+      orderByMetric,
+      latestDataTimestamp,
+      isEmailAert,
+      alertMissingData,
+      chartType,
+      periodMap,
+      metricAvg,
+    } = this.props;
     let metricTags = this.props.metricTags;
     const { selectedIndex } = this.state;
     const colSize = ['one', 'two', 'three', 'four', 'five', 'six'].indexOf(columns) + 1;
     const isListView = view === 'list';
     const syncDateWindow = isListView;
     const groupsContainerClass = isListView ? '' : ' ui ' + columns + ' cards';
-    const groupsChartClass = isListView ? "detail-charts" : 'ui card';
+    const groupsChartClass = isListView ? 'detail-charts' : 'ui card';
 
     const selected = selectedIndex !== undefined;
     const selectedGroup = selected ? groups[selectedIndex] : null;
     const selectedRowId = selected ? Math.floor(selectedIndex / colSize) : void 0;
 
-    let orderedGroups = orderByMetric ?
-      groups.sort(function (a, b) {
-        let aHighlight = (a.highlights.length > 0);
-        let bHighlight = (b.highlights.length > 0);
-        if (aHighlight && !bHighlight) {
-          return -1;
-        } else if (!aHighlight && bHighlight) {
-          return 1;
-        } else {
-          let aMetrics = a.metrics;
-          let bMetrics = b.metrics;
-          if (aMetrics < bMetrics) {
+    let orderedGroups = orderByMetric
+      ? groups.sort(function(a, b) {
+          let aHighlight = a.highlights.length > 0;
+          let bHighlight = b.highlights.length > 0;
+          if (aHighlight && !bHighlight) {
             return -1;
-          } else if (aMetrics > bMetrics) {
+          } else if (!aHighlight && bHighlight) {
             return 1;
           } else {
-            return 0;
+            let aMetrics = a.metrics;
+            let bMetrics = b.metrics;
+            if (aMetrics < bMetrics) {
+              return -1;
+            } else if (aMetrics > bMetrics) {
+              return 1;
+            } else {
+              return 0;
+            }
           }
-        }
-      }) : groups;
+        })
+      : groups;
 
     return (
       <div className="sixteen wide column" style={{ paddingTop: 0 }}>
         <div className={groupsContainerClass}>
-          { orderedGroups.map((group, index, groups) => {
+          {orderedGroups.map((group, index, groups) => {
             const rowId = Math.floor(index / colSize);
             const lastCol = !((index + 1) % colSize);
             const length = groups.length;
@@ -315,104 +346,133 @@ export class DataGroupCharts extends React.Component {
             const isSelectedItem = index === selectedIndex;
             let values = [];
             let elems = [];
-            let anomalyTag = "";
-            if(metricTags && metricTags[group.metrics]){
+            let anomalyTag = '';
+            if (metricTags && metricTags[group.metrics]) {
               anomalyTag = metricTags[group.metrics];
             }
-            let missingTag = "";
-            if((alertMissingData==undefined || alertMissingData==true) && group.sdata.length>0){
-              _.each(group.sdata[0],function(mdata,mindex){
+            let missingTag = '';
+            if (
+              (alertMissingData == undefined || alertMissingData == true) &&
+              group.sdata.length > 0
+            ) {
+              _.each(group.sdata[0], function(mdata, mindex) {
                 values.push(0);
               });
-              _.each(group.sdata,function(data,index){
-                _.each(data,function(mdata,mindex){
-                  if(mindex>0 && !isNaN(mdata)){
-                    values[mindex] = values[mindex]+1;
+              _.each(group.sdata, function(data, index) {
+                _.each(data, function(mdata, mindex) {
+                  if (mindex > 0 && !isNaN(mdata)) {
+                    values[mindex] = values[mindex] + 1;
                   }
-                }); 
+                });
               });
-              _.each(group.sdata[0],function(mdata,mindex){
-                if(mindex>0 && (values[mindex] / group.sdata.length) < 0.95){
-                  missingTag = " (missing data)";
+              _.each(group.sdata[0], function(mdata, mindex) {
+                if (mindex > 0 && values[mindex] / group.sdata.length < 0.95) {
+                  missingTag = ' (missing data)';
                   return false;
                 }
               });
             }
-            let periodTag = "";
-            let period = (periodMap && periodMap[group.metrics]) || "";
-            if(periodMap == undefined){
-              periodTag = "";
-            } else if(period != ""){
-              periodTag = "(Cycle: "+period+")";
+            let periodTag = '';
+            let period = (periodMap && periodMap[group.metrics]) || '';
+            if (periodMap == undefined) {
+              periodTag = '';
+            } else if (period != '') {
+              periodTag = '(Cycle: ' + period + ')';
             } else {
-              periodTag = "(No cycle detected)";
+              periodTag = '(No cycle detected)';
             }
-            let avgTag = (metricAvg && metricAvg[group.metrics]) || "";
+            let avgTag = (metricAvg && metricAvg[group.metrics]) || '';
             const idx = index;
             elems.push(
-              <div key={group.id} className={groupsChartClass} style={{ position: 'relative' }}
-                   onClick={() => {
-                     if (selectedIndex === idx) {
-                       this.setState({ selectedIndex: undefined });
-                     } else {
-                       this.setState({ selectedIndex: idx })
-                     }
-                   }}
+              <div
+                key={group.id}
+                className={groupsChartClass}
+                style={{ position: 'relative' }}
+                onClick={() => {
+                  if (selectedIndex === idx) {
+                    this.setState({ selectedIndex: undefined });
+                  } else {
+                    this.setState({ selectedIndex: idx });
+                  }
+                }}
               >
                 <div className="content">
-                  <div className="ui header">Metric {group.metrics} <span style={{color:'red'}}>{anomalyTag}</span><span style={{color:'orange'}}>{missingTag}</span><span>{periodTag}</span><span>{avgTag}</span></div>
+                  <div className="ui header">
+                    Metric {group.metrics} <span style={{ color: 'red' }}>{anomalyTag}</span>
+                    <span style={{ color: 'orange' }}>{missingTag}</span>
+                    <span>{periodTag}</span>
+                    <span>{avgTag}</span>
+                  </div>
                   <DataChart
                     chartType={chartType}
                     enableTriangleHighlight={true}
                     data={group}
                     latestDataTimestamp={latestDataTimestamp}
                     isEmailAert={isEmailAert}
-                    onDateWindowChange={ syncDateWindow ? this.props.onDateWindowChange : null}
-                    dateWindow={ syncDateWindow ? this.props.dateWindow : null}
+                    onDateWindowChange={syncDateWindow ? this.props.onDateWindowChange : null}
+                    dateWindow={syncDateWindow ? this.props.dateWindow : null}
                   />
                 </div>
-                {!isListView && isSelectedItem &&
-                <div style={{
-                  position: 'absolute', width: 20, height: 20, background: '#333',
-                  transform: 'rotate(45deg)',
-                  left: '50%',
-                  bottom: '-25px',
-                  marginLeft: -3
-                }}/>
-                }
-              </div>
+                {!isListView &&
+                  isSelectedItem &&
+                  <div
+                    style={{
+                      position: 'absolute',
+                      width: 20,
+                      height: 20,
+                      background: '#333',
+                      transform: 'rotate(45deg)',
+                      left: '50%',
+                      bottom: '-25px',
+                      marginLeft: -3,
+                    }}
+                  />}
+              </div>,
             );
 
-            if (!isListView &&
-              selectedGroup &&
-              rowId == selectedRowId && (lastCol || lastItem)) {
-
+            if (!isListView && selectedGroup && rowId == selectedRowId && (lastCol || lastItem)) {
               elems.push(
-                <div key={'detail_' + rowId} style={{
-                  width: '100%', background: 'rgb(51, 51, 51)', padding: '30px 13px',
-                  position: 'relative'
-                }
-                }>
+                <div
+                  key={'detail_' + rowId}
+                  style={{
+                    width: '100%',
+                    background: 'rgb(51, 51, 51)',
+                    padding: '30px 13px',
+                    position: 'relative',
+                  }}
+                >
                   <div style={{ width: '100%', backgroundColor: '#fff', padding: 10 }}>
-                    <h4 className="ui header">Metric {selectedGroup.metrics}</h4>
+                    <h4 className="ui header">
+                      Metric {selectedGroup.metrics}
+                    </h4>
                     <DataChart
                       chartType={chartType}
                       enableTriangleHighlight={true}
                       latestDataTimestamp={latestDataTimestamp}
                       isEmailAert={isEmailAert}
-                      enableAnnotations={true} data={selectedGroup}
+                      enableAnnotations={true}
+                      data={selectedGroup}
                     />
-                    <i onClick={()=>this.setState({ selectedIndex: undefined })} className="close icon"
-                       style={{ position: 'absolute', right: 10, top: 10, color: '#fff', cursor: 'pointer' }}/>
+                    <i
+                      onClick={() => this.setState({ selectedIndex: undefined })}
+                      className="close icon"
+                      style={{
+                        position: 'absolute',
+                        right: 10,
+                        top: 10,
+                        color: '#fff',
+                        cursor: 'pointer',
+                      }}
+                    />
                   </div>
-                </div>
-              )
+                </div>,
+              );
             }
 
             return elems;
           })}
         </div>
       </div>
-    )
+    );
   }
 }

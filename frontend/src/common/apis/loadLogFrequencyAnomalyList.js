@@ -80,10 +80,10 @@ const loadLogFrequencyAnomalyList = (
         );
       }
 
-      const freqTsData = [];
+      let freqTsData = [];
       const barColors = {};
       if (freqTimestamps.length > 0) {
-        const tsObj = moment(freqTimestamps[0]).subtract(5, 'minutes');
+        const tsObj = moment(freqTimestamps[0]).subtract(10, 'minutes');
         barColors[tsObj.valueOf()] = 'teal';
         freqTsData.push([new Date(tsObj.valueOf()), 0]);
       }
@@ -100,10 +100,12 @@ const loadLogFrequencyAnomalyList = (
       }, freqTimestamps);
 
       if (freqTimestamps.length > 0) {
-        const tsObj = moment(freqTimestamps[freqTimestamps.length - 1]).add(5, 'minutes');
+        const tsObj = moment(freqTimestamps[freqTimestamps.length - 1]).add(10, 'minutes');
         barColors[tsObj.valueOf()] = 'teal';
         freqTsData.push([new Date(tsObj.valueOf()), 0]);
       }
+
+      freqTsData = R.sort((a, b) => a[0].valueOf() - b[0].valueOf(), freqTsData);
 
       return {
         nid,
