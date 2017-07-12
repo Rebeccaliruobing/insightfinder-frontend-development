@@ -23,7 +23,7 @@ const getSelectedGroup = (value, appGroups) => {
   if (appGroups && value) {
     const names = value.split(',');
     const groups = [];
-    _.forEach(names, (n) => {
+    _.forEach(names, n => {
       const gp = _.find(appGroups, g => g.metrics === n);
       if (gp) {
         groups.push(gp);
@@ -98,7 +98,8 @@ class LiveAnalysisCharts extends React.Component {
     return shallowCompare(this, nextProps, nextState);
   }
 
-  @autobind calculateData() {
+  @autobind
+  calculateData() {
     // Cache the data, and recalculate it if changed.
     const {
       data,
@@ -157,7 +158,7 @@ class LiveAnalysisCharts extends React.Component {
       const avgNumberOfDays = data.instanceMetricJson && data.instanceMetricJson.avgNumberOfDays;
       if (metricAvgRaw && avgNumberOfDays) {
         const metricAvg = {};
-        Object.keys(metricAvgRaw).forEach((key) => {
+        Object.keys(metricAvgRaw).forEach(key => {
           if (metricAvgRaw[key] && metricAvgRaw[key].avg !== undefined) {
             metricAvg[key] = ` (${avgNumberOfDays}d avg: ${metricAvgRaw[key].avg.toPrecision(3)})`;
           }
@@ -192,7 +193,7 @@ class LiveAnalysisCharts extends React.Component {
     this.setState({ loading: true }, () => {
       apis
         .postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp)
-        .then((resp) => {
+        .then(resp => {
           if (resp.success) {
             alert(resp.message);
           } else {
@@ -200,7 +201,7 @@ class LiveAnalysisCharts extends React.Component {
           }
           this.setState({ loading: false });
         })
-        .catch((msg) => {
+        .catch(msg => {
           console.error(msg);
           this.setState({ loading: false });
         });
@@ -225,11 +226,13 @@ class LiveAnalysisCharts extends React.Component {
     document.body.removeChild(a);
   }
 
-  @autobind handleDateWindowSync(dateWindow) {
+  @autobind
+  handleDateWindowSync(dateWindow) {
     this.setState({ chartDateWindow: dateWindow });
   }
 
-  @autobind handleAnnotationClick(anno) {
+  @autobind
+  handleAnnotationClick(anno) {
     if (anno && anno.text && this.groups) {
       const re = /(?:metric:)(.*)(?:,)/gi;
       let metrics = [];
@@ -258,7 +261,8 @@ class LiveAnalysisCharts extends React.Component {
     }
   }
 
-  @autobind handleMetricSelectionChange(value) {
+  @autobind
+  handleMetricSelectionChange(value) {
     if (this.groups) {
       const { names, selectedGroups } = getSelectedGroup(value, this.groups);
       this.setState({
@@ -284,6 +288,7 @@ class LiveAnalysisCharts extends React.Component {
       chartType,
       alertMissingData,
       bugId,
+      eventsSummaryData,
       isEmailAert,
     } = this.props;
     const {
@@ -323,7 +328,7 @@ class LiveAnalysisCharts extends React.Component {
     const metricTags = {};
     if (data && data.anomalyMetrics) {
       const anomalyMetrics = data.anomalyMetrics.split(',');
-      _.each(anomalyMetrics, (am) => {
+      _.each(anomalyMetrics, am => {
         metricTags[am] = ' (Anomaly Detected) ';
       });
     }
@@ -332,7 +337,7 @@ class LiveAnalysisCharts extends React.Component {
     }
 
     if (summary) {
-      incidents = _.map(summary.incidentSummary, (a) => {
+      incidents = _.map(summary.incidentSummary, a => {
         const incidentObj = getRootCauseNameFromHints(a.text);
         return {
           id: a.id,
@@ -345,6 +350,8 @@ class LiveAnalysisCharts extends React.Component {
         };
       });
     }
+
+    console.log(summary);
 
     return (
       <Console.Wrapper>
@@ -359,41 +366,48 @@ class LiveAnalysisCharts extends React.Component {
                 onClick={() => this.setState({ showTenderModal: true })}
                 style={{ display: 'none' }}
               >
-                <i className="icon random" /><span>Causal Graph</span>
+                <i className="icon random" />
+                <span>Causal Graph</span>
               </Button>
               <Button
                 className="labeled icon"
                 style={{ display: !enablePublish && 'none' }}
                 onClick={() => this.setState({ showShareModal: true })}
               >
-                <i className="icon share alternate" /><span>Publish</span>
+                <i className="icon share alternate" />
+                <span>Publish</span>
               </Button>
               <Button
                 className="labeled icon"
                 style={{ display: !enableComments && 'none' }}
                 onClick={() => this.setState({ showComments: true })}
               >
-                <i className="icon comments" /><span>Comments</span>
+                <i className="icon comments" />
+                <span>Comments</span>
               </Button>
               {!bugId &&
                 !isForecast &&
                 <Button className="labeled icon" onClick={() => onRefresh()}>
-                  <i className="icon refresh" /><span>Refresh</span>
+                  <i className="icon refresh" />
+                  <span>Refresh</span>
                 </Button>}
               {!isForecast &&
                 <Button className="labeled icon" onClick={() => this.exportData()}>
-                  <i className="icon download" /><span>Export</span>
+                  <i className="icon download" />
+                  <span>Export</span>
                 </Button>}
               {projectName !== undefined &&
                 <Button className="labeled icon" onClick={() => this.saveDataToStorage()}>
-                  <i className="icon cloud" /><span>Save To Storage</span>
+                  <i className="icon cloud" />
+                  <span>Save To Storage</span>
                 </Button>}
               <Button
                 className="orange labeled icon"
                 onClick={() => this.setState({ showDebug: true })}
                 style={{ display: settingData ? '' : 'none' }}
               >
-                <i className="zoom icon" /><span>Faulty Localization Result</span>
+                <i className="zoom icon" />
+                <span>Faulty Localization Result</span>
               </Button>
               {!isForecast &&
                 <ButtonGroup className="right floated basic icon">
@@ -411,7 +425,11 @@ class LiveAnalysisCharts extends React.Component {
             </div>
             <div className="ui vertical segment">
               <div className="ui grid">
-                {!summary && (!groups || groups.length === 0) && <h3>{errorMsg}</h3>}
+                {!summary &&
+                  (!groups || groups.length === 0) &&
+                  <h3>
+                    {errorMsg}
+                  </h3>}
                 {showSummaryFlag.toLowerCase() === 'yes' &&
                   !!summary &&
                   <DataSummaryChart
@@ -438,11 +456,11 @@ class LiveAnalysisCharts extends React.Component {
                         style={{ minWidth: 200 }}
                       >
                         <div className="menu">
-                          {groups.map(g => (
+                          {groups.map(g =>
                             <div className="item" key={g.metrics} data-value={g.metrics}>
                               {g.metrics}
-                            </div>
-                          ))}
+                            </div>,
+                          )}
                         </div>
                       </Dropdown>}
                   </div>}
