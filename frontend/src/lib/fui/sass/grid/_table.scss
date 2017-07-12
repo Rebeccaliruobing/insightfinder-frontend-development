@@ -70,6 +70,9 @@
       white-space: normal;
     }
   }
+  &.space-pre {
+    white-space: pre;
+  }
 }
 .ReactVirtualized__Table__rowColumn {
   text-overflow: ellipsis;

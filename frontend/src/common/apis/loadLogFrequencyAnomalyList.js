@@ -65,6 +65,7 @@ const loadLogFrequencyAnomalyList = (
     patterns = R.map(p => {
       const { nid, patternName } = p;
       const keywords = logPatternTopKToArray(p.topK);
+      const episodes = logPatternTopKToArray(p.topKEpisode);
       const name = patternName === `Pattern ${nid}` ? keywords.join('-') : patternName;
 
       const anomalies = allAnomalies[nid.toString()] || {};
@@ -112,6 +113,7 @@ const loadLogFrequencyAnomalyList = (
         name,
         patternName,
         keywords,
+        episodes,
         anomalies,
         eventsCount: p.count,
         freqTsData,

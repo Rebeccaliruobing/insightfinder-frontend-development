@@ -109,6 +109,15 @@ class LogClusters extends React.Component {
     });
   }
 
+  @autobind
+  clusterNameRenderer({ cellData, rowData }) {
+    const episodes = get(rowData, 'episodes', []);
+    if (episodes.length > 0) {
+      return `${cellData}\nEpisodes: ${episodes.join(',')}`;
+    }
+    return cellData;
+  }
+
   render() {
     const patterns = get(this.props.data, 'patterns', []);
     const eventList = this.props.currentEventList || [];
@@ -165,7 +174,13 @@ class LogClusters extends React.Component {
                 rowGetter={({ index }) => patterns[index]}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={330} label="Cluster" dataKey="name" />
+                <Column
+                  width={330}
+                  label="Cluster"
+                  dataKey="name"
+                  className="space-pre"
+                  cellRenderer={this.clusterNameRenderer}
+                />
                 <Column width={50} label="Events" className="text-right" dataKey="eventsCount" />
               </Table>}
           </AutoSizer>

@@ -25,7 +25,7 @@ const loadLogPatternSequenceList = (
     ...credentials,
     projectName,
     dayTimeMillis: incidentId,
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
     const sequences = rawData || [];
 
@@ -44,9 +44,10 @@ const loadLogPatternSequenceList = (
       const seqNameWords = [];
       let seqKeywords = [];
       const seqPatterns = [];
-      const patterns = R.map((p) => {
+      const patterns = R.map(p => {
         const { nid, patternName, count } = p;
         const keywords = logPatternTopKToArray(p.topK);
+        const episodes = logPatternTopKToArray(p.topKEpisode);
         let name = patternName;
         if (name === `Pattern ${nid}`) {
           seqNameWords.push(keywords[0] || name);
@@ -61,6 +62,7 @@ const loadLogPatternSequenceList = (
           name,
           count,
           keywords,
+          episodes,
         };
       }, patternsInfo);
 

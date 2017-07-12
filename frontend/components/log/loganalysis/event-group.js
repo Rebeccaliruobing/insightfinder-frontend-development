@@ -123,11 +123,7 @@ class EventGroup extends React.Component {
             </span>
             <div style={{ display: 'inline-block' }}>
               {R.uniq(R.map(R.trim, episodes)).map(kw =>
-                <span
-                  key={kw}
-                  className={`keyword ${kw === highlightWord ? 'highlight' : ''}`}
-                  onClick={this.handleKeywordClick(kw)}
-                >
+                <span key={kw}>
                   {kw}
                 </span>,
               )}

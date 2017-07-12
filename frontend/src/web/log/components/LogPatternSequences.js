@@ -163,6 +163,14 @@ class LogPatternSequences extends React.PureComponent {
 
     const nameRender = ({ rowData }) => {
       if (rowData.isPattern) {
+        const episodes = get(rowData, 'episodes', []);
+        if (episodes.length > 0) {
+          return (
+            <span style={{ marginLeft: '1em' }}>
+              {`${rowData.name}\nEpisodes: ${episodes.join(',')}`}
+            </span>
+          );
+        }
         return (
           <span style={{ marginLeft: '1em' }}>
             {rowData.name}
