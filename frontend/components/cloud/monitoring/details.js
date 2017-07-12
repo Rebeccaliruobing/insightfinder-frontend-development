@@ -23,6 +23,10 @@ const ProjectDetails = class extends React.Component {
 
   convertEventsToSummaryData(events) {
     console.log(events);
+    const alies = [];
+    const highlights = [];
+    const annotations = [];
+    const incidentSummary = [];
     const summaryData = {
       id: 'summary',
       div_id: 'summary',
@@ -30,9 +34,9 @@ const ProjectDetails = class extends React.Component {
       unit: 'Anomaly Degree',
       sdata: _.map(alies, a => [a.time, a.val]),
       sname: ['X', 'Y1'],
-      highlights: highlights,
-      annotations: annotations,
-      incidentSummary: incidentSummary,
+      highlights,
+      annotations,
+      incidentSummary,
     };
     return summaryData;
   }
