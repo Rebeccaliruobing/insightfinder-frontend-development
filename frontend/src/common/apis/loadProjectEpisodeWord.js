@@ -21,13 +21,16 @@ const loadProjectEpisodeWord = (credentials: Credentials, projectName: String) =
     const episodes = rawData.episodeMapArr || [];
     const words = rawData.wordCountArr || [];
 
-    const selectedKeywords = R.map(
-      w => ({
-        ...w,
-        id: w.index,
-        name: w.pattern,
-      }),
-      R.filter(w => w.selected, words),
+    const selectedKeywords = R.sort(
+      (a, b) => a.name.localeCompare(b.name),
+      R.map(
+        w => ({
+          ...w,
+          id: w.index,
+          name: w.pattern,
+        }),
+        R.filter(w => w.selected, words),
+      ),
     );
 
     const data = {
