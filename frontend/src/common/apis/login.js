@@ -1,25 +1,28 @@
 /*  @flow */
+import moment from 'moment';
+import momenttz from 'moment-timezone';
 import getEndpoint from './getEndpoint';
 import fetchPost from './fetchPost';
 
-type Params = {
-  userName: string,
-  password: string,
-}
+const login = ({ userName, password, params }) => {
+  const { timezone } = params;
 
-const login = ({ userName, password }: Params) =>
-  fetchPost(
-    getEndpoint('login-check'),
-    {
-      userName,
-      password,
-    },
-  ).then(d => ({
+  let timezoneOffset;
+  if (timezone) {
+    timezoneOffset = momenttz.tz.zone(timezone).offset(moment.utc());
+  }
+
+  return fetchPost(getEndpoint('login-check'), {
+    userName,
+    password,
+    timezoneOffset,
+  }).then(d => ({
     credentials: {
       userName: d.data.userName,
       token: d.token,
     },
     userInfo: d.data,
   }));
+};
 
 export default login;
