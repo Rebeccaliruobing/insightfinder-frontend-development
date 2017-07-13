@@ -98,7 +98,6 @@ const ProjectDetails = class extends React.Component {
       incidentSummary,
     };
 
-    console.log(summaryData);
     return summaryData;
   }
 
