@@ -24,57 +24,67 @@ const ProjectDetails = class extends React.Component {
 
   convertEventsToSummaryData(eventsData, startTimestamp, endTimestamp) {
     const groupedEvents = {};
+    const groupedAnnos = {};
     const sdata = [];
     const highlights = [];
     const annotations = [];
     const startTime = parseInt(startTimestamp, 10);
     const endTime = parseInt(endTimestamp, 10);
 
-    // First get the whole timestamps from the first item, convert and sort it.
-    const timestamps = R.sort(
-      (a, b) => a - b,
-      R.map(
-        t => parseInt(t, 10),
-        R.filter(s => Boolean(s.trim()), get(eventsData[0], 'timestampsString', '').split(',')),
-      ),
-    );
-
-    // Then we group the events by timestamp.
+    // Group the events by timestamp.
     R.forEach(e => {
-      const tsKey = e.timestamp.toString();
-      if (tsKey) {
-        // Convert number to string as the key
-        const group = groupedEvents[tsKey] || [];
+      const timestamps = R.filter(
+        s => Boolean(s.trim()),
+        get(e, 'timestampsString', '').split(','),
+      );
+
+      R.addIndex(R.forEach)((t, idx) => {
+        const group = groupedEvents[t] || [];
         group.push(e);
-        groupedEvents[tsKey] = group;
-      }
+        groupedEvents[t] = group;
+
+        // Only add the anno for the first timestamp
+        if (idx === 0) {
+          const annos = groupedAnnos[t] || [];
+          annos.push(e);
+          groupedAnnos[t] = annos;
+        }
+      }, timestamps);
     }, eventsData);
 
-    // Add empty data for start & end
-    sdata.push([new Date(startTime), null]);
-    let index = 0;
-    R.forEach(timestamp => {
-      const time = new Date(timestamp);
-      const tsKey = timestamp.toString();
-      const events = groupedEvents[tsKey];
+    // Convert object to array
+    const groupedEventsArr = R.sort(
+      (a, b) => parseInt(a, 10) - parseInt(b, 10),
+      R.toPairs(groupedEvents),
+    );
 
-      if (events) {
+    // Add empty data for start & end to keep x in full range
+    sdata.push([new Date(startTime), null]);
+
+    let index = 0;
+    R.forEach(([ts, events]) => {
+      const timestamp = parseInt(ts, 10);
+      const time = new Date(timestamp);
+      const annos = groupedAnnos[ts];
+
+      // Get the max anomalyRatio for this timestamp
+      const ratios = R.map(v => v.anomalyRatio, events);
+      const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
+
+      highlights.push({
+        start: timestamp,
+        end: timestamp,
+        val: maxAnomalyRatio,
+      });
+
+      sdata.push([time, maxAnomalyRatio]);
+
+      if (annos) {
         index += 1;
-        // Get the max anomalyRatio for this timestamp
-        const ratios = R.map(v => v.anomalyRatio, events);
-        const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
         const details = R.filter(
           d => Boolean(d.trim()),
-          R.map(v => get(v, ['rootCauseJson', 'rootCauseDetails'], ''), events),
+          R.map(v => get(v, ['rootCauseJson', 'rootCauseDetails'], ''), annos),
         );
-
-        highlights.push({
-          start: timestamp,
-          end: timestamp,
-          val: maxAnomalyRatio < 0 ? 0 : Math.min(10, maxAnomalyRatio),
-        });
-
-        sdata.push([time, maxAnomalyRatio]);
         annotations.push({
           series: 'Y1',
           x: time.valueOf(),
@@ -82,7 +92,7 @@ const ProjectDetails = class extends React.Component {
           text: details.join('\n'),
         });
       }
-    }, timestamps);
+    }, groupedEventsArr);
     sdata.push([new Date(endTime), null]);
 
     const incidentSummary = []; // Not used
@@ -97,6 +107,8 @@ const ProjectDetails = class extends React.Component {
       annotations,
       incidentSummary,
     };
+
+    console.log(summaryData);
 
     return summaryData;
   }
