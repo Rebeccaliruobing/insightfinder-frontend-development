@@ -27,16 +27,19 @@ export function aggregateToMultiHourData(dataset, endTime, numberOfDays, isStati
             // Split the detected & predicted items and ignore data out of time window
             const predicted = !!stats.predictedFlag;
             const vector = predicted ? predictedVector : detectedVector;
-            let startTimeObj = predicted ? predictedStartTime : startTime;
+            const startTimeObj = predicted ? predictedStartTime : startTime;
 
             // Ignore the prediction if it's today and old than now.
+            let ignore = false;
             if (predicted && startTimeObj.diff(nowObj, 'days') === 0 && !isStationary) {
-              startTimeObj = nowObj;
+              if (h < nowObj) {
+                ignore = true;
+              }
             }
 
             const idx = h.diff(startTimeObj, 'hours');
 
-            if (idx >= 0 && idx < size) {
+            if (!ignore && idx >= 0 && idx < size) {
               vector[idx].items.push({
                 project,
                 group,

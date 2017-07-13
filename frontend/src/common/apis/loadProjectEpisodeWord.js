@@ -5,6 +5,7 @@
  * *****************************************************************************
  **/
 
+import R from 'ramda';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
@@ -15,11 +16,27 @@ const loadProjectEpisodeWord = (credentials: Credentials, projectName: String) =
     projectName,
     operation: 'readonly',
     isExistentIncident: true,
-  }).then((d) => {
+  }).then(d => {
     const rawData = d.data;
+    const episodes = rawData.episodeMapArr || [];
+    const words = rawData.wordCountArr || [];
+
+    const selectedKeywords = R.sort(
+      (a, b) => a.name.localeCompare(b.name),
+      R.map(
+        w => ({
+          ...w,
+          id: w.index,
+          name: w.pattern,
+        }),
+        R.filter(w => w.selected, words),
+      ),
+    );
+
     const data = {
-      episodes: rawData.episodeMapArr || [],
-      words: rawData.wordCountArr || [],
+      episodes,
+      words,
+      selectedKeywords,
     };
 
     return {

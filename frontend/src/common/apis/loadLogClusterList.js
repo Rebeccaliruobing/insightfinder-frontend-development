@@ -12,6 +12,7 @@ import moment from 'moment';
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
 import fetchGet from './fetchGet';
+import { logPatternTopKToArray } from './magicParsers';
 
 const loadLogClusterList = (credentials: Credentials, projectName: String, params: Object) => {
   // Use the time as the incident id.
@@ -36,20 +37,14 @@ const loadLogClusterList = (credentials: Credentials, projectName: String, param
       [R.ascend(R.prop('eventsCount'))],
       R.map(p => {
         // Convert the topK string into array.
-        const keywords = R.filter(
-          k => Boolean(k),
-          R.map(
-            k => k.trim(),
-            p.topK && p.topK.length > 0
-              ? p.topK.replace(/\(\d+\)/g, '').replace(/'/g, '').split(',')
-              : [],
-          ),
-        );
-        //
+        const keywords = logPatternTopKToArray(p.topK);
+        const episodes = logPatternTopKToArray(p.topKEpisode);
+
         const name = p.patternName === `Pattern ${p.nid}` ? keywords.join('-') : p.patternName;
         return {
           nid: p.nid,
           keywords,
+          episodes,
           name,
           patternName: p.patternName,
           eventsCount: p.count,

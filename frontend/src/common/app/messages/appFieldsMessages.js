@@ -22,6 +22,10 @@ const appFieldsMessages = defineMessages({
     defaultMessage: 'End Date',
     id: 'app.fields.endDate',
   },
+  timezone: {
+    defaultMessage: 'timezone',
+    id: 'app.fields.timezone',
+  },
 });
 
 export default appFieldsMessages;

@@ -7,5 +7,6 @@
 
 export { default as LogClusters } from './LogClusters';
 export { default as LogFrequencyAnomalies } from './LogFrequencyAnomalies';
+export { default as LogKeywords } from './LogKeywords';
 export { default as LogPatternSequences } from './LogPatternSequences';
 export { default as LogRareEvents } from './LogRareEvents';

@@ -33,6 +33,7 @@ import {
 import {
   LogClusters,
   LogFrequencyAnomalies,
+  LogKeywords,
   LogRareEvents,
   LogPatternSequences,
 } from './components';
@@ -86,6 +87,7 @@ class LogAnalysisCore extends React.PureComponent {
       { key: 'cluster', name: 'Clusters Detected', component: LogClusters },
       { key: 'freq', name: 'Log Frequency Anomalies', component: LogFrequencyAnomalies },
       { key: 'seq', name: 'Frequent Pattern Sequences', component: LogPatternSequences },
+      { key: 'keywords', name: 'Keywords', component: LogKeywords },
     ];
 
     // Create the select options for month picker.

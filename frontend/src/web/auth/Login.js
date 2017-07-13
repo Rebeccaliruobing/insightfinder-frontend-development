@@ -4,6 +4,8 @@ import { Link, Redirect } from 'react-router-dom';
 import VLink from 'valuelink';
 import cx from 'classnames';
 import { get } from 'lodash';
+import momenttz from 'moment-timezone';
+import R from 'ramda';
 import { autobind } from 'core-decorators';
 import { injectIntl } from 'react-intl';
 import type { State, Message } from '../../common/types';
@@ -11,13 +13,13 @@ import { hideAppLoader } from '../../common/app/actions';
 import { login } from '../../common/auth/actions';
 import { appFieldsMessages } from '../../common/app/messages';
 import { authMessages } from '../../common/auth/messages';
-import { Input } from '../../lib/fui/react';
+import { Input, Select } from '../../lib/fui/react';
 import { CenterPage, LocaleSelector } from '../app/components';
 
 type Props = {
-  appLoaderVisible: bool,
-  isLoggedIn: bool,
-  isLoggingIn: bool,
+  appLoaderVisible: boolean,
+  isLoggedIn: boolean,
+  isLoggingIn: boolean,
   intl: Object,
   hideAppLoader: Function,
   login: Function,
@@ -25,16 +27,18 @@ type Props = {
   location: Object,
 };
 
-type States = {
-  userName: string,
-  password: string,
-}
-
 class LoginCore extends React.Component {
   props: Props;
-  state: States = {
-    userName: '',
-    password: '',
+
+  constructor(props) {
+    super(props);
+
+    this.timezoneOptions = R.map(t => ({ label: t, value: t }), momenttz.tz.names());
+    this.state = {
+      userName: '',
+      password: '',
+      timezone: momenttz.tz.guess(),
+    };
   }
 
   componentDidMount() {
@@ -46,36 +50,40 @@ class LoginCore extends React.Component {
   @autobind
   handleSignIn(e) {
     e.preventDefault();
-    const { userName, password } = this.state;
-    this.props.login(userName, password);
+    const { userName, password, timezone } = this.state;
+    this.props.login(userName, password, { timezone });
   }
 
   @autobind
   handleEnterSubmit(e) {
-    const { userName, password } = this.state;
+    const { userName, password, timezone } = this.state;
     if (e.key === 'Enter' && userName && password) {
       e.preventDefault();
-      const { userName, password } = this.state;
-      this.props.login(userName, password);
+      this.props.login(userName, password, { timezone });
     }
   }
 
   render() {
     const { intl, isLoggingIn, isLoggedIn, location, loginReason } = this.props;
 
-    const userNameLink = VLink.state(this, 'userName')
-      .check(x => x, intl.formatMessage(authMessages.errorsUserNameRequired));
-    const passwordLink = VLink.state(this, 'password')
-      .check(x => x, intl.formatMessage(authMessages.errorsPasswordRequired));
+    const userNameLink = VLink.state(this, 'userName').check(
+      x => x,
+      intl.formatMessage(authMessages.errorsUserNameRequired),
+    );
+    const passwordLink = VLink.state(this, 'password').check(
+      x => x,
+      intl.formatMessage(authMessages.errorsPasswordRequired),
+    );
+    const timezoneLink = VLink.state(this, 'timezone');
     const disabled = userNameLink.error || passwordLink.error || isLoggingIn;
     const from = get(location, 'state.from', '/');
     const hasError = !isLoggedIn && loginReason;
 
     if (isLoggedIn) {
       if (from && from.pathname && from.pathname === '/account-info') {
-        return (<Redirect to="/" />);
+        return <Redirect to="/" />;
       }
-      return (<Redirect to={from} />);
+      return <Redirect to={from} />;
     }
 
     return (
@@ -83,18 +91,31 @@ class LoginCore extends React.Component {
         <form className={`ui ${hasError ? 'error' : ''} form`}>
           <LocaleSelector style={{ marginBottom: 10 }} />
           {hasError &&
-            <div className="ui error message">{intl.formatMessage(loginReason)}</div>
-          }
+            <div className="ui error message">
+              {intl.formatMessage(loginReason)}
+            </div>}
           <div className="input field required">
-            <label>{intl.formatMessage(appFieldsMessages.userName)}</label>
+            <label>
+              {intl.formatMessage(appFieldsMessages.userName)}
+            </label>
             <Input valueLink={userNameLink} icon="user icon" />
           </div>
           <div className="input field required">
-            <label>{intl.formatMessage(appFieldsMessages.password)}</label>
+            <label>
+              {intl.formatMessage(appFieldsMessages.password)}
+            </label>
             <Input
-              type="password" valueLink={passwordLink} icon="lock icon"
+              type="password"
+              valueLink={passwordLink}
+              icon="lock icon"
               onKeyPress={this.handleEnterSubmit}
             />
+          </div>
+          <div className="field">
+            <label>
+              {intl.formatMessage(appFieldsMessages.timezone)}
+            </label>
+            <Select name="timezone" options={this.timezoneOptions} valueLink={timezoneLink} />
           </div>
           <div className="field" style={{ textAlign: 'right' }}>
             <Link tabIndex={-1} to="/forgotPassword">

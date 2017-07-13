@@ -165,6 +165,15 @@ class LogFrequencyAnomalies extends React.PureComponent {
     });
   }
 
+  @autobind
+  clusterNameRenderer({ cellData, rowData }) {
+    const episodes = get(rowData, 'episodes', []);
+    if (episodes.length > 0) {
+      return `${cellData}\nEpisodes: ${episodes.join(',')}`;
+    }
+    return cellData;
+  }
+
   render() {
     const patterns = get(this.props, this.patternsPropsPath, []);
     const { eventList, anomalyText } = this.getSelectedTimeData();
@@ -176,7 +185,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
       setLogPatternName,
     } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
-    const { freqTsData, keywords, barColors } = patternInfo;
+    const { freqTsData, keywords, episodes, barColors } = patternInfo;
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
 
     const { showNameModal } = this.state;
@@ -212,7 +221,13 @@ class LogFrequencyAnomalies extends React.PureComponent {
                 rowClassName={clusterRowClassName}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={300} label="Cluster" dataKey="name" />
+                <Column
+                  width={300}
+                  label="Cluster"
+                  dataKey="name"
+                  className="space-pre"
+                  cellRenderer={this.clusterNameRenderer}
+                />
                 <Column width={50} label="Events" className="text-right" dataKey="eventsCount" />
                 <Column
                   width={70}
@@ -245,9 +260,12 @@ class LogFrequencyAnomalies extends React.PureComponent {
               />}
             {keywords &&
               keywords.length > 0 &&
-              <div
-                style={{ marginLeft: 16, marginBottom: '0.5em' }}
-              >{`Top keywords: ${keywords.join(',')}`}</div>}
+              <div style={{ marginLeft: 16 }}>{`Top keywords: ${keywords.join(',')}`}</div>}
+            {episodes &&
+              episodes.length > 0 &&
+              <div style={{ marginLeft: 16 }}>{`Top frequent episodes: ${episodes.join(
+                ',',
+              )}`}</div>}
             {freqTsData &&
               <div>
                 <DataChart
