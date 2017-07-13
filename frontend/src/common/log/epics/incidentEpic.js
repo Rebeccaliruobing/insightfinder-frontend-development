@@ -15,6 +15,7 @@ import {
   loadLogClusterList,
   loadLogPatternSequenceList,
   getLogIncidentList,
+  loadProjectEpisodeWord,
 } from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -25,10 +26,11 @@ const viewApis = {
   cluster: loadLogClusterList,
   freq: loadLogFrequencyAnomalyList,
   seq: loadLogPatternSequenceList,
+  keywords: loadProjectEpisodeWord,
 };
 
 const incidentEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('LOAD_LOG_INCIDENT').concatMap((action) => {
+  action$.ofType('LOAD_LOG_INCIDENT').concatMap(action => {
     const pickNotNil = R.pickBy(a => !R.isNil(a));
 
     const state = getState();
@@ -51,7 +53,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
     // about the incident. By checking the incidentlist params.
     if (!R.equals(incidentListParams, prevIncidentListParams)) {
       apiAction$ = Observable.from(getLogIncidentList(credentials, projectName, { month }))
-        .concatMap((listData) => {
+        .concatMap(listData => {
           const incidentList = listData.data.incidentList;
           // Add more params which can get from project info.
           const incidentInfo = R.find(i => i.id === incidentId, incidentList);
@@ -64,7 +66,7 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
               logFreqWindow: 10 * 60 * 1000,
             }),
           )
-            .concatMap((d) => {
+            .concatMap(d => {
               return Observable.of(
                 setLogInfo({
                   incidentList,
@@ -72,11 +74,11 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
                 }),
               );
             })
-            .catch((err) => {
+            .catch(err => {
               return apiEpicErrorHandle(err);
             });
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     } else {
@@ -91,10 +93,10 @@ const incidentEpic = (action$: any, { getState }: Deps) =>
           logFreqWindow: 10 * 60 * 1000,
         }),
       )
-        .concatMap((d) => {
+        .concatMap(d => {
           return Observable.of(setLogInfo({ incident: { [view]: d.data } }));
         })
-        .catch((err) => {
+        .catch(err => {
           return apiEpicErrorHandle(err);
         });
     }
