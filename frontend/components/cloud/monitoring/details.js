@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactTimeout from 'react-timeout';
-import _ from 'lodash';
+import { get } from 'lodash';
+import R from 'ramda';
 import { Console } from '../../../artui/react';
 import apis from '../../../apis';
 import LiveAnalysisCharts from '../liveanalysis';
@@ -23,16 +24,41 @@ const ProjectDetails = class extends React.Component {
 
   convertEventsToSummaryData(events) {
     console.log(events);
-    const alies = [];
-    const highlights = [];
-    const annotations = [];
+
+    let sdata = [];
+    let highlights = [];
+    let annotations = [];
+
+    R.addIndex(R.forEach)((a, idx) => {
+      const timestamp = a.timestamp;
+      const time = new Date(timestamp);
+
+      highlights.push({
+        start: timestamp,
+        end: timestamp,
+        val: a.anomalyRatio < 0 ? 0 : Math.min(10, a.anomalyRatio),
+      });
+
+      sdata.push([time, a.anomalyRatio]);
+      annotations.push({
+        series: 'Y1',
+        x: time.valueOf(),
+        shortText: idx.toString(),
+        text: get(a, ['rootCauseJson', 'rootCauseDetails'], ''),
+      });
+    }, events);
+
+    sdata = R.sort((a, b) => a[0] - b[0], sdata);
+    highlights = R.sort(R.prop('start'), highlights);
+    annotations = R.sort(R.prop('x'), annotations);
+
     const incidentSummary = [];
     const summaryData = {
       id: 'summary',
       div_id: 'summary',
       title: 'Analysis Summary',
       unit: 'Anomaly Degree',
-      sdata: _.map(alies, a => [a.time, a.val]),
+      sdata,
       sname: ['X', 'Y1'],
       highlights,
       annotations,
@@ -81,7 +107,7 @@ const ProjectDetails = class extends React.Component {
         avgNumberOfDays,
         predictedFlag,
         version,
-        false, // disableAnomalies
+        true, // disableAnomalies
       )
       .then(resp => {
         let update = {};

@@ -233,6 +233,7 @@ class LiveAnalysisCharts extends React.Component {
 
   @autobind
   handleAnnotationClick(anno) {
+    console.log(anno.text, this.groups);
     if (anno && anno.text && this.groups) {
       const re = /(?:metric:)(.*)(?:,)/gi;
       let metrics = [];
@@ -321,9 +322,6 @@ class LiveAnalysisCharts extends React.Component {
       _.keysIn(debugData).length != 0 || timeRanking.length != 0 || freqRanking != 0;
     const propsData = this.props.data ? this.props.data.instanceMetricJson : {};
     const latestDataTimestamp = propsData ? propsData.latestDataTimestamp : '';
-    const instances = propsData && propsData.instances ? propsData.instances.split(',').length : 1;
-    // incident table
-    let incidents = [];
     const dataChunkName = data && data.dataChunkName;
     const metricTags = {};
     if (data && data.anomalyMetrics) {
@@ -336,22 +334,7 @@ class LiveAnalysisCharts extends React.Component {
       enablePublish = true;
     }
 
-    if (summary) {
-      incidents = _.map(summary.incidentSummary, a => {
-        const incidentObj = getRootCauseNameFromHints(a.text);
-        return {
-          id: a.id,
-          rootCauseNames: incidentObj.rootCauseNames,
-          start: incidentObj.start,
-          duration: `${incidentObj.duration} minutes`,
-          startTimestamp: incidentObj.startTimestamp,
-          endTimestamp: incidentObj.endTimestamp,
-          text: a.text,
-        };
-      });
-    }
-
-    console.log(summary);
+    console.log(summary, eventsSummaryData);
 
     return (
       <Console.Wrapper>
@@ -434,7 +417,7 @@ class LiveAnalysisCharts extends React.Component {
                   !!summary &&
                   <DataSummaryChart
                     key="summary_chart"
-                    summary={summary}
+                    summary={eventsSummaryData || summary}
                     latestDataTimestamp={latestDataTimestamp}
                     isEmailAert={isEmailAert}
                     onDateWindowChange={this.handleDateWindowSync}
