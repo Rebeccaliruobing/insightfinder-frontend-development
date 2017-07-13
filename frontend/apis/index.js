@@ -6,7 +6,8 @@ import parseCloudRollout from '../data/parseCloudRollout';
 import { retrieveLiveAnalysis } from './retrieve-liveanalysis';
 import {
   retrieveAppNames,
-  retrieveAppMetricForecastData, retrieveAppForecastData,
+  retrieveAppMetricForecastData,
+  retrieveAppForecastData,
 } from './retrieve-forecast';
 import { loadTriageActionRecord, saveTriageActionRecord } from './retrieve-actions';
 import { loadInstanceGrouping, saveInstanceGrouping } from './instanceGrouping';
@@ -25,86 +26,90 @@ const baseUrl = window.API_BASE_URL || '/api/v1/';
 // Semantic-ui api behavior provides ui button integration, and ajax is easy to use.
 // http://semantic-ui.com/behaviors/api.html
 
-$.fn.api.settings.successTest = function (response) {
-  if (response && response.success && (response.success === true ||
-    response.success.toLowerCase() === 'true')) {
+$.fn.api.settings.successTest = function(response) {
+  if (
+    response &&
+    response.success &&
+    (response.success === true || response.success.toLowerCase() === 'true')
+  ) {
     return response.success;
   }
   return false;
 };
 
 $.fn.api.settings.api = {
-    'login': `${baseUrl}login-check`,
-    'signup': `${baseUrl}get-signup-code`,
-    'signup2': `${baseUrl}signup`,
-    'get username reminder': `${baseUrl}get-username-reminder`,
-    'get temp password': `${baseUrl}get-temp-password`,
-    'reset password': `${baseUrl}reset-password`,
+  login: `${baseUrl}login-check`,
+  signup: `${baseUrl}get-signup-code`,
+  signup2: `${baseUrl}signup`,
+  'get username reminder': `${baseUrl}get-username-reminder`,
+  'get temp password': `${baseUrl}get-temp-password`,
+  'reset password': `${baseUrl}reset-password`,
 
-    'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
-    'dashboard benchmark': `${baseUrl}dashboard-benchmark`,
-    'dashboard incident': `${baseUrl}dashboard-incident`,
-    'live analysis': `${baseUrl}liveAnalysis`,
-    'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
-    'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
-    'display project model': `${baseUrl}displayProjectModel`,
+  'dashboard uservalues': `${baseUrl}dashboard-uservalues`,
+  'dashboard benchmark': `${baseUrl}dashboard-benchmark`,
+  'dashboard incident': `${baseUrl}dashboard-incident`,
+  'live analysis': `${baseUrl}liveAnalysis`,
+  'cloud outlier detection': `${baseUrl}cloudOutlierDetection`,
+  'cloud rollout check': `${baseUrl}cloudRolloutCheck`,
+  'display project model': `${baseUrl}displayProjectModel`,
 
-    'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
-    'insight report': `${baseUrl}insightReport`,
-    'published detection': `${baseUrl}publishedDetection`,
-    'post mortem': `${baseUrl}postMortem`,
-    'log analysis': `${baseUrl}logAnalysis`,
-    'add datadog project': `${baseUrl}add-datadog-project`,
-    'add new relic project': `${baseUrl}add-newrelic-project`,
-    'add log project': `${baseUrl}add-log-project`,
-    'add custom project': `${baseUrl}add-custom-project`,
-    'add aws project': `${baseUrl}add-amazon-project`,
-    'add google project': `${baseUrl}add-google-project`,
-    'remove project': `${baseUrl}remove-project`,
-    'project setting': `${baseUrl}emailAlertSetting`,
-    'project data': `${baseUrl}projectData`,
-    'external service': `${baseUrl}service-integration`,
+  'dashboard dailysummaryreport': `${baseUrl}dashboard-dailysummaryreport`,
+  'insight report': `${baseUrl}insightReport`,
+  'published detection': `${baseUrl}publishedDetection`,
+  'post mortem': `${baseUrl}postMortem`,
+  'log analysis': `${baseUrl}logAnalysis`,
+  'add datadog project': `${baseUrl}add-datadog-project`,
+  'add new relic project': `${baseUrl}add-newrelic-project`,
+  'add log project': `${baseUrl}add-log-project`,
+  'add custom project': `${baseUrl}add-custom-project`,
+  'add aws project': `${baseUrl}add-amazon-project`,
+  'add google project': `${baseUrl}add-google-project`,
+  'remove project': `${baseUrl}remove-project`,
+  'project setting': `${baseUrl}emailAlertSetting`,
+  'project data': `${baseUrl}projectData`,
+  'external service': `${baseUrl}service-integration`,
 
-    'upload detection': `${baseUrl}upload-detection`,
-    'upload visualization': `${baseUrl}upload-visualization`,
-    'upload update': `${baseUrl}upload-update`,
-    'upload training': `${baseUrl}upload-training`,
-    'upload display': `${baseUrl}upload-display`,
+  'upload detection': `${baseUrl}upload-detection`,
+  'upload visualization': `${baseUrl}upload-visualization`,
+  'upload update': `${baseUrl}upload-update`,
+  'upload training': `${baseUrl}upload-training`,
+  'upload display': `${baseUrl}upload-display`,
 
-    'service integration': `${baseUrl}service-integration`
+  'service integration': `${baseUrl}service-integration`,
 };
 
-let request = function (method, action, data, resolve, reject) {
-    var formData = new FormData();
-    _.keys(data).forEach((k)=> formData.append(k, data[k]));
-    let xhr;
-    switch (method) {
-        case 'GET':
-            xhr = $.get($.fn.api.settings.api[action], data);
-            break;
-        case 'HEAD':
-            xhr = $.get($.fn.api.settings.api[action], data);
-            break;
-        default:
-            xhr = $.post($.fn.api.settings.api[action], data);
-            break;
-    }
-    xhr.done(function (resp) {
-        resolve(resp);
-    }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
+let request = function(method, action, data, resolve, reject) {
+  var formData = new FormData();
+  _.keys(data).forEach(k => formData.append(k, data[k]));
+  let xhr;
+  switch (method) {
+    case 'GET':
+      xhr = $.get($.fn.api.settings.api[action], data);
+      break;
+    case 'HEAD':
+      xhr = $.get($.fn.api.settings.api[action], data);
+      break;
+    default:
+      xhr = $.post($.fn.api.settings.api[action], data);
+      break;
+  }
+  xhr
+    .done(function(resp) {
+      resolve(resp);
     })
+    .fail(function(error) {
+      console.log(arguments);
+      console.log('Server Error', arguments);
+      reject(error);
+    });
 };
 
-let requestGet = function (action, data, resolve, reject) {
-    return request('GET', action, data, resolve, reject);
+let requestGet = function(action, data, resolve, reject) {
+  return request('GET', action, data, resolve, reject);
 };
-let requestPost = function (action, data, resolve, reject) {
-    return request('POST', action, data, resolve, reject);
+let requestPost = function(action, data, resolve, reject) {
+  return request('POST', action, data, resolve, reject);
 };
-
 
 /**
  总体:
@@ -141,117 +146,139 @@ const apis = {
   getExecDBStatisticsData,
 
   postLogin(userName, password) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       requestPost('login', { userName, password }, resolve, reject);
     });
   },
 
-  postDashboardUserValues(operation = 'display',
+  postDashboardUserValues(
+    operation = 'display',
     other,
     userName = store.get('userName'),
-    token = store.get('token')) {
+    token = store.get('token'),
+  ) {
     return new Promise((resolve, reject) => {
-      requestPost('dashboard uservalues',
+      requestPost(
+        'dashboard uservalues',
         { userName, token, operation, ...other },
         resolve,
-        reject);
+        reject,
+      );
     });
   },
 
-  postDashboardUserValuesMapArr(operation = 'display',
+  postDashboardUserValuesMapArr(
+    operation = 'display',
     projectName,
     selectedIndexArr,
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['dashboard uservalues'],
         data: $.param({ userName, token, operation, projectName, selectedIndexArr }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postJSONDashboardUserValues(operation = 'display',
+  postJSONDashboardUserValues(
+    operation = 'display',
     other,
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['dashboard uservalues'],
         data: $.param({ userName, token, operation, ...other }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postDashboardBenchmark(operation = 'display',
+  postDashboardBenchmark(
+    operation = 'display',
     other,
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['dashboard benchmark'],
         data: $.param({ userName, token, operation, ...other }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postDashboardIncident(operation = 'display',
+  postDashboardIncident(
+    operation = 'display',
     other,
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['dashboard incident'],
         data: $.param({ userName, token, operation, ...other }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postDashboardDailySummaryReport(forceReload,
+  postDashboardDailySummaryReport(
+    forceReload,
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       let currentResp = store.get('dailyReportResponse');
       if (!forceReload && currentResp) {
         resolve(currentResp);
@@ -260,26 +287,30 @@ const apis = {
           type: 'POST',
           url: $.fn.api.settings.api['dashboard dailysummaryreport'],
           data: $.param({ userName, token }),
-          beforeSend: function (request) {
-            request.setRequestHeader("Accept", 'application/json');
-          }
-        }).done(function (resp) {
-          store.set('dailyReportResponse', resp);
-          resolve(resp);
-        }).fail(function (error) {
-          console.log(arguments);
-          console.log("Server Error", arguments);
-          reject(error);
-        });
+          beforeSend: function(request) {
+            request.setRequestHeader('Accept', 'application/json');
+          },
+        })
+          .done(function(resp) {
+            store.set('dailyReportResponse', resp);
+            resolve(resp);
+          })
+          .fail(function(error) {
+            console.log(arguments);
+            console.log('Server Error', arguments);
+            reject(error);
+          });
       }
     });
   },
 
-  postDashboardDailySummaryReportNew(forceReload,
+  postDashboardDailySummaryReportNew(
+    forceReload,
     userName = store.get('userName'),
-    token = store.get('token')) {
+    token = store.get('token'),
+  ) {
     let self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       let currentResp = store.get('dailyReportResponseNew');
       if (!forceReload && currentResp && !self.timeFromNow(currentResp['data']['createDate'])) {
         resolve(currentResp);
@@ -288,29 +319,30 @@ const apis = {
           type: 'POST',
           url: $.fn.api.settings.api['dashboard dailysummaryreport'],
           data: $.param({ userName, token }),
-          beforeSend: function (request) {
-            request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-            request.setRequestHeader("accept", 'application/json');
-          }
-        }).done(function (resp) {
-          var reportData = { 'createDate': new Date() };
-          _.forEach(resp.data, function (value, key) {
-            key = key.split(':');
-            if (key.length == 3) {
-              reportData[key[0] + "@" + key[2]] = value;
-            }
-            else {
-              reportData[key[0]] = value;
-            }
+          beforeSend: function(request) {
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.setRequestHeader('accept', 'application/json');
+          },
+        })
+          .done(function(resp) {
+            var reportData = { createDate: new Date() };
+            _.forEach(resp.data, function(value, key) {
+              key = key.split(':');
+              if (key.length == 3) {
+                reportData[key[0] + '@' + key[2]] = value;
+              } else {
+                reportData[key[0]] = value;
+              }
+            });
+            resp['data'] = reportData;
+            store.set('dailyReportResponseNew', resp);
+            resolve(resp);
+          })
+          .fail(function(error) {
+            console.log(arguments);
+            console.log('Server Error', arguments);
+            reject(error);
           });
-          resp['data'] = reportData;
-          store.set('dailyReportResponseNew', resp);
-          resolve(resp);
-        }).fail(function (error) {
-          console.log(arguments);
-          console.log("Server Error", arguments);
-          reject(error);
-        });
       }
     });
   },
@@ -325,7 +357,6 @@ const apis = {
       halfamonth = day * 15,
       month = day * 30,
       year = month * 12,
-
       _year = diffValue / year,
       _month = diffValue / month,
       _week = diffValue / (7 * day),
@@ -334,71 +365,65 @@ const apis = {
       _min = diffValue / minute;
 
     if (_year >= 1) {
-      result = parseInt(_year) + "年前";
+      result = parseInt(_year) + '年前';
       return true;
-    }
-    else if (_month >= 1) {
-      result = parseInt(_month) + "个月前";
+    } else if (_month >= 1) {
+      result = parseInt(_month) + '个月前';
       return true;
-    }
-    else if (_week >= 1) {
-      result = parseInt(_week) + "周前";
+    } else if (_week >= 1) {
+      result = parseInt(_week) + '周前';
       return true;
-    }
-    else if (_day >= 1) {
-      result = parseInt(_day) + "天前";
+    } else if (_day >= 1) {
+      result = parseInt(_day) + '天前';
       return true;
-    }
-    else if (_hour >= 1) {
-      result = parseInt(_hour) + "个小时前";
-      return _hour > 23
-    }
-    else if (_min >= 1) {
-      result = parseInt(_min) + "分钟前";
+    } else if (_hour >= 1) {
+      result = parseInt(_hour) + '个小时前';
+      return _hour > 23;
+    } else if (_min >= 1) {
+      result = parseInt(_min) + '分钟前';
       return false;
-    }
-    else {
-      result = "刚刚";
+    } else {
+      result = '刚刚';
       return false;
     }
   },
   postInsightReport(forceReload, userName = store.get('userName'), token = store.get('token')) {
     let self = this;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       let currentResp = store.get('insightReportData');
       if (!forceReload && currentResp && !self.timeFromNow(currentResp['data']['createDate'])) {
         resolve(currentResp);
-      }
-      else {
+      } else {
         $.ajax({
           type: 'POST',
           url: $.fn.api.settings.api['insight report'],
           data: $.param({ userName, token }),
-          beforeSend: function (request) {
-            request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-            request.setRequestHeader("accept", 'application/json');
-          }
-        }).done(function (resp) {
-          var reportData = { 'createDate': new Date() };
-          _.forEach(resp.data, function (value, key) {
-            key = key.split(':');
-            if (key.length == 3) {
-              reportData[key[0] + "@" + key[2]] = value;
-            }
-            else {
-              reportData[key[0]] = value;
-            }
-          });
-          resp['data'] = reportData;
-          store.set('insightReportData', resp);
-          resolve(resp);
-        }).fail(function (error) {
-          console.log(arguments);
-          console.log("Server Error", arguments);
-          reject(error);
+          beforeSend: function(request) {
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.setRequestHeader('accept', 'application/json');
+          },
         })
+          .done(function(resp) {
+            var reportData = { createDate: new Date() };
+            _.forEach(resp.data, function(value, key) {
+              key = key.split(':');
+              if (key.length == 3) {
+                reportData[key[0] + '@' + key[2]] = value;
+              } else {
+                reportData[key[0]] = value;
+              }
+            });
+            resp['data'] = reportData;
+            store.set('insightReportData', resp);
+            resolve(resp);
+          })
+          .fail(function(error) {
+            console.log(arguments);
+            console.log('Server Error', arguments);
+            reject(error);
+          });
       }
-    })
+    });
   },
   /**
    *
@@ -410,31 +435,64 @@ const apis = {
    * @param projectName
    * @returns {Promise}
    */
-  postLiveAnalysis(projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays, endTimestamp, startTimestamp,
-    groupId, instanceName, metricName, avgEndTimestamp, avgNumberOfDays, predictedFlag, version,
-    userName = store.get('userName'), token = store.get('token')) {
+  postLiveAnalysis(
+    projectName,
+    instanceGroup,
+    modelType,
+    pvalue,
+    cvalue,
+    numberOfDays,
+    endTimestamp,
+    startTimestamp,
+    groupId,
+    instanceName,
+    metricName,
+    avgEndTimestamp,
+    avgNumberOfDays,
+    predictedFlag,
+    version,
+    disableAnomalies,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
     if (!version) {
-      version = "1";
+      version = '1';
     }
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: getEndpoint('liveAnalysis', version),
         data: $.param({
-          userName, token, projectName, instanceGroup, modelType, pvalue, cvalue, numberOfDays,
-          startTimestamp, endTimestamp, groupId, instanceName, metricName,
-          avgEndTimestamp, avgNumberOfDays, predictedFlag,
+          userName,
+          token,
+          projectName,
+          instanceGroup,
+          modelType,
+          pvalue,
+          cvalue,
+          numberOfDays,
+          startTimestamp,
+          endTimestamp,
+          groupId,
+          instanceName,
+          metricName,
+          avgEndTimestamp,
+          avgNumberOfDays,
+          predictedFlag,
+          disableAnomalies,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -453,8 +511,22 @@ const apis = {
    * @param projectName
    * @returns {Promise}
    */
-  postPostMortem(projectName, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, incidentKey, isReplay, isExistentIncident, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postPostMortem(
+    projectName,
+    pvalue,
+    cvalue,
+    modelType,
+    startTime,
+    endTime,
+    modelStartTime,
+    modelEndTime,
+    incidentKey,
+    isReplay,
+    isExistentIncident,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['post mortem'],
@@ -471,23 +543,40 @@ const apis = {
           modelEndTime,
           incidentKey,
           isReplay,
-          isExistentIncident
+          isExistentIncident,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postLogAnalysis(projectName, derivedPvalue, pvalue, cvalue, modelType, startTime, endTime, modelStartTime, modelEndTime, isExistentIncident, rareEventThreshold, operation, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postLogAnalysis(
+    projectName,
+    derivedPvalue,
+    pvalue,
+    cvalue,
+    modelType,
+    startTime,
+    endTime,
+    modelStartTime,
+    modelEndTime,
+    isExistentIncident,
+    rareEventThreshold,
+    operation,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['log analysis'],
@@ -505,18 +594,20 @@ const apis = {
           modelEndTime,
           isExistentIncident,
           rareEventThreshold,
-          operation
+          operation,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -530,44 +621,59 @@ const apis = {
    * @param origin
    * @returns {Promise}
    */
-  postCloudOutlierDetection(startTime, endTime, projectName, origin = 'cloudoutlier', userName = store.get('userName'), token = store.get('token'), ) {
-    return new Promise(function (resolve, reject) {
+  postCloudOutlierDetection(
+    startTime,
+    endTime,
+    projectName,
+    origin = 'cloudoutlier',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['cloud outlier detection'],
         data: $.param({ startTime, endTime, projectName, origin, userName, token }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postCloudRolloutCheck(startTime, endTime,
-    projectName, origin = 'cloudrollout',
+  postCloudRolloutCheck(
+    startTime,
+    endTime,
+    projectName,
+    origin = 'cloudrollout',
     userName = store.get('userName'),
-    token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['cloud rollout check'],
         data: $.param({ startTime, endTime, projectName, origin, userName, token }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(parseCloudRollout(projectName, startTime, endTime, resp));
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(parseCloudRollout(projectName, startTime, endTime, resp));
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -580,25 +686,33 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postDisplayProjectModel(startTime, endTime, projectName, origin = 'clouddisplay', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postDisplayProjectModel(
+    startTime,
+    endTime,
+    projectName,
+    origin = 'clouddisplay',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['display project model'],
         data: $.param({ startTime, endTime, projectName, origin, userName, token }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
-
 
   /**
    *
@@ -615,11 +729,25 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postUseCase(pvalue, cvalue, modelKey, modelName,
-    projectName, groupId, modelType, fromUser, dataChunkName,
-    metaData, modelStartTime, modelEndTime, latestDataTimestamp, caller,
-    userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postUseCase(
+    pvalue,
+    cvalue,
+    modelKey,
+    modelName,
+    projectName,
+    groupId,
+    modelType,
+    fromUser,
+    dataChunkName,
+    metaData,
+    modelStartTime,
+    modelEndTime,
+    latestDataTimestamp,
+    caller,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['published detection'],
@@ -639,18 +767,20 @@ const apis = {
           latestDataTimestamp,
           caller,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -664,8 +794,17 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postAddDataDogProject(projectName, projectCloudType, samplingInterval, appkey, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddDataDogProject(
+    projectName,
+    projectCloudType,
+    samplingInterval,
+    appkey,
+    apikey,
+    email = '',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add datadog project'],
@@ -677,18 +816,20 @@ const apis = {
           apikey,
           email,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -702,8 +843,16 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postAddNewRelicProject(projectName, projectCloudType, samplingInterval, apikey, email = '', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddNewRelicProject(
+    projectName,
+    projectCloudType,
+    samplingInterval,
+    apikey,
+    email = '',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add new relic project'],
@@ -714,18 +863,20 @@ const apis = {
           apikey,
           email,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -739,8 +890,18 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postAddLogProject(projectName, projectCloudType, samplingInterval, zone, access_key, secrete_key, email = '', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddLogProject(
+    projectName,
+    projectCloudType,
+    samplingInterval,
+    zone,
+    access_key,
+    secrete_key,
+    email = '',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add log project'],
@@ -753,18 +914,20 @@ const apis = {
           'secrete-key': secrete_key,
           email,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -778,8 +941,20 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postAddCustomProject(projectName, projectCloudType, dataType, samplingInterval, zone, access_key, secrete_key, processName, email = '', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddCustomProject(
+    projectName,
+    projectCloudType,
+    dataType,
+    samplingInterval,
+    zone,
+    access_key,
+    secrete_key,
+    processName,
+    email = '',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add custom project'],
@@ -794,21 +969,22 @@ const apis = {
           processName,
           email,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
-
 
   /**
    *
@@ -821,8 +997,18 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postAddAWSProject(projectName, instanceType, zone, access_key, secrete_key, hasAgentData, email = '', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddAWSProject(
+    projectName,
+    instanceType,
+    zone,
+    access_key,
+    secrete_key,
+    hasAgentData,
+    email = '',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add aws project'],
@@ -835,18 +1021,20 @@ const apis = {
           hasAgentData,
           email,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -860,8 +1048,17 @@ const apis = {
    * @returns {Promise}
    */
 
-  postAddGoogleProject(projectName, projectId, projectType, serviceAccount, filename, hasAgentData, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postAddGoogleProject(
+    projectName,
+    projectId,
+    projectType,
+    serviceAccount,
+    filename,
+    hasAgentData,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['add google project'],
@@ -869,22 +1066,24 @@ const apis = {
           projectName,
           'project-id': projectId,
           'project-type': projectType,
-          'filename': filename,
+          filename: filename,
           'service-account': serviceAccount,
           hasAgentData,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -895,21 +1094,23 @@ const apis = {
    * @returns {Promise}
    */
   postRemoveProject(projectName, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['remove project'],
         data: $.param({ projectName, userName, token }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -928,8 +1129,24 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postProjectSetting(projectName, cvalue, pvalue, derivedPvalue, cvalueEmail, pvalueEmail, cvalueFilter, pvalueFilter, predictionWindow, minAnomalyRatioFilter, sharedUsernames, logFreqWindow, projectHintMapFilename, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postProjectSetting(
+    projectName,
+    cvalue,
+    pvalue,
+    derivedPvalue,
+    cvalueEmail,
+    pvalueEmail,
+    cvalueFilter,
+    pvalueFilter,
+    predictionWindow,
+    minAnomalyRatioFilter,
+    sharedUsernames,
+    logFreqWindow,
+    projectHintMapFilename,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['project setting'],
@@ -948,18 +1165,20 @@ const apis = {
           logFreqWindow,
           projectHintMapFilename,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -975,29 +1194,78 @@ const apis = {
    * @param token
    * @returns {Promise}
    */
-  postProjectData(projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, anomalyMetrics, predictedFlag, grouping, userName = store.get('userName'), token = store.get('token')) {
-    let paramData = metricName ? { projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, metricName, predictedFlag, grouping, userName, token } :
-      { projectName, startTime, endTime, startTimestamp, endTimestamp, groupId, instanceName, anomalyMetrics, predictedFlag, grouping, userName, token };
-    return new Promise(function (resolve, reject) {
+  postProjectData(
+    projectName,
+    startTime,
+    endTime,
+    startTimestamp,
+    endTimestamp,
+    groupId,
+    instanceName,
+    metricName,
+    anomalyMetrics,
+    predictedFlag,
+    grouping,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    let paramData = metricName
+      ? {
+          projectName,
+          startTime,
+          endTime,
+          startTimestamp,
+          endTimestamp,
+          groupId,
+          instanceName,
+          metricName,
+          predictedFlag,
+          grouping,
+          userName,
+          token,
+        }
+      : {
+          projectName,
+          startTime,
+          endTime,
+          startTimestamp,
+          endTimestamp,
+          groupId,
+          instanceName,
+          anomalyMetrics,
+          predictedFlag,
+          grouping,
+          userName,
+          token,
+        };
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['project data'],
         data: $.param(paramData),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
-    
-  postProjectDataSaveToStorage(projectName, startTimestamp, endTimestamp, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+
+  postProjectDataSaveToStorage(
+    projectName,
+    startTimestamp,
+    endTimestamp,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['project data'],
@@ -1007,23 +1275,31 @@ const apis = {
           endTimestamp,
           operation: 'saveToStorage',
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
-    
-  postProjectDataSimple(projectName, metricName, instanceName, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+
+  postProjectDataSimple(
+    projectName,
+    metricName,
+    instanceName,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['project data'],
@@ -1032,43 +1308,53 @@ const apis = {
           metricName,
           instanceName,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  registerExternalService(account, serviceKey, operation, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  registerExternalService(
+    account,
+    serviceKey,
+    operation,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['external service'],
         data: $.param({
           account,
-          'service_key': serviceKey,
+          service_key: serviceKey,
           operation,
           userName,
-          token
+          token,
         }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -1084,23 +1370,33 @@ const apis = {
   * @returns {Promise}
   */
 
-  postUploadDetection(cvalue, pvalue, modelType, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postUploadDetection(
+    cvalue,
+    pvalue,
+    modelType,
+    modelName,
+    filename,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['upload detection'],
         data: $.param({ userName, token, filename, modelName, modelType, pvalue, cvalue }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -1112,22 +1408,24 @@ const apis = {
   */
 
   postUploadVisualization(filename, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['upload visualization'],
         data: $.param({ userName, token, filename }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -1141,23 +1439,32 @@ const apis = {
   * @returns {Promise}
   */
 
-  postUploadUpdate(operation, filenameFilter, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postUploadUpdate(
+    operation,
+    filenameFilter,
+    modelName,
+    filename,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['upload update'],
         data: $.param({ userName, token, filename, operation, filenameFilter, modelName }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -1170,24 +1477,34 @@ const apis = {
   * @returns {Promise}
   */
 
-  postUploadTraining(filenameFilter, modelName, filename, userName = store.get('userName'), token = store.get('token')) {
-    let param = filenameFilter ? { userName, token, filename, filenameFilter, modelName } : { userName, token, filename, modelName };
-    return new Promise(function (resolve, reject) {
+  postUploadTraining(
+    filenameFilter,
+    modelName,
+    filename,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    let param = filenameFilter
+      ? { userName, token, filename, filenameFilter, modelName }
+      : { userName, token, filename, modelName };
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['upload training'],
         data: $.param(param),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
   /**
@@ -1199,23 +1516,30 @@ const apis = {
   * @returns {Promise}
   */
 
-  postUploadDisplay(modelType, modelName, userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postUploadDisplay(
+    modelType,
+    modelName,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['upload display'],
         data: $.param({ userName, token, modelName, modelType }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -1228,23 +1552,30 @@ const apis = {
   * @returns {Promise}
   */
 
-  postServiceIntegration(service_id, operation = 'delete', userName = store.get('userName'), token = store.get('token')) {
-    return new Promise(function (resolve, reject) {
+  postServiceIntegration(
+    service_id,
+    operation = 'delete',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: $.fn.api.settings.api['service integration'],
         data: $.param({ userName, token, operation, service_id }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log(arguments);
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log(arguments);
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
@@ -1256,43 +1587,59 @@ const apis = {
   * @param userName
   * @returns {Promise}
   */
-  postUserAction(projectName, instanceId, operation = 'coldclone', userName = store.get('userName'), token = store.get('token')) {
-    let version = "1";
-    return new Promise(function (resolve, reject) {
+  postUserAction(
+    projectName,
+    instanceId,
+    operation = 'coldclone',
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    let version = '1';
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: getEndpoint('userAction', version),
         data: $.param({ userName, token, projectName, instanceId, operation }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 
-  postSysCallResult(projectName, startTimestamp, endTimestamp, userName = store.get('userName'), token = store.get('token')) {
-    let version = "1";
-    return new Promise(function (resolve, reject) {
+  postSysCallResult(
+    projectName,
+    startTimestamp,
+    endTimestamp,
+    userName = store.get('userName'),
+    token = store.get('token'),
+  ) {
+    let version = '1';
+    return new Promise(function(resolve, reject) {
       $.ajax({
         type: 'POST',
         url: getEndpoint('sysCallResult', version),
         data: $.param({ userName, token, projectName, startTimestamp, endTimestamp }),
-        beforeSend: function (request) {
-          request.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-          request.setRequestHeader("Accept", 'application/json');
-        }
-      }).done(function (resp) {
-        resolve(resp);
-      }).fail(function (error) {
-        console.log("Server Error", arguments);
-        reject(error);
-      });
+        beforeSend: function(request) {
+          request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          request.setRequestHeader('Accept', 'application/json');
+        },
+      })
+        .done(function(resp) {
+          resolve(resp);
+        })
+        .fail(function(error) {
+          console.log('Server Error', arguments);
+          reject(error);
+        });
     });
   },
 };

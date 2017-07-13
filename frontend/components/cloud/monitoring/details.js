@@ -81,6 +81,7 @@ const ProjectDetails = class extends React.Component {
         avgNumberOfDays,
         predictedFlag,
         version,
+        false, // disableAnomalies
       )
       .then(resp => {
         let update = {};
