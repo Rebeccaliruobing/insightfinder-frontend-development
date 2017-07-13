@@ -25,7 +25,7 @@ const ProjectDetails = class extends React.Component {
   convertEventsToSummaryData(eventsData, startTimestamp, endTimestamp) {
     const groupedEvents = {};
     const groupedAnnos = {};
-    const sdata = [];
+    let sdata = [];
     const highlights = [];
     const annotations = [];
     const startTime = parseInt(startTimestamp, 10);
@@ -50,6 +50,14 @@ const ProjectDetails = class extends React.Component {
           groupedAnnos[t] = annos;
         }
       }, timestamps);
+
+      // Use the endtime, add a empty array to indicate it's 0.
+      if (isNumber(e.endTimestamp)) {
+        const endKey = e.endTimestamp.toString();
+        if (!groupedEvents[endKey]) {
+          groupedEvents[endKey] = [];
+        }
+      }
     }, eventsData);
 
     // Convert object to array
@@ -58,7 +66,6 @@ const ProjectDetails = class extends React.Component {
       R.toPairs(groupedEvents),
     );
 
-    // Add empty data for start & end to keep x in full range
     sdata.push([new Date(startTime), null]);
 
     let index = 0;
@@ -71,11 +78,13 @@ const ProjectDetails = class extends React.Component {
       const ratios = R.map(v => v.anomalyRatio, events);
       const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
 
-      highlights.push({
-        start: timestamp,
-        end: timestamp,
-        val: maxAnomalyRatio,
-      });
+      if (maxAnomalyRatio > 0) {
+        highlights.push({
+          start: timestamp,
+          end: timestamp,
+          val: Math.min(10, maxAnomalyRatio),
+        });
+      }
 
       sdata.push([time, maxAnomalyRatio]);
 
