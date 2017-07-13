@@ -34,8 +34,16 @@
 }
 
 .auth.ui.container {
-  @container-mixins ();
-  .makeContainer(320px);
+  margin-left: auto;
+  margin-right: auto;
+  width: 320px;
+  max-width: 320px;
+
+  @media only screen and (max-width: 320px) {
+    margin-left: 1em !important;
+    margin-right: 1em !important;
+    width: auto !important;
+  }
 }
 
 .auth .ui.header > .image {

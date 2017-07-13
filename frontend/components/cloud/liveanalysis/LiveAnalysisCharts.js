@@ -233,9 +233,8 @@ class LiveAnalysisCharts extends React.Component {
 
   @autobind
   handleAnnotationClick(anno) {
-    console.log(anno.text, this.groups);
     if (anno && anno.text && this.groups) {
-      const re = /(?:metric:)(.*)(?:,)/gi;
+      const re = /(?:metric[: ])(.*)(?:[,(])/gi;
       let metrics = [];
       let match = re.exec(anno.text);
       while (match) {
@@ -333,8 +332,6 @@ class LiveAnalysisCharts extends React.Component {
     if (projectName && (userName !== 'admin' && projectName.indexOf('@') === -1)) {
       enablePublish = true;
     }
-
-    console.log(summary, eventsSummaryData);
 
     return (
       <Console.Wrapper>

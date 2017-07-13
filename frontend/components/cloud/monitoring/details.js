@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactTimeout from 'react-timeout';
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 import R from 'ramda';
 import { Console } from '../../../artui/react';
 import apis from '../../../apis';
@@ -22,37 +22,70 @@ const ProjectDetails = class extends React.Component {
     this.updateLiveAnalysis();
   }
 
-  convertEventsToSummaryData(events) {
-    console.log(events);
+  convertEventsToSummaryData(eventsData, startTimestamp, endTimestamp) {
+    const groupedEvents = {};
+    const sdata = [];
+    const highlights = [];
+    const annotations = [];
+    const startTime = parseInt(startTimestamp, 10);
+    const endTime = parseInt(endTimestamp, 10);
 
-    let sdata = [];
-    let highlights = [];
-    let annotations = [];
+    // First get the whole timestamps from the first item, convert and sort it.
+    const timestamps = R.sort(
+      (a, b) => a - b,
+      R.map(
+        t => parseInt(t, 10),
+        R.filter(s => Boolean(s.trim()), get(eventsData[0], 'timestampsString', '').split(',')),
+      ),
+    );
 
-    R.addIndex(R.forEach)((a, idx) => {
-      const timestamp = a.timestamp;
+    // Then we group the events by timestamp.
+    R.forEach(e => {
+      const tsKey = e.timestamp.toString();
+      if (tsKey) {
+        // Convert number to string as the key
+        const group = groupedEvents[tsKey] || [];
+        group.push(e);
+        groupedEvents[tsKey] = group;
+      }
+    }, eventsData);
+
+    // Add empty data for start & end
+    sdata.push([new Date(startTime), null]);
+    let index = 0;
+    R.forEach(timestamp => {
       const time = new Date(timestamp);
+      const tsKey = timestamp.toString();
+      const events = groupedEvents[tsKey];
 
-      highlights.push({
-        start: timestamp,
-        end: timestamp,
-        val: a.anomalyRatio < 0 ? 0 : Math.min(10, a.anomalyRatio),
-      });
+      if (events) {
+        index += 1;
+        // Get the max anomalyRatio for this timestamp
+        const ratios = R.map(v => v.anomalyRatio, events);
+        const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
+        const details = R.filter(
+          d => Boolean(d.trim()),
+          R.map(v => get(v, ['rootCauseJson', 'rootCauseDetails'], ''), events),
+        );
 
-      sdata.push([time, a.anomalyRatio]);
-      annotations.push({
-        series: 'Y1',
-        x: time.valueOf(),
-        shortText: idx.toString(),
-        text: get(a, ['rootCauseJson', 'rootCauseDetails'], ''),
-      });
-    }, events);
+        highlights.push({
+          start: timestamp,
+          end: timestamp,
+          val: maxAnomalyRatio < 0 ? 0 : Math.min(10, maxAnomalyRatio),
+        });
 
-    sdata = R.sort((a, b) => a[0] - b[0], sdata);
-    highlights = R.sort(R.prop('start'), highlights);
-    annotations = R.sort(R.prop('x'), annotations);
+        sdata.push([time, maxAnomalyRatio]);
+        annotations.push({
+          series: 'Y1',
+          x: time.valueOf(),
+          shortText: index.toString(),
+          text: details.join('\n'),
+        });
+      }
+    }, timestamps);
+    sdata.push([new Date(endTime), null]);
 
-    const incidentSummary = [];
+    const incidentSummary = []; // Not used
     const summaryData = {
       id: 'summary',
       div_id: 'summary',
@@ -64,6 +97,8 @@ const ProjectDetails = class extends React.Component {
       annotations,
       incidentSummary,
     };
+
+    console.log(summaryData);
     return summaryData;
   }
 
@@ -129,7 +164,11 @@ const ProjectDetails = class extends React.Component {
               }
 
               const events = resp1[gname] || [];
-              update.eventsSummaryData = this.convertEventsToSummaryData(events);
+              update.eventsSummaryData = this.convertEventsToSummaryData(
+                events,
+                startTimestamp,
+                endTimestamp,
+              );
               update.loading = false;
               this.setState(update);
             })
