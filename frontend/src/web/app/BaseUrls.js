@@ -33,6 +33,7 @@ const BaseUrls = {
   SettingsProject: '/settings/projects/:projectName',
   SettingsProjectWizard: '/settings/project-wizard',
   SettingsExternalServiceList: '/settings/extsvc',
+  SettingsSystem: '/settings/system',
   LiveMonitoring: '/liveMonitoring',
 
   PagerDutyImg: 'https://pagerduty.com/assets/pd_connect_button.png',

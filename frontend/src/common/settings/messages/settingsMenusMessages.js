@@ -7,6 +7,10 @@ const settingsMenusMessages = defineMessages({
     defaultMessage: 'Project Settings',
     id: 'settings.menus.projects',
   },
+  system: {
+    defaultMessage: 'System Settings',
+    id: 'settings.menus.system',
+  },
   externalService: {
     defaultMessage: 'External Service',
     id: 'settings.menus.externalService',
