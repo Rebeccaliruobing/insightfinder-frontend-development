@@ -15,7 +15,7 @@ import {
   loadLogClusterList,
   loadLogPatternSequenceList,
   getLogIncidentList,
-  loadProjectEpisodeWord,
+  getLogKeywords,
 } from '../../apis';
 import { showAppLoader, hideAppLoader } from '../../app/actions';
 import { apiEpicErrorHandle } from '../../errors';
@@ -26,7 +26,7 @@ const viewApis = {
   cluster: loadLogClusterList,
   freq: loadLogFrequencyAnomalyList,
   seq: loadLogPatternSequenceList,
-  keywords: loadProjectEpisodeWord,
+  keywords: getLogKeywords,
 };
 
 const incidentEpic = (action$: any, { getState }: Deps) =>

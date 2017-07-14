@@ -41,7 +41,7 @@ class LogKeywords extends React.Component {
   constructor(props) {
     super(props);
     this.viewName = 'keywords';
-    this.dataPath = 'selectedKeywords';
+    this.dataPath = 'keywordList';
     this.loadingComponentPath = 'log_keywords_eventlist';
   }
 
@@ -123,7 +123,8 @@ class LogKeywords extends React.Component {
                 rowGetter={({ index }) => keywords[index]}
                 onRowClick={this.handlePatternClick}
               >
-                <Column width={380} label="Keyword" dataKey="name" />
+                <Column width={330} label="Keyword" dataKey="name" />
+                <Column width={50} label="Count" dataKey="count" />
               </Table>}
           </AutoSizer>
         </Container>

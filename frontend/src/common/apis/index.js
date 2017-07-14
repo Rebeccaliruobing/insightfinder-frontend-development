@@ -15,6 +15,7 @@ export { default as getExternalServiceList } from './getExternalServiceList';
 export { default as getLogIncidentList } from './getLogIncidentList';
 export { default as getLogRerunDetection } from './getLogRerunDetection';
 export { default as getLogSequenceEventList } from './getLogSequenceEventList';
+export { default as getLogKeywords } from './getLogKeywords';
 export { default as getMetricEventList } from './getMetricEventList';
 export { default as getProjectGroupList } from './getProjectGroupList';
 export { default as getProjectList } from './getProjectList';
