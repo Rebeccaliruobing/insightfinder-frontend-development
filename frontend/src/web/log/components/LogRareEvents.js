@@ -79,7 +79,7 @@ class LogRareEvents extends React.PureComponent {
     return (
       <Container fullHeight className="flex-col">
         <DataChart
-          style={{ height: 150 }}
+          style={{ height: 150, marginTop: '1em' }}
           isLogCharts
           chartType="bar"
           data={barData}
