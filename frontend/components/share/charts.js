@@ -2,7 +2,7 @@ import React, { PropTypes as T } from 'react';
 import moment from 'moment';
 import R from 'ramda';
 import $ from 'jquery';
-import _ from 'lodash';
+import _, { isNumber, isNaN } from 'lodash';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import { Dygraph } from '../../artui/react/dataviz';
@@ -160,16 +160,18 @@ export class DataChart extends React.Component {
       const yname = data.sname[1];
       const annotations = [];
       // Skip the last one to make annotation looks better.
-      for (let i = 0; i < data.sdata.length - 1; ++i) {
+      for (let i = 0; i < data.sdata.length - 1; i += 1) {
         const value = data.sdata[i];
-        const x = moment(value[0]);
-        const wd = x.weekday();
-        annotations.push({
-          series: yname,
-          x: x.valueOf(),
-          shortText: days[wd][0],
-          text: days[wd][1],
-        });
+        if (isNumber(value[1]) && !isNaN(value[1])) {
+          const x = moment(value[0]);
+          const wd = x.weekday();
+          annotations.push({
+            series: yname,
+            x: x.valueOf(),
+            shortText: days[wd][0],
+            text: days[wd][1],
+          });
+        }
       }
 
       return annotations;
