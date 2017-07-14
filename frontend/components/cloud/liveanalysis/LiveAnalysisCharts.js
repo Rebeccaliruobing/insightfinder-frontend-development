@@ -1,6 +1,6 @@
 import React, { PropTypes as T } from 'react';
 import store from 'store';
-import _ from 'lodash';
+import _, { get } from 'lodash';
 import R from 'ramda';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
@@ -110,6 +110,7 @@ class LiveAnalysisCharts extends React.Component {
       metricName,
       startTimestamp,
       detectSuccess,
+      eventsGroupsData,
       ...rest
     } = this.props;
     if (this.latestData !== data && !!data) {
@@ -124,6 +125,13 @@ class LiveAnalysisCharts extends React.Component {
       this.groups = this.dp.groupsData || [];
       this.groupMetrics = this.dp.groupmetrics || null;
 
+      // Add highlight for the groups
+      if (eventsGroupsData) {
+        R.forEach(group => {
+          group.highlights = get(eventsGroupsData, [group.metrics, 'highlights'], []);
+        }, this.groups);
+        console.log(this.groups, eventsGroupsData);
+      }
       this.latestData = data;
     } else {
       // create missing msg

@@ -22,14 +22,16 @@ const ProjectDetails = class extends React.Component {
     this.updateLiveAnalysis();
   }
 
-  convertEventsToSummaryData(eventsData, startTimestamp, endTimestamp) {
+  convertEventsToSummaryAndGroupData(eventsData, startTimestamp, endTimestamp) {
     const groupedEvents = {};
     const groupedAnnos = {};
-    let sdata = [];
+    const sdata = [];
     const highlights = [];
     const annotations = [];
     const startTime = parseInt(startTimestamp, 10);
     const endTime = parseInt(endTimestamp, 10);
+    const metricEvents = {};
+    const eventsGroupsData = {};
 
     // Group the events by timestamp.
     R.forEach(e => {
@@ -37,6 +39,14 @@ const ProjectDetails = class extends React.Component {
         s => Boolean(s.trim()),
         get(e, 'timestampsString', '').split(','),
       );
+
+      // Get the metric names
+      const anomalyMap = get(e, 'anomalyMapJson', {});
+      let metrics = [];
+      R.forEachObjIndexed(val => {
+        metrics = R.concat(metrics, R.keys(val));
+      }, anomalyMap);
+      metrics = R.uniq(metrics);
 
       R.addIndex(R.forEach)((t, idx) => {
         const group = groupedEvents[t] || [];
@@ -49,6 +59,15 @@ const ProjectDetails = class extends React.Component {
           annos.push(e);
           groupedAnnos[t] = annos;
         }
+
+        // Prepare highlights for metrics
+        R.forEach(m => {
+          const metric = metricEvents[m] || {};
+          const highlights = metric[t] || [];
+          highlights.push(e);
+          metric[t] = highlights;
+          metricEvents[m] = metric;
+        }, metrics);
       }, timestamps);
 
       // Use the endtime, add a empty array to indicate it's 0.
@@ -78,7 +97,7 @@ const ProjectDetails = class extends React.Component {
       const ratios = R.map(v => v.anomalyRatio, events);
       const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
 
-      if (maxAnomalyRatio > 0) {
+      if (maxAnomalyRatio >= 0) {
         highlights.push({
           start: timestamp,
           end: timestamp,
@@ -117,9 +136,31 @@ const ProjectDetails = class extends React.Component {
       incidentSummary,
     };
 
-    console.log(summaryData);
+    // Cacl the highlights for metric
+    R.forEachObjIndexed((mevents, m) => {
+      const highlights = [];
+      const mEventsArr = R.sort((a, b) => parseInt(a, 10) - parseInt(b, 10), R.toPairs(mevents));
+      R.forEach(([ts, events]) => {
+        const timestamp = parseInt(ts, 10);
+        // Get the max anomalyRatio for this timestamp
+        const ratios = R.map(v => v.anomalyRatio, events);
+        const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
 
-    return summaryData;
+        if (maxAnomalyRatio >= 0) {
+          highlights.push({
+            start: timestamp,
+            end: timestamp,
+            val: Math.min(10, maxAnomalyRatio),
+          });
+        }
+      }, mEventsArr);
+
+      eventsGroupsData[m] = { highlights };
+    }, metricEvents);
+    return {
+      eventsSummaryData: summaryData,
+      eventsGroupsData,
+    };
   }
 
   updateLiveAnalysis() {
@@ -165,7 +206,7 @@ const ProjectDetails = class extends React.Component {
         true, // disableAnomalies
       )
       .then(resp => {
-        let update = {};
+        const update = {};
         if (resp.success) {
           update.data = resp.data;
 
@@ -184,11 +225,12 @@ const ProjectDetails = class extends React.Component {
               }
 
               const events = resp1[gname] || [];
-              update.eventsSummaryData = this.convertEventsToSummaryData(
-                events,
-                startTimestamp,
-                endTimestamp,
-              );
+              const {
+                eventsSummaryData,
+                eventsGroupsData,
+              } = this.convertEventsToSummaryAndGroupData(events, startTimestamp, endTimestamp);
+              update.eventsSummaryData = eventsSummaryData;
+              update.eventsGroupsData = eventsGroupsData;
               update.loading = false;
               this.setState(update);
             })
@@ -212,7 +254,7 @@ const ProjectDetails = class extends React.Component {
     const { query } = this.props.location;
     const { projectName, pvalue, cvalue, numberOfDays, endTimestamp, modelType } = query;
 
-    let { loading, data, eventsSummaryData } = this.state;
+    let { loading, data, eventsSummaryData, eventsGroupsData } = this.state;
     let debugData = undefined;
     const title =
       modelType === 'DBScan'
@@ -240,7 +282,8 @@ const ProjectDetails = class extends React.Component {
           loading={loading}
           debugData={debugData}
           eventsSummaryData={eventsSummaryData}
-          enablePublish={true}
+          eventsGroupsData={eventsGroupsData}
+          enablePublish
           onRefresh={() => this.updateLiveAnalysis()}
         />
       </Console>
