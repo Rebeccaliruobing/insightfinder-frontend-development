@@ -21,7 +21,7 @@ const getLogKeywords = (credentials: Credentials, projectName: String, params: O
     const rawData = d.data;
     let keywordList = rawData || [];
 
-    keywordList = R.sort((a, b) => a.count - b.count, keywordList);
+    keywordList = R.sort((a, b) => b.count - a.count, keywordList);
     keywordList = R.map(
       k => ({
         ...k,
@@ -34,7 +34,6 @@ const getLogKeywords = (credentials: Credentials, projectName: String, params: O
     const data = {
       keywordList,
     };
-    console.log('[IF] log keywords', rawData, keywordList);
 
     return {
       rawData,

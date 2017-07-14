@@ -59,7 +59,7 @@ const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap, start
   dp.getSummaryData();
   dp.getMetricsData();
 
-  // Append some
+  console.log(startTime);
   const groupsData = dp.groupsData;
   R.forEach(group => {
     const sdata = group.sdata || [];
