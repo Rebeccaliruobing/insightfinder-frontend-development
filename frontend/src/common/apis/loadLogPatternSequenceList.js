@@ -7,7 +7,7 @@
 /* eslint-disable no-console */
 
 import R from 'ramda';
-import { isArray } from 'lodash';
+import { isArray, isObject } from 'lodash';
 
 import type { Credentials } from '../types';
 import getEndpoint from './getEndpoint';
@@ -40,7 +40,7 @@ const loadLogPatternSequenceList = (
         console.error("[IF] Pattern sequence doesn't contains patternInfoList array", seq);
       }
 
-      const patternsInfo = patternInfoList || [];
+      const patternsInfo = R.filter(p => isObject(p), patternInfoList || []);
       const seqNameWords = [];
       let seqKeywords = [];
       const seqPatterns = [];
