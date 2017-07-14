@@ -1003,7 +1003,6 @@ class DataParser {
           }
         });
       });
-      console.log(`[IF] ${grp} sdata from ${sdata[0][0]} ~ ${sdata[sdata.length - 1][0]}`);
       var unit = metricUnitMap[value];
       return {
         id: grp,

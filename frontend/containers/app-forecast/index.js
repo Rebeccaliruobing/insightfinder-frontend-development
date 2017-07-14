@@ -41,9 +41,11 @@ const getSelectedGroup = (value, appGroups) => {
   };
 };
 
-const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
+const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap, startTime) => {
   const dataObj = appObj.appForecastData;
   const appPeriodMap = periodMap[appName] || {};
+  const dateFormat = 'YYYY-MM-DD';
+  const startTimestamp = moment(startTime, dateFormat).startOf('day').valueOf();
 
   const appData = {
     instanceMetricJson: {
@@ -56,6 +58,21 @@ const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap) => {
   const dp = new DataParser(appData);
   dp.getSummaryData();
   dp.getMetricsData();
+
+  // Append some
+  const groupsData = dp.groupsData;
+  R.forEach(group => {
+    const sdata = group.sdata || [];
+    if (sdata.length > 0 && startTimestamp) {
+      const ts = startTimestamp - 1000 * 1;
+      const d = R.clone(sdata[0]);
+      for (let i = 1; i < d.length; i += 1) {
+        d[i] = null;
+      }
+      d[0] = new Date(ts);
+      group.sdata = [d, ...sdata];
+    }
+  }, groupsData);
 
   return {
     appData,
@@ -115,11 +132,14 @@ class AppForecastCore extends Component {
   @autobind()
   handleAppNameSelected(appName) {
     const { appObj, metricUnitMapping, periodMap, selectedMetrics } = this.state;
+    const { location } = this.props;
+    const { startTime } = this.applyDefaultParams(location.query);
     const { appData, appPeriodMap, appGroups } = getSelectedAppData(
       appName,
       appObj,
       metricUnitMapping,
       periodMap,
+      startTime,
     );
     const { names, selectedGroups } = getSelectedGroup(selectedMetrics, appGroups);
 
@@ -219,7 +239,13 @@ class AppForecastCore extends Component {
             appNames = appNames.sort((a, b) => self.sortAppByCPU(a, b));
             if (appNames.length > 0) {
               appName = appNames[0];
-              const d = getSelectedAppData(appName, appObj, metricUnitMapping, periodMap);
+              const d = getSelectedAppData(
+                appName,
+                appObj,
+                metricUnitMapping,
+                periodMap,
+                startTime,
+              );
               data = d.appData;
               thisPeriodMap = d.appPeriodMap;
               appGroups = d.appGroups;

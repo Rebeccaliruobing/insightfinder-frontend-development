@@ -130,8 +130,22 @@ class LiveAnalysisCharts extends React.Component {
         R.forEach(group => {
           group.highlights = get(eventsGroupsData, [group.metrics, 'highlights'], []);
         }, this.groups);
-        console.log(this.groups, eventsGroupsData);
       }
+
+      // Append a start empty data in the groups' data
+      R.forEach(group => {
+        const sdata = group.sdata || [];
+        if (sdata.length > 0 && startTimestamp) {
+          const ts = parseInt(startTimestamp, 10) - 1000 * 1;
+          const d = R.clone(sdata[0]);
+          for (let i = 1; i < d.length; i += 1) {
+            d[i] = null;
+          }
+          d[0] = new Date(ts);
+          group.sdata = [d, ...sdata];
+        }
+      }, this.groups);
+
       this.latestData = data;
     } else {
       // create missing msg

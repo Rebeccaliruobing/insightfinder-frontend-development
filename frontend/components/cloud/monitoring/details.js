@@ -48,6 +48,7 @@ const ProjectDetails = class extends React.Component {
       }, anomalyMap);
       metrics = R.uniq(metrics);
 
+      const lastIndex = timestamps.length - 1;
       R.addIndex(R.forEach)((t, idx) => {
         const group = groupedEvents[t] || [];
         group.push(e);
@@ -68,15 +69,22 @@ const ProjectDetails = class extends React.Component {
           metric[t] = highlights;
           metricEvents[m] = metric;
         }, metrics);
-      }, timestamps);
 
-      // Use the endtime, add a empty array to indicate it's 0.
-      if (isNumber(e.endTimestamp)) {
-        const endKey = e.endTimestamp.toString();
-        if (!groupedEvents[endKey]) {
-          groupedEvents[endKey] = [];
+        // Insert some zero point to make line smooth.
+        if (idx !== lastIndex) {
+          const ts = parseInt(t, 10) - 1000 * 60 * 10; // 1 mins
+          const endKey = ts.toString();
+          if (!groupedEvents[endKey]) {
+            groupedEvents[endKey] = [];
+          }
+        } else {
+          const ts = parseInt(t, 10) + 1000 * 60 * 10; // 1 mins
+          const endKey = ts.toString();
+          if (!groupedEvents[endKey]) {
+            groupedEvents[endKey] = [];
+          }
         }
-      }
+      }, timestamps);
     }, eventsData);
 
     // Convert object to array
@@ -97,14 +105,13 @@ const ProjectDetails = class extends React.Component {
       const ratios = R.map(v => v.anomalyRatio, events);
       const maxAnomalyRatio = R.reduce(R.max, 0, ratios);
 
-      if (maxAnomalyRatio >= 0) {
+      if (maxAnomalyRatio > 0) {
         highlights.push({
           start: timestamp,
           end: timestamp,
           val: Math.min(10, maxAnomalyRatio),
         });
       }
-
       sdata.push([time, maxAnomalyRatio]);
 
       if (annos) {
