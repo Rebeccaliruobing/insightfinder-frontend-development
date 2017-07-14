@@ -74,6 +74,9 @@ class LogFrequencyAnomalies extends React.PureComponent {
   @autobind
   handlePatternClick({ rowData: pattern }) {
     this.reloadPattern(this.props, pattern.nid);
+    this.setState({
+      selectedStartTs: null,
+    });
   }
 
   @autobind
