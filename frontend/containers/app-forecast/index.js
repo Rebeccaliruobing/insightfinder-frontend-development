@@ -59,7 +59,6 @@ const getSelectedAppData = (appName, appObj, metricUnitMapping, periodMap, start
   dp.getSummaryData();
   dp.getMetricsData();
 
-  console.log(startTime);
   const groupsData = dp.groupsData;
   R.forEach(group => {
     const sdata = group.sdata || [];
@@ -254,6 +253,11 @@ class AppForecastCore extends Component {
               selectedMetrics = g.names.join(',');
               store.set(`${projectName}-forecast-metrics`, selectedMetrics);
             }
+            let { chartDateWindow } = this.state;
+            if (chartDateWindow && chartDateWindow.length === 2) {
+              const startTimestamp = moment(startTime, this.dateFormat).startOf('day').valueOf();
+              chartDateWindow = [startTimestamp - 1000, chartDateWindow[1]];
+            }
 
             this.setState(
               {
@@ -269,6 +273,7 @@ class AppForecastCore extends Component {
                 appGroups,
                 selectedGroups,
                 selectedMetrics,
+                chartDateWindow,
                 hideGroupSelector: false,
                 showErrorMsg: false,
               },
