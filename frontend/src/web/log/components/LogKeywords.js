@@ -142,6 +142,7 @@ class LogKeywords extends React.Component {
                   className="flex-item flex-col-container"
                   eventDataset={eventList}
                   showFE
+                  highlightWord={patternInfo.name}
                 />}
             </AutoSizer>
           </Container>

@@ -1,4 +1,4 @@
-import React, { PropTypes as T } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import R from 'ramda';
 import moment from 'moment';
@@ -6,17 +6,20 @@ import { autobind } from 'core-decorators';
 import { InlineEditInput } from '../../ui/inlineedit';
 import EventTable from './event-table';
 
+type Props = {
+  name: String,
+  eventDataset: Array<Object>,
+  keywords: Array<String>,
+  episodes: Array<String>,
+  className: String,
+  onNameChanged: Function,
+  nameEditable: Boolean,
+  showFE: Boolean,
+  highlightWord: ?String,
+};
+
 class EventGroup extends React.Component {
-  static propTypes = {
-    name: T.string,
-    eventDataset: T.array,
-    keywords: T.array,
-    episodes: T.array,
-    className: T.string,
-    onNameChanged: T.func,
-    nameEditable: T.bool,
-    showFE: T.bool,
-  };
+  props: Props;
 
   static defaultProps = {
     name: '',
@@ -27,6 +30,7 @@ class EventGroup extends React.Component {
     episodes: [],
     className: '',
     onNameChanged: () => {},
+    highlightWord: null,
   };
 
   constructor(props) {
@@ -34,7 +38,7 @@ class EventGroup extends React.Component {
 
     this.timeFormat = 'YYYY-MM-DD HH:mm';
     this.state = {
-      highlightWord: null,
+      highlightWord: props.highlightWord,
     };
 
     this.normalizeDataset(props);
@@ -47,7 +51,7 @@ class EventGroup extends React.Component {
     ) {
       this.normalizeDataset(nextProps);
       this.setState({
-        highlightWord: null,
+        highlightWord: nextProps.highlightWord,
       });
     }
   }
