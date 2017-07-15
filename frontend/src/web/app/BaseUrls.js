@@ -16,17 +16,14 @@ const BaseUrls = {
   Metric: '/metric',
   MetricAnalysis: '/metric/analysis',
   MetricEvents: '/metric/events',
+
   MetricAppForecast: '/metric/app-forecast',
   MetricLineCharts: '/metric/line-charts',
 
   Usecase: '/usecase/:system?',
   UsecaseBase: '/usecase',
-
   Log: '/log',
   LogAnalysis: '/log/analysis',
-  // LogAnalysis: '/log/live-analysis/:projectId?/:month?/:incidentId?',
-  LogHistoricalLogAnalysis: '/log/historical-log-analysis/:projectId?/:incidentId?',
-  LogHistoricalLogAnalysisBase: '/log/historical-log-analysis',
 
   Settings: '/settings',
   SettingsProjectList: '/settings/projects',
@@ -34,6 +31,7 @@ const BaseUrls = {
   SettingsProjectWizard: '/settings/project-wizard',
   SettingsExternalServiceList: '/settings/extsvc',
   SettingsSystem: '/settings/system',
+
   LiveMonitoring: '/liveMonitoring',
 
   PagerDutyImg: 'https://pagerduty.com/assets/pd_connect_button.png',

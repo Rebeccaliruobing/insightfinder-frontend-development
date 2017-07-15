@@ -8,25 +8,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { injectIntl } from 'react-intl';
+import R from 'ramda';
 import { autobind } from 'core-decorators';
 
-import { Container, Table, Column, AutoSizer } from '../../../lib/fui/react';
-import { BaseUrls } from '../../app/Constants';
-import { appButtonsMessages } from '../../../common/app/messages';
-import { settingsButtonMessages } from '../../../common/settings/messages';
-import {
-  loadExternalServiceList,
-  removeExternalService,
-  addExternalService,
-} from '../../../common/settings/actions';
-import { State } from '../../../common/types';
+import { Container, Box } from '../../../lib/fui/react';
+import { appMenusMessages, appButtonsMessages } from '../../../common/app/messages';
+import { State, Message } from '../../../common/types';
+import SystemGeneral from './General';
 
 type Props = {
   intl: Object,
-  externalServiceList: Array<Object>,
-  currentLoadingComponents: Object,
-  loadExternalServiceList: Function,
-  removeExternalService: Function,
+  currentErrorMessage: ?Message,
 };
 
 class SystemSettingsCore extends React.Component {
@@ -34,106 +26,69 @@ class SystemSettingsCore extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      showSlackModal: false,
-    };
 
-    const { intl } = props;
-
-    // Column renderer for remove button
-    this.removeRenderer = ({ cellData, rowData }) => {
-      return (
-        <div
-          className={`hover-show ui grey button ${rowData.status === 'removing' ? 'loading' : ''}`}
-          onClick={this.handleExtsvcRemove(cellData)}
-        >
-          {intl.formatMessage(appButtonsMessages.remove)}
-        </div>
-      );
-    };
-  }
-
-  componentDidMount() {
-    this.props.loadExternalServiceList();
+    this.defaultView = 'general';
+    this.viewsInfo = [{ key: 'general', name: 'General', component: SystemGeneral }];
   }
 
   @autobind
-  handleExtsvcRemove(serviceId) {
-    return () => {
-      if (serviceId) {
-        this.props.removeExternalService(serviceId);
-      }
-    };
-  }
-
-  @autobind
-  handleShowSlackModal() {
-    this.setState({
-      showSlackModal: true,
-    });
-  }
-
-  @autobind
-  handleSlackModalClose() {
-    this.setState({
-      showSlackModal: false,
-    });
-  }
+  handleRefreshClick() {}
 
   render() {
-    const { intl, externalServiceList, currentLoadingComponents, addExternalService } = this.props;
-    const { showSlackModal } = this.state;
+    const { intl, currentErrorMessage } = this.props;
+    const hasError = false;
+    const view = 'general';
+    const viewInfo = R.find(v => v.key === view, this.viewsInfo);
+
     return (
-      <Container fullHeight withGutter className="flex-col" style={{ padding: '1em 0' }}>
-        <h3>PagerDuty Settings</h3>
-        <Container>
-          <div className="text">
-            You can manage your alerts with your PagerDuty account. Click the button below to
-            integrate your account alerts with PagerDuty.
+      <Container fullHeight withGutter className="flex-col">
+        <Container breadcrumb>
+          <div className="section">
+            <span className="label">
+              {intl.formatMessage(appMenusMessages.settings)}
+            </span>
+            <span className="divider">/</span>
+            <span>
+              {intl.formatMessage(appMenusMessages.system)}
+            </span>
           </div>
-          <a target="_blank" rel="noopener noreferrer" href={BaseUrls.PagerDutyUrl}>
-            <img alt="PagerDuty" height="40px" src={BaseUrls.PagerDutyImg} />
-          </a>
-          <hr />
-        </Container>
-        <h3>Slack Integration</h3>
-        <Container>
-          <div className="text">
-            Register your Incoming WebHook from Slack to integrate your account alerts with Slack.
+          <div className="section float-right clearfix" style={{ fontSize: 12, marginRight: 0 }}>
+            <div className="ui orange button" tabIndex="0" onClick={this.handleRefreshClick}>
+              {intl.formatMessage(appButtonsMessages.refresh)}
+            </div>
           </div>
-          <img alt="Slack" height="40px" src={BaseUrls.SlackImg} />
-          <br />
-          <div className="ui small positive action button" onClick={this.handleShowSlackModal}>
-            {intl.formatMessage(settingsButtonMessages.addWebHook)}
-          </div>
-          <hr />
         </Container>
-        <h3 style={{ marginBottom: '1em' }}>Currently Registered External Services</h3>
-        <Container fullHeight className="flex-grow">
-          <AutoSizer disableWidth>
-            {({ height }) =>
-              <Table
-                className="with-border"
-                width={1000}
-                height={height}
-                headerHeight={40}
-                rowHeight={40}
-                rowCount={externalServiceList.length}
-                rowGetter={({ index }) => externalServiceList[index]}
-              >
-                <Column width={400} label="Service Type" dataKey="serviceProvider" />
-                <Column width={250} label="Account" dataKey="account" />
-                <Column width={250} label="ServiceKey" dataKey="serviceKey" />
-                <Column
-                  width={100}
-                  label=""
-                  className="text-right"
-                  cellRenderer={this.removeRenderer}
-                  dataKey="id"
-                />
-              </Table>}
-          </AutoSizer>
-        </Container>
+        {hasError &&
+          <Container fullHeight>
+            <div
+              className="ui error message"
+              style={{ marginTop: 16 }}
+              dangerouslySetInnerHTML={{
+                __html: intl.formatMessage(currentErrorMessage, {}),
+              }}
+            />
+          </Container>}
+        {!hasError &&
+          <Container
+            fullHeight
+            className="overflow-y-auto"
+            style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}
+          >
+            <Box className="flex-col" style={{ height: '100%', paddingTop: 0 }}>
+              <div className="ui pointing secondary menu">
+                {R.map(
+                  info =>
+                    <a key={info.key} className={`${info.key === view ? 'active' : ''} item`}>
+                      {info.name}
+                    </a>,
+                  this.viewsInfo,
+                )}
+              </div>
+              <div className="flex-grow" style={{ overflow: 'hidden' }}>
+                {viewInfo && React.createElement(viewInfo.component, { intl })}
+              </div>
+            </Box>
+          </Container>}
       </Container>
     );
   }
@@ -141,11 +96,7 @@ class SystemSettingsCore extends React.Component {
 
 const SystemSettings = injectIntl(SystemSettingsCore);
 
-export default connect(
-  (state: State) => {
-    const { externalServiceList } = state.settings;
-    const { currentLoadingComponents } = state.app;
-    return { externalServiceList, currentLoadingComponents };
-  },
-  { loadExternalServiceList, removeExternalService, addExternalService },
-)(SystemSettings);
+export default connect((state: State) => {
+  const { currentErrorMessage } = state.settings;
+  return { currentErrorMessage };
+}, {})(SystemSettings);

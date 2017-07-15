@@ -35,6 +35,10 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Settings',
     id: 'app.menus.settings',
   },
+  system: {
+    defaultMessage: 'System',
+    id: 'app.menus.system',
+  },
   issues: {
     defaultMessage: 'Issues',
     id: 'app.menus.issues',

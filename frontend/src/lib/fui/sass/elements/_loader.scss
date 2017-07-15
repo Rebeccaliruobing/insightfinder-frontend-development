@@ -4,10 +4,10 @@
 .fui.loader {
   @keyframes round-animate {
     0% {
-      transform: rotate(0)
+      transform: rotate(0);
     }
     100% {
-      transform: rotate(360deg)
+      transform: rotate(360deg);
     }
   }
   position: absolute;
@@ -16,7 +16,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1090;
+  z-index: 3090;
   > .content {
     position: relative;
     display: flex;
@@ -49,7 +49,7 @@
   }
   &.full-screen {
     position: fixed;
-    z-index: 2000;
+    z-index: 3000;
   }
   &.hidden {
     display: none;

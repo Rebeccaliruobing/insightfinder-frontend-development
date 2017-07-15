@@ -54,17 +54,13 @@ const SinglePageCore = ({
           <NavLink to={BaseUrls.Metric} className="item">
             {intl.formatMessage(appMenusMessages.metricAnalysis)}
           </NavLink>
-          <NavLink
-            to={BaseUrls.Log}
-            className="item"
-            isActive={isActiveIgnoreUrls(BaseUrls.LogHistoricalLogAnalysisBase)}
-          >
+          <NavLink to={BaseUrls.Log} className="item">
             {intl.formatMessage(appMenusMessages.logAnalysis)}
           </NavLink>
           <NavLink to={BaseUrls.UsecaseBase} className="item">
             {intl.formatMessage(appMenusMessages.issues)}
           </NavLink>
-          <NavLink to={BaseUrls.SettingsProjectList} className="item">
+          <NavLink to={BaseUrls.Settings} className="item">
             {intl.formatMessage(appMenusMessages.settings)}
           </NavLink>
           <NavLink to={BaseUrls.Help} className="item">

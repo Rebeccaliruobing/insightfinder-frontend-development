@@ -16,7 +16,7 @@ import { push } from 'react-router-redux';
 import { NavLink } from 'react-router-dom';
 import DatePicker from 'react-datepicker';
 
-import { State } from '../../../common/types';
+import { State, Message } from '../../../common/types';
 import { Container, Box, Select } from '../../../lib/fui/react';
 import { BaseUrls } from '../../app/Constants';
 import {

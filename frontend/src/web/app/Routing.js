@@ -22,6 +22,7 @@ import {
   ProjectWizard,
   SettingsProjectList,
   ExternalServiceList,
+  SystemSettings,
 } from '../settings';
 
 // TODO: v1 components needs upgrade
@@ -99,6 +100,8 @@ const SettingsRoutings = () => {
         <Route path={BaseUrls.SettingsExternalServiceList} exact component={ExternalServiceList} />
         <Route path={BaseUrls.SettingsProject} exact component={ProjectSettings} />
         <Route path={BaseUrls.SettingsProjectWizard} exact component={ProjectWizard} />
+        <Route path={BaseUrls.SettingsSystem} exact component={SystemSettings} />
+        <Redirect from="*" to={BaseUrls.SettingsProjectList} />
       </Switch>
     </SinglePage>
   );
