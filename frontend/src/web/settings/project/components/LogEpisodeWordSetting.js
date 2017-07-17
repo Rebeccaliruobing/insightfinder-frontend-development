@@ -30,14 +30,13 @@ class LogEpisodeWordSetting extends React.PureComponent {
     this.episodesStateKey = 'episodes';
     this.submitLoadingKey = 'settings_episodeword_submit';
 
-    this.checkboxCellRender = ({ dataKey, rowData, cellData }) => (
+    this.checkboxCellRender = ({ dataKey, rowData, cellData }) =>
       <input
         className="fui input"
         type="checkbox"
         checked={cellData || false}
         onChange={this.handleInputChanged(rowData, dataKey)}
-      />
-    );
+      />;
 
     const words = get(this.props, ['data', this.wordsStateKey], []);
     const episodes = get(this.props, ['data', this.episodesStateKey], []);
@@ -73,8 +72,9 @@ class LogEpisodeWordSetting extends React.PureComponent {
     }
   }
 
-  @autobind handleInputChanged(rowData, dataKey) {
-    return (e) => {
+  @autobind
+  handleInputChanged(rowData, dataKey) {
+    return e => {
       const target = e.target;
       const newVal = target.type === 'checkbox' ? target.checked : target.value || '';
 
@@ -85,11 +85,13 @@ class LogEpisodeWordSetting extends React.PureComponent {
     };
   }
 
-  @autobind selectTab(e, name) {
+  @autobind
+  selectTab(e, name) {
     this.setState({ currentTab: name });
   }
 
-  @autobind handleSaveClick() {
+  @autobind
+  handleSaveClick() {
     const { saveProjectSettings, projectName } = this.props;
     const wordsIds = R.map(
       m => parseInt(m.index.trim(), 10),
@@ -100,22 +102,27 @@ class LogEpisodeWordSetting extends React.PureComponent {
       R.filter(e => e.selected, this.localEpisodes),
     );
 
-    const episodewordIndices = R.concat(wordsIds, episodesIds);
-    saveProjectSettings(projectName, { episodewordIndices }, { [this.submitLoadingKey]: true });
+    saveProjectSettings(
+      projectName,
+      { interestingWordIndicies: wordsIds, interestingEpisodeIndicies: episodesIds },
+      { [this.submitLoadingKey]: true },
+    );
   }
 
-  @autobind handleWordsAllChecked(e) {
+  @autobind
+  handleWordsAllChecked(e) {
     const checked = e.target.checked;
 
-    R.forEach((m) => {
+    R.forEach(m => {
       m.selected = checked;
     }, this.localWords);
     this.setState({ isAllWords: checked });
   }
-  @autobind handleEpisodesAllChecked(e) {
+  @autobind
+  handleEpisodesAllChecked(e) {
     const checked = e.target.checked;
 
-    R.forEach((m) => {
+    R.forEach(m => {
       m.selected = checked;
     }, this.localEpisodes);
     this.setState({ isAllEpisodes: checked });
@@ -169,7 +176,9 @@ class LogEpisodeWordSetting extends React.PureComponent {
         >
           <div className="field" style={{ textAlign: 'right', marginBottom: 0 }}>
             <div
-              className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError ? 'disabled' : ''} blue`}
+              className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError
+                ? 'disabled'
+                : ''} blue`}
               style={{ width: 180 }}
               {...(isSubmitting || hasError ? {} : { onClick: this.handleSaveClick })}
             >
@@ -192,7 +201,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
           </div>
           <Container className="flex-grow field" style={showWords ? {} : { display: 'none' }}>
             <AutoSizer>
-              {({ width, height }) => (
+              {({ width, height }) =>
                 <Table
                   className="with-border"
                   width={width}
@@ -201,7 +210,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
                   rowHeight={40}
                   rowCount={words.length}
                   rowGetter={({ index }) => words[index]}
-                  ref={(c) => {
+                  ref={c => {
                     this.tableWords = c;
                   }}
                 >
@@ -228,13 +237,12 @@ class LogEpisodeWordSetting extends React.PureComponent {
                     headerRenderer={checkAllWordsHeaderRender}
                     cellRenderer={this.checkboxCellRender}
                   />
-                </Table>
-              )}
+                </Table>}
             </AutoSizer>
           </Container>
           <Container className="flex-grow field" style={showEpisodes ? {} : { display: 'none' }}>
             <AutoSizer>
-              {({ width, height }) => (
+              {({ width, height }) =>
                 <Table
                   className="with-border"
                   width={width}
@@ -243,7 +251,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
                   rowHeight={40}
                   rowCount={episodes.length}
                   rowGetter={({ index }) => episodes[index]}
-                  ref={(c) => {
+                  ref={c => {
                     this.tableEpisodes = c;
                   }}
                 >
@@ -270,8 +278,7 @@ class LogEpisodeWordSetting extends React.PureComponent {
                     headerRenderer={checkAllEpisodesHeaderRender}
                     cellRenderer={this.checkboxCellRender}
                   />
-                </Table>
-              )}
+                </Table>}
             </AutoSizer>
           </Container>
         </form>
