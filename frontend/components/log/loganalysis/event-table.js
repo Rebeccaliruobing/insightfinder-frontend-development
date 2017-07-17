@@ -24,16 +24,18 @@ const EventTable = ({ highlightWord, eventDataset, ...props }) => {
           </tr>
         </thead>
         <tbody>
-          {ds.map((event, idx) => (
+          {ds.map((event, idx) =>
             <tr key={idx}>
-              <td>{event.datetime}</td>
+              <td>
+                {event.datetime}
+              </td>
               <td
                 dangerouslySetInnerHTML={{
                   __html: highlightContent(event.rawData, highlightWord),
                 }}
               />
-            </tr>
-          ))}
+            </tr>,
+          )}
         </tbody>
       </table>
     </div>

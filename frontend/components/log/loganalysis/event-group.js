@@ -90,7 +90,7 @@ class EventGroup extends React.Component {
   render() {
     const { name, className, nameEditable, keywords, episodes, showFE, ...others } = this.props;
     const normalizedEvents = this.normalizedEvents;
-    const props = _.omit(others, 'onNameChanged', 'eventDataset');
+    const props = _.omit(others, 'onNameChanged', 'eventDataset', 'highlightWord');
     const { highlightWord } = this.state;
     const count = normalizedEvents.length;
     const timeRange =

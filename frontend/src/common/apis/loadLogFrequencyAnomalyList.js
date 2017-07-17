@@ -75,7 +75,7 @@ const loadLogFrequencyAnomalyList = (
       const freqs = toIntArray(get(freqVectorObj, `Pattern ${nid}`, '').split(','));
       if (freqs.length !== freqTimestamps.length) {
         console.error(
-          `[IF] ${patternName} freqVectorObj not match timestamp`,
+          `[IF] nid:${nid};${name} freqVectorObj not match timestamp`,
           freqs,
           freqTimestamps,
         );
