@@ -15,11 +15,12 @@ import {
   newCustomProject,
   newDataDogProject,
   newGoogleProject,
+  newNewRelicProject,
 } from '../../apis';
 import { apiEpicErrorHandle } from '../../errors';
 
 const createProjectEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('CREATE_PROJECT').concatMap((action) => {
+  action$.ofType('CREATE_PROJECT').concatMap(action => {
     const state = getState();
 
     const { credentials } = state.auth;
@@ -35,6 +36,8 @@ const createProjectEpic = (action$: any, { getState }: Deps) =>
       api = newDataDogProject(credentials, projectName, params);
     } else if (projectType === 'Google') {
       api = newGoogleProject(credentials, projectName, params);
+    } else if (projectType === 'NewRelic') {
+      api = newNewRelicProject(credentials, projectName, params);
     }
 
     return Observable.from(api)
@@ -44,7 +47,7 @@ const createProjectEpic = (action$: any, { getState }: Deps) =>
           Observable.of(setProjectCreationStatus('success')),
         );
       })
-      .catch((err) => {
+      .catch(err => {
         return Observable.concat(
           Observable.of(loadProjectList()),
           apiEpicErrorHandle(err),

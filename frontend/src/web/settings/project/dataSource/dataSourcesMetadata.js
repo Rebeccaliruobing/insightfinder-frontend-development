@@ -1,6 +1,7 @@
 import AWSCloudWatchSetting from './AWSCloudWatchSetting';
 import InsightAgentSetting from './InsightAgentSetting';
 import DataDogSetting from './DataDogSetting';
+import NewRelicSetting from './NewRelicSetting';
 
 import { projectWizardMessages } from '../../../../common/settings/messages';
 // import cAdvisorSetting from './cAdvisorSetting';
@@ -14,6 +15,7 @@ const dataSourcesMetadata = [
   ['Insight Agent', projectWizardMessages.InsightAgentIntro, '*,,', InsightAgentSetting, false],
   ['AWS CloudWatch', projectWizardMessages.AWSCloudWatchIntro, '*,,', AWSCloudWatchSetting, false],
   ['DataDog', projectWizardMessages.PublicDataDogIntro, '*,,', DataDogSetting, false],
+  ['New Relic', projectWizardMessages.PublicNewRelicIntro, '*,,', NewRelicSetting, false],
   /*
   [
     'Google Cloud Monitoring',
