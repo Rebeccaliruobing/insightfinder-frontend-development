@@ -17,6 +17,7 @@ import apis from '../../apis';
 import './incident.less';
 import thumbupImg from '../../images/green-thumbup.png';
 import WindowResizeListener from '../ui/window-resize-listener';
+import { buildUrl } from '../../src/common/utils';
 
 const defaultSortColumn = 'id';
 const defaultSortDirection = 'desc';
@@ -501,6 +502,36 @@ class IncidentsList extends React.Component {
     });
   }
 
+  @autobind
+  rerunDetection(e) {
+    e.stopPropagation();
+    const {
+      projectName,
+      projectType,
+      credentials,
+      instanceGroup,
+      eventEndTime,
+      numberOfDays,
+    } = this.props;
+    const { userName, token } = credentials;
+    const startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
+
+    const url = buildUrl(
+      '/cron/detect',
+      {},
+      {
+        userName,
+        token,
+        projectName,
+        projectType,
+        instanceGroup,
+        asofTimestamp: startTime.valueOf(),
+        windowMillis: numberOfDays * 24 * 60 * 1000,
+      },
+    );
+    window.open(url, '_blank');
+  }
+
   showInstanceChart() {
     const {
       projectName,
@@ -556,10 +587,18 @@ class IncidentsList extends React.Component {
           >
             Causal Analysis
           </Button>
-          {['admin', 'guest'].indexOf(store.get('userName')) != -1 &&
+          {['admin', 'guest'].indexOf(store.get('userName')) !== -1 &&
             <Button
               className="orange"
               style={{ position: 'absolute', left: 450, top: 5 }}
+              onClick={this.rerunDetection}
+            >
+              Rerun Detection
+            </Button>}
+          {['admin', 'guest'].indexOf(store.get('userName')) !== -1 &&
+            <Button
+              className="orange"
+              style={{ position: 'absolute', left: 580, top: 5 }}
               title="Overall Chart"
               onClick={e => {
                 e.stopPropagation();

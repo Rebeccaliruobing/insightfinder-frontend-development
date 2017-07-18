@@ -24,6 +24,7 @@ import { buildTreemap } from '../../apis/retrieve-liveanalysis';
 
 type Props = {
   projects: Array<Object>,
+  credentials: Object,
   hideAppLoader: Function,
   router: Object,
   location: Object,
@@ -518,7 +519,7 @@ class EventSummaryCore extends React.Component {
   }
 
   render() {
-    const { location } = this.props;
+    const { location, credentials } = this.props;
     const params = this.applyDefaultParams(location.query);
     const { modelType, eventStartTimestamp } = params;
     const predicted = params.predicted === 'true';
@@ -657,6 +658,7 @@ class EventSummaryCore extends React.Component {
                   <IncidentsList
                     projectName={projectName}
                     projectType={projectType}
+                    credentials={credentials}
                     instanceGroup={instanceGroup}
                     eventEndTime={eventEndTime}
                     endTime={realEndTime}
@@ -742,8 +744,10 @@ const EventSummary = withRouter(EventSummaryCore);
 
 export default connect(
   (state: State) => {
+    const { credentials } = state.auth;
     return {
       projects: R.filter(p => p.isMetric, state.app.projects),
+      credentials,
     };
   },
   { hideAppLoader },
