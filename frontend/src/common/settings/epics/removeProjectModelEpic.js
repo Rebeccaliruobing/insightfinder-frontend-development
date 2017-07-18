@@ -19,7 +19,7 @@ import { settingsMessages } from '../messages';
 import { loadProjectSettings } from '../actions';
 
 const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('REMOVE_PROJECT_MODEL').concatMap((action) => {
+  action$.ofType('REMOVE_PROJECT_MODEL').concatMap(action => {
     const dateFormat = 'YYYY-MM-DD';
 
     const state = getState();
@@ -39,7 +39,7 @@ const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
     const modelKeyObj = { startTimestamp, endTimestamp, modelKey };
 
     const apiAction$ = Observable.from(
-      removeProjectModel(
+      deleteProjectModel(
         credentials,
         projectName,
         {
@@ -56,7 +56,7 @@ const removeProjectModelEpic = (action$: any, { getState }: Deps) =>
           Observable.of(loadProjectSettings(projectName, params, true)),
         );
       })
-      .catch((err) => {
+      .catch(err => {
         return apiEpicErrorHandle(err);
       });
 
