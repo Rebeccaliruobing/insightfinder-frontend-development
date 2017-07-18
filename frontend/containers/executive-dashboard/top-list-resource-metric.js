@@ -194,7 +194,6 @@ class TopListResource extends React.Component {
             </thead>
             <tbody style={tbodyStyle}>
               {stats.map(data => {
-                console.log(data);
                 const { groups } = data;
                 const name = data.name;
                 const expanded = _.indexOf(expandedProjects, name) >= 0;
