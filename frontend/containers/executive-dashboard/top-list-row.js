@@ -14,10 +14,20 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
       } else if (fractionDigits === 2) {
         fractionDigits = 0;
       }
-      return (<span className={className}><b>{val.toFixed(fractionDigits).toString()}</b></span>);
+      return (
+        <span className={className}>
+          <b>
+            {val.toFixed(fractionDigits).toString()}
+          </b>
+        </span>
+      );
     }
     fractionDigits = 0;
-    return (<span className={className}>{val.toFixed(fractionDigits).toString()}</span>);
+    return (
+      <span className={className}>
+        {val.toFixed(fractionDigits).toString()}
+      </span>
+    );
   }
   return <span className={className}>-</span>;
 };
@@ -52,10 +62,17 @@ const getArrowStyles = (left, right, reverseColor = false, reverseDirection = fa
   return { visibility: 'hidden' };
 };
 
-
 const ListRow = ({
-  name, data, onRowClick, onNameClick, onActionClick, style,
-  type, isProject = false, expanded = true }) => {
+  name,
+  data,
+  onRowClick,
+  onNameClick,
+  onActionClick,
+  style,
+  type,
+  isProject = false,
+  expanded = true,
+}) => {
   const { stats, color } = data;
   const projectStyle = isProject ? { fontWeight: 'bold' } : {};
   return (
@@ -71,164 +88,182 @@ const ListRow = ({
         {isProject && expanded && <i className="angle down icon" />}
         {isProject && !expanded && <i className="angle right icon" />}
         {!isProject &&
-          <OverlayTrigger placement="right" delayShow={300} overlay={<Tooltip>Click for details</Tooltip>}>
+          <OverlayTrigger
+            placement="right"
+            delayShow={300}
+            overlay={<Tooltip>Click for details</Tooltip>}
+          >
             <i onClick={onNameClick} className="link external icon" />
-          </OverlayTrigger>
-        }
-        {false && !isProject && type === 'anomaly' &&
+          </OverlayTrigger>}
+        {false &&
+          !isProject &&
+          type === 'anomaly' &&
           <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>Causal Graph</Tooltip>}>
             <i className="random icon" onClick={onActionClick} />
-          </OverlayTrigger>
-        }
+          </OverlayTrigger>}
 
-        <OverlayTrigger placement="top" delayShow={300} overlay={<Tooltip>{name}</Tooltip>}>
-          <span className="name" style={projectStyle}>{name}</span>
+        <OverlayTrigger
+          placement="top"
+          delayShow={300}
+          overlay={
+            <Tooltip>
+              {name}
+            </Tooltip>
+          }
+        >
+          <span className="name" style={projectStyle}>
+            {name}
+          </span>
         </OverlayTrigger>
       </td>
 
       {type === 'anomaly' &&
-        <td className="number">{normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'), 2)}</td>
-      }
-      {type === 'anomaly' && <td className="number current">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'previous.avgDailyAnomalyScore'),
-              _.get(stats, 'current.avgDailyAnomalyScore'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 2, false)}
-        </div>
-      </td>}
-      {type === 'anomaly' && <td className="number predicted">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'current.avgDailyAnomalyScore'),
-              _.get(stats, 'predicted.avgDailyAnomalyScore'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'), 2)}
-        </div>
-      </td>}
-
-      {type === 'anomaly' &&
-        <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}</td>
-      }
-      {type === 'anomaly' && <td className="number current">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'previous.totalAnomalyDuration'),
-              _.get(stats, 'current.totalAnomalyDuration'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), false)}
-        </div>
-      </td>}
-      {type === 'anomaly' && <td className="number predicted">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'current.totalAnomalyDuration'),
-              _.get(stats, 'predicted.totalAnomalyDuration'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}
-        </div>
-      </td>}
-
-      {type === 'anomaly' &&
-        <td className="number">{normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}
+        <td className="number">
+          {normalizeValue(_.get(stats, 'previous.avgDailyAnomalyScore'), 2)}
         </td>}
-      {type === 'anomaly' && <td className="number current">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'previous.totalAnomalyEventCount'),
-              _.get(stats, 'current.totalAnomalyEventCount'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), false)}
-        </div>
-      </td>}
-      {type === 'anomaly' && <td className="number predicted">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'current.totalAnomalyEventCount'),
-              _.get(stats, 'predicted.totalAnomalyEventCount'),
-            )}
-          />
-          {normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}
-        </div>
-      </td>}
+      {type === 'anomaly' &&
+        <td className="number current">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'previous.avgDailyAnomalyScore'),
+                _.get(stats, 'current.avgDailyAnomalyScore'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'current.avgDailyAnomalyScore'), 2, false)}
+          </div>
+        </td>}
+      {type === 'anomaly' &&
+        <td className="number predicted">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'current.avgDailyAnomalyScore'),
+                _.get(stats, 'predicted.avgDailyAnomalyScore'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'predicted.avgDailyAnomalyScore'), 2)}
+          </div>
+        </td>}
+
+      {type === 'anomaly' &&
+        <td className="number">
+          {normalizeValue(_.get(stats, 'previous.totalAnomalyDuration'))}
+        </td>}
+      {type === 'anomaly' &&
+        <td className="number current">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'previous.totalAnomalyDuration'),
+                _.get(stats, 'current.totalAnomalyDuration'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'current.totalAnomalyDuration'), false)}
+          </div>
+        </td>}
+      {type === 'anomaly' &&
+        <td className="number predicted">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'current.totalAnomalyDuration'),
+                _.get(stats, 'predicted.totalAnomalyDuration'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'predicted.totalAnomalyDuration'))}
+          </div>
+        </td>}
+
+      {type === 'anomaly' &&
+        <td className="number">
+          {normalizeValue(_.get(stats, 'previous.totalAnomalyEventCount'))}
+        </td>}
+      {type === 'anomaly' &&
+        <td className="number current">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'previous.totalAnomalyEventCount'),
+                _.get(stats, 'current.totalAnomalyEventCount'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'current.totalAnomalyEventCount'), false)}
+          </div>
+        </td>}
+      {type === 'anomaly' &&
+        <td className="number predicted">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'current.totalAnomalyEventCount'),
+                _.get(stats, 'predicted.totalAnomalyEventCount'),
+              )}
+            />
+            {normalizeValue(_.get(stats, 'predicted.totalAnomalyEventCount'))}
+          </div>
+        </td>}
 
       {type === 'resource' &&
-        <td className="number">{normalizeValue(_.get(stats, 'previous.AvgCPUUtilization'), 1)}</td>
-      }
-      {type === 'resource' && <td className="number current">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'previous.AvgCPUUtilization'),
-              _.get(stats, 'current.AvgCPUUtilization'),
-              true,
-            )}
-          />
-          {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
-        </div>
-      </td>}
-      {type === 'resource' && <td className="number predicted">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'current.AvgCPUUtilization'),
-              _.get(stats, 'predicted.AvgCPUUtilization'),
-              true,
-            )}
-          />
-          {normalizeValue(_.get(stats, 'predicted.AvgCPUUtilization'), 1)}
-        </div>
-      </td>}
-
+        <td className="number current">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'previous.AvgCPUUtilization'),
+                _.get(stats, 'current.AvgCPUUtilization'),
+                true,
+              )}
+            />
+            {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
+          </div>
+        </td>}
       {type === 'resource' &&
-        <td className="number">{normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}</td>
-      }
-      {type === 'resource' && <td className="number current">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'previous.AvgInstanceUptime'),
-              _.get(stats, 'current.AvgInstanceUptime'),
-              true,
-            )}
-          />
-          {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
-        </div>
-      </td>}
-      {type === 'resource' && <td className="number predicted">
-        <div>
-          <i
-            className="long arrow right icon"
-            style={getArrowStyles(
-              _.get(stats, 'current.AvgInstanceUptime'),
-              _.get(stats, 'predicted.AvgInstanceUptime'),
-              true,
-            )}
-          />
-          {normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}
-        </div>
-      </td>}
+        <td className="number">
+          {normalizeValue(_.get(stats, 'predicted.targetInstances50'), 1)}
+        </td>}
+      {type === 'resource' &&
+        <td className="number">
+          {normalizeValue(_.get(stats, 'predicted.targetInstances80'), 1)}
+        </td>}
+      {type === 'resource' &&
+        <td className="number">
+          {normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}
+        </td>}
+      {type === 'resource' &&
+        <td className="number current">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'previous.AvgInstanceUptime'),
+                _.get(stats, 'current.AvgInstanceUptime'),
+                true,
+              )}
+            />
+            {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
+          </div>
+        </td>}
+      {type === 'resource' &&
+        <td className="number predicted">
+          <div>
+            <i
+              className="long arrow right icon"
+              style={getArrowStyles(
+                _.get(stats, 'current.AvgInstanceUptime'),
+                _.get(stats, 'predicted.AvgInstanceUptime'),
+                true,
+              )}
+            />
+            {normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}
+          </div>
+        </td>}
     </tr>
   );
 };

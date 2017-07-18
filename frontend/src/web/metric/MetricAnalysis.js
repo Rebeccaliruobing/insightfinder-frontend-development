@@ -387,7 +387,7 @@ class MetricAnalysisCore extends React.PureComponent {
                 style={{ borderRadius: 0, margin: 0 }}
                 onClick={this.handleViewChange('resource')}
               >
-                Resource View
+                Capacity Planning
               </div>
             </div>
           </div>}

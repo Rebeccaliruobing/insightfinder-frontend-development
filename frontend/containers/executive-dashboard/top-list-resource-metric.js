@@ -39,8 +39,9 @@ class TopListResource extends React.Component {
     });
   }
 
-  @autobind toggleProjectRow(name) {
-    return (e) => {
+  @autobind
+  toggleProjectRow(name) {
+    return e => {
       e.stopPropagation();
       e.preventDefault();
 
@@ -56,15 +57,17 @@ class TopListResource extends React.Component {
     };
   }
 
-  @autobind handleNameClick(projectName, groupName) {
-    return (e) => {
+  @autobind
+  handleNameClick(projectName, groupName) {
+    return e => {
       e.stopPropagation();
       e.preventDefault();
       this.props.onRowOpen(projectName, groupName);
     };
   }
 
-  @autobind handleExpandMore(projectName, type) {
+  @autobind
+  handleExpandMore(projectName, type) {
     return () => {
       const { expandedItemIndices } = this.state;
       const index = expandedItemIndices[projectName] || 0;
@@ -139,8 +142,12 @@ class TopListResource extends React.Component {
                 >
                   Project/Group Name
                 </th>
-                <th className="subheader" colSpan={3}>CPU Utilization (%)</th>
-                <th className="subheader" colSpan={3}>Availability (%)</th>
+                <th className="subheader" colSpan={3}>
+                  CPU Utilization (%)
+                </th>
+                <th className="subheader" colSpan={3}>
+                  Availability (%)
+                </th>
               </tr>
               <tr>
                 <th
@@ -152,33 +159,42 @@ class TopListResource extends React.Component {
                   }}
                 />
                 <th>
+                  <span>Current</span>
+                  <span className="interval">
+                    {timeIntervalCurrent}
+                  </span>
+                </th>
+                <th>
+                  <span>Target Instance Number</span>
+                  <span className="interval">(50% CPU Utilization)</span>
+                </th>
+                <th>
+                  <span>Target Instance Number</span>
+                  <span className="interval">(80% CPU Utilization)</span>
+                </th>
+                <th>
                   <span>Previous</span>
-                  <span className="interval">{timeIntervalPrevious}</span>
+                  <span className="interval">
+                    {timeIntervalPrevious}
+                  </span>
                 </th>
                 <th>
                   <span>Current</span>
-                  <span className="interval">{timeIntervalCurrent}</span>
+                  <span className="interval">
+                    {timeIntervalCurrent}
+                  </span>
                 </th>
                 <th>
                   <span>Predicted</span>
-                  <span className="interval">{timeIntervalPredicted}</span>
-                </th>
-                <th>
-                  <span>Previous</span>
-                  <span className="interval">{timeIntervalPrevious}</span>
-                </th>
-                <th>
-                  <span>Current</span>
-                  <span className="interval">{timeIntervalCurrent}</span>
-                </th>
-                <th>
-                  <span>Predicted</span>
-                  <span className="interval">{timeIntervalPredicted}</span>
+                  <span className="interval">
+                    {timeIntervalPredicted}
+                  </span>
                 </th>
               </tr>
             </thead>
             <tbody style={tbodyStyle}>
-              {stats.map((data) => {
+              {stats.map(data => {
+                console.log(data);
                 const { groups } = data;
                 const name = data.name;
                 const expanded = _.indexOf(expandedProjects, name) >= 0;
@@ -207,9 +223,10 @@ class TopListResource extends React.Component {
                   filteredGroups = groups.slice(expandedIndex, Math.min(groups.length, lastIndex));
                 }
 
-                filteredGroups.every((group) => {
+                filteredGroups.every(group => {
                   const numberOfInstances = _.get(group.stats, 'current.NumberOfInstances');
                   const numberOfMetrics = _.get(group.stats, 'current.NumberOfMetrics');
+
                   let title = group.name;
                   let suffix = '';
                   if (numberOfInstances !== undefined) {
