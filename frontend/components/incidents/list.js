@@ -514,6 +514,7 @@ class IncidentsList extends React.Component {
       instanceGroup,
       eventEndTime,
       numberOfDays,
+      modelType,
     } = this.props;
     const { userName, token } = credentials;
     const startTime = moment(eventEndTime).add(-1 * numberOfDays, 'day');
@@ -526,7 +527,7 @@ class IncidentsList extends React.Component {
         token,
         projectName,
         projectType,
-        modelType: 'Holistic',
+        modelType,
         instanceGroup,
         asofTimestamp: startTime.valueOf(),
         windowMillis: numberOfDays * 24 * 60 * 1000,
