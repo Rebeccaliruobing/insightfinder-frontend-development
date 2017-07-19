@@ -8,6 +8,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import R from 'ramda';
 import { autobind } from 'core-decorators';
+import { Tooltip } from 'pui-react-tooltip';
+import { OverlayTrigger } from 'pui-react-overlay-trigger';
 import { Button } from '../../artui/react';
 import { EventTypes, getEventType, createEventShape, calculateRGBByAnomaly } from '../utils';
 import TakeActionModal from './takeActionModal';
@@ -578,7 +580,7 @@ class IncidentsList extends React.Component {
         <div style={{ marginBottom: 4, position: 'relative' }}>
           <Button
             className="orange"
-            style={{ position: 'absolute', left: 320, top: 5 }}
+            style={{ position: 'absolute', left: 300, top: 5 }}
             title="Causal Analysis"
             onClick={e => {
               e.stopPropagation();
@@ -588,17 +590,23 @@ class IncidentsList extends React.Component {
             Causal Analysis
           </Button>
           {['admin', 'guest'].indexOf(store.get('userName')) !== -1 &&
-            <Button
-              className="orange"
-              style={{ position: 'absolute', left: 450, top: 5 }}
-              onClick={this.rerunDetection}
+            <OverlayTrigger
+              placement="top"
+              delayShow={300}
+              overlay={<Tooltip>Rerun Detection</Tooltip>}
             >
-              Rerun Detection
-            </Button>}
+              <Button
+                className="orange"
+                style={{ position: 'absolute', left: 420, top: 5 }}
+                onClick={this.rerunDetection}
+              >
+                <i className="repeat icon" style={{ marginRight: 0 }} />
+              </Button>
+            </OverlayTrigger>}
           {['admin', 'guest'].indexOf(store.get('userName')) !== -1 &&
             <Button
               className="orange"
-              style={{ position: 'absolute', left: 580, top: 5 }}
+              style={{ position: 'absolute', left: 470, top: 5 }}
               title="Overall Chart"
               onClick={e => {
                 e.stopPropagation();
