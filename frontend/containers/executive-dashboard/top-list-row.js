@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Tooltip } from 'pui-react-tooltip';
 import { OverlayTrigger } from 'pui-react-overlay-trigger';
 
-const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
+const normalizeValue = (val, fractionDigits = 0, needTotal = true, appendix = '') => {
   const className = needTotal ? 'total' : '';
   if (_.isFinite(val)) {
     if (val > 0) {
@@ -18,6 +18,7 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
         <span className={className}>
           <b>
             {val.toFixed(fractionDigits).toString()}
+            {appendix}
           </b>
         </span>
       );
@@ -26,6 +27,7 @@ const normalizeValue = (val, fractionDigits = 0, needTotal = true) => {
     return (
       <span className={className}>
         {val.toFixed(fractionDigits).toString()}
+        {appendix}
       </span>
     );
   }
@@ -212,57 +214,62 @@ const ListRow = ({
 
       {type === 'resource' &&
         <td className="number current">
-          <div>
-            <i
-              className="long arrow right icon"
-              style={getArrowStyles(
-                _.get(stats, 'previous.AvgCPUUtilization'),
-                _.get(stats, 'current.AvgCPUUtilization'),
-                true,
-              )}
-            />
-            {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false)}
-          </div>
+          {!isProject &&
+            <div>
+              <i
+                className="long arrow right icon"
+                style={getArrowStyles(
+                  _.get(stats, 'previous.AvgCPUUtilization'),
+                  _.get(stats, 'current.AvgCPUUtilization'),
+                  true,
+                )}
+              />
+              {normalizeValue(_.get(stats, 'current.AvgCPUUtilization'), 1, false, '%')}
+            </div>}
+          {isProject && <div>&nbsp;</div>}
         </td>}
       {type === 'resource' &&
         <td className="number">
-          {normalizeValue(_.get(stats, 'predicted.targetInstances50'), 1)}
+          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances50'), 1)}
         </td>}
       {type === 'resource' &&
         <td className="number">
-          {normalizeValue(_.get(stats, 'predicted.targetInstances80'), 1)}
+          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances80'), 1)}
         </td>}
       {type === 'resource' &&
         <td className="number">
-          {normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1)}
+          {!isProject &&
+            normalizeValue(_.get(stats, 'previous.AvgInstanceUptime') * 100, 1, true, '%')}
         </td>}
       {type === 'resource' &&
         <td className="number current">
-          <div>
-            <i
-              className="long arrow right icon"
-              style={getArrowStyles(
-                _.get(stats, 'previous.AvgInstanceUptime'),
-                _.get(stats, 'current.AvgInstanceUptime'),
-                true,
-              )}
-            />
-            {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false)}
-          </div>
+          {!isProject &&
+            <div>
+              <i
+                className="long arrow right icon"
+                style={getArrowStyles(
+                  _.get(stats, 'previous.AvgInstanceUptime'),
+                  _.get(stats, 'current.AvgInstanceUptime'),
+                  true,
+                )}
+              />
+              {normalizeValue(_.get(stats, 'current.AvgInstanceUptime') * 100, 1, false, '%')}
+            </div>}
         </td>}
       {type === 'resource' &&
         <td className="number predicted">
-          <div>
-            <i
-              className="long arrow right icon"
-              style={getArrowStyles(
-                _.get(stats, 'current.AvgInstanceUptime'),
-                _.get(stats, 'predicted.AvgInstanceUptime'),
-                true,
-              )}
-            />
-            {normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1)}
-          </div>
+          {!isProject &&
+            <div>
+              <i
+                className="long arrow right icon"
+                style={getArrowStyles(
+                  _.get(stats, 'current.AvgInstanceUptime'),
+                  _.get(stats, 'predicted.AvgInstanceUptime'),
+                  true,
+                )}
+              />
+              {normalizeValue(_.get(stats, 'predicted.AvgInstanceUptime') * 100, 1, true, '%')}
+            </div>}
         </td>}
     </tr>
   );

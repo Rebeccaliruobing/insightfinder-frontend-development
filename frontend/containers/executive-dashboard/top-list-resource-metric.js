@@ -143,10 +143,10 @@ class TopListResource extends React.Component {
                   Project/Group Name
                 </th>
                 <th className="subheader" colSpan={3}>
-                  CPU Utilization (%)
+                  CPU Utilization
                 </th>
                 <th className="subheader" colSpan={3}>
-                  Availability (%)
+                  Availability
                 </th>
               </tr>
               <tr>
