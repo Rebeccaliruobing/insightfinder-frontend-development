@@ -83,7 +83,7 @@ class EventTable extends React.PureComponent {
         }
       }
 
-      if (pageNo + bufferCount - 1 < pageCount) {
+      if (pageNo + bufferCount < pageCount - 1) {
         pages.push('...');
       }
       if (pageCount !== 1 && pageNo !== pageCount) {
