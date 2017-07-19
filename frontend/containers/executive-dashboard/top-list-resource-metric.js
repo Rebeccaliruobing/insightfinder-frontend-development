@@ -137,7 +137,7 @@ class TopListResource extends React.Component {
                     paddingLeft: '0.5em',
                     textAlign: 'left',
                     borderLeft: '2px solid #566f84',
-                    width: '40%',
+                    width: '30%',
                   }}
                 >
                   Project/Group Name
@@ -155,7 +155,7 @@ class TopListResource extends React.Component {
                     paddingLeft: '0.5em',
                     textAlign: 'left',
                     borderLeft: '2px solid #566f84',
-                    width: '40%',
+                    width: '30%',
                   }}
                 />
                 <th>
@@ -164,11 +164,11 @@ class TopListResource extends React.Component {
                     {timeIntervalCurrent}
                   </span>
                 </th>
-                <th>
+                <th style={{ fontSize: 12 }}>
                   <span>Target Instance Number</span>
                   <span className="interval">(50% CPU Utilization)</span>
                 </th>
-                <th>
+                <th style={{ fontSize: 12 }}>
                   <span>Target Instance Number</span>
                   <span className="interval">(80% CPU Utilization)</span>
                 </th>
