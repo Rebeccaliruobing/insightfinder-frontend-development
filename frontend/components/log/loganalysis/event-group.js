@@ -175,7 +175,6 @@ class EventGroup extends React.Component {
               )}
             </div>
           </div>}
-        <div className="spacer" />
         <EventTable
           className="flex-item"
           highlightWord={highlightWord}

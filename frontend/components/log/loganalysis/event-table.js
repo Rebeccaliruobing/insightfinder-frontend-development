@@ -94,8 +94,8 @@ class EventTable extends React.PureComponent {
     return (
       <div className="flex-col">
         {showPaging &&
-          <div style={{ textAlign: 'right', paddingBottom: 4 }}>
-            <div className="ui pagination menu" style={{ fontSize: 12, boxShadow: 'none' }}>
+          <div style={{ textAlign: 'right', paddingBottom: 2 }}>
+            <div className="ui tiny pagination menu" style={{ boxShadow: 'none' }}>
               {R.addIndex(R.map)((p, idx) => {
                 if (p === '...') {
                   return (
