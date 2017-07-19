@@ -65,6 +65,8 @@ const getLogIncidentList = (credentials: Credentials, projectName: String, param
         name: startTime.format('YYYY-MM-DD'),
         totalEventsCount: i.logentrycount,
         rareEventsCount: i.rareEventsSize,
+        anomalyHigherCount: i.anomalyHigherCount,
+        anomalyLowerCount: i.anomalyLowerCount,
         clusterCount: (i.cluster || []).length,
       });
       monthObj.add(1, 'day');
