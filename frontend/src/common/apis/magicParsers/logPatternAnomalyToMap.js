@@ -42,7 +42,7 @@ const logPatternAnomalyToMap = derivedAnomalyString => {
           }
 
           R.forEach(hint => {
-            const hintRegex = /.*neuron\s*(\d*).*\(([0-9.]*)\).*\(([0-9.]*)\).*/gi;
+            const hintRegex = /.*neuron\s*(\d*).*\(([0-9.]*)\).*\(([-]?[0-9.]*)\).*/gi;
             const matches = hintRegex.exec(hint);
             if (!matches || matches.length !== 4) {
               console.error(
