@@ -482,26 +482,22 @@ class LogAnalysisCore extends React.PureComponent {
                         </OverlayTrigger>
                       </div>}
                     <div className="content">
-                      <div className="text-center" style={{ height: 36 }}>
-                        <span style={{ fontSize: 24, float: 'left', color: 'grey' }}>
-                          {ic.dayOfMonth}
-                        </span>
-                        <div
-                          style={{ display: 'inline-block', lineHeight: '36px', float: 'right' }}
-                        >
-                          <div
-                            className="label"
-                            style={{ display: 'inline-block', paddingRight: 10 }}
-                          >
-                            Total Events:
-                          </div>
-                          <div style={{ float: 'right' }}>
-                            {ic.totalEventsCount}
-                          </div>
-                        </div>
+                      <div
+                        className="text-center"
+                        style={{ float: 'left', fontSize: 32, width: 42, color: 'grey' }}
+                      >
+                        {ic.dayOfMonth}
                       </div>
                       {!ic.isEmpty &&
-                        <div style={{ paddingLeft: 8 }}>
+                        <div style={{ marginLeft: 48, paddingTop: 12 }}>
+                          <div>
+                            <div className="label" style={{ display: 'inline-block' }}>
+                              Total Events:
+                            </div>
+                            <div style={{ float: 'right' }}>
+                              {ic.totalEventsCount}
+                            </div>
+                          </div>
                           <div>
                             <div className="label" style={{ display: 'inline-block' }}>
                               Clusters:
@@ -520,18 +516,10 @@ class LogAnalysisCore extends React.PureComponent {
                           </div>
                           <div>
                             <div className="label" style={{ display: 'inline-block' }}>
-                              Anomaly Higher Count:
+                              Bursty Events:
                             </div>
                             <div style={{ float: 'right' }}>
                               {ic.anomalyHigherCount}
-                            </div>
-                          </div>
-                          <div>
-                            <div className="label" style={{ display: 'inline-block' }}>
-                              Anomaly Lower Count:
-                            </div>
-                            <div style={{ float: 'right' }}>
-                              {ic.anomalyLowerCount}
                             </div>
                           </div>
                         </div>}
