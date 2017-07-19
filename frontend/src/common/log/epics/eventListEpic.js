@@ -16,7 +16,7 @@ import { apiEpicErrorHandle } from '../../errors';
 import { setLogInfo } from '../actions';
 
 const logEventListEpic = (action$: any, { getState }: Deps) =>
-  action$.ofType('LOAD_LOG_EVENTLIST').concatMap((action) => {
+  action$.ofType('LOAD_LOG_EVENTLIST').concatMap(action => {
     const state = getState();
     const { projectName, view, params, components } = action.payload;
     const { credentials } = state.auth;
@@ -24,20 +24,21 @@ const logEventListEpic = (action$: any, { getState }: Deps) =>
     const viewsState = state.log.viewsState || {};
 
     const apiAction$ = Observable.from(loadLogEventList(credentials, projectName, params))
-      .concatMap((d) => {
+      .concatMap(d => {
         return Observable.of(
           setLogInfo({
             viewsState: {
               ...viewsState,
               [view]: {
                 ...get(viewsState, view, {}),
-                currentEventList: d.data,
+                currentEventList: d.data.events,
+                currentEventTotalCount: d.data.totalCount,
               },
             },
           }),
         );
       })
-      .catch((err) => {
+      .catch(err => {
         return apiEpicErrorHandle(err);
       });
 

@@ -5,7 +5,7 @@
   width: 100%;
   .title {
     margin-bottom: 0.5em;
-    color: #4183C4;
+    color: #4183c4;
     cursor: pointer;
     font-size: 16px;
     font-weight: bold;
@@ -25,7 +25,7 @@
     padding: 0 0.25em 0 0.25em;
     display: inline-block;
     line-height: 20px;
-    color: #4183C4;
+    color: #4183c4;
     &:after {
       position: absolute;
       content: ',';
@@ -52,7 +52,8 @@
   border: 2px solid black;
   border-top-width: 0;
   table-layout: fixed;
-  td, th {
+  td,
+  th {
     border-right: 1px solid black;
     text-align: left;
     vertical-align: top;
@@ -66,6 +67,7 @@
   }
   td {
     border-top: 1px solid black;
+    word-break: break-all;
   }
   .highlight {
     background-color: yellow;
@@ -82,8 +84,8 @@
     border-right: 1px solid rgba(34, 36, 38, 0.45);
   }
   .bar {
-    background: #2185D0;
-    height: 16px; 
+    background: #2185d0;
+    height: 16px;
     color: white;
     line-height: 16px;
     font-size: 12px;
@@ -92,7 +94,7 @@
     cursor: pointer;
     vertical-align: middle;
     &:hover {
-      background: #2185D0;
+      background: #2185d0;
     }
   }
   .listbar-item {
@@ -116,7 +118,7 @@
         visibility: visible;
       }
       .bar {
-        background-color: #F2711C;
+        background-color: #f2711c;
       }
     }
     &.active {
@@ -125,7 +127,7 @@
         width: 4px;
       }
       .bar {
-        background-color: #F2711C;
+        background-color: #f2711c;
       }
     }
     &:before {
@@ -133,7 +135,7 @@
       position: absolute;
       width: 2px;
       height: 100%;
-      background-color: #F2711C;
+      background-color: #f2711c;
       top: 0;
       visibility: hidden;
     }
@@ -179,7 +181,7 @@
 .event-table {
   border: 2px solid black;
   width: 90%;
-  td{
+  td {
     border-right: 1px solid black;
     border-top: 1px solid black;
     text-align: left;
@@ -208,7 +210,7 @@
 .event-right-table {
   border: 2px solid black;
   width: 80%;
-  td{
+  td {
     border-right: 1px solid black;
     border-top: 1px solid black;
     text-align: left;
@@ -234,7 +236,7 @@
 .rare-event-table {
   border: 2px solid black;
   width: 60%;
-  td{
+  td {
     border-right: 1px solid black;
     border-top: 1px solid black;
     text-align: left;
@@ -257,7 +259,7 @@
 .vector-table {
   border: 2px solid black;
   width: 60%;
-  td{
+  td {
     border-right: 1px solid black;
     border-top: 1px solid black;
     text-align: left;
@@ -266,14 +268,14 @@
     &:nth-child(1) {
       border-top: none;
       font-weight: bold;
-      td{
-        &:nth-child(1){
+      td {
+        &:nth-child(1) {
           width: 20%;
         }
-        &:nth-child(2){
+        &:nth-child(2) {
           width: 60%;
         }
-        &:nth-child(3){
+        &:nth-child(3) {
           width: 20%;
         }
       }
@@ -282,10 +284,10 @@
 }
 
 .freq-event-table {
-  margin-left: 50px;    
+  margin-left: 50px;
   border: 2px solid black;
   width: 80%;
-  td{
+  td {
     border-right: 1px solid black;
     border-top: 1px solid black;
     text-align: left;
@@ -306,11 +308,11 @@
 }
 
 .pattern-sequence.ui.table {
-  .ui.horizontal.bulleted.list>.item {
+  .ui.horizontal.bulleted.list > .item {
     cursor: pointer;
     &:before {
       content: '→';
-      color: #2185D0;
+      color: #2185d0;
     }
   }
 }

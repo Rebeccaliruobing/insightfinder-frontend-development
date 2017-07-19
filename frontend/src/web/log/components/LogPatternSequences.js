@@ -22,6 +22,7 @@ type Props = {
   incidentId: String,
   startTimeMillis: Number,
   endTimeMillis: Number,
+  currentEventTotalCount: Number,
   currentPatternId: String,
   currentSequenceId: String,
   currentEventList: Array<Object>,
@@ -42,10 +43,12 @@ class LogPatternSequences extends React.PureComponent {
     this.viewName = 'seq';
     this.statePath = 'sequences';
     this.loadingComponentPath = 'log_seq_eventlist';
+    this.pageSize = 50;
 
     this.state = {
       showNameModal: false,
       newPatternName: '',
+      pageNo: 1,
     };
   }
 
@@ -99,7 +102,7 @@ class LogPatternSequences extends React.PureComponent {
     loadLogEventList(
       projectName,
       this.viewName,
-      { startTimeMillis, endTimeMillis, patternId },
+      { startTimeMillis, endTimeMillis, patternId, pageNo: 1, pageSize: this.pageSize },
       { [this.loadingComponentPath]: true },
     );
   }
@@ -139,9 +142,34 @@ class LogPatternSequences extends React.PureComponent {
     });
   }
 
+  @autobind
+  handlePageChanged(pageNo) {
+    const {
+      projectName,
+      startTimeMillis,
+      endTimeMillis,
+      currentPatternId,
+      loadLogEventList,
+    } = this.props;
+    this.setState({ pageNo });
+    loadLogEventList(
+      projectName,
+      this.viewName,
+      {
+        startTimeMillis,
+        endTimeMillis,
+        patternId: currentPatternId,
+        pageNo,
+        pageSize: this.pageSize,
+      },
+      { [this.loadingComponentPath]: true },
+    );
+  }
+
   render() {
     const sequences = get(this.props.data, this.statePath, []);
     const eventList = this.props.currentEventList || [];
+    const totalCount = this.props.currentEventTotalCount;
     const sequenceEventList = this.props.currentSequenceEventList || [];
     const {
       currentPatternId,
@@ -160,6 +188,7 @@ class LogPatternSequences extends React.PureComponent {
       x => x,
       'Pattern name cannot be empty',
     );
+    const { pageNo } = this.state;
 
     const nameRender = ({ rowData }) => {
       if (rowData.isPattern) {
@@ -272,6 +301,10 @@ class LogPatternSequences extends React.PureComponent {
                     className="flex-item flex-col-container"
                     keywords={get(sequenceInfo, 'keywords', [])}
                     episodes={get(sequenceInfo, 'episodes', [])}
+                    totalCount={totalCount}
+                    pageSize={this.pageSize}
+                    pageNo={pageNo}
+                    onPageChanged={this.handlePageChanged}
                     eventDataset={eventList}
                     showFE
                   />}

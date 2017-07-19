@@ -111,15 +111,18 @@ class LogFrequencyAnomalies extends React.PureComponent {
       if (idx >= 0) {
         startTs = freqTsData[idx][0].valueOf();
 
+        const eidx = R.findIndex(f => f[1] > 0, R.slice(idx, Infinity, freqTsData));
         // Check the next item still exist
-        if (idx < freqTsData.length - 1) {
-          endTs = freqTsData[idx + 1][0].valueOf();
+        if (eidx > idx) {
+          endTs = freqTsData[eidx] ? freqTsData[eidx][0].valueOf() : null;
         }
       }
     } else {
       const idx = R.findIndex(f => f[0].valueOf() === startTs, freqTsData);
-      if (idx >= 0) {
-        endTs = freqTsData[idx + 1] ? freqTsData[idx + 1][0].valueOf() : null;
+      const eidx = R.findIndex(f => f[1] > 0, R.slice(idx, Infinity, freqTsData));
+      // Check the next item still exist
+      if (eidx > idx) {
+        endTs = freqTsData[eidx] ? freqTsData[eidx][0].valueOf() : null;
       }
     }
 
@@ -137,7 +140,7 @@ class LogFrequencyAnomalies extends React.PureComponent {
       eventList = R.filter(e => e.datetime >= startTs, eventList);
     }
     if (endTs) {
-      eventList = R.filter(e => e.datetime < endTs, eventList);
+      eventList = R.filter(e => e.datetime <= endTs, eventList);
     }
 
     const anomaly = get(patternInfo, ['anomalies', startTs]);

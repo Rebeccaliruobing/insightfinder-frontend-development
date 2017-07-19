@@ -16,6 +16,10 @@ type Props = {
   nameEditable: Boolean,
   showFE: Boolean,
   highlightWord: ?String,
+  totalCount: Number,
+  pageSize: Number,
+  pageNo: Number,
+  onPageChanged: Function,
 };
 
 class EventGroup extends React.Component {
@@ -88,9 +92,30 @@ class EventGroup extends React.Component {
   }
 
   render() {
-    const { name, className, nameEditable, keywords, episodes, showFE, ...others } = this.props;
+    const {
+      name,
+      className,
+      nameEditable,
+      keywords,
+      episodes,
+      showFE,
+      totalCount,
+      pageSize,
+      pageNo,
+      onPageChanged,
+      ...others
+    } = this.props;
     const normalizedEvents = this.normalizedEvents;
-    const props = _.omit(others, 'onNameChanged', 'eventDataset', 'highlightWord');
+    const props = _.omit(
+      others,
+      'onNameChanged',
+      'eventDataset',
+      'highlightWord',
+      'totalCount',
+      'pageSize',
+      'pageNo',
+      'onPageChanged',
+    );
     const { highlightWord } = this.state;
     const count = normalizedEvents.length;
     const timeRange =
@@ -112,10 +137,10 @@ class EventGroup extends React.Component {
             {timeRange}
           </span>
           <span style={{ float: 'right' }}>
-            {count}
+            {totalCount || count}
           </span>
           <span className="label" style={{ float: 'right', marginRight: '1em' }}>
-            Number of Events:{' '}
+            Total Events:{' '}
           </span>
         </div>
         {showFE &&
@@ -155,6 +180,10 @@ class EventGroup extends React.Component {
           className="flex-item"
           highlightWord={highlightWord}
           eventDataset={normalizedEvents}
+          totalCount={totalCount}
+          pageSize={pageSize}
+          pageNo={pageNo}
+          onPageChanged={onPageChanged}
         />
       </div>
     );

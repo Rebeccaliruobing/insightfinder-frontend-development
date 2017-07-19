@@ -28,6 +28,7 @@ type Props = {
   incidentId: String,
   startTimeMillis: Number,
   endTimeMillis: Number,
+  currentEventTotalCount: Number,
   currentPatternId: String,
   currentEventList: Array<Object>,
   selectLogPattern: Function,
@@ -42,9 +43,11 @@ class LogClusters extends React.Component {
     super(props);
     this.viewName = 'cluster';
     this.loadingComponentPath = 'log_cluster_eventlist';
+    this.pageSize = 50;
     this.state = {
       showNameModal: false,
       newPatternName: '',
+      pageNo: 1,
     };
   }
 
@@ -76,6 +79,7 @@ class LogClusters extends React.Component {
 
   @autobind
   reloadPattern(props, patternId) {
+    this.setState({ pageNo: 1 });
     const {
       projectName,
       startTimeMillis,
@@ -87,7 +91,31 @@ class LogClusters extends React.Component {
     loadLogEventList(
       projectName,
       this.viewName,
-      { startTimeMillis, endTimeMillis, patternId },
+      { startTimeMillis, endTimeMillis, patternId, pageNo: 1, pageSize: this.pageSize },
+      { [this.loadingComponentPath]: true },
+    );
+  }
+
+  @autobind
+  handlePageChanged(pageNo) {
+    const {
+      projectName,
+      startTimeMillis,
+      endTimeMillis,
+      currentPatternId,
+      loadLogEventList,
+    } = this.props;
+    this.setState({ pageNo });
+    loadLogEventList(
+      projectName,
+      this.viewName,
+      {
+        startTimeMillis,
+        endTimeMillis,
+        patternId: currentPatternId,
+        pageNo,
+        pageSize: this.pageSize,
+      },
       { [this.loadingComponentPath]: true },
     );
   }
@@ -121,6 +149,7 @@ class LogClusters extends React.Component {
   render() {
     const patterns = get(this.props.data, 'patterns', []);
     const eventList = this.props.currentEventList || [];
+    const totalCount = this.props.currentEventTotalCount;
     const {
       currentPatternId,
       projectName,
@@ -130,6 +159,7 @@ class LogClusters extends React.Component {
     } = this.props;
     const patternInfo = R.find(p => p.nid === currentPatternId, patterns) || {};
     const isLoading = get(this.props.currentLoadingComponents, this.loadingComponentPath, false);
+    const { pageNo } = this.state;
 
     const { showNameModal } = this.state;
     const newPatternNameLink = VLink.state(this, 'newPatternName').check(
@@ -212,6 +242,10 @@ class LogClusters extends React.Component {
                   className="flex-item flex-col-container"
                   eventDataset={eventList}
                   showFE
+                  totalCount={totalCount}
+                  pageSize={this.pageSize}
+                  pageNo={pageNo}
+                  onPageChanged={this.handlePageChanged}
                   keywords={get(patternInfo, 'keywords', [])}
                   episodes={get(patternInfo, 'episodes', [])}
                 />}

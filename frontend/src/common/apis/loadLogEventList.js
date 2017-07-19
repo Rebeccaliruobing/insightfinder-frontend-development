@@ -29,6 +29,7 @@ const loadLogEventList = (credentials: Credentials, projectName: String, params:
 
     const rawData = d;
     let events = get(rawData, 'eventArray', []);
+    const totalCount = get(rawData, 'totalMatched', events.length);
     events = R.map(e => {
       const etimeVal = moment(e.timestamp).valueOf();
       return {
@@ -40,7 +41,10 @@ const loadLogEventList = (credentials: Credentials, projectName: String, params:
 
     return {
       rawData,
-      data: events,
+      data: {
+        totalCount,
+        events,
+      },
     };
   });
 };
