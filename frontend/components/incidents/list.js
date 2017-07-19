@@ -526,6 +526,7 @@ class IncidentsList extends React.Component {
         token,
         projectName,
         projectType,
+        modelType: 'Holistic',
         instanceGroup,
         asofTimestamp: startTime.valueOf(),
         windowMillis: numberOfDays * 24 * 60 * 1000,
