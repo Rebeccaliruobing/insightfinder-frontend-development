@@ -501,7 +501,7 @@ class LogAnalysisCore extends React.PureComponent {
                         </div>
                       </div>
                       {!ic.isEmpty &&
-                        <div>
+                        <div style={{ paddingLeft: 8 }}>
                           <div>
                             <div className="label" style={{ display: 'inline-block' }}>
                               Clusters:
