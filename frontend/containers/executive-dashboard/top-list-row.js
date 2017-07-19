@@ -230,11 +230,11 @@ const ListRow = ({
         </td>}
       {type === 'resource' &&
         <td className="number">
-          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances50'), 1)}
+          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances50'), 0)}
         </td>}
       {type === 'resource' &&
         <td className="number">
-          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances80'), 1)}
+          {!isProject && normalizeValue(_.get(stats, 'predicted.targetInstances80'), 0)}
         </td>}
       {type === 'resource' &&
         <td className="number">
