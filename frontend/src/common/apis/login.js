@@ -16,6 +16,7 @@ const login = ({ userName, password, params }) => {
     userName,
     password,
     timezoneOffset,
+    timezone,
   }).then(d => ({
     credentials: {
       userName: d.data.userName,
