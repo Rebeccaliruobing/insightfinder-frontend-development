@@ -50,7 +50,7 @@ class SystemGeneral extends React.Component {
     return (
       <Container fullHeight className="overflow-y-auto">
         <form className={`ui ${hasError ? 'error' : ''} form`} style={{ fontSize: 12, width: 800 }}>
-          <h3>Defualt Timezone</h3>
+          <h3>Default Timezone</h3>
           <p>
             Select the default timezone for the system. The timezone will affect the email
             notification,

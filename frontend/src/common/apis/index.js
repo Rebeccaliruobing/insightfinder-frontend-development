@@ -41,5 +41,6 @@ export { default as newExternalService } from './newExternalService';
 export { default as newGoogleProject } from './newGoogleProject';
 export { default as newNewRelicProject } from './newNewRelicProject';
 export { default as postLogPatternName } from './postLogPatternName';
+export { default as postDefaultTimezone } from './postDefaultTimezone';
 export { default as updateProjectModel } from './updateProjectModel';
 export { default as saveProjectSettings } from './saveProjectSettings';

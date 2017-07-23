@@ -112,3 +112,21 @@ export const setProjectGroupList = (projectName: String, groupList: Array<String
     groupList,
   },
 });
+
+/**
+ * Update default timezone
+ */
+export const updateDefaultTimezone = (defaultTimezone: String, components: Object) => ({
+  type: 'UPDATE_DEFAULT_TIMEZONE',
+  payload: {
+    defaultTimezone,
+    components,
+  },
+});
+
+export const setDefaultTimezone = (defaultTimezone: String) => ({
+  type: 'SET_DEFAULT_TIMEZONE',
+  payload: {
+    defaultTimezone,
+  },
+});

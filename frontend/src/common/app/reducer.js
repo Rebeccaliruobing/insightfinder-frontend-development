@@ -31,6 +31,7 @@ const initialState = {
   lastError: null,
   alerts: [],
   projects: [],
+  defaultTimezone: '',
   filters: {},
   enabledDataSourceNames: [
     'AWSCloudWatch',
@@ -99,6 +100,7 @@ const reducer = (state: AppState = initialState, action: Action): AppState => {
       ...state,
       inited: true,
       projects: data.projects,
+      defaultTimezone: data.defaultTimezone,
     };
   } else if (action.type === 'APP_STOP') {
     return {
@@ -180,6 +182,12 @@ const reducer = (state: AppState = initialState, action: Action): AppState => {
       ...state,
       currentProjectName: projectName,
       currentProjectGroupList: groupList || [],
+    };
+  } else if (action.type === 'SET_DEFAULT_TIMEZONE') {
+    const { defaultTimezone } = action.payload;
+    return {
+      ...state,
+      defaultTimezone,
     };
   }
   return { ...initialState, ...state };

@@ -9,7 +9,7 @@ import { Observable } from 'rxjs/Observable';
 
 import type { Deps } from '../../types';
 import { getProjectList } from '../../apis';
-import { setProjectList } from '../actions';
+import { setProjectList, setInitData } from '../actions';
 import { apiEpicErrorHandle } from '../../errors';
 
 const projectEpic = (action$: any, { getState }: Deps) =>
@@ -18,10 +18,13 @@ const projectEpic = (action$: any, { getState }: Deps) =>
     const { credentials } = state.auth;
 
     return Observable.from(getProjectList(credentials))
-      .concatMap((d) => {
-        return Observable.of(setProjectList(d.data.projects));
+      .concatMap(d => {
+        return Observable.concat(
+          Observable.of(setInitData({ defaultTimezone: d.data.defaultTimezone })),
+          Observable.of(setProjectList(d.data.projects)),
+        );
       })
-      .catch((err) => {
+      .catch(err => {
         return apiEpicErrorHandle(err);
       });
   });

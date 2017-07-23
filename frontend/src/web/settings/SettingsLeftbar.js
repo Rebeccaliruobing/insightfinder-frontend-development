@@ -19,12 +19,13 @@ const SettingsLeftbarCore = ({ intl }: Props) => {
             {intl.formatMessage(settingsMenusMessages.projects)}
           </span>
         </NavLink>
-        <NavLink to={BaseUrls.SettingsSystem} className="item">
-          <i className="icon iconfont icon-icons01" />
-          <span>
-            {intl.formatMessage(settingsMenusMessages.system)}
-          </span>
-        </NavLink>
+        {false &&
+          <NavLink to={BaseUrls.SettingsSystem} className="item">
+            <i className="icon iconfont icon-icons01" />
+            <span>
+              {intl.formatMessage(settingsMenusMessages.system)}
+            </span>
+          </NavLink>}
         <NavLink to={BaseUrls.SettingsExternalServiceList} className="item">
           <i className="icon iconfont icon-puzzlepiece1" />
           <span>

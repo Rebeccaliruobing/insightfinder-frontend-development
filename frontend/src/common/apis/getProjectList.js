@@ -19,6 +19,7 @@ const getProjectList = (credentials: Credentials) => {
     const { userName } = credentials;
     // The basicProjectData contains the name => props map, convert to array.
     let projects = [];
+    const defaultTimezone = get(d.data, 'defaultTimezone', '');
     const basicProjectData = get(d.data, 'basicProjectData', {});
     R.forEachObjIndexed(val => {
       projects.push(val);
@@ -63,6 +64,7 @@ const getProjectList = (credentials: Credentials) => {
       rawData: d.data,
       data: {
         projects,
+        defaultTimezone,
       },
     };
   });
