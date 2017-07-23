@@ -1,34 +1,42 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { injectIntl } from 'react-intl';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
+import { get } from 'lodash';
+
+import { State } from '../../src/common/types';
 import { Modal, Dropdown } from '../../artui/react';
 import { Input } from '../../src/lib/fui/react';
 import { IncidentActionTaken } from '../selections';
+import { updateMetricEventPatternName } from '../../src/common/metric/actions';
 import apis from '../../apis';
 import './incident.less';
 
-class TakeActionModal extends React.Component {
+class TakeActionModalCore extends React.Component {
   shouldComponentUpdate(nextProps, nextState) {
     return shallowCompare(this, nextProps, nextState);
   }
 
   constructor(props) {
     super(props);
+    this.patternNameLoadingKey = 'metric_action_pattername';
     this.state = {
       action: 'ignore',
       oneTime: 'one-time',
       instanceId: undefined,
-      actionMap: {},
       customAction: undefined,
       textLoaded: true,
-      eventName: '',
+      patternName: '',
+      actionMap: {
+        ignore: 'ignore',
+        'scale-up': 'coldclone',
+        reboot: 'filterreboot',
+        migrate: 'dummy',
+        custom: 'custom',
+      },
     };
-    this.state.actionMap['ignore'] = 'ignore';
-    this.state.actionMap['scale-up'] = 'coldclone';
-    this.state.actionMap['reboot'] = 'filterreboot';
-    this.state.actionMap['migrate'] = 'dummy';
-    this.state.actionMap['custom'] = 'custom';
   }
 
   componentDidMount() {
@@ -44,8 +52,8 @@ class TakeActionModal extends React.Component {
   }
 
   loadTriageAction(props) {
-    let { incident, projectName } = props;
-    let eventType = incident.rootCauseJson.rootCauseTypes;
+    const { incident, projectName } = props;
+    const eventType = incident.rootCauseJson.rootCauseTypes;
     apis.loadTriageActionRecord(projectName, eventType).then(resp => {
       if (resp.found) {
         this.setState({
@@ -65,10 +73,10 @@ class TakeActionModal extends React.Component {
 
   @autobind
   handleTriageSave() {
-    let { incident, projectName } = this.props;
-    let { customAction } = this.state;
-    let eventType = incident.rootCauseJson.rootCauseTypes;
-    if (customAction != undefined) {
+    const { incident, projectName } = this.props;
+    const { customAction } = this.state;
+    const eventType = incident.rootCauseJson.rootCauseTypes;
+    if (customAction !== undefined) {
       apis.saveTriageActionRecord(projectName, eventType, customAction).then(resp => {
         alert(resp.message);
       });
@@ -77,24 +85,25 @@ class TakeActionModal extends React.Component {
 
   @autobind
   handleSubmit() {
-    let { incident, projectName } = this.props;
+    const { incident, projectName } = this.props;
     let { instanceId, action } = this.state;
     let operation = 'dummy';
     if (this.state.actionMap[action]) {
       operation = this.state.actionMap[action];
     }
-    if (operation == '') {
+    if (operation === '') {
       alert('Ignoring this event.');
       return;
     }
     if (!instanceId && incident.anomalyMapJson) {
-      for (var k in incident.anomalyMapJson) {
-        if (!(operation == 'filterreboot' && instanceId == 'i-55d26464')) {
+      for (const k in incident.anomalyMapJson) {
+        if (!(operation === 'filterreboot' && instanceId === 'i-55d26464')) {
           instanceId = k;
           break;
         }
       }
     }
+
     if (instanceId) {
       apis.postUserAction(projectName, instanceId, operation).then(resp => {
         console.log(resp);
@@ -109,9 +118,55 @@ class TakeActionModal extends React.Component {
     }
   }
 
+  @autobind
+  handlePatternNameClick() {
+    const {
+      incident,
+      updateMetricEventPatternName,
+      projectName,
+      instanceGroup,
+      startTime,
+      endTime,
+      modelType,
+      eventType,
+    } = this.props;
+    const { patternName } = this.state;
+    updateMetricEventPatternName(
+      projectName,
+      {
+        nid: incident.neuronId,
+        patternName,
+        instanceGroup,
+        startTime,
+        endTime,
+        modelType,
+        eventType,
+      },
+      { [this.patternNameLoadingKey]: true },
+    );
+  }
+
   render() {
-    let { incident, projectName, ...rest } = this.props;
-    const eventNameLink = VLink.state(this, 'eventName');
+    const {
+      incident,
+      projectName,
+      instanceGroup,
+      startTime,
+      endTime,
+      modelType,
+      eventType,
+      intl,
+      currentLoadingComponents,
+      updateMetricEventPatternName,
+      ...rest
+    } = this.props;
+    const patternNameLink = VLink.state(this, 'patternName').check(
+      x => Boolean(x),
+      'Pattern name is required',
+    );
+    const hasError = patternNameLink.error;
+    const isSubmitting = get(currentLoadingComponents, this.patternNameLoadingKey, false);
+
     let { action, oneTime, instanceId, customAction, textLoaded } = this.state;
     let instances = Object.keys(incident.rootCauseByInstanceJson);
     let actions = [];
@@ -138,8 +193,14 @@ class TakeActionModal extends React.Component {
       <Modal {...rest} size="small" closable>
         <div className="content" style={{ paddingBottom: 0 }}>
           <h5 style={{ display: 'inline-block', width: 80 }}>Name:</h5>
-          <Input valueLink={eventNameLink} style={{ width: 380 }} />
-          <div className="ui button orange" style={{ float: 'right', minWidth: 110 }}>
+          <Input valueLink={patternNameLink} style={{ width: 380 }} />
+          <div
+            className={`ui button ${isSubmitting ? 'loading' : ''} ${hasError
+              ? 'disabled'
+              : ''} orange`}
+            style={{ float: 'right', minWidth: 110 }}
+            {...(isSubmitting || hasError ? {} : { onClick: this.handlePatternNameClick })}
+          >
             Set Name
           </div>
         </div>
@@ -258,4 +319,13 @@ class TakeActionModal extends React.Component {
   }
 }
 
-export default TakeActionModal;
+const TakeActionModal = injectIntl(TakeActionModalCore);
+export default connect(
+  (state: State) => {
+    const { currentLoadingComponents } = state.app;
+    return {
+      currentLoadingComponents,
+    };
+  },
+  { updateMetricEventPatternName },
+)(TakeActionModal);

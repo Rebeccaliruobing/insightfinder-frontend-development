@@ -57,3 +57,12 @@ export const loadMetricEventSummary = (
   type: 'LOAD_METRIC_EVENT_SUMMARY',
   payload: { projectName, instanceGroup, params, force, loader },
 });
+
+export const updateMetricEventPatternName = (
+  projectName: String,
+  params: Object,
+  components: Object,
+): Action => ({
+  type: 'UPDATE_METRIC_EVENT_PATTERN_NAME',
+  payload: { projectName, params, components },
+});

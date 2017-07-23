@@ -567,6 +567,7 @@ class IncidentsList extends React.Component {
       projectName,
       instanceGroup,
       endTime,
+      modelType,
       eventEndTime,
       numberOfDays,
       predictionWindow,
@@ -575,6 +576,7 @@ class IncidentsList extends React.Component {
 
     const detectedIncidents = this.detectedIncidents;
     const predictedIncidents = this.predictedIncidents;
+    const startTime = moment(endTime).add(-1 * numberOfDays, 'day').valueOf();
 
     return (
       <div className="flex-col-container" style={{ height: '100%' }}>
@@ -670,6 +672,11 @@ class IncidentsList extends React.Component {
           <TakeActionModal
             incident={this.state.activeIncident}
             projectName={projectName}
+            instanceGroup={instanceGroup}
+            startTime={startTime}
+            endTime={endTime}
+            modelType={modelType}
+            eventType={activeTab}
             onClose={() => this.setState({ showTakeActionModal: false })}
           />}
         {this.state.showSysCall &&
