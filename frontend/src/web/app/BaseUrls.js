@@ -17,6 +17,9 @@ const BaseUrls = {
   MetricAnalysis: '/metric/analysis',
   MetricEvents: '/metric/events',
 
+  Causal: '/causal',
+  CausalAnalysis: '/causal/analysis',
+
   MetricAppForecast: '/metric/app-forecast',
   MetricLineCharts: '/metric/line-charts',
 

@@ -5,4 +5,4 @@
  * *****************************************************************************
  **/
 
-export { default as LogAnalysis } from './LogAnalysis';
+export { default as CausalAnalysis } from './CausalAnalysis';

@@ -14,6 +14,7 @@ import { Login } from '../auth';
 import { Help } from '../help';
 import { SinglePage } from '../app/components';
 import { MetricAnalysis, MetricEventSummary } from '../metric';
+import { CausalAnalysis } from '../causal';
 import { LogAnalysis } from '../log';
 import { BugRepository } from '../usecase';
 import {
@@ -66,6 +67,17 @@ const MetricRoutings = () => {
           render={() => React.createElement(liveMonitoringAppV1)}
         />
         <Redirect from="*" to={BaseUrls.MetricAnalysis} />
+      </Switch>
+    </SinglePage>
+  );
+};
+
+const CausalRoutings = () => {
+  return (
+    <SinglePage>
+      <Switch>
+        <Route path={BaseUrls.CausalAnalysis} component={CausalAnalysis} />
+        <Redirect from="*" to={BaseUrls.CausalAnalysis} />
       </Switch>
     </SinglePage>
   );
@@ -129,6 +141,7 @@ const PrivateRoutings = () =>
     />
 
     <Route path={BaseUrls.Metric} component={MetricRoutings} />
+    <Route path={BaseUrls.Causal} component={CausalRoutings} />
     <Route path={BaseUrls.Log} component={LogRoutings} />
     <Route path={BaseUrls.UsecaseBase} component={UseCaseRoutings} />
     <Route path={BaseUrls.Settings} component={SettingsRoutings} />

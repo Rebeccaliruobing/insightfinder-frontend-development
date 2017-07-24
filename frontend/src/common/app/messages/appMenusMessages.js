@@ -11,25 +11,13 @@ const appMenusMessages = defineMessages({
     defaultMessage: 'Metric Analysis',
     id: 'app.menus.metricAnalysis',
   },
+  causalAnalysis: {
+    defaultMessage: 'Causal Analysis',
+    id: 'app.menus.causalAnalysis',
+  },
   logAnalysis: {
     defaultMessage: 'Log Analysis',
     id: 'app.menus.logAnalysis',
-  },
-  streamLogAnalysis: {
-    defaultMessage: 'Stream Log Analysis',
-    id: 'app.menus.streamLogAnalysis',
-  },
-  historicalMetricAnalysis: {
-    defaultMessage: 'Historical Metric Analysis',
-    id: 'app.menus.historicalMetricAnalysis',
-  },
-  historicalLogAnalysis: {
-    defaultMessage: 'Historical Log Analysis',
-    id: 'app.menus.historicalLogAnalysis',
-  },
-  staticLogAnalysis: {
-    defaultMessage: 'Static Log Analysis',
-    id: 'app.menus.staticLogAnalysis',
   },
   settings: {
     defaultMessage: 'Settings',
