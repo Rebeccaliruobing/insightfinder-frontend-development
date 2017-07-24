@@ -25,6 +25,7 @@ const defaultSortColumn = 'id';
 const defaultSortDirection = 'desc';
 const columeStyles = {
   id: { width: '10%', minWidth: 64 },
+  name: { width: '15%', minWidth: 80 },
   anomalyRatio: { width: '15%', minWidth: 80 },
   startTimestamp: { width: '15%', minWidth: 80 },
   duration: { width: '15%', minWidth: 80, paddingRight: '1em', textAlign: 'right' },
@@ -272,7 +273,7 @@ class IncidentsList extends React.Component {
             <span>Id</span>
             <i className={`angle ${sortColumn === 'id' ? icon : ''} icon`} />
           </th>
-          <th style={columeStyles.id} onClick={this.changeSorting('id')}>
+          <th style={columeStyles.name}>
             <span>Name</span>
           </th>
           <th
@@ -404,8 +405,8 @@ class IncidentsList extends React.Component {
                     className={`icon angle ${mergedArrow}`}
                   />}
               </td>
-              <td style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.eventType }}>
-                {_.get(incident, 'patternName', `Pattern ${incident.id}`)}
+              <td style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.name }}>
+                {_.get(incident, 'patternName', `Pattern ${incident.neuronId}`)}
               </td>
               <td
                 style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.anomalyRatio }}
