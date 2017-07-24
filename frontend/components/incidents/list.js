@@ -406,7 +406,11 @@ class IncidentsList extends React.Component {
                   />}
               </td>
               <td style={{ paddingTop: '0.5em', ...columeStyles.name }}>
-                {_.get(incident, 'patternName', `Pattern ${incident.neuronId}`)}
+                {_.get(
+                  incident,
+                  'patternName',
+                  _.isNumber(incident.neuronId) ? `Pattern ${incident.neuronId}` : '',
+                )}
               </td>
               <td
                 style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.anomalyRatio }}

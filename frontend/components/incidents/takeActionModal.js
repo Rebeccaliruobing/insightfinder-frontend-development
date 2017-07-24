@@ -4,7 +4,7 @@ import { injectIntl } from 'react-intl';
 import shallowCompare from 'react-addons-shallow-compare';
 import { autobind } from 'core-decorators';
 import VLink from 'valuelink';
-import { get } from 'lodash';
+import { get, isNumber } from 'lodash';
 
 import { State } from '../../src/common/types';
 import { Modal, Dropdown } from '../../artui/react';
@@ -37,7 +37,11 @@ class TakeActionModalCore extends React.Component {
         migrate: 'dummy',
         custom: 'custom',
       },
-      patternName: get(props.incident, 'patternName', ''),
+      patternName: get(
+        props.incident,
+        'patternName',
+        isNumber(props.incident.neuronId) ? `Pattern ${props.incident.neuronId}` : '',
+      ),
     };
   }
 
