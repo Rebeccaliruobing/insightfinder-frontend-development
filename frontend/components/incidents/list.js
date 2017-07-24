@@ -272,6 +272,9 @@ class IncidentsList extends React.Component {
             <span>Id</span>
             <i className={`angle ${sortColumn === 'id' ? icon : ''} icon`} />
           </th>
+          <th style={columeStyles.id} onClick={this.changeSorting('id')}>
+            <span>Name</span>
+          </th>
           <th
             style={{ textAlign: 'center', ...columeStyles.anomalyRatio }}
             onClick={this.changeSorting('anomalyRatio')}
@@ -400,6 +403,9 @@ class IncidentsList extends React.Component {
                     style={{ cursor: 'pointer' }}
                     className={`icon angle ${mergedArrow}`}
                   />}
+              </td>
+              <td style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.eventType }}>
+                {_.get(incident, 'patternName', `Pattern ${incident.id}`)}
               </td>
               <td
                 style={{ textAlign: 'center', paddingTop: '0.5em', ...columeStyles.anomalyRatio }}
@@ -566,7 +572,9 @@ class IncidentsList extends React.Component {
     const {
       projectName,
       instanceGroup,
+      startTime,
       endTime,
+      actionEndTime,
       modelType,
       eventEndTime,
       numberOfDays,
@@ -576,7 +584,6 @@ class IncidentsList extends React.Component {
 
     const detectedIncidents = this.detectedIncidents;
     const predictedIncidents = this.predictedIncidents;
-    const startTime = moment(endTime).add(-1 * numberOfDays, 'day').valueOf();
 
     return (
       <div className="flex-col-container" style={{ height: '100%' }}>
@@ -675,6 +682,7 @@ class IncidentsList extends React.Component {
             instanceGroup={instanceGroup}
             startTime={startTime}
             endTime={endTime}
+            actionEndTime={actionEndTime}
             modelType={modelType}
             eventType={activeTab}
             onClose={() => this.setState({ showTakeActionModal: false })}

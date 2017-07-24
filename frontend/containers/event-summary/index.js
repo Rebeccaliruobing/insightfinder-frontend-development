@@ -661,7 +661,9 @@ class EventSummaryCore extends React.Component {
                     credentials={credentials}
                     instanceGroup={instanceGroup}
                     eventEndTime={eventEndTime}
+                    startTime={startTime.valueOf()}
                     endTime={realEndTime}
+                    actionEndTime={eventEndTime.valueOf()}
                     numberOfDays={numberOfDays}
                     modelType={modelType}
                     incidents={data.incidents}

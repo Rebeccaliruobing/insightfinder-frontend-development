@@ -22,6 +22,7 @@ class TakeActionModalCore extends React.Component {
   constructor(props) {
     super(props);
     this.patternNameLoadingKey = 'metric_action_pattername';
+    this.changed = false;
     this.state = {
       action: 'ignore',
       oneTime: 'one-time',
@@ -36,6 +37,7 @@ class TakeActionModalCore extends React.Component {
         migrate: 'dummy',
         custom: 'custom',
       },
+      patternName: get(props.incident, 'patternName', ''),
     };
   }
 
@@ -126,11 +128,12 @@ class TakeActionModalCore extends React.Component {
       projectName,
       instanceGroup,
       startTime,
-      endTime,
+      actionEndTime,
       modelType,
       eventType,
     } = this.props;
     const { patternName } = this.state;
+    this.changed = true;
     updateMetricEventPatternName(
       projectName,
       {
@@ -138,12 +141,21 @@ class TakeActionModalCore extends React.Component {
         patternName,
         instanceGroup,
         startTime,
-        endTime,
+        endTime: actionEndTime,
         modelType,
         eventType,
       },
       { [this.patternNameLoadingKey]: true },
     );
+  }
+
+  @autobind
+  handleClose() {
+    if (this.changed) {
+      window.location.reload();
+    } else {
+      this.props.onClose();
+    }
   }
 
   render() {
@@ -153,11 +165,13 @@ class TakeActionModalCore extends React.Component {
       instanceGroup,
       startTime,
       endTime,
+      actionEndTime,
       modelType,
       eventType,
       intl,
       currentLoadingComponents,
       updateMetricEventPatternName,
+      onClose,
       ...rest
     } = this.props;
     const patternNameLink = VLink.state(this, 'patternName').check(
@@ -190,7 +204,7 @@ class TakeActionModalCore extends React.Component {
     });
 
     return (
-      <Modal {...rest} size="small" closable>
+      <Modal {...rest} size="small" closable onClose={this.handleClose}>
         <div className="content" style={{ paddingBottom: 0 }}>
           <h5 style={{ display: 'inline-block', width: 80 }}>Name:</h5>
           <Input valueLink={patternNameLink} style={{ width: 380 }} />
