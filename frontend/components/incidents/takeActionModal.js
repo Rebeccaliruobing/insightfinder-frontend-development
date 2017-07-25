@@ -22,7 +22,7 @@ class TakeActionModalCore extends React.Component {
   constructor(props) {
     super(props);
     this.patternNameLoadingKey = 'metric_action_pattername';
-    this.changed = false;
+    this.nameChanged = false;
     this.state = {
       action: 'ignore',
       oneTime: 'one-time',
@@ -50,6 +50,12 @@ class TakeActionModalCore extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const { currentLoadingComponents, incident } = nextProps;
+    const isLoading = get(currentLoadingComponents, this.loadingComponentPath, false);
+    if (!isLoading && this.nameChanged) {
+      this.nameChanged = false;
+      nextProps.onNameChanged(this.state.patternName, incident.neuronId);
+    }
     this.loadTriageAction(nextProps);
   }
 
@@ -137,7 +143,7 @@ class TakeActionModalCore extends React.Component {
       eventType,
     } = this.props;
     const { patternName } = this.state;
-    this.changed = true;
+    this.nameChanged = true;
     updateMetricEventPatternName(
       projectName,
       {
@@ -155,11 +161,7 @@ class TakeActionModalCore extends React.Component {
 
   @autobind
   handleClose() {
-    if (this.changed) {
-      window.location.reload();
-    } else {
-      this.props.onClose();
-    }
+    this.props.onClose();
   }
 
   render() {
@@ -172,6 +174,7 @@ class TakeActionModalCore extends React.Component {
       actionEndTime,
       modelType,
       eventType,
+      onNameChanged,
       intl,
       currentLoadingComponents,
       updateMetricEventPatternName,

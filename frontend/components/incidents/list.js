@@ -576,6 +576,23 @@ class IncidentsList extends React.Component {
     const url = `/liveMonitoring?${$.param(params)}`;
     window.open(url, '_blank');
   }
+  @autobind
+  handlePatternNameChanged(name, neuronId) {
+    const detectedIncidents = this.detectedIncidents;
+    const predictedIncidents = this.predictedIncidents;
+
+    R.forEach(e => {
+      if (e.neuronId === neuronId) {
+        e.patternName = name;
+      }
+    }, detectedIncidents);
+
+    R.forEach(e => {
+      if (e.neuronId === neuronId) {
+        e.patternName = name;
+      }
+    }, predictedIncidents);
+  }
 
   render() {
     const {
@@ -692,6 +709,7 @@ class IncidentsList extends React.Component {
             startTime={startTime}
             endTime={endTime}
             actionEndTime={actionEndTime}
+            onNameChanged={this.handlePatternNameChanged}
             modelType={modelType}
             eventType={activeTab}
             onClose={() => this.setState({ showTakeActionModal: false })}
