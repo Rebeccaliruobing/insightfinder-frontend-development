@@ -409,7 +409,11 @@ class IncidentsList extends React.Component {
                 {_.get(
                   incident,
                   'patternName',
-                  _.isNumber(incident.neuronId) ? `Pattern ${incident.neuronId}` : '',
+                  _.isNumber(incident.neuronId)
+                    ? incident.neuronId === -1
+                      ? 'Threshold violation'
+                      : `Pattern ${incident.neuronId}`
+                    : '',
                 )}
               </td>
               <td
