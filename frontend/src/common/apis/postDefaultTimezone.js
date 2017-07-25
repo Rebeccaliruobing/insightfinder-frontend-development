@@ -11,7 +11,13 @@ import getEndpoint from './getEndpoint';
 import fetchPost from './fetchPost';
 
 const postDefaultTimezone = (credentials: Credentials, defaultTimezone: String) => {
-  const timezoneOffset = momenttz.tz.zone(defaultTimezone).offset(moment.utc());
+  let timezoneOffset = 0;
+  if (defaultTimezone && defaultTimezone !== 'default') {
+    timezoneOffset = -momenttz.tz.zone(defaultTimezone).offset(moment.utc());
+  } else {
+    defaultTimezone = '';
+  }
+
   return fetchPost(getEndpoint('system/updateTimezone'), {
     ...credentials,
     timezoneString: defaultTimezone,

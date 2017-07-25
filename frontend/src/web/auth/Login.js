@@ -34,10 +34,11 @@ class LoginCore extends React.Component {
     super(props);
 
     this.timezoneOptions = R.map(t => ({ label: t, value: t }), momenttz.tz.names());
+    this.timezoneOptions = [{ label: 'Default', value: 'default' }, ...this.timezoneOptions];
     this.state = {
       userName: '',
       password: '',
-      timezone: momenttz.tz.guess(),
+      timezone: 'default',
     };
   }
 

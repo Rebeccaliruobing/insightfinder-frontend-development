@@ -29,9 +29,10 @@ class AccountInfo extends React.PureComponent {
 
     this.timezoneLoadingKey = 'accountinfo_timezone';
     this.timezoneOptions = R.map(t => ({ label: t, value: t }), momenttz.tz.names());
+    this.timezoneOptions = [{ label: 'Default', value: 'default' }, ...this.timezoneOptions];
 
     this.state = {
-      defaultTimezone: props.defaultTimezone,
+      defaultTimezone: props.defaultTimezone || 'default',
     };
   }
 
@@ -40,7 +41,7 @@ class AccountInfo extends React.PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const defaultTimezone = get(nextProps, 'defaultTimezone', '');
+    const defaultTimezone = get(nextProps, 'defaultTimezone', 'default');
     if (defaultTimezone !== this.props.defaultTimezone) {
       this.setState({ defaultTimezone });
     }
