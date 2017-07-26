@@ -38,6 +38,7 @@ import {
   LogPatternSequences,
 } from './components';
 import './log.scss';
+import '../../../components/log/loganalysis/logevent.less';
 
 type Props = {
   intl: Object,
